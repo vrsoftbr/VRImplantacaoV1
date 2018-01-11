@@ -1,0 +1,472 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package vrimplantacao2.dao.interfaces;
+
+import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import vrimplantacao.classe.ConexaoMySQL;
+import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
+import vrimplantacao2.vo.importacao.ProdutoIMP;
+
+public class TopSystemDAO extends InterfaceDAO {
+
+    @Override
+    public String getSistema() {
+        return "TopSystem";
+    }
+
+    @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select codigo, descricao from cad_familia_produto order by codigo"
+            )) {
+                while (rst.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("codigo"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
+    }
+
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select codigo, descricao from cad_setor order by codigo"
+            )) {
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setMerc1ID(rst.getString("codigo"));
+                    imp.setMerc1Descricao(rst.getString("descricao"));
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos() throws Exception {
+        List<ProdutoIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    p.codigo codproduto,\n" +
+                    "    p.descricao,\n" +
+                    "    p.descricao_complementar,\n" +
+                    "    p.codigo_interno,   \n" +
+                    "    case trim(coalesce(p.cean,'')) when '' then p.codigo else trim(coalesce(p.cean,'')) end codbarras, \n" +
+                    "    case when p.pesavel in ('S', 'U') then 1 else 0 end pesavel,\n" +
+                    "    case p.pesavel when 'S' then 'KG' when 'U' then 'UN' else  p.unidade end unidade,\n" +
+                    "    p.peso_liquido_embalagem,\n" +
+                    "    p.peso_bruto_embalagem,\n" +
+                    "    p.grupo,\n" +
+                    "    p.class_fiscal_mercosul,\n" +
+                    "    p.preco_venda1,\n" +
+                    "    p.preco_custo,\n" +
+                    "    p.margem_lucro,\n" +
+                    "    p.validade,\n" +
+                    "    p.familia,\n" +
+                    "    p.inativo,\n" +
+                    "    p.familiaproduto,\n" +
+                    "    p.cest,\n" +
+                    "    p.estoque_minimo,\n" +
+                    "    est.qtde_atual,\n" +
+                    "    p.tribcontrib,\n" +
+                    "    p.contrmonaliqdif,\n" +
+                    "    p.contrmonaliqund,\n" +
+                    "    p.contrsubsttrib,\n" +
+                    "    p.contraliqzero,\n" +
+                    "    pis.cstcontrib_cod,\n" +
+                    "    p.st_ecf,\n" +
+                    "    trib.sit_trib,\n" +
+                    "    trib.pct_red_calc_icms,\n" +
+                    "    trib.aliq_icms\n" +
+                    "from\n" +
+                    "    cad_produto p\n" +
+                    "    join cad_empresa emp on emp.codigo = " + getLojaOrigem() + "\n" +
+                    "    inner join ger_tribcontribitem pis on pis.cod = p.tribcontrib\n" +
+                    "    left join trib_estado trib on trib.cod_prod = p.codigo and trib.uf = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n" +
+                    "    left join cad_estoque est on est.empresa = emp.codigo and est.codigo = p.codigo and est.tipo_estoque = 1\n" +
+                    "union \n" +
+                    "select\n" +
+                    "    p.codigo codproduto,\n" +
+                    "    p.descricao,\n" +
+                    "    p.descricao_complementar,\n" +
+                    "    p.codigo_interno,   \n" +
+                    "    p.codigo codbarras, \n" +
+                    "    case when p.pesavel in ('S', 'U') then 1 else 0 end pesavel,\n" +
+                    "    case p.pesavel when 'S' then 'KG' when 'U' then 'UN' else  p.unidade end unidade,\n" +
+                    "    p.peso_liquido_embalagem,\n" +
+                    "    p.peso_bruto_embalagem,\n" +
+                    "    p.grupo,\n" +
+                    "    p.class_fiscal_mercosul,\n" +
+                    "    p.preco_venda1,\n" +
+                    "    p.preco_custo,\n" +
+                    "    p.margem_lucro,\n" +
+                    "    p.validade,\n" +
+                    "    p.familia,\n" +
+                    "    p.inativo,\n" +
+                    "    p.familiaproduto,\n" +
+                    "    p.cest,\n" +
+                    "    p.estoque_minimo,\n" +
+                    "    est.qtde_atual,\n" +
+                    "    p.tribcontrib,\n" +
+                    "    p.contrmonaliqdif,\n" +
+                    "    p.contrmonaliqund,\n" +
+                    "    p.contrsubsttrib,\n" +
+                    "    p.contraliqzero,\n" +
+                    "    pis.cstcontrib_cod,\n" +
+                    "    p.st_ecf,\n" +
+                    "    trib.sit_trib,\n" +
+                    "    trib.pct_red_calc_icms,\n" +
+                    "    trib.aliq_icms\n" +
+                    "from\n" +
+                    "    cad_produto p\n" +
+                    "    join cad_empresa emp on emp.codigo = " + getLojaOrigem() + "\n" +
+                    "    inner join ger_tribcontribitem pis on pis.cod = p.tribcontrib\n" +
+                    "    left join trib_estado trib on trib.cod_prod = p.codigo and trib.uf = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n" +
+                    "    left join cad_estoque est on est.empresa = emp.codigo and est.codigo = p.codigo and est.tipo_estoque = 1"
+            )) {
+                while (rst.next()) {
+
+                    
+                    int cst;
+                    double aliquota = 0, reducao = 0;
+                    
+                    String icms = rst.getString("st_ecf");
+                    if (icms == null) {
+                        icms = "";
+                    }
+                    icms = icms.trim().toUpperCase();
+                    
+                    if (!"".equals(icms)) {
+                        switch (icms) {
+                            case "FF": cst = 60; break;
+                            case "II": cst = 40; break;
+                            case "NN": cst = 90; break;
+                            case "7,0": cst = 0; aliquota = 7; break;
+                            case "07": cst = 0; aliquota = 7; break;
+                            case "8,4": cst = 0; aliquota = 8.4; break;
+                            case "12,0": cst = 0; aliquota = 12; break;
+                            case "12": cst = 0; aliquota = 12; break;
+                            case "18,0": cst = 0; aliquota = 18; break;
+                            case "18": cst = 0; aliquota = 18; break;
+                            case "25,0": cst = 0; aliquota = 25; break;
+                            case "25": cst = 0; aliquota = 25; break;
+                            case "0,0": cst = 90; break;
+                            case "00": cst = 90; break;
+                            default: cst = 90; break;
+                        }  
+                    } else {
+                        cst = 90;
+                        aliquota = 0;
+                        reducao = 0;
+                    }
+
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("codproduto"));
+                    imp.setDescricaoCompleta(rst.getString("Descricao"));
+                    imp.setDescricaoReduzida(imp.getDescricaoCompleta());
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setEan(rst.getString("codBarras"));
+                    imp.seteBalanca(rst.getBoolean("pesavel"));
+                    imp.setTipoEmbalagem(rst.getString("unidade"));
+                    imp.setPesoLiquido(rst.getDouble("peso_liquido_embalagem"));
+                    imp.setPesoBruto(rst.getDouble("peso_bruto_embalagem"));
+                    imp.setCodMercadologico1(rst.getString("grupo"));
+                    imp.setNcm(rst.getString("class_fiscal_mercosul"));
+                    imp.setPrecovenda(rst.getDouble("preco_venda1"));
+                    imp.setCustoComImposto(rst.getDouble("Preco_Custo"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setMargem(rst.getDouble("Margem_Lucro"));
+                    imp.setValidade(rst.getInt("Validade"));
+                    imp.setSituacaoCadastro((rst.getInt("inativo") == 0 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
+                    imp.setIdFamiliaProduto(rst.getString("familiaproduto"));
+                    imp.setCest(rst.getString("cest"));
+                    imp.setEstoqueMinimo(rst.getDouble("estoque_minimo"));
+                    imp.setEstoque(rst.getDouble("qtde_atual"));
+                    imp.setPiscofinsCstDebito(rst.getInt("cstcontrib_cod"));
+                    imp.setPiscofinsCstCredito(0);
+                    if (!"0".equals(rst.getString("contraliqzero").trim())) {
+                        imp.setPiscofinsNaturezaReceita(rst.getInt("contraliqzero"));
+                    } else {
+                        imp.setPiscofinsNaturezaReceita(rst.getInt("contrmonaliqdif"));
+                    }
+                    imp.setIcmsCst(cst);
+                    imp.setIcmsAliq(aliquota);
+                    imp.setIcmsReducao(reducao);
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select Codigo, Nome, Razao_Social, Endereco, Numero,\n"
+                    + "       Complemento, Bairro, Cep, CPF_CNPJ, Insc_Estadual, \n"
+                    + "       DDD, Prefixo, Telefone, Fax, E_Mail, Site,\n"
+                    + "       Contato, municipio, uf, cod_oficial_mun, Celular\n"
+                    + "  from cad_fornecedor  \n"
+                    + " order by Codigo"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("Codigo"));
+                    imp.setRazao(rst.getString("Razao_Social"));
+                    imp.setFantasia(rst.getString("Nome"));
+                    imp.setCnpj_cpf(rst.getString("CPF_CNPJ"));
+                    imp.setIe_rg(rst.getString("Insc_Estadual"));
+                    imp.setEndereco(rst.getString("Endereco"));
+                    imp.setNumero(rst.getString("Numero"));
+                    imp.setComplemento(rst.getString("Complemento"));
+                    imp.setBairro(rst.getString("Bairro"));
+                    imp.setCep(rst.getString("Cep"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setTel_principal(rst.getString("DDD") + rst.getString("Telefone"));
+                    if ((rst.getString("Fax") != null)
+                            && (!rst.getString("Fax").trim().isEmpty())
+                            && (rst.getString("Fax").trim().length() > 5)) {
+                        imp.addContato("1",
+                                "FAX",
+                                Utils.formataNumero(rst.getString("Fax").trim()),
+                                "",
+                                TipoContato.COMERCIAL,
+                                "");
+                    }
+                    if ((rst.getString("E_Mail") != null)
+                            && (!rst.getString("E_Mail").trim().isEmpty())) {
+                        imp.addContato("2",
+                                "EMAIL",
+                                "",
+                                "",
+                                TipoContato.COMERCIAL,
+                                rst.getString("E_mail").trim()
+                        );
+                    }
+                    if ((rst.getString("Site") != null)
+                            && (!rst.getString("Site").trim().isEmpty())) {
+                        imp.addContato("3",
+                                "HOME PAGE",
+                                "",
+                                "",
+                                TipoContato.COMERCIAL,
+                                rst.getString("Site").trim()
+                        );
+                    }
+                    if ((rst.getString("Celular") != null)
+                            && (!rst.getString("Celular").trim().isEmpty())
+                            && (rst.getString("Celular").trim().length() > 5)) {
+                        imp.addContato("4",
+                                "CELULAR",
+                                "",
+                                Utils.formataNumero(rst.getString("Celular").trim()),
+                                TipoContato.COMERCIAL,
+                                "");
+                    }
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n" +
+                    "     pf.CodForn id_fornecedor,\n" +
+                    "     pf.Produto id_produto,     \n" +
+                    "     pf.ProdForn codigoexterno,     \n" +
+                    "     (select cv.FatorConv from cad_produto_fatconv cv where cv.codigo_produto = pf.Produto and cv.UnidMedida = 'CX' limit 1) qtdCX,     \n" +
+                    "     (select cv.FatorConv from cad_produto_fatconv cv where cv.codigo_produto = pf.Produto and cv.UnidMedida = 'DP' limit 1) qtdDP,     \n" +
+                    "     (select cv.FatorConv from cad_produto_fatconv cv where cv.codigo_produto = pf.Produto and cv.UnidMedida = 'PT' limit 1) qtdPT,     \n" +
+                    "     (select cv.FatorConv from cad_produto_fatconv cv where cv.codigo_produto = pf.Produto and cv.UnidMedida in ('PC', 'PCT') limit 1) qtdPCT,\n" +
+                    "     (select concat(cv.UnidMedida,'&&',cv.FatorConv) from cad_produto_fatconv cv where cv.codigo_produto = pf.Produto limit 1) qtdOutras\n" +
+                    "from \n" +
+                    "	cad_forn_prod pf\n" +
+                    "order by Produto "
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setIdProduto(rst.getString("id_produto"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    if (rst.getString("qtdCX") != null) {
+                        imp.setQtdEmbalagem(rst.getInt("qtdCX"));
+                    } else if (rst.getString("qtdDP") != null) {
+                        imp.setQtdEmbalagem(rst.getInt("qtdDP"));
+                    } else if (rst.getString("qtdPT") != null) {
+                        imp.setQtdEmbalagem(rst.getInt("qtdPT"));
+                    } else if (rst.getString("qtdPCT") != null) {
+                        imp.setQtdEmbalagem(rst.getInt("qtdPCT"));
+                    } else if (rst.getString("qtdOutras") != null) {
+                        String[] val = rst.getString("qtdOutras").split("&&");                        
+                        imp.setQtdEmbalagem(Utils.stringToDouble(val[1]));
+                    }
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> vResult = new ArrayList<>();
+        java.sql.Date dataCadastro = new Date(new java.util.Date().getTime());
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select Codigo, Nome_Reduzido, Razao_Social, Endereco, Numero, \n"
+                    + "       Complemento, Bairro, CEP, CPF_CNPJ, Data_Nascimento, \n"
+                    + "       Nome_Pai, Nome_Mae, Insc_Estadual_Rg, Insc_Municipal, \n"
+                    + "       DDD, Telefone, Ramal, Fax, E_Mail, Limite_Credito, Contato, Data_Cadastramento,\n"
+                    + "       Bloqueado, Celular, municipio, uf, cod_oficial_mun, Ativo, DDD_Celular\n"
+                    + "  from cad_cliente"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("Codigo"));
+                    imp.setRazao(rst.getString("Razao_Social"));
+                    imp.setFantasia(rst.getString("Nome_Reduzido"));
+                    imp.setEndereco(rst.getString("Endereco"));
+                    imp.setNumero(rst.getString("Numero"));
+                    imp.setComplemento(rst.getString("Complemento"));
+                    imp.setBairro(rst.getString("Bairro"));
+                    imp.setCep(rst.getString("CEP"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCnpj(rst.getString("CPF_CNPJ"));
+                    imp.setInscricaoestadual(rst.getString("Insc_Estadual_Rg"));
+                    imp.setNomePai(rst.getString("Nome_Pai"));
+                    imp.setNomeMae(rst.getString("Nome_Mae"));
+                    imp.setTelefone(rst.getString("DDD") + rst.getString("Telefone"));
+                    imp.setCelular(rst.getString("Celular"));
+                    imp.setEmail(rst.getString("E_Mail"));
+                    imp.setValorLimite(rst.getDouble("Limite_Credito"));
+                    imp.setBloqueado(!"N".equals(rst.getString("Bloqueado")));
+                    imp.setAtivo("S".equals(rst.getString("Ativo")));
+                    if ((rst.getString("Data_Cadastramento") != null)
+                            && (!rst.getString("Data_Cadastramento").trim().isEmpty())) {
+                        imp.setDataCadastro(rst.getDate("Data_Cadastramento"));
+                    } else {
+                        imp.setDataCadastro(dataCadastro);
+                    }
+                    if ((rst.getString("Fax") != null)
+                            && (!rst.getString("Fax").trim().isEmpty())
+                            && (rst.getString("Fax").trim().length() > 5)) {
+                        imp.addContato("1",
+                                "FAX",
+                                Utils.formataNumero(rst.getString("Fax")),
+                                "",
+                                "");
+                    }
+                    if ((rst.getString("Contato") != null)
+                            && (!rst.getString("Contato").trim().isEmpty())) {
+                        imp.addContato("2",
+                                "CONTATO",
+                                "",
+                                "",
+                                rst.getString("Contato").trim()
+                        );
+                    }
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select empresa, tipo_doc, serie, numero_doc, sequencia, cliente, data_emissao,\n"
+                    + "       data_vencimento, saldo, observacao\n"
+                    + "  from fiscal.mov_car\n"
+                    + " where empresa = " + getLojaOrigem() + " "
+                    + " and data_liquidacao is null;"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP vo = new CreditoRotativoIMP();
+                    vo.setId(
+                            rst.getString("empresa") + "-" +
+                            rst.getString("tipo_doc") + "-" +
+                            rst.getString("serie") + "-" +
+                            rst.getString("numero_doc") + "-" +
+                            rst.getString("sequencia")
+                    );
+                    vo.setDataEmissao(rst.getDate("data_emissao"));
+                    vo.setDataVencimento(rst.getDate("data_vencimento"));
+                    vo.setNumeroCupom(rst.getString("numero_doc"));
+                    vo.setIdCliente(rst.getString("cliente"));
+                    vo.setValor(rst.getDouble("saldo"));
+                    
+                    if ((rst.getString("observacao") != null) &&
+                            (!rst.getString("observacao").trim().isEmpty())) {
+                        vo.setObservacao(rst.getString("observacao").trim());
+                    }
+                    vResult.add(vo);
+                }
+            }
+        }
+        return vResult;
+    }
+    
+    
+
+    public List<Estabelecimento> getLojasCliente() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select empresa, Razao_Social  from cad_filial order by empresa"
+            )) {
+                while (rst.next()) {
+                    result.add(new Estabelecimento(rst.getString("empresa"), rst.getString("razao_social")));
+                }
+            }
+        }
+        return result;
+    }
+}

@@ -1,0 +1,61 @@
+package vrimplantacao.vo.venda;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class VendaVO {
+
+    public long id = 0;
+    public int idLoja = 0;
+    public long cnpjEmitente = 0;
+    public int numeroCupom = 0;
+    public int numeroNFCe = 0;
+    public int ecf = 0;
+    public String data = "";
+    public int idClientePreferencial = 0;
+    public int matricula = 0;
+    public String horaInicio = "";
+    public String horaTermino = "";
+    public boolean cancelado = false;
+    public double subTotal = 0;
+    public double subTotalImpressora = 0;
+    public int matriculaCancelamento = 0;
+    public int idTipoCancelamento = 0;
+    public long cpf = 0;
+    public long cpfCrm = 0;
+    public int contadorDoc = 0;
+    public double valorDesconto = 0;
+    public double valorAcrescimo = 0;
+    public boolean canceladoEmVenda = false;
+    public String numeroSerie = "";
+    public int mfAdicional = 0;
+    public String modeloImpressora = "";
+    public int numeroUsuario = 0;
+    public String nomeCliente = "";
+    public String enderecoCliente = "";
+    public int idClienteEventual = 0;
+    public int idVendedor = 0;
+    public boolean finalizado = false;
+    public boolean importado = false;
+    public List<VendaItemVO> vItem = new ArrayList();
+    public List<VendaFinalizadoraVO> vFinalizadora = new ArrayList();
+    public List<VendaKitVO> vKit = new ArrayList();
+    public VendaPromocaoCupomVO oPromocao = null;
+    public List<VendaPromocaoVO> vPromocao = new ArrayList();
+    public String xml = "";
+    public String chaveCFe = "";
+    public String chaveNfce = "";
+    public String protocoloRecebimentoNfce = "";
+    public String dataHoraEmissaoNfce = "";
+    public String dataHoraRecebimentoNfce = "";
+    public String reciboNfce = "";
+    public String QRCode = "";
+    public String razaoSocialEntidade = "";
+    public long cpfCnpjEntidade = 0;
+    public boolean transmitido = false;
+    public boolean contingencia = false;
+    public String protocoloCancelamentoNfce = "";
+    public String dataHoraCancelamentoNfce = "";
+    public String justificativaCancelamento = "";
+    public boolean baixarEstoque = false;
+}

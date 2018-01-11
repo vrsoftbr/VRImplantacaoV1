@@ -1,0 +1,26 @@
+update produto set tiponaturezareceita = 999 where id in( select id from produto where tiponaturezareceita not in  (select codigo from tiponaturezareceita where cst = 7)
+and id_tipopiscofins = 1);
+
+update produto set tiponaturezareceita = 403 where id in( select id from produto where tiponaturezareceita not in  (select codigo from tiponaturezareceita where cst = 4)
+and id_tipopiscofins = 3 );
+
+update produto set tiponaturezareceita = 999 where id in( select id from produto where tiponaturezareceita not in  (select codigo from tiponaturezareceita where cst = 8)
+and id_tipopiscofins = 8 );
+
+update produto set tiponaturezareceita = 409 where id in( select id from produto where tiponaturezareceita not in  (select codigo from tiponaturezareceita where cst = 5)
+and id_tipopiscofins = 2 );
+
+update produto set tiponaturezareceita = 403 where id in( select id from produto where tiponaturezareceita not in  (select codigo from tiponaturezareceita where cst = 2)
+and id_tipopiscofins = 5);
+
+update produto set tiponaturezareceita = 999 where id in( select id from produto where tiponaturezareceita not in  (select codigo from tiponaturezareceita where cst = 3)
+and id_tipopiscofins = 6);
+
+update produto set tiponaturezareceita = 999 where id in( select id from produto where tiponaturezareceita not in  (select codigo from tiponaturezareceita where cst = 6)
+and id_tipopiscofins = 7);
+
+
+update produto set tiponaturezareceita = null where tiponaturezareceita  =  0  and id_tipopiscofins = 0;
+
+
+update produto set tiponaturezareceita = null where tiponaturezareceita  =  0  and id_tipopiscofins = 9;

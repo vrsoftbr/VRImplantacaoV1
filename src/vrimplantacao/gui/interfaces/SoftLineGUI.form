@@ -1,0 +1,613 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.3" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JInternalFrameFormInfo">
+  <Properties>
+    <Property name="resizable" type="boolean" value="true"/>
+    <Property name="title" type="java.lang.String" value="Importa&#xe7;&#xe3;o SoftLine"/>
+    <Property name="toolTipText" type="java.lang.String" value=""/>
+  </Properties>
+  <SyntheticProperties>
+    <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
+  </SyntheticProperties>
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="vRPanel2" pref="652" max="32767" attributes="0"/>
+                  <Component id="vRPanel4" alignment="0" max="32767" attributes="0"/>
+                  <Component id="vRPanel1" alignment="0" pref="652" max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="vRToolBarPadrao3" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="vRButton1" min="-2" pref="31" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="562" max="-2" attributes="0"/>
+                      <Component id="vRToolBar1" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" attributes="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="vRToolBar1" min="-2" max="-2" attributes="0"/>
+                  <Component id="vRToolBarPadrao3" min="-2" max="-2" attributes="0"/>
+                  <Component id="vRButton1" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="vRPanel4" min="-2" pref="61" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="vRPanel1" pref="418" max="32767" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Component id="vRPanel2" min="-2" pref="63" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Container class="vrframework.bean.panel.VRPanel" name="vRPanel1">
+      <Properties>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+            <TitledBorder title="Dados Origem"/>
+          </Border>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[350, 350]"/>
+        </Property>
+      </Properties>
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="1" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="vRLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="flcArquivoProduto" alignment="0" min="-2" pref="300" max="-2" attributes="1"/>
+                          </Group>
+                          <EmptySpace max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <Component id="vRLabel7" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="215" max="-2" attributes="0"/>
+                              </Group>
+                              <Component id="flcArquivoFornecedor" max="32767" attributes="1"/>
+                          </Group>
+                      </Group>
+                      <Group type="102" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="vRLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="flcArquivoProdutoImposto" alignment="0" min="-2" pref="300" max="-2" attributes="1"/>
+                              <Component id="vRLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="flcArquivoProdutoCodBarra" alignment="0" min="-2" pref="300" max="-2" attributes="1"/>
+                              <Component id="vRLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="flcArquivoProdutoMargem" alignment="1" min="-2" pref="300" max="-2" attributes="1"/>
+                              <Component id="vRLabel5" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="flcArquivoProdutoCusto" alignment="0" min="-2" pref="300" max="-2" attributes="1"/>
+                              <Component id="vRLabel6" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="flcArquivoProdutoPreco" alignment="0" min="-2" pref="300" max="-2" attributes="1"/>
+                              <Component id="vRLabel14" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="flcArquivoProdutoNcm" alignment="0" min="-2" pref="300" max="-2" attributes="1"/>
+                              <Component id="vRLabel15" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="flcArquivoProdutoFornecedor" max="32767" attributes="1"/>
+                                      <Component id="vRLabel10" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="flcArquivoCidades" alignment="0" max="32767" attributes="1"/>
+                                      <Component id="flcArquivoMercadologico" max="32767" attributes="1"/>
+                                      <Component id="flcArquivoClientePreferencial" alignment="0" max="32767" attributes="1"/>
+                                      <Component id="vRLabel13" min="-2" max="-2" attributes="0"/>
+                                      <Component id="vRLabel12" min="-2" max="-2" attributes="0"/>
+                                      <Component id="vRLabel9" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="vRLabel11" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Group type="102" attributes="0">
+                                          <Component id="rdbMercadologico1" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <Component id="rdbMercadologico2" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <Component id="rdbMercadologico3" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Group type="102" attributes="0">
+                                          <EmptySpace min="-2" pref="149" max="-2" attributes="0"/>
+                                          <Component id="chkProdutosSemCodBarras" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Component id="flcArquivoDescMercadologico" alignment="0" max="32767" attributes="1"/>
+                                  </Group>
+                              </Group>
+                          </Group>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="flcArquivoAcertarMercadologico" min="-2" pref="300" max="-2" attributes="1"/>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="1" attributes="0">
+                      <Group type="102" attributes="0">
+                          <Component id="vRLabel7" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="flcArquivoFornecedor" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" attributes="0">
+                          <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="flcArquivoProduto" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="1" attributes="0">
+                      <Group type="102" attributes="0">
+                          <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="flcArquivoProdutoImposto" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Component id="flcArquivoProdutoFornecedor" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" alignment="1" attributes="0">
+                          <Component id="vRLabel10" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="vRLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="vRLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="flcArquivoProdutoCodBarra" min="-2" max="-2" attributes="0"/>
+                      <Component id="flcArquivoClientePreferencial" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="vRLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="vRLabel11" alignment="0" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="flcArquivoProdutoMargem" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="vRLabel5" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="flcArquivoCidades" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="vRLabel12" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="flcArquivoProdutoCusto" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="vRLabel6" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="flcArquivoMercadologico" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="vRLabel13" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <Component id="flcArquivoProdutoPreco" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="vRLabel14" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="flcArquivoProdutoNcm" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="vRLabel15" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
+                          <Component id="flcArquivoAcertarMercadologico" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" attributes="0">
+                          <Component id="flcArquivoDescMercadologico" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="rdbMercadologico1" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="rdbMercadologico2" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="rdbMercadologico3" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="chkProdutosSemCodBarras" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel3">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Arquivo Produto"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="flcArquivoProduto">
+          <Properties>
+            <Property name="obrigatorio" type="boolean" value="true"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel1">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Arquivo Produto Imposto - ICMS/Piscofins"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="flcArquivoProdutoImposto">
+          <Properties>
+            <Property name="obrigatorio" type="boolean" value="true"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="flcArquivoProdutoCodBarra">
+          <Properties>
+            <Property name="obrigatorio" type="boolean" value="true"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel2">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Arquivo Produto - Codigo Barras"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel4">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Arquivo Produto - Margem"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="flcArquivoProdutoMargem">
+          <Properties>
+            <Property name="obrigatorio" type="boolean" value="true"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="flcArquivoProdutoCusto">
+          <Properties>
+            <Property name="obrigatorio" type="boolean" value="true"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel5">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Arquivo Produto - Custo"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="flcArquivoProdutoPreco">
+          <Properties>
+            <Property name="obrigatorio" type="boolean" value="true"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel6">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Arquivo Produto - Pre&#xe7;o"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="flcArquivoFornecedor">
+          <Properties>
+            <Property name="obrigatorio" type="boolean" value="true"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel7">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Arquivo Fornecedor"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="flcArquivoClientePreferencial">
+          <Properties>
+            <Property name="obrigatorio" type="boolean" value="true"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel9">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Arquivo Cliente Preferencial"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel10">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Arquivo Produto Fornecedor"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="flcArquivoProdutoFornecedor">
+          <Properties>
+            <Property name="obrigatorio" type="boolean" value="true"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel11">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Arquivo - Acertar Cidade (Cliente e Fornecedor)"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="flcArquivoCidades">
+          <Properties>
+            <Property name="obrigatorio" type="boolean" value="true"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel12">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Mercadologico"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="flcArquivoMercadologico">
+          <Properties>
+            <Property name="obrigatorio" type="boolean" value="true"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="flcArquivoDescMercadologico">
+          <Properties>
+            <Property name="obrigatorio" type="boolean" value="true"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel13">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Mercadologico - Acertar Descri&#xe7;&#xe3;o"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.radioButton.VRRadioButton" name="rdbMercadologico1">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Mercadologico1"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rdbMercadologico1ActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="vrframework.bean.radioButton.VRRadioButton" name="rdbMercadologico2">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Mercadologico2"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rdbMercadologico2ActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutosSemCodBarras">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Produtos sem Codigo Barras"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="flcArquivoProdutoNcm">
+          <Properties>
+            <Property name="obrigatorio" type="boolean" value="true"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel14">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Arquivo Produto - Acertar Ncm"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.radioButton.VRRadioButton" name="rdbMercadologico3">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Mercadologico3"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rdbMercadologico3ActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel15">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Arquivo Produto - Acertar Mercadologico"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="flcArquivoAcertarMercadologico">
+          <Properties>
+            <Property name="obrigatorio" type="boolean" value="true"/>
+          </Properties>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Container class="vrframework.bean.toolBar.VRToolBar" name="vRToolBar1">
+      <Properties>
+        <Property name="rollover" type="boolean" value="true"/>
+      </Properties>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout"/>
+    </Container>
+    <Container class="vrframework.bean.panel.VRPanel" name="vRPanel4">
+      <Properties>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+            <TitledBorder title="Importar Arquivo Balan&#xe7;a"/>
+          </Border>
+        </Property>
+      </Properties>
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="rdbCadTxt" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="rdbTxtItens" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="rdbItensMgv" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="txtArquivoBalanca" min="-2" pref="297" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="btnImportarBalanca" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="1" attributes="0">
+                  <EmptySpace max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="btnImportarBalanca" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                          <Component id="rdbCadTxt" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="rdbTxtItens" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="rdbItensMgv" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Component id="txtArquivoBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace min="-2" pref="80" max="-2" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtArquivoBalanca">
+        </Component>
+        <Component class="vrframework.bean.radioButton.VRRadioButton" name="rdbCadTxt">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="CADTXT"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rdbCadTxtActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="vrframework.bean.radioButton.VRRadioButton" name="rdbTxtItens">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="TXTITENS"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rdbTxtItensActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="vrframework.bean.radioButton.VRRadioButton" name="rdbItensMgv">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="ITENSMGV"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rdbItensMgvActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="vrframework.bean.button.VRButton" name="btnImportarBalanca">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Importar"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnImportarBalancaActionPerformed"/>
+          </Events>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Component class="vrframework.bean.button.VRButton" name="vRButton1">
+      <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/vrframework/img/ignorar.png"/>
+        </Property>
+        <Property name="toolTipText" type="java.lang.String" value="Informa&#xe7;&#xf5;es"/>
+        <Property name="focusable" type="boolean" value="false"/>
+        <Property name="horizontalTextPosition" type="int" value="0"/>
+        <Property name="verticalTextPosition" type="int" value="3"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="vRButton1ActionPerformed"/>
+      </Events>
+    </Component>
+    <Container class="vrframework.bean.toolBarPadrao.VRToolBarPadrao" name="vRToolBarPadrao3">
+      <Properties>
+        <Property name="rollover" type="boolean" value="true"/>
+        <Property name="visibleImportar" type="boolean" value="true"/>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new vrframework.bean.toolBarPadrao.VRToolBarPadrao(this)"/>
+      </AuxValues>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout"/>
+    </Container>
+    <Container class="vrframework.bean.panel.VRPanel" name="vRPanel2">
+      <Properties>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+            <TitledBorder/>
+          </Border>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[350, 350]"/>
+        </Property>
+      </Properties>
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="vRLabel8" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="cmbLojaDestino" alignment="0" min="-2" pref="104" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="32767" attributes="0"/>
+                  <Component id="btnMigrar" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <Component id="vRLabel8" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="cmbLojaDestino" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <Group type="102" alignment="1" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="btnMigrar" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Component class="vrframework.bean.comboBox.VRComboBox" name="cmbLojaDestino">
+          <Properties>
+            <Property name="obrigatorio" type="boolean" value="true"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel8">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Loja"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.button.VRButton" name="btnMigrar">
+          <Properties>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/vrframework/img/importar.png"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Migrar"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="horizontalTextPosition" type="int" value="4"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMigrarActionPerformed"/>
+          </Events>
+        </Component>
+      </SubComponents>
+    </Container>
+  </SubComponents>
+</Form>
