@@ -1,5 +1,7 @@
 package vrimplantacao2.vo.cadastro.cliente;
 
+import vrimplantacao.utils.Utils;
+
 /**
  *
  * @author Leandro
@@ -31,15 +33,15 @@ public class ClienteEventualAnteriorVO {
     }
 
     public void setCnpj(String cnpj) {
-        this.cnpj = cnpj;
+        this.cnpj = Utils.acertarTexto(cnpj);
     }
 
     public void setIe(String ie) {
-        this.ie = ie;
+        this.ie = Utils.acertarTexto(ie);
     }
 
     public void setNome(String nome) {
-        this.nome = nome;
+        this.nome = Utils.acertarTexto(nome);
     }
 
     public void setForcarGravacao(boolean forcarGravacao) {
