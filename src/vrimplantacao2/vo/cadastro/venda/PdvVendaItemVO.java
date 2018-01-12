@@ -16,7 +16,7 @@ public class PdvVendaItemVO {
     private int id_produto;// integer NOT NULL,
     private double quantidade = 0;// numeric(12,3) NOT NULL,
     private double precoVenda = 0;// numeric(11,2) NOT NULL,
-    private double valorTotal = 0;//valortotal numeric(11,2) NOT NULL,
+    //private double valorTotal = 0;//valortotal numeric(11,2) NOT NULL,
     private int id_aliquota = 8;// integer NOT NULL,
     private boolean cancelado = false;// boolean NOT NULL,
     private double valorCancelado = 0;// numeric(11,2) NOT NULL,
@@ -62,10 +62,6 @@ public class PdvVendaItemVO {
 
     public void setPrecoVenda(double precoVenda) {
         this.precoVenda = precoVenda;
-    }
-
-    public void setValorTotal(double valorTotal) {
-        this.valorTotal = valorTotal;
     }
 
     public void setId_aliquota(int id_aliquota) {
@@ -194,7 +190,7 @@ public class PdvVendaItemVO {
     }
 
     public double getValorTotal() {
-        return valorTotal;
+        return MathUtils.round(getQuantidade() * getPrecoVenda(), 2);
     }
 
     public int getId_aliquota() {

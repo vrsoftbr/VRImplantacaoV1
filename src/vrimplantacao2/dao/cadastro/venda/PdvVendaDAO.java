@@ -372,8 +372,7 @@ public class PdvVendaDAO {
             "		id_loja = " + id_loja + " and \n" +
             "		numerocupom = " + numeroCupom + " and \n" +
             "		ecf = " + ecf + " and \n" +
-            "		data = " + SQLUtils.stringSQL(DATE_FORMAT.format(data)) + " and \n" +
-            "		round(subtotalimpressora, 2) = " + MathUtils.round(subTotalImpressora, 2) + "\n" +
+            "		data = " + SQLUtils.stringSQL(DATE_FORMAT.format(data)) + "\n" +
             "	into v_id;\n" +
             "	if ( not v_id is null ) then\n" +
             "       DELETE FROM pdv.vendakititem WHERE id_vendakit IN (SELECT id FROM pdv.vendakit WHERE id_venda = v_id);\n" +

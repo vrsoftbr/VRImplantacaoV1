@@ -14,6 +14,7 @@ import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialVO;
 import vrimplantacao2.vo.cadastro.venda.PdvVendaItemVO;
 import vrimplantacao2.vo.cadastro.venda.PdvVendaVO;
 import vrimplantacao2.vo.enums.Icms;
+import vrimplantacao2.vo.enums.TipoCancelamento;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -108,6 +109,8 @@ public class VendaRepository {
 
                 int cont = 1;
 
+                float subTotalImpressora = 0;
+                
                 for (VendaItemIMP impItem: provider.getVendaItemIMP(impVenda.getId())) {
 
                     PdvVendaItemVO item = converter(impItem);
@@ -147,7 +150,10 @@ public class VendaRepository {
                         item.setId_produto(produto);
                     }
 
+                    subTotalImpressora += item.getValorTotal() - item.getValorDesconto() + item.getValorAcrescimo();
                 }
+                
+                venda.setSubTotalImpressora(subTotalImpressora);
 
                 /**
                 * Se houver alguma divergencia, não executa os processos de
@@ -281,11 +287,18 @@ public class VendaRepository {
     }
 
     public PdvVendaItemVO converter(VendaItemIMP imp) throws Exception {
-        PdvVendaItemVO item = new PdvVendaItemVO();        
+        
+        PdvVendaItemVO item = new PdvVendaItemVO();
         
         item.setQuantidade(imp.getQuantidade());
-        item.setPrecoVenda(imp.getPrecoVenda());
-        item.setValorTotal(item.getPrecoVenda() * item.getQuantidade());
+        if (imp.getTotalBruto() > 0) {
+            item.setPrecoVenda(imp.getTotalBruto() / imp.getQuantidade());
+        } else {
+            item.setPrecoVenda(imp.getPrecoVenda());
+        }
+        item.setValorDesconto(imp.getValorDesconto());
+        item.setValorAcrescimo(imp.getValorAcrescimo());
+        
         Icms aliquota = provider.getAliquota(imp.getIcmsCst(), imp.getIcmsAliq(), imp.getIcmsReduzido());
         if (aliquota != null) {
             item.setId_aliquota(aliquota.getId());
@@ -299,15 +312,16 @@ public class VendaRepository {
             ));
             item.setId_aliquota(provider.getIsento().getId());
         }
-        item.setCancelado(imp.isCancelado());
-        item.setValorCancelado(imp.getValorCancelado());
-        item.setTipoCancelamento(imp.getTipoCancelamento());
+        item.setCancelado(imp.isCancelado());        
         if (item.isCancelado()) {
+            item.setValorCancelado(item.getValorTotal());
             item.setMatriculaCancelamento(provider.getMatricula());
+            item.setTipoCancelamento(imp.getTipoCancelamento());
+            if (item.getTipoCancelamento() == null) {
+                item.setTipoCancelamento(TipoCancelamento.ERRO_DE_REGISTRO);
+            }
         }
         item.setContadorDoc(imp.getContadorDoc());
-        item.setValorDesconto(imp.getValorDesconto());
-        item.setValorAcrescimo(imp.getValorAcrescimo());
         item.setRegraCalculo("T");
         item.setCodigoBarras(Utils.stringToLong(imp.getCodigoBarras(), -1));
         item.setUnidadeMedida(imp.getUnidadeMedida());

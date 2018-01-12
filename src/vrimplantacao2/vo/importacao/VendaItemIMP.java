@@ -27,9 +27,9 @@ public class VendaItemIMP {
     @DatabaseField()
     private double precoVenda;
     @DatabaseField()
-    private boolean cancelado;
+    private double totalBruto;
     @DatabaseField()
-    private double valorCancelado;
+    private boolean cancelado;
     @DatabaseField(persisterClass = TipoCancelamento.TipoCancelamentoPersister.class)
     private TipoCancelamento tipoCancelamento;
     @DatabaseField()
@@ -114,20 +114,20 @@ public class VendaItemIMP {
         this.precoVenda = precoVenda;
     }
 
+    public double getTotalBruto() {
+        return totalBruto;
+    }
+
+    public void setTotalBruto(double totalBruto) {
+        this.totalBruto = totalBruto;
+    }
+
     public boolean isCancelado() {
         return cancelado;
     }
 
     public void setCancelado(boolean cancelado) {
         this.cancelado = cancelado;
-    }
-
-    public double getValorCancelado() {
-        return valorCancelado;
-    }
-
-    public void setValorCancelado(double valorCancelado) {
-        this.valorCancelado = valorCancelado;
     }
 
     public TipoCancelamento getTipoCancelamento() {
