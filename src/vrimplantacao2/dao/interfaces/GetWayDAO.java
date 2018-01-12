@@ -1,15 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package vrimplantacao2.dao.interfaces;
 
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Time;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,9 +30,7 @@ import vrimplantacao2.dao.cadastro.devolucao.receber.ReceberDevolucaoDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.cadastro.verba.receber.ReceberVerbaDAO;
-import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
@@ -1122,158 +1115,7 @@ public class GetWayDAO extends InterfaceDAO {
             Conexao.rollback();
             throw ex;
         }
-    }   
-
-    
-    private static class ClienteCaixa {
-
-        String codCaixa;
-        String data;
-        String coo;
-        String codClie;
-        String razao;
-        String endereco;
-        String numero;
-        String complemento;
-        String bairro;
-        String cidade;
-        String estado;
-        String cep;
-        String cnpj;
-    }
-    
-    /*@Override
-    public List<VendaIMP> getVendas(Set<OpcaoVenda> opcoes) throws Exception {
-        List<VendaIMP> result = new ArrayList<>();
-
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            MultiMap<String, ClienteCaixa> clientesVenda = new MultiMap<>();
-            
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	cc.CODCAIXA,\n" +
-                    "	cc.DATA,\n" +
-                    "	cc.COO,\n" +
-                    "	cc.CODCLIE,\n" +
-                    "	c.RAZAO,\n" +
-                    "	c.ENDERECO,\n" +
-                    "	c.NUMERO,\n" +
-                    "	c.COMPLEMENTO,\n" +
-                    "	c.BAIRRO,\n" +
-                    "	c.CIDADE,\n" +
-                    "	c.ESTADO,\n" +
-                    "	c.CEP,\n" +
-                    "	c.CNPJ_CPF\n" +
-                    "from\n" +
-                    "	caixacliente cc\n" +
-                    "	left join CLIENTES c on cast(c.CODCLIE as int) = cast(cc.CODCLIE as int)\n" +
-                    "where\n" +
-                    "	cc.CODLOJA = " + getLojaOrigem()
-            )) {
-                while (rst.next()) {
-                    ClienteCaixa cl = new ClienteCaixa();
-                    
-                    cl.codCaixa = rst.getString("CODCAIXA");
-                    cl.data = rst.getString("DATA");
-                    cl.coo = rst.getString("COO");
-                    cl.codClie = rst.getString("CODCLIE");
-                    cl.razao = Utils.acertarTexto(rst.getString("RAZAO"));
-                    cl.endereco = Utils.acertarTexto(rst.getString("ENDERECO"));
-                    cl.numero = Utils.acertarTexto(rst.getString("NUMERO"));
-                    cl.complemento = Utils.acertarTexto(rst.getString("COMPLEMENTO"));
-                    cl.bairro = Utils.acertarTexto(rst.getString("BAIRRO"));
-                    cl.cidade = Utils.acertarTexto(rst.getString("CIDADE"));
-                    cl.estado = Utils.acertarTexto(rst.getString("ESTADO"));
-                    cl.cep = Utils.acertarTexto(rst.getString("CEP"));
-                    cl.cnpj = Utils.acertarTexto(rst.getString("CNPJ_CPF"));
-                    
-                    clientesVenda.put(
-                            cl,
-                            cl.codCaixa,
-                            cl.data,
-                            cl.coo
-                    );
-                }
-            }
-            try (ResultSet rst = stm.executeQuery(
-                    "select	\n" +
-                    "	vi.CODCAIXA ecf,\n" +
-                    "	vi.coo numerocupom,\n" +
-                    "	vi.data,\n" +
-                    "	vi.ccf,\n" +
-                    "	COUNT(*),\n" +
-                    "	min(vi.HORA) horainicio,\n" +
-                    "	max(vi.HORA) horatermino,\n" +
-                    "	sum(coalesce(vi.TOTITEM, 0)) subTotalImpressora,\n" +
-                    "	sum(coalesce(vi.DESCITEM, 0)) desconto,\n" +
-                    "	sum(coalesce(vi.ACRESCITEM, 0)) acrescimo\n" +
-                    "from\n" +
-                    "	CAIXAGERAL vi\n" +
-                    "where \n" +
-                    "	vi.TIPOLANCTO = ''\n" +
-                    "	and	vi.data > current_timestamp - 540\n" +
-                    "	and	vi.atualizado = 'S'\n" +
-                    "	and (vi.flgrupo = 'S' or vi.flgrupo = 'N')\n" +
-                    "	and vi.CODLOJA = " + getLojaOrigem() + "\n" +
-                    "group by	\n" +
-                    "	vi.CODCAIXA,\n" +
-                    "	vi.coo,\n" +
-                    "	vi.data,\n" +
-                    "	vi.ccf\n" +
-                    "order by	\n" +
-                    "	data,\n" +
-                    "	vi.CODCAIXA,\n" +
-                    "	vi.coo"
-            )) {
-                while (rst.next()) {
-                    VendaIMP imp = new VendaIMP();
-                    
-                    StringBuilder id = new StringBuilder();
-                    id
-                            .append(rst.getString("ecf")).append("-")
-                            .append(rst.getString("numerocupom")).append("-")
-                            .append(rst.getString("data")).append("-")
-                            .append(rst.getString("ccf"));
-                    
-                    imp.setId(id.toString());
-                    imp.setEcf(rst.getInt("ecf"));
-                    
-                    ClienteCaixa cli = clientesVenda.get(
-                            rst.getString("ecf"),
-                            rst.getString("data"),
-                            rst.getString("numerocupom")
-                    );
-                    
-                    if (cli != null) {
-                        imp.setIdClientePreferencial(cli.codClie);
-                        imp.setNomeCliente(cli.razao);
-                        imp.setEnderecoCliente(
-                                cli.endereco + 
-                                (!"".equals(cli.numero) ? "," + cli.numero : "" ) + 
-                                (!"".equals(cli.complemento) ? "," + cli.complemento : "") +
-                                (!"".equals(cli.bairro) ? "," + cli.bairro : "") + 
-                                (!"".equals(cli.cidade) ? "," + cli.cidade : "") +
-                                (!"".equals(cli.estado) ? " - " + cli.estado : "") +
-                                (!"".equals(cli.cep) ? "," + cli.cep : "")
-                        );
-                        imp.setCpf(cli.cnpj);
-                    }
-                    
-                    imp.setNumeroCupom(rst.getInt("numerocupom"));
-                    imp.setData(rst.getDate("data"));
-                    imp.setHoraInicio(rst.getTime("horainicio"));
-                    imp.setHoraTermino(rst.getTime("horatermino"));
-                    imp.setSubTotalImpressora(rst.getDouble("subTotalImpressora"));
-                    imp.setValorDesconto(rst.getDouble("desconto"));
-                    imp.setValorAcrescimo(rst.getDouble("acrescimo"));
-                    
-                    result.add(imp);
-                }
-            }
-        }
-
-        return result;
-    }*/
+    } 
 
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
@@ -1345,7 +1187,7 @@ public class GetWayDAO extends InterfaceDAO {
                         next.setEnderecoCliente(endereco);
                     }
                 }
-            } catch (Exception ex) {
+            } catch (SQLException | ParseException ex) {
                 LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
                 throw new RuntimeException(ex);
             }
@@ -1361,8 +1203,7 @@ public class GetWayDAO extends InterfaceDAO {
                     "    min(cx.hora) as horainicio,\n" +
                     "    max(cx.hora) as horatermino,\n" +
                     "    min(case when cx.cancelado = 'N' then 0 else 1 end) as cancelado,\n" +
-                    //"    sum(cx.totitem) as subtotalimpressora,\n" +
-                    "    sum(cx.totitem - isnull(cx.descitem,0) + isnull(cx.acrescitem, 0)) as subtotalimpressora,\n" +
+                    "    sum(cx.totitem) as subtotalimpressora,\n" +
                     "    cl.cnpj_cpf cpf,\n" +
                     "    sum(isnull(cx.descitem,0)) desconto,\n" +
                     "    sum(isnull(cx.acrescitem, 0)) acrescimo,\n" +
@@ -1442,7 +1283,6 @@ public class GetWayDAO extends InterfaceDAO {
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
-        private Set<String> uk = new HashSet<>();
         
         private void obterNext() {
             try {
@@ -1456,10 +1296,10 @@ public class GetWayDAO extends InterfaceDAO {
                         next.setProduto(rst.getString("produto"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setPrecoVenda(rst.getDouble("unitario"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setTotalBruto(rst.getDouble("total"));
                         next.setValorDesconto(rst.getDouble("desconto"));
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setUnidadeMedida(rst.getString("unidade"));
                         
@@ -1543,7 +1383,7 @@ public class GetWayDAO extends InterfaceDAO {
                     "    cx.codprod as produto,\n" +
                     "    pr.DESC_PDV as descricao,    \n" +
                     "    isnull(cx.qtd, 0) as quantidade,\n" +
-                    "    isnull(cx.valorunit, 0) as unitario,\n" +
+                    "    isnull(cx.totitem, 0) as total,\n" +
                     "    case when cx.cancelado = 'N' then 0 else 1 end as cancelado,\n" +
                     "    isnull(cx.descitem, 0) as desconto,\n" +
                     "    isnull(cx.acrescitem, 0) as acrescimo,\n" +
@@ -1561,9 +1401,7 @@ public class GetWayDAO extends InterfaceDAO {
                     "where\n" +
                     "    cx.tipolancto = '' and\n" +
                     "    (cx.data between convert(datetime, '" + FORMAT.format(dataInicio) + "', 103) and convert(datetime, '" + FORMAT.format(dataTermino) + "', 103)) and\n" +
-                    "    c.apura = 'S' and\n" +
                     "    cx.codloja = " + idLojaCliente + " and\n" +
-                    "    pr.ativo = 'S' and\n" +
                     "    cx.atualizado = 'S' and\n" +
                     "    (cx.flgrupo = 'S' or cx.flgrupo = 'N')";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
