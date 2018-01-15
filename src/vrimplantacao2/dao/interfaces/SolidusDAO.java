@@ -1,6 +1,7 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.gui.interfaces.custom.solidus.Entidade;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -39,6 +41,8 @@ public class SolidusDAO extends InterfaceDAO {
     private static final Logger LOG = Logger.getLogger(SolidusDAO.class.getName());
     
     private Date vendasDataInicio = null;
+    private List<Entidade> entidadesCheques;
+    private List<Entidade> entidadesCreditoRotativo;
 
     public Date getVendasDataInicio() {
         return vendasDataInicio;
@@ -554,6 +558,7 @@ public class SolidusDAO extends InterfaceDAO {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
                     "    f.cod_loja || '-' || f.tipo_conta || '-' || f.tipo_parceiro || '-' || f.cod_parceiro || '-' || f.num_registro id,\n" +
+                    "    f.cod_entidade || ' - ' || e.des_entidade pagamento,\n" +
                     "    f.dta_emissao dataemissao,\n" +
                     "    f.num_cupom_fiscal numerocupom,\n" +
                     "    f.num_pdv pdv,\n" +
@@ -566,9 +571,11 @@ public class SolidusDAO extends InterfaceDAO {
                     "    f.num_cgc_cpf cpf\n" +
                     "from\n" +
                     "    tab_fluxo_referencia f\n" +
+                    "    left join tab_entidade e on f.cod_entidade = e.cod_entidade\n" +
                     "where\n" +
                     "    f.flg_quitado = 'N' and\n" +
                     "    f.tipo_parceiro = 0 and\n" +
+                    "    f.cod_entidade in (" + implodeList(this.entidadesCreditoRotativo) + ") and\n" +
                     "    f.cod_loja = " + getLojaOrigem() + "\n" +
                     "order by\n" +
                     "    f.dta_emissao"
@@ -602,12 +609,44 @@ public class SolidusDAO extends InterfaceDAO {
         
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select\n" +
+                    "    f.cod_loja || '-' || f.tipo_conta || '-' || f.tipo_parceiro || '-' || f.cod_parceiro || '-' || f.num_registro id,\n" +
+                    "    f.cod_entidade || ' - ' || e.des_entidade pagamento,\n" +
+                    "    f.num_cgc_cpf cpf,\n" +
+                    "    c.num_cgc cpf2,\n" +
+                    "    f.dta_emissao dataemissao,\n" +
+                    "    f.num_cupom_fiscal numerocupom,\n" +
+                    "    f.num_pdv pdv,\n" +
+                    "    f.val_parcela valor,\n" +
+                    "    c.num_rg rg,\n" +
+                    "    c.num_fone fone,\n" +
+                    "    c.des_cliente nome,\n" +
+                    "    f.des_observacao\n" +
+                    "from\n" +
+                    "    tab_fluxo_referencia f\n" +
+                    "    left join tab_entidade e on f.cod_entidade = e.cod_entidade\n" +
+                    "    left join tab_cliente c on f.cod_parceiro = c.cod_cliente\n" +
+                    "where\n" +
+                    "    f.flg_quitado = 'N'\n" +
+                    "    and f.tipo_parceiro = 0\n" +
+                    "    and f.cod_entidade in (" + implodeList(entidadesCheques) + ")\n" +
+                    "    and f.cod_loja = " + getLojaOrigem() + "\n" +
+                    "order by\n" +
+                    "    f.dta_emissao, id"
             )) {
                 while (rst.next()) {
                     ChequeIMP imp = new ChequeIMP();
                     
-                    
+                    imp.setId(rst.getString("id"));
+                    imp.setCpf(rst.getString("cpf"));
+                    imp.setDate(rst.getDate("dataemissao"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
+                    imp.setEcf(rst.getString("pdv"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setRg(rst.getString("rg"));
+                    imp.setTelefone(rst.getString("fone"));
+                    imp.setNome(rst.getString("nome"));
+                    imp.setObservacao(rst.getString("pagamento") + " - " + rst.getString("des_observacao"));
                     
                     result.add(imp);
                 }
@@ -625,7 +664,8 @@ public class SolidusDAO extends InterfaceDAO {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
                     "    f.cod_loja || '-' || f.tipo_conta || '-' || f.tipo_parceiro || '-' || f.cod_parceiro || '-' || f.num_registro id,\n" +
-                    "    f.cod_parceiro fornecedor,  \n" +
+                    "    f.cod_parceiro fornecedor,\n" +
+                    "    f.cod_entidade || ' - ' || e.des_entidade pagamento,\n" +
                     "    f.num_docto,\n" +
                     "    f.dta_emissao dataemissao,\n" +
                     "    f.dta_vencimento datavencimento,\n" +
@@ -637,6 +677,7 @@ public class SolidusDAO extends InterfaceDAO {
                     "    f.num_cgc_cpf cpf\n" +
                     "from\n" +
                     "    tab_fluxo_referencia f\n" +
+                    "    left join tab_entidade e on f.cod_entidade = e.cod_entidade\n" +
                     "where\n" +
                     "    f.flg_quitado = 'N' and\n" +
                     "    f.tipo_parceiro = 1 and\n" +
@@ -654,7 +695,7 @@ public class SolidusDAO extends InterfaceDAO {
                     imp.setDataEntrada(rst.getDate("dataemissao"));
                     imp.setDataHoraAlteracao(rst.getTimestamp("dataalteracao"));
                     imp.setValor(rst.getDouble("valor"));
-                    imp.setObservacao(rst.getString("des_cc"));
+                    imp.setObservacao(rst.getString("pagamento") + " - " + rst.getString("des_cc"));
                     imp.addVencimento(rst.getDate("datavencimento"), rst.getDouble("valor"));
                     
                     result.add(imp);
@@ -673,6 +714,43 @@ public class SolidusDAO extends InterfaceDAO {
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new VendaItemIterator(getLojaOrigem(), getVendasDataInicio());
+    }
+
+    public List<Entidade> getEntidades() throws SQLException {
+        List<Entidade> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select cod_entidade, des_entidade from tab_entidade order by cod_entidade"
+            )) {
+                while (rst.next()) {
+                    result.add(new Entidade(rst.getInt("cod_entidade"), rst.getString("des_entidade")));
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    public void setEntidadesCheques(List<Entidade> entidadesCheques) {
+        this.entidadesCheques = entidadesCheques;
+    }
+
+    public void setEntidadesCreditoRotativo(List<Entidade> entidadesCreditoRotativo) {
+        this.entidadesCreditoRotativo = entidadesCreditoRotativo;
+    }
+
+    private String implodeList(List<Entidade> entidades) {
+        StringBuilder builder = new StringBuilder();
+        
+        for (Iterator<Entidade> iterator = entidades.iterator(); iterator.hasNext(); ) {
+            builder.append(iterator.next().getId());            
+            if (iterator.hasNext()) {
+                builder.append(",");
+            }
+        }        
+        
+        return builder.toString();
     }
     
     private static class VendaIterator implements Iterator<VendaIMP> {
