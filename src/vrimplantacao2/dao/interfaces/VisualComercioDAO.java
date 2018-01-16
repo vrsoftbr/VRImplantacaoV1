@@ -523,6 +523,7 @@ public class VisualComercioDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setNumeroDocumento(rst.getString("numerodocumento"));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setDataEntrada(rst.getDate("dataemissao"));
+                    imp.setDataHoraAlteracao(rst.getTimestamp("dataemissao"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"));
                     imp.setObservacao(rst.getString("formapag") + " - " + rst.getString("historico") + " - " + rst.getString("observacao"));

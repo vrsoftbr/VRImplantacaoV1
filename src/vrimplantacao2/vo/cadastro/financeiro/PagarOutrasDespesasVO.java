@@ -66,7 +66,10 @@ public class PagarOutrasDespesasVO {
     }
 
     public void setDataEmissao(Date dataEmissao) {
-        this.dataEmissao = dataEmissao;
+        this.dataEmissao = dataEmissao != null ? dataEmissao : new Date();
+        if (this.dataHoraAlteracao == null) {
+            this.dataHoraAlteracao = new Timestamp(this.dataEmissao.getTime());
+        }
     }
 
     public Date getDataEntrada() {
@@ -74,7 +77,10 @@ public class PagarOutrasDespesasVO {
     }
 
     public void setDataEntrada(Date dataEntrada) {
-        this.dataEntrada = dataEntrada;
+        this.dataEntrada = dataEntrada != null ? dataEntrada : new Date();
+        if (this.dataHoraAlteracao == null) {
+            this.dataHoraAlteracao = new Timestamp(this.dataEntrada.getTime());
+        }
     }
 
     public double getValor() {

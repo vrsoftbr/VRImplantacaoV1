@@ -147,6 +147,7 @@ import vrimplantacao.gui.interfaces.AlterarProdutoPdvVendaItemGUI;
 import vrimplantacao2.gui.interfaces.TstiGUI;
 import vrimplantacao2.gui.interfaces.CPlusGUI;
 import vrimplantacao2.gui.interfaces.SolidusGUI;
+import vrimplantacao2.gui.interfaces.VisualComercioGUI;
 import vrimplantacao2.gui.interfaces.WmsiGUI;
 
 public final class MenuGUI extends VRMdiFrame {
@@ -531,6 +532,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuFabTech = new javax.swing.JMenuItem();
         mnuHipicom = new javax.swing.JMenuItem();
         mnuFabTech1 = new javax.swing.JMenuItem();
+        mnuVisualComercio = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1187,6 +1189,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu6.add(mnuFabTech1);
+
+        mnuVisualComercio.setText("Visual Comercio");
+        mnuVisualComercio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuVisualComercioActionPerformed(evt);
+            }
+        });
+        jMenu6.add(mnuVisualComercio);
 
         jMenu2.add(jMenu6);
 
@@ -3566,6 +3576,10 @@ public final class MenuGUI extends VRMdiFrame {
         SolidusGUI.exibir(this);
     }//GEN-LAST:event_mnuSolidusActionPerformed
 
+    private void mnuVisualComercioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuVisualComercioActionPerformed
+        VisualComercioGUI.exibir(this);
+    }//GEN-LAST:event_mnuVisualComercioActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -3726,6 +3740,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSistemaLogin;
     private javax.swing.JMenuItem mnuSolidus;
     private javax.swing.JMenuItem mnuTsti;
+    private javax.swing.JMenuItem mnuVisualComercio;
     private javax.swing.JMenuItem mnuWmsi;
     private javax.swing.JMenuItem mnupdvvendaitem;
     private vrframework.bean.toolBar.VRToolBar tlbAtalho;
