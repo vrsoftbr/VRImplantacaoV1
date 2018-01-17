@@ -202,8 +202,8 @@ public class CissDAO extends AbstractIntefaceDao {
                     "        trib.permargemsubsti as percSubst,\n" +
                     "        pg.idcodbarprod codigobarras,\n" +
                     "        est.qtdatualestoque estoque,\n" +
-                    "        custo.custonotafiscal custocomnota,\n" +
-                    "        custo.custoultimacompra custosemnota,\n" +
+                    "        custo.custonotafiscal custosemimposto,\n" +
+                    "        custo.custogerencial custocomimposto,\n" +
                     "        pg.pesobruto,\n" +
                     "        pg.pesoliquido,\n" +
                     "        coalesce(pc.qtdestminimo,0) estmin,\n" +
@@ -353,8 +353,8 @@ public class CissDAO extends AbstractIntefaceDao {
                     
                     oComplemento.setPrecoVenda(rst.getDouble("precovenda"));
                     oComplemento.setPrecoDiaSeguinte(rst.getDouble("precovenda"));
-                    oComplemento.setCustoComImposto(rst.getDouble("custocomnota"));
-                    oComplemento.setCustoSemImposto(rst.getDouble("custosemnota"));
+                    oComplemento.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    oComplemento.setCustoComImposto(rst.getDouble("custocomimposto"));                    
                     oComplemento.setIdLoja(idLojaVR);
                     oComplemento.setIdSituacaoCadastro(rst.getInt("id_Situacaocadastro"));
                     oComplemento.setEstoque(rst.getDouble("estoque"));
@@ -445,8 +445,8 @@ public class CissDAO extends AbstractIntefaceDao {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
                     "        pg.idsubproduto id,\n" +                   
-                    "        custo.custonotafiscal custocomnota,\n" +
-                    "        custo.custoultimacompra custosemnota\n" +
+                    "        custo.custonotafiscal custosemimposto,\n" +
+                    "        custo.custogerencial custocomimposto\n" +
                     "from\n" +
                     "        dba.produto_grade pg\n" +
                     "        join dba.produto p on p.idproduto = pg.idproduto\n" +
@@ -465,8 +465,8 @@ public class CissDAO extends AbstractIntefaceDao {
                     oProduto.getvCodigoAnterior().add(oAnterior);
                     
                     oProduto.setId(rst.getInt("id"));                   
-                    oComplemento.setCustoComImposto(rst.getDouble("custocomnota"));
-                    oComplemento.setCustoSemImposto(rst.getDouble("custosemnota"));                    
+                    oComplemento.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    oComplemento.setCustoSemImposto(rst.getDouble("custosemimposto"));                    
                     oAnterior.setCustocomimposto(rst.getDouble("custocomnota"));
                     oAnterior.setCustosemimposto(rst.getDouble("custosemnota"));
                     

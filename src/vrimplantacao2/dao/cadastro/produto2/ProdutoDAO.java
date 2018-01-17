@@ -130,10 +130,10 @@ public class ProdutoDAO {
             sql.put("aceitamultiplicacaopdv", true);
             sql.put("id_fornecedorfabricante", 1);
             sql.put("id_divisaofornecedor", 0);
-            sql.put("id_tipoproduto", 0);
+            //sql.put("id_tipoproduto", 0);
             sql.put("id_tipopiscofins", vo.getPisCofinsDebito().getId());
             sql.put("sazonal", false);
-            sql.put("fabricacaopropria", false);
+            //sql.put("fabricacaopropria", false);
             sql.put("consignado", false);
             {
                 NcmVO ncm = vo.getNcm();
@@ -179,9 +179,9 @@ public class ProdutoDAO {
             sql.putNull("substituicaoestadualoutros");
             sql.putNull("substituicaoestadualexterior");
             sql.put("id_cest", vo.getCest() != null ? vo.getCest().getId() : null);            
-            sql.put("id_normareposicao", vo.getNormaReposicao().getId());
+            //sql.put("id_normareposicao", vo.getNormaReposicao().getId());
             sql.putNull("lastro");
-            sql.putNull("camadasreposicao");
+            //sql.putNull("camadasreposicao");
             sql.putNull("margemminima");
             sql.putNull("margemmaxima");            
             sql.put("permitedescontopdv", true);

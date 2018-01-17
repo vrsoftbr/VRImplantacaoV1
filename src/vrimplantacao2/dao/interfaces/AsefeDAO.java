@@ -5,11 +5,12 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 public class AsefeDAO extends InterfaceDAO {
-    
+
     @Override
     public String getSistema() {
         return "Asefe";
@@ -92,6 +93,81 @@ public class AsefeDAO extends InterfaceDAO {
                     imp.setPiscofinsCstDebito(rst.getInt("STPIS"));
                     imp.setPiscofinsCstCredito(rst.getInt("STCOFINS"));
                     imp.setIcmsCst(rst.getInt("STICMS"));
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "CodCliente, Carteira, NomeCliente, EnderecoCliente, BairroCliente, \n"
+                    + "CidadeCliente, CepCliente, CpfCliente, RgCliente, LimiteCheque, LimiteCliente,\n"
+                    + "TelCliente, CelCliente, Situacao, Datanascimento, Pessoas_autorizadas,\n"
+                    + "Saldo, Cheque, Fiado, CodigoConvenio, Matricula, SENHA, UF, NUMERO, CodUf,\n"
+                    + "email, CodMunicipio, DiasVencimento, Sexo, DiasVencimentoCheque, SituacaoCheque,\n"
+                    + "DiasCarenciaCheque, ChaveAcesso, OrgaoPublico, Telefone1, Telefone2, Fax, Obs\n"
+                    + "from CC_Clientes\n"
+                    + "order by CodCliente"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("CodCliente"));
+                    imp.setRazao(rst.getString("NomeCliente"));
+                    imp.setFantasia(rst.getString("NomeCliente"));
+                    imp.setEndereco(rst.getString("EnderecoCliente"));
+                    imp.setNumero(rst.getString("NUMERO"));
+                    imp.setBairro(rst.getString("BairroCliente"));
+                    imp.setMunicipio(rst.getString("CidadeCliente"));
+                    imp.setMunicipioIBGE(rst.getInt("CodMunicipio"));
+                    imp.setUf(rst.getString("UF"));
+                    imp.setUfIBGE(rst.getInt("CodUf"));
+                    imp.setCep(rst.getString("CepCliente"));
+                    imp.setCnpj(rst.getString("CpfCliente"));
+                    imp.setInscricaoestadual(rst.getString("RgCliente"));
+                    imp.setValorLimite(rst.getDouble("LimiteCliente"));
+                    imp.setTelefone(rst.getString("TelCliente"));
+                    imp.setCelular(rst.getString("CelCliente"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setPermiteCheque((rst.getInt("Cheque") != 0));
+                    imp.setPermiteCreditoRotativo((rst.getInt("Fiado") != 0));
+                    imp.setObservacao(rst.getString("Obs"));
+
+                    if ((rst.getString("Telefone1") != null)
+                            && (!rst.getString("Telefone1").trim().isEmpty())) {
+                        imp.addContato(
+                                "1",
+                                "TELEFONE 1",
+                                rst.getString("Telefone1").trim(),
+                                null,
+                                null
+                        );
+                    }
+                    if ((rst.getString("Telefone2") != null)
+                            && (!rst.getString("Telefone2").trim().isEmpty())) {
+                        imp.addContato(
+                                "2",
+                                "TELEFONE 2",
+                                rst.getString("Telefone2").trim(),
+                                null,
+                                null
+                        );
+                    }
+                    if ((rst.getString("Fax") != null)
+                            && (!rst.getString("Fax").trim().isEmpty())) {
+                        imp.addContato(
+                                "2",
+                                "FAX",
+                                rst.getString("Fax").trim(),
+                                null,
+                                null
+                        );
+                    }
                     vResult.add(imp);
                 }
             }

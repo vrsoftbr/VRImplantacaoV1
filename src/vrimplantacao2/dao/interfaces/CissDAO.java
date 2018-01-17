@@ -136,8 +136,8 @@ public class CissDAO extends InterfaceDAO {
                     "	ean.ncm,\n" +
                     "	ean.codcest cest,\n" +
                     "	preco.valprecovarejo preco,\n" +
-                    "	custo.custonotafiscal custocomnota,\n" +
-                    "	custo.custoultimacompra custosemnota,\n" +
+                    "	custo.custonotafiscal custosemimposto,\n" +
+                    "	custo.custogerencial custocomimposto,\n" +
                     "	p.idcstpiscofinssaida piscofinssaida,\n" +
                     "	p.idcstpiscofinsentrada piscofinsentrada,\n" +
                     "	nat.idcodnatureza as tipoNaturezaReceita,\n" +
@@ -145,7 +145,8 @@ public class CissDAO extends InterfaceDAO {
                     "	trib.idsittribent as icmsCstCredito,\n" +
                     "	trib.pericment as icmsAliqCredito,\n" +
                     "	trib.pericmsai as icmsAliqDebito,\n" +
-                    "	trib.perredtribsai as icmsPercReducao,\n" +
+                    "	trib.perredtribsai as icmsPercReducaoSaida,\n" +
+                    "	trib.perredtribent as icmsPercReducaoEntrada,\n" +                            
                     "	trib.permargemsubsti as percSubst\n" +
                     "from\n" +
                     "	dba.produto_grade ean\n" +
@@ -222,8 +223,8 @@ public class CissDAO extends InterfaceDAO {
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPrecovenda(rst.getDouble("preco"));
-                    imp.setCustoComImposto(rst.getDouble("custocomnota"));
-                    imp.setCustoSemImposto(rst.getDouble("custosemnota"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));                    
                     imp.setPiscofinsCstCredito(rst.getInt("piscofinsentrada"));
                     imp.setPiscofinsCstDebito(rst.getInt("piscofinssaida"));
                     imp.setPiscofinsNaturezaReceita(rst.getInt("tipoNaturezaReceita"));
@@ -231,7 +232,8 @@ public class CissDAO extends InterfaceDAO {
                     imp.setIcmsCstEntrada(rst.getInt("icmsCstCredito"));
                     imp.setIcmsAliqEntrada(rst.getDouble("icmsAliqCredito"));
                     imp.setIcmsAliqSaida(rst.getDouble("icmsAliqDebito"));
-                    imp.setIcmsReducao(rst.getDouble("icmsPercReducao"));                  
+                    imp.setIcmsReducaoSaida(rst.getDouble("icmsPercReducaoSaida"));
+                    imp.setIcmsReducaoEntrada(rst.getDouble("icmsPercReducaoEntrada"));
                     
                     result.add(imp);
                 }
