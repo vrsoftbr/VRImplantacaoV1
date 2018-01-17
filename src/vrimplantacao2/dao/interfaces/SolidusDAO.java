@@ -41,8 +41,13 @@ public class SolidusDAO extends InterfaceDAO {
     private static final Logger LOG = Logger.getLogger(SolidusDAO.class.getName());
     
     private Date vendasDataInicio = null;
+    private Date rotativoDtaInicio = null;
+    private Date rotativoDtaFim = null;
+    private Date contasDtaInicio = null;
+    private Date contasDtaFim = null;
     private List<Entidade> entidadesCheques;
     private List<Entidade> entidadesCreditoRotativo;
+    private List<Entidade> entidadesContas;
 
     public Date getVendasDataInicio() {
         return vendasDataInicio;
@@ -52,6 +57,26 @@ public class SolidusDAO extends InterfaceDAO {
         this.vendasDataInicio = vendasDataInicio;
     }
 
+    public void setRotativoDtaInicio(Date rotativoDtaInicio) {
+        this.rotativoDtaInicio = rotativoDtaInicio;
+    }
+
+    public void setRotativoDtaFim(Date rotativoDtaFim) {
+        this.rotativoDtaFim = rotativoDtaFim;
+    }
+
+    public void setContasDtaInicio(Date contasDtaInicio) {
+        this.contasDtaInicio = contasDtaInicio;
+    }
+
+    public void setContasDtaFim(Date contasDtaFim) {
+        this.contasDtaFim = contasDtaFim;
+    }
+
+    public void setEntidadesContas(List<Entidade> entidadesContas) {
+        this.entidadesContas = entidadesContas;
+    }
+    
     @Override
     public String getSistema() {
         return "Solidus";
@@ -165,7 +190,7 @@ public class SolidusDAO extends InterfaceDAO {
                     "    case when pl.val_custo_tabela = 0 then pl.val_custo_cheio else pl.val_custo_tabela end custosemimposto,\n" +
                     "    case when pl.val_custo_cheio = 0 then pl.val_custo_tabela else pl.val_custo_cheio end custocomimposto,\n" +
                     "    pl.val_venda precovenda,\n" +
-                    "    case p.status when 0 then 1 else 0 end situacaocadastro,\n" +
+                    "    case when pl.inativo = 'S' then 0 else 1 end as situacaocadastro,\n" +
                     "    ncmcest.ncm,\n" +
                     "    ncmcest.cest,\n" +
                     "    p.cst_pis_cof_entrada,\n" +
@@ -559,6 +584,8 @@ public class SolidusDAO extends InterfaceDAO {
                     "select\n" +
                     "    f.cod_loja || '-' || f.tipo_conta || '-' || f.tipo_parceiro || '-' || f.cod_parceiro || '-' || f.num_registro id,\n" +
                     "    f.cod_entidade || ' - ' || e.des_entidade pagamento,\n" +
+                    "    f.num_cgc_cpf cpf,\n" +
+                    "    c.num_cgc cpf2,\n" +
                     "    f.dta_emissao dataemissao,\n" +
                     "    f.num_cupom_fiscal numerocupom,\n" +
                     "    f.num_pdv pdv,\n" +
@@ -568,17 +595,24 @@ public class SolidusDAO extends InterfaceDAO {
                     "    f.dta_vencimento datavencimento,\n" +
                     "    f.num_parcela parcela,\n" +
                     "    f.val_juros juros,\n" +
-                    "    f.num_cgc_cpf cpf\n" +
+                    "    f.num_cgc_cpf cpf,\n" +
+                    "    f.dta_pgto,\n" +
+                    "    f.val_desconto,\n" +
+                    "    f.val_juros,\n" +
+                    "    f.flg_quitado\n" +
                     "from\n" +
-                    "    tab_fluxo_referencia f\n" +
+                    "    tab_fluxo f\n" +
                     "    left join tab_entidade e on f.cod_entidade = e.cod_entidade\n" +
+                    "    left join tab_cliente c on f.cod_parceiro = c.cod_cliente\n" +
                     "where\n" +
-                    "    f.flg_quitado = 'N' and\n" +
-                    "    f.tipo_parceiro = 0 and\n" +
-                    "    f.cod_entidade in (" + implodeList(this.entidadesCreditoRotativo) + ") and\n" +
-                    "    f.cod_loja = " + getLojaOrigem() + "\n" +
+                    "    f.dta_emissao >= '" + DATE_FORMAT.format(rotativoDtaInicio) + "'\n" +
+                    "    and f.dta_emissao <= '" + DATE_FORMAT.format(rotativoDtaFim) + "'\n" +
+                    "    and f.tipo_parceiro = 0\n" +
+                    "    and f.cod_parceiro = 1017030\n" +
+                    "    and f.cod_entidade in (" + implodeList(this.entidadesCreditoRotativo) + ")\n" +
+                    "    and f.cod_loja = " + getLojaOrigem() + "\n" +                            
                     "order by\n" +
-                    "    f.dta_emissao"
+                    "    f.dta_emissao, id"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -594,6 +628,16 @@ public class SolidusDAO extends InterfaceDAO {
                     imp.setParcela(rst.getInt("parcela"));
                     imp.setJuros(rst.getDouble("juros"));
                     imp.setCnpjCliente(rst.getString("cpf"));
+                    if ("S".equals(rst.getString("flg_quitado"))) {
+                        imp.addPagamento(
+                                rst.getString("id"),
+                                imp.getValor(), 
+                                rst.getDouble("val_desconto"), 
+                                rst.getDouble("val_juros"),
+                                rst.getDate("dta_pgto"),
+                                ""
+                        );
+                    }
                     
                     result.add(imp);
                 }
@@ -623,7 +667,7 @@ public class SolidusDAO extends InterfaceDAO {
                     "    c.des_cliente nome,\n" +
                     "    f.des_observacao\n" +
                     "from\n" +
-                    "    tab_fluxo_referencia f\n" +
+                    "    tab_fluxo f\n" +
                     "    left join tab_entidade e on f.cod_entidade = e.cod_entidade\n" +
                     "    left join tab_cliente c on f.cod_parceiro = c.cod_cliente\n" +
                     "where\n" +
@@ -681,6 +725,7 @@ public class SolidusDAO extends InterfaceDAO {
                     "where\n" +
                     "    f.flg_quitado = 'N' and\n" +
                     "    f.tipo_parceiro = 1 and\n" +
+                    "    f.cod_entidade in (" + implodeList(entidadesContas) + ") and\n" +
                     "    f.cod_loja = " + getLojaOrigem() + "\n" +
                     "order by\n" +
                     "    f.dta_emissao"
@@ -762,8 +807,7 @@ public class SolidusDAO extends InterfaceDAO {
         public VendaIterator(String idLojaCliente, Date dataInicio) {
             try {
                 this.stm = ConexaoFirebird.getConexao().createStatement();
-                this.rst = stm.executeQuery(
-                        "select\n" +
+                this.rst = stm.executeQuery("select\n" +
                         "    v.num_ident id,\n" +
                         "    v.num_cupom_fiscal cupomfiscal,\n" +
                         "    v.num_pdv ecf,\n" +
@@ -785,7 +829,7 @@ public class SolidusDAO extends InterfaceDAO {
                         "    left join tab_cliente c on v.cod_cliente = c.cod_cliente\n" +
                         "where\n" +
                         "    v.cod_loja = " + idLojaCliente + "\n" +
-                        "    and cast(v.dta_saida as date) >= '" + new SimpleDateFormat("dd.MM.yyyy").format(dataInicio) + "'\n" +
+                        "    and cast(v.dta_saida as date) >= '" + DATE_FORMAT.format(dataInicio) + "'\n" +
                         "    and v.num_ident != 0\n" +
                         "group by\n" +
                         "    v.num_ident,\n" +
@@ -853,6 +897,7 @@ public class SolidusDAO extends InterfaceDAO {
         }
         
     }
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     
     private static class Tributacao {
         
@@ -903,8 +948,7 @@ public class SolidusDAO extends InterfaceDAO {
                 }
                 
                 stm = ConexaoFirebird.getConexao().createStatement();
-                rst = stm.executeQuery(
-                        "select\n" +
+                rst = stm.executeQuery("select\n" +
                         "    v.num_registro id,\n" +
                         "    v.num_pdv ecf,\n" +
                         "    v.num_ident idvenda,\n" +
@@ -923,7 +967,7 @@ public class SolidusDAO extends InterfaceDAO {
                         "    join tab_produto p on v.cod_produto = p.cod_produto\n" +
                         "where\n" +
                         "    v.cod_loja = " + idLojaCliente + "\n" +
-                        "    and cast(v.dta_saida as date) >= '" + new SimpleDateFormat("dd.MM.yyyy").format(dataInicio) + "'\n" +
+                        "    and cast(v.dta_saida as date) >= '" + DATE_FORMAT.format(dataInicio) + "'\n" +
                         "    and v.num_ident != 0\n" +
                         "order by\n" +
                         "    id"

@@ -32,9 +32,6 @@ public class CreditoRotativoItemDAO {
             sql.put("id_tiporecebimento", item.getId_tipoRecebimento());
             sql.put("id_usuario", item.getId_usuario());
             sql.put("id_loja", item.getId_loja());
-            sql.put("id_recebercheque", item.getId_receberCheque(), 0);
-            sql.put("id_recebercaixa", item.getId_receberCaixa(), 0);
-            sql.put("id_conciliacaobancarialancamento", item.getId_conciliacaoBancariaLancamento(), 0);
             sql.getReturning().add("id");
             try (ResultSet rst = stm.executeQuery(
                     sql.getInsert()

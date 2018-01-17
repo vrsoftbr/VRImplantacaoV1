@@ -1,6 +1,5 @@
 package vrimplantacao2.gui.interfaces;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -38,7 +37,7 @@ public class SolidusGUI extends VRInternalFrame {
     
     private static final Logger LOG = Logger.getLogger(SolidusGUI.class.getName());
     
-    private static final String SISTEMA = "Solidus";
+    public static final String SISTEMA = "Solidus";
     private static final String SERVIDOR_SQL = "Firebird";
     private static SolidusGUI instance;
     
@@ -89,6 +88,7 @@ public class SolidusGUI extends VRInternalFrame {
         
         listSelectionListenerRotativo = new ListSelectionListenerImpl("ENTIDADE_ROTATIVO_SELECIONADAS", listEntidadesRotativo);
         listSelectionListenerCheque = new ListSelectionListenerImpl("ENTIDADE_CHEQUE_SELECIONADAS", listEntidadesCheque);
+        listSelectionListenerContas = new ListSelectionListenerImpl("ENTIDADE_CONTAS_SELECIONADAS", listEntidadesContas);
                 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         listEntidadesRotativo.setModel(new DefaultListModel());
@@ -96,6 +96,9 @@ public class SolidusGUI extends VRInternalFrame {
         
         listEntidadesCheque.setModel(new DefaultListModel());
         listEntidadesCheque.addListSelectionListener(listSelectionListenerCheque);
+        
+        listEntidadesContas.setModel(new DefaultListModel());
+        listEntidadesContas.addListSelectionListener(listSelectionListenerContas);
         
         carregarParametros();
         
@@ -105,6 +108,7 @@ public class SolidusGUI extends VRInternalFrame {
     
     private ListSelectionListenerImpl listSelectionListenerRotativo;
     private ListSelectionListenerImpl listSelectionListenerCheque;
+    private ListSelectionListenerImpl listSelectionListenerContas;
 
     public void validarDadosAcesso() throws Exception {
         if (tabsConn.getSelectedIndex() == 0) {
@@ -191,6 +195,17 @@ public class SolidusGUI extends VRInternalFrame {
                 );
             } finally {
                 this.listSelectionListenerCheque.acionar = true;
+            }
+            
+            try {
+                this.listSelectionListenerContas.acionar = false;
+                listEntidadesContas.setModel(new EntidadeListModel(dao.getEntidades()));
+                getEntidadesSelecionadas(
+                        Parametros.get().get(SISTEMA, "ENTIDADE_CONTAS_SELECIONADAS"), 
+                        listEntidadesContas
+                );
+            } finally {
+                this.listSelectionListenerContas.acionar = true;
             }
             
         } catch (Exception ex) {
@@ -339,6 +354,8 @@ public class SolidusGUI extends VRInternalFrame {
                         }
                         if (chkCreditoRotativo.isSelected()) {
                             dao.setEntidadesCreditoRotativo((List<Entidade>) listEntidadesRotativo.getSelectedValuesList());
+                            dao.setRotativoDtaInicio(edtRotativoDtaInicio.getDate());
+                            dao.setRotativoDtaFim(edtRotativoDtaFim.getDate());
                             importador.importarCreditoRotativo();
                         }
                         if (chkCheque.isSelected()) {
@@ -349,6 +366,7 @@ public class SolidusGUI extends VRInternalFrame {
                             importador.importarOfertas(edtDtOferta.getDate());
                         }
                         if (chkContasAPagar.isSelected()) {
+                            dao.setEntidadesContas((List<Entidade>) listEntidadesContas.getSelectedValuesList());
                             importador.importarContasPagar(OpcaoContaPagar.NOVOS);
                         }
                         if (chkPdvVendas.isSelected()) {
@@ -439,18 +457,26 @@ public class SolidusGUI extends VRInternalFrame {
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         jScrollPane1 = new javax.swing.JScrollPane();
         listEntidadesRotativo = new vrframework.bean.list.VRList();
+        edtRotativoDtaInicio = new org.jdesktop.swingx.JXDatePicker();
+        edtRotativoDtaFim = new org.jdesktop.swingx.JXDatePicker();
+        vRLabel1 = new vrframework.bean.label.VRLabel();
+        vRLabel2 = new vrframework.bean.label.VRLabel();
         tabCheque = new vrframework.bean.panel.VRPanel();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
         jScrollPane2 = new javax.swing.JScrollPane();
         listEntidadesCheque = new vrframework.bean.list.VRList();
+        vRTabbedPane1 = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabOutros = new vrframework.bean.panel.VRPanel();
-        chkContasAPagar = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel4 = new vrframework.bean.panel.VRPanel();
         chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
         edtDtVendaIni = new org.jdesktop.swingx.JXDatePicker();
         vRPanel5 = new vrframework.bean.panel.VRPanel();
         chkOfertas = new vrframework.bean.checkBox.VRCheckBox();
         edtDtOferta = new org.jdesktop.swingx.JXDatePicker();
+        tabContasAPagar = new vrframework.bean.panel.VRPanel();
+        chkContasAPagar = new vrframework.bean.checkBox.VRCheckBox();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        listEntidadesContas = new vrframework.bean.list.VRList();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -668,7 +694,7 @@ public class SolidusGUI extends VRInternalFrame {
                         .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(261, Short.MAX_VALUE))
+                .addContainerGap(228, Short.MAX_VALUE))
         );
         tabImpFornecedorLayout.setVerticalGroup(
             tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -682,7 +708,7 @@ public class SolidusGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkFCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(71, Short.MAX_VALUE))
+                .addContainerGap(105, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Fornecedores", tabImpFornecedor);
@@ -714,7 +740,7 @@ public class SolidusGUI extends VRInternalFrame {
                 .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(339, Short.MAX_VALUE))
+                .addContainerGap(306, Short.MAX_VALUE))
         );
         tabClienteDadosLayout.setVerticalGroup(
             tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -723,7 +749,7 @@ public class SolidusGUI extends VRInternalFrame {
                 .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(66, Short.MAX_VALUE))
+                .addContainerGap(100, Short.MAX_VALUE))
         );
 
         tabClientes.addTab("Descrição", tabClienteDados);
@@ -743,15 +769,40 @@ public class SolidusGUI extends VRInternalFrame {
         });
         jScrollPane1.setViewportView(listEntidadesRotativo);
 
+        edtRotativoDtaInicio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtRotativoDtaInicioActionPerformed(evt);
+            }
+        });
+
+        edtRotativoDtaFim.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtRotativoDtaFimActionPerformed(evt);
+            }
+        });
+
+        vRLabel1.setText("Dt. Inicial");
+
+        vRLabel2.setText("Dt. Final");
+
         javax.swing.GroupLayout tabClienteRotativoLayout = new javax.swing.GroupLayout(tabClienteRotativo);
         tabClienteRotativo.setLayout(tabClienteRotativoLayout);
         tabClienteRotativoLayout.setHorizontalGroup(
             tabClienteRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tabClienteRotativoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 341, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabClienteRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tabClienteRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(tabClienteRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tabClienteRotativoLayout.createSequentialGroup()
+                                .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(67, 67, 67))
+                            .addComponent(edtRotativoDtaInicio, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(edtRotativoDtaFim, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         tabClienteRotativoLayout.setVerticalGroup(
@@ -759,10 +810,18 @@ public class SolidusGUI extends VRInternalFrame {
             .addGroup(tabClienteRotativoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabClienteRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE)
                     .addGroup(tabClienteRotativoLayout.createSequentialGroup()
                         .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(edtRotativoDtaInicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(edtRotativoDtaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -789,7 +848,7 @@ public class SolidusGUI extends VRInternalFrame {
             tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tabChequeLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 346, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -799,7 +858,7 @@ public class SolidusGUI extends VRInternalFrame {
             .addGroup(tabChequeLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
                     .addGroup(tabChequeLayout.createSequentialGroup()
                         .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -809,14 +868,6 @@ public class SolidusGUI extends VRInternalFrame {
         tabClientes.addTab("Cheques", tabCheque);
 
         vRTabbedPane2.addTab("Clientes", tabClientes);
-
-        chkContasAPagar.setText("Contas a pagar");
-        chkContasAPagar.setEnabled(true);
-        chkContasAPagar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkContasAPagarActionPerformed(evt);
-            }
-        });
 
         vRPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Importar Vendas (PDV)"));
 
@@ -881,28 +932,60 @@ public class SolidusGUI extends VRInternalFrame {
         tabOutrosLayout.setHorizontalGroup(
             tabOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabOutrosLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(tabOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(tabOutrosLayout.createSequentialGroup()
-                        .addComponent(vRPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(146, Short.MAX_VALUE))
+                .addGap(6, 6, 6)
+                .addComponent(vRPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(112, Short.MAX_VALUE))
         );
         tabOutrosLayout.setVerticalGroup(
             tabOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabOutrosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(tabOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(vRPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(66, Short.MAX_VALUE))
+                .addGroup(tabOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(97, Short.MAX_VALUE))
         );
 
-        vRTabbedPane2.addTab("Outros", tabOutros);
+        vRTabbedPane1.addTab("Outros", tabOutros);
+
+        chkContasAPagar.setText("Contas à Pagar");
+        chkContasAPagar.setEnabled(true);
+
+        listEntidadesContas.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane3.setViewportView(listEntidadesContas);
+
+        javax.swing.GroupLayout tabContasAPagarLayout = new javax.swing.GroupLayout(tabContasAPagar);
+        tabContasAPagar.setLayout(tabContasAPagarLayout);
+        tabContasAPagarLayout.setHorizontalGroup(
+            tabContasAPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tabContasAPagarLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(23, 23, 23))
+        );
+        tabContasAPagarLayout.setVerticalGroup(
+            tabContasAPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabContasAPagarLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabContasAPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(tabContasAPagarLayout.createSequentialGroup()
+                        .addComponent(chkContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        vRTabbedPane1.addTab("Contas à Pagar", tabContasAPagar);
+
+        vRTabbedPane2.addTab("Outros", vRTabbedPane1);
 
         tabs.addTab("Importação", vRTabbedPane2);
 
@@ -928,7 +1011,7 @@ public class SolidusGUI extends VRInternalFrame {
                     .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(221, Short.MAX_VALUE))
+                .addContainerGap(188, Short.MAX_VALUE))
         );
         vRPanel2Layout.setVerticalGroup(
             vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -943,7 +1026,7 @@ public class SolidusGUI extends VRInternalFrame {
                 .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(53, Short.MAX_VALUE))
+                .addContainerGap(87, Short.MAX_VALUE))
         );
 
         tabs.addTab("Unificação", vRPanel2);
@@ -1017,7 +1100,7 @@ public class SolidusGUI extends VRInternalFrame {
                             .addGroup(jPanel4Layout.createSequentialGroup()
                                 .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cmbLojaOrigem, 0, 90, Short.MAX_VALUE))
+                                .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGroup(jPanel4Layout.createSequentialGroup()
                                 .addComponent(vRLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(68, 68, 68)
@@ -1100,7 +1183,7 @@ public class SolidusGUI extends VRInternalFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(vRPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 483, Short.MAX_VALUE))
+                    .addComponent(vRPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -1110,7 +1193,7 @@ public class SolidusGUI extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
+                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -1192,16 +1275,13 @@ public class SolidusGUI extends VRInternalFrame {
     }//GEN-LAST:event_chkFCnpjActionPerformed
 
     private void chkCreditoRotativoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCreditoRotativoActionPerformed
-        // TODO add your handling code here:
+        edtRotativoDtaInicio.setDate(Parametros.get().getDate(SISTEMA, "ROTATIVO_DTA_INICIO"));
+        edtRotativoDtaFim.setDate(Parametros.get().getDate(SISTEMA, "ROTATIVO_DTA_FIM"));
     }//GEN-LAST:event_chkCreditoRotativoActionPerformed
 
     private void chkOfertasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkOfertasActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkOfertasActionPerformed
-
-    private void chkContasAPagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkContasAPagarActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkContasAPagarActionPerformed
 
     private void chkPdvVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkPdvVendasActionPerformed
         if (edtDtVendaIni.getDate() == null) {
@@ -1216,8 +1296,15 @@ public class SolidusGUI extends VRInternalFrame {
     private void chkChequeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkChequeActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkChequeActionPerformed
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
+    private void edtRotativoDtaInicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtRotativoDtaInicioActionPerformed
+        Parametros.get().put(new java.sql.Date(edtRotativoDtaInicio.getDate().getTime()), SISTEMA, "ROTATIVO_DTA_INICIO");
+    }//GEN-LAST:event_edtRotativoDtaInicioActionPerformed
+
+    private void edtRotativoDtaFimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtRotativoDtaFimActionPerformed
+        Parametros.get().put(new java.sql.Date(edtRotativoDtaFim.getDate().getTime()), SISTEMA, "ROTATIVO_DTA_FIM");
+    }//GEN-LAST:event_edtRotativoDtaFimActionPerformed
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
     private vrframework.bean.button.VRButton btnMigrar;
@@ -1264,17 +1351,22 @@ public class SolidusGUI extends VRInternalFrame {
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private org.jdesktop.swingx.JXDatePicker edtDtOferta;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
+    private org.jdesktop.swingx.JXDatePicker edtRotativoDtaFim;
+    private org.jdesktop.swingx.JXDatePicker edtRotativoDtaInicio;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private vrframework.bean.list.VRList listEntidadesCheque;
+    private vrframework.bean.list.VRList listEntidadesContas;
     private vrframework.bean.list.VRList listEntidadesRotativo;
     private vrframework.bean.panel.VRPanel tabCheque;
     private vrframework.bean.panel.VRPanel tabClienteDados;
     private vrframework.bean.panel.VRPanel tabClienteRotativo;
     private vrframework.bean.tabbedPane.VRTabbedPane tabClientes;
+    private vrframework.bean.panel.VRPanel tabContasAPagar;
     private vrframework.bean.panel.VRPanel tabImpFornecedor;
     private vrframework.bean.panel.VRPanel tabImpProduto;
     private vrframework.bean.panel.VRPanel tabOutros;
@@ -1285,6 +1377,8 @@ public class SolidusGUI extends VRInternalFrame {
     private vrframework.bean.textField.VRTextField txtPorta;
     private vrframework.bean.passwordField.VRPasswordField txtSenha;
     private vrframework.bean.textField.VRTextField txtUsuario;
+    private vrframework.bean.label.VRLabel vRLabel1;
+    private vrframework.bean.label.VRLabel vRLabel2;
     private vrframework.bean.label.VRLabel vRLabel20;
     private vrframework.bean.label.VRLabel vRLabel21;
     private vrframework.bean.label.VRLabel vRLabel23;
@@ -1296,6 +1390,7 @@ public class SolidusGUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel vRPanel4;
     private vrframework.bean.panel.VRPanel vRPanel5;
     private vrframework.bean.panel.VRPanel vRPanel6;
+    private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane1;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
     // End of variables declaration//GEN-END:variables
