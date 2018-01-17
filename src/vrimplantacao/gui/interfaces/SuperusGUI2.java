@@ -18,7 +18,6 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.RMSDAO;
 import vrimplantacao2.dao.interfaces.SuperusDAO;
 import vrimplantacao2.parametro.Parametros;
 
@@ -389,7 +388,7 @@ public class SuperusGUI2 extends VRInternalFrame {
         jLabel2 = new javax.swing.JLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
 
-        setTitle("Importação RMS");
+        setTitle("Importação Superus");
         setToolTipText("");
 
         vRToolBarPadrao3.setRollover(true);

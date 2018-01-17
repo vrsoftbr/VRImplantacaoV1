@@ -3,11 +3,18 @@ package vrimplantacao2.gui.interfaces;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
+import vrframework.bean.list.VRList;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
@@ -23,9 +30,13 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.SolidusDAO;
+import vrimplantacao2.gui.interfaces.custom.solidus.Entidade;
+import vrimplantacao2.gui.interfaces.custom.solidus.EntidadeListModel;
 import vrimplantacao2.parametro.Parametros;
 
 public class SolidusGUI extends VRInternalFrame {
+    
+    private static final Logger LOG = Logger.getLogger(SolidusGUI.class.getName());
     
     private static final String SISTEMA = "Solidus";
     private static final String SERVIDOR_SQL = "Firebird";
@@ -45,7 +56,7 @@ public class SolidusGUI extends VRInternalFrame {
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
     
-    private void gravarParametros() throws Exception {
+     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         params.put(txtHost.getText(), SISTEMA, "HOST");
         params.put(txtDatabase.getArquivo(), SISTEMA, "DATABASE");
@@ -53,6 +64,7 @@ public class SolidusGUI extends VRInternalFrame {
         params.put(txtUsuario.getText(), SISTEMA, "USUARIO");
         params.put(txtSenha.getText(), SISTEMA, "SENHA");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
+        
         if (cliente != null) {
             params.put(cliente.cnpj, SISTEMA, "LOJA_CLIENTE");
             vLojaCliente = cliente.cnpj;
@@ -74,14 +86,25 @@ public class SolidusGUI extends VRInternalFrame {
         //ConexaoFirebird.encoding = "WIN1252";        
         
         this.title = "Importação " + SISTEMA;
+        
+        listSelectionListenerRotativo = new ListSelectionListenerImpl("ENTIDADE_ROTATIVO_SELECIONADAS", listEntidadesRotativo);
+        listSelectionListenerCheque = new ListSelectionListenerImpl("ENTIDADE_CHEQUE_SELECIONADAS", listEntidadesCheque);
                 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
-
+        listEntidadesRotativo.setModel(new DefaultListModel());
+        listEntidadesRotativo.addListSelectionListener(listSelectionListenerRotativo);
+        
+        listEntidadesCheque.setModel(new DefaultListModel());
+        listEntidadesCheque.addListSelectionListener(listSelectionListenerCheque);
+        
         carregarParametros();
         
         centralizarForm();
         this.setMaximum(false);
     }
+    
+    private ListSelectionListenerImpl listSelectionListenerRotativo;
+    private ListSelectionListenerImpl listSelectionListenerCheque;
 
     public void validarDadosAcesso() throws Exception {
         if (tabsConn.getSelectedIndex() == 0) {
@@ -111,6 +134,9 @@ public class SolidusGUI extends VRInternalFrame {
         
         carregarLojaVR();
         carregarLojaCliente();
+        carregarEntidades();
+
+        
     }
     
     public void carregarLojaVR() throws Exception {
@@ -139,6 +165,39 @@ public class SolidusGUI extends VRInternalFrame {
             cont++;
         }
         cmbLojaOrigem.setSelectedIndex(index);
+    }
+    
+    private void carregarEntidades() {
+        
+        try {
+            
+            try {
+                this.listSelectionListenerRotativo.acionar = false;
+                listEntidadesRotativo.setModel(new EntidadeListModel(dao.getEntidades()));
+                getEntidadesSelecionadas(
+                        Parametros.get().get(SISTEMA, "ENTIDADE_ROTATIVO_SELECIONADAS"),
+                        listEntidadesRotativo                        
+                );
+            } finally {
+                this.listSelectionListenerRotativo.acionar = true;
+            }
+            
+            try {
+                this.listSelectionListenerCheque.acionar = false;
+                listEntidadesCheque.setModel(new EntidadeListModel(dao.getEntidades()));
+                getEntidadesSelecionadas(
+                        Parametros.get().get(SISTEMA, "ENTIDADE_CHEQUE_SELECIONADAS"), 
+                        listEntidadesCheque
+                );
+            } finally {
+                this.listSelectionListenerCheque.acionar = true;
+            }
+            
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Erro ao carregar as entidades", ex);
+            Util.exibirMensagemErro(ex, "Erro ao carregar as entidades");
+        }
+        
     }
     
     public static void exibir(VRMdiFrame i_mdiFrame) {
@@ -279,9 +338,11 @@ public class SolidusGUI extends VRInternalFrame {
                             importador.importarClienteEventual();
                         }
                         if (chkCreditoRotativo.isSelected()) {
+                            dao.setEntidadesCreditoRotativo((List<Entidade>) listEntidadesRotativo.getSelectedValuesList());
                             importador.importarCreditoRotativo();
                         }
                         if (chkCheque.isSelected()) {
+                            dao.setEntidadesCheques((List<Entidade>) listEntidadesCheque.getSelectedValuesList());
                             importador.importarCheque();
                         }
                         if (chkOfertas.isSelected()) {
@@ -365,16 +426,23 @@ public class SolidusGUI extends VRInternalFrame {
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkCustoComImposto = new vrframework.bean.checkBox.VRCheckBox();
         chkCustoSemImposto = new vrframework.bean.checkBox.VRCheckBox();
-        tabImpCliente = new vrframework.bean.panel.VRPanel();
-        chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
-        chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
-        chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
-        chkCheque = new vrframework.bean.checkBox.VRCheckBox();
         tabImpFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
         chkFCnpj = new vrframework.bean.checkBox.VRCheckBox();
+        tabClientes = new vrframework.bean.tabbedPane.VRTabbedPane();
+        tabClienteDados = new vrframework.bean.panel.VRPanel();
+        chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
+        chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
+        tabClienteRotativo = new vrframework.bean.panel.VRPanel();
+        chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        listEntidadesRotativo = new vrframework.bean.list.VRList();
+        tabCheque = new vrframework.bean.panel.VRPanel();
+        chkCheque = new vrframework.bean.checkBox.VRCheckBox();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        listEntidadesCheque = new vrframework.bean.list.VRList();
         tabOutros = new vrframework.bean.panel.VRPanel();
         chkContasAPagar = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel4 = new vrframework.bean.panel.VRPanel();
@@ -553,73 +621,6 @@ public class SolidusGUI extends VRInternalFrame {
 
         vRTabbedPane2.addTab("Produtos", tabImpProduto);
 
-        tabImpCliente.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
-
-        chkClientePreferencial.setText("Cliente Preferencial");
-        chkClientePreferencial.setEnabled(true);
-        chkClientePreferencial.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkClientePreferencialActionPerformed(evt);
-            }
-        });
-
-        chkClienteEventual.setText("Cliente Eventual");
-        chkClienteEventual.setEnabled(true);
-        chkClienteEventual.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkClienteEventualActionPerformed(evt);
-            }
-        });
-
-        chkCreditoRotativo.setText("Crédito Rotativo");
-        chkCreditoRotativo.setEnabled(true);
-        chkCreditoRotativo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkCreditoRotativoActionPerformed(evt);
-            }
-        });
-
-        chkCheque.setText("Cheques");
-        chkCheque.setEnabled(true);
-        chkCheque.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkChequeActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout tabImpClienteLayout = new javax.swing.GroupLayout(tabImpCliente);
-        tabImpCliente.setLayout(tabImpClienteLayout);
-        tabImpClienteLayout.setHorizontalGroup(
-            tabImpClienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabImpClienteLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(tabImpClienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(tabImpClienteLayout.createSequentialGroup()
-                        .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(tabImpClienteLayout.createSequentialGroup()
-                        .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(237, Short.MAX_VALUE))
-        );
-        tabImpClienteLayout.setVerticalGroup(
-            tabImpClienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabImpClienteLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(tabImpClienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(tabImpClienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(96, Short.MAX_VALUE))
-        );
-
-        vRTabbedPane2.addTab("Clientes", tabImpCliente);
-
         tabImpFornecedor.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
         chkFornecedor.setText("Fornecedor");
@@ -681,10 +682,133 @@ public class SolidusGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkFCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(73, Short.MAX_VALUE))
+                .addContainerGap(71, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Fornecedores", tabImpFornecedor);
+
+        tabClienteDados.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+
+        chkClientePreferencial.setText("Cliente Preferencial");
+        chkClientePreferencial.setEnabled(true);
+        chkClientePreferencial.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkClientePreferencialActionPerformed(evt);
+            }
+        });
+
+        chkClienteEventual.setText("Cliente Eventual");
+        chkClienteEventual.setEnabled(true);
+        chkClienteEventual.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkClienteEventualActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout tabClienteDadosLayout = new javax.swing.GroupLayout(tabClienteDados);
+        tabClienteDados.setLayout(tabClienteDadosLayout);
+        tabClienteDadosLayout.setHorizontalGroup(
+            tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabClienteDadosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(339, Short.MAX_VALUE))
+        );
+        tabClienteDadosLayout.setVerticalGroup(
+            tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabClienteDadosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(66, Short.MAX_VALUE))
+        );
+
+        tabClientes.addTab("Descrição", tabClienteDados);
+
+        chkCreditoRotativo.setText("Crédito Rotativo");
+        chkCreditoRotativo.setEnabled(true);
+        chkCreditoRotativo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkCreditoRotativoActionPerformed(evt);
+            }
+        });
+
+        listEntidadesRotativo.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane1.setViewportView(listEntidadesRotativo);
+
+        javax.swing.GroupLayout tabClienteRotativoLayout = new javax.swing.GroupLayout(tabClienteRotativo);
+        tabClienteRotativo.setLayout(tabClienteRotativoLayout);
+        tabClienteRotativoLayout.setHorizontalGroup(
+            tabClienteRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tabClienteRotativoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 341, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        tabClienteRotativoLayout.setVerticalGroup(
+            tabClienteRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabClienteRotativoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabClienteRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE)
+                    .addGroup(tabClienteRotativoLayout.createSequentialGroup()
+                        .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+
+        tabClientes.addTab("Crédito Rotativo", tabClienteRotativo);
+
+        chkCheque.setText("Cheques");
+        chkCheque.setEnabled(true);
+        chkCheque.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkChequeActionPerformed(evt);
+            }
+        });
+
+        listEntidadesCheque.setModel(new javax.swing.AbstractListModel() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public Object getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane2.setViewportView(listEntidadesCheque);
+
+        javax.swing.GroupLayout tabChequeLayout = new javax.swing.GroupLayout(tabCheque);
+        tabCheque.setLayout(tabChequeLayout);
+        tabChequeLayout.setHorizontalGroup(
+            tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tabChequeLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        tabChequeLayout.setVerticalGroup(
+            tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabChequeLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE)
+                    .addGroup(tabChequeLayout.createSequentialGroup()
+                        .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+
+        tabClientes.addTab("Cheques", tabCheque);
+
+        vRTabbedPane2.addTab("Clientes", tabClientes);
 
         chkContasAPagar.setText("Contas a pagar");
         chkContasAPagar.setEnabled(true);
@@ -775,7 +899,7 @@ public class SolidusGUI extends VRInternalFrame {
                     .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(68, Short.MAX_VALUE))
+                .addContainerGap(66, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Outros", tabOutros);
@@ -819,7 +943,7 @@ public class SolidusGUI extends VRInternalFrame {
                 .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(55, Short.MAX_VALUE))
+                .addContainerGap(53, Short.MAX_VALUE))
         );
 
         tabs.addTab("Unificação", vRPanel2);
@@ -986,7 +1110,7 @@ public class SolidusGUI extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -999,7 +1123,7 @@ public class SolidusGUI extends VRInternalFrame {
         try {
             this.setWaitCursor();
             importarTabelas();
-
+            gravarParametros();
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, getTitle());
 
@@ -1071,10 +1195,6 @@ public class SolidusGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkCreditoRotativoActionPerformed
 
-    private void chkChequeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkChequeActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkChequeActionPerformed
-
     private void chkOfertasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkOfertasActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkOfertasActionPerformed
@@ -1092,6 +1212,10 @@ public class SolidusGUI extends VRInternalFrame {
     private void edtDtOfertaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtDtOfertaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_edtDtOfertaActionPerformed
+
+    private void chkChequeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkChequeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkChequeActionPerformed
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1143,7 +1267,14 @@ public class SolidusGUI extends VRInternalFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel4;
-    private vrframework.bean.panel.VRPanel tabImpCliente;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private vrframework.bean.list.VRList listEntidadesCheque;
+    private vrframework.bean.list.VRList listEntidadesRotativo;
+    private vrframework.bean.panel.VRPanel tabCheque;
+    private vrframework.bean.panel.VRPanel tabClienteDados;
+    private vrframework.bean.panel.VRPanel tabClienteRotativo;
+    private vrframework.bean.tabbedPane.VRTabbedPane tabClientes;
     private vrframework.bean.panel.VRPanel tabImpFornecedor;
     private vrframework.bean.panel.VRPanel tabImpProduto;
     private vrframework.bean.panel.VRPanel tabOutros;
@@ -1169,6 +1300,52 @@ public class SolidusGUI extends VRInternalFrame {
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
     // End of variables declaration//GEN-END:variables
 
-    
+    private void getEntidadesSelecionadas(String param, VRList list) {
+        if (param != null && !"".equals(param)) {
+            for (String id: param.split(":")) {
+                for (int i = 0; i < list.getModel().getSize(); i++) {
+                    Entidade entidade = (Entidade) list.getModel().getElementAt(i);
+                    if (entidade.getId() == Integer.parseInt(id)) {
+                        list.addSelectionInterval(i, i);
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
+
+    private class ListSelectionListenerImpl implements ListSelectionListener {
+        
+        private String id;
+        private VRList list;
+
+        public ListSelectionListenerImpl(String id, VRList list) {
+            this.id = id;
+            this.list = list;
+        }
+        
+        public boolean acionar = true;
+
+        private String toStringEntidades() {
+            StringBuilder builder = new StringBuilder();
+            for (Iterator<Entidade> iterator = list.getSelectedValuesList().iterator(); iterator.hasNext(); ) {
+                builder.append(iterator.next().getId());
+                if (iterator.hasNext()) {
+                    builder.append(":");
+                }
+            }
+            return builder.toString();
+        }
+        
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            if (acionar) {
+                if (!e.getValueIsAdjusting()) {
+                    Parametros.get().put(toStringEntidades(), SISTEMA, id);
+                }
+            }
+        }
+    }
+    
 }

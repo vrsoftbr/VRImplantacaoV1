@@ -12,6 +12,7 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -481,6 +482,53 @@ public class VisualComercioDAO extends InterfaceDAO implements MapaTributoProvid
             )) {
                 while (rst.next()) {                    
                     result.add(new MapaTributoIMP(rst.getString("pr_icms"), rst.getString("pr_icms")));
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	p.pa_codigo id,\n" +
+                    "	p.pa_fornecedor idfornecedor,\n" +
+                    "	p.pa_documento numerodocumento,\n" +
+                    "	p.pa_emissao dataemissao,\n" +
+                    "	p.pa_valor valor,\n" +
+                    "	p.pa_vencimento vencimento,\n" +
+                    "	h.hi_nome historico,\n" +
+                    "	tp.ti_nome formapag,\n" +
+                    "	p.pa_complemento observacao\n" +
+                    "from\n" +
+                    "	pagar p\n" +
+                    "	left join historicos h on p.pa_historico = h.hi_codi\n" +
+                    "	left join tipos tp on p.pa_tipo_pagto = tp.ti_codi\n" +
+                    "where\n" +
+                    "	p.pa_pago != '*'\n" +
+                    "	and p.pa_loja = " + getLojaOrigem() + "\n" +
+                    "order by\n" +
+                    "	id"
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setNumeroDocumento(rst.getString("numerodocumento"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataEntrada(rst.getDate("dataemissao"));
+                    imp.setDataHoraAlteracao(rst.getTimestamp("dataemissao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("formapag") + " - " + rst.getString("historico") + " - " + rst.getString("observacao"));
+                    
+                    result.add(imp);
                 }
             }
         }
