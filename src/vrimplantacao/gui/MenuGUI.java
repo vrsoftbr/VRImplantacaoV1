@@ -55,7 +55,6 @@ import vrimplantacao.gui.interfaces.OrionGUI;
 import vrimplantacao.gui.interfaces.PCSistemasGUI;
 import vrimplantacao.gui.interfaces.PlanilhaChequeGUI;
 import vrimplantacao.gui.interfaces.BoechatSoftGUI;
-import vrimplantacao.gui.interfaces.CISSGui;
 import vrimplantacao.gui.interfaces.ConcretizeGUI;
 import vrimplantacao.gui.interfaces.ControlWareGUI;
 import vrimplantacao.gui.interfaces.IntelliCashGUI;
@@ -146,6 +145,7 @@ import vrimplantacao2.gui.interfaces.CPGestorGUI;
 import vrimplantacao.gui.interfaces.AlterarProdutoPdvVendaItemGUI;
 import vrimplantacao2.gui.interfaces.TstiGUI;
 import vrimplantacao2.gui.interfaces.CPlusGUI;
+import vrimplantacao2.gui.interfaces.CissGUI;
 import vrimplantacao2.gui.interfaces.SolidusGUI;
 import vrimplantacao2.gui.interfaces.WmsiGUI;
 
@@ -184,7 +184,6 @@ public final class MenuGUI extends VRMdiFrame {
     public VRSoftwarePDVGUI formImportarVRSoftwarePDV = null;
     public EccusInformaticaGUI formImportarEccusInformatica = null;
     public SuperServerGUI formImportarSuperServer = null;
-    public CISSGui formImportarCISS = null;
     public ControlWareGUI formImportarControlWare = null;
     public DestroGUI formImportarDestroGUI = null;
     public SysMouraGUI formImportarSysMoura = null;
@@ -2672,18 +2671,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemSuperServerActionPerformed
 
     private void jMenuItemCISSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemCISSActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarCISS == null || formImportarCISS.isClosed()) {
-                formImportarCISS = new CISSGui(this);
-            }
-
-            formImportarCISS.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
+        CissGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemCISSActionPerformed
 
     private void jMenuItemControlWareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemControlWareActionPerformed
