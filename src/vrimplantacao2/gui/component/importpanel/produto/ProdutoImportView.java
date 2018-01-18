@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package vrimplantacao2.gui.component.importpanel.produto;
 
 /**
@@ -32,32 +27,34 @@ public class ProdutoImportView extends javax.swing.JPanel {
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         chkProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1Custo = new vrframework.bean.checkBox.VRCheckBox();
+        chkCusto = new vrframework.bean.checkBox.VRCheckBox();
         chkCustoSemImposto = new vrframework.bean.checkBox.VRCheckBox();
         chkCustoComImposto = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1Preco = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1Estoque = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1EAN = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1EANemBranco = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1PisCofins = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1NatReceita = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1ICMS = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1AtivoInativo = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1DescCompleta = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1DescReduzida = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1DescGondola = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1ProdMercadologico = new vrframework.bean.checkBox.VRCheckBox();
+        chkPreco = new vrframework.bean.checkBox.VRCheckBox();
+        chkEstoque = new vrframework.bean.checkBox.VRCheckBox();
+        chkEAN = new vrframework.bean.checkBox.VRCheckBox();
+        chkEANemBranco = new vrframework.bean.checkBox.VRCheckBox();
+        chkPisCofins = new vrframework.bean.checkBox.VRCheckBox();
+        chkNatReceita = new vrframework.bean.checkBox.VRCheckBox();
+        chkICMS = new vrframework.bean.checkBox.VRCheckBox();
+        chkAtivoInativo = new vrframework.bean.checkBox.VRCheckBox();
+        chkDescCompleta = new vrframework.bean.checkBox.VRCheckBox();
+        chkDescReduzida = new vrframework.bean.checkBox.VRCheckBox();
+        chkDescGondola = new vrframework.bean.checkBox.VRCheckBox();
+        chkProdMercadologico = new vrframework.bean.checkBox.VRCheckBox();
         chkValidade = new vrframework.bean.checkBox.VRCheckBox();
         chkFamilia = new vrframework.bean.checkBox.VRCheckBox();
         chkTipoEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
-        chkQtdEmbalagemEAN1 = new vrframework.bean.checkBox.VRCheckBox();
+        chkMargem = new vrframework.bean.checkBox.VRCheckBox();
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkMercadologico, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkMercadologico.text")); // NOI18N
+        setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkMercadologico, "Mercadologico");
         chkMercadologico.setEnabled(true);
         add(chkMercadologico);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkFamiliaProduto, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkFamiliaProduto.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkFamiliaProduto, "Familia Produto");
         chkFamiliaProduto.setEnabled(true);
         chkFamiliaProduto.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -66,10 +63,10 @@ public class ProdutoImportView extends javax.swing.JPanel {
         });
         add(chkFamiliaProduto);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkProdutos, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkProdutos.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkProdutos, "Produtos");
         chkProdutos.setEnabled(true);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkManterBalanca, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkManterBalanca.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkManterBalanca, "Manter Balança");
         chkManterBalanca.setEnabled(true);
 
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
@@ -94,66 +91,66 @@ public class ProdutoImportView extends javax.swing.JPanel {
 
         add(vRPanel1);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkT1Custo, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkT1Custo.text")); // NOI18N
-        add(chkT1Custo);
+        org.openide.awt.Mnemonics.setLocalizedText(chkCusto, "Custo");
+        add(chkCusto);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkCustoSemImposto, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkCustoSemImposto.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkCustoSemImposto, "Custo Sem Imposto");
         add(chkCustoSemImposto);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkCustoComImposto, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkCustoComImposto.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkCustoComImposto, "Custo Com Imposto");
         add(chkCustoComImposto);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkT1Preco, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkT1Preco.text")); // NOI18N
-        add(chkT1Preco);
+        org.openide.awt.Mnemonics.setLocalizedText(chkPreco, "Preço");
+        add(chkPreco);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkT1Estoque, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkT1Estoque.text")); // NOI18N
-        add(chkT1Estoque);
+        org.openide.awt.Mnemonics.setLocalizedText(chkEstoque, "Estoque");
+        add(chkEstoque);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkT1EAN, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkT1EAN.text")); // NOI18N
-        add(chkT1EAN);
+        org.openide.awt.Mnemonics.setLocalizedText(chkEAN, "EAN");
+        add(chkEAN);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkT1EANemBranco, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkT1EANemBranco.text")); // NOI18N
-        add(chkT1EANemBranco);
+        org.openide.awt.Mnemonics.setLocalizedText(chkEANemBranco, "EAN em branco");
+        add(chkEANemBranco);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkT1PisCofins, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkT1PisCofins.text")); // NOI18N
-        add(chkT1PisCofins);
+        org.openide.awt.Mnemonics.setLocalizedText(chkPisCofins, "PIS/COFINS");
+        add(chkPisCofins);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkT1NatReceita, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkT1NatReceita.text")); // NOI18N
-        add(chkT1NatReceita);
+        org.openide.awt.Mnemonics.setLocalizedText(chkNatReceita, "Nat. Receita");
+        add(chkNatReceita);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkT1ICMS, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkT1ICMS.text")); // NOI18N
-        add(chkT1ICMS);
+        org.openide.awt.Mnemonics.setLocalizedText(chkICMS, "ICMS");
+        add(chkICMS);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkT1AtivoInativo, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkT1AtivoInativo.text")); // NOI18N
-        add(chkT1AtivoInativo);
+        org.openide.awt.Mnemonics.setLocalizedText(chkAtivoInativo, "Ativo/Inativo");
+        add(chkAtivoInativo);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkT1DescCompleta, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkT1DescCompleta.text")); // NOI18N
-        add(chkT1DescCompleta);
+        org.openide.awt.Mnemonics.setLocalizedText(chkDescCompleta, "Descrição Completa");
+        add(chkDescCompleta);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkT1DescReduzida, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkT1DescReduzida.text")); // NOI18N
-        add(chkT1DescReduzida);
+        org.openide.awt.Mnemonics.setLocalizedText(chkDescReduzida, "Descrição Reduzida");
+        add(chkDescReduzida);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkT1DescGondola, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkT1DescGondola.text")); // NOI18N
-        add(chkT1DescGondola);
+        org.openide.awt.Mnemonics.setLocalizedText(chkDescGondola, "Descrição Gondola");
+        add(chkDescGondola);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkT1ProdMercadologico, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkT1ProdMercadologico.text")); // NOI18N
-        add(chkT1ProdMercadologico);
+        org.openide.awt.Mnemonics.setLocalizedText(chkProdMercadologico, "Prod. Mercadológico");
+        add(chkProdMercadologico);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkValidade, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkValidade.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkValidade, "Validade");
         add(chkValidade);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkFamilia, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkFamilia.text")); // NOI18N
-        chkFamilia.setToolTipText(org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkFamilia.toolTipText")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkFamilia, "Família X Produto");
+        chkFamilia.setToolTipText("Corrige o relacionamento entre o produto e a família.");
         add(chkFamilia);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkTipoEmbalagemEAN, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkTipoEmbalagemEAN.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkTipoEmbalagemEAN, "Tipo Emb. EAN");
         add(chkTipoEmbalagemEAN);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkQtdEmbalagemEAN, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkQtdEmbalagemEAN.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkQtdEmbalagemEAN, "Qtd. Emb. EAN");
         add(chkQtdEmbalagemEAN);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkQtdEmbalagemEAN1, org.openide.util.NbBundle.getMessage(ProdutoImportView.class, "ProdutoImportView.chkQtdEmbalagemEAN1.text")); // NOI18N
-        add(chkQtdEmbalagemEAN1);
+        org.openide.awt.Mnemonics.setLocalizedText(chkMargem, "Margem");
+        add(chkMargem);
     }// </editor-fold>//GEN-END:initComponents
 
     private void chkFamiliaProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFamiliaProdutoActionPerformed
@@ -162,30 +159,30 @@ public class ProdutoImportView extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private vrframework.bean.checkBox.VRCheckBox chkCustoComImposto;
-    private vrframework.bean.checkBox.VRCheckBox chkCustoSemImposto;
-    private vrframework.bean.checkBox.VRCheckBox chkFamilia;
-    private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
-    private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
-    private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
-    private vrframework.bean.checkBox.VRCheckBox chkProdutos;
-    private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
-    private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN1;
-    private vrframework.bean.checkBox.VRCheckBox chkT1AtivoInativo;
-    private vrframework.bean.checkBox.VRCheckBox chkT1Custo;
-    private vrframework.bean.checkBox.VRCheckBox chkT1DescCompleta;
-    private vrframework.bean.checkBox.VRCheckBox chkT1DescGondola;
-    private vrframework.bean.checkBox.VRCheckBox chkT1DescReduzida;
-    private vrframework.bean.checkBox.VRCheckBox chkT1EAN;
-    private vrframework.bean.checkBox.VRCheckBox chkT1EANemBranco;
-    private vrframework.bean.checkBox.VRCheckBox chkT1Estoque;
-    private vrframework.bean.checkBox.VRCheckBox chkT1ICMS;
-    private vrframework.bean.checkBox.VRCheckBox chkT1NatReceita;
-    private vrframework.bean.checkBox.VRCheckBox chkT1PisCofins;
-    private vrframework.bean.checkBox.VRCheckBox chkT1Preco;
-    private vrframework.bean.checkBox.VRCheckBox chkT1ProdMercadologico;
-    private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
-    private vrframework.bean.checkBox.VRCheckBox chkValidade;
-    private vrframework.bean.panel.VRPanel vRPanel1;
+    public vrframework.bean.checkBox.VRCheckBox chkAtivoInativo;
+    public vrframework.bean.checkBox.VRCheckBox chkCusto;
+    public vrframework.bean.checkBox.VRCheckBox chkCustoComImposto;
+    public vrframework.bean.checkBox.VRCheckBox chkCustoSemImposto;
+    public vrframework.bean.checkBox.VRCheckBox chkDescCompleta;
+    public vrframework.bean.checkBox.VRCheckBox chkDescGondola;
+    public vrframework.bean.checkBox.VRCheckBox chkDescReduzida;
+    public vrframework.bean.checkBox.VRCheckBox chkEAN;
+    public vrframework.bean.checkBox.VRCheckBox chkEANemBranco;
+    public vrframework.bean.checkBox.VRCheckBox chkEstoque;
+    public vrframework.bean.checkBox.VRCheckBox chkFamilia;
+    public vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
+    public vrframework.bean.checkBox.VRCheckBox chkICMS;
+    public vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
+    public vrframework.bean.checkBox.VRCheckBox chkMargem;
+    public vrframework.bean.checkBox.VRCheckBox chkMercadologico;
+    public vrframework.bean.checkBox.VRCheckBox chkNatReceita;
+    public vrframework.bean.checkBox.VRCheckBox chkPisCofins;
+    public vrframework.bean.checkBox.VRCheckBox chkPreco;
+    public vrframework.bean.checkBox.VRCheckBox chkProdMercadologico;
+    public vrframework.bean.checkBox.VRCheckBox chkProdutos;
+    public vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
+    public vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
+    public vrframework.bean.checkBox.VRCheckBox chkValidade;
+    public vrframework.bean.panel.VRPanel vRPanel1;
     // End of variables declaration//GEN-END:variables
 }
