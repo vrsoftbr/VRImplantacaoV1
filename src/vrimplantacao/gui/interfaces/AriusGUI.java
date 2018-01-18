@@ -917,6 +917,12 @@ public class AriusGUI extends VRInternalFrame {
 
         txtBancoDadosOracle.setCaixaAlta(false);
 
+        cmbLojaCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbLojaClienteActionPerformed(evt);
+            }
+        });
+
         vRLabel8.setText("Tipo Venda");
 
         javax.swing.GroupLayout pnlConexaoLayout = new javax.swing.GroupLayout(pnlConexao);
@@ -1100,6 +1106,11 @@ public class AriusGUI extends VRInternalFrame {
             txtDtTerminoVenda.setDate(new Date(System.currentTimeMillis()));
         }
     }//GEN-LAST:event_chkPdvVendasActionPerformed
+
+    private void cmbLojaClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbLojaClienteActionPerformed
+        pnlBalanca.setSistema("ARIUS");
+        pnlBalanca.setLoja(String.valueOf(((ItemComboVO) cmbLojaCliente.getSelectedItem()).id));
+    }//GEN-LAST:event_cmbLojaClienteActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectarOracle;

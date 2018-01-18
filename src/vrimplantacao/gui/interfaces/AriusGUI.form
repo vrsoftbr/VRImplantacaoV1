@@ -949,6 +949,9 @@
               </Properties>
             </Component>
             <Component class="vrframework.bean.comboBox.VRComboBox" name="cmbLojaCliente">
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cmbLojaClienteActionPerformed"/>
+              </Events>
             </Component>
             <Component class="vrframework.bean.comboBox.VRComboBox" name="cmbTipoVenda">
             </Component>

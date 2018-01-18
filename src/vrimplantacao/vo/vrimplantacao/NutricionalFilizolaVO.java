@@ -6,7 +6,10 @@
 package vrimplantacao.vo.vrimplantacao;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import vrimplantacao.utils.Utils;
 
 public class NutricionalFilizolaVO {
     private int id = 0;
@@ -37,6 +40,7 @@ public class NutricionalFilizolaVO {
     private int percentualsodio = 0;
     private String porcao = "";
     public List<NutricionalFilizolaItemVO> vNutricionalFilizolaItem = new ArrayList<>();
+    private Set<String> produtoId = new LinkedHashSet<>();
 
     /**
      * @return the id
@@ -63,7 +67,7 @@ public class NutricionalFilizolaVO {
      * @param descricao the descricao to set
      */
     public void setDescricao(String descricao) {
-        this.descricao = descricao;
+        this.descricao = Utils.acertarTexto(descricao, 20);
     }
 
     /**
@@ -415,6 +419,13 @@ public class NutricionalFilizolaVO {
     public void setPorcao(String porcao) {
         this.porcao = porcao;
     }
-    
+
+    public void addProduto(String id) {
+        this.produtoId.add(id);
+    }
+
+    public Set<String> getProdutoId() {
+        return produtoId;
+    }
     
 }
