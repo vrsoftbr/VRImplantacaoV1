@@ -14,7 +14,7 @@ public class MercadologicoDAO {
 
     public void excluir() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            stm.execute("delete from mercadologico;");
+            stm.execute("delete from mercadologico where id > 0; delete from implantacao.codant_mercadologico;");
         }
     }
     

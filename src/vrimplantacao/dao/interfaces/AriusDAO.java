@@ -7,7 +7,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrframework.classe.ProgressBar;
@@ -15,6 +17,7 @@ import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -97,6 +100,57 @@ public class AriusDAO extends InterfaceDAO{
     }
 
     @Override
+    public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
+        
+        Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
+        
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                "select depto, secao, grupo, subgrupo, descritivo from deptos where secao = 0 and grupo = 0 and subgrupo = 0 order by 1,2,3,4"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP imp = new MercadologicoNivelIMP(rst.getString("depto"), rst.getString("descritivo"));
+                    merc.put(imp.getId(), imp);
+                }
+            }
+            
+            try (ResultSet rst = stm.executeQuery(
+                "select depto, secao, grupo, subgrupo, descritivo from deptos where secao != 0 and grupo = 0 and subgrupo = 0 order by 1,2,3,4"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP pai = merc.get(rst.getString("depto"));
+                    pai.addFilho(rst.getString("secao"), rst.getString("descritivo"));
+                }
+            }
+            
+            try (ResultSet rst = stm.executeQuery(
+                "select depto, secao, grupo, subgrupo, descritivo from deptos where secao != 0 and grupo != 0 and subgrupo = 0 order by 1,2,3,4"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP pai = merc.get(rst.getString("depto"));
+                    pai = pai.getNiveis().get(rst.getString("secao"));
+                    pai.addFilho(rst.getString("grupo"), rst.getString("descritivo"));
+                }
+            }
+            
+            try (ResultSet rst = stm.executeQuery(
+                "select depto, secao, grupo, subgrupo, descritivo from deptos where secao != 0 and grupo != 0 and subgrupo != 0 order by 1,2,3,4"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP pai = merc.get(rst.getString("depto"));
+                    pai = pai.getNiveis().get(rst.getString("secao"));
+                    pai = pai.getNiveis().get(rst.getString("grupo"));
+                    pai.addFilho(rst.getString("subgrupo"), rst.getString("descritivo"));
+                }
+            }
+        }        
+        
+        return new ArrayList<>(merc.values());
+    }
+    
+    
+
+    @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
         
@@ -113,9 +167,9 @@ public class AriusDAO extends InterfaceDAO{
                     "    m4.descritivo merc4_desc\n" +
                     "from\n" +
                     "    (select * from deptos where secao = 0 and grupo = 0 and subgrupo = 0) m1\n" +
-                    "    join (select * from deptos where secao != 0 and grupo = 0 and subgrupo = 0) m2 on m1.depto = m2.depto\n" +
-                    "    join (select * from deptos where secao != 0 and grupo != 0 and subgrupo = 0) m3 on m2.depto = m3.depto and m2.secao = m3.secao\n" +
-                    "    join (select * from deptos where secao != 0 and grupo != 0 and subgrupo != 0) m4 on m3.depto = m4.depto and m3.secao = m4.secao and m3.grupo = m4.grupo\n" +
+                    "    left join (select * from deptos where secao != 0 and grupo = 0 and subgrupo = 0) m2 on m1.depto = m2.depto\n" +
+                    "    left join (select * from deptos where secao != 0 and grupo != 0 and subgrupo = 0) m3 on m2.depto = m3.depto and m2.secao = m3.secao\n" +
+                    "    left join (select * from deptos where secao != 0 and grupo != 0 and subgrupo != 0) m4 on m3.depto = m4.depto and m3.secao = m4.secao and m3.grupo = m4.grupo\n" +
                     "order by\n" +
                     "    merc1,\n" +
                     "    merc2,\n" +
@@ -181,15 +235,17 @@ public class AriusDAO extends InterfaceDAO{
                 "    coalesce(ean.ean, cast(a.id as varchar(13))) codigobarras,\n" +
                 "    coalesce(ean.qtdee, 1) qtdembalagem,\n" +
                 "    a.unidade_venda unidade,\n" +
+                "    a.qtde_embalageme qtdembalagem_compra,\n" +
+                "    a.unidade_compra,\n" +
                 "    a.ipv,\n" +
                 "    case when not bal.id is null then 'S' else 'N' end balanca,\n" +
                 "    a.descritivo descricaocompleta,\n" +
                 "    a.descritivo_pdv descricaoreduzida,\n" +
                 "    a.descritivo descricaogondola, \n" +
                 "    a.depto cod_mercadologico1,\n" +
-                "    a.secao cod_mercadologico2,\n" +
-                "    a.grupo cod_mercadologico3,\n" +
-                "    a.subgrupo cod_mercadologico4,\n" +
+                "    nullif(a.secao,0) cod_mercadologico2,\n" +
+                "    nullif(a.grupo,0) cod_mercadologico3,\n" +
+                "    nullif(a.subgrupo,0) cod_mercadologico4,\n" +
                 "    a.familia id_familiaproduto,\n" +
                 "    fam.descritivo familiaproduto,\n" +
                 "    a.pesob pesobruto,\n" +
@@ -312,6 +368,7 @@ public class AriusDAO extends InterfaceDAO{
                     imp.setIcmsAliq(rst.getDouble("icms_aliquota"));
                     imp.setIcmsReducao(rst.getDouble("icms_reduzido"));
                     
+                    //imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem_compra"));
                     
                     ProgressBar.setStatus("Convertendo em IMP.... " + cont);
                     cont++;
@@ -435,9 +492,11 @@ public class AriusDAO extends InterfaceDAO{
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
-                    "	id_fornecedor,\n" +
-                    "	id_produto,\n" +
-                    "	codigo_exterior\n" +
+                    "	pf.id_fornecedor,\n" +
+                    "	pf.id_produto,\n" +
+                    "	pf.codigo_exterior,\n" +
+                    "	p.qtde_embalageme qtdembalagem,\n" +
+                    "	p.unidade_compra\n" +
                     "from \n" +
                     "	(select\n" +
                     "		produto id_produto,\n" +
@@ -452,9 +511,10 @@ public class AriusDAO extends InterfaceDAO{
                     "		trim(coalesce(referencia,'')) codigo_exterior \n" +
                     "	from\n" +
                     "	    produtos_fornecedor_refs) pf\n" +
+                    "	join produtos p on pf.id_produto = p.id\n" +
                     "order by\n" +
-                    "	id_fornecedor,\n" +
-                    "	id_produto"
+                    "	pf.id_fornecedor,\n" +
+                    "	pf.id_produto"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -464,6 +524,7 @@ public class AriusDAO extends InterfaceDAO{
                     imp.setIdFornecedor(rst.getString("id_fornecedor"));
                     imp.setIdProduto(rst.getString("id_produto"));
                     imp.setCodigoExterno(rst.getString("codigo_exterior"));
+                    imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
                     
                     result.add(imp);
                 }

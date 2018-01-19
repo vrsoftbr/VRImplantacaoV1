@@ -216,7 +216,7 @@ public class AriusGUI extends VRInternalFrame {
                         }
 
                         if (chkMercadologico.isSelected()) {
-                            importador.importarMercadologico();
+                            importador.importarMercadologicoPorNiveis(false);
                         }
 
                         if (chkProdutos.isSelected()) {
