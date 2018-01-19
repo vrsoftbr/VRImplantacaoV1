@@ -421,13 +421,16 @@ public class SolidusDAO extends InterfaceDAO {
                     "    pf.cod_fornecedor,\n" +
                     "    pf.cod_produto,\n" +
                     "    pf.des_referencia,\n" +
-                    "    pf.dta_alteracao,\n" +
-                    "    pf.qtd_embalagem_compra,\n" +
-                    "    pf.val_custo_embalagem\n" +
+                    "    max(pf.dta_alteracao) dta_alteracao,\n" +
+                    "    max(pf.qtd_embalagem_compra) qtd_embalagem_compra,\n" +
+                    "    max(pf.val_custo_embalagem) val_custo_embalagem\n" +
                     "from\n" +
                     "    tab_produto_fornecedor pf\n" +
-                    "where\n" +
-                    "    pf.cod_loja = " + getLojaOrigem() + "\n" +
+                    "group by\n" +
+                    "    pf.cod_fornecedor,\n" +
+                    "    pf.cod_produto,\n" +
+                    "    pf.des_referencia,\n" +
+                    "    pf.val_custo_embalagem\n" +
                     "order by 1,2,3"
             )) {
                 while (rst.next()) {
