@@ -229,10 +229,11 @@ public class ProdutoFornecedorDAO {
                     fornecedor != null &&
                     produto != null &&
                     !codigoExternoExistentes.containsKey(
-                            String.valueOf(fornecedor.getId()),
-                            String.valueOf(produto.getId()),
-                            String.valueOf(idUfEmpresa),
-                            Utils.acertarTexto(imp.getCodigoExterno(), 50))
+                        String.valueOf(fornecedor.getId()),
+                        String.valueOf(produto.getId()),
+                        String.valueOf(idUfEmpresa),
+                        Utils.acertarTexto(imp.getCodigoExterno(), 50)
+                    )
                 ) {
                     ProdutoFornecedorVO produtoFornecedor = produtoFornecedorExistentes.get(
                         fornecedor.getId(),

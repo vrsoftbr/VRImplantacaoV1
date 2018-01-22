@@ -29,23 +29,22 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="420" pref="450" max="32767" attributes="0"/>
-                  </Group>
+                  <Component id="pnlLoja" alignment="0" max="32767" attributes="0"/>
+                  <Component id="conexaoMySQL" alignment="0" pref="474" max="32767" attributes="0"/>
+                  <Component id="tabOperacoes" alignment="0" pref="0" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="pnlLoja" alignment="0" max="32767" attributes="0"/>
-                          <Component id="conexaoMySQL" alignment="0" max="32767" attributes="0"/>
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
-                              <Component id="cmbLojaOrigem" max="32767" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
-                          <Component id="tabOperacoes" alignment="0" pref="0" max="32767" attributes="0"/>
+                          <Component id="cmbLojaOrigem" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
+                      <Component id="btnMapaTribut" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -55,11 +54,16 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="conexaoMySQL" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="cmbLojaOrigem" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="cmbLojaOrigem" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Component id="btnMapaTribut" max="32767" attributes="0"/>
+              </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="tabOperacoes" pref="212" max="32767" attributes="0"/>
+              <Component id="tabOperacoes" pref="241" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pnlLoja" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -343,5 +347,14 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="vrframework.bean.button.VRButton" name="btnMapaTribut">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Mapa de Tribut."/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMapaTributActionPerformed"/>
+      </Events>
+    </Component>
   </SubComponents>
 </Form>
