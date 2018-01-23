@@ -19,6 +19,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
@@ -254,8 +255,8 @@ public class AriusDAO extends InterfaceDAO{
                 "    a.validade,\n" +
                 "    loja.margem_lucro margem, \n" +
                 "    0 as estoquemaximo,\n" +
-                "    estoq.minimo estoqueminimo,\n" +
-                "    estoq.estoque,\n" +
+                "    estoq.estoque_minimo estoqueminimo,\n" +
+                "    estoq.estoque_atual estoque,\n" +
                 "    loja.custo custocomimposto, \n" +
                 "    loja.custo_liquido custosemimposto,  \n" +
                 "    preco.venda precovenda,\n" +
@@ -299,7 +300,8 @@ public class AriusDAO extends InterfaceDAO{
                 "    join politicas_empresa poli on poli.empresa = emp.id\n" +
                 "    join produtos_precos preco on a.id = preco.produto and poli.politica = preco.politica and preco.id = " + tipoVenda + "\n" +
                 "    join produtos_loja loja on a.id = loja.id and poli.politica = loja.politica\n" +
-                "    join (select empresa, produto, sum(estoque_atual) estoque, max(estoque_minimo) minimo from produtos_estoques pest join estoques e on pest.estoque = e.id group by empresa, produto) estoq on estoq.produto = a.id and estoq.empresa = emp.id\n" +
+                "    join estoques e on e.empresa = emp.id and e.troca != 'T'\n" +
+                "    join produtos_estoques estoq on estoq.produto = a.id and estoq.estoque = e.id\n" +
                 "    left join produtos_ean ean on ean.produto = a.id\n" +
                 "    left join (select distinct id from vw_produtos_balancas order by id) bal on bal.id = a.id\n" +
                 "    left join familias fam on a.familia = fam.id\n" +
@@ -319,6 +321,7 @@ public class AriusDAO extends InterfaceDAO{
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("codigobarras"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem_compra"));
                     
                     switch (rst.getInt("ipv")) {
                         case 0: {
@@ -440,7 +443,8 @@ public class AriusDAO extends InterfaceDAO{
                     "    f.observacao,\n" +
                     "    f.dias_vencto,\n" +
                     "    f.frequencia prazovisita,\n" +
-                    "    f.entrega prazoentrega\n" +
+                    "    f.entrega prazoentrega,\n" +
+                    "    f.email\n" +
                     "from\n" +
                     "    fornecedores f\n" +
                     "order by\n" +
@@ -476,6 +480,10 @@ public class AriusDAO extends InterfaceDAO{
                     imp.setCondicaoPagamento(Utils.stringToInt(rst.getString("dias_vencto")));
                     imp.setPrazoVisita(rst.getInt("prazovisita"));
                     imp.setPrazoEntrega(rst.getInt("prazoentrega"));
+                    String email = Utils.acertarTexto(rst.getString("email")).toLowerCase();
+                    if (!"".equals(email)) {
+                        imp.addContato("EMAIL", "EMAIL", "", "", TipoContato.COMERCIAL, email);
+                    }
                     
                     result.add(imp);
                 }
@@ -1116,6 +1124,7 @@ public class AriusDAO extends InterfaceDAO{
 
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        
         final String sql = "select\n" +
                     "    v.id,\n" +
                     "    v.nf numerocupom,\n" +
@@ -1141,6 +1150,7 @@ public class AriusDAO extends InterfaceDAO{
                     "order by v.id";
         try {
             return new Iterator<VendaIMP>() {
+                
                 private Statement stm = ConexaoOracle.createStatement();
                 private ResultSet rst = stm.executeQuery(sql);
 
@@ -1195,6 +1205,7 @@ public class AriusDAO extends InterfaceDAO{
             LOG.log(Level.SEVERE, "Erro\n" + sql, ex);
             throw ex;        
         }
+        
     }
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
