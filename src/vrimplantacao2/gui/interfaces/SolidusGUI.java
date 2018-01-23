@@ -319,6 +319,9 @@ public class SolidusGUI extends VRInternalFrame {
                             if (chkQtdEmbalagemEAN.isSelected()) {
                                 opcoes.add(OpcaoProduto.QTD_EMBALAGEM_EAN);
                             }
+                            if (chkFabricante.isSelected()) {
+                                opcoes.add(OpcaoProduto.FABRICANTE);
+                            }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
                             }
@@ -329,7 +332,7 @@ public class SolidusGUI extends VRInternalFrame {
                         }
                         if (chkT1EANemBranco.isSelected()) {
                             importador.importarEANemBranco();
-                        }
+                        }                        
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
@@ -444,6 +447,7 @@ public class SolidusGUI extends VRInternalFrame {
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkCustoComImposto = new vrframework.bean.checkBox.VRCheckBox();
         chkCustoSemImposto = new vrframework.bean.checkBox.VRCheckBox();
+        chkFabricante = new vrframework.bean.checkBox.VRCheckBox();
         tabImpFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -644,6 +648,9 @@ public class SolidusGUI extends VRInternalFrame {
 
         chkCustoSemImposto.setText("Custo Sem Imposto");
         tabImpProduto.add(chkCustoSemImposto);
+
+        chkFabricante.setText("Fabricante");
+        tabImpProduto.add(chkFabricante);
 
         vRTabbedPane2.addTab("Produtos", tabImpProduto);
 
@@ -1317,6 +1324,7 @@ public class SolidusGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCustoSemImposto;
     private vrframework.bean.checkBox.VRCheckBox chkFCnpj;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
+    private vrframework.bean.checkBox.VRCheckBox chkFabricante;
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
     private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
