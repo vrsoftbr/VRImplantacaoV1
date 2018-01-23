@@ -67,6 +67,8 @@ public class ProdutoIMP {
     private boolean sugestaoCotacao;
     private boolean sugestaoPedido;
     
+    private String fornecedorFabricante;
+    
     public String getImportSistema() {
         return importSistema;
     }
@@ -488,6 +490,14 @@ public class ProdutoIMP {
 
     public void setDescontinuado(boolean descontinuado) {
         this.descontinuado = descontinuado;
+    }
+
+    public String getFornecedorFabricante() {
+        return fornecedorFabricante;
+    }
+
+    public void setFornecedorFabricante(String fornecedorFabricante) {
+        this.fornecedorFabricante = fornecedorFabricante;
     }
 
 }
