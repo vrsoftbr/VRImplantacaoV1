@@ -3,10 +3,17 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
+import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 public class AsefeDAO extends InterfaceDAO {
@@ -54,24 +61,30 @@ public class AsefeDAO extends InterfaceDAO {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT \n"
-                    + "CODBARRA_PRODUTOS, "
-                    + "CODPROD_PRODUTOS, "
-                    + "DESCRICAO_PRODUTOS,\n"
-                    + "UNIDADE_PRODUTOS, "
-                    + "CODGRU_PRODUTOS, "
-                    + "CUSTO_PRODUTOS, "
-                    + "VENDA_PRODUTOS,\n"
-                    + "NCM_PRODUTOS, "
-                    + "STPIS, "
-                    + "STCOFINS, "
-                    + "STICMS, "
-                    + "CEST, "
-                    + "CODIGOSETOR, "
-                    + "CODGRU_PRODUTOS\n"
-                    + "FROM\n"
-                    + "CE_PRODUTOS\n"
-                    + "ORDER BY \n"
-                    + "CODPROD_PRODUTOS"
+                    + "P.CODBARRA_PRODUTOS, \n"
+                    + "P.CODPROD_PRODUTOS, \n"
+                    + "P.DESCRICAO_PRODUTOS,\n"
+                    + "P.UNIDADE_PRODUTOS, \n"
+                    + "P.CODGRU_PRODUTOS, \n"
+                    + "P.CUSTO_PRODUTOS, \n"
+                    + "P.VENDA_PRODUTOS,\n"
+                    + "P.NCM_PRODUTOS, \n"
+                    + "P.STPIS, \n"
+                    + "P.STCOFINS, \n"
+                    + "P.CEST, \n"
+                    + "P.CODIGOSETOR, \n"
+                    + "P.CODGRU_PRODUTOS,\n"
+                    + "P.CODMOD_PRODUTOS, \n"
+                    + "P.STICMS,\n"
+                    + "M.DESCRICAO_MODELOS,\n"
+                    + "M.CODTRIB_MODELOS,\n"
+                    + "R.VALORREDUCAO,\n"
+                    + "P.PRODUTOPESAVEL\n"
+                    + "FROM CE_PRODUTOS P\n"
+                    + "LEFT JOIN CE_MODELOS M ON M.CODIGO_MODELOS = P.CODMOD_PRODUTOS\n"
+                    + "LEFT JOIN VW_GERALPRODUTOS P2 ON P2.CodInterno = P.CODPROD_PRODUTOS\n"
+                    + "LEFT JOIN CE_REDUCAOICMS R ON R.CODIGO = P2.CodReducao\n"
+                    + "ORDER BY CODPROD_PRODUTOS"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -79,6 +92,7 @@ public class AsefeDAO extends InterfaceDAO {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("CODPROD_PRODUTOS"));
                     imp.setEan(rst.getString("CODBARRA_PRODUTOS"));
+                    imp.setTipoEmbalagem(rst.getString("UNIDADE_PRODUTOS"));
                     imp.setDescricaoCompleta(rst.getString("DESCRICAO_PRODUTOS"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoGondola());
@@ -93,11 +107,59 @@ public class AsefeDAO extends InterfaceDAO {
                     imp.setPiscofinsCstDebito(rst.getInt("STPIS"));
                     imp.setPiscofinsCstCredito(rst.getInt("STCOFINS"));
                     imp.setIcmsCst(rst.getInt("STICMS"));
+                    imp.setIcmsAliq(rst.getDouble("CODTRIB_MODELOS"));
+                    imp.setIcmsReducao(rst.getDouble("VALORREDUCAO"));
                     vResult.add(imp);
                 }
             }
         }
         return vResult;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opcao) throws Exception {
+        if (opcao == OpcaoProduto.ICMS) {
+            List<ProdutoIMP> vResult = new ArrayList<>();
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "COD_ITEM, COD_BARRA, DESCR_ITEM,\n"
+                        + "CST_ICMS, ALIQ_ICMS, BC_ICMS_ST \n"
+                        + "from VWPRODUTOSCONTABILIDADE"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportId(rst.getString("COD_ITEM"));
+                        imp.setIcmsCst(rst.getInt("CST_ICMS"));
+                        imp.setIcmsAliq(rst.getDouble("ALIQ_ICMS"));
+                        imp.setIcmsReducao(0);
+                        vResult.add(imp);
+                    }
+                }
+                return vResult;
+            }
+        } else if (opcao == OpcaoProduto.ESTOQUE) {
+            List<ProdutoIMP> vResult = new ArrayList<>();
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select QtdEstoque, CodInterno \n"
+                        + "from VW_GERALPRODUTOS"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("CodInterno"));
+                        imp.setEstoque(rst.getDouble("QtdEstoque"));
+                        vResult.add(imp);
+                    }
+                }
+                return vResult;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -173,5 +235,129 @@ public class AsefeDAO extends InterfaceDAO {
             }
         }
         return vResult;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n"
+                    + "C.Codigo, \n"
+                    + "C.Data, \n"
+                    + "C.ValorTotal, \n"
+                    + "C.CodCliente,\n"
+                    + "C.Coo, \n"
+                    + "C.NumImpFiscal, \n"
+                    + "C.NumeroCaixa,\n"
+                    + "P.Data,\n"
+                    + "P.DataVencimento,\n"
+                    + "P.Numero,\n"
+                    + "P.Juros,\n"
+                    + "P.Valor,\n"
+                    + "P.ValorRestante\n"
+                    + "FROM VendasCrediario C\n"
+                    + "INNER JOIN ParcelasCrediario P ON P.CodVenda = C.Codigo  \n"
+                    + "WHERE P.DataPagamento IS NULL \n"
+                    + "AND C.CodEmpresa = " + getLojaOrigem() + "\n"
+                    + "ORDER BY C.Data DESC"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("Codigo"));
+                    imp.setIdCliente(rst.getString("CodCliente"));
+                    imp.setNumeroCupom(rst.getString("NumImpFiscal"));
+                    imp.setEcf(rst.getString("NumeroCaixa"));
+                    imp.setValor(rst.getDouble("Valor"));
+                    imp.setParcela(rst.getInt("Numero"));
+                    imp.setDataEmissao(rst.getDate("Data"));
+                    imp.setDataVencimento(rst.getDate("DataVencimento"));
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "ch.Codigo_Cheque, ch.Codcli_Cheque,\n"
+                    + "ch.Numero_Cheque, ch.Agencia_Cheque,\n"
+                    + "ch.Banco_Cheque, ch.DataEmissao_Cheque,\n"
+                    + "ch.DataVencimento_Cheque, ch.Valor_Cheque,\n"
+                    + "ch.Nomerepasse_Cheque, ch.Cpfrepasse_Cheque,\n"
+                    + "ch.Telrepasse_Cheque, ch.Conta_Cheque, ch.CpfCheque,\n"
+                    + "ch.CpfCliente, ch.NomeCliente, ch.Compensado, ch.CMC7,\n"
+                    + "ch.DataCadastro_Cheque, ch.DataUltAlteracao, ch.Telefone,\n"
+                    + "cli.NomeCliente cliente, cli.CpfCliente cpf, cli.RgCliente rg,\n"
+                    + "case ch.codhistorico_Cheque \n"
+                    + "when 1 then 'CHEQUE OK'\n"
+                    + "when 2 then 'CHEQUE BLOQUEADO' end historico\n"
+                    + "from CC_Cheques ch \n"
+                    + "left join CC_Clientes cli on cli.CodCliente = ch.Codcli_Cheque\n"
+                    + "where ch.CodEmpresa = " + getLojaOrigem() + "\n"
+                    + "order by Codigo_Cheque"
+            )) {
+                while (rst.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    imp.setId(rst.getString("Codigo_Cheque"));
+                    imp.setNumeroCheque(rst.getString("Numero_Cheque"));
+                    imp.setBanco(rst.getInt("Banco_Cheque"));
+                    imp.setAgencia(rst.getString("Agencia_Cheque"));
+                    imp.setConta(rst.getString("Conta_Cheque"));
+                    imp.setNome(rst.getString("cliente"));
+                    imp.setCpf(rst.getString("cpf"));
+                    imp.setRg(rst.getString("rg"));
+                    imp.setTelefone(rst.getString("Telefone"));
+                    imp.setCmc7(rst.getString("CMC7"));
+                    imp.setDataHoraAlteracao(rst.getTimestamp("DataUltAlteracao"));
+                    imp.setDate(rst.getDate("DataEmissao_Cheque"));
+                    imp.setDataDeposito(rst.getDate("DataVencimento_Cheque"));
+                    imp.setValor(rst.getDouble("Valor_Cheque"));
+                    imp.setAlinea(0);
+                    vResult.add(imp);
+                }
+            }
+            return vResult;
+        }
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        if (dataTermino == null) {
+            dataTermino = new Date();
+        }
+        List<OfertaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "o.CODIGO, o.DataInicial, o.DataFinal,\n"
+                    + "op.PRECOPROMOCAO_PRODUTOS,\n"
+                    + "p.CODPROD_PRODUTOS, op.DESCRICAO\n"
+                    + "from vwPromocao o \n"
+                    + "inner join vwPromocaoProdutos op on op.CODIGO_PROMOCAO = o.CODIGO\n"
+                    + "inner join CE_PRODUTOS p on p.CODBARRA_PRODUTOS = op.CODIGOBARRAS_PRODUTOS\n"
+                    + "where o.DataFinal > GETDATE()"
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+
+                    imp.setIdProduto(rst.getString("CODPROD_PRODUTOS"));
+                    imp.setDataInicio(rst.getDate("DataInicial"));
+                    imp.setDataFim(rst.getDate("DataFinal"));
+                    imp.setPrecoOferta(rst.getDouble("PRECOPROMOCAO_PRODUTOS"));
+                    imp.setSituacaoOferta(SituacaoOferta.ATIVO);
+                    imp.setTipoOferta(TipoOfertaVO.CAPA);
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 }
