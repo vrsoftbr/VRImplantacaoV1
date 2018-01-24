@@ -28,10 +28,10 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
     public void setSistema(String sistema) {
         this.sistema = sistema;
         if (this.sistema != null && this.loja != null) {
-            tabsOpcoes.remove(tabPesaveis);
-            tabsOpcoes.addTab("Pesáveis", tabPesaveis);
+            tabsOpcoes.remove(tabNutricional);
+            tabsOpcoes.addTab("Nutricionais", tabNutricional);
         } else {
-            tabsOpcoes.remove(tabPesaveis);
+            tabsOpcoes.remove(tabNutricional);
         }
     }
 
@@ -42,10 +42,10 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
     public void setLoja(String loja) {
         this.loja = loja;
         if (this.sistema != null && this.loja != null) {
-            tabsOpcoes.remove(tabPesaveis);
-            tabsOpcoes.addTab("Pesáveis", tabPesaveis);
+            tabsOpcoes.remove(tabNutricional);
+            tabsOpcoes.addTab("Nutricionais", tabNutricional);
         } else {
-            tabsOpcoes.remove(tabPesaveis);
+            tabsOpcoes.remove(tabNutricional);
         }
     }
     
