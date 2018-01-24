@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -197,7 +198,8 @@ public class ProdutoRepository {
             ProgressBar.setStatus("Produtos - Organizando produtos");
             System.gc();
             MultiMap<String, ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
-            MultiMap<Integer, Void> aliquotas = provider.aliquota().getAliquotas();
+            MultiMap<Integer, Void> aliquotas = provider.aliquota().getAliquotas();            
+
             produtos.clear();
             System.gc();
 
@@ -570,6 +572,9 @@ public class ProdutoRepository {
         return eanAnterior;
     }
 
+    
+    private Map<String, Integer> fabricantes  = null;
+    
     /**
      * Converte um {@link ProdutoIMP} em um {@link ProdutoVO}.
      * @param imp {@link ProdutoIMP} a ser convertido.
@@ -582,6 +587,11 @@ public class ProdutoRepository {
      */
     public ProdutoVO converterIMP(ProdutoIMP imp, int id, long ean, 
             TipoEmbalagem unidade, boolean eBalanca) throws Exception {
+        
+        if (fabricantes == null) {
+            fabricantes = provider.getFornecedoresImportados();
+        }
+        
         ProdutoVO vo = new ProdutoVO();
                   
         vo.setId(id);
@@ -600,6 +610,14 @@ public class ProdutoRepository {
         if (vo.getDatacadastro() == null) {
             vo.setDatacadastro(new Date());
         }
+        
+        Integer fornecedorFabricante = fabricantes.get(imp.getFornecedorFabricante());
+        if (fornecedorFabricante != null) {
+            vo.setIdFornecedorFabricante(fornecedorFabricante);
+        } else {
+            vo.setIdFornecedorFabricante(1);
+        }
+        
         vo.setFamiliaProduto(provider.getFamiliaProduto(imp.getIdFamiliaProduto()));
         vo.setMargem(imp.getMargem());
         MercadologicoVO merc = provider.getMercadologico(

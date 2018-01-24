@@ -2,9 +2,12 @@ package vrimplantacao2.dao.cadastro.fornecedor;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
+import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorVO;
 import vrimplantacao2.vo.cadastro.local.EstadoVO;
@@ -152,6 +155,39 @@ public class FornecedorAnteriorDAO {
                 
                 stm.execute(sql.getInsert());
             }
+    }
+
+    /**
+     * Retorna {@link Map} com IDs de fornecedores importados.
+     * @param sistema Nome do sistema armazenado na tabela implantacao.codant_fornecedor.
+     * @param loja Loja onde foram mapeados os resgistros da implantaca.codant_fornecedor.
+     * @return {@link Map} com os IDs importados.
+     * @throws Exception 
+     */
+    public Map<String, Integer> getFornecedoresImportados(String sistema, String loja) throws Exception {
+        Map<String, Integer> result = new LinkedHashMap<>();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	ant.importid,\n" +
+                    "	ant.codigoatual\n" +
+                    "from\n" +
+                    "	implantacao.codant_fornecedor ant\n" +
+                    "	join fornecedor f on ant.codigoatual = f.id\n" +
+                    "where\n" +
+                    "	importsistema = " + SQLUtils.stringSQL(sistema) + "\n" +
+                    "	and importloja = " + SQLUtils.stringSQL(loja) + "\n" +
+                    "order by\n" +
+                    "	importid"
+            )) {
+                while (rst.next()) {
+                    result.put(rst.getString("importid"), rst.getInt("codigoatual"));
+                }
+            }
+        }
+        
+        return result;
     }
     
 }

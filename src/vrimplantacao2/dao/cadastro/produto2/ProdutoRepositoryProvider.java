@@ -17,6 +17,7 @@ import vrimplantacao.vo.vrimplantacao.CestVO;
 import vrimplantacao.vo.vrimplantacao.EstadoVO;
 import vrimplantacao2.dao.cadastro.FamiliaProdutoDAO;
 import vrimplantacao2.dao.cadastro.MercadologicoDAO;
+import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto.NcmDAO;
 import vrimplantacao2.dao.cadastro.produto.OfertaDAO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -144,6 +145,19 @@ public class ProdutoRepositoryProvider {
             nivelMaximoMercadologico = mercadologicoDAO.getNivelMaximoMercadologico();
         }
         return nivelMaximoMercadologico;
+    }
+
+    private Map<String, Integer> fornecedores  = null;
+    /**
+     * Retorna {@link Map} com IDs de fornecedores importados.
+     * @return {@link Map} com os IDs importados.
+     * @throws Exception 
+     */
+    public Map<String, Integer> getFornecedoresImportados() throws Exception {
+        if (fornecedores == null) {
+            
+        }
+        return new FornecedorAnteriorDAO().getFornecedoresImportados(sistema, loja);
     }
 
     

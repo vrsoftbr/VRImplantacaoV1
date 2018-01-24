@@ -14,6 +14,7 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoEmbalagem;
 
 public class ProdutoVO {
+    
     private int id = 0;
     private String descricaoCompleta = "SEM DESCRICAO";
     private String descricaoReduzida = "SEM DESCRICAO";
@@ -39,6 +40,7 @@ public class ProdutoVO {
     private NormaReposicao normaReposicao = NormaReposicao.CAIXA;
     private boolean sugestaoCotacao = true;
     private boolean sugestaoPedido = true;
+    private int idFornecedorFabricante = 0;
     
     private final MultiMap<Long, ProdutoAutomacaoVO> eans = new MultiMap<>(
         new Factory<ProdutoAutomacaoVO>() {
@@ -315,4 +317,12 @@ public class ProdutoVO {
     public void setSugestaoPedido(boolean sugestaoPedido) {
         this.sugestaoPedido = sugestaoPedido;
     }    
+
+    public int getIdFornecedorFabricante() {
+        return idFornecedorFabricante;
+    }
+
+    public void setIdFornecedorFabricante(int idFornecedorFabricante) {
+        this.idFornecedorFabricante = idFornecedorFabricante;
+    }
 }

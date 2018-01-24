@@ -129,6 +129,11 @@ public enum OpcaoProduto {
         public String toString() {
             return "Descontinuado";
         }
+    }, FABRICANTE {
+        @Override
+        public String toString() {
+            return "Fabricante";
+        }        
     }, IMPORTAR_RESETAR_BALANCA, IMPORTAR_GERAR_SUBNIVEL_MERC, IMPORTAR_MANTER_BALANCA, 
     CATEGORIA;
     

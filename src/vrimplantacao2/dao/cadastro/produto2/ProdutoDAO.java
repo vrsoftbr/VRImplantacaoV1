@@ -128,7 +128,7 @@ public class ProdutoDAO {
             sql.put("id_tipomercadoria", 99);
             sql.put("sugestaopedido", true);
             sql.put("aceitamultiplicacaopdv", true);
-            sql.put("id_fornecedorfabricante", 1);
+            sql.put("id_fornecedorfabricante", vo.getIdFornecedorFabricante());
             sql.put("id_divisaofornecedor", 0);
             sql.put("id_tipoproduto", 0);
             sql.put("id_tipopiscofins", vo.getPisCofinsDebito().getId());
@@ -261,6 +261,10 @@ public class ProdutoDAO {
             sql.put("sugestaocotacao", vo.isSugestaoCotacao());
             sql.put("sugestaopedido", vo.isSugestaoPedido());
         }
+        if (opt.contains(OpcaoProduto.FABRICANTE)) {
+            sql.put("id_fornecedorfabricante", vo.getIdFornecedorFabricante());
+        }
+        
         sql.setWhere("id = " + vo.getId());
         
         try {

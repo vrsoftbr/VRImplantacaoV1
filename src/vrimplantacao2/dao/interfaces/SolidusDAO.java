@@ -179,6 +179,14 @@ public class SolidusDAO extends InterfaceDAO {
                     "    p.dias_validade validade,\n" +
                     "    p.des_produto decricaocompleta,\n" +
                     "    coalesce(p.des_reduzida, p.des_produto) descricaoreduzida,\n" +
+                    "    (select first 1\n" +
+                    "        cod_fornecedor\n" +
+                    "    from\n" +
+                    "        tab_produto_fornecedor\n" +
+                    "    where\n" +
+                    "        flg_preferencial = 'S'\n" +
+                    "        and cod_produto = p.cod_produto\n" +
+                    "        and cod_loja = loja.cod_loja) fabricante,\n" +
                     "    p.cod_secao,\n" +
                     "    p.cod_grupo, \n" +
                     "    p.cod_sub_grupo,\n" +
@@ -204,6 +212,7 @@ public class SolidusDAO extends InterfaceDAO {
                     "    tribent.val_reducao_base_calculo icms_entrada_reducao\n" +
                     "from\n" +
                     "    tab_produto p\n" +
+                    "    join tab_loja loja on loja.cod_loja = " + getLojaOrigem() + "\n" +
                     "    left join (\n" +
                     "        select\n" +
                     "            cod_produto,\n" +
@@ -219,7 +228,7 @@ public class SolidusDAO extends InterfaceDAO {
                     "    ) ean on p.cod_produto = ean.cod_produto\n" +
                     "    left join tab_produto_loja pl on\n" +
                     "        p.cod_produto = pl.cod_produto and\n" +
-                    "        pl.cod_loja = " + getLojaOrigem() + "\n" +
+                    "        pl.cod_loja = loja.cod_loja\n" +
                     "    left join (\n" +
                     "        select\n" +
                     "            pl.*,\n" +
@@ -265,6 +274,7 @@ public class SolidusDAO extends InterfaceDAO {
                     imp.setCodMercadologico2(rst.getString("cod_grupo"));
                     imp.setCodMercadologico3(rst.getString("cod_sub_grupo"));
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
+                    imp.setFornecedorFabricante(rst.getString("fabricante"));
                     imp.setPesoBruto(rst.getDouble("peso"));
                     imp.setPesoLiquido(rst.getDouble("peso"));
                     imp.setEstoque(rst.getDouble("estoque"));
