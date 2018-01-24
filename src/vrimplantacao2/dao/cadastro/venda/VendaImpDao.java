@@ -32,6 +32,7 @@ public class VendaImpDao {
 
     public VendaImpDao(JdbcConnectionSource source) throws SQLException {
         this.dao = DaoManager.createDao(source, VendaIMP.class);
+        this.dao.setObjectCache(false);
     }
 
     /**
@@ -95,16 +96,20 @@ public class VendaImpDao {
                 LOG.fine("Tabela de venda esvaziada no banco temporario");
 
                 if (iterator != null) {
-                    int cont = 0;
+                    int cont = 0, cont2 = 0;
                     while (iterator.hasNext()) {
-                        dao.createIfNotExists(iterator.next());
+                        dao.create(iterator.next());
                         cont++;
-                        ProgressBar.setStatus("Vendas...gravando vendas no banco temporário..." + cont);
+                        cont2++;
+                        if (cont2 == 1000) {
+                            cont2 = 0;
+                            ProgressBar.setStatus("Vendas...gravando vendas no banco temporário..." + cont);
+                        }
                     }
                 } else {                    
                     ProgressBar.setMaximum(vendas.size());
                     for (VendaIMP venda: vendas) {
-                        dao.createIfNotExists(venda);
+                        dao.create(venda);
                         ProgressBar.next();
                     }
                     vendas.clear();

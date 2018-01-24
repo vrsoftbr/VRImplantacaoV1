@@ -627,9 +627,10 @@ public class Importador {
         if (Parametros.get().isGerarBancoImplantacao()) {
             try (JdbcConnectionSource source = this.getSource()) {
                 new VendaImpDao(source).persistir(getInterfaceDAO().getVendaIterator());
+                System.gc();
                 new VendaItemImpDao(source).persistir(getInterfaceDAO().getVendaItemIterator());
             }
-        }
+        }        
         
         if (Parametros.get().isImportarBancoImplantacao()) {
             VendaRepositoryProvider provider = new VendaRepositoryProvider(
