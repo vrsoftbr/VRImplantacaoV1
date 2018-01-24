@@ -142,10 +142,7 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        if (false) {
-
-            tabsOpcoes.addTab("Pesáveis", tabPesaveis);
-        }
+        tabsOpcoes.addTab("Pesáveis", tabPesaveis);
 
         rdbFilizolaRdc360.setSelected(true);
         rdbFilizolaRdc360.setText("Filizola (RDC-360)");
@@ -185,7 +182,10 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        /*
+
         tabsOpcoes.addTab("Nutricionais", tabNutricional);
+        */
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
