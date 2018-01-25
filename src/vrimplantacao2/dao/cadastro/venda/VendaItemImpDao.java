@@ -29,6 +29,7 @@ public class VendaItemImpDao {
     
     public VendaItemImpDao(JdbcConnectionSource source) throws SQLException {
         this.dao = DaoManager.createDao(source, VendaItemIMP.class);
+        this.dao.setObjectCache(false);
     }
 
     /**
@@ -94,17 +95,22 @@ public class VendaItemImpDao {
                 ProgressBar.setStatus("Vendas...gravando itens no banco temporário...");
                 
                 if (iterator != null) {
-                    int cont = 0;
+                    int cont = 0, cont2 = 0;
+                    
                     while (iterator.hasNext()) {
-                        dao.createIfNotExists(iterator.next());
+                        dao.create(iterator.next());
                         cont++;
-                        ProgressBar.setStatus("Vendas...gravando itens no banco temporário..." + cont);
+                        cont2++;
+                        if (cont2 == 10000) {
+                            cont2 = 0;
+                            ProgressBar.setStatus("Vendas...gravando itens no banco temporário..." + cont);
+                        }
                     }
                 } else {
                     ProgressBar.setMaximum(itens.size());
                 
                     for (VendaItemIMP item: itens) {
-                        dao.createIfNotExists(item);
+                        dao.create(item);
                         ProgressBar.next();
                     }
                 }
