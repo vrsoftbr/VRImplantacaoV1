@@ -1124,8 +1124,26 @@ public class AriusDAO extends InterfaceDAO{
 
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
+
+        try {
+            return new VendaIterator(getLojaOrigem(), vendaDataInicio, vendaDataTermino);
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Erro\n", ex);
+            throw ex;        
+        }
         
-        final String sql = "select\n" +
+    }
+    
+    private static class VendaIterator implements Iterator<VendaIMP> {
+        
+        private Statement stm;
+        private ResultSet rst;
+        private final String sql;
+
+        public VendaIterator(String origem, Date vendaDataInicio, Date vendaDataTermino) throws Exception {
+            this.stm = ConexaoOracle.createStatement();            
+            this.sql = 
+                    "select\n" +
                     "    v.id,\n" +
                     "    v.nf numerocupom,\n" +
                     "    v.pdv ecf,\n" +
@@ -1144,75 +1162,85 @@ public class AriusDAO extends InterfaceDAO{
                     "    left join pdvs pdv on v.pdv = pdv.id and pdv.empresa = v.empresa\n" +
                     "    left join clientes c on v.id_cliente = c.id\n" +
                     "where\n" +
-                    "    v.empresa = " + getLojaOrigem() + "\n" +
+                    "    v.empresa = " + origem + "\n" +
                     "    and v.data_hora >= '" + DATE_FORMAT.format(vendaDataInicio) + "'\n" +
                     "    and v.data_hora <= '" + DATE_FORMAT.format(vendaDataTermino) + "'\n" +
                     "order by v.id";
-        try {
-            return new Iterator<VendaIMP>() {
-                
-                private Statement stm = ConexaoOracle.createStatement();
-                private ResultSet rst = stm.executeQuery(sql);
-
-                @Override
-                public boolean hasNext() {
-                    try {
-                        return !rst.isLast();
-                    } catch (SQLException ex) {
-                        LOG.log(Level.SEVERE, "Erro no hasNext()\n" + sql, ex);
-                        throw new RuntimeException(ex);
-                    }
-                }
-
-                @Override
-                public VendaIMP next() {
-                    try {
-                        if (rst.next()) {
-                            VendaIMP imp = new VendaIMP();
-                            imp.setId(rst.getString("id"));
-                            imp.setNumeroCupom(rst.getInt("numerocupom"));
-                            imp.setEcf(rst.getInt("ecf"));
-                            imp.setData(rst.getDate("data"));
-                            imp.setIdClientePreferencial(rst.getString("idclientepreferencial"));
-                            imp.setHoraInicio(rst.getDate("data"));
-                            imp.setHoraTermino(rst.getDate("data"));
-                            imp.setCancelado(rst.getBoolean("cancelado"));
-                            imp.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
-                            imp.setCpf(rst.getString("cpf"));
-                            imp.setNumeroSerie(rst.getString("numeroserie"));
-                            imp.setModeloImpressora(rst.getString("modeloimpressora"));
-                            imp.setNomeCliente(rst.getString("nomecliente"));
-                            imp.setEnderecoCliente(rst.getString("enderecocliente"));
-                            imp.setChaveNfCe(rst.getString("chavenfce"));
-
-                            return imp;
-                        } else {
-                            return null;
-                        }                        
-                    } catch (SQLException ex) {
-                        LOG.log(Level.SEVERE, "Erro no next()", ex);
-                        throw new RuntimeException(ex);
-                    }
-                }
-
-                @Override
-                public void remove() {
-                    throw new UnsupportedOperationException("Não suportado.");
-                }
-
-            };
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, "Erro\n" + sql, ex);
-            throw ex;        
+            this.stm.setFetchSize(10000);
+            this.rst = stm.executeQuery(sql);
         }
-        
+
+        @Override
+        public boolean hasNext() {
+            try {
+                return !rst.isClosed() && !rst.isLast();
+            } catch (SQLException ex) {
+                LOG.log(Level.SEVERE, "Erro no hasNext()\n" + sql, ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        @Override
+        public VendaIMP next() {
+            try {
+                if (rst.next()) {
+                    VendaIMP imp = new VendaIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setNumeroCupom(rst.getInt("numerocupom"));
+                    imp.setEcf(rst.getInt("ecf"));
+                    imp.setData(rst.getDate("data"));
+                    imp.setIdClientePreferencial(rst.getString("idclientepreferencial"));
+                    imp.setHoraInicio(rst.getDate("data"));
+                    imp.setHoraTermino(rst.getDate("data"));
+                    imp.setCancelado(rst.getBoolean("cancelado"));
+                    imp.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
+                    imp.setCpf(rst.getString("cpf"));
+                    imp.setNumeroSerie(rst.getString("numeroserie"));
+                    imp.setModeloImpressora(rst.getString("modeloimpressora"));
+                    imp.setNomeCliente(rst.getString("nomecliente"));
+                    imp.setEnderecoCliente(rst.getString("enderecocliente"));
+                    imp.setChaveNfCe(rst.getString("chavenfce"));
+
+                    return imp;
+                } else {
+                    rst.close();
+                    stm.close();
+                    return null;
+                }                        
+            } catch (SQLException ex) {
+                LOG.log(Level.SEVERE, "Erro no next()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Não suportado.");
+        }
     }
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
     
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        final String sql = "select\n" +
+        try {
+            return new VendaItemIterator(getLojaOrigem(), vendaDataInicio, vendaDataTermino);
+        } catch (Exception ex) {        
+            LOG.log(Level.SEVERE, "Erro\n", ex);
+            throw ex;
+        }
+    }
+    
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+    
+        private Statement stm;
+        private ResultSet rst;
+        private String sql;
+
+        public VendaItemIterator(String origem, Date vendaDataInicio, Date vendaDataTermino) throws Exception {
+            this.stm = ConexaoOracle.createStatement();
+            this.sql = 
+                    "select\n" +
                     "    vi.id,\n" +
                     "    vi.id sequencia,\n" +
                     "    vi.venda,\n" +
@@ -1231,65 +1259,61 @@ public class AriusDAO extends InterfaceDAO{
                     "    join vendas v on vi.venda = v.id\n" +
                     "    join produtos p on vi.produto = p.id\n" +
                     "where\n" +
-                    "    v.empresa = " + getLojaOrigem() + "\n" +
+                    "    v.empresa = " + origem + "\n" +
                     "    and v.data_hora >= '" + DATE_FORMAT.format(vendaDataInicio) + "'\n" +
                     "    and v.data_hora <= '" + DATE_FORMAT.format(vendaDataTermino) + "'\n" +
                     "order by vi.id";
-        try {
-            return new Iterator<VendaItemIMP>() {            
-                private Statement stm = ConexaoOracle.createStatement();
-                private ResultSet rst = stm.executeQuery(sql);
-
-                @Override
-                public boolean hasNext() {
-                    try {
-                        return !rst.isLast();
-                    } catch (SQLException ex) {
-                        LOG.log(Level.SEVERE, "Erro no hasNext()\n" + sql, ex);
-                        throw new RuntimeException(ex);
-                    }
-                }
-
-                @Override
-                public VendaItemIMP next() {
-                    try {
-                        if (rst.next()) {
-                            VendaItemIMP imp = new VendaItemIMP();
-
-                            imp.setId(rst.getString("id"));
-                            imp.setSequencia(rst.getInt("sequencia"));
-                            imp.setVenda(rst.getString("venda"));
-                            imp.setProduto(rst.getString("produto"));
-                            imp.setDescricaoReduzida(rst.getString("descritivo_pdv"));
-                            imp.setQuantidade(rst.getDouble("qtde"));
-                            imp.setPrecoVenda(rst.getDouble("valor"));
-                            imp.setValorDesconto(rst.getDouble("desconto"));
-                            imp.setValorAcrescimo(rst.getDouble("acrescimo"));
-                            imp.setCodigoBarras(rst.getString("ean"));
-                            imp.setUnidadeMedida(rst.getString("unidade"));
-                            imp.setIcmsCst(rst.getInt("cst"));
-                            imp.setIcmsAliq(rst.getDouble("aliquota"));
-
-                            return imp;
-                        } else {
-                            return null;
-                        }
-                    } catch (SQLException ex) {
-                        LOG.log(Level.SEVERE, "Erro no next()", ex);
-                        throw new RuntimeException(ex);
-                    }
-                }
-
-                @Override
-                public void remove() {
-                    throw new UnsupportedOperationException("Não suportado.");
-                }
-
-            };
-        } catch (Exception ex) {        
-            LOG.log(Level.SEVERE, "Erro\n" + sql, ex);
-            throw ex;
+            this.stm.setFetchSize(10000);
+            this.rst = stm.executeQuery(sql);
         }
+
+        @Override
+        public boolean hasNext() {
+            try {
+                return !rst.isClosed() && !rst.isLast();
+            } catch (SQLException ex) {
+                LOG.log(Level.SEVERE, "Erro no hasNext()\n" + sql, ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            try {
+                if (rst.next()) {
+                    VendaItemIMP imp = new VendaItemIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setSequencia(rst.getInt("sequencia"));
+                    imp.setVenda(rst.getString("venda"));
+                    imp.setProduto(rst.getString("produto"));
+                    imp.setDescricaoReduzida(rst.getString("descritivo_pdv"));
+                    imp.setQuantidade(rst.getDouble("qtde"));
+                    imp.setPrecoVenda(rst.getDouble("valor"));
+                    imp.setValorDesconto(rst.getDouble("desconto"));
+                    imp.setValorAcrescimo(rst.getDouble("acrescimo"));
+                    imp.setCodigoBarras(rst.getString("ean"));
+                    imp.setUnidadeMedida(rst.getString("unidade"));
+                    imp.setIcmsCst(rst.getInt("cst"));
+                    imp.setIcmsAliq(rst.getDouble("aliquota"));
+
+                    return imp;
+                } else {
+                    rst.close();
+                    stm.close();
+                    return null;
+                }
+            } catch (SQLException ex) {
+                LOG.log(Level.SEVERE, "Erro no next()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Não suportado.");
+        }
+        
     }
     
     

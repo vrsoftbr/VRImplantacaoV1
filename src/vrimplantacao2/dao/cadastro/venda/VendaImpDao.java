@@ -101,7 +101,7 @@ public class VendaImpDao {
                         dao.create(iterator.next());
                         cont++;
                         cont2++;
-                        if (cont2 == 1000) {
+                        if (cont2 == 10000) {
                             cont2 = 0;
                             ProgressBar.setStatus("Vendas...gravando vendas no banco temporário..." + cont);
                         }
