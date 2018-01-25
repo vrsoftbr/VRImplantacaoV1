@@ -38,7 +38,7 @@ public class InteragemDAO extends InterfaceDAO {
         }
         return result;
     }
-    
+
     @Override
     public String getSistema() {
         return "Interagem";
@@ -129,7 +129,7 @@ public class InteragemDAO extends InterfaceDAO {
                     if ((rst.getString("ean") != null)
                             && (!rst.getString("ean").trim().isEmpty())
                             && (rst.getString("ean").trim().length() >= 4)
-                            && (rst.getString("ean").trim().length() <= 6) 
+                            && (rst.getString("ean").trim().length() <= 6)
                             && ("S".equals(rst.getString("balanca").trim()))) {
                         ProdutoBalancaVO produtoBalanca;
                         long codigoProduto;
@@ -151,6 +151,31 @@ public class InteragemDAO extends InterfaceDAO {
                     vResult.add(imp);
                     ProgressBar.setStatus("Carregando dados...Produtos..." + contador);
                     contador++;
+                }
+            }
+        }
+        return vResult;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "p.codpro id_produto,\n"
+                    + "p.codigo codigobarras,\n"
+                    + "p.qtdun qtdembalagem\n"
+                    + "from tabprocod p"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id_produto"));
+                    imp.setEan(rst.getString("codigobarras"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    vResult.add(imp);
                 }
             }
         }

@@ -5,7 +5,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
@@ -86,6 +90,7 @@ public class AsefeDAO extends InterfaceDAO {
                     + "LEFT JOIN CE_REDUCAOICMS R ON R.CODIGO = P2.CodReducao\n"
                     + "ORDER BY CODPROD_PRODUTOS"
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -104,11 +109,29 @@ public class AsefeDAO extends InterfaceDAO {
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setNcm(rst.getString("NCM_PRODUTOS"));
                     imp.setCest(rst.getString("CEST"));
-                    imp.setPiscofinsCstDebito(rst.getInt("STPIS"));
-                    imp.setPiscofinsCstCredito(rst.getInt("STCOFINS"));
-                    imp.setIcmsCst(rst.getInt("STICMS"));
+                    imp.setPiscofinsCstDebito(Integer.parseInt(Utils.formataNumero(rst.getString("STPIS"))));
+                    imp.setPiscofinsCstCredito(Integer.parseInt(Utils.formataNumero(rst.getString("STCOFINS"))));
+                    imp.setIcmsCst(Integer.parseInt(Utils.formataNumero(rst.getString("STICMS"))));
                     imp.setIcmsAliq(rst.getDouble("CODTRIB_MODELOS"));
                     imp.setIcmsReducao(rst.getDouble("VALORREDUCAO"));
+                    
+                    ProdutoBalancaVO produtoBalanca;
+                    long codigoProduto;
+                    codigoProduto = Long.parseLong(imp.getImportId());
+                    if (codigoProduto <= Integer.MAX_VALUE) {
+                        produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                    } else {
+                        produtoBalanca = null;
+                    }
+                    
+                    if (produtoBalanca != null) {
+                        imp.seteBalanca(true);
+                        imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
+                    } else {
+                        imp.setValidade(0);
+                        imp.seteBalanca(false);
+                    }
+                    
                     vResult.add(imp);
                 }
             }
@@ -118,7 +141,7 @@ public class AsefeDAO extends InterfaceDAO {
 
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opcao) throws Exception {
-        if (opcao == OpcaoProduto.ICMS) {
+        /*if (opcao == OpcaoProduto.ICMS) {
             List<ProdutoIMP> vResult = new ArrayList<>();
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -140,7 +163,8 @@ public class AsefeDAO extends InterfaceDAO {
                 }
                 return vResult;
             }
-        } else if (opcao == OpcaoProduto.ESTOQUE) {
+        } else*/ 
+        if (opcao == OpcaoProduto.ESTOQUE) {
             List<ProdutoIMP> vResult = new ArrayList<>();
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -306,7 +330,7 @@ public class AsefeDAO extends InterfaceDAO {
                     ChequeIMP imp = new ChequeIMP();
                     imp.setId(rst.getString("Codigo_Cheque"));
                     imp.setNumeroCheque(rst.getString("Numero_Cheque"));
-                    imp.setBanco(rst.getInt("Banco_Cheque"));
+                    imp.setBanco(Integer.parseInt(Utils.formataNumero(rst.getString("Banco_Cheque"))));
                     imp.setAgencia(rst.getString("Agencia_Cheque"));
                     imp.setConta(rst.getString("Conta_Cheque"));
                     imp.setNome(rst.getString("cliente"));
