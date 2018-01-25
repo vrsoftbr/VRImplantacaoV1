@@ -16,7 +16,9 @@ import vrframework.classe.ProgressBar;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.venda.MultiStatementIterator;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -1124,14 +1126,74 @@ public class AriusDAO extends InterfaceDAO{
 
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-
         try {
-            return new VendaIterator(getLojaOrigem(), vendaDataInicio, vendaDataTermino);
+            MultiStatementIterator<VendaIMP> iterator = new MultiStatementIterator<>(
+                    new MultiStatementIterator.NextBuilder<VendaIMP>() {
+                        @Override
+                        public VendaIMP makeNext(ResultSet rst) throws Exception {
+                            VendaIMP imp = new VendaIMP();
+
+                            imp.setId(rst.getString("id"));
+                            imp.setNumeroCupom(rst.getInt("numerocupom"));
+                            imp.setEcf(rst.getInt("ecf"));
+                            imp.setData(rst.getDate("data"));
+                            imp.setIdClientePreferencial(rst.getString("idclientepreferencial"));
+                            imp.setHoraInicio(rst.getDate("data"));
+                            imp.setHoraTermino(rst.getDate("data"));
+                            imp.setCancelado(rst.getBoolean("cancelado"));
+                            imp.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
+                            imp.setCpf(rst.getString("cpf"));
+                            imp.setNumeroSerie(rst.getString("numeroserie"));
+                            imp.setModeloImpressora(rst.getString("modeloimpressora"));
+                            imp.setNomeCliente(rst.getString("nomecliente"));
+                            imp.setEnderecoCliente(rst.getString("enderecocliente"));
+                            imp.setChaveNfCe(rst.getString("chavenfce"));
+
+                            return imp;
+                        }
+                    },
+                    new MultiStatementIterator.StatementBuilder() {
+                        @Override
+                        public Statement makeStatement() throws Exception {
+                            return ConexaoOracle.getConexao().createStatement();
+                        }
+                    }
+            );
+            
+            String sql = "select\n" +
+                    "    v.id,\n" +
+                    "    v.nf numerocupom,\n" +
+                    "    v.pdv ecf,\n" +
+                    "    v.data_hora data,\n" +
+                    "    v.id_cliente idclientepreferencial,\n" +
+                    "    case when v.cancelado != 'F' then 1 else 0 end as cancelado,\n" +
+                    "    v.valor subtotalimpressora,\n" +
+                    "    v.cnpj_cpf cpf,\n" +
+                    "    pdv.serie numeroserie,\n" +
+                    "    pdv.ecf_mod modeloimpressora,\n" +
+                    "    c.descritivo nomecliente,\n" +
+                    "    c.endereco || ',' || c.numero || ',' || c.complemento || ',' || c.bairro || ',' || c.cidade || '' || c.estado enderecocliente,\n" +
+                    "    v.chave chavenfce\n" +
+                    "from\n" +
+                    "    vendas v\n" +
+                    "    left join pdvs pdv on v.pdv = pdv.id and pdv.empresa = v.empresa\n" +
+                    "    left join clientes c on v.id_cliente = c.id\n" +
+                    "where\n" +
+                    "    v.empresa = " + getLojaOrigem() + "\n" +
+                    "    and cast(to_char(v.data_hora, 'yyyymmdd') as integer) >= cast('{DATA_INICIO}' as integer)\n" +
+                    "    and cast(to_char(v.data_hora, 'yyyymmdd') as integer) <= cast('{DATA_TERMINO}' as integer)\n" +
+                    "order by v.id";
+
+            for (String statement: SQLUtils.quebrarSqlEmMeses(sql, vendaDataInicio, vendaDataTermino, new SimpleDateFormat("yyyyMMdd"))) {
+                iterator.addStatement(statement);
+            }
+            
+            return iterator;
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, "Erro\n", ex);
             throw ex;        
         }
-        
+    
     }
     
     private static class VendaIterator implements Iterator<VendaIMP> {
@@ -1223,12 +1285,82 @@ public class AriusDAO extends InterfaceDAO{
     
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        
+        try {
+            MultiStatementIterator<VendaItemIMP> iterator = new MultiStatementIterator<>(
+                    new MultiStatementIterator.NextBuilder<VendaItemIMP>() {
+                        @Override
+                        public VendaItemIMP makeNext(ResultSet rst) throws Exception {
+                            VendaItemIMP imp = new VendaItemIMP();
+
+                            imp.setId(rst.getString("id"));
+                            imp.setSequencia(rst.getInt("sequencia"));
+                            imp.setVenda(rst.getString("venda"));
+                            imp.setProduto(rst.getString("produto"));
+                            imp.setDescricaoReduzida(rst.getString("descritivo_pdv"));
+                            imp.setQuantidade(rst.getDouble("qtde"));
+                            imp.setPrecoVenda(rst.getDouble("valor"));
+                            imp.setValorDesconto(rst.getDouble("desconto"));
+                            imp.setValorAcrescimo(rst.getDouble("acrescimo"));
+                            imp.setCodigoBarras(rst.getString("ean"));
+                            imp.setUnidadeMedida(rst.getString("unidade"));
+                            imp.setIcmsCst(rst.getInt("cst"));
+                            imp.setIcmsAliq(rst.getDouble("aliquota"));
+
+                            return imp;
+                        }
+                    },
+                    new MultiStatementIterator.StatementBuilder() {
+                        @Override
+                        public Statement makeStatement() throws Exception {
+                            return ConexaoOracle.getConexao().createStatement();
+                        }
+                    }
+            );
+            
+            String sql = "select\n" +
+                    "    vi.id,\n" +
+                    "    vi.id sequencia,\n" +
+                    "    vi.venda,\n" +
+                    "    vi.produto,\n" +
+                    "    p.descritivo_pdv,\n" +
+                    "    vi.qtde,\n" +
+                    "    (vi.valor / vi.qtde) valor,\n" +
+                    "    vi.desconto,\n" +
+                    "    vi.acrescimo,\n" +
+                    "    coalesce((select ean from produtos_ean where produto = p.id and rownum = 1), cast(p.id as varchar(10))) ean,\n" +
+                    "    p.unidade_venda unidade,\n" +
+                    "    vi.cst,\n" +
+                    "    vi.aliquota\n" +
+                    "from\n" +
+                    "    itens_venda vi\n" +
+                    "    join vendas v on vi.venda = v.id\n" +
+                    "    join produtos p on vi.produto = p.id\n" +
+                    "where\n" +
+                    "    v.empresa = " + getLojaOrigem() + "\n" +
+                    "    and cast(to_char(v.data_hora, 'yyyymmdd') as integer) >= cast('{DATA_INICIO}' as integer)\n" +
+                    "    and cast(to_char(v.data_hora, 'yyyymmdd') as integer) <= cast('{DATA_TERMINO}' as integer)\n" +
+                    "order by vi.id";
+
+            for (String statement: SQLUtils.quebrarSqlEmMeses(sql, vendaDataInicio, vendaDataTermino, new SimpleDateFormat("yyyyMMdd"))) {
+                iterator.addStatement(statement);
+            }
+            
+            return iterator;
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Erro\n", ex);
+            throw ex;        
+        }
+        
+        
+        /*
         try {
             return new VendaItemIterator(getLojaOrigem(), vendaDataInicio, vendaDataTermino);
         } catch (Exception ex) {        
             LOG.log(Level.SEVERE, "Erro\n", ex);
             throw ex;
         }
+        */
     }
     
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {

@@ -1,7 +1,10 @@
 package vrimplantacao2.utils.sql;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import org.joda.time.DateTime;
 
 /**
  * Classe com diversas operações para facilitar a criação scripts sql.
@@ -68,6 +71,37 @@ public final class SQLUtils {
      */
     public static String doubleSQL(double number, double nullValue) {
         return number != nullValue ? number + "" : null;
+    }
+    
+    /**
+     * Este método auxilia na quebra de um intervalo de tempo maior em diversos
+     * intervalos menores de um mês. Coloque as tags {DATA_INICIO} e {DATA_TERMINO}
+     * onde deverá ser substituído por uma data do intervalo gerado.
+     * @param sql Comando sql que será transformado em intervalos.
+     * @param vendaDataInicio Data inicial do intervalo.
+     * @param vendaDataTermino Data final do intervalor.
+     * @param format Formatador das datas informadas.
+     * @return Lista de comandos SQL com as datas substituidas pelos intervalos menores.
+     */
+    public static List<String> quebrarSqlEmMeses (String sql, Date vendaDataInicio, Date vendaDataTermino, SimpleDateFormat format) {
+        
+        DateTime inicio = new DateTime(vendaDataInicio.getTime());
+        DateTime termino = new DateTime(vendaDataTermino.getTime());        
+        
+        List<String> result = new ArrayList<>();
+        while (inicio.isBefore(termino)) {
+            DateTime prox = inicio.plusMonths(1);
+            if (prox.isAfter(termino)) {
+                prox = termino;
+            }
+            String copy = sql.replace("{DATA_INICIO}", format.format(new Date(inicio.getMillis())));
+            copy = copy.replace("{DATA_TERMINO}", format.format(new Date(prox.getMillis())));
+            result.add(copy);
+            inicio = prox.plusDays(1);
+            
+        }
+        
+        return result;
     }
         
 }
