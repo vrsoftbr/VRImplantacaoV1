@@ -1,4 +1,4 @@
-package vrimplantacao2.gui.component.conexao.mysql;
+package vrimplantacao2.gui.component.conexao;
 
 /**
  *

@@ -1,20 +1,25 @@
-package vrimplantacao2.gui.component.conexao.mysql;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package vrimplantacao2.gui.component.conexao.firebird;
 
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import javax.swing.ImageIcon;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
-import vrimplantacao.classe.ConexaoMySQL;
+import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.parametro.Parametros;
 
 /**
  *
  * @author Leandro
  */
-public class ConexaoMySQLPanel extends javax.swing.JPanel {
+public class ConexaoFirebirdPanel extends javax.swing.JPanel {
 
     private String sistema;
-    private ConexaoMySQL conexao = new ConexaoMySQL();
+    private ConexaoFirebird conexao = new ConexaoFirebird();
     private ConexaoEvent onConectar;
 
     public void setOnConectar(ConexaoEvent onConectar) {
@@ -36,7 +41,7 @@ public class ConexaoMySQLPanel extends javax.swing.JPanel {
     /**
      * Creates new form ConexaoMySQLPanel
      */
-    public ConexaoMySQLPanel() {
+    public ConexaoFirebirdPanel() {
         initComponents();
     }
     
@@ -59,14 +64,14 @@ public class ConexaoMySQLPanel extends javax.swing.JPanel {
         vRLabel2 = new vrframework.bean.label.VRLabel();
         txtHost = new vrframework.bean.textField.VRTextField();
         vRLabel3 = new vrframework.bean.label.VRLabel();
-        txtDatabase = new vrframework.bean.textField.VRTextField();
+        txtDatabase = new vrframework.bean.fileChooser.VRFileChooser();
         vRLabel7 = new vrframework.bean.label.VRLabel();
         txtPorta = new vrframework.bean.textField.VRTextField();
         jPanel5 = new javax.swing.JPanel();
         vRLabel26 = new vrframework.bean.label.VRLabel();
         txtStrConexao = new javax.swing.JTextField();
 
-        setBorder(javax.swing.BorderFactory.createTitledBorder("Conexão MySQL"));
+        setBorder(javax.swing.BorderFactory.createTitledBorder("Conexão Firebird"));
 
         txtUsuario.setCaixaAlta(false);
 
@@ -91,8 +96,6 @@ public class ConexaoMySQLPanel extends javax.swing.JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel3, "Banco de Dados");
 
-        txtDatabase.setCaixaAlta(false);
-
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel7, "Porta");
 
         txtPorta.setCaixaAlta(false);
@@ -105,12 +108,12 @@ public class ConexaoMySQLPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(5, 5, 5)
-                .addComponent(txtHost, javax.swing.GroupLayout.DEFAULT_SIZE, 77, Short.MAX_VALUE)
-                .addGap(5, 5, 5)
+                .addComponent(txtHost, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(5, 5, 5)
-                .addComponent(txtDatabase, javax.swing.GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE)
-                .addGap(5, 5, 5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtDatabase, javax.swing.GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(5, 5, 5)
                 .addComponent(txtPorta, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -124,10 +127,10 @@ public class ConexaoMySQLPanel extends javax.swing.JPanel {
                     .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtHost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtPorta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(10, 10, 10))
+                    .addComponent(txtPorta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(9, 9, 9))
         );
 
         tabsCon.addTab("Conexão Padrão", pnlConexaoPadrao);
@@ -144,7 +147,7 @@ public class ConexaoMySQLPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(vRLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtStrConexao, javax.swing.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
+                .addComponent(txtStrConexao, javax.swing.GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
@@ -217,7 +220,7 @@ public class ConexaoMySQLPanel extends javax.swing.JPanel {
         if (txtPorta.getText().isEmpty()) {
             throw new VRException("Favor informar a porta do banco de dados MySQL!");
         }
-        if (txtDatabase.getText().isEmpty()) {
+        if (txtDatabase.getArquivo().isEmpty()) {
             throw new VRException("Favor informar nome do banco de dados MySQL!");
         }
         if (txtUsuario.getText().isEmpty()) {
@@ -226,7 +229,7 @@ public class ConexaoMySQLPanel extends javax.swing.JPanel {
 
         if (tabsCon.getSelectedIndex() == 0) {
             conexao.abrirConexao(txtHost.getText(), txtPorta.getInt(), 
-                    txtDatabase.getText(), txtUsuario.getText(), txtSenha.getText());
+                    txtDatabase.getArquivo(), txtUsuario.getText(), txtSenha.getText());
         } else {
             conexao.abrirConexao(txtStrConexao.getText(), txtUsuario.getText(), txtSenha.getText());
         }
@@ -239,7 +242,7 @@ public class ConexaoMySQLPanel extends javax.swing.JPanel {
     public void carregarParametros() {
         Parametros params = Parametros.get();
         txtHost.setText(params.getWithNull(host, sistema, "HOST"));
-        txtDatabase.setText(params.getWithNull(database, sistema, "DATABASE"));
+        txtDatabase.setArquivo(params.getWithNull(database, sistema, "DATABASE"));
         txtPorta.setText(params.getWithNull(port, sistema, "PORTA"));
         txtUsuario.setText(params.getWithNull(user, sistema, "USUARIO"));
         txtSenha.setText(params.getWithNull(pass, sistema, "SENHA"));
@@ -253,7 +256,7 @@ public class ConexaoMySQLPanel extends javax.swing.JPanel {
     public void atualizarParametros() {
         Parametros params = Parametros.get();
         params.put(txtHost.getText(), sistema, "HOST");
-        params.put(txtDatabase.getText(), sistema, "DATABASE");
+        params.put(txtDatabase.getArquivo(), sistema, "DATABASE");
         params.put(txtPorta.getText(), sistema, "PORTA");
         params.put(txtUsuario.getText(), sistema, "USUARIO");
         params.put(txtSenha.getText(), sistema, "SENHA");
@@ -264,7 +267,7 @@ public class ConexaoMySQLPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel pnlConexaoPadrao;
     private javax.swing.JTabbedPane tabsCon;
-    private vrframework.bean.textField.VRTextField txtDatabase;
+    private vrframework.bean.fileChooser.VRFileChooser txtDatabase;
     private vrframework.bean.textField.VRTextField txtHost;
     private vrframework.bean.textField.VRTextField txtPorta;
     private vrframework.bean.passwordField.VRPasswordField txtSenha;

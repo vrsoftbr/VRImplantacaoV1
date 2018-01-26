@@ -15,6 +15,8 @@ public class ConexaoFirebird {
     private static String dataBase = "";
     private static String usuario = "";
     private static String senha = "";
+    private String strCon;
+    private boolean usandoString = false; 
     public static String encoding = "";
 
     public void abrirConexao(String i_ip, int i_porta, String i_database, String i_usuario, String i_senha) throws Exception {
@@ -33,6 +35,21 @@ public class ConexaoFirebird {
             }
             con = DriverManager.getConnection("jdbc:firebirdsql:" + i_ip + "/" + i_porta + ":" + i_database + ("".equals(extra) ? "" : "?" + extra), i_usuario, i_senha);
 
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+    
+    public void abrirConexao(String conString, String i_usuario, String i_senha) throws Exception {
+        Class.forName("com.mysql.jdbc.Driver");
+
+        usuario = i_usuario;
+        senha = i_senha;
+        strCon = conString;
+        usandoString = true;
+
+        try {
+            con = DriverManager.getConnection(conString, i_usuario, i_senha);
         } catch (Exception ex) {
             throw ex;
         }

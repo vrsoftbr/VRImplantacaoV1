@@ -149,6 +149,7 @@ import vrimplantacao2.gui.interfaces.TstiGUI;
 import vrimplantacao2.gui.interfaces.CPlusGUI;
 import vrimplantacao2.gui.interfaces.CissGUI;
 import vrimplantacao2.gui.interfaces.SolidusGUI;
+import vrimplantacao2.gui.interfaces.SuperGUI;
 import vrimplantacao2.gui.interfaces.VisualComercioGUI;
 import vrimplantacao2.gui.interfaces.WmsiGUI;
 
@@ -508,6 +509,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSDInformatica = new javax.swing.JMenuItem();
         mnuCplus = new javax.swing.JMenuItem();
         mnuSolidus = new javax.swing.JMenuItem();
+        mnuSuper = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -996,6 +998,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu5.add(mnuSolidus);
+
+        mnuSuper.setText("Super");
+        mnuSuper.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSuperActionPerformed(evt);
+            }
+        });
+        jMenu5.add(mnuSuper);
 
         jMenu2.add(jMenu5);
 
@@ -3593,9 +3603,12 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuAvanceActionPerformed
 
     private void mnuAsefeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAsefeActionPerformed
-        // TODO add your handling code here:
         AsefeGUI.exibir(this);
     }//GEN-LAST:event_mnuAsefeActionPerformed
+
+    private void mnuSuperActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSuperActionPerformed
+        SuperGUI.exibir(this);
+    }//GEN-LAST:event_mnuSuperActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -3758,6 +3771,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu mnuSistema;
     private javax.swing.JMenuItem mnuSistemaLogin;
     private javax.swing.JMenuItem mnuSolidus;
+    private javax.swing.JMenuItem mnuSuper;
     private javax.swing.JMenuItem mnuTsti;
     private javax.swing.JMenuItem mnuVisualComercio;
     private javax.swing.JMenuItem mnuWmsi;
