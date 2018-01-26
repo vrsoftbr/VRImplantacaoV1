@@ -138,7 +138,7 @@ public class CissDAO extends InterfaceDAO {
                     + "	ean.codcest cest,\n"
                     + "	preco.valprecovarejo preco,\n"
                     + "	custo.custonotafiscal custosemimposto,\n"
-                    + "	custo.custogerencial custocomimposto,\n"
+                    + "	custo.custoultimacompra custocomimposto,\n"
                     + "	p.idcstpiscofinssaida piscofinssaida,\n"
                     + "	p.idcstpiscofinsentrada piscofinsentrada,\n"
                     + "	nat.idcodnatureza as tipoNaturezaReceita,\n"
