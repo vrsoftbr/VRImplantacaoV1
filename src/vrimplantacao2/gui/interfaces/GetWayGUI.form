@@ -180,11 +180,12 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkManterBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Component id="chkFamiliaProduto" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkMercadologico" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkT1Estoque" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkT1Custo" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkT1Preco" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFamiliaProduto" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkTemArquivoBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
@@ -268,6 +269,8 @@
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="chkMercadologico" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="chkTemArquivoBalanca" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Component id="chkProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
                                           <Component id="chkManterBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -330,7 +333,7 @@
                               <Component id="chkCustoSemImposto" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkT1AtivoInativo" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="9" max="32767" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -502,6 +505,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1CEST">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="CEST"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTemArquivoBalanca">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tem Arquivo Balan&#xe7;a"/>
                   </Properties>
                 </Component>
               </SubComponents>

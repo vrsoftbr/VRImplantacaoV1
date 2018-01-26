@@ -59,6 +59,7 @@ public class GetWayDAO extends InterfaceDAO {
 
     public int v_tipoDocumento;
     public int v_tipoDocumentoCheque;
+    public boolean v_usar_arquivoBalanca;
 
     @Override
     public String getSistema() {
@@ -336,20 +337,26 @@ public class GetWayDAO extends InterfaceDAO {
                             && (!rst.getString("ean").trim().isEmpty())
                             && (rst.getString("ean").trim().length() >= 4)
                             && (rst.getString("ean").trim().length() <= 6)) {
-                        ProdutoBalancaVO produtoBalanca;
-                        long codigoProduto;
-                        codigoProduto = Long.parseLong(imp.getEan());
-                        if (codigoProduto <= Integer.MAX_VALUE) {
-                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                        
+                        if (v_usar_arquivoBalanca) {
+                            ProdutoBalancaVO produtoBalanca;
+                            long codigoProduto;
+                            codigoProduto = Long.parseLong(imp.getEan());
+                            if (codigoProduto <= Integer.MAX_VALUE) {
+                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                            } else {
+                                produtoBalanca = null;
+                            }
+                            if (produtoBalanca != null) {
+                                imp.seteBalanca(true);
+                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rst.getInt("VALIDADE"));
+                            } else {
+                                imp.setValidade(0);
+                                imp.seteBalanca(false);
+                            }
                         } else {
-                            produtoBalanca = null;
-                        }
-                        if (produtoBalanca != null) {
-                            imp.seteBalanca(true);
-                            imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rst.getInt("VALIDADE"));
-                        } else {
-                            imp.setValidade(0);
-                            imp.seteBalanca(false);
+                            imp.seteBalanca(rst.getString("unidade").contains("KG") ? true : false);
+                            imp.setValidade(rst.getInt("VALIDADE"));
                         }
                     }
                     vResult.add(imp);

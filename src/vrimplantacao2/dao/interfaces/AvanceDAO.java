@@ -7,10 +7,12 @@ import java.util.List;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -186,13 +188,37 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    /*@Override
+     public List<ProdutoIMP> getProdutos(OpcaoProduto opcao) throws Exception {
+     if (opcao == OpcaoProduto.ICMS) {
+     List<ProdutoIMP> result = new ArrayList<>();
+     try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+     try (ResultSet rst = stm.executeQuery(""
+     + "select codigo, cst, aliquota "
+     + "from cadmer "
+     )) {
+     while (rst.next()) {
+     ProdutoIMP imp = new ProdutoIMP();
+     imp.setImportLoja(getLojaOrigem());
+     imp.setImportSistema(getSistema());
+     imp.setImportId(rst.getString("codigo"));
+     imp.setIcmsDebitoId(rst.getString("aliquota"));
+     imp.setIcmsCreditoId(rst.getString("aliquota"));
+     result.add(imp);
+     }
+     }
+     return result;
+     }
+     }
+     return null;
+     }*/
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT id, CONCAT(descricao,'  |cst:' ,cst) descricao FROM aliquota ORDER BY 1"
+                    "SELECT aliquota id, CONCAT(descricao,'  |cst:' ,cst) descricao FROM aliquota ORDER BY 1"
             )) {
                 while (rst.next()) {
                     result.add(new MapaTributoIMP(rst.getString("id"), rst.getString("descricao")));
@@ -313,7 +339,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                             && (!rst.getString("VENDEDOR").trim().isEmpty())) {
                         imp.addContato(
                                 "3",
-                                rst.getString("VENDEDOR").substring(0, 30),
+                                (rst.getString("VENDEDOR").length() > 30 ? rst.getString("VENDEDOR").substring(0, 30) : rst.getString("VENDEDOR").trim()),
                                 (rst.getString("fonevend") == null ? "" : rst.getString("fonevend").trim()),
                                 null,
                                 TipoContato.COMERCIAL,
@@ -324,7 +350,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                             && (!rst.getString("supervisor").trim().isEmpty())) {
                         imp.addContato(
                                 "4",
-                                rst.getString("supervisor").substring(0, 30),
+                                (rst.getString("supervisor").length() > 30 ? rst.getString("supervisor").substring(0, 30) : rst.getString("supervisor").trim()),
                                 (rst.getString("fonesup") == null ? "" : rst.getString("fonesup").trim()),
                                 null,
                                 TipoContato.COMERCIAL,
@@ -438,14 +464,17 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "c.anotacoes,\n"
                     + "c.cod_mun,\n"
                     + "c.id_pais,\n"
-                    + "c.natureza_juridica\n"
-                    + "FROM clientes c"
+                    + "c.natureza_juridica,\n"
+                    + "e.endereco\n"
+                    + "FROM clientes c\n"
+                    + "LEFT JOIN clientes_enderecos e on e.cliente = c.codigo"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rst.getString("codigo"));
                     imp.setRazao(rst.getString("nome"));
                     imp.setFantasia(rst.getString("fantasia"));
+                    imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("compl"));
                     imp.setBairro(rst.getString("bairro"));
@@ -468,15 +497,15 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     if ((rst.getString("rg") != null)
                             && (!rst.getString("rg").trim().isEmpty())) {
-                        imp.setInscricaoestadual(rst.getString("rg").trim());
+                        imp.setInscricaoestadual(rst.getString("rg").trim().replace("'", ""));
                     } else if ((rst.getString("inscr") != null)
                             && (!rst.getString("inscr").trim().isEmpty())) {
-                        imp.setInscricaoestadual(rst.getString("inscr").trim());
+                        imp.setInscricaoestadual(rst.getString("inscr").trim().replace("'", ""));
                     } else {
                         imp.setInscricaoMunicipal("ISENTO");
                     }
 
-                    imp.setOrgaoemissor(rst.getString("orgemissor"));
+                    imp.setOrgaoemissor(rst.getString("orgemissor").replace("'", ""));
                     imp.setNomePai(rst.getString("pai"));
                     imp.setNomeMae(rst.getString("mae"));
                     imp.setNomeConjuge(rst.getString("conjuge"));
@@ -512,4 +541,77 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n"
+                    + "id,\n"
+                    + "emissao,\n"
+                    + "vencimento,\n"
+                    + "documento,\n"
+                    + "codcli,\n"
+                    + "cupom,\n"
+                    + "valor_original,\n"
+                    + "valor,\n"
+                    + "valorpago,\n"
+                    + "(valor - valorpago) valorconta,\n"
+                    + "historico,\n"
+                    + "caixa\n"
+                    + "FROM receb\n"
+                    + "WHERE pago = 0\n"
+                    + "AND codcli IS NOT NULL\n"
+                    + "AND tipodoc NOT LIKE '%CHQ%'"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdCliente(rst.getString("codcli"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setValor(rst.getDouble("valorconta"));
+                    imp.setNumeroCupom(rst.getString("cupom"));
+                    imp.setEcf(rst.getString("caixa"));
+                    imp.setObservacao(rst.getString("historico"));
+                    if (rst.getDouble("valor_original") > 0) {
+                        imp.setObservacao(imp.getObservacao() + " VALOR ORIGINAL DA CONTA " + rst.getDouble("valor_original"));
+                    }
+                    if (rst.getDouble("valorpago") > 0) {
+                        imp.setObservacao(imp.getObservacao() + " VALOR PAGO " + rst.getDouble("valorpago"));
+                    }
+                    result.add(imp);
+                }
+            }
+            return result;
+        }
+    }
+    
+    
+/*
+    SELECT 
+ch.id, 
+ch.emissao, 
+ch.documento, 
+ch.vencimento,
+ch.cupom,
+ch.valor,
+ch.valorpago,
+(ch.valor - ch.valorpago) valorconta,, 
+ch.historico,
+ch.caixa,
+b.codigo,
+ch.ncheque,
+ch.numbanco,
+ch.agencia,
+ch.cpfcgc,
+ch.caixa,
+ch.datahora_alteracao,
+c
+FROM receb ch
+LEFT JOIN bancos b ON b.id = ch.id_banco
+LEFT JOIN clientes c ON c.codigo = ch.codcli
+WHERE tipodoc LIKE '%CHQ%'
+*/    
 }
