@@ -112,17 +112,6 @@
                     </Property>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFamiliaProduto">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Familia Produto"/>
-                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                      <Connection code="true" type="code"/>
-                    </Property>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFamiliaProdutoActionPerformed"/>
-                  </Events>
-                </Component>
                 <Container class="vrframework.bean.panel.VRPanel" name="vRPanel1">
 
                   <Layout>
@@ -330,6 +319,9 @@
       </SubComponents>
     </Container>
     <Component class="vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel" name="conexao">
+      <Properties>
+        <Property name="sistema" type="java.lang.String" value="Super"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

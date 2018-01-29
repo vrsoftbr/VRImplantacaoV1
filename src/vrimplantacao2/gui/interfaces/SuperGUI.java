@@ -147,19 +147,12 @@ public class SuperGUI extends VRInternalFrame {
                     importador.setLojaVR(idLojaVR);     
 
                     if (tabOperacoes.getSelectedIndex() == 0) {
-                        
-                        if (chkFamiliaProduto.isSelected()) {                        
-                            importador.importarFamiliaProduto();
-                        }
-
                         if (chkMercadologico.isSelected()) {
                             importador.importarMercadologico();
                         }
-
                         if (chkProdutos.isSelected()) {
                             importador.importarProduto(chkManterBalanca.isSelected());
                         }
-
                         {
                             List<OpcaoProduto> opcoes = new ArrayList<>();
                             if (chkCusto.isSelected()) {
@@ -255,7 +248,6 @@ public class SuperGUI extends VRInternalFrame {
         tabImportacao = new javax.swing.JTabbedPane();
         tabProdutos = new javax.swing.JPanel();
         chkMercadologico = new vrframework.bean.checkBox.VRCheckBox();
-        chkFamiliaProduto = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         chkProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
@@ -297,15 +289,6 @@ public class SuperGUI extends VRInternalFrame {
         chkMercadologico.setText("Mercadologico");
         chkMercadologico.setEnabled(true);
         tabProdutos.add(chkMercadologico);
-
-        chkFamiliaProduto.setText("Familia Produto");
-        chkFamiliaProduto.setEnabled(true);
-        chkFamiliaProduto.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkFamiliaProdutoActionPerformed(evt);
-            }
-        });
-        tabProdutos.add(chkFamiliaProduto);
 
         chkProdutos.setText("Produtos");
         chkProdutos.setEnabled(true);
@@ -437,6 +420,8 @@ public class SuperGUI extends VRInternalFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        conexao.setSistema("Super");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -487,10 +472,6 @@ public class SuperGUI extends VRInternalFrame {
         }
     }//GEN-LAST:event_btnMigrarActionPerformed
 
-    private void chkFamiliaProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFamiliaProdutoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkFamiliaProdutoActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkAtivoInativo;
@@ -504,7 +485,6 @@ public class SuperGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkEANemBranco;
     private vrframework.bean.checkBox.VRCheckBox chkEstoque;
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
-    private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkICMS;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
