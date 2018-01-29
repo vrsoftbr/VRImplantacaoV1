@@ -9,6 +9,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 public class SuperDAO extends InterfaceDAO {
@@ -280,7 +281,40 @@ public class SuperDAO extends InterfaceDAO {
         
         return result;
     }
-    
-    
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    pf.cd_fornec idfornecedor,\n" +
+                    "    pf.cd_prod idproduto,\n" +
+                    "    nullif(trim(pf.cd_prod_for), '') codigoexterno,\n" +
+                    "    coalesce(pf.qtd_emb, 1) qtdembalagem,\n" +
+                    "    coalesce(nullif(pf.vlr_tab_for,0), pf.vlr_unit) custotabela\n" +
+                    "from\n" +
+                    "    fornecedor_produto pf\n" +
+                    "order by\n" +
+                    "    1,2,3"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setCodigoExterno(rst.getString("qtdembalagem"));
+                    imp.setCustoTabela(rst.getDouble("custotabela"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
     
 }
