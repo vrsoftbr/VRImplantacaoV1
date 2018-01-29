@@ -5,8 +5,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEstadoCivil;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -316,5 +319,89 @@ public class SuperDAO extends InterfaceDAO {
         
         return result;
     }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    c.cd_cli id,\n" +
+                    "    c.cgccpf cnpj,\n" +
+                    "    c.i_estad inscricaoestadual,\n" +
+                    "    c.nom_cli razao,\n" +
+                    "    c.nom_fant fantasia,\n" +
+                    "    case when c.status = 'A' then 1 else 0 end ativo,\n" +
+                    "    c.endereco,\n" +
+                    "    c.nro_logradouro numero,\n" +
+                    "    c.end_compl complemento,\n" +
+                    "    c.dsc_bairro bairro,\n" +
+                    "    m.cd_ibge municipio_ibge,\n" +
+                    "    c.dsc_municipio municipio,\n" +
+                    "    m.uf,\n" +
+                    "    c.cep,\n" +
+                    "    c.est_civil,\n" +
+                    "    c.dt_nasc datanascimento,\n" +
+                    "    c.dt_cdto datacadastro,\n" +
+                    "    c.loc_trab empresa,\n" +
+                    "    c.tel_trab empresatelefone,\n" +
+                    "    c.vlr_contrato valorlimite,\n" +
+                    "    c.nom_conjuge conjuge,\n" +
+                    "    c.obs observacoes,\n" +
+                    "    c.tel telefone,\n" +
+                    "    c.cel celular,\n" +
+                    "    c.e_mail email,\n" +
+                    "    c.fax fax,\n" +
+                    "    c.i_munic inscricaomunicipal\n" +
+                    "from\n" +
+                    "    cliente c\n" +
+                    "    left join municipio m on\n" +
+                    "        c.cd_municipio = m.cd_municipio\n" +
+                    "order by\n" +
+                    "    c.cd_cli"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipioIBGE(rst.getInt("municipio_ibge"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    switch (Utils.acertarTexto(rst.getString("est_civil"))) {
+                        case "S": imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO); break;
+                        default: imp.setEstadoCivil(TipoEstadoCivil.OUTROS);
+                    }
+                    imp.setDataNascimento(rst.getDate("datanascimento"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setEmpresa(rst.getString("empresa"));
+                    imp.setEmpresaTelefone(rst.getString("empresatelefone"));
+                    imp.setValorLimite(rst.getDouble("valorlimite"));
+                    imp.setNomeConjuge(rst.getString("conjuge"));
+                    imp.setObservacao2(rst.getString("observacoes"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setFax(rst.getString("fax"));
+                    imp.setInscricaoMunicipal(rst.getString("inscricaomunicipal"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
     
 }

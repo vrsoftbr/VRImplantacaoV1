@@ -13,6 +13,7 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
@@ -229,6 +230,15 @@ public class SuperGUI extends VRInternalFrame {
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
+                        
+                        //CLIENTES
+                        
+                        if (chkClientesPreferenciais.isSelected()) {
+                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
+                        }
+                        if (chkClientesEventuais.isSelected()) {
+                            importador.importarClienteEventual(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
+                        }
                     }
                                        
                     ProgressBar.dispose();
@@ -284,6 +294,9 @@ public class SuperGUI extends VRInternalFrame {
         tabFornecedores = new javax.swing.JPanel();
         chkFornecedores = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        tabClientes = new javax.swing.JPanel();
+        chkClientesPreferenciais = new vrframework.bean.checkBox.VRCheckBox();
+        chkClientesEventuais = new vrframework.bean.checkBox.VRCheckBox();
         pnlLoja = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel1 = new javax.swing.JLabel();
@@ -406,6 +419,18 @@ public class SuperGUI extends VRInternalFrame {
 
         tabImportacao.addTab("Fornecedores", tabFornecedores);
 
+        tabClientes.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        chkClientesPreferenciais.setText("Clientes Preferenciais");
+        chkClientesPreferenciais.setEnabled(true);
+        tabClientes.add(chkClientesPreferenciais);
+
+        chkClientesEventuais.setText("Clientes Eventuais");
+        chkClientesEventuais.setEnabled(true);
+        tabClientes.add(chkClientesEventuais);
+
+        tabImportacao.addTab("Clientes", tabClientes);
+
         tabOperacoes.addTab("Importação", tabImportacao);
 
         btnMigrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
@@ -473,7 +498,7 @@ public class SuperGUI extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(tabOperacoes, javax.swing.GroupLayout.DEFAULT_SIZE, 245, Short.MAX_VALUE)
+                .addComponent(tabOperacoes)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -500,6 +525,8 @@ public class SuperGUI extends VRInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkAtivoInativo;
+    private vrframework.bean.checkBox.VRCheckBox chkClientesEventuais;
+    private vrframework.bean.checkBox.VRCheckBox chkClientesPreferenciais;
     private vrframework.bean.checkBox.VRCheckBox chkCusto;
     private vrframework.bean.checkBox.VRCheckBox chkCustoComImposto;
     private vrframework.bean.checkBox.VRCheckBox chkCustoSemImposto;
@@ -529,6 +556,7 @@ public class SuperGUI extends VRInternalFrame {
     private vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel conexao;
     private javax.swing.JLabel jLabel1;
     private vrframework.bean.panel.VRPanel pnlLoja;
+    private javax.swing.JPanel tabClientes;
     private javax.swing.JPanel tabFornecedores;
     private javax.swing.JTabbedPane tabImportacao;
     private javax.swing.JTabbedPane tabOperacoes;
