@@ -13,6 +13,7 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.SuperDAO;
@@ -219,6 +220,15 @@ public class SuperGUI extends VRInternalFrame {
                         if (chkEANemBranco.isSelected()) {
                             importador.importarEANemBranco();
                         }
+                        
+                        //FORNECEDORES
+                        
+                        if (chkFornecedores.isSelected()) {
+                            importador.importarFornecedor(OpcaoFornecedor.DADOS, OpcaoFornecedor.CONTATOS);
+                        }
+                        if (chkProdutoFornecedor.isSelected()) {
+                            importador.importarProdutoFornecedor();
+                        }
                     }
                                        
                     ProgressBar.dispose();
@@ -271,6 +281,9 @@ public class SuperGUI extends VRInternalFrame {
         chkTipoEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkMargem = new vrframework.bean.checkBox.VRCheckBox();
+        tabFornecedores = new javax.swing.JPanel();
+        chkFornecedores = new vrframework.bean.checkBox.VRCheckBox();
+        chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         pnlLoja = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel1 = new javax.swing.JLabel();
@@ -381,6 +394,18 @@ public class SuperGUI extends VRInternalFrame {
 
         tabImportacao.addTab("Produtos", tabProdutos);
 
+        tabFornecedores.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        chkFornecedores.setText("Fornecedor");
+        chkFornecedores.setEnabled(true);
+        tabFornecedores.add(chkFornecedores);
+
+        chkProdutoFornecedor.setText("Produto fornecedores");
+        chkProdutoFornecedor.setEnabled(true);
+        tabFornecedores.add(chkProdutoFornecedor);
+
+        tabImportacao.addTab("Fornecedores", tabFornecedores);
+
         tabOperacoes.addTab("Importação", tabImportacao);
 
         btnMigrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
@@ -485,6 +510,7 @@ public class SuperGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkEANemBranco;
     private vrframework.bean.checkBox.VRCheckBox chkEstoque;
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
+    private vrframework.bean.checkBox.VRCheckBox chkFornecedores;
     private vrframework.bean.checkBox.VRCheckBox chkICMS;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
@@ -493,6 +519,7 @@ public class SuperGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkPisCofins;
     private vrframework.bean.checkBox.VRCheckBox chkPreco;
     private vrframework.bean.checkBox.VRCheckBox chkProdMercadologico;
+    private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
@@ -502,6 +529,7 @@ public class SuperGUI extends VRInternalFrame {
     private vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel conexao;
     private javax.swing.JLabel jLabel1;
     private vrframework.bean.panel.VRPanel pnlLoja;
+    private javax.swing.JPanel tabFornecedores;
     private javax.swing.JTabbedPane tabImportacao;
     private javax.swing.JTabbedPane tabOperacoes;
     private javax.swing.JPanel tabProdutos;

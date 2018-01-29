@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -195,5 +197,90 @@ public class SuperDAO extends InterfaceDAO {
         
         return result;
     }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    f.cd_fornec id,\n" +
+                    "    f.razao_social razao,\n" +
+                    "    f.nom_fantasia fantasia,\n" +
+                    "    f.cpfcnpj cnpj_cpf,\n" +
+                    "    f.ins_estadual_rg ie_rg,\n" +
+                    "    f.insc_suframa suframa,\n" +
+                    "    f.insc_municipal,\n" +
+                    "    case when f.status = 'A' then 1 else 0 end ativo,\n" +
+                    "    f.endereco,\n" +
+                    "    f.nro_logradouro numero,\n" +
+                    "    f.end_compl complemento,\n" +
+                    "    f.dsc_bairro bairro,\n" +
+                    "    m.cd_ibge id_municipio,\n" +
+                    "    m.dsc_municipio municipio,\n" +
+                    "    m.uf,\n" +
+                    "    f.cep,\n" +
+                    "    f.tel_fornec,\n" +
+                    "    f.tel_celular,\n" +
+                    "    f.tel_fax,\n" +
+                    "    f.tel_vendedor,\n" +
+                    "    f.e_mail,\n" +
+                    "    f.dt_cdto datacadastros,\n" +
+                    "    f.obs observacoes,\n" +
+                    "    f.dias_entrega prazoentrega,\n" +
+                    "    f.dias_visita prazovisita,\n" +
+                    "    coalesce(pp.primeira_parc, 0) condicaopagamento,\n" +
+                    "    f.dsc_vendedor vendedor\n" +
+                    "from\n" +
+                    "    fornecedor f\n" +
+                    "    left join municipio m on\n" +
+                    "        f.cd_municipio = m.cd_municipio\n" +
+                    "    left join fornecedor_prazo_pagamento pp on\n" +
+                    "        f.cd_przpagto = pp.cd_przpagto\n" +
+                    "order by\n" +
+                    "    f.cd_fornec"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj_cpf"));
+                    imp.setIe_rg(rst.getString("ie_rg"));
+                    imp.setSuframa(rst.getString("suframa"));
+                    imp.setInsc_municipal(rst.getString("insc_municipal"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setIbge_municipio(rst.getInt("id_municipio"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setTel_principal(rst.getString("tel_fornec"));                    
+                    imp.addCelular("CELULAR", rst.getString("tel_celular"));                    
+                    imp.addTelefone("FAX", rst.getString("tel_fax"));
+                    imp.addContato(rst.getString("vendedor"), rst.getString("tel_vendedor"), "", TipoContato.COMERCIAL, "");
+                    imp.addEmail("EMAIL", rst.getString("e_mail"), TipoContato.COMERCIAL);
+                    imp.setDatacadastro(rst.getDate("datacadastros"));
+                    imp.setObservacao(rst.getString("observacoes"));
+                    imp.setPrazoEntrega(rst.getInt("prazoentrega"));
+                    imp.setPrazoVisita(rst.getInt("prazovisita"));
+                    imp.setCondicaoPagamento(rst.getInt("condicaopagamento"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    
     
 }
