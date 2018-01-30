@@ -35,12 +35,14 @@ public class AsefeDAO extends InterfaceDAO {
                     "SELECT DISTINCT\n"
                     + "M1.CODIGO MERC1, M1.DESCRICAO DESC_MERC1,\n"
                     + "M2.CODIGO_GRUPOS MERC2, M2.DESCRICAO_GRUPOS DESC_MERC2,\n"
-                    + "'1' MERC3, M2.DESCRICAO_GRUPOS DESC_MERC3\n"
+                    + "coalesce(M3.Codigo, '1') MERC3,\n"
+                    + "coalesce(M3.Descricao, M2.DESCRICAO_GRUPOS) DESC_MERC3\n"
                     + "FROM\n"
                     + "CE_PRODUTOS P\n"
                     + "INNER JOIN CE_SETORES M1 ON M1.CODIGO = P.CODIGOSETOR\n"
                     + "INNER JOIN CE_GRUPOS M2 ON M2.CODIGO_GRUPOS = P.CODGRU_PRODUTOS\n"
-                    + "ORDER BY M1.CODIGO, M2.CODIGO_GRUPOS"
+                    + "left join SubGrupos M3 on M3.Codigo = p.SubGrupo\n"
+                    + "ORDER BY M1.CODIGO, M2.CODIGO_GRUPOS, coalesce(M3.Codigo, '1')"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -79,6 +81,7 @@ public class AsefeDAO extends InterfaceDAO {
                     + "P.CODIGOSETOR, \n"
                     + "P.CODGRU_PRODUTOS,\n"
                     + "P.CODMOD_PRODUTOS, \n"
+                    + "coalesce(P.SubGrupo, '1') SubGrupo,\n"
                     + "P.STICMS,\n"
                     + "M.DESCRICAO_MODELOS,\n"
                     + "M.CODTRIB_MODELOS,\n"
@@ -103,10 +106,7 @@ public class AsefeDAO extends InterfaceDAO {
                     imp.setDescricaoGondola(imp.getDescricaoGondola());
                     imp.setCodMercadologico1(rst.getString("CODIGOSETOR"));
                     imp.setCodMercadologico2(rst.getString("CODGRU_PRODUTOS"));
-                    imp.setCodMercadologico3("1");
-                    imp.setPrecovenda(rst.getDouble("VENDA_PRODUTOS"));
-                    imp.setCustoComImposto(rst.getDouble("CUSTO_PRODUTOS"));
-                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setCodMercadologico3(rst.getString("SubGrupo"));
                     imp.setNcm(rst.getString("NCM_PRODUTOS"));
                     imp.setCest(rst.getString("CEST"));
                     imp.setPiscofinsCstDebito(Integer.parseInt(Utils.formataNumero(rst.getString("STPIS"))));
@@ -114,7 +114,7 @@ public class AsefeDAO extends InterfaceDAO {
                     imp.setIcmsCst(Integer.parseInt(Utils.formataNumero(rst.getString("STICMS"))));
                     imp.setIcmsAliq(rst.getDouble("CODTRIB_MODELOS"));
                     imp.setIcmsReducao(rst.getDouble("VALORREDUCAO"));
-                    
+
                     ProdutoBalancaVO produtoBalanca;
                     long codigoProduto;
                     codigoProduto = Long.parseLong(imp.getImportId());
@@ -123,7 +123,7 @@ public class AsefeDAO extends InterfaceDAO {
                     } else {
                         produtoBalanca = null;
                     }
-                    
+
                     if (produtoBalanca != null) {
                         imp.seteBalanca(true);
                         imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
@@ -131,7 +131,7 @@ public class AsefeDAO extends InterfaceDAO {
                         imp.setValidade(0);
                         imp.seteBalanca(false);
                     }
-                    
+
                     vResult.add(imp);
                 }
             }
@@ -141,30 +141,89 @@ public class AsefeDAO extends InterfaceDAO {
 
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opcao) throws Exception {
-        /*if (opcao == OpcaoProduto.ICMS) {
+        if (opcao == OpcaoProduto.CUSTO) {
             List<ProdutoIMP> vResult = new ArrayList<>();
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select \n"
-                        + "COD_ITEM, COD_BARRA, DESCR_ITEM,\n"
-                        + "CST_ICMS, ALIQ_ICMS, BC_ICMS_ST \n"
-                        + "from VWPRODUTOSCONTABILIDADE"
+                        + "p.CODPROD_PRODUTOS,\n"
+                        + "p.DESCRICAO_PRODUTOS,\n"
+                        + "pe.Barras, \n"
+                        + "pe.Quantidade,\n"
+                        + "pe.CustoReal, \n"
+                        + "pe.Venda, \n"
+                        + "pe.Margem\n"
+                        + "from ProdutosEmpresa pe\n"
+                        + "inner join CE_PRODUTOS p on p.CODBARRA_PRODUTOS = pe.Barras\n"
+                        + "where pe.CodEmpresa = " + getLojaOrigem()
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportSistema(getSistema());
                         imp.setImportLoja(getLojaOrigem());
-                        imp.setImportId(rst.getString("COD_ITEM"));
-                        imp.setIcmsCst(rst.getInt("CST_ICMS"));
-                        imp.setIcmsAliq(rst.getDouble("ALIQ_ICMS"));
-                        imp.setIcmsReducao(0);
+                        imp.setImportId(rst.getString("CODPROD_PRODUTOS"));
+                        imp.setCustoComImposto(rst.getDouble("CustoReal"));
+                        imp.setCustoSemImposto(imp.getCustoComImposto());
                         vResult.add(imp);
                     }
                 }
                 return vResult;
             }
-        } else*/ 
-        if (opcao == OpcaoProduto.ESTOQUE) {
+        } else if (opcao == OpcaoProduto.PRECO) {
+            List<ProdutoIMP> vResult = new ArrayList<>();
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "p.CODPROD_PRODUTOS,\n"
+                        + "p.DESCRICAO_PRODUTOS,\n"
+                        + "pe.Barras, \n"
+                        + "pe.Quantidade,\n"
+                        + "pe.CustoReal, \n"
+                        + "pe.Venda, \n"
+                        + "pe.Margem\n"
+                        + "from ProdutosEmpresa pe\n"
+                        + "inner join CE_PRODUTOS p on p.CODBARRA_PRODUTOS = pe.Barras\n"
+                        + "where pe.CodEmpresa = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportId(rst.getString("CODPROD_PRODUTOS"));
+                        imp.setPrecovenda(rst.getDouble("Venda"));
+                        vResult.add(imp);
+                    }
+                }
+                return vResult;
+            }
+        } else if (opcao == OpcaoProduto.MARGEM) {
+            List<ProdutoIMP> vResult = new ArrayList<>();
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "p.CODPROD_PRODUTOS,\n"
+                        + "p.DESCRICAO_PRODUTOS,\n"
+                        + "pe.Barras, \n"
+                        + "pe.Quantidade,\n"
+                        + "pe.CustoReal, \n"
+                        + "pe.Venda, \n"
+                        + "pe.Margem\n"
+                        + "from ProdutosEmpresa pe\n"
+                        + "inner join CE_PRODUTOS p on p.CODBARRA_PRODUTOS = pe.Barras\n"
+                        + "where pe.CodEmpresa = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportId(rst.getString("CODPROD_PRODUTOS"));
+                        imp.setMargem(rst.getDouble("Margem"));
+                        vResult.add(imp);
+                    }
+                }
+                return vResult;
+            }
+        } else if (opcao == OpcaoProduto.ESTOQUE) {
             List<ProdutoIMP> vResult = new ArrayList<>();
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -192,12 +251,44 @@ public class AsefeDAO extends InterfaceDAO {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "CodCliente, Carteira, NomeCliente, EnderecoCliente, BairroCliente, \n"
-                    + "CidadeCliente, CepCliente, CpfCliente, RgCliente, LimiteCheque, LimiteCliente,\n"
-                    + "TelCliente, CelCliente, Situacao, Datanascimento, Pessoas_autorizadas,\n"
-                    + "Saldo, Cheque, Fiado, CodigoConvenio, Matricula, SENHA, UF, NUMERO, CodUf,\n"
-                    + "email, CodMunicipio, DiasVencimento, Sexo, DiasVencimentoCheque, SituacaoCheque,\n"
-                    + "DiasCarenciaCheque, ChaveAcesso, OrgaoPublico, Telefone1, Telefone2, Fax, Obs\n"
+                    + "CodCliente, "
+                    + "Carteira, "
+                    + "NomeCliente, "
+                    + "EnderecoCliente, "
+                    + "BairroCliente, \n"
+                    + "CidadeCliente, "
+                    + "CepCliente, "
+                    + "CpfCliente, "
+                    + "RgCliente, "
+                    + "LimiteCheque, "
+                    + "LimiteCliente,\n"
+                    + "TelCliente, "
+                    + "CelCliente, "
+                    + "Situacao, "
+                    + "Datanascimento, "
+                    + "Pessoas_autorizadas,\n"
+                    + "Saldo, "
+                    + "Cheque, "
+                    + "Fiado, "
+                    + "CodigoConvenio, "
+                    + "Matricula, "
+                    + "SENHA, "
+                    + "UF, "
+                    + "NUMERO, "
+                    + "CodUf,\n"
+                    + "email, "
+                    + "CodMunicipio, "
+                    + "DiasVencimento, "
+                    + "Sexo, "
+                    + "DiasVencimentoCheque, "
+                    + "SituacaoCheque,\n"
+                    + "DiasCarenciaCheque, "
+                    + "ChaveAcesso, "
+                    + "OrgaoPublico, "
+                    + "Telefone1, "
+                    + "Telefone2, "
+                    + "Fax, "
+                    + "Obs\n"
                     + "from CC_Clientes\n"
                     + "order by CodCliente"
             )) {
@@ -223,6 +314,7 @@ public class AsefeDAO extends InterfaceDAO {
                     imp.setPermiteCheque((rst.getInt("Cheque") != 0));
                     imp.setPermiteCreditoRotativo((rst.getInt("Fiado") != 0));
                     imp.setObservacao(rst.getString("Obs"));
+                    imp.setDataNascimento(rst.getDate("Datanascimento"));
 
                     if ((rst.getString("Telefone1") != null)
                             && (!rst.getString("Telefone1").trim().isEmpty())) {

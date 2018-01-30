@@ -11,6 +11,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -171,7 +172,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
-                    imp.setSituacaoCadastro(SituacaoCadastro.getById(rst.getInt("situacaocadastro")));
+                    imp.setSituacaoCadastro((rst.getInt("situacaocadastro") == 1 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstCredito(Utils.stringToInt(rst.getString("piscofins_entrada")));
@@ -188,30 +189,6 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    /*@Override
-     public List<ProdutoIMP> getProdutos(OpcaoProduto opcao) throws Exception {
-     if (opcao == OpcaoProduto.ICMS) {
-     List<ProdutoIMP> result = new ArrayList<>();
-     try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-     try (ResultSet rst = stm.executeQuery(""
-     + "select codigo, cst, aliquota "
-     + "from cadmer "
-     )) {
-     while (rst.next()) {
-     ProdutoIMP imp = new ProdutoIMP();
-     imp.setImportLoja(getLojaOrigem());
-     imp.setImportSistema(getSistema());
-     imp.setImportId(rst.getString("codigo"));
-     imp.setIcmsDebitoId(rst.getString("aliquota"));
-     imp.setIcmsCreditoId(rst.getString("aliquota"));
-     result.add(imp);
-     }
-     }
-     return result;
-     }
-     }
-     return null;
-     }*/
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -547,7 +524,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
+                    "SELECT\n"
                     + "id,\n"
                     + "emissao,\n"
                     + "vencimento,\n"
@@ -561,9 +538,9 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "historico,\n"
                     + "caixa\n"
                     + "FROM receb\n"
-                    + "WHERE pago = 0\n"
+                    + "WHERE pagamento IS NULL\n"
                     + "AND codcli IS NOT NULL\n"
-                    + "AND tipodoc NOT LIKE '%CHQ%'"
+                    + "AND id_conta <> 2"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -587,31 +564,64 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
             return result;
         }
     }
-    
-    
-/*
-    SELECT 
-ch.id, 
-ch.emissao, 
-ch.documento, 
-ch.vencimento,
-ch.cupom,
-ch.valor,
-ch.valorpago,
-(ch.valor - ch.valorpago) valorconta,, 
-ch.historico,
-ch.caixa,
-b.codigo,
-ch.ncheque,
-ch.numbanco,
-ch.agencia,
-ch.cpfcgc,
-ch.caixa,
-ch.datahora_alteracao,
-c
-FROM receb ch
-LEFT JOIN bancos b ON b.id = ch.id_banco
-LEFT JOIN clientes c ON c.codigo = ch.codcli
-WHERE tipodoc LIKE '%CHQ%'
-*/    
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n"
+                    + "ch.id, \n"
+                    + "ch.emissao, \n"
+                    + "ch.documento, \n"
+                    + "ch.vencimento,\n"
+                    + "ch.cupom,\n"
+                    + "ch.valor,\n"
+                    + "ch.valorpago,\n"
+                    + "(ch.valor - ch.valorpago) valorconta, \n"
+                    + "ch.historico,\n"
+                    + "ch.caixa,\n"
+                    + "b.codigo,\n"
+                    + "ch.ncheque,\n"
+                    + "ch.numbanco,\n"
+                    + "ch.agencia,\n"
+                    + "ch.cpfcgc,\n"
+                    + "ch.caixa,\n"
+                    + "ch.datahora_alteracao,\n"
+                    + "ch.cpfcgc AS cpfcnpj_cheque,\n"
+                    + "c.cpf AS cpf_cliente,\n"
+                    + "c.rg AS rg_cliente,\n"
+                    + "c.nome AS nome_cliente,\n"
+                    + "c.cgc AS cgc_cliente,\n"
+                    + "c.inscr AS inscr_cliente,\n"
+                    + "c.telefone AS telefone_cliente\n"
+                    + "FROM receb ch\n"
+                    + "LEFT JOIN bancos b ON b.id = ch.id_banco\n"
+                    + "LEFT JOIN clientes c ON c.codigo = ch.codcli\n"
+                    + "WHERE ch.id_conta = 2\n"
+                    + "AND pagamento IS NULL"
+            )) {
+                while (rst.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setCpf(rst.getString("cpfcnpj_cheque"));
+                    imp.setNumeroCheque(rst.getString("ncheque"));
+                    imp.setAgencia(rst.getString("agencia"));
+                    imp.setBanco(rst.getInt("codigo"));
+                    imp.setNumeroCupom(rst.getString("documento"));
+                    imp.setEcf(rst.getString("caixa"));
+                    imp.setValor(rst.getDouble("valorconta"));
+                    imp.setObservacao(rst.getString("historico"));
+                    imp.setNome(rst.getString("nome_cliente"));
+                    imp.setTelefone(rst.getString("telefone_cliente"));
+                    imp.setDate(rst.getDate("emissao"));
+                    imp.setDataDeposito(rst.getDate("vencimento"));
+                    imp.setDataHoraAlteracao(rst.getTimestamp("datahora_alteracao"));
+                    imp.setAlinea(0);
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 }

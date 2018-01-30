@@ -246,6 +246,9 @@ public class ClientePreferencialDAO {
                 if (opt.contains(OpcaoCliente.INSCRICAO_ESTADUAL)) {
                     sql.put("inscricaoestadual", vo.getInscricaoEstadual());
                 }
+                if (opt.contains(OpcaoCliente.DATA_NASCIMENTO)) {
+                    sql.put("datanascimento", vo.getDataNascimento());
+                }
                 sql.setWhere("id = " + vo.getId());
                 stm.execute(sql.getUpdate());
             }

@@ -45,6 +45,7 @@ public class ClienteRepository {
             opt.add(OpcaoCliente.OBSERVACOES2);
             opt.add(OpcaoCliente.SITUACAO_CADASTRO);
             opt.add(OpcaoCliente.INSCRICAO_ESTADUAL);
+            opt.add(OpcaoCliente.DATA_NASCIMENTO);
         }
         
         this.provider.begin();
@@ -122,6 +123,10 @@ public class ClienteRepository {
                         cliente = converterClientePreferencial(imp);
                         cliente.setId(anterior.getCodigoAtual().getId());
                         atualizarClientePreferencial(cliente, opt);
+                    } else if (opt.contains(OpcaoCliente.DATA_NASCIMENTO)) {
+                        cliente = converterClientePreferencial(imp);
+                        cliente.setId(anterior.getCodigoAtual().getId());
+                        atualizarClientePreferencial(cliente, opt);
                     } else {
                         cliente = anterior.getCodigoAtual();
                     }
@@ -180,6 +185,9 @@ public class ClienteRepository {
                         atualizarClientePreferencial(vo, opt);
                     }
                     if (opt.contains(OpcaoCliente.VALOR_LIMITE)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.DATA_NASCIMENTO)) {
                         atualizarClientePreferencial(vo, opt);
                     }
                 }
