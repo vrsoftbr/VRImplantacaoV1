@@ -511,6 +511,7 @@ public class VisualComercioDAO extends InterfaceDAO implements MapaTributoProvid
                     "	left join tipos tp on p.pa_tipo_pagto = tp.ti_codi\n" +
                     "where\n" +
                     "	p.pa_pago != '*'\n" +
+                    "	and tp.ti_codi = 8\n" +
                     "	and p.pa_loja = " + getLojaOrigem() + "\n" +
                     "order by\n" +
                     "	id"

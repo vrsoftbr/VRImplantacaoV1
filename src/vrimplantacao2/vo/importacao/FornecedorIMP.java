@@ -404,22 +404,68 @@ public class FornecedorIMP {
         this.tipoEmpresa = tipoEmpresa;
     }
     
-    
-
+    /**
+     * Inclui um novo contato no fornecedor. Se o nome estiver vazio ou nulo, 
+     * então o contato não é incluiso e null é retornado.
+     * @param id ID que identificará o contato na lista de contatos do fornecedor.
+     * @param nome Nome do contato.
+     * @param telefone Telefone do contato.
+     * @param celular Celular do contato.
+     * @param tipo Tipo do contato.
+     * @param email E-mail do contato.
+     * @return Contato cadastrado ou null quando o nome for vazio.
+     */
     public FornecedorContatoIMP addContato(String id, String nome, String telefone, String celular, TipoContato tipo, String email) {
-        FornecedorContatoIMP cont = contatos.make(id);
-        cont.setImportSistema(getImportSistema());
-        cont.setImportLoja(getImportLoja());
-        cont.setImportFornecedorId(getImportId());
-        cont.setImportId(id);
-        cont.setNome(nome);
-        cont.setTelefone(telefone);
-        cont.setCelular(celular);
-        cont.setTipoContato(tipo);
-        cont.setEmail(email);
-        return cont;
+        
+        if (nome != null && !"".equals(nome.trim())) {
+            
+            if (id == null) {
+                int cont = 1;
+                while (contatos.containsKey("CONTATO " + cont)) {
+                    cont++;
+                }
+                id = "CONTATO " + cont;
+            }
+            
+            FornecedorContatoIMP cont = contatos.make(id);
+            cont.setImportSistema(getImportSistema());
+            cont.setImportLoja(getImportLoja());
+            cont.setImportFornecedorId(getImportId());
+            cont.setImportId(id);
+            cont.setNome(nome);
+            cont.setTelefone(telefone);
+            cont.setCelular(celular);
+            cont.setTipoContato(tipo);
+            cont.setEmail(email);
+            
+            return cont;
+            
+        } else {
+            return null;
+        }
+        
     }
     
+    /**
+     * Inclui um novo contato no fornecedor. Se o nome estiver vazio ou nulo, 
+     * então o contato não é incluiso e null é retornado.
+     * @param nome Nome do contato.
+     * @param telefone Telefone do contato.
+     * @param celular Celular do contato.
+     * @param tipo Tipo do contato.
+     * @param email E-mail do contato.
+     * @return Contato cadastrado ou null quando o nome for vazio.
+     */
+    public FornecedorContatoIMP addContato(String nome, String telefone, String celular, TipoContato tipo, String email) {        
+        return addContato(null, nome, telefone, celular, tipo, email);
+    }
+    
+    /**
+     * Incluí uma forma de pagamento no cadastro do fornecedor.
+     * @param id  ID da condição de pagamento.
+     * @param vencimento Dia de vencimento.
+     * @return Forma de pagamento do fornecedor que foi armazenada.
+     */
     public FornecedorPagamentoIMP addPagamento(String id, int vencimento) {
         FornecedorPagamentoIMP pag = pagamentos.make(id);
         pag.setImportSistema(getImportSistema());
@@ -444,6 +490,50 @@ public class FornecedorIMP {
 
     public void setTipo_inscricao(TipoInscricao tipo_inscricao) {
         this.tipo_inscricao = tipo_inscricao;
+    }
+
+    /**
+     * Método criado para facilitar a inclusão de celular nos contatos do fornecedor.
+     * @param descricao Descricão que será utilizada no contato.
+     * @param celular Celular que será gravado.
+     * @return Contato incluso.
+     */
+    public FornecedorContatoIMP addCelular(String descricao, String celular) {
+        if (celular != null && !"".equals(celular.trim())) {
+            return addContato(descricao, "", celular, TipoContato.COMERCIAL, "");
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Método criado para facilitar a inclusão de telefones adicionais nos
+     * contatos do fornecedor.
+     * @param descricao Descrição que será utilizada nos contatos.
+     * @param telefone Telefone a ser incluso.
+     * @return Contato incluso.
+     */
+    public FornecedorContatoIMP addTelefone(String descricao, String telefone) {
+        if (telefone != null && !"".equals(telefone.trim())) {
+            return addContato(descricao, telefone, "", TipoContato.COMERCIAL, "");
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Método criado para facilitar a inclusão de e-mails no fornecedor como contato.
+     * @param descricao Descrição que será utilizada no cadastro.
+     * @param email E-mail do fornecedor.
+     * @param tipo Tipo de e-mail.
+     * @return Contato incluso.
+     */
+    public FornecedorContatoIMP addEmail(String descricao, String email, TipoContato tipo) {
+        if (email != null && !"".equals(email.trim())) {
+            return addContato(descricao, "", "", tipo, email);
+        } else {
+            return null;
+        }
     }
 
 }

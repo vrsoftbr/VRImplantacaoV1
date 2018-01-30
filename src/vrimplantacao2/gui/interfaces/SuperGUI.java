@@ -13,36 +13,36 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.interfaces.AvanceDAO;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.dao.interfaces.SuperDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
-import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoView;
 import vrimplantacao2.parametro.Parametros;
 
-public class AvanceGUI extends VRInternalFrame {
-
-    private static final String SISTEMA = "Avance";
-    private static AvanceGUI instance;
+public class SuperGUI extends VRInternalFrame {
+    
+    private static final String SISTEMA = "Sistema Super";
+    private static SuperGUI instance;
 
     public static String getSISTEMA() {
         return SISTEMA;
     }
-
+    
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
-        conexaoMySQL.carregarParametros();
+        conexao.carregarParametros();
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
-
+    
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
-        conexaoMySQL.atualizarParametros();
+        conexao.atualizarParametros();
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
             params.put(cliente.cnpj, SISTEMA, "LOJA_CLIENTE");
@@ -55,41 +55,40 @@ public class AvanceGUI extends VRInternalFrame {
         }
         params.salvar();
     }
-
-    private AvanceDAO avanceDAO = new AvanceDAO();
-
-    private AvanceGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    
+    private SuperDAO dao = new SuperDAO();
+    
+    private SuperGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
-
+        
+        
         this.title = "Importação " + SISTEMA;
-
-        conexaoMySQL.host = "localhost";
-        conexaoMySQL.database = "retguarda";
-        conexaoMySQL.port = "3306";
-        conexaoMySQL.user = "root";
-        conexaoMySQL.pass = "infor";
-
+        
+        conexao.host = "localhost";
+        conexao.database = "c://sistemassuper//banco//SISTEMASSUPER.FDB";
+        conexao.port = "3050";
+        conexao.user = "sysdba";
+        conexao.pass = "masterkey";
+                
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
-        conexaoMySQL.setOnConectar(new ConexaoEvent() {
+        conexao.setOnConectar(new ConexaoEvent() {
             @Override
-            public void executar() throws Exception {
-
-                btnMapaTribut.setEnabled(true);
-
-                gravarParametros();
+            public void executar() throws Exception {                
+                gravarParametros();        
                 carregarLojaVR();
                 carregarLojaCliente();
-            }
+            }            
         });
-
-        carregarParametros();
-
+        
+        carregarParametros();        
+        
         centralizarForm();
         this.setMaximum(false);
     }
 
+    
     public void carregarLojaVR() throws Exception {
         cmbLojaVR.setModel(new DefaultComboBoxModel());
         int cont = 0;
@@ -103,12 +102,12 @@ public class AvanceGUI extends VRInternalFrame {
         }
         cmbLojaVR.setSelectedIndex(index);
     }
-
+    
     public void carregarLojaCliente() throws Exception {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja : avanceDAO.getLojasCliente()) {
+        for (Estabelecimento loja: dao.getLojasCliente()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -117,12 +116,12 @@ public class AvanceGUI extends VRInternalFrame {
         }
         cmbLojaOrigem.setSelectedIndex(index);
     }
-
+    
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
-            i_mdiFrame.setWaitCursor();
+            i_mdiFrame.setWaitCursor();            
             if (instance == null || instance.isClosed()) {
-                instance = new AvanceGUI(i_mdiFrame);
+                instance = new SuperGUI(i_mdiFrame);
             }
             instance.setVisible(true);
         } catch (Exception ex) {
@@ -136,34 +135,26 @@ public class AvanceGUI extends VRInternalFrame {
         Thread thread = new Thread() {
             int idLojaVR;
             String idLojaCliente;
-
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
-
-                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
-                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
-
-                    Importador importador = new Importador(avanceDAO);
+                    
+                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
+                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;                                        
+                    
+                    Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
-                    importador.setLojaVR(idLojaVR);
+                    importador.setLojaVR(idLojaVR);     
 
                     if (tabOperacoes.getSelectedIndex() == 0) {
-
-                        if (chkFamiliaProduto.isSelected()) {
-                            importador.importarFamiliaProduto();
-                        }
-
                         if (chkMercadologico.isSelected()) {
                             importador.importarMercadologico();
                         }
-
                         if (chkProdutos.isSelected()) {
                             importador.importarProduto(chkManterBalanca.isSelected());
                         }
-
                         {
                             List<OpcaoProduto> opcoes = new ArrayList<>();
                             if (chkCusto.isSelected()) {
@@ -192,7 +183,7 @@ public class AvanceGUI extends VRInternalFrame {
                             }
                             if (chkAtivoInativo.isSelected()) {
                                 opcoes.add(OpcaoProduto.ATIVO);
-                            }
+                            }    
                             if (chkDescCompleta.isSelected()) {
                                 opcoes.add(OpcaoProduto.DESC_COMPLETA);
                             }
@@ -204,13 +195,13 @@ public class AvanceGUI extends VRInternalFrame {
                             }
                             if (chkProdMercadologico.isSelected()) {
                                 opcoes.add(OpcaoProduto.MERCADOLOGICO);
-                            }
+                            }                        
                             if (chkValidade.isSelected()) {
                                 opcoes.add(OpcaoProduto.VALIDADE);
                             }
                             if (chkMargem.isSelected()) {
                                 opcoes.add(OpcaoProduto.MARGEM);
-                            }
+                            }          
                             if (chkFamilia.isSelected()) {
                                 opcoes.add(OpcaoProduto.FAMILIA);
                             }
@@ -230,41 +221,30 @@ public class AvanceGUI extends VRInternalFrame {
                         if (chkEANemBranco.isSelected()) {
                             importador.importarEANemBranco();
                         }
-
-                        if (chkFornecedor.isSelected()) {
-                            importador.importarFornecedor();
+                        
+                        //FORNECEDORES
+                        
+                        if (chkFornecedores.isSelected()) {
+                            importador.importarFornecedor(OpcaoFornecedor.DADOS, OpcaoFornecedor.CONTATOS);
                         }
-
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
-
-                        List<OpcaoFornecedor> opcoes = new ArrayList<>();
-                        if (chkFContatos.isSelected()) {
-                            opcoes.add(OpcaoFornecedor.CONTATOS);
-                        }
-
-                        if (!opcoes.isEmpty()) {
-                            importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
-                        }
                         
-                        if (chkClientePreferencial.isSelected()) {
-                            importador.importarClientePreferencial();
-                        }
+                        //CLIENTES
                         
-                        if (chkCreditoRotativo.isSelected()) {
-                            importador.importarCreditoRotativo();
+                        if (chkClientesPreferenciais.isSelected()) {
+                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
                         }
-                        
-                        if (chkCheque.isSelected()) {
-                            importador.importarCheque();
+                        if (chkClientesEventuais.isSelected()) {
+                            importador.importarClienteEventual(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
                         }
                     }
-
+                                       
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
-                    try {
+                    try {                    
                         ConexaoMySQL.getConexao().close();
                     } catch (Exception ex1) {
                         Exceptions.printStackTrace(ex1);
@@ -282,14 +262,12 @@ public class AvanceGUI extends VRInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        conexaoMySQL = new vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel();
         vRLabel1 = new vrframework.bean.label.VRLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
         tabOperacoes = new javax.swing.JTabbedPane();
         tabImportacao = new javax.swing.JTabbedPane();
         tabProdutos = new javax.swing.JPanel();
         chkMercadologico = new vrframework.bean.checkBox.VRCheckBox();
-        chkFamiliaProduto = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         chkProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
@@ -313,24 +291,20 @@ public class AvanceGUI extends VRInternalFrame {
         chkTipoEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkMargem = new vrframework.bean.checkBox.VRCheckBox();
-        vRPanel2 = new vrframework.bean.panel.VRPanel();
-        chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
+        tabFornecedores = new javax.swing.JPanel();
+        chkFornecedores = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        vRPanel3 = new vrframework.bean.panel.VRPanel();
-        chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
-        chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
-        chkCheque = new vrframework.bean.checkBox.VRCheckBox();
+        tabClientes = new javax.swing.JPanel();
+        chkClientesPreferenciais = new vrframework.bean.checkBox.VRCheckBox();
+        chkClientesEventuais = new vrframework.bean.checkBox.VRCheckBox();
         pnlLoja = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel1 = new javax.swing.JLabel();
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
-        btnMapaTribut = new vrframework.bean.button.VRButton();
+        conexao = new vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel();
 
         setTitle("Importação Emporio");
         setToolTipText("");
-
-        conexaoMySQL.setSistema(getSISTEMA());
 
         vRLabel1.setText("Loja (Cliente):");
 
@@ -341,15 +315,6 @@ public class AvanceGUI extends VRInternalFrame {
         chkMercadologico.setText("Mercadologico");
         chkMercadologico.setEnabled(true);
         tabProdutos.add(chkMercadologico);
-
-        chkFamiliaProduto.setText("Familia Produto");
-        chkFamiliaProduto.setEnabled(true);
-        chkFamiliaProduto.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkFamiliaProdutoActionPerformed(evt);
-            }
-        });
-        tabProdutos.add(chkFamiliaProduto);
 
         chkProdutos.setText("Produtos");
         chkProdutos.setEnabled(true);
@@ -442,71 +407,29 @@ public class AvanceGUI extends VRInternalFrame {
 
         tabImportacao.addTab("Produtos", tabProdutos);
 
-        chkFornecedor.setText("Fornecedor");
+        tabFornecedores.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        chkFContatos.setText("Contatos");
+        chkFornecedores.setText("Fornecedor");
+        chkFornecedores.setEnabled(true);
+        tabFornecedores.add(chkFornecedores);
 
-        chkProdutoFornecedor.setText("Produto Fornecedor");
+        chkProdutoFornecedor.setText("Produto fornecedores");
+        chkProdutoFornecedor.setEnabled(true);
+        tabFornecedores.add(chkProdutoFornecedor);
 
-        javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
-        vRPanel2.setLayout(vRPanel2Layout);
-        vRPanel2Layout.setHorizontalGroup(
-            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(vRPanel2Layout.createSequentialGroup()
-                        .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(26, 26, 26)
-                        .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(226, Short.MAX_VALUE))
-        );
-        vRPanel2Layout.setVerticalGroup(
-            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(131, Short.MAX_VALUE))
-        );
+        tabImportacao.addTab("Fornecedores", tabFornecedores);
 
-        tabImportacao.addTab("Forncedores", vRPanel2);
+        tabClientes.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        chkClientePreferencial.setText("Cliente Preferencial");
+        chkClientesPreferenciais.setText("Clientes Preferenciais");
+        chkClientesPreferenciais.setEnabled(true);
+        tabClientes.add(chkClientesPreferenciais);
 
-        chkCreditoRotativo.setText("Crédito Rotativo");
+        chkClientesEventuais.setText("Clientes Eventuais");
+        chkClientesEventuais.setEnabled(true);
+        tabClientes.add(chkClientesEventuais);
 
-        chkCheque.setText("Cheque");
-
-        javax.swing.GroupLayout vRPanel3Layout = new javax.swing.GroupLayout(vRPanel3);
-        vRPanel3.setLayout(vRPanel3Layout);
-        vRPanel3Layout.setHorizontalGroup(
-            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(335, Short.MAX_VALUE))
-        );
-        vRPanel3Layout.setVerticalGroup(
-            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(116, Short.MAX_VALUE))
-        );
-
-        tabImportacao.addTab("Clientes", vRPanel3);
+        tabImportacao.addTab("Clientes", tabClientes);
 
         tabOperacoes.addTab("Importação", tabImportacao);
 
@@ -531,7 +454,7 @@ public class AvanceGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(cmbLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(cmbLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, 352, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -547,13 +470,7 @@ public class AvanceGUI extends VRInternalFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        btnMapaTribut.setText("Mapa de Tribut.");
-        btnMapaTribut.setEnabled(false);
-        btnMapaTribut.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnMapaTributActionPerformed(evt);
-            }
-        });
+        conexao.setSistema("Super");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -562,31 +479,24 @@ public class AvanceGUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(pnlLoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(conexaoMySQL, javax.swing.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
                     .addComponent(tabOperacoes, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnMapaTribut, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(conexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(conexaoMySQL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(conexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(btnMapaTribut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(tabOperacoes)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -612,29 +522,11 @@ public class AvanceGUI extends VRInternalFrame {
         }
     }//GEN-LAST:event_btnMigrarActionPerformed
 
-    private void chkFamiliaProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFamiliaProdutoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkFamiliaProdutoActionPerformed
-
-    private void btnMapaTributActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaTributActionPerformed
-        try {
-            MapaTributacaoView.exibir(
-                    mdiFrame,
-                    SISTEMA,
-                    ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj,
-                    avanceDAO);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, "Erro ao abrir");
-        }
-    }//GEN-LAST:event_btnMapaTributActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private vrframework.bean.button.VRButton btnMapaTribut;
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkAtivoInativo;
-    private vrframework.bean.checkBox.VRCheckBox chkCheque;
-    private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
-    private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
+    private vrframework.bean.checkBox.VRCheckBox chkClientesEventuais;
+    private vrframework.bean.checkBox.VRCheckBox chkClientesPreferenciais;
     private vrframework.bean.checkBox.VRCheckBox chkCusto;
     private vrframework.bean.checkBox.VRCheckBox chkCustoComImposto;
     private vrframework.bean.checkBox.VRCheckBox chkCustoSemImposto;
@@ -644,10 +536,8 @@ public class AvanceGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkEAN;
     private vrframework.bean.checkBox.VRCheckBox chkEANemBranco;
     private vrframework.bean.checkBox.VRCheckBox chkEstoque;
-    private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
-    private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
-    private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkFornecedores;
     private vrframework.bean.checkBox.VRCheckBox chkICMS;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
@@ -663,16 +553,16 @@ public class AvanceGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkValidade;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
-    private vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel conexaoMySQL;
+    private vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel conexao;
     private javax.swing.JLabel jLabel1;
     private vrframework.bean.panel.VRPanel pnlLoja;
+    private javax.swing.JPanel tabClientes;
+    private javax.swing.JPanel tabFornecedores;
     private javax.swing.JTabbedPane tabImportacao;
     private javax.swing.JTabbedPane tabOperacoes;
     private javax.swing.JPanel tabProdutos;
     private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.panel.VRPanel vRPanel1;
-    private vrframework.bean.panel.VRPanel vRPanel2;
-    private vrframework.bean.panel.VRPanel vRPanel3;
     // End of variables declaration//GEN-END:variables
 
 }

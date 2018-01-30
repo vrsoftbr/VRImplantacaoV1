@@ -1,6 +1,7 @@
 package vrimplantacao2.vo.importacao;
 
 import java.util.Date;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 
@@ -376,6 +377,10 @@ public class ProdutoIMP {
     public void setSituacaoCadastro(SituacaoCadastro situacaoCadastro) {
         this.situacaoCadastro = situacaoCadastro;
     }
+    
+    public void setSituacaoCadastro(int situacaoCadastro) {
+        this.situacaoCadastro = SituacaoCadastro.getById(situacaoCadastro);
+    }
 
     public void setNcm(String ncm) {
         this.ncm = ncm;
@@ -388,13 +393,22 @@ public class ProdutoIMP {
     public void setPiscofinsCstDebito(int piscofinsCstDebito) {
         this.piscofinsCstDebito = piscofinsCstDebito;
     }
+    public void setPiscofinsCstDebito(String piscofinsCstDebito) {
+        this.piscofinsCstDebito = Utils.stringToInt(piscofinsCstDebito);
+    }
 
     public void setPiscofinsCstCredito(int piscofinsCstCredito) {
         this.piscofinsCstCredito = piscofinsCstCredito;
     }
+    public void setPiscofinsCstCredito(String piscofinsCstCredito) {
+        this.piscofinsCstCredito = Utils.stringToInt(piscofinsCstCredito);
+    }
 
     public void setPiscofinsNaturezaReceita(int piscofinsNaturezaReceita) {
         this.piscofinsNaturezaReceita = piscofinsNaturezaReceita;
+    }    
+    public void setPiscofinsNaturezaReceita(String piscofinsNaturezaReceita) {
+        this.piscofinsNaturezaReceita = Utils.stringToInt(piscofinsNaturezaReceita);
     }
 
     public void setIcmsCst(int icmsCst) {
