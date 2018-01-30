@@ -60,6 +60,7 @@ public class GetWayDAO extends InterfaceDAO {
     public int v_tipoDocumento;
     public int v_tipoDocumentoCheque;
     public boolean v_usar_arquivoBalanca;
+    public boolean usarMargemBruta = false;
 
     @Override
     public String getSistema() {
@@ -304,7 +305,11 @@ public class GetWayDAO extends InterfaceDAO {
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.setQtdEmbalagem(rst.getInt("QTD_EMBVENDA") == 0 ? 1 : rst.getInt("QTD_EMBVENDA"));
                     imp.setDataCadastro(rst.getDate("dtinclui"));
-                    imp.setMargem(rst.getDouble("margem_param"));
+                    if (usarMargemBruta) {
+                        imp.setMargem(rst.getDouble("margem_bruta"));
+                    } else {
+                        imp.setMargem(rst.getDouble("margem_param"));
+                    }
                     imp.setPrecovenda(rst.getDouble("preco_unit"));
                     imp.setCustoComImposto(rst.getDouble("preco_cust"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
