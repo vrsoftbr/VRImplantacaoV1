@@ -505,6 +505,8 @@ public class SolidusDAO extends InterfaceDAO {
                     "    tab_cliente c\n" +
                     "    left join tab_cidade cd on\n" +
                     "        c.cod_cidade = cd.cod_cidade\n" +
+                    "where\n" +
+                    "   c.des_cliente <> 'CADASTRO AUTOMATICO'\n" +
                     "order by\n" +
                     "    1"
             )) {

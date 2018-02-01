@@ -33,11 +33,19 @@ public class ClienteEventualAnteriorVO {
     }
 
     public void setCnpj(String cnpj) {
-        this.cnpj = Utils.acertarTexto(cnpj);
+        if (cnpj != null) {
+            this.cnpj = cnpj.replace("'", cnpj);
+        } else {
+            this.cnpj = null;
+        }
     }
 
     public void setIe(String ie) {
-        this.ie = Utils.acertarTexto(ie);
+        if (ie != null) {
+            this.ie = ie.replace("'", ie);
+        } else {
+            this.ie = null;
+        }
     }
 
     public void setNome(String nome) {

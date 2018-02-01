@@ -71,18 +71,18 @@ public class ClienteRepository {
                 //Se o cliente não tiver sido cadastrado anteriormente, executa.
                 if (anterior == null) {     
                     if (opt.contains(OpcaoCliente.DADOS)) {
+                        
+                        //Obtem um ID válido.                    
+                        int id = ids.obterID(imp.getId());                        
                         //Trata o cnpj
                         long cnpj = Utils.stringToLong(imp.getCnpj(), -2);
                         //Se o cnpj já estiver cadastrado, coloca -2 para gerar um novo.
                         if (cnpjCadastrados.containsKey(cnpj)) {
-                            cnpj = -2;
-                        }
-
-                        //Obtem um ID válido.                    
-                        int id = ids.obterID(imp.getId());
-
-                        if (cnpj < 0) {
-                            cnpj = id;
+                            if (cnpjCadastrados.containsKey((long) id)) {
+                                cnpj = -id;
+                            } else {
+                                cnpj = id;
+                            }
                         }
 
                         //Converte os dados.
