@@ -2,10 +2,15 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoDB2;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -18,12 +23,27 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
  * @author Leandro
  */
 public class CissDAO extends InterfaceDAO {
+    
+    private static final Logger LOG = Logger.getLogger(CissDAO.class.getName());
+    
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
+
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
 
     @Override
     public String getSistema() {
@@ -474,6 +494,225 @@ public class CissDAO extends InterfaceDAO {
         }
 
         return result;
+    }
+
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+    }
+    
+    private static class VendaIterator implements Iterator<VendaIMP> {
+
+        private final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+        
+        private Statement stm;
+        private ResultSet rst;
+        private VendaIMP next;
+        
+        public VendaIterator(String idLoja, Date dataInicial, Date dataFinal) throws Exception {
+            String sql = 
+                    "SELECT\n" +
+                    "	n.idplanilha id,\n" +
+                    "	n.numcupomfiscal numerocupom,\n" +
+                    "	n.idcaixa ecf,\n" +
+                    "	n.dtmovimento data,\n" +
+                    "	n.IDCLIFOR idcliente,\n" +
+                    "	case when n.FLAGNOTACANCEL= 'T' then 1 else 0 end cancelado,\n" +
+                    "	v.VALCONTABIL subtotalimpressora,\n" +
+                    "	v.CNPJCPF cpf,\n" +
+                    "	v.NOME nomecliente,\n" +
+                    "	v.ENDERECO,\n" +
+                    "	v.NUMERo,\n" +
+                    "	v.COMPLEMENTO,\n" +
+                    "	v.BAIRRO,\n" +
+                    "	v.IDCIDADE,\n" +
+                    "	v.idcep cep	\n" +
+                    "FROM\n" +
+                    "	dba.NOTAS_ENTRADA_SAIDA v\n" +
+                    "	join dba.NOTAS n on\n" +
+                    "		v.idempresa = n.idempresa\n" +
+                    "		and v.idplanilha = n.idplanilha\n" +
+                    "	join dba.OPERACAO_INTERNA op on\n" +
+                    "		v.idoperacao = op.idoperacao\n" +
+                    "WHERE\n" +
+                    "	v.dtmovimento >= '" + FORMAT.format(dataInicial) + "' and\n" +
+                    "	v.dtmovimento <= '" + FORMAT.format(dataFinal) + "' and\n" +
+                    "	op.tipomovimento = 'V' and\n" +
+                    "	op.FLAGMOVPRODUTOS = 'T' and\n" +
+                    "	v.idempresa = " + idLoja + "\n" +
+                    "order by\n" +
+                    "	id";
+            try {
+                stm = ConexaoDB2.getConexao().createStatement();
+                LOG.log(Level.FINE, "SQL da venda: " + sql);
+                rst = stm.executeQuery(sql);
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro ao executar o SQL", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+        
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaIMP next() {
+            obterNext();
+            try {
+                return next;
+            } finally {
+                next = null;
+            }
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+
+        private void obterNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaIMP();
+                        
+                        next.setId(rst.getString("id"));
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                        next.setData(rst.getDate("data"));
+                        next.setIdClientePreferencial(rst.getString("idcliente"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
+                        next.setCpf(rst.getString("cpf"));
+                        next.setNomeCliente(rst.getString("nomecliente"));
+                        next.setEnderecoCliente(String.format(
+                                "%s,%s,%s,%s  %s  %s", 
+                                rst.getString("ENDERECO"),
+                                rst.getString("NUMERo"),
+                                rst.getString("COMPLEMENTO"),
+                                rst.getString("BAIRRO"),
+                                rst.getString("IDCIDADE"),
+                                rst.getString("cep")
+                        ));
+                    }
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro ao obter o proximo registro", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+    
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+
+        private final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+        
+        private Statement stm;
+        private ResultSet rst;
+        private VendaItemIMP next;
+        
+        public VendaItemIterator(String idLoja, Date dataInicial, Date dataFinal) throws Exception {
+            String sql = 
+                    "SELECT\n" +
+                    "	e.idplanilha || '-' || e.numsequencia id,\n" +
+                    "	e.NUMSEQUENCIA sequencia,\n" +
+                    "	e.IDPLANILHA id_venda,\n" +
+                    "	e.IDSUBPRODUTO idproduto,\n" +
+                    "	e.VALTOTBRUTO totalbruto,\n" +
+                    "	e.QTDPRODUTO quantidade,\n" +
+                    "	case when n.FLAGNOTACANCEL= 'T' then 1 else 0 end cancelado,\n" +
+                    "	coalesce(e.VALDESCONTOPRO, 0) desconto,\n" +
+                    "	coalesce(e.VALACRESCIMOPRO, 0) acrescimo,\n" +
+                    "	ean.descrresproduto descricaoreduzida,\n" +
+                    "	ean.CODBAR codigobarras,\n" +
+                    "	p.embalagemsaida embalagem,\n" +
+                    "	e.IDSITTRIB icms_cst,\n" +
+                    "	e.PERICM icms_aliq,\n" +
+                    "	e.PERREDTRIB icms_reducao\n" +
+                    "FROM\n" +
+                    "	dba.ESTOQUE_ANALITICO e\n" +
+                    "	join dba.OPERACAO_INTERNA op on\n" +
+                    "		e.IDOPERACAO = op.IDOPERACAO\n" +
+                    "	join dba.NOTAS n on\n" +
+                    "		e.IDPLANILHA = n.IDPLANILHA and\n" +
+                    "		e.IDEMPRESA = n.IDEMPRESA\n" +
+                    "	join dba.NOTAS_ENTRADA_SAIDA v on\n" +
+                    "		v.idempresa = n.idempresa	\n" +
+                    "		and v.idplanilha = n.idplanilha\n" +
+                    "	join dba.PRODUTO_GRADE ean on\n" +
+                    "		ean.IDSUBPRODUTO = e.IDSUBPRODUTO and\n" +
+                    "		ean.IDPRODUTO = e.IDPRODUTO\n" +
+                    "	join dba.produto p on \n" +
+                    "		ean.idproduto = p.idproduto\n" +
+                    "WHERE\n" +
+                    "	v.dtmovimento >= '2017-09-01' and\n" +
+                    "	v.dtmovimento <= '2017-09-30' and\n" +
+                    "	op.tipomovimento = 'V' and\n" +
+                    "	op.FLAGMOVPRODUTOS = 'T' and\n" +
+                    "	n.idempresa = 3\n" +
+                    "order by\n" +
+                    "	id";
+            try {
+                stm = ConexaoDB2.getConexao().createStatement();
+                LOG.log(Level.FINE, "SQL da venda item: " + sql);
+                rst = stm.executeQuery(sql);
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro ao executar o SQL", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+        
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            obterNext();
+            try {
+                return next;
+            } finally {
+                next = null;
+            }
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+
+        private void obterNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaItemIMP();
+                        
+                        next.setId(rst.getString("id"));
+                        /*next.set(rst.getString(""));
+                        next.set(rst.getString(""));
+                        next.set(rst.getString(""));
+                        next.set(rst.getString(""));
+                        next.set(rst.getString(""));
+                        next.set(rst.getString(""));
+                        next.set(rst.getString(""));
+                        next.set(rst.getString(""));
+                        next.set(rst.getString(""));
+                        next.set(rst.getString(""));
+                        next.set(rst.getString(""));
+                        next.set(rst.getString(""));
+                        next.set(rst.getString(""));*/
+                    }
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro ao obter o proximo registro", ex);
+                throw new RuntimeException(ex);
+            }
+        }
     }
 
 }
