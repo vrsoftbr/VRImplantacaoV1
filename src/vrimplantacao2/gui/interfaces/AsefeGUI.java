@@ -281,7 +281,8 @@ public class AsefeGUI extends VRInternalFrame {
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(
                                     OpcaoCliente.DADOS,
-                                    (chkDataNascimento.isSelected() ? OpcaoCliente.DATA_NASCIMENTO : null));
+                                    (chkDataNascimento.isSelected() ? OpcaoCliente.DATA_NASCIMENTO : null),
+                                    OpcaoCliente.VALOR_LIMITE);
                         }
                         if (chkRotativo.isSelected()) {
                             importador.importarCreditoRotativo();

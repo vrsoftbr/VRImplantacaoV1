@@ -103,7 +103,7 @@ public class AsefeDAO extends InterfaceDAO {
                     imp.setTipoEmbalagem(rst.getString("UNIDADE_PRODUTOS"));
                     imp.setDescricaoCompleta(rst.getString("DESCRICAO_PRODUTOS"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
-                    imp.setDescricaoGondola(imp.getDescricaoGondola());
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setCodMercadologico1(rst.getString("CODIGOSETOR"));
                     imp.setCodMercadologico2(rst.getString("CODGRU_PRODUTOS"));
                     imp.setCodMercadologico3(rst.getString("SubGrupo"));
@@ -227,15 +227,24 @@ public class AsefeDAO extends InterfaceDAO {
             List<ProdutoIMP> vResult = new ArrayList<>();
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "select QtdEstoque, CodInterno \n"
-                        + "from VW_GERALPRODUTOS"
+                        "select \n"
+                        + "p.CODPROD_PRODUTOS,\n"
+                        + "p.DESCRICAO_PRODUTOS,\n"
+                        + "pe.Barras, \n"
+                        + "pe.Quantidade,\n"
+                        + "pe.CustoReal, \n"
+                        + "pe.Venda, \n"
+                        + "pe.Margem\n"
+                        + "from ProdutosEmpresa pe\n"
+                        + "inner join CE_PRODUTOS p on p.CODBARRA_PRODUTOS = pe.Barras\n"
+                        + "where pe.CodEmpresa = " + getLojaOrigem()
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("CodInterno"));
-                        imp.setEstoque(rst.getDouble("QtdEstoque"));
+                        imp.setImportId(rst.getString("CODPROD_PRODUTOS"));
+                        imp.setEstoque(rst.getDouble("Quantidade"));
                         vResult.add(imp);
                     }
                 }
