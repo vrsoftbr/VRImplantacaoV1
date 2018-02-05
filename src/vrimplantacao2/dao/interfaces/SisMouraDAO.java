@@ -8,17 +8,23 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import vrimplantacao.classe.ConexaoMySQL;
+import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
+import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -28,19 +34,21 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class SisMouraDAO extends InterfaceDAO {
 
+    private static final Logger LOG = Logger.getLogger(SisMouraDAO.class.getName());
+
     @Override
     public String getSistema() {
         return "SisMoura";
     }
 
-    public List<Estabelecimento> getLojasCliente() throws Exception {
+    public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
                     + "Codigo, (Fantasia +' - '+CNPJ) Empresa\n"
-                    + "from Empresa"
+                    + "from Empresa\n"
                     + "order by Codigo"
             )) {
                 while (rst.next()) {
@@ -165,8 +173,8 @@ public class SisMouraDAO extends InterfaceDAO {
                     imp.setCest(rst.getString("Codigo_CEST"));
                     imp.setPiscofinsCstDebito(rst.getInt("pisconfinssaida"));
                     imp.setPiscofinsCstCredito(rst.getInt("pisconfisentrada"));
-                    imp.setPiscofinsNaturezaReceita(rst.getInt("pisconfinsnatureza"));
-                    imp.setIcmsCst(rst.getInt("icms_cst"));
+                    imp.setPiscofinsNaturezaReceita(Integer.parseInt(Utils.formataNumero(rst.getString("pisconfinsnatureza"))));
+                    imp.setIcmsCst(Integer.parseInt(Utils.formataNumero(rst.getString("icms_cst"))));
                     imp.setIcmsAliq(rst.getDouble("icms_aliquota"));
                     imp.setIcmsReducao(rst.getDouble("icms_reducao"));
                     vResult.add(imp);
@@ -230,7 +238,7 @@ public class SisMouraDAO extends InterfaceDAO {
                     + "	p.Complemento,\n"
                     + "	p.Bairro,\n"
                     + "	cast(cd.Codigo_Cidade_IBGE as integer) id_municipio,\n"
-                    + "	cd.Estado id_estado,\n"
+                    + "	cd.Codigo_UF_IBGE id_estado,\n"
                     + "	p.Cep,\n"
                     + "       \n"
                     + "	p.Endereco_Pagamento cob_endereco,\n"
@@ -257,63 +265,65 @@ public class SisMouraDAO extends InterfaceDAO {
                     + "order by\n"
                     + "	p.Codigo"
             )) {
-                FornecedorIMP imp = new FornecedorIMP();
-                imp.setImportLoja(getLojaOrigem());
-                imp.setImportSistema(getSistema());
-                imp.setImportId(rst.getString("id"));
-                imp.setRazao(rst.getString("razao"));
-                imp.setFantasia(rst.getString("fantasia"));
-                imp.setCnpj_cpf(rst.getString("cnpj"));
-                imp.setIe_rg(rst.getString("inscricaoestadual"));
-                imp.setEndereco(rst.getString("endereco"));
-                imp.setNumero(rst.getString("Numero"));
-                imp.setComplemento(rst.getString("Complemento"));
-                imp.setBairro(rst.getString("Bairro"));
-                imp.setCep(rst.getString("Cep"));
-                imp.setIbge_municipio(rst.getInt("id_municipio"));
-                imp.setIbge_uf(rst.getInt("id_estado"));
-                imp.setDatacadastro(rst.getDate("dataCadastro"));
-                imp.setTel_principal(rst.getString("fone1"));
-                imp.setObservacao(rst.getString("Observacao"));
-                imp.setAtivo((rst.getInt("id_situacaocadastro") == 1));
-                imp.setCob_endereco(rst.getString("cob_endereco"));
-                imp.setCob_numero(rst.getString("cob_numero"));
-                imp.setCob_bairro(rst.getString("cob_bairro"));
-                imp.setCob_ibge_municipio(rst.getInt("cob_id_municipio"));
-                imp.setCob_ibge_uf(rst.getInt("cob_id_estado"));
-                imp.setCob_cep(rst.getString("cob_cep"));
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("inscricaoestadual"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("Numero"));
+                    imp.setComplemento(rst.getString("Complemento"));
+                    imp.setBairro(rst.getString("Bairro"));
+                    imp.setCep(rst.getString("Cep"));
+                    imp.setIbge_municipio(rst.getInt("id_municipio"));
+                    imp.setIbge_uf(rst.getInt("id_estado"));
+                    imp.setDatacadastro(rst.getDate("dataCadastro"));
+                    imp.setTel_principal(rst.getString("fone1"));
+                    imp.setObservacao(rst.getString("Observacao"));
+                    imp.setAtivo((rst.getInt("id_situacaocadastro") == 1));
+                    imp.setCob_endereco(rst.getString("cob_endereco"));
+                    imp.setCob_numero(rst.getString("cob_numero"));
+                    imp.setCob_bairro(rst.getString("cob_bairro"));
+                    imp.setCob_ibge_municipio(rst.getInt("cob_id_municipio"));
+                    imp.setCob_uf(rst.getString("cob_id_estado"));
+                    imp.setCob_cep(rst.getString("cob_cep"));
 
-                if ((rst.getString("Fone2") != null)
-                        && (!rst.getString("Fone2").trim().isEmpty())) {
-                    imp.addContato(
-                            "1",
-                            "TELEFONE 2",
-                            rst.getString("Fone2"),
-                            TipoContato.COMERCIAL,
-                            null
-                    );
+                    if ((rst.getString("Fone2") != null)
+                            && (!rst.getString("Fone2").trim().isEmpty())) {
+                        imp.addContato(
+                                "1",
+                                "TELEFONE 2",
+                                rst.getString("Fone2"),
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("Fax") != null)
+                            && (!rst.getString("Fax").trim().isEmpty())) {
+                        imp.addContato(
+                                "2",
+                                "FAX",
+                                rst.getString("Fax"),
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("email") != null)
+                            && (!rst.getString("email").trim().isEmpty())) {
+                        imp.addContato(
+                                "3",
+                                "EMAIL",
+                                null,
+                                TipoContato.COMERCIAL,
+                                rst.getString("email").toLowerCase()
+                        );
+                    }
+                    vResult.add(imp);
                 }
-                if ((rst.getString("Fax") != null)
-                        && (!rst.getString("Fax").trim().isEmpty())) {
-                    imp.addContato(
-                            "2",
-                            "FAX",
-                            rst.getString("Fax"),
-                            TipoContato.COMERCIAL,
-                            null
-                    );
-                }
-                if ((rst.getString("email") != null)
-                        && (!rst.getString("email").trim().isEmpty())) {
-                    imp.addContato(
-                            "3",
-                            "EMAIL",
-                            null,
-                            TipoContato.COMERCIAL,
-                            rst.getString("email").toLowerCase()
-                    );
-                }
-                vResult.add(imp);
             }
         }
         return vResult;
@@ -424,12 +434,12 @@ public class SisMouraDAO extends InterfaceDAO {
                     imp.setEmpresaEndereco(rst.getString("enderecoEmpresa"));
                     imp.setSalario(rst.getDouble("salario"));
 
-                    if ((rst.getString("Fone2") != null)
-                            && (!rst.getString("Fone2").trim().isEmpty())) {
+                    if ((rst.getString("telefone2") != null)
+                            && (!rst.getString("telefone2").trim().isEmpty())) {
                         imp.addContato(
                                 "1",
                                 "TELEFONE 2",
-                                rst.getString("Fone2"),
+                                rst.getString("telefone2"),
                                 null,
                                 null
                         );
@@ -474,8 +484,8 @@ public class SisMouraDAO extends InterfaceDAO {
                     + "r.Caixa, \n"
                     + "r.Data_Baixa  \n"
                     + "from Contas_Receber r\n"
-                    + "where r.Empresa = 1\n"
-                    + "and r.Data_Baixa is null;"
+                    + "where r.Empresa = " + getLojaOrigem() + "\n"
+                    + "and r.Data_Baixa is null"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -488,6 +498,79 @@ public class SisMouraDAO extends InterfaceDAO {
                     imp.setValor(rst.getDouble("Valor"));
                     imp.setObservacao(rst.getString("Observacao"));
                     imp.setEcf(rst.getString("PDV"));
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "Codigo,\n"
+                    + "Nome_Cliente,\n"
+                    + "Fone_Cliente,\n"
+                    + "CPF,\n"
+                    + "Venda, \n"
+                    + "Valor_Cheque,\n"
+                    + "Banco,\n"
+                    + "Cheque,\n"
+                    + "Vencimento,\n"
+                    + "Observacao,\n"
+                    + "Agencia,\n"
+                    + "Conta,\n"
+                    + "Data_Cadastro\n"
+                    + "from Cheques\n"
+                    + "where CodEmpresa = " + getLojaOrigem() + "\n"
+                    + "and Baixa_Data is null"
+            )) {
+                while (rst.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    imp.setId(rst.getString("Codigo"));
+                    imp.setNome(rst.getString("Nome_Cliente"));
+                    imp.setCpf(rst.getString("CPF"));
+                    imp.setValor(rst.getDouble("Valor_Cheque"));
+                    imp.setBanco(rst.getInt("Banco"));
+                    imp.setAgencia(rst.getString("Agencia"));
+                    imp.setConta(rst.getString("Conta"));
+                    imp.setNumeroCupom(rst.getString("Venda"));
+                    imp.setObservacao(rst.getString("Observacao"));
+                    imp.setDataHoraAlteracao(rst.getTimestamp("Data_Cadastro"));
+                    imp.setAlinea(0);
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "Codigo,\n"
+                    + "Produto,\n"
+                    + "Validade_Inicial,\n"
+                    + "Validade_Final,\n"
+                    + "Preco_Produto,\n"
+                    + "Preco_Promocao\n"
+                    + "from Produto_Promocao\n"
+                    + "where Validade_Final > GETDATE()"
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    imp.setIdProduto(rst.getString("Produto"));
+                    imp.setDataInicio(rst.getDate("Validade_Inicial"));
+                    imp.setDataFim(rst.getDate("Validade_Final"));
+                    imp.setPrecoOferta(rst.getDouble("Preco_Promocao"));
+                    imp.setSituacaoOferta(SituacaoOferta.ATIVO);
+                    imp.setTipoOferta(TipoOfertaVO.CAPA);
                     vResult.add(imp);
                 }
             }

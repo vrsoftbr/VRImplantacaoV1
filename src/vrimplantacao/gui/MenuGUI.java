@@ -148,6 +148,7 @@ import vrimplantacao2.gui.interfaces.AvanceGUI;
 import vrimplantacao2.gui.interfaces.TstiGUI;
 import vrimplantacao2.gui.interfaces.CPlusGUI;
 import vrimplantacao2.gui.interfaces.CissGUI;
+import vrimplantacao2.gui.interfaces.SisMouraGUI;
 import vrimplantacao2.gui.interfaces.SolidusGUI;
 import vrimplantacao2.gui.interfaces.SuperGUI;
 import vrimplantacao2.gui.interfaces.VisualComercioGUI;
@@ -1107,7 +1108,7 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu6.add(jMenuItemSuperServer);
 
-        jMenuItemSysMoura.setText("SysMoura");
+        jMenuItemSysMoura.setText("SisMoura");
         jMenuItemSysMoura.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemSysMouraActionPerformed(evt);
@@ -2745,18 +2746,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemDestroActionPerformed
 
     private void jMenuItemSysMouraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSysMouraActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarSysMoura == null || formImportarSysMoura.isClosed()) {
-                formImportarSysMoura = new SysMouraGUI(this);
-            }
-
-            formImportarSysMoura.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
+        SisMouraGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemSysMouraActionPerformed
 
     private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
