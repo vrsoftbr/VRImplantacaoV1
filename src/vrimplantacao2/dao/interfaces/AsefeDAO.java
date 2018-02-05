@@ -13,6 +13,7 @@ import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -86,7 +87,8 @@ public class AsefeDAO extends InterfaceDAO {
                     + "M.DESCRICAO_MODELOS,\n"
                     + "M.CODTRIB_MODELOS,\n"
                     + "R.VALORREDUCAO,\n"
-                    + "P.PRODUTOPESAVEL\n"
+                    + "P.PRODUTOPESAVEL,\n"
+                    + "p.Inutilizado\n"
                     + "FROM CE_PRODUTOS P\n"
                     + "LEFT JOIN CE_MODELOS M ON M.CODIGO_MODELOS = P.CODMOD_PRODUTOS\n"
                     + "LEFT JOIN VW_GERALPRODUTOS P2 ON P2.CodInterno = P.CODPROD_PRODUTOS\n"
@@ -101,6 +103,7 @@ public class AsefeDAO extends InterfaceDAO {
                     imp.setImportId(rst.getString("CODPROD_PRODUTOS"));
                     imp.setEan(rst.getString("CODBARRA_PRODUTOS"));
                     imp.setTipoEmbalagem(rst.getString("UNIDADE_PRODUTOS"));
+                    imp.setSituacaoCadastro(rst.getInt("Inutilizado") == 1 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setDescricaoCompleta(rst.getString("DESCRICAO_PRODUTOS"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
