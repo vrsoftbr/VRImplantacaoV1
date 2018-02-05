@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package vrimplantacao2.dao.cadastro.venda;
 
 import com.j256.ormlite.field.FieldType;
@@ -61,9 +56,13 @@ public class DateTimePersister extends DateType {
         if (sqlArg != null && sqlArg instanceof Number) {
             if (fieldType.getType().equals(Date.class)) {
                 try {
-                    return FORMAT.parse(String.valueOf(sqlArg));
+                    if ("0".equals(String.valueOf(sqlArg))) {
+                        return null;
+                    } else {
+                        return FORMAT.parse(String.valueOf(sqlArg));
+                    }
                 } catch (ParseException ex) {
-                    LOG.log(Level.SEVERE, "Erro ao converter a data", ex);
+                    LOG.log(Level.SEVERE, "Erro ao converter a data: " + String.valueOf(sqlArg), ex);
                     throw new RuntimeException(ex);
                 }
             }
