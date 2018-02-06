@@ -539,7 +539,8 @@ public class CissDAO extends InterfaceDAO {
                     "	v.dtmovimento <= '" + FORMAT.format(dataFinal) + "' and\n" +
                     "	op.tipomovimento = 'V' and\n" +
                     "	op.FLAGMOVPRODUTOS = 'T' and\n" +
-                    "	v.idempresa = " + idLoja + "\n" +
+                    "	v.idempresa = " + idLoja + " and\n" +
+                    "	not n.numcupomfiscal is null\n" +
                     "order by\n" +
                     "	id";
             try {
@@ -583,6 +584,8 @@ public class CissDAO extends InterfaceDAO {
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
                         next.setData(rst.getDate("data"));
+                        next.setHoraInicio(rst.getDate("data"));
+                        next.setHoraTermino(rst.getDate("data"));
                         next.setIdClientePreferencial(rst.getString("idcliente"));
                         next.setCancelado(rst.getBoolean("cancelado"));
                         next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
@@ -604,6 +607,11 @@ public class CissDAO extends InterfaceDAO {
                 throw new RuntimeException(ex);
             }
         }
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
     }
     
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
@@ -648,11 +656,12 @@ public class CissDAO extends InterfaceDAO {
                     "	join dba.produto p on \n" +
                     "		ean.idproduto = p.idproduto\n" +
                     "WHERE\n" +
-                    "	v.dtmovimento >= '2017-09-01' and\n" +
-                    "	v.dtmovimento <= '2017-09-30' and\n" +
+                    "	v.dtmovimento >= '" + FORMAT.format(dataInicial) + "' and\n" +
+                    "	v.dtmovimento <= '" + FORMAT.format(dataFinal) + "' and\n" +
                     "	op.tipomovimento = 'V' and\n" +
                     "	op.FLAGMOVPRODUTOS = 'T' and\n" +
-                    "	n.idempresa = 3\n" +
+                    "	n.idempresa = " + idLoja + " and\n" +
+                    "	not n.numcupomfiscal is null\n" +
                     "order by\n" +
                     "	id";
             try {
@@ -693,19 +702,20 @@ public class CissDAO extends InterfaceDAO {
                         next = new VendaItemIMP();
                         
                         next.setId(rst.getString("id"));
-                        /*next.set(rst.getString(""));
-                        next.set(rst.getString(""));
-                        next.set(rst.getString(""));
-                        next.set(rst.getString(""));
-                        next.set(rst.getString(""));
-                        next.set(rst.getString(""));
-                        next.set(rst.getString(""));
-                        next.set(rst.getString(""));
-                        next.set(rst.getString(""));
-                        next.set(rst.getString(""));
-                        next.set(rst.getString(""));
-                        next.set(rst.getString(""));
-                        next.set(rst.getString(""));*/
+                        next.setSequencia(rst.getInt("sequencia"));
+                        next.setVenda(rst.getString("id_venda"));
+                        next.setProduto(rst.getString("idproduto"));
+                        next.setTotalBruto(rst.getDouble("totalbruto"));
+                        next.setQuantidade(rst.getDouble("quantidade"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
+                        next.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                        next.setCodigoBarras(rst.getString("codigobarras"));
+                        next.setUnidadeMedida(rst.getString("embalagem"));
+                        next.setIcmsCst(rst.getInt("icms_cst"));
+                        next.setIcmsAliq(rst.getDouble("icms_aliq"));
+                        next.setIcmsReduzido(rst.getDouble("icms_reducao"));
                     }
                 }
             } catch (Exception ex) {
