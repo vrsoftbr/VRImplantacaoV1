@@ -378,25 +378,29 @@ public class AsefeDAO extends InterfaceDAO {
                     + "C.Coo, \n"
                     + "C.NumImpFiscal, \n"
                     + "C.NumeroCaixa,\n"
-                    + "P.Data,\n"
-                    + "P.DataVencimento,\n"
                     + "P.Numero,\n"
                     + "P.Juros,\n"
                     + "P.Valor,\n"
-                    + "P.ValorRestante\n"
+                    + "P.ValorRestante,\n"
+                    + "ValorSemJuros,\n"
+                    + "p.ValorPagamento,\n"
+                    + "(p.ValorSemJuros - p.ValorPagamento) valorConta,\n"
+                    + "P.Data,\n"
+                    + "P.DataVencimento\n"
                     + "FROM VendasCrediario C\n"
                     + "INNER JOIN ParcelasCrediario P ON P.CodVenda = C.Codigo  \n"
-                    + "WHERE P.DataPagamento IS NULL \n"
+                    + "WHERE P.ValorRestante <= Valor\n"
+                    + "and p.ValorRestante > 0\n"
                     + "AND C.CodEmpresa = " + getLojaOrigem() + "\n"
-                    + "ORDER BY C.Data DESC"
+                    + "ORDER BY C.Data"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rst.getString("Codigo"));
                     imp.setIdCliente(rst.getString("CodCliente"));
-                    imp.setNumeroCupom(rst.getString("NumImpFiscal"));
+                    imp.setNumeroCupom(rst.getString("Coo"));
                     imp.setEcf(rst.getString("NumeroCaixa"));
-                    imp.setValor(rst.getDouble("Valor"));
+                    imp.setValor(rst.getDouble("valorConta"));
                     imp.setParcela(rst.getInt("Numero"));
                     imp.setDataEmissao(rst.getDate("Data"));
                     imp.setDataVencimento(rst.getDate("DataVencimento"));
