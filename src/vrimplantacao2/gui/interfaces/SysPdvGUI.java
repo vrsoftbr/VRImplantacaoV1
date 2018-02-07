@@ -20,6 +20,7 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.SysPdvDAO;
+import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.interfaces.custom.solidus.Entidade;
 import vrimplantacao2.parametro.Parametros;
 
@@ -45,7 +46,24 @@ public class SysPdvGUI extends VRInternalFrame {
         this.title = "Importação " + SISTEMA;
                        
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
-        
+        conexaoFirebird.setOnConectar(new ConexaoEvent() {
+            @Override
+            public void executar() throws Exception {
+                dao.setTipoConexao(SysPdvDAO.TipoConexao.FIREBIRD);
+                gravarParametros();                
+                carregarLojaCliente();
+                carregarLojaVR();
+            }
+        });
+        conexaoSqlServer.setOnConectar(new ConexaoEvent() {
+            @Override
+            public void executar() throws Exception {
+                dao.setTipoConexao(SysPdvDAO.TipoConexao.SQL_SERVER);
+                gravarParametros();                
+                carregarLojaCliente();
+                carregarLojaVR();
+            }
+        });
         carregarParametros();
         
         centralizarForm();
@@ -54,7 +72,7 @@ public class SysPdvGUI extends VRInternalFrame {
     
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
-        switch (params.get(SISTEMA, "CONEXAO")) {
+        switch (params.getWithNull("FIREBIRD", SISTEMA, "CONEXAO")) {
             case "FIREBIRD": tabsConexoes.setSelectedIndex(0); break;
             case "SQLSERVER": tabsConexoes.setSelectedIndex(1);break;
         }

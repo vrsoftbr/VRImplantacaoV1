@@ -241,11 +241,11 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
     
     public void carregarParametros() {
         Parametros params = Parametros.get();
-        txtHost.setText(params.getWithNull(host, sistema, "HOST"));
-        txtDatabase.setArquivo(params.getWithNull(database, sistema, "DATABASE"));
-        txtPorta.setText(params.getWithNull(port, sistema, "PORTA"));
-        txtUsuario.setText(params.getWithNull(user, sistema, "USUARIO"));
-        txtSenha.setText(params.getWithNull(pass, sistema, "SENHA"));
+        txtHost.setText(params.getWithNull(host, sistema, "FIREBIRD", "HOST"));
+        txtDatabase.setArquivo(params.getWithNull(database, sistema, "FIREBIRD", "DATABASE"));
+        txtPorta.setText(params.getWithNull(port, sistema, "FIREBIRD", "PORTA"));
+        txtUsuario.setText(params.getWithNull(user, sistema, "FIREBIRD", "USUARIO"));
+        txtSenha.setText(params.getWithNull(pass, sistema, "FIREBIRD", "SENHA"));
     }
     public String pass = "root";
     public String user = "root";
@@ -255,11 +255,11 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
     
     public void atualizarParametros() {
         Parametros params = Parametros.get();
-        params.put(txtHost.getText(), sistema, "HOST");
-        params.put(txtDatabase.getArquivo(), sistema, "DATABASE");
-        params.put(txtPorta.getText(), sistema, "PORTA");
-        params.put(txtUsuario.getText(), sistema, "USUARIO");
-        params.put(txtSenha.getText(), sistema, "SENHA");
+        params.put(txtHost.getText(), sistema, "FIREBIRD", "HOST");
+        params.put(txtDatabase.getArquivo(), sistema, "FIREBIRD", "DATABASE");
+        params.put(txtPorta.getText(), sistema, "FIREBIRD", "PORTA");
+        params.put(txtUsuario.getText(), sistema, "FIREBIRD", "USUARIO");
+        params.put(txtSenha.getText(), sistema, "FIREBIRD", "SENHA");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

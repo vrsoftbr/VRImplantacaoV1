@@ -5,10 +5,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -103,72 +111,244 @@ public class SysPdvDAO extends InterfaceDAO {
         return result;
     }
 
+    private static class Ean {
+        
+        public String idProduto;
+        public String ean;
+        public int qtdEmbalagem;        
+
+        public Ean(String idProduto, String ean, int qtdEmbalagem) {
+            this.idProduto = idProduto;
+            this.ean = ean;
+            this.qtdEmbalagem = qtdEmbalagem;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            hash = 97 * hash + Objects.hashCode(this.idProduto);
+            hash = 97 * hash + Objects.hashCode(this.ean);
+            hash = 97 * hash + (int) (Double.doubleToLongBits(this.qtdEmbalagem) ^ (Double.doubleToLongBits(this.qtdEmbalagem) >>> 32));
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final Ean other = (Ean) obj;
+            if (!Objects.equals(this.idProduto, other.idProduto)) {
+                return false;
+            }
+            if (!Objects.equals(this.ean, other.ean)) {
+                return false;
+            }
+            return Double.doubleToLongBits(this.qtdEmbalagem) == Double.doubleToLongBits(other.qtdEmbalagem);
+        }
+        
+    }
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         
-        try (Statement stm = tipoConexao.getConnection().createStatement()) {        
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
+            Map<String, int[]> piscofins = new HashMap<>();            
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n" +
-                    "	replace(p.procod,',','') procod,\n" +
-                    "	p.procodint,\n" +
-                    "	p.prodes,\n" +
-                    "	p.prodesrdz,\n" +
-                    "	p.seccod,\n" +
-                    "	p.trbid,\n" +
-                    "	p.prounid,\n" +
-                    "	p.proestmin,\n" +
-                    "	p.proestmax,\n" +
-                    "	p.grpcod,\n" +
-                    "	p.sgrcod,\n" +
-                    "	p.proncm,\n" +
-                    "	p.proforlin,\n" +
-                    "	p.natcodigo,\n" +
-                    "	p.proprc1,\n" +
-                    "	p.proprccst,\n" +
-                    "	p.prodatcadinc,\n" +
-                    "	p.proiteemb,\n" +
-                    "	p.promrg1,\n" +
-                    "	proprcvdavar,\n" +
-                    "	items.procodsim,\n" +
-                    "	p.procest,\n" +
-                    "	p.propesbrt,\n" +
-                    "	p.propesliq,\n" +
-                    "	case p.propesvar\n" +
-                    "	when 'S' then 4\n" +
-                    "	when 'P' then 4\n" +
-                    "	else 1 end as id_tipoembalagem,\n" +
-                    "	case when p.proenvbal = 'S' then 1 else 0 end as e_balanca,\n" +
-                    "	p.provld validade,\n" +
-                    "	i.trbtabb, \n" +
-                    "	i.trbalq, \n" +
-                    "	i.trbred, \n" +
-                    "	p.procest, \n" +
-                    "	vw.pis_cst_e, \n" +
-                    "	vw.pis_cst_s,\n" +
-                    "	vw.cod_natureza_receita, \n" +
-                    "	p.PROPESVAR\n" +
-                    "FROM \n" +
-                    "	produto p\n" +
-                    "	LEFT JOIN item_similares items ON \n" +
-                    "		items.procod = p.procod\n" +
-                    "	left join tributacao i on \n" +
-                    "		i.trbid = p.trbid\n" +
-                    "	left join mxf_vw_pis_cofins vw on \n" +
-                    "		vw.codigo_produto = p.procod\n" +
-                    "where \n" +
-                    "	p.procod similar to '[0-9]+'\n" +
-                    "ORDER BY \n" +
-                    "	cast(replace(p.procod,',','') as bigint)"
+                    "select\n" +
+                    "    p.procod id_produto,\n" +
+                    "    pis.impfedst piscofins_entrada,\n" +
+                    "    pis.impfedstsai piscofins_saida\n" +
+                    "from\n" +
+                    "    (select\n" +
+                    "         pispro.procod,\n" +
+                    "         min(pispro.impfedsim) impfedsim\n" +
+                    "     from\n" +
+                    "         impostos_federais pis\n" +
+                    "         join impostos_federais_produto pispro on\n" +
+                    "            pis.impfedsim = pispro.impfedsim\n" +
+                    "            and pis.impfedtip = 'P'\n" +
+                    "     group by\n" +
+                    "         pispro.procod) p\n" +
+                    "     join impostos_federais pis on\n" +
+                    "        p.impfedsim = pis.impfedsim"
             )) {
                 while (rst.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
+                    piscofins.put(
+                            rst.getString("id_produto"), 
+                            new int[] {
+                                Utils.stringToInt(rst.getString("piscofins_entrada")),
+                                Utils.stringToInt(rst.getString("piscofins_saida"))
+                            }
+                    );
+                }
+            }
+            
+            Map<String, Set<Ean>> eans = new HashMap<>();            
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    procod id_produto,\n" +
+                    "    procod ean,\n" +
+                    "    1 qtdembalagem\n" +
+                    "from\n" +
+                    "    produto\n" +
+                    "union\n" +
+                    "select\n" +
+                    "    procod id_produto,\n" +
+                    "    procodaux ean,\n" +
+                    "    coalesce(profatormult, 1) qtdembalagem\n" +
+                    "from\n" +
+                    "    produtoaux\n" +
+                    "order by\n" +
+                    "    1"
+            )) {
+                while (rst.next()) {
+                    long ean = Utils.stringToLong(rst.getString("ean"), -2);
+                    if (ean > 999999 || !String.valueOf(rst.getString("ean")).equals(rst.getString("id_produto"))) {
+                        
+                        Set<Ean> ea = eans.get(rst.getString("id_produto"));
+                        
+                        if (ea == null) {
+                            ea = new HashSet<>();
+                        }
+                        
+                        ea.add(
+                            new Ean(
+                                rst.getString("id_produto"),
+                                rst.getString("ean"),
+                                Math.round(rst.getFloat("qtdembalagem"))
+                            )
+                        );
+                        
+                        eans.put(
+                            rst.getString("id_produto"),                             
+                            ea
+                        );
+                    }
+                }
+            }
+            
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n" +
+                    "    p.procod id,\n" +
+                    "    p.prodes descricaocompleta,\n" +
+                    "    p.prodesrdz descricaoreduzida,\n" +
+                    "    p.seccod merc1,\n" +
+                    "    p.grpcod merc2,\n" +
+                    "    p.sgrcod merc3,\n" +
+                    "    p.proestmin estoqueminimo,\n" +
+                    "    p.proestmax estoquemaximo,\n" +
+                    "    est.estatu estoque,\n" +
+                    "    p.proncm ncm,\n" +
+                    "    case when p.proforlin = 'S' then 0 else 1 end situacaocadastro,\n" +
+                    "    p.proprccst custocomimposto,\n" +
+                    "    p.proprccst custosemimposto,\n" +
+                    "    p.prodatcadinc datacadastro,\n" +
+                    "    p.proiteemb qtdembalagem,\n" +
+                    "    p.promrg1 margem,\n" +
+                    "    proprcvdavar precovenda,\n" +
+                    "    items.procodsim id_familiaproduto,\n" +
+                    "    p.propesbrt pesobruto,\n" +
+                    "    p.propesliq pesoliquido,\n" +
+                    "    case p.propesvar\n" +
+                    "    when 'S' then 'KG'\n" +
+                    "    when 'P' then 'KG'\n" +
+                    "    else 'UN' end as tipoembalagem,\n" +
+                    "    case when p.proenvbal = 'S' then 1 else 0 end e_balanca,\n" +
+                    "    coalesce(p.provld, 0) validade,\n" +
+                    "    i.trbtabb icms_cst, \n" +
+                    "    i.trbalq icms_aliquota, \n" +
+                    "    i.trbred icms_reducao, \n" +
+                    "    p.procest cest,\n" +
+                    "    p.natcodigo piscofins_natrec\n" +
+                    "FROM \n" +
+                    "    produto p\n" +
+                    "    LEFT JOIN item_similares items ON \n" +
+                    "        items.procod = p.procod\n" +
+                    "    left join tributacao i on \n" +
+                    "        i.trbid = p.trbid\n" +
+                    "    left join estoque est on\n" +
+                    "        est.PROCOD = p.PROCOD\n" +
+                    "ORDER BY \n" +
+                    "    cast(replace(p.procod,',','') as bigint)"
+            )) {
+                Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
+                while (rst.next()) {
                     
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rst.getString(""));
+                    for (Ean ean: eans.get(rst.getString("id"))) {
                     
-                    result.add(imp);
+                        ProdutoIMP imp = new ProdutoIMP();
+
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportId(rst.getString("id"));
+                        imp.setEan(ean.ean);
+                        imp.setQtdEmbalagem(ean.qtdEmbalagem);
+                        imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                        imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                        imp.setCodMercadologico1(rst.getString("merc1"));
+                        imp.setCodMercadologico2(rst.getString("merc2"));
+                        imp.setCodMercadologico3(rst.getString("merc3"));
+
+                        ProdutoBalancaVO bal = balanca.get(Utils.stringToInt(rst.getString("id")));                    
+                        if (bal != null) {
+                            imp.seteBalanca(true);
+                            if (null != bal.getPesavel()) { 
+                                switch (bal.getPesavel()) {
+                                    case "P":
+                                        imp.setTipoEmbalagem("KG");
+                                        break;
+                                    case "U":
+                                        imp.setTipoEmbalagem("UN");
+                                        break;
+                                }
+                            }
+                            imp.setValidade(bal.getValidade());
+                        } else {
+                            if (balanca.isEmpty()) {
+                                imp.seteBalanca(rst.getBoolean("e_balanca"));
+                                imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                            } else {
+                                imp.seteBalanca(false);
+                                imp.setTipoEmbalagem("UN");
+                            }
+                            imp.setValidade(rst.getInt("validade"));
+                        }
+
+                        imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
+                        imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
+                        imp.setEstoque(rst.getDouble("estoque"));
+                        imp.setNcm(rst.getString("ncm"));
+                        imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
+                        imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                        imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                        imp.setDataCadastro(rst.getDate("datacadastro"));
+                        imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
+                        imp.setMargem(rst.getDouble("margem"));
+                        imp.setPrecovenda(rst.getDouble("precovenda"));
+                        imp.setIdFamiliaProduto(rst.getString("id_familiaproduto"));
+                        imp.setPesoBruto(rst.getDouble("pesobruto"));
+                        imp.setPesoLiquido(rst.getDouble("pesoliquido"));
+                        imp.setIcmsCst(Utils.stringToInt(rst.getString("icms_cst")));
+                        imp.setIcmsAliq(rst.getDouble("icms_aliquota"));
+                        imp.setIcmsReducao(rst.getDouble("icms_reducao"));
+                        imp.setCest(rst.getString("cest"));
+                        
+                        int[] pis = piscofins.get(rst.getString("id"));
+                        
+                        if (pis != null) {
+                            imp.setPiscofinsCstCredito(pis[0]);
+                            imp.setPiscofinsCstDebito(pis[1]);
+                            imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_natrec"));
+                        }
+
+                        result.add(imp);
+                        
+                    }
                 }
             }
         }
@@ -184,10 +364,10 @@ public class SysPdvDAO extends InterfaceDAO {
         
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT prpcod, prpcab1 FROM PROPRIO"
+                    "SELECT prpcod, prpfan FROM PROPRIO"
             )) {
                 while (rst.next()) {
-                    result.add(new Estabelecimento(rst.getString("prpcod"), rst.getString("prpcab1")));
+                    result.add(new Estabelecimento(rst.getString("prpcod"), rst.getString("prpfan")));
                 }
             }
         }
