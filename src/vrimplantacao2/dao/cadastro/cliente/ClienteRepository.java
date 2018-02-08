@@ -1,6 +1,7 @@
 package vrimplantacao2.dao.cadastro.cliente;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -588,7 +589,7 @@ public class ClienteRepository {
         vo.setTelefoneCobranca(imp.getCobrancaTelefone());
         vo.setPrazoPagamento(imp.getPrazoPagamento());
         vo.setTipoOrgaoPublico(imp.getTipoOrgaoPublico());
-        vo.setDataCadastro(imp.getDataCadastro());
+        vo.setDataCadastro(imp.getDataCadastro() == null ? new Date() : imp.getDataCadastro());
         vo.setLimiteCompra(imp.getLimiteCompra());
         vo.setCobraTaxaNotaFiscal(false);
         
