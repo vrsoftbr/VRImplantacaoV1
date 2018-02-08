@@ -247,9 +247,10 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
         txtUsuario.setText(params.getWithNull(user, sistema, "FIREBIRD", "USUARIO"));
         txtSenha.setText(params.getWithNull(pass, sistema, "FIREBIRD", "SENHA"));
     }
-    public String pass = "root";
-    public String user = "root";
-    public String port = "3306";
+    
+    public String pass = "masterkey";
+    public String user = "sysdba";
+    public String port = "3050";
     public String database = "database";
     public String host = "localhost";
     

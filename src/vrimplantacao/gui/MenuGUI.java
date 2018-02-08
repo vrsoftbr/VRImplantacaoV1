@@ -2163,7 +2163,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemGetWayActionPerformed
 
     private void jMenuItemSysPDVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSysPDVActionPerformed
-
+        SysPdvGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemSysPDVActionPerformed
 
     private void jMenuItemIdealActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemIdealActionPerformed

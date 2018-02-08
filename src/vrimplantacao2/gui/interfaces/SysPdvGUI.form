@@ -564,6 +564,11 @@
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
         <Component class="vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel" name="conexaoFirebird">
+          <Properties>
+            <Property name="sistema" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="SISTEMA" type="code"/>
+            </Property>
+          </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Firebird">
@@ -573,6 +578,11 @@
           </Constraints>
         </Component>
         <Component class="vrimplantacao2.gui.component.conexao.sqlserver.ConexaoSqlServerPanel" name="conexaoSqlServer">
+          <Properties>
+            <Property name="sistema" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="SISTEMA" type="code"/>
+            </Property>
+          </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="SQL Server">

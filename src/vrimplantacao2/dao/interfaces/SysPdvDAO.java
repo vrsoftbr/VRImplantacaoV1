@@ -17,7 +17,9 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -355,6 +357,72 @@ public class SysPdvDAO extends InterfaceDAO {
         
         return result;
     }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    f.forcod id,\n" +
+                    "    f.fordes razao,\n" +
+                    "    f.forfan fantasia,\n" +
+                    "    f.forcgc cnpj,\n" +
+                    "    f.forcgf inscricaoestadual,\n" +
+                    "    f.forend endereco,\n" +
+                    "    f.fornum numero,\n" +
+                    "    f.forcmp complemento,\n" +
+                    "    f.forbai bairro,\n" +
+                    "    f.forcodibge ibge_municipio,\n" +
+                    "    f.forcep cep,\n" +
+                    "    f.fortel telefone,\n" +
+                    "    current_date datacadastro,\n" +
+                    "    f.forobs observacao,\n" +
+                    "    f.forprz prazoentrega,\n" +
+                    "    f.forcon contato,\n" +
+                    "    f.forfax fax\n" +
+                    "from\n" +
+                    "    fornecedor f\n" +
+                    "where\n" +
+                    "    f.forcod != '0000'\n" +
+                    "order by\n" +
+                    "    1"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("inscricaoestadual"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setIbge_municipio(rst.getInt("ibge_municipio"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setTel_principal(rst.getString("telefone"));
+                    imp.setDatacadastro(rst.getDate("datacadastro"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setPrazoEntrega(rst.getInt("prazoentrega"));
+                    String contato = Utils.acertarTexto(rst.getString("contato"));
+                    if (!"".equals(contato)) {
+                        imp.addContato(contato, rst.getString("telefone"), null, TipoContato.COMERCIAL, "");
+                    }
+                    imp.addTelefone("FAX", rst.getString("fax"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
     
     
     

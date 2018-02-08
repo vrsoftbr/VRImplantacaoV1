@@ -660,7 +660,10 @@ public class SysPdvGUI extends VRInternalFrame {
 
         tabs.addTab("Unificação", vRPanel2);
 
+        conexaoFirebird.setSistema(SISTEMA);
         tabsConexoes.addTab("Firebird", conexaoFirebird);
+
+        conexaoSqlServer.setSistema(SISTEMA);
         tabsConexoes.addTab("SQL Server", conexaoSqlServer);
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
