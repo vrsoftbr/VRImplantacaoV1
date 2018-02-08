@@ -244,7 +244,7 @@ public class ConexaoSqlServerPanel extends javax.swing.JPanel {
     }
     public String pass = "sa";
     public String user = "sa";
-    public String port = "1521";
+    public String port = "1433";
     public String database = "database";
     public String host = "localhost";
     

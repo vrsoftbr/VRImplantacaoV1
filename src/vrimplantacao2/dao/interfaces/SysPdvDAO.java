@@ -18,6 +18,9 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEstadoCivil;
+import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -37,7 +40,7 @@ public class SysPdvDAO extends InterfaceDAO {
 
     @Override
     public String getSistema() {
-        return "SysPDV";
+        return this.tipoConexao.getSistema();
     }
 
     @Override
@@ -377,7 +380,7 @@ public class SysPdvDAO extends InterfaceDAO {
                     "    f.forcodibge ibge_municipio,\n" +
                     "    f.forcep cep,\n" +
                     "    f.fortel telefone,\n" +
-                    "    current_date datacadastro,\n" +
+                    "    " + (tipoConexao == TipoConexao.FIREBIRD ? "current_date" : "getdate()") + " datacadastro,\n" +
                     "    f.forobs observacao,\n" +
                     "    f.forprz prazoentrega,\n" +
                     "    f.forcon contato,\n" +
@@ -422,10 +425,129 @@ public class SysPdvDAO extends InterfaceDAO {
         
         return result;
     }
-    
-    
-    
-    
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    c.clicod id,\n" +
+                    "    c.clicpfcgc cnpj,\n" +
+                    "    c.clirgcgf inscricaoestadual,\n" +
+                    "    c.clirgexp emissor,\n" +
+                    "    c.clides razao,\n" +
+                    "    c.clifan fantasia,\n" +
+                    "    case when st.stablq = 'S' then 1 else 0 end bloqueado,\n" +
+                    "    c.clidtblo databloqueio,\n" +
+                    "    c.cliend endereco,\n" +
+                    "    c.clinum numero,\n" +
+                    "    c.clicmp complemento,\n" +
+                    "    c.clibai bairro,\n" +
+                    "    c.clicodigoibge ibge_municipio,\n" +
+                    "    c.clicid cidade,\n" +
+                    "    c.cliest estado,\n" +
+                    "    c.clicep cep,\n" +
+                    "    c.cliestciv estadocivil,\n" +
+                    "    c.clidtcad datacadastro,\n" +
+                    "    c.clidtnas datanascimento,\n" +
+                    "    c.clisex sexo,\n" +
+                    "    c.cliemptrb empresa,\n" +
+                    "    c.cliempend empresa_endereco,\n" +
+                    "    c.cliemptel empresa_telefone,\n" +
+                    "    c.cliempcar empresa_cargo,\n" +
+                    "    c.clisal empresa_salario,\n" +
+                    "    c.clilimcre valorlimite,\n" +
+                    "    c.clipai nomepai,\n" +
+                    "    c.climae nomemae,\n" +
+                    "    c.cliobs observacao2,\n" +
+                    "    c.clidiafec diavencimento,\n" +
+                    "    c.clitel telefone,\n" +
+                    "    c.clitel2 telefone2,\n" +
+                    "    c.cliemail email,\n" +
+                    "    c.clifax fax,\n" +
+                    "    c.cliendcob cob_endereco,\n" +
+                    "    c.clinumcob cob_numero,\n" +
+                    "    c.clicmp cob_complemento,\n" +
+                    "    c.clibai cob_bairro,\n" +
+                    "    c.clicidcob cob_cidade,\n" +
+                    "    c.cliestcob cob_estado,\n" +
+                    "    c.clicepcob cob_cep,\n" +
+                    "    c.cliprz prazopagamento,\n" +
+                    "    c.cliinscmun inscricaomunicipal,\n" +
+                    "    c.clilimcre2 limitecompra\n" +
+                    "from\n" +
+                    "    cliente c\n" +
+                    "    left join status st on\n" +
+                    "        c.stacod = st.stacod\n" +
+                    "where\n" +
+                    "    c.clicod != '000000000000000'\n" +
+                    "order by\n" +
+                    "    c.clicod"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
+                    imp.setOrgaoemissor(rst.getString("emissor"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setBloqueado(rst.getBoolean("bloqueado"));
+                    imp.setDataBloqueio(rst.getDate("databloqueio"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipioIBGE(rst.getInt("ibge_municipio"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setCep(rst.getString("cep"));
+                    switch (Utils.acertarTexto(rst.getString("estadocivil"))) {
+                        case "S": imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO); break;
+                        case "O": imp.setEstadoCivil(TipoEstadoCivil.CASADO); break;
+                        default : imp.setEstadoCivil(TipoEstadoCivil.OUTROS); break;
+                    }
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setDataNascimento(rst.getDate("datanascimento"));
+                    switch (Utils.acertarTexto(rst.getString("sexo"))) {
+                        case "F": imp.setSexo(TipoSexo.FEMININO); break;
+                        default : imp.setSexo(TipoSexo.MASCULINO); break;
+                    }
+                    imp.setEmpresa(rst.getString("empresa"));
+                    imp.setEmpresaEndereco(rst.getString("empresa_endereco"));
+                    imp.setEmpresaTelefone(rst.getString("empresa_telefone"));
+                    imp.setCargo(rst.getString("empresa_cargo"));
+                    imp.setSalario(rst.getDouble("empresa_salario"));
+                    imp.setValorLimite(rst.getDouble("valorlimite"));
+                    imp.setNomePai(rst.getString("nomepai"));
+                    imp.setNomeMae(rst.getString("nomemae"));
+                    imp.setObservacao2(rst.getString("observacao2"));
+                    imp.setDiaVencimento(Utils.stringToInt(rst.getString("diavencimento")));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setCelular(rst.getString("telefone2"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setFax(rst.getString("fax"));
+                    imp.setCobrancaEndereco(rst.getString("cob_endereco"));
+                    imp.setCobrancaNumero(rst.getString("cob_numero"));
+                    imp.setCobrancaComplemento(rst.getString("cob_complemento"));
+                    imp.setCobrancaBairro(rst.getString("cob_bairro"));
+                    imp.setCobrancaMunicipio(rst.getString("cob_cidade"));
+                    imp.setCobrancaUf(rst.getString("cob_estado"));
+                    imp.setCobrancaCep(rst.getString("cob_cep"));
+                    imp.setPrazoPagamento(rst.getInt("prazopagamento"));
+                    imp.setInscricaoMunicipal(rst.getString("inscricaomunicipal"));
+                    imp.setLimiteCompra(rst.getDouble("limitecompra"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
 
     public List<Estabelecimento> getLojasCliente() throws SQLException {
         List<Estabelecimento> result = new ArrayList<>();
@@ -450,15 +572,24 @@ public class SysPdvDAO extends InterfaceDAO {
             public Connection getConnection() {
                 return ConexaoFirebird.getConexao();
             }
+            @Override
+            public String getSistema() {
+                return "SysPdv(FIREBIRD)";
+            }
         },
         SQL_SERVER {
             @Override
             public Connection getConnection() {
                 return ConexaoSqlServer.getConexao();
             }
+            @Override
+            public String getSistema() {
+                return "SysPdv(SQLSERVER)";
+            }
         };
         
         public abstract Connection getConnection();
+        public abstract String getSistema();
         public String getLojasClienteSQL() {
             return "";
         }

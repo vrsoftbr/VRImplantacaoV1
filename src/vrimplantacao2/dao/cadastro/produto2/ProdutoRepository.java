@@ -575,6 +575,9 @@ public class ProdutoRepository {
     
     private Map<String, Integer> fabricantes  = null;
     
+    private String fillNull(String value) {
+        return value != null ? value : "";
+    }
     /**
      * Converte um {@link ProdutoIMP} em um {@link ProdutoVO}.
      * @param imp {@link ProdutoIMP} a ser convertido.
@@ -621,11 +624,11 @@ public class ProdutoRepository {
         vo.setFamiliaProduto(provider.getFamiliaProduto(imp.getIdFamiliaProduto()));
         vo.setMargem(imp.getMargem());
         MercadologicoVO merc = provider.getMercadologico(
-                imp.getCodMercadologico1(), 
-                imp.getCodMercadologico2(), 
-                imp.getCodMercadologico3(), 
-                imp.getCodMercadologico4(), 
-                imp.getCodMercadologico5()
+                fillNull(imp.getCodMercadologico1()), 
+                fillNull(imp.getCodMercadologico2()), 
+                fillNull(imp.getCodMercadologico3()), 
+                fillNull(imp.getCodMercadologico4()), 
+                fillNull(imp.getCodMercadologico5())
         );
         
         if (merc == null) {
