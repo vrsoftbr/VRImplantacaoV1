@@ -2,6 +2,8 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,6 +18,9 @@ import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ConveniadoIMP;
+import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
+import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -424,6 +429,7 @@ public class SuperusDAO extends InterfaceDAO {
                     + "from\n"
                     + "  PESSOAS p\n"
                     + "  join CLIENTES c on p.codigo = c.codigo\n"
+                    + " where c.codigoconvenio = 0\n"
                     + "order by p.codigo"
             )) {
                 while (rst.next()) {
@@ -551,7 +557,8 @@ public class SuperusDAO extends InterfaceDAO {
                     + "flagalt, \n"
                     + "historico \n"
                     + "from CHEQUESRECEBER \n"
-                    + "where pagamento = 'N'"
+                    + "where pagamento = 'N'\n"
+                    + "and loja = " + getLojaOrigem()
             )) {
                 while (rst.next()) {
                     ChequeIMP imp = new ChequeIMP();
@@ -563,7 +570,7 @@ public class SuperusDAO extends InterfaceDAO {
                             && (!rst.getString("cnpj").trim().isEmpty())) {
                         imp.setCpf(rst.getString("cnpj"));
                     } else {
-                        imp.setCpf(rst.getString(""));
+                        imp.setCpf("");
                     }
 
                     imp.setDate(rst.getDate("emissao"));
@@ -610,6 +617,163 @@ public class SuperusDAO extends InterfaceDAO {
                     imp.setPrecoOferta(rst.getDouble("precopromocao"));
                     imp.setSituacaoOferta(SituacaoOferta.ATIVO);
                     imp.setTipoOferta(TipoOfertaVO.CAPA);
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
+        List<ConvenioEmpresaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n"
+                    + "p.codigo, \n"
+                    + "p.razao,\n"
+                    + "p.nome, \n"
+                    + "p.estado,\n"
+                    + "p.cpf,\n"
+                    + "p.cnpj,\n"
+                    + "p.bairro,\n"
+                    + "p.cep,\n"
+                    + "p.cidade,\n"
+                    + "p.endereco,\n"
+                    + "p.estado,\n"
+                    + "p.ie,\n"
+                    + "p.rg,\n"
+                    + "p.flaginc,\n"
+                    + "c.dataencerramento,\n"
+                    + "c.datarecebimento,\n"
+                    + "c.prazodias,\n"
+                    + "c.ultimofechamento,\n"
+                    + "  trim((select case when coalesce(trim(ddd),'') = '' then telefone else ddd||telefone end as asd "
+                    + "from telefones "
+                    + "where codigo = p.codigo "
+                    + "and lower(tipo) = 'residencial' "
+                    + "and rownum = 1 )) fone1, sysdate as datainicio_atual, sysdate as datafinal_atual\n"
+                    + "FROM pessoas p,convenios c\n"
+                    + "WHERE p.codigo=c.codigo"
+            )) {
+                SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
+                while (rst.next()) {
+                    ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
+                    imp.setId(rst.getString("codigo"));
+                    imp.setRazao(rst.getString("razao"));
+                    
+                    if ((rst.getString("cpf") != null) &&
+                            (!rst.getString("cpf").trim().isEmpty())) {
+                        imp.setCnpj(rst.getString("cpf"));
+                    } else if ((rst.getString("cnpj") != null) &&
+                            (!rst.getString("cnpj").trim().isEmpty())) {
+                        imp.setCnpj(rst.getString("cnpj"));
+                    } else {
+                        imp.setCnpj("");
+                    }
+                    
+                    if ((rst.getString("rg") != null) &&
+                            (!rst.getString("rg").trim().isEmpty())) {
+                        imp.setInscricaoEstadual(rst.getString("rg"));
+                    } else if ((rst.getString("ie") != null) &&
+                            (!rst.getString("ie").trim().isEmpty())) {
+                        imp.setInscricaoEstadual(rst.getString("ie"));
+                    } else {
+                        imp.setInscricaoEstadual("");
+                    }
+                    
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero("0");
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setTelefone(rst.getString("fone1"));
+                    imp.setDataInicio(rst.getDate("datainicio_atual"));
+                    imp.setDataTermino(rst.getDate("datafinal_atual"));
+                    imp.setDesconto(0);
+                    imp.setDiaPagamento(rst.getInt("prazodias"));
+                    imp.setDiaInicioRenovacao(1);
+                    imp.setBloqueado(false);
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ConveniadoIMP> getConveniado() throws Exception {
+        List<ConveniadoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "p.codigo,\n"
+                    + "p.cpf,\n"
+                    + "p.nome,\n"
+                    + "p.razao,\n"
+                    + "p.cnpj,\n"
+                    + "p.ie,\n"
+                    + "p.rg,\n"
+                    + "c.bloqueado,\n"
+                    + "c.codigoconvenio,\n"
+                    + "c.limite    \n"
+                    + "from pessoas p\n"
+                    + "inner join clientes c on c.codigo = p.codigo\n"
+                    + "where p.cliente = 'S'\n"
+                    + "and p.convenio = 'N'\n"
+                    + "and c.codigoconvenio > 0"
+            )) {
+                while (rst.next()) {
+                    ConveniadoIMP imp = new ConveniadoIMP();
+                    imp.setId(rst.getString("codigo"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setNome(rst.getString("razao"));
+                    imp.setIdEmpresa(rst.getString("codigoconvenio"));
+                    imp.setBloqueado(rst.getBoolean("bloqueado"));
+                    imp.setConvenioLimite(rst.getDouble("limite"));
+                    imp.setLojaCadastro("1");
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
+        List<ConvenioTransacaoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "  rot.chave id,\n"
+                    + "  ROT.CODIGO id_cliente,\n"
+                    + "  coalesce(c.cnpj, c.cpf) cnpj,\n"
+                    + "  ROT.LOJA id_loja,\n"
+                    + "  ROT.EMISSAO dataemissao,\n"
+                    + "  rot.cupom,\n"
+                    + "  ROT.VALOR,\n"
+                    + "  round((((rot.taxa / 30) * floor(current_date - rot.vencimento)) / 100) * rot.valor, 2) juros,\n"
+                    + "  ROT.HISTORICO observacao,\n"
+                    + "  ROT.VENCIMENTO,\n"
+                    + "  ROT.PDV ecf\n"
+                    + "FROM RECEBER_CONTAS  ROT  \n"
+                    + "INNER JOIN PESSOAS C ON C.CODIGO = ROT.CODIGO\n"
+                    + "INNER JOIN CLIENTES CLI ON CLI.CODIGO = C.CODIGO\n"
+                    + "where rot.chaverecebimento = 0 and rot.loja = " + getLojaOrigem()
+                    + " and CLI.codigoconvenio > 0"
+            )) {
+                SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
+                while (rst.next()) {
+                    ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdConveniado(rst.getString("id_cliente"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setNumeroCupom(rst.getString("cupom"));
+                    imp.setDataHora(rst.getTimestamp("dataemissao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("observacao"));
                     result.add(imp);
                 }
             }

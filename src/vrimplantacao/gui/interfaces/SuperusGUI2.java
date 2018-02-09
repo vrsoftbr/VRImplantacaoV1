@@ -259,6 +259,10 @@ public class SuperusGUI2 extends VRInternalFrame {
                             importador.importarEANemBranco();
                         }
 
+                        if (chkOferta.isSelected()) {
+                            importador.importarOfertas(null);
+                        }
+                        
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor(OpcaoFornecedor.DADOS, OpcaoFornecedor.CONTATOS);
                         }
@@ -275,10 +279,26 @@ public class SuperusGUI2 extends VRInternalFrame {
                             importador.importarCreditoRotativo();
                         }
 
+                        if (chkCheque.isSelected()) {
+                            importador.importarCheque();
+                        }
+                        
                         if (chkClienteEventual.isSelected()) {
                             importador.importarClienteEventual();
                         }
 
+                        if (chkConvEmpresa.isSelected()) {
+                            importador.importarConvenioEmpresa();
+                        }
+                        
+                        if (chkConvConveniado.isSelected()) {
+                            importador.importarConvenioConveniado();
+                        }
+                        
+                        if (chkConvRecebimento.isSelected()) {
+                            importador.importarConvenioTransacao();
+                        }
+                        
                         if (chkNutricionalFilizola.isSelected()) {
                             importador.importarNutricionalFilizola();
                         }
@@ -354,13 +374,19 @@ public class SuperusGUI2 extends VRInternalFrame {
         chkNutricionalToledo = new vrframework.bean.checkBox.VRCheckBox();
         chkValidade = new vrframework.bean.checkBox.VRCheckBox();
         chkAtacado = new vrframework.bean.checkBox.VRCheckBox();
+        chkOferta = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel8 = new vrframework.bean.panel.VRPanel();
+        chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel9 = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
-        vRPanel8 = new vrframework.bean.panel.VRPanel();
-        chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkCheque = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel1 = new vrframework.bean.panel.VRPanel();
+        chkConvEmpresa = new vrframework.bean.checkBox.VRCheckBox();
+        chkConvConveniado = new vrframework.bean.checkBox.VRCheckBox();
+        chkConvRecebimento = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -485,6 +511,8 @@ public class SuperusGUI2 extends VRInternalFrame {
 
         chkAtacado.setText("Atacado");
 
+        chkOferta.setText("Oferta");
+
         javax.swing.GroupLayout vRPanel7Layout = new javax.swing.GroupLayout(vRPanel7);
         vRPanel7.setLayout(vRPanel7Layout);
         vRPanel7Layout.setHorizontalGroup(
@@ -514,16 +542,18 @@ public class SuperusGUI2 extends VRInternalFrame {
                     .addComponent(chkNutricionalToledo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkNutricionalFilizola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkT1ProdMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkT1DescGondola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(vRPanel7Layout.createSequentialGroup()
                         .addComponent(chkT1DescCompleta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkValidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkT1DescReduzida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(vRPanel7Layout.createSequentialGroup()
-                        .addGap(119, 119, 119)
-                        .addComponent(chkAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(20, Short.MAX_VALUE))
+                        .addComponent(chkT1DescGondola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(6, 6, 6)
+                        .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         vRPanel7Layout.setVerticalGroup(
             vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -535,7 +565,9 @@ public class SuperusGUI2 extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkT1DescReduzida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkT1DescGondola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(chkT1DescGondola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addGroup(vRPanel7Layout.createSequentialGroup()
                             .addComponent(chkFamiliaProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -583,61 +615,6 @@ public class SuperusGUI2 extends VRInternalFrame {
 
         vRTabbedPane2.addTab("Produtos", vRPanel7);
 
-        vRPanel9.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
-
-        chkClientePreferencial.setText("Cliente Preferencial");
-        chkClientePreferencial.setEnabled(true);
-        chkClientePreferencial.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkClientePreferencialActionPerformed(evt);
-            }
-        });
-
-        chkClienteEventual.setText("Cliente Eventual");
-        chkClienteEventual.setEnabled(true);
-        chkClienteEventual.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkClienteEventualActionPerformed(evt);
-            }
-        });
-
-        chkRotativo.setText("Crédito Rotativo");
-        chkRotativo.setEnabled(true);
-        chkRotativo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkRotativoActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout vRPanel9Layout = new javax.swing.GroupLayout(vRPanel9);
-        vRPanel9.setLayout(vRPanel9Layout);
-        vRPanel9Layout.setHorizontalGroup(
-            vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel9Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(vRPanel9Layout.createSequentialGroup()
-                        .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(251, Short.MAX_VALUE))
-        );
-        vRPanel9Layout.setVerticalGroup(
-            vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel9Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(vRPanel9Layout.createSequentialGroup()
-                        .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(107, Short.MAX_VALUE))
-        );
-
-        vRTabbedPane2.addTab("Clientes", vRPanel9);
-
         vRPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
         chkFornecedor.setText("Fornecedor");
@@ -665,7 +642,7 @@ public class SuperusGUI2 extends VRInternalFrame {
                 .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(271, Short.MAX_VALUE))
+                .addContainerGap(283, Short.MAX_VALUE))
         );
         vRPanel8Layout.setVerticalGroup(
             vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -678,6 +655,116 @@ public class SuperusGUI2 extends VRInternalFrame {
         );
 
         vRTabbedPane2.addTab("Fornecedores", vRPanel8);
+
+        vRPanel9.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+
+        chkClientePreferencial.setText("Cliente Preferencial");
+        chkClientePreferencial.setEnabled(true);
+        chkClientePreferencial.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkClientePreferencialActionPerformed(evt);
+            }
+        });
+
+        chkClienteEventual.setText("Cliente Eventual");
+        chkClienteEventual.setEnabled(true);
+        chkClienteEventual.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkClienteEventualActionPerformed(evt);
+            }
+        });
+
+        chkRotativo.setText("Crédito Rotativo");
+        chkRotativo.setEnabled(true);
+        chkRotativo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkRotativoActionPerformed(evt);
+            }
+        });
+
+        chkCheque.setText("Cheque");
+
+        javax.swing.GroupLayout vRPanel9Layout = new javax.swing.GroupLayout(vRPanel9);
+        vRPanel9.setLayout(vRPanel9Layout);
+        vRPanel9Layout.setHorizontalGroup(
+            vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(vRPanel9Layout.createSequentialGroup()
+                        .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(263, Short.MAX_VALUE))
+        );
+        vRPanel9Layout.setVerticalGroup(
+            vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(vRPanel9Layout.createSequentialGroup()
+                        .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(88, Short.MAX_VALUE))
+        );
+
+        vRTabbedPane2.addTab("Clientes", vRPanel9);
+
+        chkConvEmpresa.setText("Empresas");
+        chkConvEmpresa.setEnabled(true);
+        chkConvEmpresa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkConvEmpresaActionPerformed(evt);
+            }
+        });
+
+        chkConvConveniado.setText("Conveniados");
+        chkConvConveniado.setEnabled(true);
+        chkConvConveniado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkConvConveniadoActionPerformed(evt);
+            }
+        });
+
+        chkConvRecebimento.setText("Recebimentos em aberto");
+        chkConvRecebimento.setEnabled(true);
+        chkConvRecebimento.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkConvRecebimentoActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
+        vRPanel1.setLayout(vRPanel1Layout);
+        vRPanel1Layout.setHorizontalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkConvEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkConvConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkConvRecebimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(340, Short.MAX_VALUE))
+        );
+        vRPanel1Layout.setVerticalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkConvEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkConvConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkConvRecebimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(88, Short.MAX_VALUE))
+        );
+
+        vRTabbedPane2.addTab("Convênio", vRPanel1);
 
         tabs.addTab("Importação", vRTabbedPane2);
 
@@ -703,7 +790,7 @@ public class SuperusGUI2 extends VRInternalFrame {
                     .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(231, Short.MAX_VALUE))
+                .addContainerGap(243, Short.MAX_VALUE))
         );
         vRPanel2Layout.setVerticalGroup(
             vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -797,7 +884,7 @@ public class SuperusGUI2 extends VRInternalFrame {
                 .addComponent(vRLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(13, Short.MAX_VALUE))
+                .addContainerGap(25, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -827,7 +914,7 @@ public class SuperusGUI2 extends VRInternalFrame {
                 .addContainerGap()
                 .addComponent(vRLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtStrConexao, javax.swing.GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
+                .addComponent(txtStrConexao, javax.swing.GroupLayout.DEFAULT_SIZE, 355, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
@@ -899,12 +986,12 @@ public class SuperusGUI2 extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(vRPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE))
+                    .addComponent(vRPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 505, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -997,18 +1084,35 @@ public class SuperusGUI2 extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtDatabaseActionPerformed
 
+    private void chkConvEmpresaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkConvEmpresaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkConvEmpresaActionPerformed
+
+    private void chkConvConveniadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkConvConveniadoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkConvConveniadoActionPerformed
+
+    private void chkConvRecebimentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkConvRecebimentoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkConvRecebimentoActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkAtacado;
+    private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
+    private vrframework.bean.checkBox.VRCheckBox chkConvConveniado;
+    private vrframework.bean.checkBox.VRCheckBox chkConvEmpresa;
+    private vrframework.bean.checkBox.VRCheckBox chkConvRecebimento;
     private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkNutricionalFilizola;
     private vrframework.bean.checkBox.VRCheckBox chkNutricionalToledo;
+    private vrframework.bean.checkBox.VRCheckBox chkOferta;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
@@ -1052,6 +1156,7 @@ public class SuperusGUI2 extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel24;
     private vrframework.bean.label.VRLabel vRLabel25;
     private vrframework.bean.label.VRLabel vRLabel26;
+    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.panel.VRPanel vRPanel6;

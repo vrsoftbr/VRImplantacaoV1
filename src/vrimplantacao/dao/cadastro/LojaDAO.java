@@ -191,12 +191,13 @@ public class LojaDAO {
                 sql.append(" dataultimaentrada, custosemimposto, custocomimposto, custosemimpostoanterior, custocomimpostoanterior, precovenda, precovendaanterior,");
                 sql.append(" precodiaseguinte, estoque, troca, emiteetiqueta, custosemperdasemimposto, custosemperdasemimpostoanterior, customediocomimposto,");
                 sql.append(" customediosemimposto, id_aliquotacredito, dataultimavenda, teclaassociada, id_situacaocadastro, id_loja, descontinuado,");
-                sql.append(" quantidadeultimaentrada, centralizado, operacional, valoricmssubstituicao, dataultimaentradaanterior, cestabasica)");
+                sql.append(" quantidadeultimaentrada, centralizado, operacional, valoricmssubstituicao, dataultimaentradaanterior, cestabasica, valoroutrassubstituicao,");
+                sql.append("id_tipocalculoddv, id_tipoproduto, fabricacaopropria)");
                 sql.append(" (SELECT id_produto, prateleira, secao, estoqueminimo, estoquemaximo, valoripi, null, null, " + (i_loja.copiaCusto ? "custosemimposto" : "0") + ",");
                 sql.append(" " + (i_loja.copiaCusto ? "custocomimposto" : "0") + ", 0, 0, " + (i_loja.copiaPrecoVenda ? "precovenda" : "0") + ",");
                 sql.append("  0, precodiaseguinte, 0, 0, emiteetiqueta, 0, 0, 0, 0, id_aliquotacredito,");
                 sql.append(" null, teclaassociada, id_situacaocadastro, " + i_loja.id + ", descontinuado, 0, centralizado, operacional,");
-                sql.append(" valoricmssubstituicao, null, cestabasica from produtocomplemento where id_loja = " + i_loja.idCopiarLoja + ")");
+                sql.append(" valoricmssubstituicao, null, cestabasica, 0, 3, 0, false from produtocomplemento where id_loja = " + i_loja.idCopiarLoja + ")");
 
                 stm.execute(sql.toString());
 

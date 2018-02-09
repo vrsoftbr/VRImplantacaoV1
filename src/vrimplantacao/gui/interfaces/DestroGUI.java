@@ -172,7 +172,7 @@ public class DestroGUI extends VRInternalFrame {
                     }
 
                     if (chkEstoqueProduto.isSelected()) {
-                        //importacaoDestroDAO.importarEstoqueProduto(id_loja, id_lojaCliente);
+                        importacaoDestroDAO.importarEstoqueProduto(id_loja);
                     }
                     
                     if (chkCodigoBarras.isSelected()) {
