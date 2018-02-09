@@ -44,8 +44,6 @@ import vrimplantacao.gui.interfaces.PlanilhaContasReceberGUI;
 import vrimplantacao.gui.interfaces.PlanilhaConveniadoGUI;
 import vrimplantacao.gui.interfaces.PlanilhaPadraoGUI;
 import vrimplantacao.gui.interfaces.PlanilhaVendasGUI;
-import vrimplantacao.gui.interfaces.SysPdvGUI;
-import vrimplantacao.gui.interfaces.SysPdvSqlServer2GUI;
 import vrimplantacao.gui.interfaces.VRSoftwareGUI;
 import vrimplantacao.gui.interfaces.WisaSoftGUI_2;
 import vrimplantacao.gui.interfaces.GuiaSistemasGUI;
@@ -151,6 +149,7 @@ import vrimplantacao2.gui.interfaces.CissGUI;
 import vrimplantacao2.gui.interfaces.SisMouraGUI;
 import vrimplantacao2.gui.interfaces.SolidusGUI;
 import vrimplantacao2.gui.interfaces.SuperGUI;
+import vrimplantacao2.gui.interfaces.SysPdvGUI;
 import vrimplantacao2.gui.interfaces.VisualComercioGUI;
 import vrimplantacao2.gui.interfaces.WmsiGUI;
 
@@ -162,8 +161,6 @@ public final class MenuGUI extends VRMdiFrame {
     public MilenioGUI formImportarMilenio = null;
     public JMasterGUI formImportarJMaster = null;    
     public GetWayGUI formImportarGetWay = null;
-    public SysPdvGUI formImportarSysPdv = null;
-    public SysPdvSqlServer2GUI formImportarSysPdvSqlServer = null;
     public IdealGUI formImportarIdeal = null;
     public ImportacaoLogVendaGUI formImportacaoLogVendaGUI = null;
     public RMSGUI formImportarRM = null;
@@ -2166,20 +2163,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemGetWayActionPerformed
 
     private void jMenuItemSysPDVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSysPDVActionPerformed
-
-        try {
-            this.setWaitCursor();
-            if (formImportarSysPdv == null || formImportarSysPdv.isClosed()) {
-                formImportarSysPdv = new SysPdvGUI(this);
-            }
-
-            formImportarSysPdv.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
+        SysPdvGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemSysPDVActionPerformed
 
     private void jMenuItemIdealActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemIdealActionPerformed
@@ -2268,20 +2252,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemMobilityActionPerformed
 
     private void jMenuItemSysPDVSQLServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSysPDVSQLServerActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarSysPdvSqlServer == null || formImportarSysPdvSqlServer.isClosed()) {
-                formImportarSysPdvSqlServer = new SysPdvSqlServer2GUI(this);
-            }
-
-            formImportarSysPdvSqlServer.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
-
+        SysPdvGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemSysPDVSQLServerActionPerformed
 
     private void jMenuItemGdoorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGdoorActionPerformed

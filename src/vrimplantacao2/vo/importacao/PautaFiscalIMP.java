@@ -3,10 +3,6 @@ package vrimplantacao2.vo.importacao;
 import vrimplantacao2.vo.cadastro.tributacao.AliquotaVO;
 import vrimplantacao2.vo.enums.TipoIva;
 
-/**
- *
- * @author Leandro
- */
 public class PautaFiscalIMP {
     
     private String id;
@@ -17,9 +13,11 @@ public class PautaFiscalIMP {
     private AliquotaVO aliquotaCredito = AliquotaVO.OUTRAS;
     private AliquotaVO aliquotaDebito = AliquotaVO.OUTRAS;
     private AliquotaVO aliquotaDebitoForaEstado = AliquotaVO.OUTRAS;
+    private AliquotaVO aliquotaCreditoForaEstado = AliquotaVO.OUTRAS;
     private String aliquotaCreditoId;
     private String aliquotaDebitoId;
     private String aliquotaDebitoForaEstadoId;
+    private String aliquotaCreditoForaEstadoId;
     private double ivaAjustado = 0;
     private boolean icmsRecolhidoAntecipadamente = false;
 
@@ -138,6 +136,22 @@ public class PautaFiscalIMP {
 
     public void setAliquotaDebitoForaEstadoId(String aliquotaDebitoForaEstadoId) {
         this.aliquotaDebitoForaEstadoId = aliquotaDebitoForaEstadoId;
+    }
+
+    public AliquotaVO getAliquotaCreditoForaEstado() {
+        return aliquotaCreditoForaEstado;
+    }
+
+    public void setAliquotaCreditoForaEstado(AliquotaVO aliquotaCreditoForaEstado) {
+        this.aliquotaCreditoForaEstado = aliquotaCreditoForaEstado;
+    }
+
+    public String getAliquotaCreditoForaEstadoId() {
+        return aliquotaCreditoForaEstadoId;
+    }
+
+    public void setAliquotaCreditoForaEstadoId(String aliquotaCreditoForaEstadoId) {
+        this.aliquotaCreditoForaEstadoId = aliquotaCreditoForaEstadoId;
     }
     
 }
