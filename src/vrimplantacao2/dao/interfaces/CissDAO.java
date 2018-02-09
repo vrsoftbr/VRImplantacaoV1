@@ -632,8 +632,8 @@ public class CissDAO extends InterfaceDAO {
                     "	e.VALTOTBRUTO totalbruto,\n" +
                     "	e.QTDPRODUTO quantidade,\n" +
                     "	case when n.FLAGNOTACANCEL= 'T' then 1 else 0 end cancelado,\n" +
-                    "	coalesce(e.VALDESCONTOPRO, 0) desconto,\n" +
-                    "	coalesce(e.VALACRESCIMOPRO, 0) acrescimo,\n" +
+                    "	coalesce(e.VALDESCONTOFINANCEIRO, 0) desconto,\n" +
+                    "	coalesce(e.VALACRESCIMOFINANCEIRO, 0) acrescimo,\n" +
                     "	ean.descrresproduto descricaoreduzida,\n" +
                     "	ean.CODBAR codigobarras,\n" +
                     "	p.embalagemsaida embalagem,\n" +
