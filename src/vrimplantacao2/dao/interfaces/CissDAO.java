@@ -629,11 +629,11 @@ public class CissDAO extends InterfaceDAO {
                     "	e.NUMSEQUENCIA sequencia,\n" +
                     "	e.IDPLANILHA id_venda,\n" +
                     "	e.IDSUBPRODUTO idproduto,\n" +
-                    "	e.VALTOTBRUTO totalbruto,\n" +
+                    "	e.VALTOTLIQUIDO totalbruto,\n" +
                     "	e.QTDPRODUTO quantidade,\n" +
                     "	case when n.FLAGNOTACANCEL= 'T' then 1 else 0 end cancelado,\n" +
-                    "	coalesce(e.VALDESCONTOFINANCEIRO, 0) desconto,\n" +
-                    "	coalesce(e.VALACRESCIMOFINANCEIRO, 0) acrescimo,\n" +
+                    "	0 as desconto,\n" +
+                    "	0 as acrescimo,\n" +
                     "	ean.descrresproduto descricaoreduzida,\n" +
                     "	ean.CODBAR codigobarras,\n" +
                     "	p.embalagemsaida embalagem,\n" +
@@ -658,8 +658,7 @@ public class CissDAO extends InterfaceDAO {
                     "WHERE\n" +
                     "	v.dtmovimento >= '" + FORMAT.format(dataInicial) + "' and\n" +
                     "	v.dtmovimento <= '" + FORMAT.format(dataFinal) + "' and\n" +
-                    "	op.tipomovimento = 'V' and\n" +
-                    "	op.FLAGMOVPRODUTOS = 'T' and\n" +
+                    "	op.idoperacao = 1300 and\n" +
                     "	n.idempresa = " + idLoja + " and\n" +
                     "	not n.numcupomfiscal is null\n" +
                     "order by\n" +
