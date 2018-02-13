@@ -518,7 +518,7 @@ public class CissDAO extends InterfaceDAO {
                     "	n.dtmovimento data,\n" +
                     "	n.IDCLIFOR idcliente,\n" +
                     "	case when n.FLAGNOTACANCEL= 'T' then 1 else 0 end cancelado,\n" +
-                    "	v.VALCONTABIL subtotalimpressora,\n" +
+                    "	sum(cr.valtitulo) subtotalimpressora,\n" +
                     "	v.CNPJCPF cpf,\n" +
                     "	v.NOME nomecliente,\n" +
                     "	v.ENDERECO,\n" +
@@ -526,23 +526,38 @@ public class CissDAO extends InterfaceDAO {
                     "	v.COMPLEMENTO,\n" +
                     "	v.BAIRRO,\n" +
                     "	v.IDCIDADE,\n" +
-                    "	v.idcep cep	\n" +
-                    "FROM\n" +
-                    "	dba.NOTAS_ENTRADA_SAIDA v\n" +
+                    "	v.idcep cep\n" +
+                    "FROM \n" +
+                    "	dba.CONTAS_RECEBER cr\n" +
                     "	join dba.NOTAS n on\n" +
-                    "		v.idempresa = n.idempresa\n" +
-                    "		and v.idplanilha = n.idplanilha\n" +
-                    "	join dba.OPERACAO_INTERNA op on\n" +
-                    "		v.idoperacao = op.idoperacao\n" +
+                    "		cr.IDEMPRESA = n.IDEMPRESA AND\n" +
+                    "		cr.IDPLANILHA = n.IDPLANILHA\n" +
+                    "	join dba.NOTAS_ENTRADA_SAIDA v on\n" +
+                    "		cr.IDEMPRESA = v.IDEMPRESA AND\n" +
+                    "		cr.IDPLANILHA = v.IDPLANILHA\n" +
+                    "	join dba.FRCAIXA_RECEBIMENTO fr on\n" +
+                    "		cr.IDEMPRESA = fr.IDEMPRESA AND\n" +
+                    "		cr.IDPLANILHA = fr.IDPLANILHA AND\n" +
+                    "		cr.IDRECEBIMENTO = fr.IDRECEBIMENTO	\n" +
                     "WHERE\n" +
-                    "	v.dtmovimento >= '" + FORMAT.format(dataInicial) + "' and\n" +
-                    "	v.dtmovimento <= '" + FORMAT.format(dataFinal) + "' and\n" +
-                    "	op.tipomovimento = 'V' and\n" +
-                    "	op.FLAGMOVPRODUTOS = 'T' and\n" +
-                    "	v.idempresa = " + idLoja + " and\n" +
-                    "	not n.numcupomfiscal is null\n" +
-                    "order by\n" +
-                    "	id";
+                    "	v.IDOPERACAO = 1300 AND\n" +
+                    "	cr.IDEMPRESA IN (" + idLoja + ") AND\n" +
+                    "	cr.DTMOVIMENTO BETWEEN '" + FORMAT.format(dataInicial) + "' AND '" + FORMAT.format(dataFinal) + "'\n" +
+                    "group by\n" +
+                    "	n.idplanilha,\n" +
+                    "	n.numcupomfiscal,\n" +
+                    "	n.idcaixa,\n" +
+                    "	n.dtmovimento,\n" +
+                    "	n.IDCLIFOR,\n" +
+                    "	case when n.FLAGNOTACANCEL= 'T' then 1 else 0 end,\n" +
+                    "	v.CNPJCPF,\n" +
+                    "	v.NOME,\n" +
+                    "	v.ENDERECO,\n" +
+                    "	v.NUMERo,\n" +
+                    "	v.COMPLEMENTO,\n" +
+                    "	v.BAIRRO,\n" +
+                    "	v.IDCIDADE,\n" +
+                    "	v.idcep";
             try {
                 stm = ConexaoDB2.getConexao().createStatement();
                 LOG.log(Level.FINE, "SQL da venda: " + sql);
@@ -624,7 +639,7 @@ public class CissDAO extends InterfaceDAO {
         
         public VendaItemIterator(String idLoja, Date dataInicial, Date dataFinal) throws Exception {
             String sql = 
-                    "SELECT\n" +
+                    "select\n" +
                     "	e.idplanilha || '-' || e.numsequencia id,\n" +
                     "	e.NUMSEQUENCIA sequencia,\n" +
                     "	e.IDPLANILHA id_venda,\n" +
@@ -632,37 +647,30 @@ public class CissDAO extends InterfaceDAO {
                     "	e.VALTOTLIQUIDO totalbruto,\n" +
                     "	e.QTDPRODUTO quantidade,\n" +
                     "	case when n.FLAGNOTACANCEL= 'T' then 1 else 0 end cancelado,\n" +
-                    "	0 as desconto,\n" +
-                    "	0 as acrescimo,\n" +
+                    "	0 desconto,\n" +
+                    "	0 acrescimo,\n" +
                     "	ean.descrresproduto descricaoreduzida,\n" +
                     "	ean.CODBAR codigobarras,\n" +
                     "	p.embalagemsaida embalagem,\n" +
                     "	e.IDSITTRIB icms_cst,\n" +
                     "	e.PERICM icms_aliq,\n" +
                     "	e.PERREDTRIB icms_reducao\n" +
-                    "FROM\n" +
-                    "	dba.ESTOQUE_ANALITICO e\n" +
-                    "	join dba.OPERACAO_INTERNA op on\n" +
-                    "		e.IDOPERACAO = op.IDOPERACAO\n" +
-                    "	join dba.NOTAS n on\n" +
-                    "		e.IDPLANILHA = n.IDPLANILHA and\n" +
-                    "		e.IDEMPRESA = n.IDEMPRESA\n" +
-                    "	join dba.NOTAS_ENTRADA_SAIDA v on\n" +
-                    "		v.idempresa = n.idempresa	\n" +
-                    "		and v.idplanilha = n.idplanilha\n" +
-                    "	join dba.PRODUTO_GRADE ean on\n" +
-                    "		ean.IDSUBPRODUTO = e.IDSUBPRODUTO and\n" +
-                    "		ean.IDPRODUTO = e.IDPRODUTO\n" +
-                    "	join dba.produto p on \n" +
-                    "		ean.idproduto = p.idproduto\n" +
-                    "WHERE\n" +
-                    "	v.dtmovimento >= '" + FORMAT.format(dataInicial) + "' and\n" +
-                    "	v.dtmovimento <= '" + FORMAT.format(dataFinal) + "' and\n" +
-                    "	op.idoperacao = 1300 and\n" +
-                    "	n.idempresa = " + idLoja + " and\n" +
-                    "	not n.numcupomfiscal is null\n" +
-                    "order by\n" +
-                    "	id";
+                    "from\n" +
+                    "	notas n\n" +
+                    "	join estoque_analitico e on\n" +
+                    "		e.idempresa = n.idempresa and\n" +
+                    "		e.idplanilha = n.idplanilha and\n" +
+                    "		(e.numsequenciakit is null or e.numsequenciakit <= 0)\n" +
+                    "	join produto_grade ean on\n" +
+                    "		ean.idsubproduto = e.idsubproduto\n" +
+                    "	join produto p on\n" +
+                    "		p.idproduto = e.idproduto\n" +
+                    "where\n" +
+                    "	e.idoperacao = 1300 and\n" +
+                    "	e.idempresa in (" + idLoja + ") and\n" +
+                    "	e.dtmovimento between '" + FORMAT.format(dataInicial) + "' and '" + FORMAT.format(dataFinal) + "'\n" +
+                    "order by 1";
+            
             try {
                 stm = ConexaoDB2.getConexao().createStatement();
                 LOG.log(Level.FINE, "SQL da venda item: " + sql);
