@@ -18,6 +18,8 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.interfaces.custom.solidus.Entidade;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
+import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -333,7 +335,9 @@ public class SolidusDAO extends InterfaceDAO {
                     "    f.qtd_dia_carencia prazoseguranca,\n" +
                     "    f.des_contato,\n" +
                     "    f.des_email,\n" +
-                    "    f.num_fax\n" +
+                    "    f.num_fax,\n" +
+                    "    case f.micro_empresa when 'S' then 1 else 0 end microempresa,\n" +
+                    "    case f.flg_produtor_rural when 'S' then 1 else 0 end produtorrural\n" +
                     "from\n" +
                     "    tab_fornecedor f\n" +
                     "    left join tab_cidade cd on\n" +
@@ -377,6 +381,12 @@ public class SolidusDAO extends InterfaceDAO {
                     String fax = Utils.formataNumero(rst.getString("num_fax"));
                     if (!"0".equals(fax)) {
                         imp.addContato("B", "FAX", fax, "", TipoContato.COMERCIAL, "");
+                    }
+                                        
+                    if (rst.getBoolean("produtorrural")) {
+                        imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL);
+                    } else if (rst.getBoolean("microempresa")) {
+                        imp.setTipoEmpresa(TipoEmpresa.ME_SIMPLES);
                     }
                     
                     result.add(imp);
@@ -491,7 +501,7 @@ public class SolidusDAO extends InterfaceDAO {
                     "    c.dta_admissao_trab dataadmissao,\n" +
                     "    c.des_cargo cargo,\n" +
                     "    c.val_renda salario,\n" +
-                    "    c.val_limite_credito,\n" +
+                    "    c.val_limite_conv limitecredito,\n" +
                     "    c.des_conjuge nomeconjuge,\n" +
                     "    c.des_pai nomepai,\n" +
                     "    c.des_mae nomemae,\n" +
@@ -500,7 +510,8 @@ public class SolidusDAO extends InterfaceDAO {
                     "    c.num_fone,\n" +
                     "    c.num_fax,\n" +
                     "    c.num_celular,\n" +
-                    "    c.des_email\n" +
+                    "    c.des_email,\n" +
+                    "    case c.flg_envia_codigo when 'S' then 1 else 0 end permiterotativo\n" +
                     "from\n" +
                     "    tab_cliente c\n" +
                     "    left join tab_cidade cd on\n" +
@@ -534,7 +545,7 @@ public class SolidusDAO extends InterfaceDAO {
                     imp.setDataAdmissao(rst.getDate("dataadmissao"));
                     imp.setCargo(rst.getString("cargo"));
                     imp.setSalario(rst.getDouble("salario"));
-                    imp.setValorLimite(rst.getDouble("val_limite_credito"));
+                    imp.setValorLimite(rst.getDouble("limitecredito"));
                     imp.setNomeConjuge(rst.getString("nomeconjuge"));
                     imp.setNomePai(rst.getString("nomepai"));
                     imp.setNomeMae(rst.getString("nomemae"));
@@ -544,6 +555,7 @@ public class SolidusDAO extends InterfaceDAO {
                     imp.setFax(rst.getString("num_fax"));
                     imp.setCelular(rst.getString("num_celular"));
                     imp.setEmail(rst.getString("des_email"));
+                    imp.setPermiteCreditoRotativo(rst.getBoolean("permiterotativo"));
                     
                     result.add(imp);
                 }
@@ -623,7 +635,6 @@ public class SolidusDAO extends InterfaceDAO {
                     "    f.dta_emissao >= '" + DATE_FORMAT.format(rotativoDtaInicio) + "'\n" +
                     "    and f.dta_emissao <= '" + DATE_FORMAT.format(rotativoDtaFim) + "'\n" +
                     "    and f.tipo_parceiro = 0\n" +
-                    "    and f.cod_parceiro = 1017030\n" +
                     "    and f.cod_entidade in (" + implodeList(this.entidadesCreditoRotativo) + ")\n" +
                     "    and f.cod_loja = " + getLojaOrigem() + "\n" +                            
                     "order by\n" +
