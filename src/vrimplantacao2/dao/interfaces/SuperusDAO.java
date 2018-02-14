@@ -2,7 +2,6 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,6 +34,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class SuperusDAO extends InterfaceDAO {
 
+    public String v_codEmpresaConv;
+    
     @Override
     public String getSistema() {
         return "Superus";
@@ -430,7 +431,7 @@ public class SuperusDAO extends InterfaceDAO {
                     + "from\n"
                     + "  PESSOAS p\n"
                     + "  join CLIENTES c on p.codigo = c.codigo\n"
-                    + " where c.codigoconvenio = 0\n"
+                    + ("".equals(v_codEmpresaConv) ? "where c.codigoconvenio = 0\n" : "where c.codigoconvenio <> " + v_codEmpresaConv) + "\n"
                     + "order by p.codigo"
             )) {
                 while (rst.next()) {
@@ -656,7 +657,8 @@ public class SuperusDAO extends InterfaceDAO {
                     + "and lower(tipo) = 'residencial' "
                     + "and rownum = 1 )) fone1, sysdate as datainicio_atual, sysdate as datafinal_atual\n"
                     + "FROM pessoas p,convenios c\n"
-                    + "WHERE p.codigo=c.codigo"
+                    + "WHERE p.codigo = c.codigo "
+                    + ("".equals(v_codEmpresaConv) ? "and c.codigo > 0" : "and c.codigo = " + v_codEmpresaConv)
             )) {
                 SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
                 while (rst.next()) {
@@ -724,7 +726,7 @@ public class SuperusDAO extends InterfaceDAO {
                     + "inner join clientes c on c.codigo = p.codigo\n"
                     + "where p.cliente = 'S'\n"
                     + "and p.convenio = 'N'\n"
-                    + "and c.codigoconvenio > 0"
+                    + ("".equals(v_codEmpresaConv) ? "and c.codigoconvenio > 0" : "and c.codigoconvenio = " + v_codEmpresaConv)
             )) {
                 while (rst.next()) {
                     ConveniadoIMP imp = new ConveniadoIMP();
