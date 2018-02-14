@@ -351,6 +351,7 @@
                               </Group>
                               <Component id="chkFContatos" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFCnpj" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFTipoEmpresa" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="228" max="32767" attributes="0"/>
                       </Group>
@@ -367,10 +368,12 @@
                                   <Component id="chkFContatos" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkFCnpj" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkFTipoEmpresa" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="105" max="32767" attributes="0"/>
+                          <EmptySpace pref="86" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -418,6 +421,17 @@
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFCnpjActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFTipoEmpresa">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo Empresa"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
+                    </Property>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFTipoEmpresaActionPerformed"/>
                   </Events>
                 </Component>
               </SubComponents>

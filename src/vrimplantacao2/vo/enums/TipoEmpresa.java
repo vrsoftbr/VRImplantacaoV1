@@ -8,7 +8,7 @@ package vrimplantacao2.vo.enums;
 public enum TipoEmpresa {
 
     LUCRO_PRESUMIDO(1, "LUCRO PRESUMIDO"),
-    PRODUTOR_RURAL(2, "PRODUTOR RURAL"),
+    PRODUTOR_RURAL_JURIDICO(2, "PRODUTOR RURAL PES. JURIDICA"),
     LUCRO_REAL(3, "LUCRO REAL"),
     LUCRO_REAL_ESTIMADO(4, "LUCRO REAL ESTIMADO"),
     LUCRO_REAL_ESTIMADO_OP(5, "LUCRO REAL ESTIMADO OP."),
@@ -17,7 +17,8 @@ public enum TipoEmpresa {
     ME_SIMPLES(8, "ME - SIMPLES"),
     EPP_SIMPLES(9, "EPP - SIMPLES"),
     EIRELI(10, "EIRELI"),
-    MEI(11, "MEI");
+    MEI(11, "MEI"),
+    PRODUTOR_RURAL_FISICA(12, "PRODUTOR RURAL PES. FISICA");
 
     private int id;
     private String descricao;

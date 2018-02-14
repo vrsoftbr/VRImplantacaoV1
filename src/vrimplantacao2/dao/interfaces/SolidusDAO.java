@@ -384,7 +384,12 @@ public class SolidusDAO extends InterfaceDAO {
                     }
                                         
                     if (rst.getBoolean("produtorrural")) {
-                        imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL);
+                        long cnpj = Utils.stringToLong(rst.getString("cnpj"));
+                        if (cnpj > 99999999999L) {
+                            imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_JURIDICO);
+                        } else {
+                            imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_FISICA);
+                        }
                     } else if (rst.getBoolean("microempresa")) {
                         imp.setTipoEmpresa(TipoEmpresa.ME_SIMPLES);
                     }

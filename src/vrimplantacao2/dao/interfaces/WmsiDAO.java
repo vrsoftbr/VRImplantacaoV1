@@ -452,7 +452,7 @@ public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
                     if ((rst.getString("for_indprodrural") != null)
                             && (!rst.getString("for_indprodrural").trim().isEmpty())
                             && ("1".equals(rst.getString("for_indprodrural").trim()))) {
-                        imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL);
+                        imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_JURIDICO);
                     } else if ((rst.getString("for_supersimples") != null)
                             && (!rst.getString("for_supersimples").trim().isEmpty())
                             && ("1".equals(rst.getString("for_supersimples").trim()))) {
