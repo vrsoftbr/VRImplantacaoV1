@@ -153,8 +153,8 @@ public class SuperusDAO extends InterfaceDAO {
                     + "  p.setor mercadologico1,\n"
                     + "  p.grupo mercadologico2,\n"
                     + "  p.subgrupo mercadologico3,\n"
-                    + "  ncm.nome ncm,\n"
-                    + "  null as cest,\n"
+                    + "  c.nome ncm,\n"
+                    + "  c.cest cest,\n"
                     + "  case p.CODIGOREA when 0 then null else p.CODIGOREA end as id_familia,\n"
                     + "  preco.lucro margem,\n"
                     + "  p.pesoliquido,\n"
@@ -174,6 +174,7 @@ public class SuperusDAO extends InterfaceDAO {
                     + "from\n"
                     + "  produtos p\n"
                     + "  join produtos_impostos imp on p.codigo = imp.codigo and imp.loja = " + getLojaOrigem() + "\n"
+                    + "  join classificacao c on imp.classificacao = c.codigo\n"
                     + "  left join produtos_ean ean on p.codigo = ean.codigo and ean.codbarra > 0 \n"
                     + "  and ean.vendapadrao = 'S'\n"
                     + "  left join classificacao ncm on imp.classificacao = ncm.codigo\n"
@@ -213,9 +214,9 @@ public class SuperusDAO extends InterfaceDAO {
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(rst.getInt("id_Situacaocadastro")));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
 
-                    imp.setCodMercadologico1(rst.getString("mercadologico1"));
-                    imp.setCodMercadologico2(rst.getString("mercadologico2"));
-                    imp.setCodMercadologico3(rst.getString("mercadologico3"));
+                    imp.setCodMercadologico1(String.valueOf(rst.getInt("mercadologico1") == 0 ? 1 : rst.getInt("mercadologico1")));
+                    imp.setCodMercadologico2(String.valueOf(rst.getInt("mercadologico2") == 0 ? 1 : rst.getInt("mercadologico2")));
+                    imp.setCodMercadologico3(String.valueOf(rst.getInt("mercadologico3") == 0 ? 1 : rst.getInt("mercadologico3")));
 
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
