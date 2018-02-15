@@ -80,33 +80,30 @@ public class MapaTributacaoView extends JPanel {
         jLabel2 = new javax.swing.JLabel();
         txtAgrupador = new javax.swing.JTextField();
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(MapaTributacaoView.class, "MapaTributacaoView.jLabel3.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, "Buscar");
 
-        txtBusca.setText(org.openide.util.NbBundle.getMessage(MapaTributacaoView.class, "MapaTributacaoView.txtBusca.text")); // NOI18N
         txtBusca.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 txtBuscaKeyRelesed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(btnAtualizar, org.openide.util.NbBundle.getMessage(MapaTributacaoView.class, "MapaTributacaoView.btnAtualizar.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(btnAtualizar, "Atualizar listagem");
         btnAtualizar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAtualizarOnClick(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(jCheckBox1, org.openide.util.NbBundle.getMessage(MapaTributacaoView.class, "MapaTributacaoView.jCheckBox1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jCheckBox1, "Exibir todos");
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(MapaTributacaoView.class, "MapaTributacaoView.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, "Sistema");
 
         txtSistema.setEditable(false);
-        txtSistema.setText(org.openide.util.NbBundle.getMessage(MapaTributacaoView.class, "MapaTributacaoView.txtSistema.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(MapaTributacaoView.class, "MapaTributacaoView.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, "Agrupador");
 
         txtAgrupador.setEditable(false);
-        txtAgrupador.setText(org.openide.util.NbBundle.getMessage(MapaTributacaoView.class, "MapaTributacaoView.txtAgrupador.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

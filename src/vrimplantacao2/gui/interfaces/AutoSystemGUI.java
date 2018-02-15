@@ -1,15 +1,13 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import vrframework.bean.internalFrame.VRInternalFrame;
-import vrframework.bean.list.VRList;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
@@ -24,10 +22,11 @@ import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.AutoSystemDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
-import vrimplantacao2.gui.interfaces.custom.solidus.Entidade;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
-public class AutoSystemGUI extends VRInternalFrame {
+public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButtonProvider {
     
     private static final Logger LOG = Logger.getLogger(AutoSystemGUI.class.getName());
     
@@ -36,6 +35,7 @@ public class AutoSystemGUI extends VRInternalFrame {
     
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
+    private String vDeposito = "-1";
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -44,17 +44,23 @@ public class AutoSystemGUI extends VRInternalFrame {
         
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
+        vDeposito = params.get(SISTEMA, "DEPOSITO");
     }
     
      private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
+        Estabelecimento deposito = (Estabelecimento) cmbDeposito.getSelectedItem();
         
         conexao.atualizarParametros();
         
         if (cliente != null) {
             params.put(cliente.cnpj, SISTEMA, "LOJA_CLIENTE");
             vLojaCliente = cliente.cnpj;
+        }
+        if (deposito != null) {
+            params.put(deposito.cnpj, SISTEMA, "DEPOSITO");
+            vDeposito = deposito.cnpj;
         }
         ItemComboVO vr = (ItemComboVO) cmbLojaVR.getSelectedItem();
         if (vr != null) {
@@ -78,6 +84,7 @@ public class AutoSystemGUI extends VRInternalFrame {
                         gravarParametros();
                         carregarLojaCliente();
                         carregarLojaVR();
+                        mapaTributacaoButton1.setEnabled(true);
                     }
                 }
         );
@@ -118,6 +125,22 @@ public class AutoSystemGUI extends VRInternalFrame {
             cont++;
         }
         cmbLojaOrigem.setSelectedIndex(index);
+    }    
+    
+    private void carregarDepositos() throws Exception {
+        cmbDeposito.setModel(new DefaultComboBoxModel());
+        int cont = 0;
+        int index = 0;
+        for (Estabelecimento loja: dao.getDepositos()) {
+            cmbDeposito.addItem(loja);
+            if (vDeposito != null && vDeposito.equals(loja.cnpj)) {
+                index = cont;
+            }
+            cont++;
+        }
+        if (vDeposito != null) {
+            cmbDeposito.setSelectedIndex(index);
+        }
     }
        
     public static void exibir(VRMdiFrame i_mdiFrame) {
@@ -152,6 +175,8 @@ public class AutoSystemGUI extends VRInternalFrame {
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
 
+                    dao.setIdDeposito((int) cmbDeposito.getSelectedItem());
+                    
                     if (tabs.getSelectedIndex() == 0) {
 
                         if (chkMercadologico.isSelected()) {
@@ -340,6 +365,7 @@ public class AutoSystemGUI extends VRInternalFrame {
         chkCustoComImposto = new vrframework.bean.checkBox.VRCheckBox();
         chkCustoSemImposto = new vrframework.bean.checkBox.VRCheckBox();
         chkFabricante = new vrframework.bean.checkBox.VRCheckBox();
+        mapaTributacaoButton1 = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
         tabImpFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -372,6 +398,8 @@ public class AutoSystemGUI extends VRInternalFrame {
         chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         cmbLojaOrigem = new javax.swing.JComboBox();
+        jLabel3 = new javax.swing.JLabel();
+        cmbDeposito = new javax.swing.JComboBox();
 
         setTitle("Importação AutoSystem");
         setToolTipText("");
@@ -522,6 +550,10 @@ public class AutoSystemGUI extends VRInternalFrame {
         chkFabricante.setText("Fabricante");
         tabImpProduto.add(chkFabricante);
 
+        mapaTributacaoButton1.setEnabled(false);
+        mapaTributacaoButton1.setProvider(this);
+        tabImpProduto.add(mapaTributacaoButton1);
+
         vRTabbedPane2.addTab("Produtos", tabImpProduto);
 
         tabImpFornecedor.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
@@ -571,7 +603,7 @@ public class AutoSystemGUI extends VRInternalFrame {
                         .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(230, Short.MAX_VALUE))
+                .addContainerGap(271, Short.MAX_VALUE))
         );
         tabImpFornecedorLayout.setVerticalGroup(
             tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -617,7 +649,7 @@ public class AutoSystemGUI extends VRInternalFrame {
                 .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(308, Short.MAX_VALUE))
+                .addContainerGap(349, Short.MAX_VALUE))
         );
         tabClienteDadosLayout.setVerticalGroup(
             tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -665,7 +697,7 @@ public class AutoSystemGUI extends VRInternalFrame {
                     .addComponent(chkCvEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCvConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCvTransacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(340, Short.MAX_VALUE))
+                .addContainerGap(381, Short.MAX_VALUE))
         );
         tabConvenioLayout.setVerticalGroup(
             tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -750,7 +782,7 @@ public class AutoSystemGUI extends VRInternalFrame {
                 .addComponent(vRPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(114, Short.MAX_VALUE))
+                .addContainerGap(155, Short.MAX_VALUE))
         );
         tabOutrosLayout.setVerticalGroup(
             tabOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -780,7 +812,7 @@ public class AutoSystemGUI extends VRInternalFrame {
             tabContasAPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tabContasAPagarLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(23, 23, 23))
@@ -793,7 +825,7 @@ public class AutoSystemGUI extends VRInternalFrame {
                     .addGroup(tabContasAPagarLayout.createSequentialGroup()
                         .addComponent(chkContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 145, Short.MAX_VALUE))
+                    .addComponent(jScrollPane3))
                 .addContainerGap())
         );
 
@@ -825,7 +857,7 @@ public class AutoSystemGUI extends VRInternalFrame {
                     .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(190, Short.MAX_VALUE))
+                .addContainerGap(231, Short.MAX_VALUE))
         );
         vRPanel2Layout.setVerticalGroup(
             vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -846,23 +878,34 @@ public class AutoSystemGUI extends VRInternalFrame {
         tabs.addTab("Unificação", vRPanel2);
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
+        cmbLojaOrigem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbLojaOrigemActionPerformed(evt);
+            }
+        });
+
+        jLabel3.setText("Depósito (Estoque)");
+
+        cmbDeposito.setModel(new DefaultComboBoxModel());
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(conexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(conexao, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+                    .addComponent(vRPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(tabs, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(jLabel2)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(cmbDeposito, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -871,11 +914,13 @@ public class AutoSystemGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addComponent(conexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3)
+                    .addComponent(cmbDeposito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
+                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -950,6 +995,18 @@ public class AutoSystemGUI extends VRInternalFrame {
     private void chkCvTransacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCvTransacaoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkCvTransacaoActionPerformed
+
+    private void cmbLojaOrigemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbLojaOrigemActionPerformed
+        try {
+            if (cmbLojaOrigem.getSelectedItem() != null) {
+                dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+                carregarDepositos();
+            }
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Erro ao carregar os depósitos do cliente", ex);
+            Util.exibirMensagemErro(ex, "Erro ao carregar os depósitos do cliente");
+        }
+    }//GEN-LAST:event_cmbLojaOrigemActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
@@ -994,6 +1051,7 @@ public class AutoSystemGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkValidade;
+    private javax.swing.JComboBox cmbDeposito;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel conexao;
@@ -1001,8 +1059,10 @@ public class AutoSystemGUI extends VRInternalFrame {
     private org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane3;
     private vrframework.bean.list.VRList listEntidadesContas;
+    private vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton mapaTributacaoButton1;
     private vrframework.bean.panel.VRPanel tabClienteDados;
     private vrframework.bean.tabbedPane.VRTabbedPane tabClientes;
     private vrframework.bean.panel.VRPanel tabContasAPagar;
@@ -1020,52 +1080,27 @@ public class AutoSystemGUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;
     // End of variables declaration//GEN-END:variables
 
-    private void getEntidadesSelecionadas(String param, VRList list) {
-        if (param != null && !"".equals(param)) {
-            for (String id: param.split(":")) {
-                for (int i = 0; i < list.getModel().getSize(); i++) {
-                    Entidade entidade = (Entidade) list.getModel().getElementAt(i);
-                    if (entidade.getId() == Integer.parseInt(id)) {
-                        list.addSelectionInterval(i, i);
-                        break;
-                    }
-                }
-            }
-        }
+    @Override
+    public MapaTributoProvider getProvider() {
+        return dao;
     }
 
-
-    private class ListSelectionListenerImpl implements ListSelectionListener {
-        
-        private String id;
-        private VRList list;
-
-        public ListSelectionListenerImpl(String id, VRList list) {
-            this.id = id;
-            this.list = list;
-        }
-        
-        public boolean acionar = true;
-
-        private String toStringEntidades() {
-            StringBuilder builder = new StringBuilder();
-            for (Iterator<Entidade> iterator = list.getSelectedValuesList().iterator(); iterator.hasNext(); ) {
-                builder.append(iterator.next().getId());
-                if (iterator.hasNext()) {
-                    builder.append(":");
-                }
-            }
-            return builder.toString();
-        }
-        
-        @Override
-        public void valueChanged(ListSelectionEvent e) {
-            if (acionar) {
-                if (!e.getValueIsAdjusting()) {
-                    Parametros.get().put(toStringEntidades(), SISTEMA, id);
-                }
-            }
-        }
+    @Override
+    public String getSistema() {
+        return SISTEMA;
     }
-    
+
+    @Override
+    public String getLoja() {
+        if (cmbLojaOrigem.getSelectedItem() != null) {
+            return ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+        }
+        return null;
+    }
+
+    @Override
+    public Frame getFrame() {
+        return mdiFrame;
+    }
+
 }
