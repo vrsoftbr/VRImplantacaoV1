@@ -2,7 +2,6 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,6 +34,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class SuperusDAO extends InterfaceDAO {
 
+    public String v_codEmpresaConv;
+    
     @Override
     public String getSistema() {
         return "Superus";
@@ -153,8 +154,8 @@ public class SuperusDAO extends InterfaceDAO {
                     + "  p.setor mercadologico1,\n"
                     + "  p.grupo mercadologico2,\n"
                     + "  p.subgrupo mercadologico3,\n"
-                    + "  ncm.nome ncm,\n"
-                    + "  null as cest,\n"
+                    + "  c.nome ncm,\n"
+                    + "  c.cest cest,\n"
                     + "  case p.CODIGOREA when 0 then null else p.CODIGOREA end as id_familia,\n"
                     + "  preco.lucro margem,\n"
                     + "  p.pesoliquido,\n"
@@ -174,6 +175,7 @@ public class SuperusDAO extends InterfaceDAO {
                     + "from\n"
                     + "  produtos p\n"
                     + "  join produtos_impostos imp on p.codigo = imp.codigo and imp.loja = " + getLojaOrigem() + "\n"
+                    + "  join classificacao c on imp.classificacao = c.codigo\n"
                     + "  left join produtos_ean ean on p.codigo = ean.codigo and ean.codbarra > 0 \n"
                     + "  and ean.vendapadrao = 'S'\n"
                     + "  left join classificacao ncm on imp.classificacao = ncm.codigo\n"
@@ -213,9 +215,9 @@ public class SuperusDAO extends InterfaceDAO {
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(rst.getInt("id_Situacaocadastro")));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
 
-                    imp.setCodMercadologico1(rst.getString("mercadologico1"));
-                    imp.setCodMercadologico2(rst.getString("mercadologico2"));
-                    imp.setCodMercadologico3(rst.getString("mercadologico3"));
+                    imp.setCodMercadologico1(String.valueOf(rst.getInt("mercadologico1") == 0 ? 1 : rst.getInt("mercadologico1")));
+                    imp.setCodMercadologico2(String.valueOf(rst.getInt("mercadologico2") == 0 ? 1 : rst.getInt("mercadologico2")));
+                    imp.setCodMercadologico3(String.valueOf(rst.getInt("mercadologico3") == 0 ? 1 : rst.getInt("mercadologico3")));
 
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
@@ -429,7 +431,7 @@ public class SuperusDAO extends InterfaceDAO {
                     + "from\n"
                     + "  PESSOAS p\n"
                     + "  join CLIENTES c on p.codigo = c.codigo\n"
-                    + " where c.codigoconvenio = 0\n"
+                    + ("".equals(v_codEmpresaConv) ? "where c.codigoconvenio = 0\n" : "where c.codigoconvenio <> " + v_codEmpresaConv) + "\n"
                     + "order by p.codigo"
             )) {
                 while (rst.next()) {
@@ -655,7 +657,8 @@ public class SuperusDAO extends InterfaceDAO {
                     + "and lower(tipo) = 'residencial' "
                     + "and rownum = 1 )) fone1, sysdate as datainicio_atual, sysdate as datafinal_atual\n"
                     + "FROM pessoas p,convenios c\n"
-                    + "WHERE p.codigo=c.codigo"
+                    + "WHERE p.codigo = c.codigo "
+                    + ("".equals(v_codEmpresaConv) ? "and c.codigo > 0" : "and c.codigo = " + v_codEmpresaConv)
             )) {
                 SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
                 while (rst.next()) {
@@ -723,7 +726,7 @@ public class SuperusDAO extends InterfaceDAO {
                     + "inner join clientes c on c.codigo = p.codigo\n"
                     + "where p.cliente = 'S'\n"
                     + "and p.convenio = 'N'\n"
-                    + "and c.codigoconvenio > 0"
+                    + ("".equals(v_codEmpresaConv) ? "and c.codigoconvenio > 0" : "and c.codigoconvenio = " + v_codEmpresaConv)
             )) {
                 while (rst.next()) {
                     ConveniadoIMP imp = new ConveniadoIMP();
