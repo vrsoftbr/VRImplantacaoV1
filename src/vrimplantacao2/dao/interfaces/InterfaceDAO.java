@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaVO;
 import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -161,6 +162,16 @@ public abstract class InterfaceDAO {
      */
     public List<ClienteIMP> getClientes() throws Exception {
         return new ArrayList<>();
+    }
+
+    /**
+     * Permite o retorno listas especificadas dependendo da {@link OpcaoCliente}.
+     * @param opcao Opção de importação.
+     * @return
+     * @throws Exception 
+     */    
+    public List<ClienteIMP> getClientes(OpcaoCliente opcao) throws Exception {
+        return null;
     }
     
     /**
