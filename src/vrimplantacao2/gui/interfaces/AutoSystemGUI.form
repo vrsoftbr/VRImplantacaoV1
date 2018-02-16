@@ -369,6 +369,7 @@
                               </Group>
                               <Component id="chkFContatos" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFCnpj" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFSitCad" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="271" max="32767" attributes="0"/>
                       </Group>
@@ -385,6 +386,8 @@
                                   <Component id="chkFContatos" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkFCnpj" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkFSitCad" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -436,6 +439,17 @@
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFCnpjActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFSitCad">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Sit. Cadastro"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
+                    </Property>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFSitCadActionPerformed"/>
                   </Events>
                 </Component>
               </SubComponents>

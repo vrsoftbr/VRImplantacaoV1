@@ -257,7 +257,6 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
                                 importador.atualizarProdutos(opcoes);
                             }
                         }
-
                         if (chkT1EAN.isSelected()) {
                             importador.importarEAN();
                         }
@@ -276,6 +275,9 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
                         }              
                         if (chkFCnpj.isSelected()) {
                             opcoes.add(OpcaoFornecedor.CNPJ_CPF);
+                        }
+                        if (chkFSitCad.isSelected()) {
+                            opcoes.add(OpcaoFornecedor.SITUACAO_CADASTRO);
                         }
                         if (!opcoes.isEmpty()) {
                             importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
@@ -372,6 +374,7 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
         chkFCnpj = new vrframework.bean.checkBox.VRCheckBox();
+        chkFSitCad = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabClienteDados = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -591,6 +594,14 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
             }
         });
 
+        chkFSitCad.setText("Sit. Cadastro");
+        chkFSitCad.setEnabled(true);
+        chkFSitCad.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkFSitCadActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout tabImpFornecedorLayout = new javax.swing.GroupLayout(tabImpFornecedor);
         tabImpFornecedor.setLayout(tabImpFornecedorLayout);
         tabImpFornecedorLayout.setHorizontalGroup(
@@ -603,7 +614,8 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkFCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkFCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkFSitCad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(271, Short.MAX_VALUE))
         );
         tabImpFornecedorLayout.setVerticalGroup(
@@ -616,7 +628,9 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkFCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(chkFCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkFSitCad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -1008,6 +1022,10 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
             Util.exibirMensagemErro(ex, "Erro ao carregar os depósitos do cliente");
         }
     }//GEN-LAST:event_cmbLojaOrigemActionPerformed
+
+    private void chkFSitCadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFSitCadActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkFSitCadActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
@@ -1021,6 +1039,7 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
     private vrframework.bean.checkBox.VRCheckBox chkCvTransacao;
     private vrframework.bean.checkBox.VRCheckBox chkFCnpj;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
+    private vrframework.bean.checkBox.VRCheckBox chkFSitCad;
     private vrframework.bean.checkBox.VRCheckBox chkFabricante;
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
     private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;

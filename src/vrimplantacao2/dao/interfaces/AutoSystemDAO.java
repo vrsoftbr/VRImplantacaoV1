@@ -5,10 +5,14 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -229,6 +233,127 @@ public class AutoSystemDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     result.add(new MapaTributoIMP(rst.getString("codigo"), rst.getString("descricao")));
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	f.grid id,\n" +
+                    "	f.nome razao,\n" +
+                    "	f.nome_reduzido fantasia,\n" +
+                    "	f.cpf cnpj,\n" +
+                    "	f.rg,\n" +
+                    "	f.inscr_est,\n" +
+                    "	f.inscr_municipal,\n" +
+                    "	case f.flag when 'A' then 1 else 0 end ativo,\n" +
+                    "	f.logradouro,\n" +
+                    "	f.numero,\n" +
+                    "	f.complemento,\n" +
+                    "	f.bairro,\n" +
+                    "	f.cidade,\n" +
+                    "	f.estado,\n" +
+                    "	f.cep,\n" +
+                    "	\n" +
+                    "	f.endereco_c,\n" +
+                    "	f.bairro_c,\n" +
+                    "	f.cidade_c,\n" +
+                    "	f.estado_c,\n" +
+                    "	f.cep_c,\n" +
+                    "	f.fone_c,\n" +
+                    "\n" +
+                    "	f.bloqueado,\n" +
+                    "	f.fone telefone_principal,\n" +
+                    "	f.fone_c,\n" +
+                    "	f.data_cad datacadastro,\n" +
+                    "	f.obs observacao,\n" +
+                    "	f.email_nfe\n" +
+                    "from\n" +
+                    "	pessoa f\n" +
+                    "WHERE\n" +
+                    "	f.tipo ~~ '%%F%%'::bpchar::text\n" +
+                    "order by\n" +
+                    "	f.grid"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    if (Utils.stringToLong(rst.getString("cnpj")) <= 99999999999L) {
+                        imp.setIe_rg(rst.getString("rg"));
+                    } else {
+                        imp.setIe_rg(rst.getString("inscr_est"));
+                    }                    
+                    imp.setInsc_municipal(rst.getString("inscr_municipal"));
+                    imp.setEndereco(rst.getString("logradouro"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setCob_endereco(rst.getString("endereco_c"));
+                    imp.setCob_bairro(rst.getString("bairro_c"));
+                    imp.setCob_municipio(rst.getString("cidade_c"));
+                    imp.setCob_uf(rst.getString("estado_c"));
+                    imp.setCob_cep(rst.getString("cep_c"));
+                    imp.addTelefone("FONE COBRANCA", rst.getString("fone_c"));
+                    imp.setAtivo(!rst.getBoolean("bloqueado"));
+                    imp.setTel_principal(rst.getString("telefone_principal"));
+                    imp.setDatacadastro(rst.getDate("datacadastro"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.addEmail("NFE", rst.getString("email_nfe"), TipoContato.NFE);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	pf.fornecedor,\n" +
+                    "	p.codigo produto,\n" +
+                    "	pf.codigo codigoexterno,\n" +
+                    "	pf.qtde_unid qtdembalagem\n" +
+                    "from\n" +
+                    "	produto_fornec pf\n" +
+                    "	join produto p on\n" +
+                    "		pf.produto = p.grid\n" +
+                    "order by\n" +
+                    "	1,2"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setIdFornecedor(rst.getString("fornecedor"));
+                    imp.setIdProduto(rst.getString("produto"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
+                    
+                    result.add(imp);
                 }
             }
         }
