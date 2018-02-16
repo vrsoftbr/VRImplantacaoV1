@@ -151,7 +151,8 @@ public class RCNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     "  p.m1 margem,\n" +
                     "  p.p" + getLojaOrigem() + " preco,\n" +
                     "  coalesce(cus.custo, 0) custosemimposto,\n" +
-                    "  coalesce(cus.custoformacao, 0) custocomimposto,\n" +
+                    "  coalesce(cus.custo, 0) custocomimposto,\n" +
+                    //"  coalesce(cus.custoformacao, 0) custocomimposto,\n" +
                     "  case p.coddesativado when 1 then 0 else 1 end id_situacaocadastro,\n" +
                     "  p.codigoncm ncm,\n" +
                     "  p.cest,\n" +
