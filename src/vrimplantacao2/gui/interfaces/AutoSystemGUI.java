@@ -13,6 +13,7 @@ import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.dao.cadastro.LojaDAO;
+import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
@@ -175,7 +176,7 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
 
-                    dao.setIdDeposito((int) cmbDeposito.getSelectedItem());
+                    dao.setIdDeposito(Utils.stringToInt(((Estabelecimento) cmbDeposito.getSelectedItem()).cnpj));
                     
                     if (tabs.getSelectedIndex() == 0) {
 

@@ -599,6 +599,12 @@ public class ProdutoRepository {
                   
         vo.setId(id);
         vo.setDescricaoCompleta(imp.getDescricaoCompleta());
+        if ("SEM DESCRICAO".equals(imp.getDescricaoReduzida())){
+            vo.setDescricaoReduzida(vo.getDescricaoCompleta());
+        }
+        if ("SEM DESCRICAO".equals(imp.getDescricaoGondola())){
+            vo.setDescricaoGondola(vo.getDescricaoCompleta());
+        }
         vo.setDescricaoReduzida(imp.getDescricaoReduzida());
         vo.setDescricaoGondola(imp.getDescricaoGondola());       
         vo.setQtdEmbalagem(imp.getQtdEmbalagemCotacao());

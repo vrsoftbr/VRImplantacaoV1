@@ -24,6 +24,10 @@ public final class SQLUtils {
      * @return string = 'string', se for null retorna null.
      */
     public static String stringSQL(String string) {
+        if (string == null) {
+            string = "null";
+        }
+        string = string.replace("'", "''");
         return string != null ? "'" + string + "'" : null;
     }
 

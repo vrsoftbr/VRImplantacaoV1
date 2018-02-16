@@ -53,7 +53,8 @@ public class ConexaoPostgres {
             Properties props = new Properties();
             props.put("user", i_usuario);
             props.put("password", i_senha);
-            props.put("allowEncodingChanges", "true");
+            props.put("charSet", "UTF8");
+            //props.put("allowEncodingChanges", "true");
             con = DriverManager.getConnection("jdbc:postgresql://" + i_ip + ":" + i_porta + "/" + i_database, props);
         } catch (Exception ex) {
             if (!ipSec.isEmpty()) {
