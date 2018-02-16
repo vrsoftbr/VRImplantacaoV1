@@ -9,6 +9,8 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -352,6 +354,109 @@ public class AutoSystemDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdProduto(rst.getString("produto"));
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
                     imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	c.grid codigo,\n" +
+                    "	c.cpf,\n" +
+                    "	c.rg,\n" +
+                    "	c.inscr_est,\n" +
+                    "	c.rg_orgao_exp orgaoemissor,\n" +
+                    "	c.nome razao,\n" +
+                    "	c.nome_reduzido fantasia,\n" +
+                    "	c.logradouro,\n" +
+                    "	c.numero,\n" +
+                    "	c.complemento,\n" +
+                    "	c.bairro,\n" +
+                    "	c.cidade,\n" +
+                    "	c.estado,\n" +
+                    "	c.cep,\n" +
+                    "	c.fone,\n" +
+                    "	c.fax,\n" +
+                    "	c.celular,\n" +
+                    "	c.email,\n" +
+                    "	c.contato,\n" +
+                    "	c.endereco_c,\n" +
+                    "	c.bairro_c,\n" +
+                    "	c.cidade_c,\n" +
+                    "	c.estado_c,\n" +
+                    "	c.fone_c,\n" +
+                    "	c.bloqueado,\n" +
+                    "	c.sexo,\n" +
+                    "	c.data_nasc datanascimento,\n" +
+                    "	c.data_cad datacadastro,\n" +
+                    "	c.obs observacao,\n" +
+                    "	case c.flag when 'A' then 1 else 0 end ativo,\n" +
+                    "	c.inscr_municipal,\n" +
+                    "	c.limite_credito,\n" +
+                    "	c.data_admissao,\n" +
+                    "	c.email_nfe,\n" +
+                    "	c.produtor_rural,\n" +
+                    "	c.nome_mae,\n" +
+                    "	c.nome_pai\n" +
+                    "FROM \n" +
+                    "	pessoa c\n" +
+                    "	left join cargo o on c.cargo = o.grid\n" +
+                    "WHERE \n" +
+                    "	c.tipo ~~ '%%C%%'::bpchar::text\n" +
+                    "order by\n" +
+                    "	1"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rst.getString("codigo"));
+                    imp.setCnpj(rst.getString("cpf"));
+                    if (Utils.stringToLong(rst.getString("cpf")) <= 99999999999L) {
+                        imp.setInscricaoestadual(rst.getString("rg"));
+                    } else {
+                        imp.setInscricaoestadual(rst.getString("inscr_est"));
+                    }   
+                    imp.setOrgaoemissor(rst.getString("orgaoemissor"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setEndereco(rst.getString("logradouro"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setTelefone(rst.getString("fone"));
+                    imp.setFax(rst.getString("fax"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.addContato("C", rst.getString("contato"), "", "", "");
+                    imp.setCobrancaEndereco(rst.getString("endereco_c"));
+                    imp.setCobrancaBairro(rst.getString("bairro_c"));
+                    imp.setCobrancaMunicipio(rst.getString("cidade_c"));
+                    imp.setCobrancaUf(rst.getString("estado_c"));
+                    imp.setCobrancaTelefone(rst.getString("fone_c"));
+                    imp.setBloqueado(rst.getBoolean("bloqueado"));
+                    imp.setSexo("F".equals(rst.getString("sexo")) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                    imp.setDataNascimento(rst.getDate("datanascimento"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setObservacao2(rst.getString("observacao"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setInscricaoMunicipal(rst.getString("inscr_municipal"));
+                    imp.setValorLimite(rst.getDouble("limite_credito"));
+                    imp.setDataAdmissao(rst.getDate("data_admissao"));
+                    imp.addEmail("NFE", rst.getString("email_nfe"), TipoContato.NFE);
+                    imp.setNomeMae(rst.getString("nome_mae"));
+                    imp.setNomePai(rst.getString("nome_pai"));
                     
                     result.add(imp);
                 }

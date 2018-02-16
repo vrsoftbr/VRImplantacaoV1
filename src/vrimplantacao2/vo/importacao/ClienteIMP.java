@@ -2,7 +2,10 @@ package vrimplantacao2.vo.importacao;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoIndicadorIE;
 import vrimplantacao2.vo.enums.TipoOrgaoPublico;
@@ -469,6 +472,16 @@ public class ClienteIMP {
     public void setEmail(String email) {
         this.email = email;
     }
+    
+    public void addEmail(String descricao, String email, TipoContato tipo) {
+        if (email != null && !"".equals(email.trim())) {
+            addContato(null, descricao, "", "", email);
+        }
+    }
+    
+    public void addEmail(String email, TipoContato tipo) {
+        addEmail(tipo.getDescricao(), email, tipo);
+    }
 
     public String getFax() {
         return fax;
@@ -611,14 +624,29 @@ public class ClienteIMP {
      * @param email  E-mail do contato. (Eventual)
      */
     public void addContato(String id, String nome, String telefone, String celular, String email) {
-        ClienteContatoIMP contato = new ClienteContatoIMP();
-        contato.setId(id);
-        contato.setCliente(this);
-        contato.setNome(nome);
-        contato.setTelefone(telefone);
-        contato.setCelular(celular);
-        contato.setEmail(email);
-        contatos.add(contato);
+        if (nome != null && !"".equals(nome.trim())) {
+            ClienteContatoIMP contato = new ClienteContatoIMP();
+
+            if (id == null) {
+                Set<String> ids = new HashSet<>();
+                for (ClienteContatoIMP cont: contatos) {
+                    ids.add(cont.getId());
+                }
+                int cont = 1;
+                while (ids.contains("CONTATO " + cont)) {
+                    cont++;
+                }
+                id = "CONTATO " + cont;
+            }
+
+            contato.setId(id);
+            contato.setCliente(this);
+            contato.setNome(nome);
+            contato.setTelefone(telefone);
+            contato.setCelular(celular);
+            contato.setEmail(email);
+            contatos.add(contato);
+        }
     }
 
     public void copiarEnderecoParaEmpresa() {
