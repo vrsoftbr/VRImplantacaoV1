@@ -11,6 +11,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -466,7 +467,45 @@ public class AutoSystemDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    
-    
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	m.grid id,\n" +
+                    "	m.data emissao,\n" +
+                    "	m.documento numerocupom,\n" +
+                    "	m.valor, \n" +
+                    "	m.obs observacao,\n" +
+                    "	m.pessoa id_cliente,\n" +
+                    "	m.vencto vencimento\n" +
+                    "from\n" +
+                    "	movto m\n" +
+                    "where\n" +
+                    "	m.motivo = 163 and \n" +
+                    "	m.child = 0 \n" +
+                    "order by\n" +
+                    "	data"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setIdCliente(rst.getString("id_cliente"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
     
 }
