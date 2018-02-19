@@ -151,6 +151,61 @@ public class Importador {
         repository.setGerarNiveisComoSubniveis(gerarNiveisComoSubNiveis);
         repository.salvar(mercadologicos);
     }
+
+    /**
+     * Importa os mercadológicos nivel 1 dos produtos.
+     * @throws Exception 
+     */
+    public void importarMercadologico1() throws Exception {
+        ProgressBar.setStatus("Carregando dados do mercadológico nivel 1...");
+        List<MercadologicoIMP> mercadologicos = getInterfaceDAO().getMercadologico1();
+        MercadologicoDAO dao = new MercadologicoDAO();
+        dao.salvarMerc1(mercadologicos);
+    }
+
+    /**
+     * Importa os mercadológicos nivel 2 dos produtos.
+     * @throws Exception 
+     */
+    public void importarMercadologico2() throws Exception {
+        ProgressBar.setStatus("Carregando dados do mercadológico nivel 2...");
+        List<MercadologicoIMP> mercadologicos = getInterfaceDAO().getMercadologico2();
+        MercadologicoDAO dao = new MercadologicoDAO();
+        dao.salvar(mercadologicos);
+    }
+
+    /**
+     * Importa os mercadológicos nivel 3 dos produtos.
+     * @throws Exception 
+     */
+    public void importarMercadologico3() throws Exception {
+        ProgressBar.setStatus("Carregando dados do mercadológico nivel 3...");
+        List<MercadologicoIMP> mercadologicos = getInterfaceDAO().getMercadologico3();
+        MercadologicoDAO dao = new MercadologicoDAO();
+        dao.salvar(mercadologicos);
+    }
+
+    /**
+     * Importa os mercadológicos nivel 4 dos produtos.
+     * @throws Exception 
+     */
+    public void importarMercadologico4() throws Exception {
+        ProgressBar.setStatus("Carregando dados do mercadológico nivel 4...");
+        List<MercadologicoIMP> mercadologicos = getInterfaceDAO().getMercadologico4();
+        MercadologicoDAO dao = new MercadologicoDAO();
+        dao.salvar(mercadologicos);
+    }
+
+    /**
+     * Importa os mercadológicos nivel 5 dos produtos.
+     * @throws Exception 
+     */
+    public void importarMercadologico5() throws Exception {
+        ProgressBar.setStatus("Carregando dados do mercadológico nivel 5...");
+        List<MercadologicoIMP> mercadologicos = getInterfaceDAO().getMercadologico5();
+        MercadologicoDAO dao = new MercadologicoDAO();
+        dao.salvar(mercadologicos);
+    }
     
     /**
      * Executa a importação das famílias dos produtos.

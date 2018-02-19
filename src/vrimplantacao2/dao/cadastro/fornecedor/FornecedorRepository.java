@@ -164,6 +164,7 @@ public class FornecedorRepository {
                             || (opt.contains(OpcaoFornecedor.SITUACAO_CADASTRO))
                             || (opt.contains(OpcaoFornecedor.TIPO_EMPRESA))
                             || (opt.contains(OpcaoFornecedor.CNPJ_CPF))
+                            || (opt.contains(OpcaoFornecedor.INSCRICAO_ESTADUAL))
                             || (opt.contains(OpcaoFornecedor.BAIRRO))) {
                         atualizarFornecedor(vo, opt);
                     }

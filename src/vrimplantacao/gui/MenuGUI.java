@@ -152,6 +152,7 @@ import vrimplantacao2.gui.interfaces.SolidusGUI;
 import vrimplantacao2.gui.interfaces.SuperGUI;
 import vrimplantacao2.gui.interfaces.SysPdvGUI;
 import vrimplantacao2.gui.interfaces.VisualComercioGUI;
+import vrimplantacao2.gui.interfaces.Wm_byFileGUI;
 import vrimplantacao2.gui.interfaces.WmsiGUI;
 
 public final class MenuGUI extends VRMdiFrame {
@@ -615,6 +616,7 @@ public final class MenuGUI extends VRMdiFrame {
         jMenuItem27 = new javax.swing.JMenuItem();
         jMenuItem32 = new javax.swing.JMenuItem();
         mnuHostMundo = new javax.swing.JMenuItem();
+        mnuWmByFile = new javax.swing.JMenuItem();
         jMenu11 = new javax.swing.JMenu();
         jMenuItem29 = new javax.swing.JMenuItem();
         jMenuItem15 = new javax.swing.JMenuItem();
@@ -1808,6 +1810,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu4.add(mnuHostMundo);
+
+        mnuWmByFile.setText("Wm");
+        mnuWmByFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuWmByFileActionPerformed(evt);
+            }
+        });
+        jMenu4.add(mnuWmByFile);
 
         jMenu1.add(jMenu4);
 
@@ -3585,6 +3595,10 @@ public final class MenuGUI extends VRMdiFrame {
         AutoSystemGUI.exibir(this);
     }//GEN-LAST:event_mnuAutoSystemActionPerformed
 
+    private void mnuWmByFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuWmByFileActionPerformed
+        Wm_byFileGUI.exibir(this);
+    }//GEN-LAST:event_mnuWmByFileActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -3750,6 +3764,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSuper;
     private javax.swing.JMenuItem mnuTsti;
     private javax.swing.JMenuItem mnuVisualComercio;
+    private javax.swing.JMenuItem mnuWmByFile;
     private javax.swing.JMenuItem mnuWmsi;
     private javax.swing.JMenuItem mnupdvvendaitem;
     private vrframework.bean.toolBar.VRToolBar tlbAtalho;

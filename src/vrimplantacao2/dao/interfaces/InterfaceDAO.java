@@ -80,6 +80,51 @@ public abstract class InterfaceDAO {
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
         return new ArrayList<>();
     }
+
+    /**
+     * Retorna uma listagem de mercadológicos.
+     * @return Lista com os mercadológicos nivel 1 a serem importados.
+     * @throws Exception 
+     */
+    public List<MercadologicoIMP> getMercadologico1() throws Exception {
+        return new ArrayList<>();        
+    }
+
+    /**
+     * Retorna uma listagem de mercadológicos.
+     * @return Lista com os mercadológicos nivel 2 a serem importados.
+     * @throws Exception 
+     */
+    public List<MercadologicoIMP> getMercadologico2() throws Exception {
+        return new ArrayList<>();        
+    }
+
+    /**
+     * Retorna uma listagem de mercadológicos.
+     * @return Lista com os mercadológicos nivel 3 a serem importados.
+     * @throws Exception 
+     */
+    public List<MercadologicoIMP> getMercadologico3() throws Exception {
+        return new ArrayList<>();        
+    }
+
+    /**
+     * Retorna uma listagem de mercadológicos.
+     * @return Lista com os mercadológicos nivel 4 a serem importados.
+     * @throws Exception 
+     */
+    public List<MercadologicoIMP> getMercadologico4() throws Exception {
+        return new ArrayList<>();        
+    }
+
+    /**
+     * Retorna uma listagem de mercadológicos.
+     * @return Lista com os mercadológicos nivel 5 a serem importados.
+     * @throws Exception 
+     */
+    public List<MercadologicoIMP> getMercadologico5() throws Exception {
+        return new ArrayList<>();        
+    }
     
     /**
      * Retorna uma listagem com as famílias dos produtos.

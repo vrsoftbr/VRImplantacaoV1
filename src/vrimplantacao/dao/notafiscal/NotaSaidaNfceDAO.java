@@ -92,7 +92,7 @@ public class NotaSaidaNfceDAO {
     }
     private final ProdutoAnteriorDAO daoV2 = new ProdutoAnteriorDAO(false);
 
-    public VendaVO importar(String i_xml, boolean verificarCodigoAnterior) throws Exception {
+    public VendaVO importar(String i_xml, boolean verificarCodigoAnterior, boolean verificarCodigoBarras) throws Exception {
         //abre arquivo
         boolean importacaoV2 = isImportacaoV2();
         try {
@@ -236,6 +236,14 @@ public class NotaSaidaNfceDAO {
                     } else {
                         codigoProduto = new ProdutoDAO().getIdAnterior(Long.parseLong(cProd.getTextContent()));
                     }
+                } else if (verificarCodigoBarras) {
+                    if (importacaoV2) {
+                        daoV2.setImportSistema(impLoja.impSistema);
+                        daoV2.setImportLoja(impLoja.impLoja);
+                        codigoProduto = daoV2.getCodigoAtualEANant(daoV2.getImportSistema(), daoV2.getImportLoja(), cProd.getTextContent().replace("'", "").replace("\n", "").trim());
+                    } else {
+                        codigoProduto = new ProdutoDAO().getIdAnterior(Long.parseLong(cProd.getTextContent()));
+                    }
                 } else {
                     codigoProduto = Integer.parseInt(cProd.getTextContent().replace("'", "").replace("\n", "").trim());
                 }
@@ -259,13 +267,16 @@ public class NotaSaidaNfceDAO {
                     idAliquotaICMS = getIdAliquotaICMS(Integer.parseInt(CST.getTextContent()), Double.parseDouble(pICMS.getTextContent()));
                 }
 
+                String codigoBarras;
+                codigoBarras = ("".equals(cEAN.getTextContent()) ? String.valueOf(codigoProduto) : cEAN.getTextContent());
+                
                 VendaItemVO oVendaItem = new VendaItemVO();
                 oVendaItem.idProduto = codigoProduto;
                 oVendaItem.quantidade = Double.parseDouble(qCom.getTextContent());
                 oVendaItem.valorTotal = Double.parseDouble(vProd.getTextContent());
                 oVendaItem.precoVenda = Double.parseDouble(vUnTrib.getTextContent());
                 oVendaItem.idAliquota = idAliquotaICMS;
-                oVendaItem.codigoBarras = Long.parseLong(cEAN.getTextContent());
+                oVendaItem.codigoBarras = Long.parseLong(codigoBarras);
                 oVendaItem.valorDesconto = (vDescUn == null ? 0 : Double.parseDouble(vDescUn.getTextContent()));
                 oVendaItem.regraCalculo = "T";
                 oVendaItem.sequencia = Integer.parseInt(sequencia);
