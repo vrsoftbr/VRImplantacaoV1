@@ -1,5 +1,7 @@
 package vrimplantacao2.vo.cadastro.mercadologico;
 
+import vrimplantacao.utils.Utils;
+
 /**
  * Código anterior do mercadológico
  * @author Leandro
@@ -125,7 +127,7 @@ public class MercadologicoAnteriorVO {
     }
 
     public void setDescricao(String descricao) {
-        this.descricao = descricao;
+        this.descricao = Utils.acertarTexto(descricao);
     }
 
     public void setMerc1(int merc1) {

@@ -321,7 +321,7 @@ public class SysPdvDAO extends InterfaceDAO {
                                 imp.seteBalanca(false);
                                 imp.setTipoEmbalagem("UN");
                             }
-                            imp.setValidade(rst.getInt("validade"));
+                            imp.setValidade(Utils.stringToInt(rst.getString("validade")));
                         }
 
                         imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));

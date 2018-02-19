@@ -400,7 +400,7 @@ public class MercadologicoDAO {
                             "	" + Utils.quoteSQL(chave[4]) + ", \n" +
                             "	" + Utils.quoteSQL(chave[5]) + ", \n" +
                             "       " + Utils.quoteSQL(chave[6]) + ", \n" +
-                            "       " + Utils.quoteSQL(descricao.descricao) + ", \n" +
+                            "       " + Utils.quoteSQL(Utils.acertarTexto(descricao.descricao)) + ", \n" +
                             "       " + descricao.nivel + " \n" +
                             ");";
                     stm.execute(sql);
