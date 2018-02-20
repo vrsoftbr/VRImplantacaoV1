@@ -1355,7 +1355,7 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu8.add(mnuJrf);
 
-        mnuAutoSystem.setText("Auto System");
+        mnuAutoSystem.setText("AutoSystem");
         mnuAutoSystem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 mnuAutoSystemActionPerformed(evt);

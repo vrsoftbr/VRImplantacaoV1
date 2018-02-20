@@ -585,7 +585,7 @@
                         </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuAutoSystem">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Auto System"/>
+                            <Property name="text" type="java.lang.String" value="AutoSystem"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuAutoSystemActionPerformed"/>

@@ -128,6 +128,10 @@ public class ClienteRepository {
                         cliente = converterClientePreferencial(imp);
                         cliente.setId(anterior.getCodigoAtual().getId());
                         atualizarClientePreferencial(cliente, opt);
+                    } else if (opt.contains(OpcaoCliente.TELEFONE)) {
+                        cliente = converterClientePreferencial(imp);
+                        cliente.setId(anterior.getCodigoAtual().getId());
+                        atualizarClientePreferencial(cliente, opt);
                     } else {
                         cliente = anterior.getCodigoAtual();
                     }

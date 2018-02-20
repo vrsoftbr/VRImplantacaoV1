@@ -266,7 +266,7 @@ public class ClientePreferencialVO {
     }
 
     public void setTelefone(String telefone) {
-        this.telefone = Utils.acertarTexto(telefone, 14, "0000000000");
+        this.telefone = Utils.formataNumero(telefone, 14, "0000000000");
     }
 
     public void setCelular(String celular) {

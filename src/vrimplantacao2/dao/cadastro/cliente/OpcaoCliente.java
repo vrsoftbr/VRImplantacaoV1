@@ -13,5 +13,6 @@ public enum OpcaoCliente {
     VALOR_LIMITE,
     INSCRICAO_ESTADUAL,
     DATA_NASCIMENTO,
-    ENDERECO;
+    ENDERECO, 
+    TELEFONE;
 }

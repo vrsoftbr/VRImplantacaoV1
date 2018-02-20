@@ -249,6 +249,9 @@ public class ClientePreferencialDAO {
                 if (opt.contains(OpcaoCliente.DATA_NASCIMENTO)) {
                     sql.put("datanascimento", vo.getDataNascimento());
                 }
+                if (opt.contains(OpcaoCliente.TELEFONE)) {
+                    sql.put("telefone", vo.getTelefone());
+                }
                 sql.setWhere("id = " + vo.getId());
                 stm.execute(sql.getUpdate());
             }

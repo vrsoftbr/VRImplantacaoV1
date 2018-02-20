@@ -8,6 +8,7 @@ import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -140,19 +141,20 @@ public class AutoSystemDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.subgrupo merc2,\n" +
                     "	est.estoque,\n" +
                     "	p.margem_lucro margem,\n" +
-                    "	est.ult_custo custosemimposto,\n" +
-                    "	est.ult_custo_fiscal custocomimposto,\n" +
-                    "	p.preco_unit precovenda,\n" +
-                    "	case when p.permite_venda then 1 else 0 end id_situacaocadastro,\n" +
+                    "	p.preco_custo custosemimposto,\n" +
+                    "	p.preco_custo custocomimposto,\n" +
+                    "	coalesce(nullif(premp.preco_unit,0), p.preco_unit) precovenda,\n" +
+                    "	p.flag,\n" +
                     "	p.codigo_ncm ncm,\n" +
                     "	p.cest,\n" +
                     "	p.cst_pis piscofins_saida,\n" +
                     "	p.cst_pis_entrada pisconfins_entrada,\n" +
-                    "	p.natureza_receita piscofins_natureza_receita,\n" +
+                    "	nat.codigo_nat_rec piscofins_natureza_receita,\n" +
                     "	p.tributacao id_icms,\n" +
                     "	p.fornecedor\n" +
                     "from\n" +
                     "	produto p\n" +
+                    "	join empresa emp on emp.grid = " + getLojaOrigem()+ "\n" +
                     "	left join (\n" +
                     "		select\n" +
                     "			grid,\n" +
@@ -174,9 +176,14 @@ public class AutoSystemDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	) ean on\n" +
                     "		ean.grid = p.grid\n" +
                     "	left join  estoque_produto est on\n" +
-                    "		est.empresa = " + getLojaOrigem() + "\n" +
+                    "		est.empresa =  emp.grid\n" +
                     "		and est.deposito = " + getIdDeposito() + "\n" +
                     "		and est.produto = p.grid\n" +
+                    "	left join produto_empresa premp on\n" +
+                    "		premp.empresa = emp.grid\n" +
+                    "		and premp.produto = p.grid\n" +
+                    "	left join natureza_receita nat on\n" +
+                    "		p.natureza_receita = nat.codigo\n" +
                     "order by\n" +
                     "	id"
             )) {
@@ -194,6 +201,8 @@ public class AutoSystemDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.seteBalanca(rst.getBoolean("ebalanca"));
                     imp.setValidade(rst.getInt("validade"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rst.getString("descricaocompleta"));
+                    imp.setDescricaoGondola(rst.getString("descricaocompleta"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setEstoque(rst.getDouble("estoque"));
@@ -201,7 +210,20 @@ public class AutoSystemDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
-                    imp.setSituacaoCadastro(rst.getInt("id_situacaocadastro"));
+                    switch (Utils.acertarTexto(rst.getString("flag"))) {                        
+                        case "D":
+                            imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
+                            imp.setDescontinuado(true);
+                            break;
+                        case "I":
+                            imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+                            imp.setDescontinuado(true);
+                            break;
+                        default:
+                            imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+                            imp.setDescontinuado(false);
+                            break;                        
+                    }
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofins_saida"));
