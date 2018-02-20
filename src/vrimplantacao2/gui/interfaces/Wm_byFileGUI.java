@@ -105,6 +105,7 @@ public class Wm_byFileGUI extends VRInternalFrame {
                     wmDAO.v_arquivoXlsForn = txtFileForn.getArquivo();
                     wmDAO.v_arquivoXlsFornCompl = txtFileFornComp.getArquivo();
                     wmDAO.v_arquivoXlsProdForn = txtFileProdForn.getArquivo();
+                    wmDAO.v_arquivoXlsCliente = txtFileCliente.getArquivo();
                     Importador importador = new Importador(wmDAO);
                     importador.setLojaOrigem(idLojaOrigem);
                     importador.setLojaVR(idLojaVR);
@@ -196,19 +197,28 @@ public class Wm_byFileGUI extends VRInternalFrame {
                             importador.importarFornecedor();
                         }
 
-                        List<OpcaoFornecedor> opcoes = new ArrayList<>();
-                        if (chkCnpj.isSelected()) {
-                            opcoes.add(OpcaoFornecedor.CNPJ_CPF);
-                        }
-                        if (chkInscricaoEstadual.isSelected()) {
-                            opcoes.add(OpcaoFornecedor.INSCRICAO_ESTADUAL);
+                        {
+                            List<OpcaoFornecedor> opcoes = new ArrayList<>();
+                            if (chkCnpj.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.CNPJ_CPF);
+                            }
+                            if (chkInscricaoEstadual.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.INSCRICAO_ESTADUAL);
+                            }
+
+                            if (!opcoes.isEmpty()) {
+                                importador.atualizarFornecedorNovo(opcoes);
+                            }
                         }
                         
-                        if (!opcoes.isEmpty()) {
-                            importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
+                        if (chkProdutoFornecedor.isSelected()) {
+                            importador.importarProdutoFornecedor();
                         }
                         
-                        
+                        if (chkClientePreferencial.isSelected()) {
+                            importador.importarClientePreferencial();
+                        }
+
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -285,6 +295,13 @@ public class Wm_byFileGUI extends VRInternalFrame {
         txtFileProdForn = new vrframework.bean.fileChooser.VRFileChooser();
         vRLabel6 = new vrframework.bean.label.VRLabel();
         chkInscricaoEstadual = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel5 = new vrframework.bean.panel.VRPanel();
+        vRLabel7 = new vrframework.bean.label.VRLabel();
+        txtFileCliente = new vrframework.bean.fileChooser.VRFileChooser();
+        vRLabel8 = new vrframework.bean.label.VRLabel();
+        txtFileClienteComp = new vrframework.bean.fileChooser.VRFileChooser();
+        chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
+        chkEnderecoCliente = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
@@ -587,6 +604,52 @@ public class Wm_byFileGUI extends VRInternalFrame {
 
         vRTabbedPane2.addTab("Fornecedores", vRPanel1);
 
+        vRLabel7.setText("Diretório Cliente");
+
+        vRLabel8.setText("Diretório Cliente (Dados Complementares - Endereço)");
+
+        chkClientePreferencial.setText("Cliente Preferencial");
+
+        chkEnderecoCliente.setText("Endereço");
+
+        javax.swing.GroupLayout vRPanel5Layout = new javax.swing.GroupLayout(vRPanel5);
+        vRPanel5.setLayout(vRPanel5Layout);
+        vRPanel5Layout.setHorizontalGroup(
+            vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtFileCliente, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE)
+                    .addComponent(txtFileClienteComp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(vRPanel5Layout.createSequentialGroup()
+                        .addGroup(vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkEnderecoCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(vRLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        vRPanel5Layout.setVerticalGroup(
+            vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtFileCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(vRLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtFileClienteComp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkEnderecoCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(153, 153, 153))
+        );
+
+        vRTabbedPane2.addTab("Clientes", vRPanel5);
+
         tabs.addTab("Importação", vRTabbedPane2);
 
         chkUnifProdutos.setText("Produtos (Somente com EAN válido)");
@@ -702,8 +765,10 @@ public class Wm_byFileGUI extends VRInternalFrame {
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkAtacado;
     private vrframework.bean.checkBox.VRCheckBox chkCest;
+    private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkCnpj;
     private vrframework.bean.checkBox.VRCheckBox chkContatos;
+    private vrframework.bean.checkBox.VRCheckBox chkEnderecoCliente;
     private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkInscricaoEstadual;
@@ -734,6 +799,8 @@ public class Wm_byFileGUI extends VRInternalFrame {
     private javax.swing.JLabel jLabel1;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private vrframework.bean.fileChooser.VRFileChooser txtFile;
+    private vrframework.bean.fileChooser.VRFileChooser txtFileCliente;
+    private vrframework.bean.fileChooser.VRFileChooser txtFileClienteComp;
     private vrframework.bean.fileChooser.VRFileChooser txtFileComp;
     private vrframework.bean.fileChooser.VRFileChooser txtFileForn;
     private vrframework.bean.fileChooser.VRFileChooser txtFileFornComp;
@@ -746,10 +813,13 @@ public class Wm_byFileGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel4;
     private vrframework.bean.label.VRLabel vRLabel5;
     private vrframework.bean.label.VRLabel vRLabel6;
+    private vrframework.bean.label.VRLabel vRLabel7;
+    private vrframework.bean.label.VRLabel vRLabel8;
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.panel.VRPanel vRPanel4;
+    private vrframework.bean.panel.VRPanel vRPanel5;
     private vrframework.bean.panel.VRPanel vRPanel7;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;

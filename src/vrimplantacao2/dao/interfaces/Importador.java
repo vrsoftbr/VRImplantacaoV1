@@ -532,6 +532,41 @@ public class Importador {
         rep.atualizar(fornecedores, opcoes);
     }
 
+    public void atualizarFornecedorNovo(List<OpcaoFornecedor> opcoes) throws Exception {
+        ProgressBar.setStatus("Carregando fornecedores (atualização)...");
+        List<FornecedorIMP> fornecedores = null;
+        for (OpcaoFornecedor opt: opcoes) {
+            opt.setListaEspecial(getInterfaceDAO().getFornecedores(opt));
+            fornecedores = opt.getListaEspecial();
+        }
+        
+        
+        
+        FornecedorRepositoryProvider provider = new FornecedorRepositoryProvider(
+                getSistema(),
+                getLojaOrigem(),
+                getLojaVR()
+        );
+        FornecedorRepository repository = new FornecedorRepository(provider);
+        repository.atualizar(fornecedores, opcoes.toArray(new OpcaoFornecedor[]{}));
+    }
+    
+/*    public void atualizarProdutos(List<OpcaoProduto> opcoes) throws Exception {
+        ProgressBar.setStatus("Carregando produtos...");
+        List<ProdutoIMP> produtos = getInterfaceDAO().getProdutos();
+        for (OpcaoProduto opt: opcoes) {
+            opt.setListaEspecial(getInterfaceDAO().getProdutos(opt));
+        }
+        ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
+        provider.setSistema(getInterfaceDAO().getSistema());
+        provider.setLoja(getInterfaceDAO().getLojaOrigem());
+        provider.setLojaVR(getLojaVR());
+        provider.getOpcoes().add(OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC);
+        ProdutoRepository repository = new ProdutoRepository(provider);
+        repository.atualizar(produtos, opcoes.toArray(new OpcaoProduto[]{}));
+    }
+*/    
+    
     public void atualizarClientePreferencial(OpcaoCliente... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando clientes (atualização)...");
         List<ClienteIMP> clientes = getInterfaceDAO().getClientes();

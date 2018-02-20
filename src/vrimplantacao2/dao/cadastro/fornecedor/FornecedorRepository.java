@@ -140,6 +140,8 @@ public class FornecedorRepository {
                         imp.getImportId()
                 );
                 
+                System.out.println("CodForn: " + imp.getImportId()+" Cnpj: " + imp.getCnpj_cpf());
+                
                 if (anterior != null && anterior.getCodigoAtual() != null) {
                     
                     FornecedorVO vo = converter(imp);
