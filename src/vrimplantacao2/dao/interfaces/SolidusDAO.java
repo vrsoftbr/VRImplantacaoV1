@@ -19,7 +19,6 @@ import vrimplantacao2.gui.interfaces.custom.solidus.Entidade;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
-import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -50,6 +49,15 @@ public class SolidusDAO extends InterfaceDAO {
     private List<Entidade> entidadesCheques;
     private List<Entidade> entidadesCreditoRotativo;
     private List<Entidade> entidadesContas;
+    private boolean somenteAtivos = false;
+
+    public boolean isSomenteAtivos() {
+        return somenteAtivos;
+    }
+
+    public void setSomenteAtivos(boolean somenteAtivos) {
+        this.somenteAtivos = somenteAtivos;
+    }
 
     public Date getVendasDataInicio() {
         return vendasDataInicio;
@@ -253,6 +261,7 @@ public class SolidusDAO extends InterfaceDAO {
                     "        pl.cod_tributacao = trib.cod_tributacao\n" +
                     "    left join tab_tributacao tribent on\n" +
                     "        pl.cod_trib_entrada = tribent.cod_tributacao\n" +
+                    (isSomenteAtivos() ? "where pl.inativo != 'S'\n" : "") +
                     "order by\n" +
                     "    id"
             )) {
