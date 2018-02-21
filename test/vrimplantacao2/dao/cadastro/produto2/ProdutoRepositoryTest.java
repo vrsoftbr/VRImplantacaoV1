@@ -113,14 +113,34 @@ public class ProdutoRepositoryTest {
         merc.setDescricao("BOVINA");
         when(provider.getMercadologico("ACOUGUE", "BOVINO", "", "", "")).thenReturn(merc);
         
-        when(provider.tributo().getPisConfisDebito(7)).thenReturn(new PisCofinsVO(1, "ISENTO", 7, false));
-        when(provider.tributo().getPisConfisCredito(71)).thenReturn(new PisCofinsVO(13, "ISENTO (E)", 71, true));
-        when(provider.tributo().getNaturezaReceita(7, 101)).thenReturn(new NaturezaReceitaVO(1, 7, 101, "LEITE CONDENSADO (NAT)"));
+        when(provider.tributo().getPisConfisDebito(eq(1))).thenReturn(new PisCofinsVO(0, "TRIBUTADO", 1, false));
+        when(provider.tributo().getPisConfisCredito(eq(50))).thenReturn(new PisCofinsVO(12, "TRIBUTADO (E)", 50, true));
+        when(provider.tributo().getNaturezaReceita(anyInt(), anyInt())).thenReturn(null);
         
-        when(provider.tributo().getPisConfisDebito(6)).thenReturn(new PisCofinsVO(7, "TRIB - ALIQUOTA ZERO", 6, false));
-        when(provider.tributo().getPisConfisCredito(73)).thenReturn(new PisCofinsVO(19, "TRIB - ALIQUOTA ZERO(E)", 73, true));
-        when(provider.tributo().getNaturezaReceita(6, 121)).thenReturn(new NaturezaReceitaVO(1, 6, 121, "CARNES (NAT)"));
-                
+        when(provider.tributo().getPisConfisDebito(eq(49))).thenReturn(new PisCofinsVO(9, "OUTRAS OPERACOES", 49, false));
+        when(provider.tributo().getPisConfisCredito(eq(99))).thenReturn(new PisCofinsVO(21, "OUTRAS OPERACOES (E)", 99, true));
+        
+        when(provider.tributo().getPisConfisDebito(eq(7))).thenReturn(new PisCofinsVO(1, "ISENTO", 7, false));
+        when(provider.tributo().getPisConfisCredito(eq(71))).thenReturn(new PisCofinsVO(13, "ISENTO (E)", 71, true));        
+        
+        when(provider.tributo().getPisConfisDebito(eq(4))).thenReturn(new PisCofinsVO(3, "MONOFASICO", 4, false));
+        when(provider.tributo().getPisConfisCredito(eq(70))).thenReturn(new PisCofinsVO(15, "MONOFASICO (E)", 70, true));    
+        
+        when(provider.tributo().getPisConfisDebito(eq(6))).thenReturn(new PisCofinsVO(7, "TRIB - ALIQUOTA ZERO", 6, false));
+        when(provider.tributo().getPisConfisCredito(eq(73))).thenReturn(new PisCofinsVO(19, "TRIB - ALIQUOTA ZERO(E)", 73, true));
+        
+        
+        when(provider.tributo().getNaturezaReceita(eq(2), eq(403))).thenReturn(new NaturezaReceitaVO(22, 2, 403, "REFRIGERANTES"));
+        when(provider.tributo().getNaturezaReceita(eq(3), eq(940))).thenReturn(new NaturezaReceitaVO(67, 3, 940, "AGUAS E REFRIGERANTES, EM LATA"));
+        when(provider.tributo().getNaturezaReceita(eq(4), eq(403))).thenReturn(new NaturezaReceitaVO(98, 4, 403, "REFRIGERANTES"));
+        when(provider.tributo().getNaturezaReceita(eq(5), eq(409))).thenReturn(new NaturezaReceitaVO(152, 5, 409, "ARTIGOS DE PERFUMARIA (VENDAS A ZFM)"));
+        when(provider.tributo().getNaturezaReceita(eq(6), eq(121))).thenReturn(new NaturezaReceitaVO(1, 6, 121, "CARNES (NAT)"));
+        when(provider.tributo().getNaturezaReceita(eq(6), eq(999))).thenReturn(new NaturezaReceitaVO(212, 6, 999, "OUTROS PRODUTOS E RECEITAS"));
+        when(provider.tributo().getNaturezaReceita(eq(7), eq(999))).thenReturn(new NaturezaReceitaVO(196, 7, 999, "OUTRAS RECEITAS COM ISENCAO"));
+        when(provider.tributo().getNaturezaReceita(eq(7), eq(101))).thenReturn(new NaturezaReceitaVO(213, 7, 101, "FORNECIMENTO DE MERCADORIAS OU SERVICOS PARA USO OU CONSUMO DE BORDO EM EMBARCACOES E AERONAVES EM TRAFEGO INTERNACIONAL, QUANDO O PAGAMENTO FOR EFETUADO EM MOEDA CONVERSIVEL (EXCETO QUEROSENE DE AVIACAO)"));
+        when(provider.tributo().getNaturezaReceita(eq(8), eq(999))).thenReturn(new NaturezaReceitaVO(232, 8, 999, "OUTRAS RECEITAS SEM INCIDENCIA"));
+        when(provider.tributo().getNaturezaReceita(eq(9), eq(999))).thenReturn(new NaturezaReceitaVO(269, 9, 999, "OUTRAS OPERACOES COM SUSPENSAO"));
+
     }
     
     public static ProdutoIMP getProdutoIMP_MOCA() throws Exception {
@@ -571,6 +591,121 @@ public class ProdutoRepositoryTest {
         assertEquals(SituacaoCadastro.ATIVO, actual.getSituacaoCadastro());
         assertEquals(TipoEmbalagem.UN, actual.getTipoEmbalagem());
         assertEquals(0, actual.getValidade());
+    }
+    
+    @Test
+    public void testConvertPisCofins_VALIDO() throws Exception {
+        
+        ProdutoIMP imp = getProdutoIMP_MOCA();
+        
+        imp.setPiscofinsCstDebito(1);
+        imp.setPiscofinsCstCredito(50);
+        imp.setPiscofinsNaturezaReceita(0);
+        
+        ProdutoVO actual = new ProdutoVO();        
+        new ProdutoRepository(provider).convertPisCofins(imp, actual);
+        assertEquals(1, actual.getPisCofinsDebito().getCst());
+        assertEquals(50, actual.getPisCofinsCredito().getCst());
+        assertNull(actual.getPisCofinsNaturezaReceita());
+        
+    }
+    
+    @Test
+    public void testConvertPisCofins_INVALIDO() throws Exception {
+        
+        ProdutoIMP imp = getProdutoIMP_MOCA();
+        
+        imp.setPiscofinsCstDebito(-1);
+        imp.setPiscofinsCstCredito(-1);
+        imp.setPiscofinsNaturezaReceita(0);
+        
+        ProdutoVO actual = new ProdutoVO();        
+        new ProdutoRepository(provider).convertPisCofins(imp, actual);
+        assertEquals(7, actual.getPisCofinsDebito().getCst());
+        assertEquals(71, actual.getPisCofinsCredito().getCst());
+        assertEquals(999, actual.getPisCofinsNaturezaReceita().getCodigo());
+        
+    }
+    
+    @Test
+    public void testConvertPisCofins_INVALIDO_2() throws Exception {
+        
+        ProdutoIMP imp = getProdutoIMP_MOCA();
+        
+        imp.setPiscofinsCstDebito(99);
+        imp.setPiscofinsCstCredito(99);
+        imp.setPiscofinsNaturezaReceita(0);
+        
+        ProdutoVO actual = new ProdutoVO();        
+        new ProdutoRepository(provider).convertPisCofins(imp, actual);
+        assertEquals(49, actual.getPisCofinsDebito().getCst());
+        assertEquals(99, actual.getPisCofinsCredito().getCst());
+        
+    }
+    
+    @Test
+    public void testConvertPisCofins_INVALIDO_3() throws Exception {
+        
+        ProdutoIMP imp = getProdutoIMP_MOCA();
+        
+        imp.setPiscofinsCstDebito(49);
+        imp.setPiscofinsCstCredito(49);
+        imp.setPiscofinsNaturezaReceita(0);
+        
+        ProdutoVO actual = new ProdutoVO();        
+        new ProdutoRepository(provider).convertPisCofins(imp, actual);
+        assertEquals(49, actual.getPisCofinsDebito().getCst());
+        assertEquals(99, actual.getPisCofinsCredito().getCst());
+        
+    }
+    
+    private void testNaturezaReceita(ProdutoRepository repository, int cstDebito, int naturezaReceita, int expected) throws Exception {
+        
+        NaturezaReceitaVO nat = repository.getNaturezaReceita(cstDebito, naturezaReceita);        
+        assertEquals(expected, nat.getCodigo());
+        
+    }
+    
+    @Test
+    public void testGetNaturezaReceita() throws Exception {
+        ProdutoRepository repository = new ProdutoRepository(provider);
+        
+        assertNull(repository.getNaturezaReceita(1, 2));
+        testNaturezaReceita(repository, 2, 403, 403);
+        testNaturezaReceita(repository, 2, 15, 403);
+        testNaturezaReceita(repository, 3, 940, 940);
+        testNaturezaReceita(repository, 3, 0, 940);
+        testNaturezaReceita(repository, 4, 403, 403);
+        testNaturezaReceita(repository, 4, 48, 403);
+        testNaturezaReceita(repository, 5, 409, 409);
+        testNaturezaReceita(repository, 5, 789, 409);
+        testNaturezaReceita(repository, 6, 999, 999);
+        testNaturezaReceita(repository, 6, 121, 121);
+        testNaturezaReceita(repository, 6, 10, 999);
+        testNaturezaReceita(repository, 7, 999, 999);
+        testNaturezaReceita(repository, 7, 156, 999);
+        testNaturezaReceita(repository, 8, 999, 999);
+        testNaturezaReceita(repository, 8, 741, 999);
+        testNaturezaReceita(repository, 9, 999, 999);
+        testNaturezaReceita(repository, 9, 359, 999);
+        
+    }
+    
+    @Test
+    public void testConvertPisCofins_VALIDO_C_NATUREZA_RECEITA() throws Exception {
+        
+        ProdutoIMP imp = getProdutoIMP_MOCA();
+        
+        imp.setPiscofinsCstDebito(4);
+        imp.setPiscofinsCstCredito(70);
+        imp.setPiscofinsNaturezaReceita(403);
+        
+        ProdutoVO actual = new ProdutoVO();        
+        new ProdutoRepository(provider).convertPisCofins(imp, actual);
+        assertEquals(4, actual.getPisCofinsDebito().getCst());
+        assertEquals(70, actual.getPisCofinsCredito().getCst());
+        assertEquals(403, actual.getPisCofinsNaturezaReceita().getCodigo());
+        
     }
     
     @Test

@@ -22,7 +22,7 @@ public class PisCofinsDAO {
     /**
      * Retorna o PIS/COFINS de Crédito através do cst.
      * @param cst Cst do PIS/COFINS de crédito.
-     * @return PIS/COFINS localizado ou caso contrário o padrão PISCOFINS_CREDITO_PADRAO.
+     * @return PIS/COFINS localizado ou caso contrário null.
      * @throws Exception 
      */
     public PisCofinsVO getPisConfisCredito(int cst) throws Exception {
@@ -30,18 +30,13 @@ public class PisCofinsDAO {
             atualizaPisCofins();
         }
         
-        PisCofinsVO result = pisConfins.get(true, cst);
-        if (result == null) {
-            return PISCOFINS_CREDITO_PADRAO;
-        } else {
-            return result;
-        }
+        return pisConfins.get(true, cst);
     }
     
     /**
      * Retorna o PIS/COFINS de Débito através do cst.
      * @param cst Cst do PIS/COFINS de débito.
-     * @return PIS/COFINS localizado ou caso contrário o padrão PISCOFINS_DEBITO_PADRAO.
+     * @return PIS/COFINS localizado ou caso contrário null.
      * @throws Exception 
      */
     public PisCofinsVO getPisConfisDebito(int cst) throws Exception {
@@ -49,12 +44,7 @@ public class PisCofinsDAO {
             atualizaPisCofins();
         }
         
-        PisCofinsVO result = pisConfins.get(false, cst);
-        if (result == null) {
-            return PISCOFINS_DEBITO_PADRAO;
-        } else {
-            return result;
-        }
+        return pisConfins.get(false, cst);
     }    
     
     /**
@@ -68,31 +58,8 @@ public class PisCofinsDAO {
     public NaturezaReceitaVO getNaturezaReceita(int cstDebito, int natureza) throws Exception {
         if (naturezaReceita == null) {
             atualizaNaturezaReceita();
-        }
-        
-        NaturezaReceitaVO result = naturezaReceita.get(cstDebito, natureza);
-        
-        if (result == null) {
-            if (cstDebito == 7) {
-                result = naturezaReceita.get(cstDebito, 999);
-            } else if (cstDebito == 5) {
-                result = naturezaReceita.get(cstDebito, 409);
-            } else if (cstDebito == 4) {
-                result = naturezaReceita.get(cstDebito, 403);
-            } else if (cstDebito == 9) {
-                result = naturezaReceita.get(cstDebito, 999);
-            } else if (cstDebito == 2) {
-                result = naturezaReceita.get(cstDebito, 403);
-            } else if (cstDebito == 3) {
-                result = naturezaReceita.get(cstDebito, 940);
-            } else if (cstDebito == 6) {
-                result = naturezaReceita.get(cstDebito, 999);
-            } else if (cstDebito == 8) {
-                result = naturezaReceita.get(cstDebito, 999);
-            }
-        }
-        
-        return result;
+        }        
+        return naturezaReceita.get(cstDebito, natureza);
     }
     
     /**

@@ -30,6 +30,8 @@ import vrimplantacao2.vo.cadastro.ProdutoComplementoVO;
 import vrimplantacao2.vo.cadastro.ProdutoVO;
 import vrimplantacao2.vo.cadastro.oferta.OfertaVO;
 import vrimplantacao2.vo.enums.Icms;
+import vrimplantacao2.vo.enums.NaturezaReceitaVO;
+import vrimplantacao2.vo.enums.PisCofinsVO;
 import vrimplantacao2.vo.enums.TipoEmbalagem;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -701,6 +703,16 @@ public class ProdutoRepository {
         vo.setSituacaoCadastro(imp.getSituacaoCadastro());        
         
         //<editor-fold defaultstate="collapsed" desc="Conversão do PIS/COFINS">
+        convertPisCofins(imp, vo);
+        //</editor-fold>
+
+        vo.setValidade(imp.getValidade());        
+        
+        return vo;
+    }
+    
+    public void convertPisCofins(ProdutoIMP imp, ProdutoVO vo) throws Exception {
+        
         int pisCofinsDebito, pisCofinsCredito;
         if (imp.getPiscofinsCstDebito() != 0 && imp.getPiscofinsCstCredito() == 0) {
             pisCofinsDebito = imp.getPiscofinsCstDebito();
@@ -712,15 +724,47 @@ public class ProdutoRepository {
             pisCofinsDebito = imp.getPiscofinsCstDebito();
             pisCofinsCredito = imp.getPiscofinsCstCredito();
         }
+        PisCofinsVO pDeb = provider.tributo().getPisConfisDebito(pisCofinsDebito);
+        PisCofinsVO pCre = provider.tributo().getPisConfisCredito(pisCofinsCredito);
         
-        vo.setPisCofinsDebito(provider.tributo().getPisConfisDebito(pisCofinsDebito));
-        vo.setPisCofinsCredito(provider.tributo().getPisConfisCredito(pisCofinsCredito));
-        vo.setPisCofinsNaturezaReceita(provider.tributo().getNaturezaReceita(vo.getPisCofinsDebito().getCst(), imp.getPiscofinsNaturezaReceita()));
-        //</editor-fold>
-
-        vo.setValidade(imp.getValidade());        
+        if (pDeb == null) {
+            pDeb = provider.tributo().getPisConfisDebito(converterCreditoParaDebito(pisCofinsCredito));
+        }
+        if (pCre == null) {
+            pCre = provider.tributo().getPisConfisCredito(converterDebitoParaCredito(pisCofinsDebito));
+        }
         
-        return vo;
+        vo.setPisCofinsDebito(pDeb);
+        vo.setPisCofinsCredito(pCre);
+        vo.setPisCofinsNaturezaReceita(getNaturezaReceita(vo.getPisCofinsDebito().getCst(), imp.getPiscofinsNaturezaReceita()));
+        
+    }
+    
+    public NaturezaReceitaVO getNaturezaReceita(int cstDebito, int naturezaReceita) throws Exception {
+        
+        NaturezaReceitaVO result = provider.tributo().getNaturezaReceita(cstDebito, naturezaReceita);
+        
+        if (result == null) {
+            if (cstDebito == 7) {
+                result = provider.tributo().getNaturezaReceita(cstDebito, 999);
+            } else if (cstDebito == 5) {
+                result = provider.tributo().getNaturezaReceita(cstDebito, 409);
+            } else if (cstDebito == 4) {
+                result = provider.tributo().getNaturezaReceita(cstDebito, 403);
+            } else if (cstDebito == 9) {
+                result = provider.tributo().getNaturezaReceita(cstDebito, 999);
+            } else if (cstDebito == 2) {
+                result = provider.tributo().getNaturezaReceita(cstDebito, 403);
+            } else if (cstDebito == 3) {
+                result = provider.tributo().getNaturezaReceita(cstDebito, 940);
+            } else if (cstDebito == 6) {
+                result = provider.tributo().getNaturezaReceita(cstDebito, 999);
+            } else if (cstDebito == 8) {
+                result = provider.tributo().getNaturezaReceita(cstDebito, 999);
+            }
+        }
+        
+        return result;
     }
     
     /**
