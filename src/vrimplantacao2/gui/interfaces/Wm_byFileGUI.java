@@ -12,6 +12,7 @@ import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
@@ -106,6 +107,8 @@ public class Wm_byFileGUI extends VRInternalFrame {
                     wmDAO.v_arquivoXlsFornCompl = txtFileFornComp.getArquivo();
                     wmDAO.v_arquivoXlsProdForn = txtFileProdForn.getArquivo();
                     wmDAO.v_arquivoXlsCliente = txtFileCliente.getArquivo();
+                    wmDAO.v_arquivoXlsCliCompl = txtFileClienteComp.getArquivo();
+                    wmDAO.v_arquivoXlsCreditoRotativo = txtFileCreditoRotativo.getArquivo();
                     Importador importador = new Importador(wmDAO);
                     importador.setLojaOrigem(idLojaOrigem);
                     importador.setLojaVR(idLojaVR);
@@ -117,7 +120,7 @@ public class Wm_byFileGUI extends VRInternalFrame {
                         }
 
                         if (chkMercadologico.isSelected()) {
-                            importador.importarMercadologico1();
+                            importador.importarMercadologicoPorNiveis(true);
                         }
 
                         if (chkProdutos.isSelected()) {
@@ -218,6 +221,20 @@ public class Wm_byFileGUI extends VRInternalFrame {
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial();
                         }
+                        
+                        {
+                            List<OpcaoCliente> opcoes = new ArrayList<>();
+                            if (chkEnderecoCliente.isSelected()) {
+                                opcoes.add(OpcaoCliente.ENDERECO_COMPLETO);
+                            }
+                            if (!opcoes.isEmpty()) {
+                                importador.atualizarClientePreferencialNovo(opcoes.toArray(new OpcaoCliente[]{}));
+                            }
+                        }
+                        
+                        if (chkCreditoRotativo.isSelected()) {
+                            importador.importarCreditoRotativo();
+                        }
 
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
@@ -302,6 +319,10 @@ public class Wm_byFileGUI extends VRInternalFrame {
         txtFileClienteComp = new vrframework.bean.fileChooser.VRFileChooser();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkEnderecoCliente = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel6 = new vrframework.bean.panel.VRPanel();
+        vRLabel9 = new vrframework.bean.label.VRLabel();
+        txtFileCreditoRotativo = new vrframework.bean.fileChooser.VRFileChooser();
+        chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
@@ -650,6 +671,39 @@ public class Wm_byFileGUI extends VRInternalFrame {
 
         vRTabbedPane2.addTab("Clientes", vRPanel5);
 
+        vRLabel9.setText("Diretório Crédito Rotativo");
+
+        chkCreditoRotativo.setText("Receber Crédito Rotativo");
+
+        javax.swing.GroupLayout vRPanel6Layout = new javax.swing.GroupLayout(vRPanel6);
+        vRPanel6.setLayout(vRPanel6Layout);
+        vRPanel6Layout.setHorizontalGroup(
+            vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtFileCreditoRotativo, javax.swing.GroupLayout.DEFAULT_SIZE, 579, Short.MAX_VALUE)
+                    .addGroup(vRPanel6Layout.createSequentialGroup()
+                        .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(vRLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        vRPanel6Layout.setVerticalGroup(
+            vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtFileCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(223, Short.MAX_VALUE))
+        );
+
+        vRTabbedPane2.addTab("Crédito Rotativo", vRPanel6);
+
         tabs.addTab("Importação", vRTabbedPane2);
 
         chkUnifProdutos.setText("Produtos (Somente com EAN válido)");
@@ -768,6 +822,7 @@ public class Wm_byFileGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkCnpj;
     private vrframework.bean.checkBox.VRCheckBox chkContatos;
+    private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkEnderecoCliente;
     private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
@@ -802,6 +857,7 @@ public class Wm_byFileGUI extends VRInternalFrame {
     private vrframework.bean.fileChooser.VRFileChooser txtFileCliente;
     private vrframework.bean.fileChooser.VRFileChooser txtFileClienteComp;
     private vrframework.bean.fileChooser.VRFileChooser txtFileComp;
+    private vrframework.bean.fileChooser.VRFileChooser txtFileCreditoRotativo;
     private vrframework.bean.fileChooser.VRFileChooser txtFileForn;
     private vrframework.bean.fileChooser.VRFileChooser txtFileFornComp;
     private vrframework.bean.fileChooser.VRFileChooser txtFileProdForn;
@@ -815,11 +871,13 @@ public class Wm_byFileGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel6;
     private vrframework.bean.label.VRLabel vRLabel7;
     private vrframework.bean.label.VRLabel vRLabel8;
+    private vrframework.bean.label.VRLabel vRLabel9;
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.panel.VRPanel vRPanel4;
     private vrframework.bean.panel.VRPanel vRPanel5;
+    private vrframework.bean.panel.VRPanel vRPanel6;
     private vrframework.bean.panel.VRPanel vRPanel7;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;

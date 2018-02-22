@@ -249,6 +249,13 @@ public class ClientePreferencialDAO {
                 if (opt.contains(OpcaoCliente.DATA_NASCIMENTO)) {
                     sql.put("datanascimento", vo.getDataNascimento());
                 }
+                if (opt.contains(OpcaoCliente.ENDERECO_COMPLETO)) {
+                    sql.put("endereco", vo.getEndereco());
+                    sql.put("numero", vo.getNumero());
+                    sql.put("bairro", vo.getBairro());
+                    sql.put("id_municipio", vo.getId_municipio());
+                    sql.put("id_estado", vo.getId_estado());
+                }
                 sql.setWhere("id = " + vo.getId());
                 stm.execute(sql.getUpdate());
             }

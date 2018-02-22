@@ -814,7 +814,7 @@ public class MercadologicoDAO {
 
             try (Statement stm = Conexao.createStatement()) {
                 ProgressBar.setStatus("Gravando os mercadológicos nivel 1...");
-                ProgressBar.setMaximum(getCodigoAnterior().size());
+                ProgressBar.setMaximum(mercadologicos.size());
                 for (KeyList<String> imp : getCodigoAnterior().keySet()) {
                     String[] chave = imp.toArray();
                     MercadologicoVO vo = getCodigoAnterior().get(chave);

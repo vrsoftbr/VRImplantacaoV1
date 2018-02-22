@@ -10,6 +10,7 @@ import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import jxl.Cell;
@@ -23,6 +24,7 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
@@ -49,6 +51,7 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
     public String v_arquivoXlsProdForn;
     public String v_arquivoXlsCliente;
     public String v_arquivoXlsCliCompl;
+    public String v_arquivoXlsCreditoRotativo;
 
     @Override
     public String getSistema() {
@@ -107,12 +110,14 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<MercadologicoIMP> getMercadologico1() throws Exception {
-        List<MercadologicoIMP> result = new ArrayList<>();
+    public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
+        Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
+        List<String> mercs = new ArrayList<>();
         WorkbookSettings settings = new WorkbookSettings();
         Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXls), settings);
         Sheet[] sheets = arquivo.getSheets();
         int linha;
+        String mercadologico1 = "";
 
         for (int sh = 0; sh < sheets.length; sh++) {
             Sheet sheet = arquivo.getSheet(sh);
@@ -125,18 +130,62 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
 
                 Cell cellCodigo = sheet.getCell(0, i);
+                Cell cellNivel = sheet.getCell(1, i);
                 Cell cellDescricao = sheet.getCell(2, i);
+                Cell cellPai = sheet.getCell(5, i);
 
-                MercadologicoIMP imp = new MercadologicoIMP();
+                if ("1".equals(cellNivel.getContents().trim())) {
 
-                imp.setImportLoja(getLojaOrigem());
-                imp.setImportSistema(getSistema());
-                imp.setMerc1ID(cellCodigo.getContents());
-                imp.setMerc1Descricao(cellDescricao.getContents());
-                result.add(imp);
+                    MercadologicoNivelIMP imp = new MercadologicoNivelIMP();
+                    imp.setId(cellCodigo.getContents());
+                    imp.setDescricao(cellDescricao.getContents());
+
+                    merc.put(imp.getId(), imp);
+                }
+                if ("2".equals(cellNivel.getContents().trim())) {
+
+                    mercs.add(cellCodigo.getContents() + ";" + cellPai.getContents());
+
+                    MercadologicoNivelIMP merc1 = merc.get(cellPai.getContents());
+                    if (merc1 != null) {
+                        merc1.addFilho(
+                                cellCodigo.getContents(),
+                                cellDescricao.getContents()
+                        );
+                    }
+                }
+                if ("3".equals(cellNivel.getContents().trim())) {
+                    for (int j = 0; j < mercs.size(); j++) {
+                        String[] mercs1 = mercs.get(j).split(";");
+                        String merca1 = "", merca2 = "";
+                        switch (j) {
+                            case 0:
+                                merca2 = mercs1[j];
+                                break;
+                            case 1:
+                                merca1 = mercs1[j];
+                                break;
+                        }
+
+                        if (merca2.equals(cellPai.getContents())) {
+                            mercadologico1 = merca1;
+                            continue;
+                        }
+                    }
+                    MercadologicoNivelIMP merc1 = merc.get(mercadologico1);
+                    if (merc1 != null) {
+                        MercadologicoNivelIMP merc2 = merc1.getNiveis().get(cellPai.getContents());
+                        if (merc2 != null) {
+                            merc2.addFilho(
+                                    cellCodigo.getContents(),
+                                    cellDescricao.getContents()
+                            );
+                        }
+                    }
+                }
             }
         }
-        return result;
+        return new ArrayList<>(merc.values());
     }
 
     @Override
@@ -319,7 +368,7 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(cellCodigoProduto.getContents());
-                    imp.setEstoque(Double.parseDouble(cellEstoqueProduto.getContents()));
+                    imp.setEstoque(Double.parseDouble(cellEstoqueProduto.getContents().replace(".", "").replace(",", ".")));
                     result.add(imp);
                 }
             }
@@ -845,7 +894,7 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
         Sheet[] sheets = arquivo.getSheets();
         int linha;
 
-        if (opcao == OpcaoCliente.ENDERECO) {
+        if (opcao == OpcaoCliente.ENDERECO_COMPLETO) {
 
             for (int sh = 0; sh < sheets.length; sh++) {
                 Sheet sheet = arquivo.getSheet(sh);
@@ -883,7 +932,7 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         WorkbookSettings settings = new WorkbookSettings();
-        Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXls), settings);
+        Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXlsCreditoRotativo), settings);
         Sheet[] sheets = arquivo.getSheets();
         int linha;
         DateFormat fmt = new SimpleDateFormat("yyyy/MM/dd");
@@ -913,7 +962,7 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setId(cellId.getContents());
                 imp.setIdCliente(cellIdCliente.getContents());
                 imp.setNumeroCupom(cellNumeroCupom.getContents());
-                imp.setValor(Double.parseDouble(cellValor.getContents()));
+                imp.setValor(Double.parseDouble(cellValor.getContents().replace(".", "").replace(",", ".")));
                 imp.setDataEmissao(dataEmissao);
                 imp.setDataVencimento(dataVencimento);
                 result.add(imp);

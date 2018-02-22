@@ -158,6 +158,7 @@ public class ClienteRepository {
                 opt.add(OpcaoCliente.DADOS);
                 opt.add(OpcaoCliente.CONTATOS);
                 opt.add(OpcaoCliente.OBSERVACOES2);
+                opt.add(OpcaoCliente.ENDERECO_COMPLETO);
             }
             provider.begin();
             
@@ -189,6 +190,9 @@ public class ClienteRepository {
                         atualizarClientePreferencial(vo, opt);
                     }
                     if (opt.contains(OpcaoCliente.DATA_NASCIMENTO)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.ENDERECO_COMPLETO)) {
                         atualizarClientePreferencial(vo, opt);
                     }
                 }

@@ -153,61 +153,6 @@ public class Importador {
     }
 
     /**
-     * Importa os mercadológicos nivel 1 dos produtos.
-     * @throws Exception 
-     */
-    public void importarMercadologico1() throws Exception {
-        ProgressBar.setStatus("Carregando dados do mercadológico nivel 1...");
-        List<MercadologicoIMP> mercadologicos = getInterfaceDAO().getMercadologico1();
-        MercadologicoDAO dao = new MercadologicoDAO();
-        dao.salvarMerc1(mercadologicos);
-    }
-
-    /**
-     * Importa os mercadológicos nivel 2 dos produtos.
-     * @throws Exception 
-     */
-    public void importarMercadologico2() throws Exception {
-        ProgressBar.setStatus("Carregando dados do mercadológico nivel 2...");
-        List<MercadologicoIMP> mercadologicos = getInterfaceDAO().getMercadologico2();
-        MercadologicoDAO dao = new MercadologicoDAO();
-        dao.salvar(mercadologicos);
-    }
-
-    /**
-     * Importa os mercadológicos nivel 3 dos produtos.
-     * @throws Exception 
-     */
-    public void importarMercadologico3() throws Exception {
-        ProgressBar.setStatus("Carregando dados do mercadológico nivel 3...");
-        List<MercadologicoIMP> mercadologicos = getInterfaceDAO().getMercadologico3();
-        MercadologicoDAO dao = new MercadologicoDAO();
-        dao.salvar(mercadologicos);
-    }
-
-    /**
-     * Importa os mercadológicos nivel 4 dos produtos.
-     * @throws Exception 
-     */
-    public void importarMercadologico4() throws Exception {
-        ProgressBar.setStatus("Carregando dados do mercadológico nivel 4...");
-        List<MercadologicoIMP> mercadologicos = getInterfaceDAO().getMercadologico4();
-        MercadologicoDAO dao = new MercadologicoDAO();
-        dao.salvar(mercadologicos);
-    }
-
-    /**
-     * Importa os mercadológicos nivel 5 dos produtos.
-     * @throws Exception 
-     */
-    public void importarMercadologico5() throws Exception {
-        ProgressBar.setStatus("Carregando dados do mercadológico nivel 5...");
-        List<MercadologicoIMP> mercadologicos = getInterfaceDAO().getMercadologico5();
-        MercadologicoDAO dao = new MercadologicoDAO();
-        dao.salvar(mercadologicos);
-    }
-    
-    /**
      * Executa a importação das famílias dos produtos.
      * @throws Exception 
      */
@@ -540,8 +485,6 @@ public class Importador {
             fornecedores = opt.getListaEspecial();
         }
         
-        
-        
         FornecedorRepositoryProvider provider = new FornecedorRepositoryProvider(
                 getSistema(),
                 getLojaOrigem(),
@@ -551,25 +494,24 @@ public class Importador {
         repository.atualizar(fornecedores, opcoes.toArray(new OpcaoFornecedor[]{}));
     }
     
-/*    public void atualizarProdutos(List<OpcaoProduto> opcoes) throws Exception {
-        ProgressBar.setStatus("Carregando produtos...");
-        List<ProdutoIMP> produtos = getInterfaceDAO().getProdutos();
-        for (OpcaoProduto opt: opcoes) {
-            opt.setListaEspecial(getInterfaceDAO().getProdutos(opt));
-        }
-        ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
-        provider.setSistema(getInterfaceDAO().getSistema());
-        provider.setLoja(getInterfaceDAO().getLojaOrigem());
-        provider.setLojaVR(getLojaVR());
-        provider.getOpcoes().add(OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC);
-        ProdutoRepository repository = new ProdutoRepository(provider);
-        repository.atualizar(produtos, opcoes.toArray(new OpcaoProduto[]{}));
-    }
-*/    
-    
     public void atualizarClientePreferencial(OpcaoCliente... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando clientes (atualização)...");
         List<ClienteIMP> clientes = getInterfaceDAO().getClientes();
+        ClienteRepositoryProvider provider = new ClienteRepositoryProvider();
+        provider.setSistema(getSistema());
+        provider.setLojaOrigem(getLojaOrigem());
+        provider.setLojaVR(getLojaVR());
+        ClienteRepository rep = new ClienteRepository(provider);
+        rep.atualizarClientePreferencial(clientes, opcoes);
+    }
+
+    public void atualizarClientePreferencialNovo(OpcaoCliente... opcoes) throws Exception {
+        ProgressBar.setStatus("Carregando clientes (atualização)...");
+        List<ClienteIMP> clientes = null;
+        for (OpcaoCliente opt : opcoes) {
+            opt.setListaEspecial(getInterfaceDAO().getClientes(opt));
+            clientes = opt.getListaEspecial();
+        }
         ClienteRepositoryProvider provider = new ClienteRepositoryProvider();
         provider.setSistema(getSistema());
         provider.setLojaOrigem(getLojaOrigem());

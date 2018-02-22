@@ -65,7 +65,7 @@ import vrimplantacao.gui.interfaces.EccusInformaticaGUI;
 import vrimplantacao.gui.interfaces.MRSGUI;
 import vrimplantacao.gui.interfaces.VRSoftwarePDVGUI;
 import vrimplantacao.gui.interfaces.SuperServerGUI;
-import vrimplantacao.gui.interfaces.DestroGUI;
+import vrimplantacao2.gui.interfaces.DestroGUI;
 import vrimplantacao.gui.interfaces.GZSistemasGUI;
 import vrimplantacao.gui.interfaces.ImportarNotaSaidaImportacaoArquivoGUI;
 import vrimplantacao.gui.interfaces.PlanilhaNCMGUI;
@@ -2722,18 +2722,8 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemControlWareActionPerformed
 
     private void jMenuItemDestroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemDestroActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarDestroGUI == null || formImportarDestroGUI.isClosed()) {
-                formImportarDestroGUI = new DestroGUI(this);
-            }
-
-            formImportarDestroGUI.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
+    
+        DestroGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemDestroActionPerformed
 
     private void jMenuItemSysMouraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSysMouraActionPerformed
