@@ -151,7 +151,7 @@ public class Importador {
         repository.setGerarNiveisComoSubniveis(gerarNiveisComoSubNiveis);
         repository.salvar(mercadologicos);
     }
-    
+
     /**
      * Executa a importação das famílias dos produtos.
      * @throws Exception 
@@ -477,9 +477,41 @@ public class Importador {
         rep.atualizar(fornecedores, opcoes);
     }
 
+    public void atualizarFornecedorNovo(List<OpcaoFornecedor> opcoes) throws Exception {
+        ProgressBar.setStatus("Carregando fornecedores (atualização)...");
+        List<FornecedorIMP> fornecedores = null;
+        for (OpcaoFornecedor opt: opcoes) {
+            opt.setListaEspecial(getInterfaceDAO().getFornecedores(opt));
+            fornecedores = opt.getListaEspecial();
+        }
+        
+        FornecedorRepositoryProvider provider = new FornecedorRepositoryProvider(
+                getSistema(),
+                getLojaOrigem(),
+                getLojaVR()
+        );
+        FornecedorRepository repository = new FornecedorRepository(provider);
+        repository.atualizar(fornecedores, opcoes.toArray(new OpcaoFornecedor[]{}));
+    }
+    
     public void atualizarClientePreferencial(OpcaoCliente... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando clientes (atualização)...");
         List<ClienteIMP> clientes = getInterfaceDAO().getClientes();
+        ClienteRepositoryProvider provider = new ClienteRepositoryProvider();
+        provider.setSistema(getSistema());
+        provider.setLojaOrigem(getLojaOrigem());
+        provider.setLojaVR(getLojaVR());
+        ClienteRepository rep = new ClienteRepository(provider);
+        rep.atualizarClientePreferencial(clientes, opcoes);
+    }
+
+    public void atualizarClientePreferencialNovo(OpcaoCliente... opcoes) throws Exception {
+        ProgressBar.setStatus("Carregando clientes (atualização)...");
+        List<ClienteIMP> clientes = null;
+        for (OpcaoCliente opt : opcoes) {
+            opt.setListaEspecial(getInterfaceDAO().getClientes(opt));
+            clientes = opt.getListaEspecial();
+        }
         ClienteRepositoryProvider provider = new ClienteRepositoryProvider();
         provider.setSistema(getSistema());
         provider.setLojaOrigem(getLojaOrigem());

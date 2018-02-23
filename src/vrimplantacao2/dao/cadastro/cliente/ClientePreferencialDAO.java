@@ -251,37 +251,44 @@ public class ClientePreferencialDAO {
                 }
                 if (opt.contains(OpcaoCliente.TELEFONE)) {
                     sql.put("telefone", vo.getTelefone());
+                    if (opt.contains(OpcaoCliente.ENDERECO_COMPLETO)) {
+                        sql.put("endereco", vo.getEndereco());
+                        sql.put("numero", vo.getNumero());
+                        sql.put("bairro", vo.getBairro());
+                        sql.put("id_municipio", vo.getId_municipio());
+                        sql.put("id_estado", vo.getId_estado());
+                    }
+                    sql.setWhere("id = " + vo.getId());
+                    stm.execute(sql.getUpdate());
                 }
-                sql.setWhere("id = " + vo.getId());
-                stm.execute(sql.getUpdate());
             }
         }
     }
 
     public Map<Long, ClientePreferencialVO> getClientesPorCnpj() throws Exception {
         Map<Long, ClientePreferencialVO> result = new LinkedHashMap<>();
-        
+
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	c.id,\n" +
-                    "	c.nome,\n" +
-                    "	c.cnpj,\n" +
-                    "	c.endereco,\n" +
-                    "	c.numero,\n" +
-                    "	c.complemento,\n" +
-                    "	c.bairro,\n" +
-                    "	c.id_municipio,\n" +
-                    "	c.id_estado,\n" +
-                    "	c.cep\n" +
-                    "from\n" +
-                    "	clientepreferencial c\n" +
-                    "order by\n" +
-                    "	c.id"
+                    "select\n"
+                    + "	c.id,\n"
+                    + "	c.nome,\n"
+                    + "	c.cnpj,\n"
+                    + "	c.endereco,\n"
+                    + "	c.numero,\n"
+                    + "	c.complemento,\n"
+                    + "	c.bairro,\n"
+                    + "	c.id_municipio,\n"
+                    + "	c.id_estado,\n"
+                    + "	c.cep\n"
+                    + "from\n"
+                    + "	clientepreferencial c\n"
+                    + "order by\n"
+                    + "	c.id"
             )) {
                 while (rst.next()) {
                     ClientePreferencialVO vo = new ClientePreferencialVO();
-                    
+
                     vo.setId(rst.getInt("id"));
                     vo.setNome(rst.getString("nome"));
                     vo.setCnpj(rst.getLong("cnpj"));
@@ -292,12 +299,12 @@ public class ClientePreferencialDAO {
                     vo.setId_municipio(rst.getInt("id_municipio"));
                     vo.setId_estado(rst.getInt("id_estado"));
                     vo.setCep(rst.getInt("cep"));
-                    
+
                     result.put(vo.getCnpj(), vo);
                 }
             }
         }
-        
+
         return result;
     }
 }

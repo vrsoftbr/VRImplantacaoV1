@@ -6,6 +6,9 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.io.File;
+import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,12 +19,12 @@ import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
+import vrframework.classe.Conexao;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.cadastro.mercadologico.MercadologicoAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
@@ -30,6 +33,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -43,6 +47,13 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public String v_arquivoXls;
+    public String v_arquivoXlsCompl;
+    public String v_arquivoXlsForn;
+    public String v_arquivoXlsFornCompl;
+    public String v_arquivoXlsProdForn;
+    public String v_arquivoXlsCliente;
+    public String v_arquivoXlsCliCompl;
+    public String v_arquivoXlsCreditoRotativo;
 
     @Override
     public String getSistema() {
@@ -87,7 +98,7 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
 
                 Cell cellCodigo = sheet.getCell(0, i);
-                Cell cellDescricao = sheet.getCell(1, i);
+                Cell cellDescricao = sheet.getCell(2, i);
 
                 FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
                 imp.setImportLoja(getLojaOrigem());
@@ -103,11 +114,12 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
         Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
-        ArrayList<String> mercadologico1 = new ArrayList<>();
+        List<String> mercs = new ArrayList<>();
         WorkbookSettings settings = new WorkbookSettings();
         Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXls), settings);
         Sheet[] sheets = arquivo.getSheets();
         int linha;
+        String mercadologico1 = "";
 
         for (int sh = 0; sh < sheets.length; sh++) {
             Sheet sheet = arquivo.getSheet(sh);
@@ -124,39 +136,52 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
                 Cell cellDescricao = sheet.getCell(2, i);
                 Cell cellPai = sheet.getCell(5, i);
 
-                MercadologicoNivelIMP imp = new MercadologicoNivelIMP();
+                if ("1".equals(cellNivel.getContents().trim())) {
 
-                if (null != cellNivel.getContents().trim()) {
-                    switch (cellNivel.getContents().trim()) {
-                        case "1":
-                            mercadologico1 = new ArrayList<>();
-                            imp.setId(cellCodigo.getContents());
-                            imp.setDescricao(cellDescricao.getContents());
-                            merc.put(imp.getId(), imp);
-                            mercadologico1.add(imp.getId());
-                            break;
-                        case "2": {
-                            MercadologicoNivelIMP merc1 = merc.get(cellPai.getContents());
-                            if (merc1 != null) {
-                                merc1.addFilho(
-                                        cellCodigo.getContents(),
-                                        cellDescricao.getContents()
-                                );
-                            }
-                            break;
+                    MercadologicoNivelIMP imp = new MercadologicoNivelIMP();
+                    imp.setId(cellCodigo.getContents());
+                    imp.setDescricao(cellDescricao.getContents());
+
+                    merc.put(imp.getId(), imp);
+                }
+                if ("2".equals(cellNivel.getContents().trim())) {
+
+                    mercs.add(cellCodigo.getContents() + ";" + cellPai.getContents());
+
+                    MercadologicoNivelIMP merc1 = merc.get(cellPai.getContents());
+                    if (merc1 != null) {
+                        merc1.addFilho(
+                                cellCodigo.getContents(),
+                                cellDescricao.getContents()
+                        );
+                    }
+                }
+                if ("3".equals(cellNivel.getContents().trim())) {
+                    for (int j = 0; j < mercs.size(); j++) {
+                        String[] mercs1 = mercs.get(j).split(";");
+                        String merca1 = "", merca2 = "";
+                        switch (j) {
+                            case 0:
+                                merca2 = mercs1[j];
+                                break;
+                            case 1:
+                                merca1 = mercs1[j];
+                                break;
                         }
-                        case "3": {
-                            MercadologicoNivelIMP merc1 = merc.get(new MercadologicoAnteriorDAO().getCodMerc1(getSistema(), getLojaOrigem(), cellPai.getContents()));
-                            if (merc1 != null) {
-                                MercadologicoNivelIMP merc2 = merc1.getNiveis().get(cellPai.getContents());
-                                if (merc2 != null) {
-                                    merc2.addFilho(
-                                            cellCodigo.getContents(),
-                                            cellDescricao.getContents()
-                                    );
-                                }
-                            }
-                            break;
+
+                        if (merca2.equals(cellPai.getContents())) {
+                            mercadologico1 = merca1;
+                            continue;
+                        }
+                    }
+                    MercadologicoNivelIMP merc1 = merc.get(mercadologico1);
+                    if (merc1 != null) {
+                        MercadologicoNivelIMP merc2 = merc1.getNiveis().get(cellPai.getContents());
+                        if (merc2 != null) {
+                            merc2.addFilho(
+                                    cellCodigo.getContents(),
+                                    cellDescricao.getContents()
+                            );
                         }
                     }
                 }
@@ -202,11 +227,12 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setImportLoja(getLojaOrigem());
                 imp.setImportSistema(getSistema());
                 imp.setImportId(cellCodigo.getContents());
+                imp.setEan(getCodigoBarrasBalanca(cellCodigo.getContents()));
                 imp.setDescricaoCompleta(cellDescricaoCompleta.getContents());
                 imp.setDescricaoReduzida(cellDescricaoReduzida.getContents());
                 imp.setDescricaoGondola(imp.getDescricaoCompleta());
                 imp.setIdFamiliaProduto(cellIdFamiliaProduto.getContents());
-                imp.setValidade(Integer.parseInt(cellValidade.getContents()));
+                imp.setValidade(Integer.parseInt("".equals(cellValidade.getContents()) ? "0" : cellValidade.getContents()));
                 imp.setSituacaoCadastro(cellSituacaoCadastro.getContents().contains("N") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                 imp.setNcm(cellNcm.getContents());
                 imp.setTipoEmbalagem(cellTipoEmbalagem.getContents().contains("QUILO") ? "KG" : cellTipoEmbalagem.getContents());
@@ -214,7 +240,7 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
 
                 ProdutoBalancaVO produtoBalanca;
                 long codigoProduto;
-                codigoProduto = Long.parseLong(imp.getImportId());
+                codigoProduto = Long.parseLong(imp.getEan());
                 if (codigoProduto <= Integer.MAX_VALUE) {
                     produtoBalanca = produtosBalanca.get((int) codigoProduto);
                 } else {
@@ -233,13 +259,12 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opcao) throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-        WorkbookSettings settings = new WorkbookSettings();
-        Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXls), settings);
-        Sheet[] sheets = arquivo.getSheets();
-        int linha;
-
         if (opcao == OpcaoProduto.CUSTO) {
+            List<ProdutoIMP> result = new ArrayList<>();
+            WorkbookSettings settings = new WorkbookSettings();
+            Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXlsCompl), settings);
+            Sheet[] sheets = arquivo.getSheets();
+            int linha;
 
             for (int sh = 0; sh < sheets.length; sh++) {
                 Sheet sheet = arquivo.getSheet(sh);
@@ -258,13 +283,18 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(cellCodigoProduto.getContents());
-                    imp.setCustoComImposto(Double.parseDouble(cellCustoProduto.getContents()));
+                    imp.setCustoComImposto(Double.parseDouble(cellCustoProduto.getContents().replace(".", "").replace(",", ".")));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     result.add(imp);
                 }
             }
             return result;
         } else if (opcao == OpcaoProduto.PRECO) {
+            List<ProdutoIMP> result = new ArrayList<>();
+            WorkbookSettings settings = new WorkbookSettings();
+            Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXlsCompl), settings);
+            Sheet[] sheets = arquivo.getSheets();
+            int linha;
 
             for (int sh = 0; sh < sheets.length; sh++) {
                 Sheet sheet = arquivo.getSheet(sh);
@@ -283,12 +313,17 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(cellCodigoProduto.getContents());
-                    imp.setPrecovenda(Double.parseDouble(cellPrecoProduto.getContents()));
+                    imp.setPrecovenda(Double.parseDouble(cellPrecoProduto.getContents().replace(".", "").replace(",", ".")));
                     result.add(imp);
                 }
             }
             return result;
         } else if (opcao == OpcaoProduto.MARGEM) {
+            List<ProdutoIMP> result = new ArrayList<>();
+            WorkbookSettings settings = new WorkbookSettings();
+            Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXlsCompl), settings);
+            Sheet[] sheets = arquivo.getSheets();
+            int linha;
 
             for (int sh = 0; sh < sheets.length; sh++) {
                 Sheet sheet = arquivo.getSheet(sh);
@@ -307,12 +342,17 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(cellCodigoProduto.getContents());
-                    imp.setMargem(Double.parseDouble(cellMargemProduto.getContents()));
+                    imp.setMargem(Double.parseDouble(cellMargemProduto.getContents().replace(".", "").replace(",", ".")));
                     result.add(imp);
                 }
             }
             return result;
         } else if (opcao == OpcaoProduto.ESTOQUE) {
+            List<ProdutoIMP> result = new ArrayList<>();
+            WorkbookSettings settings = new WorkbookSettings();
+            Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXlsCompl), settings);
+            Sheet[] sheets = arquivo.getSheets();
+            int linha;
 
             for (int sh = 0; sh < sheets.length; sh++) {
                 Sheet sheet = arquivo.getSheet(sh);
@@ -331,12 +371,17 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(cellCodigoProduto.getContents());
-                    imp.setEstoque(Double.parseDouble(cellEstoqueProduto.getContents()));
+                    imp.setEstoque(Double.parseDouble(cellEstoqueProduto.getContents().replace(".", "").replace(",", ".")));
                     result.add(imp);
                 }
             }
             return result;
         } else if (opcao == OpcaoProduto.NATUREZA_RECEITA) {
+            List<ProdutoIMP> result = new ArrayList<>();
+            WorkbookSettings settings = new WorkbookSettings();
+            Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXlsCompl), settings);
+            Sheet[] sheets = arquivo.getSheets();
+            int linha;
 
             for (int sh = 0; sh < sheets.length; sh++) {
                 Sheet sheet = arquivo.getSheet(sh);
@@ -361,6 +406,12 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
             }
             return result;
         } else if (opcao == OpcaoProduto.PIS_COFINS) {
+            List<ProdutoIMP> result = new ArrayList<>();
+            WorkbookSettings settings = new WorkbookSettings();
+            Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXlsCompl), settings);
+            Sheet[] sheets = arquivo.getSheets();
+            int linha;
+
             for (int sh = 0; sh < sheets.length; sh++) {
                 Sheet sheet = arquivo.getSheet(sh);
                 linha = 0;
@@ -385,6 +436,12 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
             }
             return result;
         } else if (opcao == OpcaoProduto.CEST) {
+            List<ProdutoIMP> result = new ArrayList<>();
+            WorkbookSettings settings = new WorkbookSettings();
+            Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXlsCompl), settings);
+            Sheet[] sheets = arquivo.getSheets();
+            int linha;
+
             for (int sh = 0; sh < sheets.length; sh++) {
                 Sheet sheet = arquivo.getSheet(sh);
                 linha = 0;
@@ -408,6 +465,11 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
             }
             return result;
         } else if (opcao == OpcaoProduto.ICMS) {
+            List<ProdutoIMP> result = new ArrayList<>();
+            WorkbookSettings settings = new WorkbookSettings();
+            Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXlsCompl), settings);
+            Sheet[] sheets = arquivo.getSheets();
+            int linha;
 
             for (int sh = 0; sh < sheets.length; sh++) {
                 Sheet sheet = arquivo.getSheet(sh);
@@ -456,9 +518,11 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
 
                 Cell cellIdProduto = sheet.getCell(0, i);
                 Cell cellEan = sheet.getCell(1, i);
+                Cell cellTipo = sheet.getCell(2, i);
 
                 if ((cellEan.getContents() != null)
-                        && (!cellEan.getContents().trim().isEmpty())) {
+                        && (!cellEan.getContents().trim().isEmpty())
+                        && (cellTipo.getContents().contains("E"))) {
 
                     if (Long.parseLong(Utils.formataNumero(cellEan.getContents())) > 999999) {
 
@@ -479,7 +543,7 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
         WorkbookSettings settings = new WorkbookSettings();
-        Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXls), settings);
+        Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXlsForn), settings);
         Sheet[] sheets = arquivo.getSheets();
         int linha;
 
@@ -555,13 +619,13 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public List<FornecedorIMP> getFornecedores(OpcaoFornecedor opcao) throws Exception {
-        List<FornecedorIMP> result = new ArrayList<>();
-        WorkbookSettings settings = new WorkbookSettings();
-        Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXls), settings);
-        Sheet[] sheets = arquivo.getSheets();
-        int linha;
 
         if (opcao == OpcaoFornecedor.CNPJ_CPF) {
+            List<FornecedorIMP> result = new ArrayList<>();
+            WorkbookSettings settings = new WorkbookSettings();
+            Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXlsFornCompl), settings);
+            Sheet[] sheets = arquivo.getSheets();
+            int linha;
             for (int sh = 0; sh < sheets.length; sh++) {
                 Sheet sheet = arquivo.getSheet(sh);
                 linha = 0;
@@ -581,10 +645,16 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(cellCodigo.getContents());
                     imp.setCnpj_cpf(cellCnpj.getContents());
                     result.add(imp);
+                    System.out.println("CodForn: " + imp.getImportId() + " Cnpj: " + imp.getCnpj_cpf());
                 }
             }
             return result;
         } else if (opcao == OpcaoFornecedor.INSCRICAO_ESTADUAL) {
+            List<FornecedorIMP> result = new ArrayList<>();
+            WorkbookSettings settings = new WorkbookSettings();
+            Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXlsFornCompl), settings);
+            Sheet[] sheets = arquivo.getSheets();
+            int linha;
             for (int sh = 0; sh < sheets.length; sh++) {
                 Sheet sheet = arquivo.getSheet(sh);
                 linha = 0;
@@ -615,7 +685,7 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         WorkbookSettings settings = new WorkbookSettings();
-        Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXls), settings);
+        Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXlsProdForn), settings);
         Sheet[] sheets = arquivo.getSheets();
         int linha;
 
@@ -631,17 +701,21 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
 
                 Cell cellIdProduto = sheet.getCell(0, i);
                 Cell cellCodigoExterno = sheet.getCell(1, i);
+                Cell cellTipo = sheet.getCell(2, i);
                 Cell cellQtdEmbalagem = sheet.getCell(3, i);
                 Cell cellIdFornecedor = sheet.getCell(4, i);
 
                 if ((cellIdFornecedor.getContents() != null)
-                        && (!cellIdFornecedor.getContents().trim().isEmpty())) {
+                        && (!cellIdFornecedor.getContents().trim().isEmpty())
+                        && (cellTipo.getContents().contains("F"))) {
 
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
-                    imp.setIdFornecedor(cellIdFornecedor.getContents());
-                    imp.setIdProduto(cellIdProduto.getContents());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdFornecedor(cellIdFornecedor.getContents().trim());
+                    imp.setIdProduto(cellIdProduto.getContents().trim());
                     imp.setCodigoExterno(cellCodigoExterno.getContents());
-                    imp.setQtdEmbalagem(Double.parseDouble(cellQtdEmbalagem.getContents()));
+                    imp.setQtdEmbalagem(Double.parseDouble(cellQtdEmbalagem.getContents().replace(".", "").replace(",", ".")));
                     result.add(imp);
                 }
             }
@@ -653,7 +727,7 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         WorkbookSettings settings = new WorkbookSettings();
-        Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXls), settings);
+        Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXlsCliente), settings);
         Sheet[] sheets = arquivo.getSheets();
         DateFormat fmt = new SimpleDateFormat("yyyy/MM/dd");
         java.sql.Date dataCadastro, dataNascimento;
@@ -701,8 +775,19 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
                 Cell cellDDD4 = sheet.getCell(125, i);
                 Cell cellTelefone4 = sheet.getCell(126, i);
 
-                dataCadastro = new java.sql.Date(fmt.parse(cellDataCadastro.getContents().replace("-", "/")).getTime());
-                dataNascimento = new java.sql.Date(fmt.parse(cellDataNascimento.getContents().replace("-", "/")).getTime());
+                if ((cellDataCadastro.getContents() != null)
+                        && (!cellDataCadastro.getContents().trim().isEmpty())) {
+                    dataCadastro = new java.sql.Date(fmt.parse(cellDataCadastro.getContents().replace("-", "/")).getTime());
+                } else {
+                    dataCadastro = new Date(new java.util.Date().getTime());
+                }
+
+                if ((cellDataNascimento.getContents() != null)
+                        && (!cellDataNascimento.getContents().trim().isEmpty())) {
+                    dataNascimento = new java.sql.Date(fmt.parse(cellDataNascimento.getContents().replace("-", "/")).getTime());
+                } else {
+                    dataNascimento = null;
+                }
 
                 ClienteIMP imp = new ClienteIMP();
                 imp.setId(cellCodigo.getContents());
@@ -719,8 +804,20 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setEmail(cellEmail.getContents().trim() == null ? "" : cellEmail.getContents().toLowerCase());
                 imp.setCelular(cellDDDCelular.getContents() + cellCelular.getContents());
                 imp.setUf(cellUf.getContents());
-                imp.setSalario(Double.parseDouble(cellSalario.getContents()));
-                imp.setValorLimite(Double.parseDouble(cellLimite.getContents()));
+
+                if ((cellSalario.getContents() != null)
+                        && (!cellSalario.getContents().trim().isEmpty())) {
+                    imp.setSalario(Double.parseDouble(cellSalario.getContents().replace(".", "").replace(",", ".")));
+                } else {
+                    imp.setSalario(0);
+                }
+
+                if ((cellLimite.getContents() != null)
+                        && (!cellLimite.getContents().trim().isEmpty())) {
+                    imp.setValorLimite(Double.parseDouble(cellLimite.getContents().replace(".", "").replace(",", ".")));
+                } else {
+                    imp.setValorLimite(0);
+                }
                 imp.setObservacao(cellObservacao.getContents());
                 imp.setDataCadastro(dataCadastro);
                 imp.setDataNascimento(dataNascimento);
@@ -800,11 +897,11 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ClienteIMP> getClientes(OpcaoCliente opcao) throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         WorkbookSettings settings = new WorkbookSettings();
-        Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXls), settings);
+        Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXlsCliCompl), settings);
         Sheet[] sheets = arquivo.getSheets();
         int linha;
 
-        if (opcao == OpcaoCliente.ENDERECO) {
+        if (opcao == OpcaoCliente.ENDERECO_COMPLETO) {
 
             for (int sh = 0; sh < sheets.length; sh++) {
                 Sheet sheet = arquivo.getSheet(sh);
@@ -836,5 +933,120 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
             return result;
         }
         return null;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        WorkbookSettings settings = new WorkbookSettings();
+        Workbook arquivo = Workbook.getWorkbook(new File(v_arquivoXlsCreditoRotativo), settings);
+        Sheet[] sheets = arquivo.getSheets();
+        int linha;
+        DateFormat fmt = new SimpleDateFormat("yyyy/MM/dd");
+        java.sql.Date dataEmissao, dataVencimento;
+
+        for (int sh = 0; sh < sheets.length; sh++) {
+            Sheet sheet = arquivo.getSheet(sh);
+            linha = 0;
+
+            for (int i = 0; i < sheet.getRows(); i++) {
+                linha++;
+                if (linha == 1) {
+                    continue;
+                }
+
+                Cell cellId = sheet.getCell(0, i);
+                Cell cellDataEmissao = sheet.getCell(3, i);
+                Cell cellDataVencimento = sheet.getCell(4, i);
+                Cell cellValor = sheet.getCell(5, i);
+                Cell cellIdCliente = sheet.getCell(17, i);
+                Cell cellNumeroCupom = sheet.getCell(40, i);
+
+                dataEmissao = new java.sql.Date(fmt.parse(cellDataEmissao.getContents().replace("-", "/")).getTime());
+                dataVencimento = new java.sql.Date(fmt.parse(cellDataVencimento.getContents().replace("-", "/")).getTime());
+
+                CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                imp.setId(cellId.getContents());
+                imp.setIdCliente(cellIdCliente.getContents());
+                imp.setNumeroCupom(cellNumeroCupom.getContents());
+                imp.setValor(Double.parseDouble(cellValor.getContents().replace(".", "").replace(",", ".")));
+                imp.setDataEmissao(dataEmissao);
+                imp.setDataVencimento(dataVencimento);
+                result.add(imp);
+            }
+        }
+        return result;
+    }
+
+    public void gravarCodigoBarrasxBalanca(String i_arquivo) throws Exception {
+        WorkbookSettings settings = new WorkbookSettings();
+        Workbook arquivo = Workbook.getWorkbook(new File(i_arquivo), settings);
+        Sheet[] sheets = arquivo.getSheets();
+        int linha;
+        Statement stm = null;
+        StringBuilder sql = null;
+
+        try {
+            Conexao.begin();
+
+            stm = Conexao.createStatement();
+
+            sql = new StringBuilder();
+            sql.append("create table implantacao.codbarras_balanca ( "
+                    + "codigo_produto character varying(20), "
+                    + "codigo_barras character varying(20) ) ");
+            stm.execute(sql.toString());
+
+            for (int sh = 0; sh < sheets.length; sh++) {
+                Sheet sheet = arquivo.getSheet(sh);
+                linha = 0;
+
+                for (int i = 0; i < sheet.getRows(); i++) {
+
+                    linha++;
+                    if (linha == 1) {
+                        continue;
+                    }
+
+                    Cell cellIdProduto = sheet.getCell(0, i);
+                    Cell cellEan = sheet.getCell(1, i);
+                    Cell cellTipo = sheet.getCell(2, i);
+
+                    if (cellTipo.getContents().contains("E")) {
+                        sql = new StringBuilder();
+                        sql.append("insert into implantacao.codbarras_balanca ("
+                                + "codigo_produto, codigo_barras ) "
+                                + "values ("
+                                + "'" + cellIdProduto.getContents().trim() + "', "
+                                + "'" + Utils.formataNumero(cellEan.getContents().trim()) + "')");
+                        stm.execute(sql.toString());
+                    }
+                    System.out.println(i);
+                }
+            }
+
+            stm.close();
+            Conexao.commit();
+        } catch (Exception ex) {
+            Conexao.rollback();
+            throw ex;
+        }
+    }
+
+    private String getCodigoBarrasBalanca(String i_codigo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "distinct codigo_barras "
+                    + "from implantacao.codbarras_balanca "
+                    + "where codigo_produto = '" + i_codigo + "'"
+            )) {
+                if (rst.next()) {
+                    return rst.getString("codigo_barras");
+                } else {
+                    return "0";
+                }
+            }
+        }
     }
 }
