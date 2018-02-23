@@ -109,7 +109,7 @@ public class DestroDAO extends InterfaceDAO {
                     + "I.FILIAL_CHAVE,\n"
                     + "I.T_CUS,\n"
                     + "T_PVL,\n"
-                    + "I.secao_chave\n"
+                    + "I.secao_chave mercadologico\n"
                     + "FROM ESTITEM p\n"
                     + "INNER JOIN item I ON I.estitem_chave  = P.estitem_chave\n"
                     + "INNER JOIN ICMS IC ON IC.ICMS_COD_CHAVE = P.i_icms and I.estitem_chave  = P.estitem_chave\n"
@@ -126,6 +126,9 @@ public class DestroDAO extends InterfaceDAO {
                     imp.setDescricaoCompleta(rst.getString("I_DES"));
                     imp.setDescricaoReduzida(rst.getString("I_DRD"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setCodMercadologico1(rst.getString("mercadologico"));
+                    imp.setCodMercadologico2(rst.getString("mercadologico"));
+                    imp.setCodMercadologico3(rst.getString("mercadologico"));
                     imp.setTipoEmbalagem(rst.getString("UNIDADE_UNV_CHAVE"));
                     imp.setQtdEmbalagem(rst.getInt("I_QUN"));
                     imp.setDataCadastro(rst.getDate("DATA_INCLUSAO") == null ? rst.getDate("DATA_ALTERACAO") : rst.getDate("DATA_INCLUSAO"));

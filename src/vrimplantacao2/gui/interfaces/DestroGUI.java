@@ -171,12 +171,8 @@ public class DestroGUI extends VRInternalFrame {
 
                     if (tabs.getSelectedIndex() == 0) {
                     
-                        if (chkFamiliaProduto.isSelected()) {                        
-                            importador.importarFamiliaProduto();
-                        }
-
                         if (chkMercadologico.isSelected()) {
-                            importador.importarMercadologicoPorNiveis(false);
+                            importador.importarMercadologico();
                         }
 
                         if (chkProdutos.isSelected()) {

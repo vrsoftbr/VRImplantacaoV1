@@ -7,6 +7,8 @@ package vrimplantacao2.dao.interfaces;
 
 import java.io.File;
 import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
+import vrframework.classe.Conexao;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
@@ -34,7 +37,6 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
-import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -96,7 +98,7 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
 
                 Cell cellCodigo = sheet.getCell(0, i);
-                Cell cellDescricao = sheet.getCell(1, i);
+                Cell cellDescricao = sheet.getCell(2, i);
 
                 FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
                 imp.setImportLoja(getLojaOrigem());
@@ -225,6 +227,7 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setImportLoja(getLojaOrigem());
                 imp.setImportSistema(getSistema());
                 imp.setImportId(cellCodigo.getContents());
+                imp.setEan(getCodigoBarrasBalanca(cellCodigo.getContents()));
                 imp.setDescricaoCompleta(cellDescricaoCompleta.getContents());
                 imp.setDescricaoReduzida(cellDescricaoReduzida.getContents());
                 imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -237,7 +240,7 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
 
                 ProdutoBalancaVO produtoBalanca;
                 long codigoProduto;
-                codigoProduto = Long.parseLong(imp.getImportId());
+                codigoProduto = Long.parseLong(imp.getEan());
                 if (codigoProduto <= Integer.MAX_VALUE) {
                     produtoBalanca = produtosBalanca.get((int) codigoProduto);
                 } else {
@@ -515,9 +518,11 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
 
                 Cell cellIdProduto = sheet.getCell(0, i);
                 Cell cellEan = sheet.getCell(1, i);
+                Cell cellTipo = sheet.getCell(2, i);
 
                 if ((cellEan.getContents() != null)
-                        && (!cellEan.getContents().trim().isEmpty())) {
+                        && (!cellEan.getContents().trim().isEmpty())
+                        && (cellTipo.getContents().contains("E"))) {
 
                     if (Long.parseLong(Utils.formataNumero(cellEan.getContents())) > 999999) {
 
@@ -696,11 +701,13 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
 
                 Cell cellIdProduto = sheet.getCell(0, i);
                 Cell cellCodigoExterno = sheet.getCell(1, i);
+                Cell cellTipo = sheet.getCell(2, i);
                 Cell cellQtdEmbalagem = sheet.getCell(3, i);
                 Cell cellIdFornecedor = sheet.getCell(4, i);
 
                 if ((cellIdFornecedor.getContents() != null)
-                        && (!cellIdFornecedor.getContents().trim().isEmpty())) {
+                        && (!cellIdFornecedor.getContents().trim().isEmpty())
+                        && (cellTipo.getContents().contains("F"))) {
 
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -969,5 +976,77 @@ public class Wm_byFileDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
+    }
+
+    public void gravarCodigoBarrasxBalanca(String i_arquivo) throws Exception {
+        WorkbookSettings settings = new WorkbookSettings();
+        Workbook arquivo = Workbook.getWorkbook(new File(i_arquivo), settings);
+        Sheet[] sheets = arquivo.getSheets();
+        int linha;
+        Statement stm = null;
+        StringBuilder sql = null;
+
+        try {
+            Conexao.begin();
+
+            stm = Conexao.createStatement();
+
+            sql = new StringBuilder();
+            sql.append("create table implantacao.codbarras_balanca ( "
+                    + "codigo_produto character varying(20), "
+                    + "codigo_barras character varying(20) ) ");
+            stm.execute(sql.toString());
+
+            for (int sh = 0; sh < sheets.length; sh++) {
+                Sheet sheet = arquivo.getSheet(sh);
+                linha = 0;
+
+                for (int i = 0; i < sheet.getRows(); i++) {
+
+                    linha++;
+                    if (linha == 1) {
+                        continue;
+                    }
+
+                    Cell cellIdProduto = sheet.getCell(0, i);
+                    Cell cellEan = sheet.getCell(1, i);
+                    Cell cellTipo = sheet.getCell(2, i);
+
+                    if (cellTipo.getContents().contains("E")) {
+                        sql = new StringBuilder();
+                        sql.append("insert into implantacao.codbarras_balanca ("
+                                + "codigo_produto, codigo_barras ) "
+                                + "values ("
+                                + "'" + cellIdProduto.getContents().trim() + "', "
+                                + "'" + Utils.formataNumero(cellEan.getContents().trim()) + "')");
+                        stm.execute(sql.toString());
+                    }
+                    System.out.println(i);
+                }
+            }
+
+            stm.close();
+            Conexao.commit();
+        } catch (Exception ex) {
+            Conexao.rollback();
+            throw ex;
+        }
+    }
+
+    private String getCodigoBarrasBalanca(String i_codigo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "distinct codigo_barras "
+                    + "from implantacao.codbarras_balanca "
+                    + "where codigo_produto = '" + i_codigo + "'"
+            )) {
+                if (rst.next()) {
+                    return rst.getString("codigo_barras");
+                } else {
+                    return "0";
+                }
+            }
+        }
     }
 }

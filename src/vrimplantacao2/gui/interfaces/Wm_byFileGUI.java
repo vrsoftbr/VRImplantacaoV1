@@ -325,6 +325,10 @@ public class Wm_byFileGUI extends VRInternalFrame {
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel8 = new vrframework.bean.panel.VRPanel();
+        vRLabel10 = new vrframework.bean.label.VRLabel();
+        txtFileCodigoBarras = new vrframework.bean.fileChooser.VRFileChooser();
+        btnGravarCodigoBarras = new vrframework.bean.button.VRButton();
         vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         vRPanel4 = new vrframework.bean.panel.VRPanel();
         vRLabel1 = new vrframework.bean.label.VRLabel();
@@ -727,6 +731,50 @@ public class Wm_byFileGUI extends VRInternalFrame {
 
         tabs.addTab("Unificação", vRPanel2);
 
+        vRLabel10.setText("Importar Código de Barras para comparar com os códigos de balança");
+
+        btnGravarCodigoBarras.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
+        btnGravarCodigoBarras.setText("Gravar");
+        btnGravarCodigoBarras.setFocusable(false);
+        btnGravarCodigoBarras.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        btnGravarCodigoBarras.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnGravarCodigoBarras.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGravarCodigoBarrasActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout vRPanel8Layout = new javax.swing.GroupLayout(vRPanel8);
+        vRPanel8.setLayout(vRPanel8Layout);
+        vRPanel8Layout.setHorizontalGroup(
+            vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(vRPanel8Layout.createSequentialGroup()
+                        .addComponent(txtFileCodigoBarras, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnGravarCodigoBarras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(vRPanel8Layout.createSequentialGroup()
+                        .addComponent(vRLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        vRPanel8Layout.setVerticalGroup(
+            vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btnGravarCodigoBarras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(vRPanel8Layout.createSequentialGroup()
+                        .addComponent(vRLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtFileCodigoBarras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(281, Short.MAX_VALUE))
+        );
+
+        tabs.addTab("Especias", vRPanel8);
+
         vRLabel1.setText("Loja Origem");
 
         javax.swing.GroupLayout vRPanel4Layout = new javax.swing.GroupLayout(vRPanel4);
@@ -814,7 +862,17 @@ public class Wm_byFileGUI extends VRInternalFrame {
         }
     }//GEN-LAST:event_btnMapaTributActionPerformed
 
+    private void btnGravarCodigoBarrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGravarCodigoBarrasActionPerformed
+        try {
+            // TODO add your handling code here:
+            wmDAO.gravarCodigoBarrasxBalanca(txtFileCodigoBarras.getArquivo());
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }//GEN-LAST:event_btnGravarCodigoBarrasActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private vrframework.bean.button.VRButton btnGravarCodigoBarras;
     private vrframework.bean.button.VRButton btnMapaTribut;
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkAtacado;
@@ -856,6 +914,7 @@ public class Wm_byFileGUI extends VRInternalFrame {
     private vrframework.bean.fileChooser.VRFileChooser txtFile;
     private vrframework.bean.fileChooser.VRFileChooser txtFileCliente;
     private vrframework.bean.fileChooser.VRFileChooser txtFileClienteComp;
+    private vrframework.bean.fileChooser.VRFileChooser txtFileCodigoBarras;
     private vrframework.bean.fileChooser.VRFileChooser txtFileComp;
     private vrframework.bean.fileChooser.VRFileChooser txtFileCreditoRotativo;
     private vrframework.bean.fileChooser.VRFileChooser txtFileForn;
@@ -864,6 +923,7 @@ public class Wm_byFileGUI extends VRInternalFrame {
     private vrframework.bean.textField.VRTextField txtLojaOrigem;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel1;
+    private vrframework.bean.label.VRLabel vRLabel10;
     private vrframework.bean.label.VRLabel vRLabel2;
     private vrframework.bean.label.VRLabel vRLabel3;
     private vrframework.bean.label.VRLabel vRLabel4;
@@ -879,6 +939,7 @@ public class Wm_byFileGUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel vRPanel5;
     private vrframework.bean.panel.VRPanel vRPanel6;
     private vrframework.bean.panel.VRPanel vRPanel7;
+    private vrframework.bean.panel.VRPanel vRPanel8;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
     // End of variables declaration//GEN-END:variables
