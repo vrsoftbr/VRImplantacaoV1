@@ -49,15 +49,6 @@ public class SolidusDAO extends InterfaceDAO {
     private List<Entidade> entidadesCheques;
     private List<Entidade> entidadesCreditoRotativo;
     private List<Entidade> entidadesContas;
-    private boolean somenteAtivos = false;
-
-    public boolean isSomenteAtivos() {
-        return somenteAtivos;
-    }
-
-    public void setSomenteAtivos(boolean somenteAtivos) {
-        this.somenteAtivos = somenteAtivos;
-    }
 
     public Date getVendasDataInicio() {
         return vendasDataInicio;
@@ -89,8 +80,14 @@ public class SolidusDAO extends InterfaceDAO {
     
     @Override
     public String getSistema() {
-        return "Solidus";
+        return sistema;
     }
+
+    public void setSistema(String sistema) {
+        this.sistema = sistema;
+    }
+    
+    public String sistema = "Solidus";
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
@@ -261,7 +258,11 @@ public class SolidusDAO extends InterfaceDAO {
                     "        pl.cod_tributacao = trib.cod_tributacao\n" +
                     "    left join tab_tributacao tribent on\n" +
                     "        pl.cod_trib_entrada = tribent.cod_tributacao\n" +
-                    (isSomenteAtivos() ? "where pl.inativo != 'S'\n" : "") +
+                    "where \n" +
+                    "    (not p.des_produto  like 'MP %' or\n" +
+                    "    not p.des_produto  like 'EMB %' or\n" +
+                    "    not p.des_produto  like 'USO %')\n" +
+                    "    and pl.inativo != 'S'\n" +
                     "order by\n" +
                     "    id"
             )) {
@@ -531,7 +532,8 @@ public class SolidusDAO extends InterfaceDAO {
                     "    left join tab_cidade cd on\n" +
                     "        c.cod_cidade = cd.cod_cidade\n" +
                     "where\n" +
-                    "   c.des_cliente <> 'CADASTRO AUTOMATICO'\n" +
+                    "   c.des_cliente <> 'CADASTRO AUTOMATICO' and\n" +
+                    "   c.flg_envia_codigo = 'S'\n" +
                     "order by\n" +
                     "    1"
             )) {
