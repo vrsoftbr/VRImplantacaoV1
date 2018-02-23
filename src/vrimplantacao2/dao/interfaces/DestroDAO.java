@@ -13,6 +13,10 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -45,7 +49,35 @@ public class DestroDAO extends InterfaceDAO {
         }
         return result;
     }
-    
+
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "SECAO_CHAVE, "
+                    + "S_DES "
+                    + "from SECAO "
+                    + "order by SECAO_CHAVE"
+            )) {
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setMerc1ID(rst.getString("SECAO_CHAVE"));
+                    imp.setMerc1Descricao(rst.getString("S_DES"));
+                    imp.setMerc2ID(rst.getString("SECAO_CHAVE"));
+                    imp.setMerc2Descricao(rst.getString("S_DES"));
+                    imp.setMerc3ID(rst.getString("SECAO_CHAVE"));
+                    imp.setMerc3Descricao(rst.getString("S_DES"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -107,9 +139,9 @@ public class DestroDAO extends InterfaceDAO {
                     imp.setIcmsCst(rst.getDouble("i_prb") > 0 ? 20 : rst.getInt("CST_ICMS_SAIDA"));
                     imp.setIcmsAliq(rst.getDouble("I_PER"));
                     imp.setIcmsReducao(rst.getDouble("i_prb"));
-                    
-                    if ((Double.parseDouble(Utils.formataNumero(rst.getString("i_bar"))) < 10000) &&
-                            (Double.parseDouble(Utils.formataNumero(rst.getString("i_bar"))) > 0)) {
+
+                    if ((Double.parseDouble(Utils.formataNumero(rst.getString("i_bar"))) < 10000)
+                            && (Double.parseDouble(Utils.formataNumero(rst.getString("i_bar"))) > 0)) {
                         imp.seteBalanca(true);
                     } else {
                         imp.seteBalanca(false);
@@ -232,6 +264,104 @@ public class DestroDAO extends InterfaceDAO {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id_produto"));
                     imp.setEan(rst.getString("codigobarras"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "F.clifor_chave,\n"
+                    + "F.c_tip,\n"
+                    + "F.c_ins,\n"
+                    + "F.c_des,\n"
+                    + "F.c_fan,\n"
+                    + "F.c_cad,\n"
+                    + "F.data_exclusao,\n"
+                    + "EN.estado_chave,\n"
+                    + "EN.endereco,\n"
+                    + "EN.numero,\n"
+                    + "EN.cidade,\n"
+                    + "EN.bairro,\n"
+                    + "EN.complemento,\n"
+                    + "EM.email,\n"
+                    + "TEL.telefone,\n"
+                    + "TEL.contato,\n"
+                    + "EN.cep\n"
+                    + "FROM CLIFOR F\n"
+                    + "LEFT join CLIENDERECOS ON CLIENDERECOS.clifor_chave = F.clifor_chave\n"
+                    + "LEFT JOIN ENDERECOS EN ON EN.id_endereco = CLIENDERECOS.id_endereco\n"
+                    + "LEFT JOIN CLIEMAIL ON CLIEMAIL.clifor_chave = F.clifor_chave\n"
+                    + "LEFT JOIN EMAIL EM ON  EM.id_email = CLIEMAIL.id_email\n"
+                    + "LEFT JOIN clitelefones CTEL ON CTEL.clifor_chave = F.clifor_chave\n"
+                    + "LEFT JOIN telefones TEL ON TEL.id_telefone = CTEL.id_telefone\n"
+                    + "WHERE F.CLIFOR_TIPO IN (2,3)\n"
+                    + "ORDER BY F.clifor_chave"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("clifor_chave"));
+                    imp.setCnpj_cpf(rst.getString("clifor_chave"));
+                    imp.setIe_rg(rst.getString("c_ins"));
+                    imp.setRazao(rst.getString("c_des"));
+                    imp.setFantasia(rst.getString("c_fan"));
+                    imp.setDatacadastro(rst.getDate("c_cad"));
+                    imp.setAtivo((rst.getDate("data_exclusao") == null));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado_chave"));
+                    imp.setTel_principal(rst.getString("telefone"));
+                    if ((rst.getString("contato") != null)
+                            && (!rst.getString("contato").trim().isEmpty())) {
+                        imp.setObservacao("CONTATO " + rst.getString("contato"));
+                    }
+                    if ((rst.getString("email") != null)
+                            && (!rst.getString("email").trim().isEmpty())) {
+                        imp.addContato(
+                                "1",
+                                "EMAIL",
+                                null,
+                                TipoContato.COMERCIAL,
+                                rst.getString("email").toLowerCase()
+                        );
+                    }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "clifor_chave id_fornecedor,\n"
+                    + "estitem_chave id_produto,\n"
+                    + "cod as codigo_externo\n"
+                    + "from fornec_prod "
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("id_produto"));
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setCodigoExterno(rst.getString("codigo_externo"));
                     result.add(imp);
                 }
             }
