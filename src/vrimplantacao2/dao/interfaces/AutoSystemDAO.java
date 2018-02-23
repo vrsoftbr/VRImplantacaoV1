@@ -141,8 +141,8 @@ public class AutoSystemDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.subgrupo merc2,\n" +
                     "	est.estoque,\n" +
                     "	p.margem_lucro margem,\n" +
-                    "	p.preco_custo custosemimposto,\n" +
-                    "	p.preco_custo custocomimposto,\n" +
+                    "	coalesce(nullif(premp.preco_custo,0), p.preco_custo) custosemimposto,\n" +
+                    "	coalesce(nullif(premp.preco_custo,0), p.preco_custo) custocomimposto,\n" +
                     "	coalesce(nullif(premp.preco_unit,0), p.preco_unit) precovenda,\n" +
                     "	p.flag,\n" +
                     "	p.codigo_ncm ncm,\n" +

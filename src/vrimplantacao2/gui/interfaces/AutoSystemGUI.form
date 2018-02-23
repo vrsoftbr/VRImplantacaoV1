@@ -26,7 +26,7 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="conexao" pref="493" max="32767" attributes="0"/>
+                  <Component id="conexao" pref="512" max="32767" attributes="0"/>
                   <Component id="vRPanel3" alignment="0" max="32767" attributes="0"/>
                   <Component id="tabs" alignment="0" pref="0" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
@@ -56,7 +56,7 @@
                   <Component id="cmbDeposito" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabs" max="32767" attributes="0"/>
+              <Component id="tabs" pref="242" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -371,7 +371,7 @@
                               <Component id="chkFCnpj" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFSitCad" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="271" max="32767" attributes="0"/>
+                          <EmptySpace pref="290" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -491,7 +491,7 @@
                                   <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="349" max="32767" attributes="0"/>
+                              <EmptySpace pref="368" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -564,7 +564,7 @@
                                   <Component id="chkCvConveniado" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkCvTransacao" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="381" max="32767" attributes="0"/>
+                              <EmptySpace pref="400" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -643,7 +643,7 @@
                           <Component id="chkUnifClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="chkUnifClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="231" max="32767" attributes="0"/>
+                      <EmptySpace pref="250" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
