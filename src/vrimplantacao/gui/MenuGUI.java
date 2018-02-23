@@ -65,7 +65,7 @@ import vrimplantacao.gui.interfaces.EccusInformaticaGUI;
 import vrimplantacao.gui.interfaces.MRSGUI;
 import vrimplantacao.gui.interfaces.VRSoftwarePDVGUI;
 import vrimplantacao.gui.interfaces.SuperServerGUI;
-import vrimplantacao.gui.interfaces.DestroGUI;
+import vrimplantacao2.gui.interfaces.DestroGUI;
 import vrimplantacao.gui.interfaces.GZSistemasGUI;
 import vrimplantacao.gui.interfaces.ImportarNotaSaidaImportacaoArquivoGUI;
 import vrimplantacao.gui.interfaces.PlanilhaNCMGUI;
@@ -152,6 +152,7 @@ import vrimplantacao2.gui.interfaces.SolidusGUI;
 import vrimplantacao2.gui.interfaces.SuperGUI;
 import vrimplantacao2.gui.interfaces.SysPdvGUI;
 import vrimplantacao2.gui.interfaces.VisualComercioGUI;
+import vrimplantacao2.gui.interfaces.Wm_byFileGUI;
 import vrimplantacao2.gui.interfaces.WmsiGUI;
 
 public final class MenuGUI extends VRMdiFrame {
@@ -615,6 +616,7 @@ public final class MenuGUI extends VRMdiFrame {
         jMenuItem27 = new javax.swing.JMenuItem();
         jMenuItem32 = new javax.swing.JMenuItem();
         mnuHostMundo = new javax.swing.JMenuItem();
+        mnuWmByFile = new javax.swing.JMenuItem();
         jMenu11 = new javax.swing.JMenu();
         jMenuItem29 = new javax.swing.JMenuItem();
         jMenuItem15 = new javax.swing.JMenuItem();
@@ -1809,6 +1811,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu4.add(mnuHostMundo);
 
+        mnuWmByFile.setText("Wm");
+        mnuWmByFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuWmByFileActionPerformed(evt);
+            }
+        });
+        jMenu4.add(mnuWmByFile);
+
         jMenu1.add(jMenu4);
 
         jMenu11.setText("Alteração ID Produtos");
@@ -2712,18 +2722,8 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemControlWareActionPerformed
 
     private void jMenuItemDestroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemDestroActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarDestroGUI == null || formImportarDestroGUI.isClosed()) {
-                formImportarDestroGUI = new DestroGUI(this);
-            }
-
-            formImportarDestroGUI.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
+    
+        DestroGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemDestroActionPerformed
 
     private void jMenuItemSysMouraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSysMouraActionPerformed
@@ -3585,6 +3585,10 @@ public final class MenuGUI extends VRMdiFrame {
         AutoSystemGUI.exibir(this);
     }//GEN-LAST:event_mnuAutoSystemActionPerformed
 
+    private void mnuWmByFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuWmByFileActionPerformed
+        Wm_byFileGUI.exibir(this);
+    }//GEN-LAST:event_mnuWmByFileActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -3750,6 +3754,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSuper;
     private javax.swing.JMenuItem mnuTsti;
     private javax.swing.JMenuItem mnuVisualComercio;
+    private javax.swing.JMenuItem mnuWmByFile;
     private javax.swing.JMenuItem mnuWmsi;
     private javax.swing.JMenuItem mnupdvvendaitem;
     private vrframework.bean.toolBar.VRToolBar tlbAtalho;

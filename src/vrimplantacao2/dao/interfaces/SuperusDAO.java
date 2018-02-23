@@ -146,7 +146,7 @@ public class SuperusDAO extends InterfaceDAO {
                     + "  case p.pesvar when 'S' then 1 else 0 end as e_balanca,\n"
                     + "  case when p.pesvar = 'S' and p.tipo = 'P' then 'KG' else 'UN' end as tipoembalagem,\n"
                     + "  val.validade,  \n"
-                    + "  p.nome descricaocompleta,\n"
+                    + "  p.nome like descricaocompleta,\n"
                     + "  p.nome2 descricaoreduzida,\n"
                     + "  p.nome descricaogondola,\n"
                     + "  case p.inativo when 'S' then 0 else 1 end as id_situacaocadastro,\n"
@@ -431,7 +431,7 @@ public class SuperusDAO extends InterfaceDAO {
                     + "from\n"
                     + "  PESSOAS p\n"
                     + "  join CLIENTES c on p.codigo = c.codigo\n"
-                    + ("".equals(v_codEmpresaConv) ? "where c.codigoconvenio = 0\n" : "where c.codigoconvenio <> " + v_codEmpresaConv) + "\n"
+                    + ("".equals(v_codEmpresaConv) ? "where c.codigoconvenio = 0\n" : "where c.codigoconvenio not in (" + v_codEmpresaConv) + ")\n"
                     + "order by p.codigo"
             )) {
                 while (rst.next()) {
@@ -536,35 +536,42 @@ public class SuperusDAO extends InterfaceDAO {
         List<ChequeIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "codigo, \n"
-                    + "agencia, \n"
-                    + "cheque, \n"
-                    + "cpf, \n"
-                    + "cnpj, \n"
-                    + "emissao,\n"
-                    + "chave, \n"
-                    + "vencimento, \n"
-                    + "serie, \n"
-                    + "banco, \n"
-                    + "valor, \n"
-                    + "pagamento,\n"
-                    + "observacao, \n"
-                    + "loja, \n"
-                    + "conta, \n"
-                    + "pdv, \n"
-                    + "cupom, \n"
-                    + "status, \n"
-                    + "cmc7, \n"
-                    + "flagalt, \n"
-                    + "historico \n"
-                    + "from CHEQUESRECEBER \n"
-                    + "where pagamento = 'N'\n"
-                    + "and loja = " + getLojaOrigem()
+                    "select\n"
+                    + "(ch.loja||'-'||ch.codigo||'-'||ch.agencia||'-'||ch.cheque) id,\n"
+                    + "ch.codigo as id_cliente, \n"
+                    + "p.nome,\n"
+                    + "p.ie, \n"
+                    + "p.rg, \n"
+                    + "trim((select case when coalesce(trim(ddd),'') = '' then telefone else ddd||telefone end as asd from telefones where codigo = p.codigo and lower(tipo) = 'residencial' and rownum = 1 )) fone,\n"
+                    + "ch.agencia, \n"
+                    + "ch.cheque, \n"
+                    + "ch.cpf, \n"
+                    + "ch.cnpj, \n"
+                    + "ch.emissao,\n"
+                    + "ch.chave, \n"
+                    + "ch.vencimento, \n"
+                    + "ch.serie, \n"
+                    + "ch.banco, \n"
+                    + "ch.valor, \n"
+                    + "ch.pagamento,\n"
+                    + "ch.observacao, \n"
+                    + "ch.loja, \n"
+                    + "ch.conta, \n"
+                    + "ch.pdv, \n"
+                    + "ch.cupom, \n"
+                    + "ch.status, \n"
+                    + "ch.cmc7, \n"
+                    + "ch.flagalt, \n"
+                    + "ch.historico\n"
+                    + "from CHEQUESRECEBER ch\n"
+                    + "left join pessoas p on p.codigo = ch.codigo\n"
+                    + "inner join clientes c on c.codigo = p.codigo\n"
+                    + "where ch.pagamento = 'N'\n"
+                    + "and ch.loja = " + getLojaOrigem()
             )) {
                 while (rst.next()) {
                     ChequeIMP imp = new ChequeIMP();
-                    imp.setId(rst.getString("codigo"));
+                    imp.setId(rst.getString("id"));
                     if ((rst.getString("cpf") != null)
                             && (!rst.getString("cpf").trim().isEmpty())) {
                         imp.setCpf(rst.getString("cpf"));
@@ -575,6 +582,8 @@ public class SuperusDAO extends InterfaceDAO {
                         imp.setCpf("");
                     }
 
+                    imp.setNome(rst.getString("nome"));
+                    imp.setTelefone(rst.getString("fone"));
                     imp.setDate(rst.getDate("emissao"));
                     imp.setDataDeposito(rst.getDate("vencimento"));
                     imp.setDataHoraAlteracao(rst.getTimestamp("flagalt"));
@@ -658,7 +667,7 @@ public class SuperusDAO extends InterfaceDAO {
                     + "and rownum = 1 )) fone1, sysdate as datainicio_atual, sysdate as datafinal_atual\n"
                     + "FROM pessoas p,convenios c\n"
                     + "WHERE p.codigo = c.codigo "
-                    + ("".equals(v_codEmpresaConv) ? "and c.codigo > 0" : "and c.codigo = " + v_codEmpresaConv)
+                    + ("".equals(v_codEmpresaConv) ? "and c.codigo > 0" : "and c.codigo in (" + v_codEmpresaConv) + ")"
             )) {
                 SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
                 while (rst.next()) {
@@ -726,7 +735,7 @@ public class SuperusDAO extends InterfaceDAO {
                     + "inner join clientes c on c.codigo = p.codigo\n"
                     + "where p.cliente = 'S'\n"
                     + "and p.convenio = 'N'\n"
-                    + ("".equals(v_codEmpresaConv) ? "and c.codigoconvenio > 0" : "and c.codigoconvenio = " + v_codEmpresaConv)
+                    + ("".equals(v_codEmpresaConv) ? "and c.codigoconvenio > 0" : "and c.codigoconvenio in (" + v_codEmpresaConv) + ")"
             )) {
                 while (rst.next()) {
                     ConveniadoIMP imp = new ConveniadoIMP();

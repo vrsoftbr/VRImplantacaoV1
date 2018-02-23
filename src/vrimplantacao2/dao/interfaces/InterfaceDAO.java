@@ -80,7 +80,7 @@ public abstract class InterfaceDAO {
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
         return new ArrayList<>();
     }
-    
+
     /**
      * Retorna uma listagem com as famílias dos produtos.
      * @return Listagem das famílias dos produtos.

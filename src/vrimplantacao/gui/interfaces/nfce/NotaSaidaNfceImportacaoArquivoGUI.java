@@ -55,6 +55,8 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                         dao.impLoja = (LojaV2) cboLojaV2.getSelectedItem();
                     }
 
+                    
+                    
                     String[] arquivos = flcArquivo.getArquivo().split(";");
                     ArrayList<DivergenciaVO> vDivergenciaGeral = new ArrayList();
 
@@ -63,10 +65,10 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                         VendaVO oVenda = null;
 
                         try {
-                            oVenda = dao.importar(arq, chkVerificarCodigoAnterior.isSelected());
+                            oVenda = dao.importar(arq, chkVerificarCodigoAnterior.isSelected(), chkVerificarCodigoBarras.isSelected());
 
                         } catch (Exception ex) {
-                            vDivergenciaGeral.add(new DivergenciaVO("Não foi possível importar o arquivo " + arq + "!", TipoDivergencia.ERRO.getId()));
+                            vDivergenciaGeral.add(new DivergenciaVO("Não foi possível importar o arquivo " + arq + "! " + ex, TipoDivergencia.ERRO.getId()));
                             continue;
                         }
 
@@ -125,6 +127,7 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
         chkVerificarCodigoAnterior = new vrframework.bean.checkBox.VRCheckBox();
         cboLojaV2 = new javax.swing.JComboBox();
         vRLabel35 = new vrframework.bean.label.VRLabel();
+        chkVerificarCodigoBarras = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         btnSair = new vrframework.bean.button.VRButton();
         btnImportar = new vrframework.bean.button.VRButton();
@@ -143,6 +146,11 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
         chkBaixaEstoque.setText("Baixar estoque loja");
 
         chkVerificarCodigoAnterior.setText("Verificar Código Anterior");
+        chkVerificarCodigoAnterior.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkVerificarCodigoAnteriorActionPerformed(evt);
+            }
+        });
 
         cboLojaV2.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -157,6 +165,13 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
 
         vRLabel35.setText("Lojas encontradas (Importação V2)");
 
+        chkVerificarCodigoBarras.setText("Verificar Código de Barras");
+        chkVerificarCodigoBarras.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkVerificarCodigoBarrasActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
         vRPanel1Layout.setHorizontalGroup(
@@ -167,6 +182,7 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                     .addComponent(cboLojaV2, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(vRPanel1Layout.createSequentialGroup()
                         .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkVerificarCodigoBarras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkVerificarCodigoAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkBaixaEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -186,11 +202,13 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                 .addComponent(chkBaixaEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkVerificarCodigoAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkVerificarCodigoBarras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
                 .addComponent(vRLabel35, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cboLojaV2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         btnSair.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/sair.png"))); // NOI18N
@@ -284,12 +302,25 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_cboLojaV2ActionPerformed
 
+    private void chkVerificarCodigoAnteriorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkVerificarCodigoAnteriorActionPerformed
+        // TODO add your handling code here:
+            chkVerificarCodigoBarras.setSelected(false);
+            chkVerificarCodigoAnterior.setSelected(true);
+    }//GEN-LAST:event_chkVerificarCodigoAnteriorActionPerformed
+
+    private void chkVerificarCodigoBarrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkVerificarCodigoBarrasActionPerformed
+        // TODO add your handling code here:
+            chkVerificarCodigoBarras.setSelected(true);
+            chkVerificarCodigoAnterior.setSelected(false);
+    }//GEN-LAST:event_chkVerificarCodigoBarrasActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnImportar;
     private vrframework.bean.button.VRButton btnSair;
     private javax.swing.JComboBox cboLojaV2;
     private vrframework.bean.checkBox.VRCheckBox chkBaixaEstoque;
     private vrframework.bean.checkBox.VRCheckBox chkVerificarCodigoAnterior;
+    private vrframework.bean.checkBox.VRCheckBox chkVerificarCodigoBarras;
     private vrframework.bean.fileChooser.VRFileChooser flcArquivo;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao tlbToolBar;
     private vrframework.bean.label.VRLabel vRLabel1;

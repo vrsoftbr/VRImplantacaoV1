@@ -65,12 +65,13 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="cboLojaV2" alignment="0" max="32767" attributes="0"/>
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkVerificarCodigoBarras" min="-2" max="-2" attributes="0"/>
                               <Component id="chkVerificarCodigoAnterior" min="-2" max="-2" attributes="0"/>
                               <Component id="chkBaixaEstoque" min="-2" max="-2" attributes="0"/>
                               <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
@@ -95,11 +96,13 @@
                   <Component id="chkBaixaEstoque" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="chkVerificarCodigoAnterior" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="chkVerificarCodigoBarras" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="17" max="32767" attributes="0"/>
                   <Component id="vRLabel35" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="cboLojaV2" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -125,6 +128,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Verificar C&#xf3;digo Anterior"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkVerificarCodigoAnteriorActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JComboBox" name="cboLojaV2">
           <Properties>
@@ -141,6 +147,14 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Lojas encontradas (Importa&#xe7;&#xe3;o V2)"/>
           </Properties>
+        </Component>
+        <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkVerificarCodigoBarras">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Verificar C&#xf3;digo de Barras"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkVerificarCodigoBarrasActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

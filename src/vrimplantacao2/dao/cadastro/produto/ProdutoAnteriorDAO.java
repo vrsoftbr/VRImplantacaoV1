@@ -237,6 +237,29 @@ public class ProdutoAnteriorDAO {
         return retorno;
     }
 
+    public int getCodigoAtualEANant(String sistema, String loja, String ean) throws Exception {
+        int retorno = -1;
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT "
+                    + "ant.codigoatual "
+                    + "FROM \n"
+                    + "	implantacao.codant_produto ant\n"
+                    + "inner join implantacao.codant_ean ean on ean.importid = ant.impid "
+                    + "where ant.impsistema = " + SQLUtils.stringSQL(sistema) + " "
+                    + " and ant.imploja = " + SQLUtils.stringSQL(loja) + " "
+                    + " and ean.ean = " + SQLUtils.stringSQL(ean)
+            )) {
+                if (rst.next()) {
+                    retorno = rst.getInt("codigoatual");
+                } else {
+                    retorno = -1;
+                }
+            }
+        }
+        return retorno;
+    }
+    
     public String getCodigoAnteriorCpGestor(String ean) throws Exception {
         String retorno = "-1";
         try (Statement stm = Conexao.createStatement()) {
