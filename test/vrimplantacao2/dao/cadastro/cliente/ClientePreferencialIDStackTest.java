@@ -18,7 +18,7 @@ public class ClientePreferencialIDStackTest {
 
     @Test
     public void testObterID() throws Exception {
-        ClientePreferencialIDStack stack = new ClientePreferencialIDStack() {
+        ClientePreferencialIDStack stack = new ClientePreferencialIDStack(1) {
             @Override
             public Set<Integer> obterIdsExistentes() throws Exception {
                 return new LinkedHashSet<>(Arrays.asList(1, 4, 6, 8, 9));

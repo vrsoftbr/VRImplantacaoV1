@@ -34,121 +34,139 @@ public class ClienteRepository {
         this.provider = provider;
     }
     
-    public void importarClientePreferencial(List<ClienteIMP> clientes, OpcaoCliente... opcoes) throws Exception {
-        Set<OpcaoCliente> opt = new HashSet<>(Arrays.asList(opcoes));        
-        //Eliminar duplicados, ordernar e identificar ids inválidos (> 999999)
-        clientes = organizarListagem(clientes);        
-        System.gc();
+    public void importarClientePreferencial(List<ClienteIMP> clientes, Set<OpcaoCliente> opt) throws Exception {  
+                
+        int iniciarEm = 1;
         
-        if (opt.isEmpty()) {
-            opt.add(OpcaoCliente.DADOS);
-            opt.add(OpcaoCliente.CONTATOS);
-            opt.add(OpcaoCliente.OBSERVACOES2);
-            opt.add(OpcaoCliente.SITUACAO_CADASTRO);
-            opt.add(OpcaoCliente.INSCRICAO_ESTADUAL);
-            opt.add(OpcaoCliente.DATA_NASCIMENTO);
+        //Tratar opções
+        boolean parametroValidos = true;
+        for (OpcaoCliente opcao: opt) {            
+            if (OpcaoCliente.IMP_REINICIAR_NUMERACAO.equals(opcao)) {
+                iniciarEm = (int) opcao.getParametros().get("N_REINICIO");
+            }            
+            parametroValidos &= opcao.checkParametros();
         }
         
-        this.provider.begin();
-        try {
-            //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
-            setNotificacao("Preparando para gravar cliente preferêncial...", clientes.size());
-            ClientePreferencialIDStack ids = provider.getClientePreferencialIDStack();
-            Map<Long, Integer> cnpjCadastrados = provider.preferencial().getCnpjCadastrados();
-            MultiMap<String, ClientePreferencialAnteriorVO> anteriores = provider.preferencial().getAnteriores();
-            MultiMap<String, Void> contatos = provider.preferencial().getContatosExistentes();
-            //</editor-fold>
-            
-            setNotificacao("Gravando cliente preferêncial...", clientes.size());
-            for (ClienteIMP imp: clientes) {
-                ClientePreferencialAnteriorVO anterior = anteriores.get(
-                        provider.getSistema(),
-                        provider.getLojaOrigem(),
-                        imp.getId()
-                );
-                
-                ClientePreferencialVO cliente = null;
-                
-                //Se o cliente não tiver sido cadastrado anteriormente, executa.
-                if (anterior == null) {     
-                    if (opt.contains(OpcaoCliente.DADOS)) {
-                        
-                        //Obtem um ID válido.                    
-                        int id = ids.obterID(imp.getId());                        
-                        //Trata o cnpj
-                        long cnpj = Utils.stringToLong(imp.getCnpj(), -2);
-                        //Se o cnpj já estiver cadastrado, coloca -2 para gerar um novo.
-                        if (cnpjCadastrados.containsKey(cnpj)) {
-                            if (cnpjCadastrados.containsKey((long) id)) {
-                                cnpj = -id;
-                            } else {
-                                cnpj = id;
-                            }
-                        }
-
-                        //Converte os dados.
-                        cliente = converterClientePreferencial(imp);                    
-                        cliente.setId(id);
-                        cliente.setCnpj(cnpj);
-
-                        anterior = converterClientePreferencialAnterior(imp);
-                        anterior.setCodigoAtual(cliente);
-
-                        //Grava as informações
-                        gravarClientePreferencial(cliente);
-                        gravarClientePreferencialAnterior(anterior);
-
-                        //Incluindo o produto nas listagens
-                        cnpjCadastrados.put(cnpj, id);
-                        anteriores.put(
-                                anterior, 
-                                provider.getSistema(),
-                                provider.getLojaOrigem(),
-                                imp.getId()
-                        );
-                    }
-                } else {                    
-                    if (opt.contains(OpcaoCliente.OBSERVACOES2)) {
-                        cliente = converterClientePreferencial(imp);
-                        cliente.setId(anterior.getCodigoAtual().getId());
-                        atualizarClientePreferencial(cliente, opt);
-                    } else if (opt.contains(OpcaoCliente.SITUACAO_CADASTRO)) {
-                        cliente = converterClientePreferencial(imp);
-                        cliente.setId(anterior.getCodigoAtual().getId());
-                        atualizarClientePreferencial(cliente, opt);
-                    } else if (opt.contains(OpcaoCliente.VALOR_LIMITE)) {
-                        cliente = converterClientePreferencial(imp);
-                        cliente.setId(anterior.getCodigoAtual().getId());
-                        atualizarClientePreferencial(cliente, opt);
-                    } else if (opt.contains(OpcaoCliente.INSCRICAO_ESTADUAL)) {
-                        cliente = converterClientePreferencial(imp);
-                        cliente.setId(anterior.getCodigoAtual().getId());
-                        atualizarClientePreferencial(cliente, opt);
-                    } else if (opt.contains(OpcaoCliente.DATA_NASCIMENTO)) {
-                        cliente = converterClientePreferencial(imp);
-                        cliente.setId(anterior.getCodigoAtual().getId());
-                        atualizarClientePreferencial(cliente, opt);
-                    } else if (opt.contains(OpcaoCliente.TELEFONE)) {
-                        cliente = converterClientePreferencial(imp);
-                        cliente.setId(anterior.getCodigoAtual().getId());
-                        atualizarClientePreferencial(cliente, opt);
-                    } else {
-                        cliente = anterior.getCodigoAtual();
-                    }
-                }
-                
-                if (opt.contains(OpcaoCliente.CONTATOS)) {
-                    importarContatoPreferencial(cliente, imp, contatos);
-                }
-
-                notificar();
-            }
-            this.provider.commit();
-            
+        if (parametroValidos) {
+        
+            //Eliminar duplicados, ordernar e identificar ids inválidos (> 999999)
+            clientes = organizarListagem(clientes);        
             System.gc();
-        } catch (Exception e) {
-            this.provider.rollback();
-            throw e;
+
+            if (opt.isEmpty()) {
+                opt.add(OpcaoCliente.DADOS);
+                opt.add(OpcaoCliente.CONTATOS);
+                opt.add(OpcaoCliente.OBSERVACOES2);
+                opt.add(OpcaoCliente.SITUACAO_CADASTRO);
+                opt.add(OpcaoCliente.INSCRICAO_ESTADUAL);
+                opt.add(OpcaoCliente.DATA_NASCIMENTO);
+            }
+
+            this.provider.begin();
+            try {
+                //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
+                setNotificacao("Preparando para gravar cliente preferêncial...", clientes.size());                
+                
+                ClientePreferencialIDStack ids = provider.getClientePreferencialIDStack(iniciarEm);
+                Map<Long, Integer> cnpjCadastrados = provider.preferencial().getCnpjCadastrados();
+                MultiMap<String, ClientePreferencialAnteriorVO> anteriores = provider.preferencial().getAnteriores();
+                MultiMap<String, Void> contatos = provider.preferencial().getContatosExistentes();
+                //</editor-fold>
+
+                setNotificacao("Gravando cliente preferêncial...", clientes.size());
+                for (ClienteIMP imp: clientes) {
+                    ClientePreferencialAnteriorVO anterior = anteriores.get(
+                            provider.getSistema(),
+                            provider.getLojaOrigem(),
+                            imp.getId()
+                    );
+
+                    ClientePreferencialVO cliente = null;
+
+                    //Se o cliente não tiver sido cadastrado anteriormente, executa.
+                    if (anterior == null) {     
+                        if (opt.contains(OpcaoCliente.DADOS)) {
+
+                            //Obtem um ID válido.                    
+                            int id = ids.obterID(imp.getId());                        
+                            //Trata o cnpj
+                            long cnpj = Utils.stringToLong(imp.getCnpj(), -2);
+                            //Se o cnpj já estiver cadastrado, coloca -2 para gerar um novo.
+                            if (cnpjCadastrados.containsKey(cnpj)) {
+                                if (cnpjCadastrados.containsKey((long) id)) {
+                                    cnpj = -id;
+                                } else {
+                                    cnpj = id;
+                                }
+                            }
+
+                            //Converte os dados.
+                            cliente = converterClientePreferencial(imp);                    
+                            cliente.setId(id);
+                            cliente.setCnpj(cnpj);
+
+                            anterior = converterClientePreferencialAnterior(imp);
+                            anterior.setCodigoAtual(cliente);
+
+                            //Grava as informações
+                            gravarClientePreferencial(cliente);
+                            gravarClientePreferencialAnterior(anterior);
+
+                            //Incluindo o produto nas listagens
+                            cnpjCadastrados.put(cnpj, id);
+                            anteriores.put(
+                                    anterior, 
+                                    provider.getSistema(),
+                                    provider.getLojaOrigem(),
+                                    imp.getId()
+                            );
+                        }
+                    } else {                    
+                        if (opt.contains(OpcaoCliente.OBSERVACOES2)) {
+                            cliente = converterClientePreferencial(imp);
+                            cliente.setId(anterior.getCodigoAtual().getId());
+                            atualizarClientePreferencial(cliente, opt);
+                        } else if (opt.contains(OpcaoCliente.SITUACAO_CADASTRO)) {
+                            cliente = converterClientePreferencial(imp);
+                            cliente.setId(anterior.getCodigoAtual().getId());
+                            atualizarClientePreferencial(cliente, opt);
+                        } else if (opt.contains(OpcaoCliente.VALOR_LIMITE)) {
+                            cliente = converterClientePreferencial(imp);
+                            cliente.setId(anterior.getCodigoAtual().getId());
+                            atualizarClientePreferencial(cliente, opt);
+                        } else if (opt.contains(OpcaoCliente.INSCRICAO_ESTADUAL)) {
+                            cliente = converterClientePreferencial(imp);
+                            cliente.setId(anterior.getCodigoAtual().getId());
+                            atualizarClientePreferencial(cliente, opt);
+                        } else if (opt.contains(OpcaoCliente.DATA_NASCIMENTO)) {
+                            cliente = converterClientePreferencial(imp);
+                            cliente.setId(anterior.getCodigoAtual().getId());
+                            atualizarClientePreferencial(cliente, opt);
+                        } else if (opt.contains(OpcaoCliente.TELEFONE)) {
+                            cliente = converterClientePreferencial(imp);
+                            cliente.setId(anterior.getCodigoAtual().getId());
+                            atualizarClientePreferencial(cliente, opt);
+                        } else {
+                            cliente = anterior.getCodigoAtual();
+                        }
+                    }
+
+                    if (opt.contains(OpcaoCliente.CONTATOS)) {
+                        importarContatoPreferencial(cliente, imp, contatos);
+                    }
+
+                    notificar();
+                }
+                this.provider.commit();
+
+                System.gc();
+            } catch (Exception e) {
+                this.provider.rollback();
+                throw e;
+            }
+        
+        } else {
+            throw new Exception("Há valores incorretos nos parametros.");
         }
     }  
                                              
@@ -168,10 +186,7 @@ public class ClienteRepository {
             
             //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
             setNotificacao("Preparando para gravar cliente preferêncial...", clientes.size());
-            ClientePreferencialIDStack ids = provider.getClientePreferencialIDStack();
-            Map<Long, Integer> cnpjCadastrados = provider.preferencial().getCnpjCadastrados();
             MultiMap<String, ClientePreferencialAnteriorVO> anteriores = provider.preferencial().getAnteriores();
-            MultiMap<String, Void> contatos = provider.preferencial().getContatosExistentes();
             //</editor-fold>
             
             setNotificacao("Atualizando cliente preferêncial...", clientes.size());
@@ -237,138 +252,108 @@ public class ClienteRepository {
             }
         }
     }
-    
-    /*public void atualizarClientePreferencial(List<ClienteIMP> clientes, OpcaoCliente... opcoes) throws Exception {
-        Set<OpcaoCliente> opt = new HashSet<>(Arrays.asList(opcoes));
-        
-        //Eliminar duplicados, ordernar e identificar ids inválidos (> 999999)
-        clientes = organizarListagem(clientes);        
-        System.gc();
-        
-        this.provider.begin();
-        try {
-            //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
-            setNotificacao("Preparando para gravar cliente preferêncial...", clientes.size());
-            ClientePreferencialIDStack ids = provider.getClientePreferencialIDStack();
-            Map<Long, Integer> cnpjCadastrados = provider.preferencial().getCnpjCadastrados();
-            MultiMap<String, ClientePreferencialAnteriorVO> anteriores = provider.preferencial().getAnteriores();
-            MultiMap<String, Void> contatos = provider.preferencial().getContatosExistentes();
-            //</editor-fold>
-            
-            setNotificacao("Atualizando cliente preferêncial...", clientes.size());
-            for (ClienteIMP imp: clientes) {
-                ClientePreferencialAnteriorVO anterior = anteriores.get(
-                        provider.getSistema(),
-                        provider.getLojaOrigem(),
-                        imp.getId()
-                );
-                
-                ClientePreferencialVO cliente;
-                
-                //Se o cliente não tiver sido cadastrado anteriormente, executa.
-                if (anterior != null && anterior.getCodigoAtual() != null) {                    
-                    //Converte os dados.
-                    cliente = converterClientePreferencial(imp); 
-                }                 
 
-                notificar();
-            }
-            this.provider.commit();
-            
-            System.gc();
-        } catch (Exception e) {
-            this.provider.rollback();
-            throw e;
-        }    
-    }*/
-
-    public void importarClienteEventual(List<ClienteIMP> clientes, OpcaoCliente... opcoes) throws Exception {
-        Set<OpcaoCliente> opt = new HashSet<>(Arrays.asList(opcoes));    
-        //Eliminar duplicados, ordernar e identificar ids inválidos (> 999999)
-        clientes = organizarListagem(clientes);        
-        System.gc();
+    public void importarClienteEventual(List<ClienteIMP> clientes, Set<OpcaoCliente> opt) throws Exception {
         
-        if (opt.isEmpty()) {
-            opt.add(OpcaoCliente.DADOS);
-            opt.add(OpcaoCliente.CONTATOS);
+        int iniciarEm = 1;
+        
+        //Tratar opções
+        boolean parametroValidos = true;
+        for (OpcaoCliente opcao: opt) {            
+            if (OpcaoCliente.IMP_REINICIAR_NUMERACAO.equals(opcao)) {
+                iniciarEm = (int) opcao.getParametros().get("N_REINICIO");
+            }            
+            parametroValidos &= opcao.checkParametros();
         }
         
-        this.provider.begin();
-        try {
-            //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
-            setNotificacao("Preparando para gravar cliente eventuais...", clientes.size());
-            ClienteEventualIDStack ids = provider.getClienteEventualIDStack();
-            Map<Long, Integer> cnpjCadastrados = provider.eventual().getCnpjCadastrados();
-            MultiMap<String, ClienteEventualAnteriorVO> anteriores = provider.eventual().getAnteriores();
-            MultiMap<String, Void> contatos = provider.eventual().getContatosExistentes();
-            //</editor-fold>
-            
-            setNotificacao("Gravando cliente eventual...", clientes.size());
-            for (ClienteIMP imp: clientes) {
-                ClienteEventualAnteriorVO anterior = anteriores.get(
-                        provider.getSistema(),
-                        provider.getLojaOrigem(),
-                        imp.getId()
-                );
-                
-                ClienteEventualVO cliente = null;
-                
-                //Se o cliente não tiver sido cadastrado anteriormente, executa.
-                if (anterior == null) { 
-                    if (opt.contains(OpcaoCliente.DADOS)) {
-                        //Trata o cnpj
-                        long cnpj = Utils.stringToLong(imp.getCnpj(), -2);
-                        //Se o cnpj já estiver cadastrado, coloca -2 para gerar um novo.
-                        if (cnpjCadastrados.containsKey(cnpj)) {
-                            cnpj = -2;
+        if (parametroValidos) {
+
+            //Eliminar duplicados, ordernar e identificar ids inválidos (> 999999)
+            clientes = organizarListagem(clientes);        
+            System.gc();
+
+            if (opt.isEmpty()) {
+                opt.add(OpcaoCliente.DADOS);
+                opt.add(OpcaoCliente.CONTATOS);
+            }
+
+            this.provider.begin();
+            try {
+                //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
+                setNotificacao("Preparando para gravar cliente eventuais...", clientes.size());
+                ClienteEventualIDStack ids = provider.getClienteEventualIDStack(iniciarEm);
+                Map<Long, Integer> cnpjCadastrados = provider.eventual().getCnpjCadastrados();
+                MultiMap<String, ClienteEventualAnteriorVO> anteriores = provider.eventual().getAnteriores();
+                MultiMap<String, Void> contatos = provider.eventual().getContatosExistentes();
+                //</editor-fold>
+
+                setNotificacao("Gravando cliente eventual...", clientes.size());
+                for (ClienteIMP imp: clientes) {
+                    ClienteEventualAnteriorVO anterior = anteriores.get(
+                            provider.getSistema(),
+                            provider.getLojaOrigem(),
+                            imp.getId()
+                    );
+
+                    ClienteEventualVO cliente = null;
+
+                    //Se o cliente não tiver sido cadastrado anteriormente, executa.
+                    if (anterior == null) { 
+                        if (opt.contains(OpcaoCliente.DADOS)) {
+                            //Trata o cnpj
+                            long cnpj = Utils.stringToLong(imp.getCnpj(), -2);
+                            //Se o cnpj já estiver cadastrado, coloca -2 para gerar um novo.
+                            if (cnpjCadastrados.containsKey(cnpj)) {
+                                cnpj = -2;
+                            }
+
+                            //Obtem um ID válido.                    
+                            int id = ids.obterID(imp.getId());
+
+                            if (cnpj < 0) {
+                                cnpj = id;
+                            }
+
+                            //Converte os dados.
+                            cliente = converterClienteEventual(imp);                    
+                            cliente.setId(id);
+                            cliente.setCnpj(cnpj);
+
+                            anterior = converterClienteEventualAnterior(imp);
+                            anterior.setCodigoAtual(cliente);
+
+                            //Grava as informações
+                            gravarClienteEventual(cliente);
+                            gravarClienteEventualAnterior(anterior);   
+
+                            //Incluindo o produto nas listagens
+                            cnpjCadastrados.put(cnpj, id);
+                            anteriores.put(
+                                    anterior, 
+                                    provider.getSistema(),
+                                    provider.getLojaOrigem(),
+                                    imp.getId()
+                            );
                         }
-
-                        //Obtem um ID válido.                    
-                        int id = ids.obterID(imp.getId());
-
-                        if (cnpj < 0) {
-                            cnpj = id;
-                        }
-
-                        //Converte os dados.
-                        cliente = converterClienteEventual(imp);                    
-                        cliente.setId(id);
-                        cliente.setCnpj(cnpj);
-
-                        anterior = converterClienteEventualAnterior(imp);
-                        anterior.setCodigoAtual(cliente);
-
-                        //Grava as informações
-                        gravarClienteEventual(cliente);
-                        gravarClienteEventualAnterior(anterior);   
-
-                        //Incluindo o produto nas listagens
-                        cnpjCadastrados.put(cnpj, id);
-                        anteriores.put(
-                                anterior, 
-                                provider.getSistema(),
-                                provider.getLojaOrigem(),
-                                imp.getId()
-                        );
+                    } else {
+                        cliente = anterior.getCodigoAtual();
                     }
-                } else {
-                    cliente = anterior.getCodigoAtual();
-                }
-                
-                if (opt.contains(OpcaoCliente.CONTATOS)) {
-                    importarContatoEventual(cliente, imp, contatos);
-                }
 
-                notificar();
+                    if (opt.contains(OpcaoCliente.CONTATOS)) {
+                        importarContatoEventual(cliente, imp, contatos);
+                    }
+
+                    notificar();
+                }
+                this.provider.commit();
+
+                System.gc();
+            } catch (Exception e) {
+                this.provider.rollback();
+                throw e;
             }
-            this.provider.commit();
-            
-            System.gc();
-        } catch (Exception e) {
-            this.provider.rollback();
-            throw e;
-        }
         
+        }
     }
 
     private void importarContatoEventual(ClienteEventualVO cliente, ClienteIMP imp, MultiMap<String, Void> contatos) throws Exception {
@@ -647,7 +632,7 @@ public class ClienteRepository {
         try {
             //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
             setNotificacao("Preparando para gravar cliente preferêncial (Unificação)...", clientes.size());
-            ClientePreferencialIDStack ids = provider.getClientePreferencialIDStack();
+            ClientePreferencialIDStack ids = provider.getClientePreferencialIDStack(1);
             Map<Long, Integer> cnpjCadastrados = provider.preferencial().getCnpjCadastrados();
             MultiMap<String, ClientePreferencialAnteriorVO> anteriores = provider.preferencial().getAnteriores();
             MultiMap<String, Void> contatos = provider.preferencial().getContatosExistentes();
@@ -753,7 +738,7 @@ public class ClienteRepository {
         try {
             //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
             setNotificacao("Preparando para gravar cliente eventual (Unificação)...", clientes.size());
-            ClienteEventualIDStack ids = provider.getClienteEventualIDStack();
+            ClienteEventualIDStack ids = provider.getClienteEventualIDStack(1);
             Map<Long, Integer> cnpjCadastrados = provider.eventual().getCnpjCadastrados();
             MultiMap<String, ClienteEventualAnteriorVO> anteriores = provider.eventual().getAnteriores();
             MultiMap<String, Void> contatos = provider.eventual().getContatosExistentes();

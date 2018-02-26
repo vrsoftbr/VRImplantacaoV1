@@ -314,7 +314,7 @@ public class Importador {
         provider.setLojaOrigem(getInterfaceDAO().getLojaOrigem());
         provider.setLojaVR(getLojaVR());
         ClienteRepository rep = new ClienteRepository(provider);
-        rep.importarClientePreferencial(clientes, opcoes);
+        rep.importarClientePreferencial(clientes, new HashSet<>(Arrays.asList(opcoes)));
     }
 
     /**
@@ -330,7 +330,7 @@ public class Importador {
         provider.setLojaOrigem(getInterfaceDAO().getLojaOrigem());
         provider.setLojaVR(getLojaVR());
         ClienteRepository rep = new ClienteRepository(provider);
-        rep.importarClienteEventual(clientes, opcoes);
+        rep.importarClienteEventual(clientes, new HashSet<>(Arrays.asList(opcoes)));
     }
     
     public void importarCreditoRotativo() throws Exception {

@@ -15,6 +15,11 @@ public class ClientePreferencialIDStack {
     
     private IDStack stack;
     private Set<Integer> idsExistentes;
+    private final int iniciarEm;
+    
+    public ClientePreferencialIDStack(int iniciarEm) {
+        this.iniciarEm = iniciarEm;
+    }    
     
     public Set<Integer> obterIdsExistentes() throws Exception {
         Set<Integer> result = new HashSet<>();
@@ -38,7 +43,7 @@ public class ClientePreferencialIDStack {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT id from\n" +
-                    "(SELECT id FROM generate_series(1, 999999)\n" +
+                    "(SELECT id FROM generate_series(" + iniciarEm + ", 999999)\n" +
                     "AS s(id) EXCEPT SELECT id FROM clientepreferencial) AS codigointerno"
             )) {
                 while (rst.next()) {
