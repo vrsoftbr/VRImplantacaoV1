@@ -517,7 +517,7 @@ public class ProdutoRepository {
             debitoForaEstadoNfe = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, icmsReducaoSaida);
             
             if (icmsCstSaida == 20) {
-                double aliq = MathUtils.round(icmsAliqSaida - (icmsAliqSaida * (icmsReducaoSaida / 100)), 0);                
+                double aliq = MathUtils.round(icmsAliqSaida - (icmsAliqSaida * (icmsReducaoSaida / 100)), 1);                
                 consumidor = provider.tributo().getIcms(0, aliq, 0);
             } else {
                 consumidor = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, 0);

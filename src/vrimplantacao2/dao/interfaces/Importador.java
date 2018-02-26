@@ -410,32 +410,34 @@ public class Importador {
      * Unifica o cadastro dos clientes preferenciais. Todo cliente com CNPJ/CPF
      * válido será importado e os que não se enquadram nessa regra ficam 
      * gravados apenas na tabela implantacao.codant_clientepreferencial.
+     * @param opcoes Opções de importação.
      * @throws Exception 
      */
-    public void unificarClientePreferencial() throws Exception {
+    public void unificarClientePreferencial(OpcaoCliente... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando clientes preferenciais(Unificação)...");
         List<ClienteIMP> clientes = getInterfaceDAO().getClientesPreferenciais();
         ClienteRepositoryProvider provider = new ClienteRepositoryProvider();
         provider.setSistema(getSistema());
         provider.setLojaOrigem(getLojaOrigem());
         provider.setLojaVR(getLojaVR());
-        new ClienteRepository(provider).unificarClientePreferencial(clientes);
+        new ClienteRepository(provider).unificarClientePreferencial(clientes, new HashSet<>(Arrays.asList(opcoes)));
     }
     
     /**
      * Unifica o cadastro dos clientes eventuais. Todo cliente com CNPJ/CPF
      * válido será importado e os que não se enquadram nessa regra ficam 
      * gravados apenas na tabela implantacao.codant_clienteeventual.
+     * @param opcoes Opções da importação.
      * @throws Exception 
      */
-    public void unificarClienteEventual() throws Exception {
+    public void unificarClienteEventual(OpcaoCliente... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando clientes eventuais(Unificação)...");
         List<ClienteIMP> clientes = getInterfaceDAO().getClientesEventuais();
         ClienteRepositoryProvider provider = new ClienteRepositoryProvider();
         provider.setSistema(getSistema());
         provider.setLojaOrigem(getLojaOrigem());
         provider.setLojaVR(getLojaVR());
-        new ClienteRepository(provider).unificarClienteEventual(clientes);
+        new ClienteRepository(provider).unificarClienteEventual(clientes, new HashSet<>(Arrays.asList(opcoes)));
     }    
 
     /**

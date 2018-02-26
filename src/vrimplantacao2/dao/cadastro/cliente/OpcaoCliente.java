@@ -20,7 +20,7 @@ public enum OpcaoCliente {
                 return false;
             }
             try {
-                if (((int) getParametros().get("N_REINICIO")) > 0) {
+                if (((int) getParametros().get("N_REINICIO")) < 1) {
                     LOG.severe("Número de reinicio menor que 0");
                     return false;
                 }

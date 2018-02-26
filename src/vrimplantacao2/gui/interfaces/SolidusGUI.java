@@ -417,10 +417,28 @@ public class SolidusGUI extends VRInternalFrame {
                             importador.unificarProdutoFornecedor();
                         }                        
                         if (chkUnifClientePreferencial.isSelected()) {
-                            importador.unificarClientePreferencial();
+                            List<OpcaoCliente> opcoes = new ArrayList<>();
+                            if (chkReiniciarIDClienteUnif.isSelected()) {
+                                opcoes.add(
+                                    OpcaoCliente.IMP_REINICIAR_NUMERACAO.addParametro(
+                                        "N_REINICIO",
+                                        Utils.stringToInt(txtReiniciarIDClienteUnif.getText())
+                                    )
+                                );
+                            }
+                            importador.unificarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));
                         }                        
                         if (chkClienteEventual.isSelected()) {
-                            importador.unificarClienteEventual();
+                            List<OpcaoCliente> opcoes = new ArrayList<>();
+                            if (chkReiniciarIDClienteUnif.isSelected()) {
+                                opcoes.add(
+                                    OpcaoCliente.IMP_REINICIAR_NUMERACAO.addParametro(
+                                        "N_REINICIO",
+                                        Utils.stringToInt(txtReiniciarIDClienteUnif.getText())
+                                    )
+                                );
+                            }
+                            importador.unificarClienteEventual(opcoes.toArray(new OpcaoCliente[]{}));
                         }
                     }
                                        
@@ -519,6 +537,8 @@ public class SolidusGUI extends VRInternalFrame {
         chkUnifProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
+        chkReiniciarIDClienteUnif = new vrframework.bean.checkBox.VRCheckBox();
+        txtReiniciarIDClienteUnif = new vrframework.bean.textField.VRTextField();
         vRPanel6 = new vrframework.bean.panel.VRPanel();
         tabsConn = new javax.swing.JTabbedPane();
         jPanel4 = new javax.swing.JPanel();
@@ -1066,6 +1086,16 @@ public class SolidusGUI extends VRInternalFrame {
 
         chkUnifClienteEventual.setText("Cliente Eventual (Somente com CPF/CNPJ)");
 
+        chkReiniciarIDClienteUnif.setText("Reiniciar ID (Clientes)");
+        chkReiniciarIDClienteUnif.setEnabled(true);
+        chkReiniciarIDClienteUnif.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkReiniciarIDClienteUnifActionPerformed(evt);
+            }
+        });
+
+        txtReiniciarIDClienteUnif.setMascara("Numero");
+
         javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
         vRPanel2.setLayout(vRPanel2Layout);
         vRPanel2Layout.setHorizontalGroup(
@@ -1077,7 +1107,11 @@ public class SolidusGUI extends VRInternalFrame {
                     .addComponent(chkUnifFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(vRPanel2Layout.createSequentialGroup()
+                        .addComponent(chkReiniciarIDClienteUnif, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtReiniciarIDClienteUnif, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(188, Short.MAX_VALUE))
         );
         vRPanel2Layout.setVerticalGroup(
@@ -1093,7 +1127,11 @@ public class SolidusGUI extends VRInternalFrame {
                 .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(87, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
+                .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkReiniciarIDClienteUnif, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtReiniciarIDClienteUnif, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         tabs.addTab("Unificação", vRPanel2);
@@ -1275,7 +1313,7 @@ public class SolidusGUI extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE)
+                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -1398,6 +1436,10 @@ public class SolidusGUI extends VRInternalFrame {
     private void chkReiniciarIDClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkReiniciarIDClienteActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkReiniciarIDClienteActionPerformed
+
+    private void chkReiniciarIDClienteUnifActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkReiniciarIDClienteUnifActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkReiniciarIDClienteUnifActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
@@ -1424,6 +1466,7 @@ public class SolidusGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
     private vrframework.bean.checkBox.VRCheckBox chkReiniciarIDCliente;
+    private vrframework.bean.checkBox.VRCheckBox chkReiniciarIDClienteUnif;
     private vrframework.bean.checkBox.VRCheckBox chkT1AtivoInativo;
     private vrframework.bean.checkBox.VRCheckBox chkT1Custo;
     private vrframework.bean.checkBox.VRCheckBox chkT1DescCompleta;
@@ -1473,6 +1516,7 @@ public class SolidusGUI extends VRInternalFrame {
     private vrframework.bean.textField.VRTextField txtHost;
     private vrframework.bean.textField.VRTextField txtPorta;
     private vrframework.bean.textField.VRTextField txtReiniciarID;
+    private vrframework.bean.textField.VRTextField txtReiniciarIDClienteUnif;
     private vrframework.bean.passwordField.VRPasswordField txtSenha;
     private vrframework.bean.textField.VRTextField txtSistema;
     private vrframework.bean.textField.VRTextField txtUsuario;
