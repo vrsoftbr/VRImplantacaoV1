@@ -146,7 +146,7 @@ public class SuperusDAO extends InterfaceDAO {
                     + "  case p.pesvar when 'S' then 1 else 0 end as e_balanca,\n"
                     + "  case when p.pesvar = 'S' and p.tipo = 'P' then 'KG' else 'UN' end as tipoembalagem,\n"
                     + "  val.validade,  \n"
-                    + "  p.nome like descricaocompleta,\n"
+                    + "  p.nome descricaocompleta,\n"
                     + "  p.nome2 descricaoreduzida,\n"
                     + "  p.nome descricaogondola,\n"
                     + "  case p.inativo when 'S' then 0 else 1 end as id_situacaocadastro,\n"
@@ -251,6 +251,36 @@ public class SuperusDAO extends InterfaceDAO {
         return vProduto;
     }
 
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "codigo, "
+                    + "codbarra, "
+                    + "quantidade \n"
+                    + "from produtos_ean"
+            )) {
+                while (rst.next()) {
+                    if ((rst.getString("codbarra") != null)
+                            && (!rst.getString("codbarra").trim().isEmpty())
+                            && (Long.parseLong(Utils.formataNumero(rst.getString("codbarra"))) > 999999)) {
+
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("codigo"));
+                        imp.setEan(rst.getString("codbarra"));
+                        imp.setQtdEmbalagem(rst.getInt("quantidade"));
+                        result.add(imp);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -537,7 +567,7 @@ public class SuperusDAO extends InterfaceDAO {
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "(ch.loja||'-'||ch.codigo||'-'||ch.agencia||'-'||ch.cheque) id,\n"
+                    + "ch.chave id,\n"
                     + "ch.codigo as id_cliente, \n"
                     + "p.nome,\n"
                     + "p.ie, \n"

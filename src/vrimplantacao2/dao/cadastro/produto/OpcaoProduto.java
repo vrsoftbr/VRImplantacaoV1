@@ -134,6 +134,11 @@ public enum OpcaoProduto {
         public String toString() {
             return "Fabricante";
         }        
+    }, DATA_CADASTRO {
+        @Override
+        public String toString() {
+            return "Data Cadastro";
+        }
     }, IMPORTAR_RESETAR_BALANCA, IMPORTAR_GERAR_SUBNIVEL_MERC, IMPORTAR_MANTER_BALANCA, 
     CATEGORIA;
     
