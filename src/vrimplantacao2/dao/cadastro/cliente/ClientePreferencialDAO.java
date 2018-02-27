@@ -251,16 +251,18 @@ public class ClientePreferencialDAO {
                 }
                 if (opt.contains(OpcaoCliente.TELEFONE)) {
                     sql.put("telefone", vo.getTelefone());
-                    if (opt.contains(OpcaoCliente.ENDERECO_COMPLETO)) {
-                        sql.put("endereco", vo.getEndereco());
-                        sql.put("numero", vo.getNumero());
-                        sql.put("bairro", vo.getBairro());
-                        sql.put("id_municipio", vo.getId_municipio());
-                        sql.put("id_estado", vo.getId_estado());
-                    }
-                    sql.setWhere("id = " + vo.getId());
-                    stm.execute(sql.getUpdate());
                 }
+                if (opt.contains(OpcaoCliente.ENDERECO_COMPLETO)) {
+                    sql.put("endereco", vo.getEndereco());
+                    sql.put("numero", vo.getNumero());
+                    sql.put("bairro", vo.getBairro());
+                    sql.put("id_municipio", vo.getId_municipio());
+                    sql.put("id_estado", vo.getId_estado());
+                }
+
+                sql.setWhere("id = " + vo.getId());
+                stm.execute(sql.getUpdate());
+                
             }
         }
     }

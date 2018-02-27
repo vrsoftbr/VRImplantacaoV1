@@ -266,6 +266,9 @@ public class ProdutoDAO {
         if (opt.contains(OpcaoProduto.FABRICANTE)) {
             sql.put("id_fornecedorfabricante", vo.getIdFornecedorFabricante());
         }
+        if (opt.contains(OpcaoProduto.DATA_CADASTRO)) {
+            sql.put("datacadastro", vo.getDatacadastro());
+        }
         
         sql.setWhere("id = " + vo.getId());
         

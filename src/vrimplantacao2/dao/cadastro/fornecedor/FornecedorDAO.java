@@ -666,6 +666,9 @@ public class FornecedorDAO {
                 if (opt.contains(OpcaoFornecedor.INSCRICAO_ESTADUAL)) {
                     sql.put("inscricaoestadual", vo.getInscricaoEstadual());
                 }
+                if (opt.contains(OpcaoFornecedor.MUNICIPIO)) {
+                    sql.put("id_municipio", vo.getMunicipio().getId());
+                }
                 sql.setWhere("id = " + vo.getId());
                 stm.execute(sql.getUpdate());
             }

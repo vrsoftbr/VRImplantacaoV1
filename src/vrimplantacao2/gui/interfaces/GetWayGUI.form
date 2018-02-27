@@ -385,6 +385,14 @@
                     </Component>
                   </SubComponents>
                 </Container>
+                <Component class="vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton" name="btnMapaTrib">
+                  <Properties>
+                    <Property name="enabled" type="boolean" value="false"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMapaTribActionPerformed"/>
+                  </Events>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="vRPanel9">

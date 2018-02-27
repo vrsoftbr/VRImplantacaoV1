@@ -31,6 +31,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.verba.receber.ReceberVerbaDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
@@ -46,6 +47,7 @@ import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.cadastro.financeiro.ReceberDevolucaoVO;
 import vrimplantacao2.vo.cadastro.financeiro.ReceberVerbaVO;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -53,8 +55,8 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  *
  * @author lucasrafael
  */
-public class GetWayDAO extends InterfaceDAO {
-    
+public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
+
     private static final Logger LOG = Logger.getLogger(GetWayDAO.class.getName());
 
     public int v_tipoDocumento;
@@ -69,23 +71,23 @@ public class GetWayDAO extends InterfaceDAO {
 
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	CODLOJA id,\n" +
-                    "	descricao\n" +
-                    "from\n" +
-                    "	LOJA\n" +
-                    "order by\n" +
-                    "	id"
+                    "select\n"
+                    + "	CODLOJA id,\n"
+                    + "	descricao\n"
+                    + "from\n"
+                    + "	LOJA\n"
+                    + "order by\n"
+                    + "	id"
             )) {
                 while (rst.next()) {
                     result.add(new Estabelecimento(rst.getString("id"), rst.getString("descricao")));
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -154,140 +156,103 @@ public class GetWayDAO extends InterfaceDAO {
         double valIcmsCredito;
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select "
-                    + "fam.codfamilia, "
-                    + "prod.VALIDADE, "
-                    + "prod.codtrib, "
-                    + "prod.codprod, "
-                    + "prod.descricao, "
-                    + "prod.desc_pdv, "
-                    + "coalesce(merc.codcreceita, 1)as MERC1, "
-                    + "coalesce(merc.codgrupo, 1) as MERC2, "
-                    + "coalesce(merc.codcategoria, 1) as MERC3, "
-                    + "prod.codaliq, "
-                    + "prod.barra ean, "
-                    + "prod.unidade, "
-                    + "prod.estoque, "
-                    + "prod.preco_cust, "
-                    + "prod.preco_unit, "
-                    + "prod.margem_bruta, "
-                    + "prod.margem_param, "
-                    + "prod.codaliq_nf, "
-                    + "prod.obs, "
-                    + "prod.dtaltera, "
-                    + "prod.dtinclui, "
-                    + "prod.qtd_emb, "
-                    + "prod.preco_especial, "
-                    + "prod.cst_pisentrada, "
-                    + "prod.cst_pissaida, "
-                    + "prod.cst_cofinsentrada, "
-                    + "prod.cst_cofinssaida, "
-                    + "prod.nat_rec, "
-                    + "prod.generoitem_sef2, "
-                    + "prod.aliquota_ibpt, "
-                    + "prod.aliquota_ibptest, "
-                    + "prod.aliquota_ibptmun, "
-                    + "prod.codncm, "
-                    + "prod.ATIVO, "
-                    + "prod.CODCEST, "
-                    + "prod.QTD_EMBVENDA, "
-                    + "Prod.CODALIQ ALIQ_DEBITO, "
-                    + "A.VALORTRIB VAL_DEBITO, "
-                    + "Prod.CODTRIB CST_SAIDA, "
-                    + "Prod.CODALIQ_NF ALIQ_DEBITO_FORA_ESTADO, "
-                    + "A2.VALORTRIB VAL_DEBITO_FORA_ESTADO, "
-                    + "A.REDUCAO, "
-                    + "Prod.CODTRIB_ENT CST_ENTRADA, "
-                    + "Prod.PER_REDUC_ENT REDUCAO_CREDITO, "
-                    + "PROD.ULTICMSCRED, "
-                    + "PROD.CODCEST, "
-                    + "prod.DTINCLUI,"
-                    + "prod.DESATIVACOMPRA "
-                    + "from produtos prod "
-                    + "inner join ALIQUOTA_ICMS A on A.CODALIQ = PROD.CODALIQ "
-                    + "INNER JOIN ALIQUOTA_ICMS A2 ON A2.CODALIQ = PROD.CODALIQ_NF "
-                    + "left outer join CATEGORIA merc ON merc.CODCRECEITA = prod.codcreceita "
-                    + " and merc.CODGRUPO = prod.codgrupo and merc.CODCATEGORIA = prod.codcategoria "
-                    + "left outer join PROD_FAMILIA fam ON fam.CODPROD = prod.CODPROD and prod.codprod > 0 "
-                    + "union all"
-                    + " select "
-                    + "fam.codfamilia, "
-                    + "prod.VALIDADE, "
-                    + "prod.codtrib, "
-                    + "prod.codprod, "
-                    + "prod.descricao, "
-                    + "prod.desc_pdv, "
-                    + "coalesce(merc.codcreceita, 1)as MERC1, "
-                    + "coalesce(merc.codgrupo, 1) as MERC2, "
-                    + "coalesce(merc.codcategoria, 1) as MERC3, "
-                    + "prod.codaliq, "
-                    + "BAR.BARRA ean, "
-                    + "prod.unidade, "
-                    + "prod.estoque, "
-                    + "prod.preco_cust, "
-                    + "prod.preco_unit, "
-                    + "prod.margem_bruta, "
-                    + "prod.margem_param, "
-                    + "prod.codaliq_nf, "
-                    + "prod.obs, "
-                    + "prod.dtaltera, "
-                    + "prod.dtinclui, "
-                    + "prod.qtd_emb, "
-                    + "prod.preco_especial, "
-                    + "prod.cst_pisentrada, "
-                    + "prod.cst_pissaida, "
-                    + "prod.cst_cofinsentrada, "
-                    + "prod.cst_cofinssaida, "
-                    + "prod.nat_rec, "
-                    + "prod.generoitem_sef2, "
-                    + "prod.aliquota_ibpt, "
-                    + "prod.aliquota_ibptest, "
-                    + "prod.aliquota_ibptmun, "
-                    + "prod.codncm, "
-                    + "prod.ATIVO, "
-                    + "prod.CODCEST, "
-                    + "prod.QTD_EMBVENDA, "
-                    + "Prod.CODALIQ ALIQ_DEBITO, "
-                    + "A.VALORTRIB VAL_DEBITO, "
-                    + "Prod.CODTRIB CST_SAIDA, "
-                    + "Prod.CODALIQ_NF ALIQ_DEBITO_FORA_ESTADO, "
-                    + "A2.VALORTRIB VAL_DEBITO_FORA_ESTADO, "
-                    + "A.REDUCAO, "
-                    + "Prod.CODTRIB_ENT CST_ENTRADA, "
-                    + "Prod.PER_REDUC_ENT REDUCAO_CREDITO, "
-                    + "PROD.ULTICMSCRED, "
-                    + "PROD.CODCEST, "
-                    + "prod.DTINCLUI, "
-                    + "prod.DESATIVACOMPRA "
-                    + "from produtos prod "
-                    + "inner join ALIQUOTA_ICMS A on A.CODALIQ = PROD.CODALIQ "
-                    + "INNER JOIN ALIQUOTA_ICMS A2 ON A2.CODALIQ = PROD.CODALIQ_NF "
-                    + "left outer join CATEGORIA merc ON merc.CODCRECEITA = prod.codcreceita "
-                    + "and merc.CODGRUPO = prod.codgrupo and merc.CODCATEGORIA = prod.codcategoria "
-                    + "left outer join PROD_FAMILIA fam ON fam.CODPROD = prod.CODPROD and prod.codprod > 0 "
-                    + "inner join ALTERNATIVO BAR on BAR.CODPROD = PROD.CODPROD and LEN(BAR.BARRA) > 6 "
-                    + "order by prod.codprod "
+                    "select\n"
+                    + "    fam.codfamilia,\n"
+                    + "    prod.validade,\n"
+                    + "    prod.codprod,\n"
+                    + "    prod.descricao,\n"
+                    + "    prod.desc_pdv,\n"
+                    + "    coalesce(merc.codcreceita, 1) as merc1,\n"
+                    + "    coalesce(merc.codgrupo, 1) as merc2,\n"
+                    + "    coalesce(merc.codcategoria, 1) as merc3,\n"
+                    + "    prod.codaliq,\n"
+                    + "    prod.barra ean,\n"
+                    + "    prod.unidade,\n"
+                    + "    prod.estoque,\n"
+                    + "    prod.preco_cust,\n"
+                    + "    prod.preco_unit,\n"
+                    + "    prod.margem_bruta,\n"
+                    + "    prod.margem_param,\n"
+                    + "    prod.codaliq_nf,\n"
+                    + "    prod.obs,\n"
+                    + "    prod.dtaltera,\n"
+                    + "    prod.dtinclui,\n"
+                    + "    prod.qtd_emb,\n"
+                    + "    prod.preco_especial,\n"
+                    + "    prod.cst_pisentrada,\n"
+                    + "    prod.cst_pissaida,\n"
+                    + "    prod.cst_cofinsentrada,\n"
+                    + "    prod.cst_cofinssaida,\n"
+                    + "    prod.nat_rec,\n"
+                    + "    prod.generoitem_sef2,\n"
+                    + "    prod.aliquota_ibpt,\n"
+                    + "    prod.aliquota_ibptest,\n"
+                    + "    prod.aliquota_ibptmun,\n"
+                    + "    prod.codncm,\n"
+                    + "    prod.ativo,\n"
+                    + "    prod.codcest,\n"
+                    + "    prod.qtd_embvenda,\n"
+                    + "    prod.codaliq cst_debito,\n"
+                    + "    prod.codaliq_nf cst_entrada,\n"
+                    + "    prod.codcest,\n"
+                    + "    prod.dtinclui,\n"
+                    + "    prod.desativacompra\n"
+                    + "from\n"
+                    + "    produtos prod\n"
+                    + "    left outer join categoria merc on merc.codcreceita = prod.codcreceita and merc.codgrupo = prod.codgrupo and merc.codcategoria = prod.codcategoria\n"
+                    + "    left outer join prod_familia fam on fam.codprod = prod.codprod and prod.codprod > 0\n"
+                    + "union all\n"
+                    + "select\n"
+                    + "    fam.codfamilia,\n"
+                    + "    prod.validade,\n"
+                    + "    prod.codprod,\n"
+                    + "    prod.descricao,\n"
+                    + "    prod.desc_pdv,\n"
+                    + "    coalesce(merc.codcreceita, 1) as merc1,\n"
+                    + "    coalesce(merc.codgrupo, 1) as merc2,\n"
+                    + "    coalesce(merc.codcategoria, 1) as merc3,\n"
+                    + "    prod.codaliq,\n"
+                    + "    bar.barra ean,\n"
+                    + "    prod.unidade,\n"
+                    + "    prod.estoque,\n"
+                    + "    prod.preco_cust,\n"
+                    + "    prod.preco_unit,\n"
+                    + "    prod.margem_bruta,\n"
+                    + "    prod.margem_param,\n"
+                    + "    prod.codaliq_nf,\n"
+                    + "    prod.obs,\n"
+                    + "    prod.dtaltera,\n"
+                    + "    prod.dtinclui,\n"
+                    + "    prod.qtd_emb,\n"
+                    + "    prod.preco_especial,\n"
+                    + "    prod.cst_pisentrada,\n"
+                    + "    prod.cst_pissaida,\n"
+                    + "    prod.cst_cofinsentrada,\n"
+                    + "    prod.cst_cofinssaida,\n"
+                    + "    prod.nat_rec,\n"
+                    + "    prod.generoitem_sef2,\n"
+                    + "    prod.aliquota_ibpt,\n"
+                    + "    prod.aliquota_ibptest,\n"
+                    + "    prod.aliquota_ibptmun,\n"
+                    + "    prod.codncm,\n"
+                    + "    prod.ativo,\n"
+                    + "    prod.codcest,\n"
+                    + "    prod.qtd_embvenda,\n"
+                    + "    prod.codaliq cst_debito,\n"
+                    + "    prod.codaliq_nf cst_credito,\n"
+                    + "    prod.codcest,\n"
+                    + "    prod.dtinclui,\n"
+                    + "    prod.desativacompra\n"
+                    + "from\n"
+                    + "    produtos prod\n"
+                    + "    left outer join categoria merc on merc.codcreceita = prod.codcreceita and merc.codgrupo = prod.codgrupo and merc.codcategoria = prod.codcategoria\n"
+                    + "    left outer join prod_familia fam on fam.codprod = prod.codprod and prod.codprod > 0\n"
+                    + "    inner join alternativo bar on bar.codprod = prod.codprod and len(bar.barra) > 6\n"
+                    + "order by\n"
+                    + "    prod.codprod"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
-                    cstSaida = Integer.parseInt(Utils.formataNumero(rst.getString("CST_SAIDA")));
-                    cstEntrada = Integer.parseInt(Utils.formataNumero(rst.getString("CST_ENTRADA")));
-
-                    if (cstSaida > 9) {
-                        cstSaida = Integer.parseInt(String.valueOf(cstSaida).substring(0, 2));
-                    }
-                    if (cstEntrada > 9) {
-                        cstEntrada = Integer.parseInt(String.valueOf(cstEntrada).substring(0, 2));
-                    }
-
-                    valIcmsCredito = 0;
-
-                    if ((Integer.parseInt(Utils.formataNumero(rst.getString("CST_ENTRADA"))) == 0)
-                            && (rst.getDouble("ULTICMSCRED") == 0.0)) {
-                        valIcmsCredito = rst.getDouble("VAL_DEBITO_FORA_ESTADO");
-                    } else {
-                        valIcmsCredito = rst.getDouble("ULTICMSCRED");
-                    }
 
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -320,29 +285,14 @@ public class GetWayDAO extends InterfaceDAO {
                     imp.setPiscofinsCstCredito(rst.getInt("cst_pisentrada"));
                     imp.setPiscofinsNaturezaReceita(Integer.parseInt(Utils.formataNumero(rst.getString("NAT_REC"))));
 
-                    imp.setIcmsCstSaida(cstSaida);
-                    imp.setIcmsAliqSaida(rst.getDouble("VAL_DEBITO"));
-                    imp.setIcmsReducaoSaida(rst.getDouble("REDUCAO"));
-
-                    if (rst.getDouble("REDUCAO_CREDITO") == 33.33) {
-                        valIcmsCredito = 18;
-                    } else if (rst.getDouble("REDUCAO_CREDITO") == 52) {
-                        valIcmsCredito = 25;
-                    } else if (rst.getDouble("REDUCAO_CREDITO") == 41.67) {
-                        valIcmsCredito = 12;
-                    } else if (rst.getDouble("REDUCAO_CREDITO") == 61.11) {
-                        valIcmsCredito = 18;
-                    }
-
-                    imp.setIcmsCstEntrada(cstEntrada);
-                    imp.setIcmsAliqEntrada(valIcmsCredito);
-                    imp.setIcmsReducaoEntrada(rst.getDouble("REDUCAO_CREDITO"));
+                    imp.setIcmsDebitoId(rst.getString("CST_DEBITO"));
+                    imp.setIcmsCreditoId(rst.getString("CST_ENTRADA"));
 
                     if ((rst.getString("ean") != null)
                             && (!rst.getString("ean").trim().isEmpty())
                             && (rst.getString("ean").trim().length() >= 4)
                             && (rst.getString("ean").trim().length() <= 6)) {
-                        
+
                         if (v_usar_arquivoBalanca) {
                             ProdutoBalancaVO produtoBalanca;
                             long codigoProduto;
@@ -1127,7 +1077,7 @@ public class GetWayDAO extends InterfaceDAO {
             Conexao.rollback();
             throw ex;
         }
-    } 
+    }
 
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
@@ -1139,7 +1089,7 @@ public class GetWayDAO extends InterfaceDAO {
     public void setDataTerminoVenda(Date dataTerminoVenda) {
         this.dataTerminoVenda = dataTerminoVenda;
     }
-    
+
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         return new VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
@@ -1149,17 +1099,33 @@ public class GetWayDAO extends InterfaceDAO {
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
     }
-    
+
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList();
+
+        try (Statement stmt = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = stmt.executeQuery(
+                    "select codaliq, descricao from aliquota_icms"
+            )) {
+                while (rs.next()) {
+                    result.add(new MapaTributoIMP(rs.getString("codaliq"), rs.getString("descricao")));
+                }
+            }
+        }
+        return result;
+    }
+
     private static class VendaIterator implements Iterator<VendaIMP> {
-        
+
         private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
-        
+
         private Statement stm = ConexaoSqlServer.getConexao().createStatement();
         private ResultSet rst;
         private String sql;
         private VendaIMP next;
         private Set<String> uk = new HashSet<>();
-        
+
         private void obterNext() {
             try {
                 SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
@@ -1187,15 +1153,15 @@ public class GetWayDAO extends InterfaceDAO {
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setNumeroSerie(rst.getString("numeroserie"));
                         next.setModeloImpressora(rst.getString("modelo"));
-                        next.setNomeCliente(rst.getString("nomecliente"));                        
-                        String endereco = 
-                                Utils.acertarTexto(rst.getString("endereco")) + "," +
-                                Utils.acertarTexto(rst.getString("numero")) + "," +
-                                Utils.acertarTexto(rst.getString("complemento")) + "," +
-                                Utils.acertarTexto(rst.getString("bairro")) + "," +
-                                Utils.acertarTexto(rst.getString("cidade")) + "-" +
-                                Utils.acertarTexto(rst.getString("estado")) + "," +
-                                Utils.acertarTexto(rst.getString("cep"));
+                        next.setNomeCliente(rst.getString("nomecliente"));
+                        String endereco
+                                = Utils.acertarTexto(rst.getString("endereco")) + ","
+                                + Utils.acertarTexto(rst.getString("numero")) + ","
+                                + Utils.acertarTexto(rst.getString("complemento")) + ","
+                                + Utils.acertarTexto(rst.getString("bairro")) + ","
+                                + Utils.acertarTexto(rst.getString("cidade")) + "-"
+                                + Utils.acertarTexto(rst.getString("estado")) + ","
+                                + Utils.acertarTexto(rst.getString("cep"));
                         next.setEnderecoCliente(endereco);
                     }
                 }
@@ -1203,68 +1169,67 @@ public class GetWayDAO extends InterfaceDAO {
                 LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
                 throw new RuntimeException(ex);
             }
-        }        
-        
-        public VendaIterator (String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
-            this.sql = 
-                    "select\n" +
-                    "    cx.coo as numerocupom,\n" +
-                    "    cx.codcaixa as ecf,\n" +
-                    "    cx.data as data,\n" +
-                    "    cx.cliente as idclientepreferencial,\n" +
-                    "    min(cx.hora) as horainicio,\n" +
-                    "    max(cx.hora) as horatermino,\n" +
-                    "    min(case when cx.cancelado = 'N' then 0 else 1 end) as cancelado,\n" +
-                    "    sum(cx.totitem) as subtotalimpressora,\n" +
-                    "    cl.cnpj_cpf cpf,\n" +
-                    "    sum(isnull(cx.descitem,0)) desconto,\n" +
-                    "    sum(isnull(cx.acrescitem, 0)) acrescimo,\n" +
-                    "    pdv.NUM_SERIE numeroserie,\n" +
-                    "    pdv.IMP_MODELO modelo,\n" +
-                    "    pdv.IMP_MARCA marca,\n" +
-                    "    cl.razao nomecliente,\n" +
-                    "    cl.endereco,\n" +
-                    "    cl.numero,\n" +
-                    "    cl.complemento,\n" +
-                    "    cl.bairro,\n" +
-                    "    cl.cidade,\n" +
-                    "    cl.estado,\n" +
-                    "    cl.cep\n" +
-                    "from\n" +
-                    "    caixageral as cx\n" +
-                    "    join PRODUTOS pr on cx.codprod = pr.codprod\n" +
-                    "    left join creceita c on pr.codcreceita = c.codcreceita\n" +
-                    "    left join clientes cl on cx.cliente = cast(cl.codclie as varchar(20))\n" +
-                    "    left join parampdv pdv on cx.codloja = pdv.CODLOJA and cx.codcaixa = pdv.CODCAIXA\n" +
-                    "where\n" +
-                    "    cx.tipolancto = '' and\n" +
-                    "    (cx.data between convert(datetime, '" + FORMAT.format(dataInicio) + "', 103) and convert(datetime, '" + FORMAT.format(dataTermino) + "', 103)) and\n" +
-                    "    cx.codloja = " + idLojaCliente + " and\n" +
-                    "    cx.atualizado = 'S' and\n" +
-                    "    (cx.flgrupo = 'S' or cx.flgrupo = 'N')\n" +
-                    "group by\n" +
-                    "	 cx.coo,\n" +
-                    "    cx.codcaixa,\n" +
-                    "    cx.data,\n" +
-                    "    cx.cliente,\n" +
-                    "	 cl.cnpj_cpf,\n" +
-                    "    pdv.NUM_SERIE,\n" +
-                    "    pdv.IMP_MODELO,\n" +
-                    "    pdv.IMP_MARCA,\n" +
-                    "    cl.razao,\n" +
-                    "    cl.endereco,\n" +
-                    "    cl.numero,\n" +
-                    "    cl.complemento,\n" +
-                    "    cl.bairro,\n" +
-                    "    cl.cidade,\n" +
-                    "    cl.estado,\n" +
-                    "    cl.cep\n" +
-                    "order by\n" +
-                    "    data, numerocupom";
+        }
+
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            this.sql
+                    = "select\n"
+                    + "    cx.coo as numerocupom,\n"
+                    + "    cx.codcaixa as ecf,\n"
+                    + "    cx.data as data,\n"
+                    + "    cx.cliente as idclientepreferencial,\n"
+                    + "    min(cx.hora) as horainicio,\n"
+                    + "    max(cx.hora) as horatermino,\n"
+                    + "    min(case when cx.cancelado = 'N' then 0 else 1 end) as cancelado,\n"
+                    + "    sum(cx.totitem) as subtotalimpressora,\n"
+                    + "    cl.cnpj_cpf cpf,\n"
+                    + "    sum(isnull(cx.descitem,0)) desconto,\n"
+                    + "    sum(isnull(cx.acrescitem, 0)) acrescimo,\n"
+                    + "    pdv.NUM_SERIE numeroserie,\n"
+                    + "    pdv.IMP_MODELO modelo,\n"
+                    + "    pdv.IMP_MARCA marca,\n"
+                    + "    cl.razao nomecliente,\n"
+                    + "    cl.endereco,\n"
+                    + "    cl.numero,\n"
+                    + "    cl.complemento,\n"
+                    + "    cl.bairro,\n"
+                    + "    cl.cidade,\n"
+                    + "    cl.estado,\n"
+                    + "    cl.cep\n"
+                    + "from\n"
+                    + "    caixageral as cx\n"
+                    + "    join PRODUTOS pr on cx.codprod = pr.codprod\n"
+                    + "    left join creceita c on pr.codcreceita = c.codcreceita\n"
+                    + "    left join clientes cl on cx.cliente = cast(cl.codclie as varchar(20))\n"
+                    + "    left join parampdv pdv on cx.codloja = pdv.CODLOJA and cx.codcaixa = pdv.CODCAIXA\n"
+                    + "where\n"
+                    + "    cx.tipolancto = '' and\n"
+                    + "    (cx.data between convert(datetime, '" + FORMAT.format(dataInicio) + "', 103) and convert(datetime, '" + FORMAT.format(dataTermino) + "', 103)) and\n"
+                    + "    cx.codloja = " + idLojaCliente + " and\n"
+                    + "    cx.atualizado = 'S' and\n"
+                    + "    (cx.flgrupo = 'S' or cx.flgrupo = 'N')\n"
+                    + "group by\n"
+                    + "	 cx.coo,\n"
+                    + "    cx.codcaixa,\n"
+                    + "    cx.data,\n"
+                    + "    cx.cliente,\n"
+                    + "	 cl.cnpj_cpf,\n"
+                    + "    pdv.NUM_SERIE,\n"
+                    + "    pdv.IMP_MODELO,\n"
+                    + "    pdv.IMP_MARCA,\n"
+                    + "    cl.razao,\n"
+                    + "    cl.endereco,\n"
+                    + "    cl.numero,\n"
+                    + "    cl.complemento,\n"
+                    + "    cl.bairro,\n"
+                    + "    cl.cidade,\n"
+                    + "    cl.estado,\n"
+                    + "    cl.cep\n"
+                    + "order by\n"
+                    + "    data, numerocupom";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
-       
 
         @Override
         public boolean hasNext() {
@@ -1284,18 +1249,18 @@ public class GetWayDAO extends InterfaceDAO {
         public void remove() {
             throw new UnsupportedOperationException("Not supported.");
         }
-    
+
     }
-    
+
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
         private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
-        
+
         private Statement stm = ConexaoSqlServer.getConexao().createStatement();
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
-        
+
         private void obterNext() {
             try {
                 if (next == null) {
@@ -1314,12 +1279,12 @@ public class GetWayDAO extends InterfaceDAO {
                         next.setCancelado(rst.getBoolean("cancelado"));
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setUnidadeMedida(rst.getString("unidade"));
-                        
+
                         String trib = rst.getString("codaliq_venda");
                         if (trib == null || "".equals(trib)) {
                             trib = rst.getString("codaliq_produto");
                         }
-                        
+
                         obterAliquota(next, trib);
                     }
                 }
@@ -1327,12 +1292,13 @@ public class GetWayDAO extends InterfaceDAO {
                 LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
                 throw new RuntimeException(ex);
             }
-        }        
+        }
 
         /**
          * Método temporario, desenvolver um mapeamento eficiente da tributação.
+         *
          * @param item
-         * @throws SQLException 
+         * @throws SQLException
          */
         public void obterAliquota(VendaItemIMP item, String icms) throws SQLException {
             /*
@@ -1344,7 +1310,7 @@ public class GetWayDAO extends InterfaceDAO {
             I	0.00	ISENTO
             F	0.00	SUBST TRIBUTARIA
             N	0.00	NAO INCIDENTE
-            */
+             */
             int cst;
             double aliq;
             switch (icms) {
@@ -1384,42 +1350,41 @@ public class GetWayDAO extends InterfaceDAO {
             item.setIcmsCst(cst);
             item.setIcmsAliq(aliq);
         }
-        
-        public VendaItemIterator (String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
-            this.sql = 
-                    "select\n" +
-                    "    cx.id,\n" +
-                    "    cx.coo as numerocupom,\n" +
-                    "    cx.codcaixa as ecf,\n" +
-                    "    cx.data as data,\n" +
-                    "    cx.codprod as produto,\n" +
-                    "    pr.DESC_PDV as descricao,    \n" +
-                    "    isnull(cx.qtd, 0) as quantidade,\n" +
-                    "    isnull(cx.totitem, 0) as total,\n" +
-                    "    case when cx.cancelado = 'N' then 0 else 1 end as cancelado,\n" +
-                    "    isnull(cx.descitem, 0) as desconto,\n" +
-                    "    isnull(cx.acrescitem, 0) as acrescimo,\n" +
-                    "    cx.barra codigobarras,\n" +
-                    "    pr.unidade,\n" +
-                    "    cx.codaliq codaliq_venda,\n" +
-                    "    pr.codaliq codaliq_produto,\n" +
-                    "    ic.DESCRICAO trib_desc\n" +
-                    "from\n" +
-                    "    caixageral as cx\n" +
-                    "    join PRODUTOS pr on cx.codprod = pr.codprod\n" +
-                    "    left join creceita c on pr.codcreceita = c.codcreceita\n" +
-                    "    left join clientes cl on cx.cliente = cast(cl.codclie as varchar(20))\n" +
-                    "    left join ALIQUOTA_ICMS ic on pr.codaliq = ic.codaliq\n" +
-                    "where\n" +
-                    "    cx.tipolancto = '' and\n" +
-                    "    (cx.data between convert(datetime, '" + FORMAT.format(dataInicio) + "', 103) and convert(datetime, '" + FORMAT.format(dataTermino) + "', 103)) and\n" +
-                    "    cx.codloja = " + idLojaCliente + " and\n" +
-                    "    cx.atualizado = 'S' and\n" +
-                    "    (cx.flgrupo = 'S' or cx.flgrupo = 'N')";
+
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            this.sql
+                    = "select\n"
+                    + "    cx.id,\n"
+                    + "    cx.coo as numerocupom,\n"
+                    + "    cx.codcaixa as ecf,\n"
+                    + "    cx.data as data,\n"
+                    + "    cx.codprod as produto,\n"
+                    + "    pr.DESC_PDV as descricao,    \n"
+                    + "    isnull(cx.qtd, 0) as quantidade,\n"
+                    + "    isnull(cx.totitem, 0) as total,\n"
+                    + "    case when cx.cancelado = 'N' then 0 else 1 end as cancelado,\n"
+                    + "    isnull(cx.descitem, 0) as desconto,\n"
+                    + "    isnull(cx.acrescitem, 0) as acrescimo,\n"
+                    + "    cx.barra codigobarras,\n"
+                    + "    pr.unidade,\n"
+                    + "    cx.codaliq codaliq_venda,\n"
+                    + "    pr.codaliq codaliq_produto,\n"
+                    + "    ic.DESCRICAO trib_desc\n"
+                    + "from\n"
+                    + "    caixageral as cx\n"
+                    + "    join PRODUTOS pr on cx.codprod = pr.codprod\n"
+                    + "    left join creceita c on pr.codcreceita = c.codcreceita\n"
+                    + "    left join clientes cl on cx.cliente = cast(cl.codclie as varchar(20))\n"
+                    + "    left join ALIQUOTA_ICMS ic on pr.codaliq = ic.codaliq\n"
+                    + "where\n"
+                    + "    cx.tipolancto = '' and\n"
+                    + "    (cx.data between convert(datetime, '" + FORMAT.format(dataInicio) + "', 103) and convert(datetime, '" + FORMAT.format(dataTermino) + "', 103)) and\n"
+                    + "    cx.codloja = " + idLojaCliente + " and\n"
+                    + "    cx.atualizado = 'S' and\n"
+                    + "    (cx.flgrupo = 'S' or cx.flgrupo = 'N')";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
-       
 
         @Override
         public boolean hasNext() {
@@ -1440,5 +1405,5 @@ public class GetWayDAO extends InterfaceDAO {
             throw new UnsupportedOperationException("Not supported.");
         }
     }
-    
+
 }
