@@ -641,7 +641,7 @@ public class ClienteRepositoryTest {
         teste.add(clienteImp4);
         teste.add(clienteImp11);
         
-        repository.unificarClientePreferencial(teste);
+        repository.unificarClientePreferencial(teste, EnumSet.noneOf(OpcaoCliente.class));
         
         assertEquals(3, pref.size());
         ClientePreferencialTestClasses.assert1(pref.get(0));
@@ -706,7 +706,7 @@ public class ClienteRepositoryTest {
         teste.add(clienteImp4);
         teste.add(clienteImp11);
         
-        repository.unificarClienteEventual(teste);
+        repository.unificarClienteEventual(teste, EnumSet.noneOf(OpcaoCliente.class));
         
         assertEquals(3, pref.size());
         ClienteEventualTestClasses.assert1(pref.get(0));
