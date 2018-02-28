@@ -143,8 +143,8 @@ public class DestroDAO extends InterfaceDAO {
                     imp.setIcmsAliq(rst.getDouble("I_PER"));
                     imp.setIcmsReducao(rst.getDouble("i_prb"));
 
-                    if ((Double.parseDouble(Utils.formataNumero(rst.getString("i_bar"))) < 10000)
-                            && (Double.parseDouble(Utils.formataNumero(rst.getString("i_bar"))) > 0)) {
+                    if ((Double.parseDouble(Utils.formataNumero(rst.getString("i_bar")))
+                            == (Double.parseDouble(Utils.formataNumero(rst.getString("id")))))) {
                         imp.seteBalanca(true);
                     } else {
                         imp.seteBalanca(false);
@@ -162,27 +162,20 @@ public class DestroDAO extends InterfaceDAO {
             List<ProdutoIMP> result = new ArrayList<>();
             try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "WITH\n"
-                        + "mov AS(\n"
-                        + "    select m.estitem_chave, MAX(movestoq_chave) as movi\n"
-                        + "    FROM movestoq as m\n"
-                        + "    where m.filial_chave in (" + getLojaOrigem() + ")\n"
-                        + "    group by m.estitem_chave\n"
-                        + ")\n"
-                        + "select\n"
-                        + "    m.estitem_chave id_produto,\n"
-                        + "    m.preco_custo custo\n"
-                        + "from movestoq as m\n"
-                        + "inner join mov on mov.estitem_chave = m.estitem_chave AND mov.movi = m.movestoq_chave\n"
-                        + "where m.filial_chave in (" + getLojaOrigem() + ")"
+                        "select\n"
+                        + "estitem_chave id_produto, "
+                        + "t_cus\n"
+                        + "from item\n"
+                        + "where filial_chave = " + getLojaOrigem() + "\n"
+                        + "order by estitem_chave"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("id_produto"));
-                        imp.setCustoComImposto(rst.getDouble("custo"));
-                        imp.setCustoSemImposto(rst.getDouble("custo"));
+                        imp.setCustoComImposto(rst.getDouble("t_cus"));
+                        imp.setCustoSemImposto(rst.getDouble("t_cus"));
                         result.add(imp);
                     }
                 }
@@ -192,19 +185,12 @@ public class DestroDAO extends InterfaceDAO {
             List<ProdutoIMP> result = new ArrayList<>();
             try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "WITH\n"
-                        + "mov AS(\n"
-                        + "    select m.estitem_chave, MAX(movestoq_chave) as movi\n"
-                        + "    FROM movestoq as m\n"
-                        + "    where m.filial_chave in (" + getLojaOrigem() + ")\n"
-                        + "    group by m.estitem_chave\n"
-                        + ")\n"
-                        + "select\n"
-                        + "    m.estitem_chave id_produto,\n"
-                        + "    m.preco_venda venda\n"
-                        + "from movestoq as m\n"
-                        + "inner join mov on mov.estitem_chave = m.estitem_chave AND mov.movi = m.movestoq_chave\n"
-                        + "where m.filial_chave in (" + getLojaOrigem() + ")"
+                        "select\n"
+                        + "estitem_chave id_produto, "
+                        + "t_pv1 venda "
+                        + "from item\n"
+                        + "where filial_chave = " + getLojaOrigem() + "\n"
+                        + "order by estitem_chave"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();

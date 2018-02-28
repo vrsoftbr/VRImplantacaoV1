@@ -251,7 +251,7 @@ public class SisMouraDAO extends InterfaceDAO {
                     + "	p.Fone fone1,\n"
                     + "	p.RG inscricaoestadual,\n"
                     + "	p.cpf cnpj,\n"
-                    + "	p.Observacao,\n"
+                    + "	p.Obs,\n"
                     + "	p.Fone2,\n"
                     + "	p.Fax,\n"
                     + "	coalesce(p.Email, p.email_utilizado, p.Emails_Promocionais) email,\n"
@@ -283,7 +283,7 @@ public class SisMouraDAO extends InterfaceDAO {
                     imp.setIbge_uf(rst.getInt("id_estado"));
                     imp.setDatacadastro(rst.getDate("dataCadastro"));
                     imp.setTel_principal(rst.getString("fone1"));
-                    imp.setObservacao(rst.getString("Observacao"));
+                    imp.setObservacao(rst.getString("Obs"));
                     imp.setAtivo((rst.getInt("id_situacaocadastro") == 1));
                     imp.setCob_endereco(rst.getString("cob_endereco"));
                     imp.setCob_numero(rst.getString("cob_numero"));
@@ -298,6 +298,7 @@ public class SisMouraDAO extends InterfaceDAO {
                                 "1",
                                 "TELEFONE 2",
                                 rst.getString("Fone2"),
+                                null,
                                 TipoContato.COMERCIAL,
                                 null
                         );
@@ -308,6 +309,7 @@ public class SisMouraDAO extends InterfaceDAO {
                                 "2",
                                 "FAX",
                                 rst.getString("Fax"),
+                                null,
                                 TipoContato.COMERCIAL,
                                 null
                         );
@@ -317,6 +319,7 @@ public class SisMouraDAO extends InterfaceDAO {
                         imp.addContato(
                                 "3",
                                 "EMAIL",
+                                null,
                                 null,
                                 TipoContato.COMERCIAL,
                                 rst.getString("email").toLowerCase()

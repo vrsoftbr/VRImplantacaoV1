@@ -56,13 +56,9 @@ public class WmsiGUI extends VRInternalFrame {
         params.put(txtPorta.getText(), SISTEMA, "PORTA");
         params.put(txtUsuario.getText(), SISTEMA, "USUARIO");
         params.put(txtSenha.getText(), SISTEMA, "SENHA");
-        params.put(txtStrConexao.getText(), SISTEMA, "STR_CONN");
+        params.put(txtStrConexao.getText(), SISTEMA, "STR_CONN");        
         params.put(tabsConn.getSelectedIndex() == 1, SISTEMA, "USAR_STRING_CONN");
-        Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
-        if (cliente != null) {
-            params.put(cliente.cnpj, SISTEMA, "LOJA_CLIENTE");
-            vLojaCliente = cliente.cnpj;
-        }
+        params.put(txtLojaOrigem.getText(), SISTEMA, "LOJA_CLIENTE");
         ItemComboVO vr = (ItemComboVO) cmbLojaVR.getSelectedItem();
         if (vr != null) {
             params.put(vr.id, SISTEMA, "LOJA_VR");
@@ -131,8 +127,8 @@ public class WmsiGUI extends VRInternalFrame {
         gravarParametros();
         btnMapaTribut.setEnabled(true);
         carregarLojaVR();
-        carregarLojaCliente();
-        carregarTipoDocumento();
+        //carregarLojaCliente();
+        //carregarTipoDocumento();
     }
 
     public void carregarLojaVR() throws Exception {
@@ -149,7 +145,7 @@ public class WmsiGUI extends VRInternalFrame {
         cmbLojaVR.setSelectedIndex(index);
     }
 
-    public void carregarLojaCliente() throws Exception {
+    /*public void carregarLojaCliente() throws Exception {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
@@ -161,7 +157,7 @@ public class WmsiGUI extends VRInternalFrame {
             cont++;
         }
         cmbLojaOrigem.setSelectedIndex(index);
-    }
+    }*/
 
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
@@ -189,7 +185,8 @@ public class WmsiGUI extends VRInternalFrame {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
-                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                    //idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                    idLojaCliente = txtLojaOrigem.getText();
                     wmsiDAO.v_tipoDocumentoRotativo = String.valueOf(((ItemComboVO) cmbTipoDocRotativo.getSelectedItem()).id);
                     wmsiDAO.v_tipoDocumentoCheque = String.valueOf(((ItemComboVO) cmbTipoDocCheque.getSelectedItem()).id);
                     Importador importador = new Importador(wmsiDAO);
@@ -468,7 +465,7 @@ public class WmsiGUI extends VRInternalFrame {
         vRLabel26 = new vrframework.bean.label.VRLabel();
         txtStrConexao = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        cmbLojaOrigem = new javax.swing.JComboBox();
+        txtLojaOrigem = new vrframework.bean.textField.VRTextField();
 
         setTitle("Importação Wmsi");
         setToolTipText("");
@@ -1117,8 +1114,6 @@ public class WmsiGUI extends VRInternalFrame {
 
         jLabel2.setText("Loja Origem");
 
-        cmbLojaOrigem.setModel(new DefaultComboBoxModel());
-
         javax.swing.GroupLayout vRPanel6Layout = new javax.swing.GroupLayout(vRPanel6);
         vRPanel6.setLayout(vRPanel6Layout);
         vRPanel6Layout.setHorizontalGroup(
@@ -1136,12 +1131,12 @@ public class WmsiGUI extends VRInternalFrame {
                             .addGroup(vRPanel6Layout.createSequentialGroup()
                                 .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(txtLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(vRPanel6Layout.createSequentialGroup()
                                 .addComponent(vRLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(68, 68, 68)
                                 .addComponent(jLabel2)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnConectar, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
@@ -1160,7 +1155,7 @@ public class WmsiGUI extends VRInternalFrame {
                     .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnConectar)
                     .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -1311,7 +1306,7 @@ public class WmsiGUI extends VRInternalFrame {
             MapaTributacaoView.exibir(
                     mdiFrame,
                     SISTEMA,
-                    ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj,
+                    txtLojaOrigem.getText(),
                     wmsiDAO);
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Erro ao abrir");
@@ -1370,7 +1365,6 @@ public class WmsiGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkValidade;
     private vrframework.bean.checkBox.VRCheckBox chkreceberDevolucao;
-    private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private javax.swing.JComboBox cmbTipoDocCheque;
     private javax.swing.JComboBox cmbTipoDocRotativo;
@@ -1383,6 +1377,7 @@ public class WmsiGUI extends VRInternalFrame {
     private javax.swing.JTabbedPane tabsConn;
     private vrframework.bean.textField.VRTextField txtDatabase;
     private vrframework.bean.textField.VRTextField txtHost;
+    private vrframework.bean.textField.VRTextField txtLojaOrigem;
     private vrframework.bean.textField.VRTextField txtPorta;
     private vrframework.bean.passwordField.VRPasswordField txtSenha;
     private javax.swing.JTextField txtStrConexao;

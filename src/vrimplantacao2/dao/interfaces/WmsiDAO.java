@@ -724,8 +724,8 @@ public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "REC_DESCONTO, \n"
                     + "REC_NOTA\n"
                     + "from TAB_RECTITULO \n"
-                    + "where TIPD_CODIGO in (" + v_tipoDocumentoRotativo + ")\n"
-                    + "and REC_LOJA_CODIGO = '" + getLojaOrigem() + "'\n"
+                    //+ "where TIPD_CODIGO in (" + v_tipoDocumentoRotativo + ")\n"
+                    + "where REC_LOJA_CODIGO = '" + getLojaOrigem() + "'\n"
                     + "and rec_valor_pago is null"
             )) {
                 SimpleDateFormat format = new SimpleDateFormat("yy/MM/dd");

@@ -937,7 +937,7 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="txtSenha" min="-2" pref="96" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="cmbLojaOrigem" max="32767" attributes="0"/>
+                                  <Component id="txtLojaOrigem" min="-2" pref="99" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="vRLabel21" min="-2" max="-2" attributes="0"/>
@@ -945,7 +945,7 @@
                                   <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                           <Component id="btnConectar" min="-2" pref="114" max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -970,7 +970,7 @@
                       <Component id="txtSenha" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="btnConectar" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="txtUsuario" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -1164,12 +1164,7 @@
             <Property name="text" type="java.lang.String" value="Loja Origem"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JComboBox" name="cmbLojaOrigem">
-          <Properties>
-            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="new DefaultComboBoxModel()" type="code"/>
-            </Property>
-          </Properties>
+        <Component class="vrframework.bean.textField.VRTextField" name="txtLojaOrigem">
         </Component>
       </SubComponents>
     </Container>
