@@ -220,7 +220,7 @@ public class IntelliCashGUI extends VRInternalFrame {
                         }
                         
                         if (chkClientePreferencial.isSelected()) {
-                            intelliCashDAO.importarClientePreferencial(idLojaVR, idLojaCliente);
+                            importador.importarClientePreferencial();
                         }
 
                     } else if (tab.getSelectedIndex() == 1) {
@@ -232,10 +232,9 @@ public class IntelliCashGUI extends VRInternalFrame {
                         }
                         if (chkUnifProdutoFornecedor.isSelected()) {
                             importador.unificarProdutoFornecedor();
-                        }
-                        
+                        }                        
                         if (chkUnifClientePreferencial.isSelected()) {
-                            intelliCashDAO.integrarClienteCpfCnpj(idLojaVR, idLojaCliente);
+                            importador.unificarClientePreferencial();
                         }
                         
                     }

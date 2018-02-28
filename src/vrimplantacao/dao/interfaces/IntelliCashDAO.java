@@ -42,6 +42,7 @@ import vrimplantacao.vo.vrimplantacao.ReceberChequeVO;
 import vrimplantacao.vo.vrimplantacao.ReceberCreditoRotativoVO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -383,6 +384,86 @@ public class IntelliCashDAO extends AbstractIntefaceDao {
             
             return result;
         }
+
+        @Override
+        public List<ClienteIMP> getClientes() throws Exception {
+            List<ClienteIMP> result = new ArrayList<>();
+
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {                    
+                try (ResultSet rst = stm.executeQuery(               
+                    "select\n" +
+                    "    a.id,\n" +
+                    "    a.nome,\n" +
+                    "    en.logradouro res_endereco,\n" +
+                    "    en.numero res_numero,\n" +
+                    "    en.complemento res_complemento,\n" +
+                    "    en.bairro res_bairro,\n" +
+                    "    cidibge.id res_cidade_ibge,\n" +
+                    "    cid.cidade res_cidade,\n" +
+                    "    cid.uf res_uf,\n" +
+                    "    en.cep res_cep,   \n" +
+                    "    a.doc cnpj,\n" +
+                    "    dcie.doc as inscricaoestadual,\n" +
+                    "    (select first 1 coalesce('('||ddd||')', '') || telefone from telefones where agente = a.id order by id desc) fone1,\n" +
+                    "    (select first 1 skip 1 coalesce('('||ddd||')', '') || telefone from telefones where agente = a.id order by id desc) fone2,\n" +
+                    "    (select first 1 skip 2 coalesce('('||ddd||')', '') || telefone from telefones where agente = a.id order by id desc) celular,\n" +
+                    "    c.diavenc prazodias,\n" +
+                    "    coalesce(c.cadastro, current_date) datacadastro,\n" +
+                    "    (select first 1 email from emails where agente = a.id) email,\n" +
+                    "    c.limite limitepreferencial,\n" +
+                    "    c.renda salario,\n" +
+                    "    c.situacao,\n" +
+                    "    tpcl.id tipo_cliente,\n" +
+                    "    tpcl.descricao,\n" +
+                    "    c.cadastro,\n" +
+                    "    cidibge.id,\n" +
+                    "    dcrg.doc as rg\n" +
+                    "from\n" +
+                    "    agentes a\n" +
+                    "    join clientes c on c.id = a.id\n" +
+                    "    left join enderecos en on en.agente = a.id\n" +
+                    "    left join cidades cid on cid.id = en.cidade\n" +
+                    "    left join tiposclientes tpcl on tpcl.id = c.tipocliente\n" +
+                    "    left join cidadesibge cidibge on cidibge.id2 = cid.id\n" +
+                    "    left join docs dcie on dcie.codag = a.id and dcie.tipo = 66\n" +
+                    "    left join docs dcrg on dcrg.codag = a.id and dcrg.tipo = 67\n" +
+                    "order by\n" +
+                    "    a.id"
+                )) {
+                    while (rst.next()) {                    
+                        ClienteIMP imp = new ClienteIMP();
+
+                        imp.setId(rst.getString("id"));
+                        imp.setRazao(rst.getString("nome"));
+                        imp.setEndereco(rst.getString("res_endereco"));
+                        imp.setNumero(rst.getString("res_numero"));
+                        imp.setComplemento(rst.getString("res_complemento"));
+                        imp.setBairro(rst.getString("res_bairro"));
+                        imp.setMunicipio(rst.getString("res_cidade"));
+                        imp.setUf(rst.getString("res_uf"));
+                        imp.setCep(rst.getString("res_cep"));
+                        imp.setTelefone(rst.getString("fone1"));
+                        if (Utils.stringToLong(rst.getString("fone2")) != 0) {
+                            imp.addContato("FONE2", "FONE2", rst.getString("fone2"), "", "");
+                        }
+                        imp.setCelular(rst.getString("celular"));
+                        imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
+                        imp.setCnpj(rst.getString("cnpj"));
+                        imp.setDiaVencimento(rst.getInt("prazodias"));
+                        imp.setDataCadastro(rst.getDate("datacadastro"));
+                        imp.setEmail(rst.getString("email"));
+                        imp.setValorLimite(rst.getDouble("limitepreferencial"));
+                        imp.setObservacao("IMPORTADO VR");
+                        imp.setSalario(rst.getDouble("salario"));                 
+
+                        result.add(imp);
+                    }                
+                }
+            }
+            return result;
+        }
+        
+        
         
     };
     
