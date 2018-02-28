@@ -194,7 +194,7 @@ public class LojaDAO {
                 sql.append(" customediosemimposto, id_aliquotacredito, dataultimavenda, teclaassociada, id_situacaocadastro, id_loja, descontinuado,");
                 sql.append(" quantidadeultimaentrada, centralizado, operacional, valoricmssubstituicao, dataultimaentradaanterior, cestabasica, valoroutrassubstituicao,");
                 sql.append("id_tipocalculoddv");
-                if (Versao.menorQue(3,17,11)) {
+                if (Versao.maiorQue(3,17,10)) {
                     sql.append(", id_tipoproduto, fabricacaopropria");
                 }
                 sql.append(")");
@@ -203,7 +203,7 @@ public class LojaDAO {
                 sql.append("  0, precodiaseguinte, 0, 0, emiteetiqueta, 0, 0, 0, 0, id_aliquotacredito,");
                 sql.append(" null, teclaassociada, id_situacaocadastro, " + i_loja.id + ", descontinuado, 0, centralizado, operacional,");
                 sql.append(" valoricmssubstituicao, null, cestabasica, 0, 3");
-                if (Versao.menorQue(3,17,11)) {
+                if (Versao.maiorQue(3,17,10)) {
                     sql.append(", 0, false");
                 }
                 sql.append(" from produtocomplemento where id_loja = " + i_loja.idCopiarLoja + ")");

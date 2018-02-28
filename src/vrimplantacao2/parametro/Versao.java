@@ -69,4 +69,36 @@ public final class Versao {
         return false;
     }
     
+    /**
+     * Compara e retorna se a versão informada é maior que a atual.
+     * @param versao Versão a ser comparada.
+     * @return true se for menor.
+     */
+    public static boolean maiorQue(int... versao) {
+        for (int i = 0; i < versao.length; i++) {
+            if (versao[i] < versaoArray[i]) {
+                return false;
+            } else if (versao[i] > versaoArray[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Compara e retorna se a versão informada é igual ao atual.
+     * @param versao Versão a ser comparada.
+     * @return true se for menor.
+     */
+    public static boolean igual(int... versao) {
+        for (int i = 0; i < versao.length; i++) {
+            if (versao[i] < versaoArray[i]) {
+                return false;
+            } else if (versao[i] > versaoArray[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
 }
