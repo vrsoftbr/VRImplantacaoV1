@@ -8,6 +8,8 @@ import java.util.TreeSet;
 import vrframework.classe.Conexao;
 import vrframework.classe.Util;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
@@ -182,6 +184,10 @@ public class ProdutoDAO {
             sql.putNull("margemmaxima");            
             sql.put("permitedescontopdv", true);
             sql.put("verificapesopdv", false);
+            if (Versao.maiorQue(3,17,10)) {
+                sql.put("id_tipoproduto", 0);
+                sql.put("fabricacaopropria", false);
+            }
             
             try {
                 stm.execute(sql.getInsert());
@@ -259,6 +265,9 @@ public class ProdutoDAO {
         }
         if (opt.contains(OpcaoProduto.FABRICANTE)) {
             sql.put("id_fornecedorfabricante", vo.getIdFornecedorFabricante());
+        }
+        if (opt.contains(OpcaoProduto.DATA_CADASTRO)) {
+            sql.put("datacadastro", vo.getDatacadastro());
         }
         
         sql.setWhere("id = " + vo.getId());

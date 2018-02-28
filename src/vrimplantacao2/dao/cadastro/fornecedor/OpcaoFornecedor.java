@@ -28,7 +28,8 @@ public enum OpcaoFornecedor {
     SITUACAO_CADASTRO,
     TIPO_EMPRESA,
     CNPJ_CPF,
-    INSCRICAO_ESTADUAL;
+    INSCRICAO_ESTADUAL,
+    MUNICIPIO;
     
     private List<FornecedorIMP> listaEspecial;
 

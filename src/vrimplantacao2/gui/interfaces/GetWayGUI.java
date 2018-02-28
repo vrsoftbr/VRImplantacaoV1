@@ -1,5 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +24,8 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
 public class GetWayGUI extends VRInternalFrame {
@@ -87,6 +90,27 @@ public class GetWayGUI extends VRInternalFrame {
         //cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
         carregarParametros();
+        btnMapaTrib.setProvider(new MapaTributacaoButtonProvider() {
+            @Override
+            public MapaTributoProvider getProvider() {
+                return getWayDAO;
+            }
+
+            @Override
+            public String getSistema() {
+                return SISTEMA;
+            }
+
+            @Override
+            public String getLoja() {
+                return vLojaCliente;
+            }
+
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
+            }
+        });
         
         centralizarForm();
         this.setMaximum(false);
@@ -116,6 +140,7 @@ public class GetWayGUI extends VRInternalFrame {
                     txtDatabase.getText(), txtUsuario.getText(), txtSenha.getText());
         }
         
+        btnMapaTrib.setEnabled(true);
         gravarParametros();
         carregarLojaCliente();
         carregarLojaVR();
@@ -429,6 +454,7 @@ public class GetWayGUI extends VRInternalFrame {
         jPanel2 = new javax.swing.JPanel();
         chkMargem = new vrframework.bean.checkBox.VRCheckBox();
         chkUsarMargemBruta = new vrframework.bean.checkBox.VRCheckBox();
+        btnMapaTrib = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
         vRPanel9 = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -660,6 +686,14 @@ public class GetWayGUI extends VRInternalFrame {
         jPanel2.add(chkUsarMargemBruta);
 
         vRPanel7.add(jPanel2);
+
+        btnMapaTrib.setEnabled(false);
+        btnMapaTrib.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMapaTribActionPerformed(evt);
+            }
+        });
+        vRPanel7.add(btnMapaTrib);
 
         vRTabbedPane2.addTab("Produtos", vRPanel7);
 
@@ -1340,9 +1374,14 @@ public class GetWayGUI extends VRInternalFrame {
         }
     }//GEN-LAST:event_edtDtVendaFimActionPerformed
 
+    private void btnMapaTribActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaTribActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnMapaTribActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
     private vrframework.bean.button.VRButton btnDivergencias;
+    private vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTrib;
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkAtacado;
     private vrframework.bean.checkBox.VRCheckBox chkCategoria;

@@ -19,6 +19,7 @@ import vrimplantacao.dao.cadastro.UsuarioDAO;
 import vrimplantacao.vo.loja.FornecedorVO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao.vo.loja.UsuarioVO;
+import vrimplantacao2.parametro.Versao;
 
 public class LoginGUI extends VRDialog {
 
@@ -35,7 +36,7 @@ public class LoginGUI extends VRDialog {
         cboLoja.carregar();
         cboLoja.setId(Global.idLoja);
 
-        lblVersao.setText("Versão " + Global.VERSAO);
+        lblVersao.setText("Versão do banco " + Versao.getVersao());
 
         carregarEmpresa();
 

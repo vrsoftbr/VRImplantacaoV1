@@ -7,6 +7,7 @@ import vrframework.classe.Util;
 import vrimplantacao.classe.Global;
 import vrimplantacao.dao.PropertiesDAO;
 import vrimplantacao.gui.LoginGUI;
+import vrimplantacao2.parametro.Versao;
 
 public class Main {
 
@@ -37,6 +38,8 @@ public class Main {
             Conexao.abrirConexao(ipBanco, ipSecBanco, portaBanco, nomeBanco, usuarioBanco, senhaBanco);
 
             Global.idLoja = oProperties.getInt("system.numeroloja");
+            
+            Versao.carregar();
 
             SplashScreen.setStatus("Carregando interface...");
 

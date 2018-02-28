@@ -159,13 +159,15 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtFile" max="32767" attributes="0"/>
+                              <Component id="txtFile" pref="594" max="32767" attributes="0"/>
                               <Component id="txtFileComp" alignment="0" max="32767" attributes="0"/>
-                              <Group type="102" attributes="0">
+                              <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkT1Preco" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkT1Custo" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkT1Estoque" min="-2" max="-2" attributes="0"/>
+                              <Component id="vRLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkT1Preco" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkT1Custo" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Group type="102" alignment="0" attributes="0">
                                           <Group type="103" groupAlignment="0" attributes="0">
                                               <Group type="102" alignment="0" attributes="0">
@@ -189,31 +191,29 @@
                                               <Component id="chkT1ICMS" alignment="0" min="-2" max="-2" attributes="0"/>
                                               <Component id="chkT1NatReceita" alignment="0" min="-2" max="-2" attributes="0"/>
                                           </Group>
-                                          <EmptySpace min="-2" pref="44" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Component id="btnMapaTribut" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="-2" pref="44" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkQtdEmbCotacao" min="-2" max="-2" attributes="0"/>
+                                      <Group type="102" alignment="0" attributes="0">
                                           <Group type="103" groupAlignment="0" attributes="0">
-                                              <Component id="chkQtdEmbCotacao" min="-2" max="-2" attributes="0"/>
-                                              <Group type="102" alignment="0" attributes="0">
-                                                  <Group type="103" groupAlignment="0" attributes="0">
-                                                      <Component id="chkT1DescGondola" min="-2" max="-2" attributes="0"/>
-                                                      <Component id="chkT1DescReduzida" min="-2" max="-2" attributes="0"/>
-                                                      <Component id="chkT1DescCompleta" min="-2" max="-2" attributes="0"/>
-                                                      <Component id="chkT1ProdMercadologico" min="-2" max="-2" attributes="0"/>
-                                                      <Component id="chkTipoEmbalagemEAN" alignment="0" min="-2" max="-2" attributes="0"/>
-                                                      <Component id="chkQtdEmbalagemEAN" alignment="0" min="-2" max="-2" attributes="0"/>
-                                                  </Group>
-                                                  <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
-                                                  <Group type="103" groupAlignment="0" attributes="0">
-                                                      <Component id="chkAtacado" min="-2" max="-2" attributes="0"/>
-                                                      <Component id="chkT1AtivoInativo" min="-2" max="-2" attributes="0"/>
-                                                  </Group>
-                                              </Group>
+                                              <Component id="chkT1DescGondola" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkT1DescReduzida" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkT1DescCompleta" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkT1ProdMercadologico" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkTipoEmbalagemEAN" alignment="0" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkQtdEmbalagemEAN" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                          <EmptySpace min="-2" pref="34" max="-2" attributes="0"/>
+                                          <Group type="103" groupAlignment="0" attributes="0">
+                                              <Component id="chkAtacado" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkT1AtivoInativo" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkDataCadastro" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                       </Group>
-                                      <Component id="chkT1Estoque" min="-2" max="-2" attributes="0"/>
-                                      <Component id="btnMapaTribut" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="vRLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
@@ -251,6 +251,7 @@
                               <Component id="chkManterBalanca" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkValidade" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkT1ProdMercadologico" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkDataCadastro" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
@@ -441,6 +442,11 @@
                     <Property name="text" type="java.lang.String" value="Cest"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkDataCadastro">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Data Cadastro"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="vRPanel1">
@@ -458,11 +464,12 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtFileForn" alignment="0" pref="579" max="32767" attributes="0"/>
+                              <Component id="txtFileForn" alignment="0" pref="594" max="32767" attributes="0"/>
                               <Component id="txtFileFornComp" alignment="0" max="32767" attributes="0"/>
                               <Component id="txtFileProdForn" alignment="0" max="32767" attributes="0"/>
                               <Group type="102" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkMunicipio" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkInscricaoEstadual" min="-2" max="-2" attributes="0"/>
                                       <Component id="vRLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="vRLabel5" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -510,7 +517,9 @@
                           <Component id="chkInscricaoEstadual" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkContatos" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="64" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkMunicipio" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="41" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -562,6 +571,11 @@
                     <Property name="text" type="java.lang.String" value="Inscricao Estadual"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMunicipio">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Municipio"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="vRPanel5">
@@ -579,7 +593,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtFileCliente" alignment="0" pref="579" max="32767" attributes="0"/>
+                              <Component id="txtFileCliente" alignment="0" pref="594" max="32767" attributes="0"/>
                               <Component id="txtFileClienteComp" alignment="0" max="32767" attributes="0"/>
                               <Group type="102" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
@@ -657,7 +671,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtFileCreditoRotativo" alignment="0" pref="579" max="32767" attributes="0"/>
+                              <Component id="txtFileCreditoRotativo" alignment="0" pref="594" max="32767" attributes="0"/>
                               <Group type="102" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
@@ -750,16 +764,24 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
+                  <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
-                              <Component id="txtFileCodigoBarras" pref="493" max="32767" attributes="0"/>
+                              <Component id="txtFileCodigoBarras" pref="508" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnGravarCodigoBarras" min="-2" max="-2" attributes="0"/>
                           </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="txtFileProdutoFamilia" pref="508" max="32767" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="btnGravarProdutoFamilia" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <Group type="102" attributes="0">
-                              <Component id="vRLabel10" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="vRLabel10" min="-2" max="-2" attributes="0"/>
+                                  <Component id="vRLabel11" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
@@ -779,7 +801,16 @@
                               <Component id="txtFileCodigoBarras" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace pref="281" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="btnGravarProdutoFamilia" alignment="1" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="1" attributes="0">
+                              <Component id="vRLabel11" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="txtFileProdutoFamilia" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <EmptySpace pref="234" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -804,6 +835,27 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnGravarCodigoBarrasActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtFileProdutoFamilia">
+            </Component>
+            <Component class="vrframework.bean.label.VRLabel" name="vRLabel11">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Importar C&#xf3;digo Produto e C&#xf3;digo Familia Produto"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.button.VRButton" name="btnGravarProdutoFamilia">
+              <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/vrframework/img/importar.png"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Gravar"/>
+                <Property name="focusable" type="boolean" value="false"/>
+                <Property name="horizontalTextPosition" type="int" value="4"/>
+                <Property name="verticalTextPosition" type="int" value="3"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnGravarProdutoFamiliaActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>
