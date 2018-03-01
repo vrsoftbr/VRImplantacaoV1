@@ -14,7 +14,6 @@ public class Main {
     public static void main(String[] args) {
         try {
             Util.setLookAndFeel();
-            Util.verificarVersaoJava();
             
             new PropertiesDAO().verficarConfiguracao();
 
