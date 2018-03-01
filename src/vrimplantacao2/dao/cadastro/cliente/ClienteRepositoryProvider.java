@@ -81,12 +81,12 @@ public class ClienteRepositoryProvider {
     }
     //</editor-fold>
 
-    public ClientePreferencialIDStack getClientePreferencialIDStack() {        
-        return new ClientePreferencialIDStack();
+    public ClientePreferencialIDStack getClientePreferencialIDStack(int iniciarEm) {        
+        return new ClientePreferencialIDStack(iniciarEm);
     }
     
-    public ClienteEventualIDStack getClienteEventualIDStack() {
-        return new ClienteEventualIDStack();
+    public ClienteEventualIDStack getClienteEventualIDStack(int iniciarEm) {
+        return new ClienteEventualIDStack(iniciarEm);
     }
 
     public MunicipioVO getMunicipioById(int municipioIBGE) throws Exception {

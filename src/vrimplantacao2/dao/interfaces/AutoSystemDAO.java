@@ -157,7 +157,7 @@ public class AutoSystemDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	join empresa emp on emp.grid = " + getLojaOrigem()+ "\n" +
                     "	left join (\n" +
                     "		select\n" +
-                    "			grid,\n" +
+                    "			grid produto,\n" +
                     "			codigo_barra\n" +
                     "		from\n" +
                     "			produto\n" +
@@ -166,7 +166,7 @@ public class AutoSystemDAO extends InterfaceDAO implements MapaTributoProvider {
                     "			trim(codigo_barra) != ''\n" +
                     "		union	\n" +
                     "		select\n" +
-                    "			grid,\n" +
+                    "			produto,\n" +
                     "			codigo_barra\n" +
                     "		from\n" +
                     "			produto_codigo_barra\n" +
@@ -174,7 +174,7 @@ public class AutoSystemDAO extends InterfaceDAO implements MapaTributoProvider {
                     "			not codigo_barra is null and\n" +
                     "			trim(codigo_barra) != ''\n" +
                     "	) ean on\n" +
-                    "		ean.grid = p.grid\n" +
+                    "		ean.produto = p.grid\n" +
                     "	left join  estoque_produto est on\n" +
                     "		est.empresa =  emp.grid\n" +
                     "		and est.deposito = " + getIdDeposito() + "\n" +

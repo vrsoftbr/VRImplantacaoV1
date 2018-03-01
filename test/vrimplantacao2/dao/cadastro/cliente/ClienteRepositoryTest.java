@@ -1,6 +1,7 @@
 package vrimplantacao2.dao.cadastro.cliente;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import org.junit.Test;
@@ -70,8 +71,8 @@ public class ClienteRepositoryTest {
         cnpjPreferencial.put(10026789000123L, 1);
         when(provider.preferencial().getCnpjCadastrados()).thenReturn(cnpjPreferencial);
         
-        when(provider.getClientePreferencialIDStack()).thenReturn(stack);
-        when(provider.getClienteEventualIDStack()).thenReturn(stack2);
+        when(provider.getClientePreferencialIDStack(eq(1))).thenReturn(stack);
+        when(provider.getClienteEventualIDStack(eq(1))).thenReturn(stack2);
         when(provider.preferencial().getAnteriores()).thenReturn(new MultiMap<String, ClientePreferencialAnteriorVO>()); 
         when(provider.eventual().getAnteriores()).thenReturn(new MultiMap<String, ClienteEventualAnteriorVO>());     
     }
@@ -101,8 +102,8 @@ public class ClienteRepositoryTest {
         when(provider.eventual()).thenReturn(evt);
         when(provider.eventual().getContatosExistentes()).thenReturn(new MultiMap<String, Void>());
         
-        when(provider.getClientePreferencialIDStack()).thenReturn(stack);
-        when(provider.getClienteEventualIDStack()).thenReturn(stack2);
+        when(provider.getClientePreferencialIDStack(eq(1))).thenReturn(stack);
+        when(provider.getClienteEventualIDStack(eq(1))).thenReturn(stack2);
         when(provider.preferencial().getAnteriores()).thenReturn(new MultiMap<String, ClientePreferencialAnteriorVO>()); 
         when(provider.eventual().getAnteriores()).thenReturn(new MultiMap<String, ClienteEventualAnteriorVO>());     
         
@@ -325,7 +326,7 @@ public class ClienteRepositoryTest {
         teste.add(clienteImp4);
         teste.add(clienteImp11);
         
-        repository.importarClientePreferencial(teste);
+        repository.importarClientePreferencial(teste, EnumSet.noneOf(OpcaoCliente.class));
         
         assertEquals(4, pref.size());
         ClientePreferencialTestClasses.assert1(pref.get(0));
@@ -391,7 +392,7 @@ public class ClienteRepositoryTest {
         teste.add(clienteImp4);
         teste.add(clienteImp11);
         
-        repository.importarClienteEventual(teste);
+        repository.importarClienteEventual(teste, EnumSet.noneOf(OpcaoCliente.class));
         
         assertEquals(4, pref.size());
         ClienteEventualTestClasses.assert1(pref.get(0));
@@ -456,7 +457,7 @@ public class ClienteRepositoryTest {
         teste.add(clienteImp4);
         teste.add(clienteImp11);
         
-        repository.importarClienteEventual(teste);
+        repository.importarClienteEventual(teste, EnumSet.noneOf(OpcaoCliente.class));
         
         assertEquals(3, pref.size());
         ClienteEventualTestClasses.assert1(pref.get(0));
@@ -493,7 +494,7 @@ public class ClienteRepositoryTest {
         
         teste.add(clienteImp1);
         
-        repository.importarClientePreferencial(teste);
+        repository.importarClientePreferencial(teste, EnumSet.noneOf(OpcaoCliente.class));
         
         assertEquals(4, contatos.size());
         
@@ -528,7 +529,7 @@ public class ClienteRepositoryTest {
         
         teste.add(clienteImp1);
         
-        repository.importarClienteEventual(teste);
+        repository.importarClienteEventual(teste, EnumSet.noneOf(OpcaoCliente.class));
         
         assertEquals(4, contatos.size());
         
@@ -582,7 +583,7 @@ public class ClienteRepositoryTest {
         teste.add(clienteImp4);
         teste.add(clienteImp11);
         
-        repository.importarClientePreferencial(teste);
+        repository.importarClientePreferencial(teste, EnumSet.noneOf(OpcaoCliente.class));
         
         assertEquals(3, pref.size());
         ClientePreferencialTestClasses.assert1(pref.get(0));
@@ -640,7 +641,7 @@ public class ClienteRepositoryTest {
         teste.add(clienteImp4);
         teste.add(clienteImp11);
         
-        repository.unificarClientePreferencial(teste);
+        repository.unificarClientePreferencial(teste, EnumSet.noneOf(OpcaoCliente.class));
         
         assertEquals(3, pref.size());
         ClientePreferencialTestClasses.assert1(pref.get(0));
@@ -705,7 +706,7 @@ public class ClienteRepositoryTest {
         teste.add(clienteImp4);
         teste.add(clienteImp11);
         
-        repository.unificarClienteEventual(teste);
+        repository.unificarClienteEventual(teste, EnumSet.noneOf(OpcaoCliente.class));
         
         assertEquals(3, pref.size());
         ClienteEventualTestClasses.assert1(pref.get(0));

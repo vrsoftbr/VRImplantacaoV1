@@ -15,6 +15,7 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.AutoSystemDAO;
@@ -43,6 +44,7 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
         vDeposito = params.get(SISTEMA, "DEPOSITO");
+        txtReiniciarID.setText(params.getWithNull("1", SISTEMA, "N_REINICIO"));
     }
     
      private void gravarParametros() throws Exception {
@@ -65,7 +67,8 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
             params.put(vr.id, SISTEMA, "LOJA_VR");
             vLojaVR = vr.id;
         }
-        params.salvar();
+        params.put(Utils.stringToInt(txtReiniciarID.getText()), SISTEMA, "N_REINICIO");
+        params.salvar();        
     }
     
     private AutoSystemDAO dao = new AutoSystemDAO();
@@ -266,25 +269,45 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
                         }
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
-                        }                        
-                        List<OpcaoFornecedor> opcoes = new ArrayList<>();
-                        if (chkFContatos.isSelected()) {
-                            opcoes.add(OpcaoFornecedor.CONTATOS);                        
-                        }              
-                        if (chkFCnpj.isSelected()) {
-                            opcoes.add(OpcaoFornecedor.CNPJ_CPF);
-                        }
-                        if (chkFSitCad.isSelected()) {
-                            opcoes.add(OpcaoFornecedor.SITUACAO_CADASTRO);
-                        }
-                        if (!opcoes.isEmpty()) {
-                            importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
+                        }  
+                        {
+                            List<OpcaoFornecedor> opcoes = new ArrayList<>();
+                            if (chkFContatos.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.CONTATOS);                        
+                            }              
+                            if (chkFCnpj.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.CNPJ_CPF);
+                            }
+                            if (chkFSitCad.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.SITUACAO_CADASTRO);
+                            }
+                            if (!opcoes.isEmpty()) {
+                                importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
+                            }
                         }
                         if (chkClientePreferencial.isSelected()) {
-                            importador.importarClientePreferencial();
+                            List<OpcaoCliente> opcoes = new ArrayList<>();
+                            if (chkReiniciarIDCliente.isSelected()) {
+                                opcoes.add(
+                                    OpcaoCliente.IMP_REINICIAR_NUMERACAO.addParametro(
+                                        "N_REINICIO",
+                                        Utils.stringToInt(txtReiniciarID.getText())
+                                    )
+                                );
+                            }
+                            importador.importarClientePreferencial(opcoes.toArray(new OpcaoCliente[] {}));
                         }
                         if (chkClienteEventual.isSelected()) {
-                            importador.importarClienteEventual();
+                            List<OpcaoCliente> opcoes = new ArrayList<>();
+                            if (chkReiniciarIDCliente.isSelected()) {
+                                opcoes.add(
+                                    OpcaoCliente.IMP_REINICIAR_NUMERACAO.addParametro(
+                                        "N_REINICIO",
+                                        Utils.stringToInt(txtReiniciarID.getText())
+                                    )
+                                );
+                            }
+                            importador.importarClienteEventual(opcoes.toArray(new OpcaoCliente[] {}));
                         }
                         if (chkCvEmpresa.isSelected()) {
                             importador.importarCheque();
@@ -372,6 +395,8 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        chkReiniciarIDCliente = new vrframework.bean.checkBox.VRCheckBox();
+        txtReiniciarID = new vrframework.bean.textField.VRTextField();
         tabConvenio = new vrframework.bean.panel.VRPanel();
         chkCvEmpresa = new vrframework.bean.checkBox.VRCheckBox();
         chkCvConveniado = new vrframework.bean.checkBox.VRCheckBox();
@@ -597,7 +622,7 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
                     .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFSitCad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(290, Short.MAX_VALUE))
+                .addContainerGap(217, Short.MAX_VALUE))
         );
         tabImpFornecedorLayout.setVerticalGroup(
             tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -644,6 +669,16 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
             }
         });
 
+        chkReiniciarIDCliente.setText("Reiniciar ID");
+        chkReiniciarIDCliente.setEnabled(true);
+        chkReiniciarIDCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkReiniciarIDClienteActionPerformed(evt);
+            }
+        });
+
+        txtReiniciarID.setMascara("Numero");
+
         javax.swing.GroupLayout tabClienteDadosLayout = new javax.swing.GroupLayout(tabClienteDados);
         tabClienteDados.setLayout(tabClienteDadosLayout);
         tabClienteDadosLayout.setHorizontalGroup(
@@ -651,10 +686,14 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
             .addGroup(tabClienteDadosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(368, Short.MAX_VALUE))
+                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(tabClienteDadosLayout.createSequentialGroup()
+                        .addComponent(chkReiniciarIDCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtReiniciarID, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(359, 359, 359))
         );
         tabClienteDadosLayout.setVerticalGroup(
             tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -665,7 +704,11 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
                 .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 65, Short.MAX_VALUE)
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkReiniciarIDCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtReiniciarID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         tabClientes.addTab("Descrição", tabClienteDados);
@@ -704,7 +747,7 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
                     .addComponent(chkCvEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCvConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCvTransacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(400, Short.MAX_VALUE))
+                .addContainerGap(327, Short.MAX_VALUE))
         );
         tabConvenioLayout.setVerticalGroup(
             tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -746,7 +789,7 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
                     .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(250, Short.MAX_VALUE))
+                .addContainerGap(177, Short.MAX_VALUE))
         );
         vRPanel2Layout.setVerticalGroup(
             vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -784,7 +827,7 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(conexao, javax.swing.GroupLayout.DEFAULT_SIZE, 512, Short.MAX_VALUE)
+                    .addComponent(conexao, javax.swing.GroupLayout.DEFAULT_SIZE, 439, Short.MAX_VALUE)
                     .addComponent(vRPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(tabs, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
@@ -809,7 +852,7 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
                     .addComponent(jLabel3)
                     .addComponent(cmbDeposito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE)
+                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -890,6 +933,10 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
     private void chkCreditoRotativoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCreditoRotativoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkCreditoRotativoActionPerformed
+
+    private void chkReiniciarIDClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkReiniciarIDClienteActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkReiniciarIDClienteActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
@@ -913,6 +960,7 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
+    private vrframework.bean.checkBox.VRCheckBox chkReiniciarIDCliente;
     private vrframework.bean.checkBox.VRCheckBox chkT1AtivoInativo;
     private vrframework.bean.checkBox.VRCheckBox chkT1Custo;
     private vrframework.bean.checkBox.VRCheckBox chkT1DescCompleta;
@@ -947,6 +995,7 @@ public class AutoSystemGUI extends VRInternalFrame implements MapaTributacaoButt
     private vrframework.bean.panel.VRPanel tabImpFornecedor;
     private vrframework.bean.panel.VRPanel tabImpProduto;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
+    private vrframework.bean.textField.VRTextField txtReiniciarID;
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;

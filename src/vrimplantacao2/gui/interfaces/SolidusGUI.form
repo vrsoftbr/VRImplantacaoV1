@@ -368,7 +368,7 @@
                               </Group>
                               <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="116" max="32767" attributes="0"/>
+                          <EmptySpace pref="82" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -466,8 +466,13 @@
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="chkReiniciarIDCliente" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="txtReiniciarID" min="-2" pref="47" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
-                              <EmptySpace pref="306" max="32767" attributes="0"/>
+                              <EmptySpace pref="297" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -478,7 +483,12 @@
                               <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="134" max="32767" attributes="0"/>
+                              <EmptySpace pref="68" max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="chkReiniciarIDCliente" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtReiniciarID" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -505,6 +515,22 @@
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkClienteEventualActionPerformed"/>
                       </Events>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkReiniciarIDCliente">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Reiniciar ID"/>
+                        <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                          <Connection code="true" type="code"/>
+                        </Property>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkReiniciarIDClienteActionPerformed"/>
+                      </Events>
+                    </Component>
+                    <Component class="vrframework.bean.textField.VRTextField" name="txtReiniciarID">
+                      <Properties>
+                        <Property name="mascara" type="java.lang.String" value="Numero"/>
+                      </Properties>
                     </Component>
                   </SubComponents>
                 </Container>
@@ -559,7 +585,7 @@
                                       <Component id="edtRotativoDtaFim" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                                   </Group>
-                                  <Component id="jScrollPane1" pref="165" max="32767" attributes="0"/>
+                                  <Component id="jScrollPane1" pref="131" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -648,7 +674,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="jScrollPane2" alignment="0" pref="165" max="32767" attributes="0"/>
+                                  <Component id="jScrollPane2" alignment="0" pref="131" max="32767" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -737,7 +763,7 @@
                                   <Component id="vRPanel4" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
                                   <Component id="vRPanel5" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="131" max="32767" attributes="0"/>
+                              <EmptySpace pref="97" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -866,7 +892,7 @@
                                       <Component id="chkContasAPagar" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                                   </Group>
-                                  <Component id="jScrollPane3" alignment="0" pref="165" max="32767" attributes="0"/>
+                                  <Component id="jScrollPane3" alignment="0" pref="131" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -922,7 +948,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
+                  <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="chkUnifProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -930,6 +956,11 @@
                           <Component id="chkUnifProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="chkUnifClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="chkUnifClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="chkReiniciarIDClienteUnif" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="txtReiniciarIDClienteUnif" min="-2" pref="47" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
                       <EmptySpace pref="188" max="32767" attributes="0"/>
                   </Group>
@@ -948,7 +979,12 @@
                       <Component id="chkUnifClientePreferencial" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkUnifClienteEventual" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="121" max="32767" attributes="0"/>
+                      <EmptySpace pref="59" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="chkReiniciarIDClienteUnif" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtReiniciarIDClienteUnif" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -977,6 +1013,22 @@
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUnifClienteEventual">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Cliente Eventual (Somente com CPF/CNPJ)"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkReiniciarIDClienteUnif">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Reiniciar ID (Clientes)"/>
+                <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="true" type="code"/>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkReiniciarIDClienteUnifActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="vrframework.bean.textField.VRTextField" name="txtReiniciarIDClienteUnif">
+              <Properties>
+                <Property name="mascara" type="java.lang.String" value="Numero"/>
               </Properties>
             </Component>
           </SubComponents>
