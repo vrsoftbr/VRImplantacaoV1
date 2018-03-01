@@ -359,6 +359,11 @@
                     <Property name="text" type="java.lang.String" value="Tem Arquivo Balan&#xe7;a"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMArgem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Margem"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="vRPanel9">

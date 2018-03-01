@@ -238,6 +238,9 @@ public class SisMouraGUI extends VRInternalFrame {
                             if (chkCategoria.isSelected()) {
                                 opcoes.add(OpcaoProduto.CATEGORIA);
                             }
+                            if (chkMArgem.isSelected()) {
+                                opcoes.add(OpcaoProduto.MARGEM);
+                            }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
                             }
@@ -356,6 +359,7 @@ public class SisMouraGUI extends VRInternalFrame {
         chkT1NCM = new vrframework.bean.checkBox.VRCheckBox();
         chkT1CEST = new vrframework.bean.checkBox.VRCheckBox();
         chkTemArquivoBalanca = new vrframework.bean.checkBox.VRCheckBox();
+        chkMArgem = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel9 = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
@@ -550,6 +554,9 @@ public class SisMouraGUI extends VRInternalFrame {
 
         chkTemArquivoBalanca.setText("Tem Arquivo Balança");
         vRPanel7.add(chkTemArquivoBalanca);
+
+        chkMArgem.setText("Margem");
+        vRPanel7.add(chkMArgem);
 
         vRTabbedPane2.addTab("Produtos", vRPanel7);
 
@@ -961,6 +968,7 @@ public class SisMouraGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
     private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkMArgem;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkNutricionalFilizola;
