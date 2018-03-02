@@ -147,6 +147,7 @@ import vrimplantacao2.gui.interfaces.AvanceGUI;
 import vrimplantacao2.gui.interfaces.TstiGUI;
 import vrimplantacao2.gui.interfaces.CPlusGUI;
 import vrimplantacao2.gui.interfaces.CissGUI;
+import vrimplantacao2.gui.interfaces.ScefGUI;
 import vrimplantacao2.gui.interfaces.SisMouraGUI;
 import vrimplantacao2.gui.interfaces.SolidusGUI;
 import vrimplantacao2.gui.interfaces.SuperGUI;
@@ -510,6 +511,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuCplus = new javax.swing.JMenuItem();
         mnuSolidus = new javax.swing.JMenuItem();
         mnuSuper = new javax.swing.JMenuItem();
+        mnuScef = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1008,6 +1010,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu5.add(mnuSuper);
+
+        mnuScef.setText("Scef");
+        mnuScef.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuScefActionPerformed(evt);
+            }
+        });
+        jMenu5.add(mnuScef);
 
         jMenu2.add(jMenu5);
 
@@ -3589,6 +3599,11 @@ public final class MenuGUI extends VRMdiFrame {
         Wm_byFileGUI.exibir(this);
     }//GEN-LAST:event_mnuWmByFileActionPerformed
 
+    private void mnuScefActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuScefActionPerformed
+        // TODO add your handling code here:
+        ScefGUI.exibir(this);
+    }//GEN-LAST:event_mnuScefActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -3744,6 +3759,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSDInformatica;
     private javax.swing.JMenuItem mnuSaac;
     private javax.swing.JMenuItem mnuSatecfe;
+    private javax.swing.JMenuItem mnuScef;
     private javax.swing.JMenuItem mnuScripts;
     private javax.swing.JMenuItem mnuSicom;
     private javax.swing.JMenuItem mnuSifat;
