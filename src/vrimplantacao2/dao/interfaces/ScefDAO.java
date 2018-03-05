@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -23,7 +24,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class ScefDAO extends InterfaceDAO {
 
-    private static final Logger LOG = Logger.getLogger(SisMouraDAO.class.getName());
+    private static final Logger LOG = Logger.getLogger(ScefDAO.class.getName());
 
     @Override
     public String getSistema() {
@@ -36,13 +37,16 @@ public class ScefDAO extends InterfaceDAO {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "loccodigo,\n"
-                    + "locnome\n"
-                    + "from local\n"
+                    + "e.empcodigo codigo,\n"
+                    + "(trim(e.empnome)||' - LOCAL '||l.loccodigo||' '||l.locnome) descricao,\n"
+                    + "l.loccodigo,\n"
+                    + "l.locnome\n"
+                    + "from local l\n"
+                    + "inner join empresa e on e.empcodigo = l.empcodigo\n"
                     + "order by loccodigo"
             )) {
                 while (rst.next()) {
-                    result.add(new Estabelecimento(rst.getString("loccodigo"), rst.getString("locnome")));
+                    result.add(new Estabelecimento(rst.getString("loccodigo"), rst.getString("descricao")));
                 }
             }
         }
@@ -56,14 +60,16 @@ public class ScefDAO extends InterfaceDAO {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "p.procodigo,\n"
+                    + "b.codbarra,\n"
+                    + "e.prequantidade,\n"
                     + "p.prodescricao,\n"
-                    + "prodesc_imp_fiscal,\n"
+                    + "p.prodesc_imp_fiscal,\n"
                     + "p.propeso_unidade,\n"
-                    + "p.propreco_custo_sem_icms,\n"
-                    + "p.propreco_custo_com_icms,\n"
+                    + "p.propreco_custo_sem_icms custocomimposto,\n"
+                    + "p.propreco_custo_com_icms custosemimposto,\n"
                     + "p.propreco_custo_medio_cicms,\n"
                     + "p.propreco_custo_medio_sicms,\n"
-                    + "p.propreco_venda,\n"
+                    + "p.propreco_venda precovenda,\n"
                     + "p.promargem,\n"
                     + "p.proinclusao,\n"
                     + "p.probalanca,\n"
@@ -86,14 +92,41 @@ public class ScefDAO extends InterfaceDAO {
                     + "s.pstdescricao sit_descricao\n"
                     + "from produto p\n"
                     + "left join cest c on c.cestcodigo = p.cestcodigo\n"
-                    + "left join prosituacao_tributaria s on s.prosit_tributaria = p.prosit_tributaria"
+                    + "left join prosituacao_tributaria s on s.prosit_tributaria = p.prosit_tributaria\n"
+                    + "left join proembala e on e.procodigo = p.procodigo\n"
+                    + "left join procodbarra b on b.precodigo = e.precodigo\n"
             )) {
                 while (rst.next()) {
-
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("procodigo"));
+                    imp.setEan(rst.getString("codbarra"));
+                    imp.seteBalanca((!"N".equals(rst.getString("probalanca"))));
+                    imp.setSituacaoCadastro(rst.getDate("proexclusao") != null ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
+                    imp.setTipoEmbalagem(rst.getString("embcodigo"));
+                    imp.setQtdEmbalagem(rst.getInt("prequantidade"));
+                    imp.setDataCadastro(rst.getDate("proinclusao"));
+                    imp.setDescricaoCompleta(rst.getString("prodescricao"));
+                    imp.setDescricaoReduzida(imp.getDescricaoCompleta());
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setMargem(rst.getDouble("promargem"));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setPiscofinsCstDebito(rst.getString("stpcodigo"));
+                    imp.setPiscofinsCstCredito(rst.getString("stpcodigo_entrada"));
+                    imp.setNcm(rst.getString("proncm"));
+                    imp.setCest(rst.getString("cestchave"));
+                    imp.setIcmsCst(rst.getInt("pro_sit_trib_nf"));
+                    imp.setIcmsAliq(rst.getDouble("proicms"));
+                    imp.setIcmsReducao(rst.getDouble("proreducao_base_icms"));
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        LOG.getName();
+        return result;
     }
 
     @Override
@@ -109,10 +142,15 @@ public class ScefDAO extends InterfaceDAO {
                         + "where loccodigo = " + getLojaOrigem()
                 )) {
                     while (rst.next()) {
-
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("procodigo"));
+                        imp.setEstoque(rst.getDouble("estatual"));
+                        result.add(imp);
                     }
                 }
-                return null;
+                return result;
             }
         }
         return null;
@@ -143,7 +181,16 @@ public class ScefDAO extends InterfaceDAO {
                     + "WHERE f.PESFORNECEDOR = 'S'"
             )) {
                 while (rst.next()) {
-
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("pescodigo"));
+                    imp.setRazao(rst.getString("pesnome"));
+                    imp.setFantasia(rst.getString("pesapelido"));
+                    imp.setEndereco(rst.getString("pesendereco"));
+                    imp.setNumero(rst.getString("pesendereco_numero"));
+                    imp.setComplemento(rst.getString("pesendereco_complemento"));
+                    imp.setBairro(rst.getString("pesbairro"));
                 }
             }
         }
