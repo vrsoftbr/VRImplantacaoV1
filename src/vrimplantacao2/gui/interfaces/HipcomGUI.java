@@ -147,7 +147,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                         }
 
                         if (chkMercadologico.isSelected()) {
-                            importador.importarMercadologico();
+                            importador.importarMercadologicoPorNiveis(false);
                         }
 
                         if (chkProdutos.isSelected()) {
