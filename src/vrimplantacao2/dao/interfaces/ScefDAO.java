@@ -269,7 +269,7 @@ public class ScefDAO extends InterfaceDAO {
                                 "EMAIL",
                                 null,
                                 null,
-                                TipoContato.NFE,
+                                TipoContato.COMERCIAL,
                                 rst.getString("pesemail").toLowerCase()
                         );
                     }
@@ -317,7 +317,7 @@ public class ScefDAO extends InterfaceDAO {
                     + "plcdescricao descricao,\n"
                     + "current_timestamp as dataatual\n"
                     + "from planodeconta\n"
-                    + "where plccodigo = " + v_empresaConvenio
+                    + "where plccodigo in (" + v_empresaConvenio + ")"
             )) {
                 while (rst.next()) {
                     ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
@@ -350,7 +350,7 @@ public class ScefDAO extends InterfaceDAO {
                     + "inner join pescliente c on c.pescodigo = p.pescodigo\n"
                     + "inner join pesfisica f on f.pescodigo = p.pescodigo\n"
                     + "where p.pescliente = 'S'\n"
-                    + "and p.plccodigo_receber = " + v_empresaConvenio
+                    + "and p.plccodigo_receber in (" + v_empresaConvenio + ")"
             )) {
                 while (rst.next()) {
                     ConveniadoIMP imp = new ConveniadoIMP();
