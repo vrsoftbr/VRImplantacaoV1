@@ -59,6 +59,93 @@ public class ScefDAO extends InterfaceDAO {
     }
 
     @Override
+    public List<ProdutoIMP> getProdutosBalanca() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "p.procodigo,\n"
+                    + "b.codbarra,\n"
+                    + "e.prequantidade,\n"
+                    + "p.prodescricao,\n"
+                    + "p.prodesc_imp_fiscal,\n"
+                    + "p.propreco_custo_sem_icms custocomimposto,\n"
+                    + "p.propreco_custo_com_icms custosemimposto,\n"
+                    + "p.propreco_custo_medio_cicms,\n"
+                    + "p.propreco_custo_medio_sicms,\n"
+                    + "p.propreco_venda precovenda,\n"
+                    + "p.promargem,\n"
+                    + "p.proinclusao datacadastro,\n"
+                    + "p.probalanca,\n"
+                    + "case p.status when 'A' then '1' else '0' end status,\n"
+                    + "p.embcodigo,\n"
+                    + "p.embcodigo_unidade,\n"
+                    + "p.proicms,\n"
+                    + "p.proreducao_base_icms,\n"
+                    + "p.prodiasvencimento,\n"
+                    + "p.pro_sit_trib_nf,\n"
+                    + "p.proexclusao dataexclusao,\n"
+                    + "p.proncm,\n"
+                    + "p.stpcodigo,\n"
+                    + "p.stpcodigo_entrada,\n"
+                    + "p.stccodigo,\n"
+                    + "p.stccodigo_entrada,\n"
+                    + "c.cestchave,\n"
+                    + "s.prosit_tributaria sit_trib,\n"
+                    + "p.prosit_tributaria sit_prod,\n"
+                    + "s.pstdescricao sit_descricao\n"
+                    + "from produto p\n"
+                    + "left join cest c on c.cestcodigo = p.cestcodigo\n"
+                    + "left join prosituacao_tributaria s on s.prosit_tributaria = p.prosit_tributaria\n"
+                    + "left join proembala e on e.procodigo = p.procodigo\n"
+                    + "left join procodbarra b on b.precodigo = e.precodigo\n"
+                    + "where p.status = 'A' \n"
+                    + "and p.probalanca <> 'N'"
+            )) {
+                while (rst.next()) {
+                    String ean;
+                    if ((rst.getString("codbarra") != null)
+                            && (!rst.getString("codbarra").trim().isEmpty())) {
+
+                        if ((rst.getString("codbarra").length() > 7) 
+                                && (rst.getString("codbarra").contains("0000000"))) {
+
+                            ean = rst.getString("codbarra").substring(1, 5);
+                            
+                            ProdutoIMP imp = new ProdutoIMP();
+                            imp.setImportLoja(getLojaOrigem());
+                            imp.setImportSistema(getSistema());
+                            imp.setImportId(rst.getString("procodigo"));
+                            imp.setEan(ean);
+                            imp.seteBalanca((!"N".equals(rst.getString("probalanca"))));
+                            imp.setSituacaoCadastro(rst.getInt("status") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                            imp.setTipoEmbalagem(rst.getString("embcodigo"));
+                            imp.setQtdEmbalagem(rst.getInt("prequantidade"));
+                            imp.setDataCadastro(rst.getDate("proinclusao"));
+                            imp.setDescricaoCompleta(rst.getString("prodescricao"));
+                            imp.setDescricaoReduzida(imp.getDescricaoCompleta());
+                            imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                            imp.setMargem(rst.getDouble("promargem"));
+                            imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                            imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                            imp.setPrecovenda(rst.getDouble("precovenda"));
+                            imp.setPiscofinsCstDebito(rst.getString("stpcodigo"));
+                            imp.setPiscofinsCstCredito(rst.getString("stpcodigo_entrada"));
+                            imp.setNcm(rst.getString("proncm"));
+                            imp.setCest(rst.getString("cestchave"));
+                            imp.setIcmsCst(rst.getInt("pro_sit_trib_nf"));
+                            imp.setIcmsAliq(rst.getDouble("proicms"));
+                            imp.setIcmsReducao(rst.getDouble("proreducao_base_icms"));
+                            result.add(imp);
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
@@ -69,14 +156,13 @@ public class ScefDAO extends InterfaceDAO {
                     + "e.prequantidade,\n"
                     + "p.prodescricao,\n"
                     + "p.prodesc_imp_fiscal,\n"
-                    + "p.propeso_unidade,\n"
                     + "p.propreco_custo_sem_icms custocomimposto,\n"
                     + "p.propreco_custo_com_icms custosemimposto,\n"
                     + "p.propreco_custo_medio_cicms,\n"
                     + "p.propreco_custo_medio_sicms,\n"
                     + "p.propreco_venda precovenda,\n"
                     + "p.promargem,\n"
-                    + "p.proinclusao,\n"
+                    + "p.proinclusao datacadastro,\n"
                     + "p.probalanca,\n"
                     + "case p.status when 'A' then '1' else '0' end status,\n"
                     + "p.embcodigo,\n"
@@ -85,7 +171,7 @@ public class ScefDAO extends InterfaceDAO {
                     + "p.proreducao_base_icms,\n"
                     + "p.prodiasvencimento,\n"
                     + "p.pro_sit_trib_nf,\n"
-                    + "p.proexclusao,\n"
+                    + "p.proexclusao dataexclusao,\n"
                     + "p.proncm,\n"
                     + "p.stpcodigo,\n"
                     + "p.stpcodigo_entrada,\n"
@@ -131,10 +217,9 @@ public class ScefDAO extends InterfaceDAO {
                 }
             }
         }
-        LOG.getName();
         return result;
     }
-
+    
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opcao) throws Exception {
         if (opcao == OpcaoProduto.ESTOQUE) {

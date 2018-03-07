@@ -185,10 +185,28 @@ public class Importador {
         
         importarProduto(opcoes.toArray(new OpcaoProduto[]{}));
     }
+
+    @Deprecated
+    public void importarProdutoBalanca(boolean manterCodigoDeBalanca, boolean gerarNiveisComoSubniveis) throws Exception {
+        List<OpcaoProduto> opcoes = new ArrayList<>();
+        if (manterCodigoDeBalanca) {
+            opcoes.add(OpcaoProduto.IMPORTAR_MANTER_BALANCA);
+        }
+        if (gerarNiveisComoSubniveis) {
+            opcoes.add(OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC);
+        }
+        
+        importarProdutoBalanca(opcoes.toArray(new OpcaoProduto[]{}));
+    }
     
     @Deprecated
     public void importarProduto(boolean manterCodigoDeBalanca) throws Exception {
         this.importarProduto(manterCodigoDeBalanca, false);
+    }
+
+    @Deprecated
+    public void importarProdutoBalanca(boolean manterCodigoDeBalanca) throws Exception {
+        this.importarProdutoBalanca(manterCodigoDeBalanca, false);
     }
     
     public void importarProduto(OpcaoProduto... opcoes) throws Exception {
@@ -206,6 +224,21 @@ public class Importador {
         
     }
 
+    public void importarProdutoBalanca(OpcaoProduto... opcoes) throws Exception {
+        
+        ProgressBar.setStatus("Carregando produtos...");
+        List<ProdutoIMP> produtos = getInterfaceDAO().getProdutosBalanca();
+        ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
+        provider.setLoja(getLojaOrigem());
+        provider.setSistema(getSistema());
+        provider.setLojaVR(getLojaVR());
+        provider.setOpcoes(opcoes);
+        
+        ProdutoRepository repository = new ProdutoRepository(provider);
+        repository.salvar(produtos);
+        
+    }
+    
     /**
      * Executa a importação dos fornecedores.
      * @param opt
