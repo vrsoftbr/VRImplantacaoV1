@@ -160,7 +160,7 @@ public class ProdutoDAO {
             sql.put("codigoanp", "");
             sql.put("impostomedionacional", 0);
             sql.put("impostomedioimportado", 0);
-            sql.put("sugestaocotacao", false);
+            sql.put("sugestaocotacao", true);
             sql.put("tara", 0.0);
             sql.put("utilizatabelasubstituicaotributaria", false);
             sql.put("id_tipolocaltroca", 0);

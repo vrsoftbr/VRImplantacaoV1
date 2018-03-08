@@ -125,6 +125,44 @@ public class MapaTributacaoDAO {
             throw e;
         }
     }
+    
+    /**
+     * Retorna todas as tributações ativas no VR.
+     * @return
+     * @throws Exception 
+     */
+    public List<Icms> getTributacaoVR() throws Exception {
+        List<Icms> result = new ArrayList<>();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "	id,\n"
+                    + "	descricao,\n"
+                    + "	situacaotributaria,\n"
+                    + "	porcentagem,\n"
+                    + "	reduzido	\n"
+                    + "from \n"
+                    + "	aliquota\n"
+                    + "where\n"
+                    + "	id_situacaocadastro = 1\n"
+                    + "order by\n"
+                    + "	descricao"
+            )) {
+                while (rst.next()) {
+                    Icms vo = new Icms(
+                            rst.getInt("id"),
+                            rst.getString("descricao"),
+                            rst.getInt("situacaotributaria"),
+                            rst.getDouble("porcentagem"),
+                            rst.getDouble("reduzido"));
+                    result.add(vo);
+                }
+            }
+        }
+
+        return result;
+    }
 
     public List<Icms> getTributacaoVR(String texto) throws Exception {
         List<Icms> result = new ArrayList<>();

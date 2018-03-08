@@ -2,6 +2,7 @@ package vrimplantacao2.gui.component.mapatributacao;
 
 import java.util.ArrayList;
 import java.util.List;
+import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.enums.Icms;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 
@@ -62,7 +63,7 @@ public class MapaTributacaoController {
     void atualizarMapa() throws Exception {
         //Cria a tabela do mapeamento se ainda não existir.
         dao.createTable();
-        List<MapaTributoVO> convertido = converterMapa(provider.getTributacao());
+        List<MapaTributoVO> convertido = converterMapa(provider.getTributacao());       
         dao.gravarTributacaoOrigem(convertido);
         //Retorna o mapa
         mapa = dao.getMapa(getSistema(), getAgrupador());
@@ -90,7 +91,13 @@ public class MapaTributacaoController {
         }
     }
 
-    private List<MapaTributoVO> converterMapa(List<MapaTributoIMP> tributacao) {
+    private List<MapaTributoVO> converterMapa(List<MapaTributoIMP> tributacao) throws Exception {        
+        
+        MultiMap<Comparable, Icms> tributacaoVR = new MultiMap<>();        
+        for (Icms icms: dao.getTributacaoVR()) {
+            tributacaoVR.put(icms, icms.getCst(), icms.getAliquota(), icms.getReduzido());
+        }        
+        
         List<MapaTributoVO> result = new ArrayList<>();
         for (MapaTributoIMP imp: tributacao) {
             MapaTributoVO vo = new MapaTributoVO();
@@ -98,6 +105,9 @@ public class MapaTributacaoController {
             vo.setAgrupador(getAgrupador());
             vo.setOrigId(imp.getId());
             vo.setOrigDescricao(imp.getDescricao());
+                        
+            vo.setAliquota(tributacaoVR.get(imp.getCst(), imp.getAliquota(), imp.getReduzido()));
+            
             result.add(vo);
         }
         return result;

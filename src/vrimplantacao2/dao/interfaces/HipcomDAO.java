@@ -10,7 +10,9 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  *
@@ -43,7 +45,34 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<MapaTributoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	t.trbcod,\n" +
+                    "	t.trbdescr,\n" +
+                    "	t.trbstrib cst,\n" +
+                    "	t.trbaliq aliq,\n" +
+                    "	t.trbreduc reducao\n" +
+                    "from\n" +
+                    "	hiptrb t\n" +
+                    "order by\n" +
+                    "	1"
+            )) {
+                while (rst.next()) {
+                    result.add(new MapaTributoIMP(
+                            rst.getString("trbcod"),
+                            rst.getString("trbdescr"),
+                            rst.getInt("cst"),
+                            rst.getDouble("aliq"),
+                            rst.getDouble("reducao")
+                    ));
+                }
+            }
+        }
+        
+        return result;
     }
 
     @Override
@@ -161,7 +190,132 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
-    
-    
+
+    @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select famcod, famdescr from hipfam order by 1"
+            )) {
+                while (rst.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("famcod"));
+                    imp.setDescricao(rst.getString("famdescr"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	p.procodplu id,\n" +
+                    "	p.prodtcad datacadastro,\n" +
+                    "	coalesce(ean.barcodbar, p.procodplu) ean,\n" +
+                    "	coalesce(ean.barqtemb, 1) qtdembalagem,\n" +
+                    "	coalesce(cot.embqtemb, 1) qtdcotacao,\n" +
+                    "	substring(p.proembu, 1,2) tipoembalagem,\n" +
+                    "	case p.propesado\n" +
+                    "	when 'S' then 1\n" +
+                    "	else 0 end as ebalanca,\n" +
+                    "	p.provalid validade,\n" +
+                    "	p.prodescr descricaocompleta,\n" +
+                    "	coalesce(nullif(trim(p.prodescgon),''), p.prodescr) descricaogondola,\n" +
+                    "	p.prodescres descricaoreduzida,\n" +
+                    "	p.prodepto merc1,\n" +
+                    "	p.prosecao merc2,\n" +
+                    "	p.progrupo merc3,\n" +
+                    "	p.prosubgr merc4,\n" +
+                    "	p.procodfam id_familia,\n" +
+                    "	p.propeso peso,\n" +
+                    "	prc.prlestoq estoque,\n" +
+                    "	prc.prlmargind margemunit,\n" +
+                    "	prc.prlctentr custocomimposto,\n" +
+                    "	prc.prlctbal custosemimposto,\n" +
+                    "	prc.prlprven precovenda,\n" +
+                    "	case prc.prlforalin\n" +
+                    "	when 'E' then 0\n" +
+                    "	else 1 end id_situacaocadastro,\n" +
+                    "	case prc.prlforalin when 'S' then 1 else 0 end descontinuacao,\n" +
+                    "	case prc.prlcotacao when 'S' then 1 else 0 end cotacao,\n" +
+                    "	p.proclasfisc ncm,\n" +
+                    "	p.procest cest,\n" +
+                    "	prc.prlcodpiscofe piscofinsentrada,\n" +
+                    "	prc.prlcodpiscofs piscofinssaida,\n" +
+                    "	prc.prlcodrec piscofinsnatrec,\n" +
+                    "	prc.prlcodtris icmssaidaid,\n" +
+                    "	prc.prlcodtrie icmsentradaid,\n" +
+                    "	prc.prlprvena precoatacado,\n" +
+                    "	prc.prlmargata margematacado\n" +
+                    "from\n" +
+                    "	hippro p\n" +
+                    "	left join hipbar ean on\n" +
+                    "		ean.barcodplu = p.procodplu\n" +
+                    "	left join hipprl prc on\n" +
+                    "		prc.prlcodplu = p.procodplu and\n" +
+                    "		prc.prlloja = 1\n" +
+                    "	left join cotemb cot on\n" +
+                    "		cot.embcodplu = p.procodplu\n" +
+                    "order by 1"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("qtdcotacao"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.seteBalanca(rst.getBoolean("ebalanca"));
+                    imp.setValidade(rst.getInt("validade"));
+                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoGondola(rst.getString("descricaogondola"));
+                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    imp.setCodMercadologico1(rst.getString("merc1"));
+                    imp.setCodMercadologico2(rst.getString("merc2"));
+                    imp.setCodMercadologico3(rst.getString("merc3"));
+                    imp.setCodMercadologico4(rst.getString("merc4"));
+                    imp.setIdFamiliaProduto(rst.getString("id_familia"));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+                    imp.setPesoBruto(rst.getDouble("peso"));
+                    imp.setPesoLiquido(rst.getDouble("peso"));
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setMargem(rst.getDouble("margemunit"));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setSituacaoCadastro(rst.getInt("id_situacaocadastro"));
+                    imp.setPiscofinsCstCredito(rst.getString("piscofinsentrada"));
+                    imp.setPiscofinsCstDebito(rst.getString("piscofinssaida"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("piscofinsnatrec"));
+                    imp.setIcmsDebitoId(rst.getString("icmssaidaid"));
+                    imp.setIcmsCreditoId(rst.getString("icmsentradaid"));
+                    imp.setAtacadoPreco(rst.getDouble("precoatacado"));
+                    imp.setAtacadoPorcentagem(rst.getDouble("margematacado"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
     
 }
