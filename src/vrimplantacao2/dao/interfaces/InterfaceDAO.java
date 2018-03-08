@@ -108,6 +108,15 @@ public abstract class InterfaceDAO {
     public List<ProdutoIMP> getProdutos(OpcaoProduto opcao) throws Exception {
         return null;
     }
+
+    /**
+     * Retorna uma listagem com os produtos de balanca.
+     * @return Retorna uma listagem com os produtos cadastrados.
+     * @throws Exception 
+     */
+    public List<ProdutoIMP> getProdutosBalanca() throws Exception {
+        return null;
+    }
     
     /**
      * Retorna uma listagem com os fornecedores.
