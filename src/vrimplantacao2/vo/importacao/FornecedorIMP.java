@@ -1,6 +1,9 @@
 package vrimplantacao2.vo.importacao;
 
 import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.Factory;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -51,12 +54,21 @@ public class FornecedorIMP {
     private int prazoEntrega = 0;
     private int prazoVisita = 0;
     private int prazoSeguranca = 0;
-    private int condicaoPagamento = 0;    
+    
+    private Set<Integer> condicoesPagamentos = new LinkedHashSet<>();
     
     private TipoFornecedor tipoFornecedor = TipoFornecedor.ATACADO;
     
     private TipoEmpresa tipoEmpresa = TipoEmpresa.LUCRO_REAL;
 
+    public Set<Integer> getCondicoesPagamentos() {
+        return condicoesPagamentos;
+    }
+    
+    public void addCondicaoPagamento(int condicaoPagamento) {
+        this.condicoesPagamentos.add(condicaoPagamento < 0 ? 0 : condicaoPagamento);
+    }
+    
     private final MultiMap<String, FornecedorContatoIMP> contatos = new MultiMap<>(
             new Factory<FornecedorContatoIMP>() {
                 @Override
@@ -216,10 +228,6 @@ public class FornecedorIMP {
         return observacao;
     }
 
-    public int getCondicaoPagamento() {
-        return condicaoPagamento;
-    }
-
     public int getPrazoEntrega() {
         return prazoEntrega;
     }
@@ -377,7 +385,7 @@ public class FornecedorIMP {
     }
 
     public void setCondicaoPagamento(int condicaoPagamento) {
-        this.condicaoPagamento = condicaoPagamento < 0 ? 0 : condicaoPagamento;
+        addCondicaoPagamento(condicaoPagamento);
     }
 
     public void setPrazoEntrega(int prazoEntrega) {
@@ -536,4 +544,32 @@ public class FornecedorIMP {
         }
     }
 
+    /**
+     * Copia todo o endereço para o endereço de cobrança.
+     */
+    public void copiarEnderecoParaCobranca() {
+        this.cob_endereco = this.endereco;
+        this.cob_numero = this.numero;
+        this.cob_complemento = this.complemento;
+        this.cob_bairro = this.bairro;
+        this.cob_municipio = this.municipio;
+        this.cob_uf = this.uf;
+        this.cob_ibge_municipio = this.ibge_municipio;
+        this.cob_ibge_uf = this.ibge_uf;
+        this.cob_cep = this.cep;
+    }
+
+    /**
+     * Método de conveniência para atribuir um tipo produtor rural ao
+     * fornecedor. Ao acionar este método é verificado o cnpj do fornecedor e se
+     * for pessoa física atribui o valor {@link TipoEmpresa#PRODUTOR_RURAL_FISICA}
+     * senão {@link TipoEmpresa#PRODUTOR_RURAL_JURIDICO}.
+     */
+    public void setProdutorRural() {
+        if (Utils.stringToLong(this.cnpj_cpf) <= 99999999999L) {
+            this.tipoEmpresa = TipoEmpresa.PRODUTOR_RURAL_FISICA;
+        } else {
+            this.tipoEmpresa = TipoEmpresa.PRODUTOR_RURAL_JURIDICO;
+        }
+    }
 }

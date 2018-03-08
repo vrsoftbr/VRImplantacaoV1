@@ -91,8 +91,8 @@ public class FornecedorRepository {
                 if (vo != null) {
                     processarContatos(imp, vo, contatos);
                     
-                    if (imp.getCondicaoPagamento() > 0) {
-                        provider.gravarCondicaoPagamento(vo.getId(), imp.getCondicaoPagamento());
+                    for (Integer condicao: imp.getCondicoesPagamentos()) {
+                        provider.gravarCondicaoPagamento(vo.getId(), condicao);
                     }
 
                     if (imp.getPrazoEntrega() > 0 || imp.getPrazoSeguranca() > 0 || imp.getPrazoVisita() > 0) {
@@ -181,8 +181,8 @@ public class FornecedorRepository {
                     }
                     
                     if (opt.contains(OpcaoFornecedor.CONDICAO_PAGAMENTO)) {
-                        if (imp.getCondicaoPagamento() > 0) {
-                            provider.gravarCondicaoPagamento(vo.getId(), imp.getCondicaoPagamento());
+                        for (Integer condicao: imp.getCondicoesPagamentos()) {
+                            provider.gravarCondicaoPagamento(vo.getId(), condicao);
                         }
                     }
 
@@ -265,8 +265,8 @@ public class FornecedorRepository {
                 if (vo != null) {
                     processarContatos(imp, vo, contatos);
                     
-                    if (imp.getCondicaoPagamento() > 0) {
-                        provider.gravarCondicaoPagamento(vo.getId(), imp.getCondicaoPagamento());
+                    for (Integer condicao: imp.getCondicoesPagamentos()) {
+                        provider.gravarCondicaoPagamento(vo.getId(), condicao);
                     }
 
                     if (imp.getPrazoEntrega() > 0 || imp.getPrazoSeguranca() > 0 || imp.getPrazoVisita() > 0) {

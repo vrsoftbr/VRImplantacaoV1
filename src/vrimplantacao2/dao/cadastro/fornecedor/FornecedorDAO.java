@@ -287,8 +287,8 @@ public class FornecedorDAO {
                         }
                     }
 
-                    if (imp.getCondicaoPagamento() > 0) {
-                        pagamentoDAO.salvar(vo.getId(), imp.getCondicaoPagamento());
+                    for (Integer condicao: imp.getCondicoesPagamentos()) {
+                        pagamentoDAO.salvar(vo.getId(), condicao);
                     }
 
                     if (imp.getPrazoEntrega() > 0 || imp.getPrazoSeguranca() > 0 || imp.getPrazoVisita() > 0) {
