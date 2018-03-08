@@ -9,7 +9,11 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import vrimplantacao.classe.ConexaoDBF;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -44,8 +48,8 @@ public class OrionDAO extends InterfaceDAO {
                     + "codsub as id, "
                     + "titulograd as descricao "
                     + "from ESTOQUE "
-                    + "where plu is not null "
-                    + "or trim(plu) <> ''"
+                    + "where codsub is not null "
+                    + "or trim(codsub) <> ''"
             )) {
                 while (rst.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
@@ -106,13 +110,14 @@ public class OrionDAO extends InterfaceDAO {
                     + "e.plu id_produto, "
                     + "l.codigo ean, "
                     + "e.codsetor mercadologico1, "
-                    + "e.codgru, mercadologico2"
-                    + "e.codsubgru, mercadologico3"
+                    + "e.codgru mercadologico2,"
+                    + "e.codsubgru mercadologico3, "
                     + "e.nome descricaocompleta, "
                     + "e.descricao descricaoreduzida, "
                     + "e.gondola descricaogondola, "
                     + "e.custo, "
                     + "e.classfis ncm, "
+                    + "e.cest, "
                     + "e.sittribut, "
                     + "e.icms, "
                     + "e.reducao, "
@@ -134,12 +139,14 @@ public class OrionDAO extends InterfaceDAO {
                     + "left join ligplu l on e.plu = l.plu  "
                     + "where e.plu is not null"
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+                    ProdutoBalancaVO produtoBalanca;
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id_produto"));
-                    imp.setEan(rst.getString("ean"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaogondola"));
@@ -155,12 +162,46 @@ public class OrionDAO extends InterfaceDAO {
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setEstoque(rst.getDouble("quantfisc"));
                     imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("piscst"));
                     imp.setPiscofinsCstCredito(rst.getString("cofinscst"));
                     imp.setIcmsCst(rst.getInt("sittribut"));
                     imp.setIcmsAliq(rst.getDouble("icms"));
                     imp.setIcmsReducao(rst.getDouble("reducao"));
                     imp.setDataCadastro(rst.getDate("inclusao"));
+
+                    long codigoProduto;
+                    if ((rst.getString("ean") != null)
+                            && (!rst.getString("ean").trim().isEmpty())) {
+
+                        if (Long.parseLong(Utils.formataNumero(rst.getString("ean").trim())) <= 999999) {
+
+                            codigoProduto = Long.parseLong(rst.getString("ean").trim());
+                            if (codigoProduto <= Integer.MAX_VALUE) {
+                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                            } else {
+                                produtoBalanca = null;
+                            }
+
+                            if (produtoBalanca != null) {
+                                imp.seteBalanca(true);
+                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
+                            } else {
+                                imp.setValidade(0);
+                                imp.seteBalanca(false);
+                            }
+
+                            imp.setEan(rst.getString("ean"));
+
+                        } else {
+                            imp.seteBalanca(false);
+                            imp.setEan(rst.getString("ean"));
+                        }
+                    } else {
+                        imp.seteBalanca(false);
+                        imp.setEan(rst.getString("ean"));
+                    }
+
                     result.add(imp);
                 }
             }
@@ -377,7 +418,7 @@ public class OrionDAO extends InterfaceDAO {
                             && (!rst.getString("rg").trim().isEmpty())) {
                         imp.setInscricaoestadual(rst.getString("rg"));
                     } else if ((rst.getString("inscest") != null)
-                            & (!rst.getString("inscest").trim().isEmpty())) {
+                            && (!rst.getString("inscest").trim().isEmpty())) {
                         imp.setInscricaoestadual(rst.getString("inscest"));
                     } else {
                         imp.setInscricaoestadual("");
@@ -424,7 +465,7 @@ public class OrionDAO extends InterfaceDAO {
                     + "codigocli, "
                     + "terminal "
                     + "from receber "
-                    + "where vlrpago = 0"
+                    //+ "where vlrpago = 0"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();

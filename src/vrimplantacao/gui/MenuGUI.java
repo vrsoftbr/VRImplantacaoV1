@@ -49,7 +49,7 @@ import vrimplantacao.gui.interfaces.WisaSoftGUI_2;
 import vrimplantacao.gui.interfaces.GuiaSistemasGUI;
 import vrimplantacao.gui.interfaces.GCFGUI;
 import vrimplantacao.gui.interfaces.MultiPdvGUI;
-import vrimplantacao.gui.interfaces.OrionGUI;
+import vrimplantacao2.gui.interfaces.OrionGUI;
 import vrimplantacao.gui.interfaces.PCSistemasGUI;
 import vrimplantacao.gui.interfaces.PlanilhaChequeGUI;
 import vrimplantacao.gui.interfaces.BoechatSoftGUI;
@@ -2561,19 +2561,8 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemSoftaExActionPerformed
 
     private void jMenuItemOrionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemOrionActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarOrion == null || formImportarOrion.isClosed()) {
-                formImportarOrion = new OrionGUI(this);
-            }
-
-            formImportarOrion.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
+        
+        OrionGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemOrionActionPerformed
 
     private void jMenuItemUltraSystActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemUltraSystActionPerformed
