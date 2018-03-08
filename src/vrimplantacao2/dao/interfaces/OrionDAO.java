@@ -25,7 +25,6 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class OrionDAO extends InterfaceDAO {
 
-    public String Texto;
     public String i_arquivo;
 
     @Override
@@ -235,9 +234,9 @@ public class OrionDAO extends InterfaceDAO {
                                 "1",
                                 "TELEFONE2",
                                 rst.getString("telefone2"),
-                                Texto,
+                                null,
                                 TipoContato.COMERCIAL,
-                                Texto
+                                null
                         );
                     }
                     if ((rst.getString("telefone3") != null)
@@ -246,9 +245,9 @@ public class OrionDAO extends InterfaceDAO {
                                 "2",
                                 "TELEFONE 3",
                                 rst.getString("telefone3"),
-                                Texto,
+                                null,
                                 TipoContato.COMERCIAL,
-                                Texto
+                                null
                         );
                     }
                     if ((rst.getString("email") != null)
@@ -256,8 +255,8 @@ public class OrionDAO extends InterfaceDAO {
                         imp.addContato(
                                 "3",
                                 "EMAIL",
-                                Texto,
-                                Texto,
+                                null,
+                                null,
                                 TipoContato.COMERCIAL,
                                 rst.getString("email").toLowerCase()
                         );
@@ -335,10 +334,80 @@ public class OrionDAO extends InterfaceDAO {
                     + "rg "
                     + "from cliente"
             )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("codigo"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("nome"));
+                    imp.setDataNascimento(rst.getDate("nascimento"));
+                    imp.setEmpresa(rst.getString("firma"));
+                    imp.setCargo(rst.getString("cargo"));
+                    imp.setSalario(rst.getDouble("salario"));
+                    imp.setValorLimite(rst.getDouble("saldo"));
+                    imp.setNomeMae(rst.getString("mae"));
+                    imp.setNomePai(rst.getString("pai"));
+                    imp.setEndereco(rst.getString("rua"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setTelefone(rst.getString("telefone1"));
+                    imp.setEmail(rst.getString("email"));
 
+                    if ((rst.getString("contato") != null)
+                            && (!rst.getString("contato").trim().isEmpty())) {
+                        imp.setObservacao(rst.getString("CONTATO " + rst.getString("contato")));
+                    }
+                    if ((rst.getString("contatcom") != null)
+                            && (!rst.getString("contatcom").trim().isEmpty())) {
+                        imp.setObservacao(imp.getObservacao() + " CONTATOCOM " + rst.getString("contatcom"));
+                    }
+
+                    if ((rst.getString("cic") != null)
+                            && (!rst.getString("cic").trim().isEmpty())) {
+                        imp.setCnpj(rst.getString("cic"));
+                    } else if ((rst.getString("cgc") != null)
+                            && (!rst.getString("cgc").trim().isEmpty())) {
+                        imp.setCnpj(rst.getString("cgc"));
+                    } else {
+                        imp.setCnpj("");
+                    }
+
+                    if ((rst.getString("rg") != null)
+                            && (!rst.getString("rg").trim().isEmpty())) {
+                        imp.setInscricaoestadual(rst.getString("rg"));
+                    } else if ((rst.getString("inscest") != null)
+                            & (!rst.getString("inscest").trim().isEmpty())) {
+                        imp.setInscricaoestadual(rst.getString("inscest"));
+                    } else {
+                        imp.setInscricaoestadual("");
+                    }
+
+                    if ((rst.getString("telefone2") != null)
+                            && (!rst.getString("telefone2").trim().isEmpty())) {
+                        imp.addContato(
+                                "1",
+                                "TELEFONE 2",
+                                rst.getString("telefone2"),
+                                null,
+                                null
+                        );
+                    }
+                    if ((rst.getString("telefone3") != null)
+                            && (!rst.getString("telefone3").trim().isEmpty())) {
+                        imp.addContato(
+                                "3",
+                                "TELEFONE 3",
+                                rst.getString("telefone3"),
+                                null,
+                                null
+                        );
+                    }
+                    result.add(imp);
+                }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -358,10 +427,18 @@ public class OrionDAO extends InterfaceDAO {
                     + "where vlrpago = 0"
             )) {
                 while (rst.next()) {
-
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("codigo"));
+                    imp.setIdCliente(rst.getString("codigocli"));
+                    imp.setNumeroCupom(rst.getString("codigo"));
+                    imp.setEcf(rst.getString("terminal"));
+                    imp.setDataEmissao(rst.getDate("dlanca"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setValor(rst.getDouble("valorreceb"));
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 }
