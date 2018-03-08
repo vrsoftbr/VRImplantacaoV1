@@ -6,11 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoMySQL;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -317,5 +320,98 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	f.forcod id,\n" +
+                    "	f.forrazao razao,\n" +
+                    "	coalesce(nullif(trim(f.forfantas),''), f.forrazao) fantasia,\n" +
+                    "	f.forcnpj cnpj,\n" +
+                    "	f.forinsest inscricaoestadual,\n" +
+                    "	f.forinsmunic inscricaomunicipal,\n" +
+                    "	case f.forforalin when 'S' then 0 else 1 end ativo,\n" +
+                    "	f.forendere endereco,\n" +
+                    "	f.forbairro bairro,\n" +
+                    "	f.formunicip municipio,\n" +
+                    "	f.forestado uf,\n" +
+                    "	f.forcodmunic ibge_munic,\n" +
+                    "	f.forcep cep,\n" +
+                    "	f.forfone telefone,\n" +
+                    "	f.forqtmincxa qtdminimapedido,\n" +
+                    "	f.forvlrmin valorminimopedido,\n" +
+                    "	f.forobserv observacao,\n" +
+                    "	f.forentrega prazoentrega,\n" +
+                    "	f.forvisita prazovisita,\n" +
+                    "	f.forcondpag condicaopagamento,\n" +
+                    "	f.forcontato contato,\n" +
+                    "	f.forfonecont fonecontato,\n" +
+                    "	f.forsite site,\n" +
+                    "	f.foremail email,\n" +
+                    "	f.foremailxml emailnfe,\n" +
+                    "	f.fortipforn tipofornecedor,\n" +
+                    "	case f.forprodutor when 'S' then 1 else 0 end produtorural\n" +
+                    "from\n" +
+                    "	hipfor f\n" +
+                    "order by 1"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("inscricaoestadual"));
+                    imp.setInsc_municipal(rst.getString("inscricaomunicipal"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setIbge_municipio(rst.getInt("ibge_munic"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setTel_principal(rst.getString("telefone"));
+                    imp.setQtd_minima_pedido(rst.getInt("qtdminimapedido"));
+                    imp.setValor_minimo_pedido(rst.getDouble("valorminimopedido"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setPrazoEntrega(rst.getInt("prazoentrega"));
+                    imp.setPrazoVisita(rst.getInt("prazovisita"));
+                    
+                    String cond = rst.getString("condicaopagamento");
+                    if (cond == null) cond = "";
+                    cond = cond.replaceAll("[^0-9 \\/-]", "");
+                    
+                    String[] parcs = cond.split("\\/| |\\-");
+                    
+                    for (String parc: parcs) {
+                        if (!"".equals(parc.trim())) {
+                            int dia = Utils.stringToInt(parc);
+                            imp.addCondicaoPagamento(dia);
+                        }
+                    }
+                    
+                    imp.addContato(rst.getString("contato"), rst.getString("fonecontato"), "", TipoContato.COMERCIAL, "");
+                    imp.addEmail("SITE", rst.getString("site"), TipoContato.COMERCIAL);
+                    imp.addEmail("EMAIL", rst.getString("email"), TipoContato.COMERCIAL);
+                    imp.addEmail("NFE", rst.getString("emailnfe"), TipoContato.NFE);
+                    if (rst.getBoolean("produtorural")) {
+                        imp.setProdutorRural();
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
     
 }
