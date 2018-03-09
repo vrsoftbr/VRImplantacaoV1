@@ -35,7 +35,7 @@ public class ScefGUI extends VRInternalFrame {
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
-        txtHost.setText(params.get("localhost", SISTEMA, "HOST"));
+        txtHost.setText(params.getWithNull("localhost", SISTEMA, "HOST"));
         txtDatabase.setText(params.getWithNull("C:\\SHI\\DADOS", SISTEMA, "DATABASE"));
         txtPorta.setText(params.getWithNull("3050", SISTEMA, "PORTA"));
         txtUsuario.setText(params.getWithNull("SYSDBA", SISTEMA, "USUARIO"));
