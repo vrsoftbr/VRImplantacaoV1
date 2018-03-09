@@ -1,5 +1,10 @@
 package vrimplantacao2.dao.cadastro.nutricional;
 
+import java.util.Map;
+import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaVO;
+import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.cadastro.nutricional.NutricionalAnteriorVO;
+
 /**
  *
  * @author Leandro
@@ -38,6 +43,46 @@ public class NutricionalRepositoryProvider {
 
     public void setLojaVR(int lojaVR) {
         this.lojaVR = lojaVR;
+    }
+
+    public void gravar(NutricionalFilizolaVO vo) throws Exception {
+        
+    }
+
+    public void setStatus(String nutricionaisCarregando_dados) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public Map<String, NutricionalAnteriorVO> getAnteriores() throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public Map<String, Integer> getProdutos() throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    public void begin() throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void commit() throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void rollback() throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void gravar(NutricionalAnteriorVO anterior) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    MultiMap<Integer, Void> getNutricionaisFilizola() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    void gravarItem(Integer codigoAtualFilizola, Integer idProduto) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
     

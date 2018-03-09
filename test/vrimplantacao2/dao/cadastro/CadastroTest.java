@@ -7,6 +7,7 @@ import vrimplantacao2.dao.cadastro.cliente.ClienteRepositoryTest;
 import vrimplantacao2.dao.cadastro.financeiro.FinanceiroTest;
 import vrimplantacao2.dao.cadastro.fiscal.FiscalTest;
 import vrimplantacao2.dao.cadastro.mercadologico.MercadologicoRepositoryTest;
+import vrimplantacao2.dao.cadastro.nutricional.NutricionalRepositoryTest;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoIDStackTest;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoRepositoryTest;
 
@@ -18,7 +19,8 @@ import vrimplantacao2.dao.cadastro.produto2.ProdutoRepositoryTest;
     ClientePreferencialIDStackTest.class,
     ClienteRepositoryTest.class,
     MercadologicoRepositoryTest.class,
-    FiscalTest.class
+    FiscalTest.class,
+    NutricionalRepositoryTest.class
 })
 public class CadastroTest {
     

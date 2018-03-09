@@ -5,7 +5,6 @@ package vrimplantacao2.dao.cadastro.nutricional;
  * @author Leandro
  */
 public enum OpcaoNutricional {
-    TODOS,
     FILIZOLA,
     TOLEDO
 }

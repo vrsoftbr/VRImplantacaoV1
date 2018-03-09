@@ -39,6 +39,7 @@ public class NutricionalFilizolaVO {
     private int percentualferro = 0;
     private int percentualsodio = 0;
     private String porcao = "";
+    private String mensagemAlergico = "";
     public List<NutricionalFilizolaItemVO> vNutricionalFilizolaItem = new ArrayList<>();
     private Set<String> produtoId = new LinkedHashSet<>();
 
@@ -426,6 +427,14 @@ public class NutricionalFilizolaVO {
 
     public Set<String> getProdutoId() {
         return produtoId;
+    }
+
+    public String getMensagemAlergico() {
+        return mensagemAlergico;
+    }
+
+    public void setMensagemAlergico(String mensagemAlergico) {
+        this.mensagemAlergico = Utils.acertarTexto(mensagemAlergico, 168);
     }
     
 }
