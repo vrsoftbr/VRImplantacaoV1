@@ -220,6 +220,9 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkEANemBranco.isSelected()) {
                             importador.importarEANemBranco();
                         }
+                        if (chkNutricional.isSelected()) {
+                            importador.importarNutricional();
+                        }
 
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
@@ -303,6 +306,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkTipoEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkMargem = new vrframework.bean.checkBox.VRCheckBox();
+        chkNutricional = new vrframework.bean.checkBox.VRCheckBox();
         btnMapaTribut = new vrframework.bean.button.VRButton();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -429,6 +433,9 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkMargem.setText("Margem");
         tabProdutos.add(chkMargem);
+
+        chkNutricional.setText("Nutricional");
+        tabProdutos.add(chkNutricional);
 
         btnMapaTribut.setText("Mapa de Tribut.");
         btnMapaTribut.setEnabled(false);
@@ -637,6 +644,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkNatReceita;
+    private vrframework.bean.checkBox.VRCheckBox chkNutricional;
     private vrframework.bean.checkBox.VRCheckBox chkPisCofins;
     private vrframework.bean.checkBox.VRCheckBox chkPreco;
     private vrframework.bean.checkBox.VRCheckBox chkProdMercadologico;

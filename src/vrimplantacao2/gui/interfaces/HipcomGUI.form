@@ -277,6 +277,11 @@
                     <Property name="text" type="java.lang.String" value="Margem"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNutricional">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Nutricional"/>
+                  </Properties>
+                </Component>
                 <Component class="vrframework.bean.button.VRButton" name="btnMapaTribut">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Mapa de Tribut."/>

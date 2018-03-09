@@ -7,14 +7,18 @@ import java.util.List;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaVO;
+import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -412,6 +416,54 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	pf.prfforn idfornecedor,\n" +
+                    "	pf.prfcodplu idproduto,\n" +
+                    "	pf.prfreffor codigoexterno,\n" +
+                    "	case when pf.prfqtemb < 1 then 1 else pf.prfqtemb end qtdembalagem,\n" +
+                    "	pf.prfprtab precopacote\n" +
+                    "from\n" +
+                    "	hipprf pf\n" +
+                    "where\n" +
+                    "	pf.prfloja = " + getLojaOrigem() + "\n" +
+                    "order by 1,2"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));                    
+                    imp.setCustoTabela(MathUtils.round(rst.getDouble("precopacote") / rst.getDouble("qtdembalagem"), 2));                                        
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<NutricionalFilizolaVO> getNutricionalFilizola() throws Exception {
+        return super.getNutricionalFilizola(); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<NutricionalToledoVO> getNutricionalToledo() throws Exception {
+        return super.getNutricionalToledo(); //To change body of generated methods, choose Tools | Templates.
+    }
+    
     
     
 }
