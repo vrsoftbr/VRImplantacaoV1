@@ -108,7 +108,7 @@ public class NutricionalRepositoryTest {
                         return null;
                     }
                 }
-        ).when(provider).gravarItem(anyInt(), anyInt());
+        ).when(provider).gravarItemFilizola(anyInt(), anyInt());
         
         NutricionalFilizolaVO expectedFilizola = NutricionalTestClasses.getFilizola1();
         NutricionalAnteriorVO expectedAnterior = NutricionalTestClasses.getAnterior1();
@@ -178,7 +178,7 @@ public class NutricionalRepositoryTest {
                         return null;
                     }
                 }
-        ).when(provider).gravarItem(anyInt(), anyInt());
+        ).when(provider).gravarItemToledo(anyInt(), anyInt());
         
         NutricionalToledoVO expectedToledo = NutricionalTestClasses.getToledo1();
         NutricionalAnteriorVO expectedAnterior = NutricionalTestClasses.getAnterior1();

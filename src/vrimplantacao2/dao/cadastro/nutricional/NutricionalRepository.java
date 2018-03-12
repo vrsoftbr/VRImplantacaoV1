@@ -44,6 +44,7 @@ public class NutricionalRepository {
         provider.begin();
         try {
         
+            provider.setStatus("Nutricionais...Gravando...", nutricionais.size());
             for (NutricionalIMP imp: nutricionais) {
                 LOG.finer("Nutricional: " + imp.getId() + " - " + imp.getDescricao());
                 NutricionalAnteriorVO anterior = anteriores.get(imp.getId());
@@ -84,7 +85,7 @@ public class NutricionalRepository {
                         if (opt.contains(OpcaoNutricional.FILIZOLA)) {
                             if (anterior.getCodigoAtualFilizola() != null) {
                                 if (nutricionaisFilizola != null && !nutricionaisFilizola.containsKey(anterior.getCodigoAtualFilizola(), idProduto)) {
-                                    provider.gravarItem(anterior.getCodigoAtualFilizola(), idProduto);    
+                                    provider.gravarItemFilizola(anterior.getCodigoAtualFilizola(), idProduto);    
                                     nutricionaisFilizola.put(null, anterior.getCodigoAtualFilizola(), idProduto);
                                     LOG.finest("ID Filizola Produto " + idProduto + " gravado no nutricional " + anterior.getCodigoAtualFilizola()); 
                                 }
@@ -93,7 +94,7 @@ public class NutricionalRepository {
                         if (opt.contains(OpcaoNutricional.TOLEDO)) {
                             if (anterior.getCodigoAtualToledo() != null) {
                                 if (nutricionaisToledo != null && !nutricionaisToledo.containsKey(anterior.getCodigoAtualToledo(), idProduto)) {
-                                    provider.gravarItem(anterior.getCodigoAtualToledo(), idProduto);    
+                                    provider.gravarItemToledo(anterior.getCodigoAtualToledo(), idProduto);    
                                     nutricionaisToledo.put(null, anterior.getCodigoAtualToledo(), idProduto);
                                     LOG.finest("ID Toledo Produto " + idProduto + " gravado no nutricional " + anterior.getCodigoAtualToledo()); 
                                 }
@@ -102,6 +103,7 @@ public class NutricionalRepository {
                     }
                 }
                 
+                provider.setStatus();
             }
             
             provider.commit();

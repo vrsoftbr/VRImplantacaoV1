@@ -3,6 +3,7 @@ package vrimplantacao2.dao.cadastro.produto;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import vrframework.classe.Conexao;
@@ -553,6 +554,40 @@ public class ProdutoAnteriorDAO {
                     vo.setContadorImportacao(rst.getInt("contadorimportacao"));
                     
                     result.put(vo.getImportId(), vo);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    /**
+     * Retorna o código atual dos produtos através do código de importação.
+     * @param sistema Código do sistema importado.
+     * @param loja Código da loja importada.
+     * @return {@link Map} com os códigos dos produtos mapeados com os códigos 
+     * anteriores.
+     * @throws Exception 
+     */
+    public Map<String, Integer> getAnteriores(String sistema, String loja) throws Exception {
+        Map<String, Integer> result = new HashMap<>();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	ant.impid,\n" +
+                    "	ant.codigoatual\n" +
+                    "from\n" +
+                    "	implantacao.codant_produto ant\n" +
+                    "	join produto p on ant.codigoatual = p.id\n" +
+                    "where\n" +
+                    "	ant.impsistema = " + SQLUtils.stringSQL(sistema) + " and\n" +
+                    "	ant.imploja = " + SQLUtils.stringSQL(loja) + " and	\n" +
+                    "	not ant.codigoatual is null\n" +
+                    "order by 1"
+            )) {
+                while (rst.next()) {
+                    result.put(rst.getString("impid"), rst.getInt("codigoatual"));
                 }
             }
         }
