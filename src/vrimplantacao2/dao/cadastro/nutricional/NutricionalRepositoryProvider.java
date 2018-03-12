@@ -2,6 +2,7 @@ package vrimplantacao2.dao.cadastro.nutricional;
 
 import java.util.Map;
 import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaVO;
+import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.nutricional.NutricionalAnteriorVO;
 
@@ -48,6 +49,10 @@ public class NutricionalRepositoryProvider {
     public void gravar(NutricionalFilizolaVO vo) throws Exception {
         
     }
+    
+    public void gravar(NutricionalToledoVO vo) throws Exception {
+        
+    }
 
     public void setStatus(String nutricionaisCarregando_dados) throws Exception {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -77,11 +82,15 @@ public class NutricionalRepositoryProvider {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    MultiMap<Integer, Void> getNutricionaisFilizola() {
+    public MultiMap<Integer, Void> getNutricionaisFilizola() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    public MultiMap<Integer, Void> getNutricionaisToledo() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    void gravarItem(Integer codigoAtualFilizola, Integer idProduto) {
+    public void gravarItem(Integer codigoAtualFilizola, Integer idProduto) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

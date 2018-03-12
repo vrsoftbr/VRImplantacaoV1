@@ -10,7 +10,7 @@ public class NutricionalAnteriorVO {
     private String loja;
     private String id;
     private Integer codigoAtualFilizola;
-    private Integer codigoAtualToledo = -1;
+    private Integer codigoAtualToledo;
 
     public String getSistema() {
         return sistema;

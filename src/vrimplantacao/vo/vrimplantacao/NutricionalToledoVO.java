@@ -6,7 +6,9 @@
 package vrimplantacao.vo.vrimplantacao;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class NutricionalToledoVO {
     private int id = 0;
@@ -40,8 +42,25 @@ public class NutricionalToledoVO {
     private int medidainteira = 0;
     private int id_tipomedidadecimal = 0;
     private int id_tipomedida = 0;
+    private List<String> mensagemAlergico = new ArrayList<>(15);
+    private Set<String> idProdutos = new HashSet<>();
     public List<NutricionalToledoItemVO> vNutricionalToledoItem = new ArrayList<>();
 
+    public Set<String> getIdProdutos() {
+        return idProdutos;
+    }
+
+    public void addProduto(String id) {
+        this.idProdutos.add(id);
+    }
+    
+    public List<String> getMensagemAlergico() {
+        return mensagemAlergico;
+    }
+
+    public void addMensagemAlergico(String mensagem) {
+        this.mensagemAlergico.add(mensagem);
+    }
     /**
      * @return the id
      */

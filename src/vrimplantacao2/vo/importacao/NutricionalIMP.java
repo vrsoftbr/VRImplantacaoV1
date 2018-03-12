@@ -14,7 +14,7 @@ public class NutricionalIMP {
     
     private String id;// integer NOT NULL,
     private String descricao;// character varying(20) NOT NULL,
-    private SituacaoCadastro situacaoCadastro;// integer NOT NULL,
+    private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;// integer NOT NULL,
     private int caloria;// integer NOT NULL,
     private double carboidrato;// numeric(10,1) NOT NULL,
     private boolean carboidratoInferior;// boolean NOT NULL,
@@ -63,7 +63,7 @@ public class NutricionalIMP {
     }
 
     public void setSituacaoCadastro(SituacaoCadastro situacaoCadastro) {
-        this.situacaoCadastro = situacaoCadastro;
+        this.situacaoCadastro = situacaoCadastro != null ? situacaoCadastro : SituacaoCadastro.ATIVO;
     }
 
     public int getCaloria() {
