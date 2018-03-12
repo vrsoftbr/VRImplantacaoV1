@@ -220,9 +220,9 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
                 produto.setNcm(linha.getString("ncm"));
                 produto.setCest(linha.getString("cest"));
-                produto.setPiscofinsCstCredito(linha.getInt("piscofins_cst_credito"));
-                produto.setPiscofinsCstDebito(linha.getInt("piscofins_cst_debito"));
-                produto.setPiscofinsNaturezaReceita(linha.getInt("piscofins_natureza_receita"));
+                produto.setPiscofinsCstCredito(linha.getString("piscofins_cst_credito"));
+                produto.setPiscofinsCstDebito(linha.getString("piscofins_cst_debito"));
+                produto.setPiscofinsNaturezaReceita(linha.getString("piscofins_natureza_receita"));
                 produto.setIcmsCst(linha.getInt("icms_cst"));
                 produto.setIcmsAliq(linha.getDouble("icms_aliquota"));
                 produto.setIcmsReducao(linha.getDouble("icms_reduzido"));
