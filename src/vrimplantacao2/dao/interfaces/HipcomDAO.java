@@ -8,19 +8,20 @@ import java.util.Set;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaVO;
-import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -504,5 +505,57 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+
+    @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct\n" +
+                    "	l.lojestado uf,\n" +
+                    "	p.proclasfisc ncm,\n" +
+                    "	pl.prlpivast p_iva,\n" +
+                    "	pl.prlvivast v_iva,\n" +
+                    "	#pl.prlvpauta pauta,\n" +
+                    "	pl.prlcodtrie icmside,\n" +
+                    "	pl.prlcodtris icmsids\n" +
+                    "from\n" +
+                    "	hipprl pl\n" +
+                    "	join hiploj l on\n" +
+                    "		pl.prlloja = l.lojcod\n" +
+                    "	join hippro p on\n" +
+                    "		pl.prlcodplu = p.procodplu\n" +
+                    "where\n" +
+                    "	pl.prlloja = " + getLojaOrigem() + " and\n" +
+                    "	(pl.prlpivast != 0 or\n" +
+                    "	pl.prlvivast != 0)\n" +
+                    "order by 1,2"
+            )) {
+                while (rst.next()) {
+                    PautaFiscalIMP imp = new PautaFiscalIMP();
+                    
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setId(imp.getUf() + "-" + imp.getNcm());
+                    if (rst.getDouble("p_iva") != 0) {
+                        imp.setTipoIva(TipoIva.PERCENTUAL);
+                        imp.setIva(rst.getDouble("p_iva"));
+                    } else {
+                        imp.setTipoIva(TipoIva.VALOR);
+                        imp.setIva(rst.getDouble("v_iva"));
+                    }
+                    imp.setAliquotaDebitoId(rst.getString("icmsids"));
+                    imp.setAliquotaCreditoId(rst.getString("icmside"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    
     
 }

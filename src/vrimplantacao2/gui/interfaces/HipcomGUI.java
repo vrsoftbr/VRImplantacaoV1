@@ -21,6 +21,7 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoView;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 
 public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
 
@@ -221,6 +222,9 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkEANemBranco.isSelected()) {
                             importador.importarEANemBranco();
                         }
+                        if (chkPautaFiscal.isSelected()) {
+                            importador.importarPautaFiscal(OpcaoFiscal.NOVOS);
+                        }
                         
                         {
                             List<OpcaoNutricional> opcoes = new ArrayList<>();
@@ -317,6 +321,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkNutricionalFilizola = new vrframework.bean.checkBox.VRCheckBox();
         chkNutricionalToledo = new vrframework.bean.checkBox.VRCheckBox();
         btnMapaTribut = new vrframework.bean.button.VRButton();
+        chkPautaFiscal = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
@@ -457,6 +462,9 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
             }
         });
         tabProdutos.add(btnMapaTribut);
+
+        chkPautaFiscal.setText("Pauta Fiscal");
+        tabProdutos.add(chkPautaFiscal);
 
         tabImportacao.addTab("Produtos", tabProdutos);
 
@@ -661,6 +669,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkNatReceita;
     private vrframework.bean.checkBox.VRCheckBox chkNutricionalFilizola;
     private vrframework.bean.checkBox.VRCheckBox chkNutricionalToledo;
+    private vrframework.bean.checkBox.VRCheckBox chkPautaFiscal;
     private vrframework.bean.checkBox.VRCheckBox chkPisCofins;
     private vrframework.bean.checkBox.VRCheckBox chkPreco;
     private vrframework.bean.checkBox.VRCheckBox chkProdMercadologico;
