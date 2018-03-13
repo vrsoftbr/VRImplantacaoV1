@@ -252,6 +252,7 @@ public class ScefGUI extends VRInternalFrame {
                             if (chkCategoria.isSelected()) {
                                 opcoes.add(OpcaoProduto.CATEGORIA);
                             }
+                            
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
                             }

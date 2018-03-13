@@ -181,7 +181,10 @@ public class ScefDAO extends InterfaceDAO {
                     + "c.cestchave,\n"
                     + "s.prosit_tributaria sit_trib,\n"
                     + "p.prosit_tributaria sit_prod,\n"
-                    + "s.pstdescricao sit_descricao\n"
+                    + "s.pstdescricao sit_descricao,\n"
+                    + "(((p.propreco_venda * e.prequantidade))) preco_venda,\n"
+                    + "(((p.propreco_venda * e.prequantidade) * (e.prepercembalagem * -1)) / 100) as valor_desconto,\n"
+                    + "(e.prepercembalagem * -1) porcentagem_desconto\n"
                     + "from produto p\n"
                     + "left join cest c on c.cestcodigo = p.cestcodigo\n"
                     + "left join prosituacao_tributaria s on s.prosit_tributaria = p.prosit_tributaria\n"
@@ -191,22 +194,38 @@ public class ScefDAO extends InterfaceDAO {
             )) {
                 while (rst.next()) {
                     String codigobarras;
-                    
+
                     codigobarras = rst.getString("codbarra");
-                    
+
+
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("procodigo"));
+
                     if (rst.getInt("prequantidade") > 1) {
                         if ((codigobarras != null)
                                 && (!codigobarras.trim().isEmpty())
                                 && (codigobarras.trim().length() < 7)) {
 
-                            codigobarras = StringUtils.leftPad(codigobarras, 8, "9");
+                            if (codigobarras.trim().length() == 1) {
+                                codigobarras = "9999999" + codigobarras.trim();
+                            } else if (codigobarras.trim().length() == 2) {
+                                codigobarras = "999999" + codigobarras.trim();
+                            } else if (codigobarras.trim().length() == 3) {
+                                codigobarras = "99999" + codigobarras.trim();
+                            } else if (codigobarras.trim().length() == 4) {
+                                codigobarras = "9999" + codigobarras.trim();
+                            } else if (codigobarras.trim().length() == 5) {
+                                codigobarras = "999" + codigobarras.trim();
+                            } else {
+                                codigobarras = "99" + codigobarras.trim();
+                            }
+                        } else {
+                            codigobarras = StringUtils.leftPad(imp.getImportId(), 8, "9");
                         }
                     }
                     
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("procodigo"));
                     imp.setEan(codigobarras);
                     imp.seteBalanca((!"N".equals(rst.getString("probalanca"))));
                     imp.setSituacaoCadastro(rst.getInt("status") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
@@ -219,6 +238,7 @@ public class ScefDAO extends InterfaceDAO {
                     imp.setMargem(rst.getDouble("promargem"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    imp.setAtacadoPorcentagem(rst.getDouble("porcentagem_desconto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setPiscofinsCstDebito(rst.getString("stpcodigo"));
                     imp.setPiscofinsCstCredito(rst.getString("stpcodigo_entrada"));
@@ -287,9 +307,9 @@ public class ScefDAO extends InterfaceDAO {
 
                     if ((codigobarras != null)
                             && (!codigobarras.trim().isEmpty())) {
-                        
+
                         if (codigobarras.trim().length() < 7) {
-                            
+
                             if (codigobarras.trim().length() == 1) {
                                 imp.setEan("9999999" + codigobarras.trim());
                             } else if (codigobarras.trim().length() == 2) {
@@ -300,12 +320,9 @@ public class ScefDAO extends InterfaceDAO {
                                 imp.setEan("9999" + codigobarras.trim());
                             } else if (codigobarras.trim().length() == 5) {
                                 imp.setEan("999" + codigobarras.trim());
-                            } else if (codigobarras.trim().length() == 6) {
-                                imp.setEan("99" + codigobarras.trim());
                             } else {
-                                imp.setEan("9" + codigobarras.trim());
+                                imp.setEan("99" + codigobarras.trim());
                             }
-                            
                         } else {
                             imp.setEan(codigobarras);
                         }
