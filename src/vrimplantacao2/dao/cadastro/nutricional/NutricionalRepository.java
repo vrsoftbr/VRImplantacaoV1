@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaVO;
 import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
+import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.nutricional.NutricionalAnteriorVO;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
@@ -34,6 +35,9 @@ public class NutricionalRepository {
         MultiMap<Integer, Void> nutricionaisFilizola = null;
         MultiMap<Integer, Void> nutricionaisToledo = null;
         
+        IDStack idsFilizola = provider.getIdsVagosFilizola();
+        IDStack idsToledo = provider.getIdsVagosToledo();
+        
         if (opt.contains(OpcaoNutricional.FILIZOLA)) {
             nutricionaisFilizola = provider.getNutricionaisFilizola();
         }
@@ -56,6 +60,8 @@ public class NutricionalRepository {
                     if (opt.contains(OpcaoNutricional.FILIZOLA)) {
                         NutricionalFilizolaVO vo = converterNutricionalFilizola(imp);
                         
+                        vo.setId((int) idsFilizola.pop());
+                        
                         provider.gravar(vo);
                         
                         anterior.setCodigoAtualFilizola(vo.getId());
@@ -64,6 +70,8 @@ public class NutricionalRepository {
                     
                     if (opt.contains(OpcaoNutricional.TOLEDO)) {
                         NutricionalToledoVO vo = converterNutricionalToledo(imp);
+                        
+                        vo.setId((int) idsToledo.pop());
                         
                         provider.gravar(vo);
                         

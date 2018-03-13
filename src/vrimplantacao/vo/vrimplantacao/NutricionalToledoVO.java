@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import vrimplantacao.utils.Utils;
 
 public class NutricionalToledoVO {
     private int id = 0;
@@ -86,7 +87,7 @@ public class NutricionalToledoVO {
      * @param descricao the descricao to set
      */
     public void setDescricao(String descricao) {
-        this.descricao = descricao;
+        this.descricao = Utils.acertarTexto(descricao, 20);
     }
 
     /**

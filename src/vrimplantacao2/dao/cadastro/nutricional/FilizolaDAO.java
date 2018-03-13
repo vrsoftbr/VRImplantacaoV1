@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import vrframework.classe.Conexao;
 import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaVO;
+import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 
@@ -18,7 +19,7 @@ public class FilizolaDAO {
             SQLBuilder sql = new SQLBuilder();  
             
             sql.setTableName("nutricionalfilizola");
-            sql.getReturning().add("id");
+            sql.put("id", vo.getId());
             sql.put("descricao", vo.getDescricao());
             sql.put("id_situacaocadastro", vo.getId_situacaocadastro());
             sql.put("caloria", vo.getCaloria());
@@ -47,13 +48,7 @@ public class FilizolaDAO {
             sql.put("porcao", vo.getPorcao());
             sql.put("mensagemalergico", vo.getMensagemAlergico());
             
-            try (ResultSet rst = stm.executeQuery(
-                    sql.getInsert()                    
-            )) {
-                if (rst.next()) {
-                    vo.setId(rst.getInt("id"));
-                }
-            }
+            stm.execute(sql.getInsert());
         }
     }
 
@@ -84,8 +79,26 @@ public class FilizolaDAO {
             sql.setTableName("nutricionalfilizolaitem");
             sql.put("id_nutricionalfilizola", idNutricional);
             sql.put("id_produto", idProduto);            
-            stm.executeQuery(sql.getInsert());
+            stm.execute(sql.getInsert());
         }
+    }
+
+    public IDStack getIdsVagos(int maxId) throws Exception {
+        IDStack result = new IDStack();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT id from\n" +
+                    "(SELECT id FROM generate_series(1, " + maxId + ")\n" +
+                    "AS s(id) EXCEPT SELECT id FROM nutricionalfilizola) AS codigointerno ORDER BY id desc"
+            )) {
+                while (rst.next()) {
+                    result.add(rst.getLong("id"));
+                }
+            }
+        }
+        
+        return result;
     }
     
 }

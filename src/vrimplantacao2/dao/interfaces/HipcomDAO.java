@@ -4,12 +4,14 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaVO;
 import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -18,6 +20,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -455,15 +458,51 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<NutricionalFilizolaVO> getNutricionalFilizola() throws Exception {
-        return super.getNutricionalFilizola(); //To change body of generated methods, choose Tools | Templates.
+    public List<NutricionalIMP> getNutricional(Set<OpcaoNutricional> opcoes) throws Exception {
+        List<NutricionalIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	n.nutcodplu id,\n" +
+                    "	p.prodescres descricao,\n" +
+                    "	n.nutcaloria caloria,\n" +
+                    "	n.nutcarboid carboidrato,\n" +
+                    "	n.nutproteina proteina,\n" +
+                    "	n.nutgordtot gordura,\n" +
+                    "	n.nutgordsat gordurasaturada,\n" +
+                    "	n.nutgordtrns gorduratrans,\n" +
+                    "	n.nutfibra fibra,\n" +
+                    "	n.nutsodio sodio,\n" +
+                    "	concat(n.nutqtde, n.nutunidade) porcao\n" +
+                    "from\n" +
+                    "	hipnut n\n" +
+                    "	join hippro p on n.nutcodplu = p.procodplu\n" +
+                    "order by 1"
+            )) {
+                while (rst.next()) {
+                    NutricionalIMP imp = new NutricionalIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    imp.setCaloria(rst.getInt("caloria"));
+                    imp.setCarboidrato(rst.getInt("carboidrato"));
+                    imp.setProteina(rst.getInt("proteina"));
+                    imp.setGordura(rst.getInt("gordura"));
+                    imp.setGorduraSaturada(rst.getInt("gordurasaturada"));
+                    imp.setGorduraTrans(rst.getInt("gorduratrans"));
+                    imp.setFibra(rst.getInt("fibra"));
+                    imp.setSodio(rst.getInt("sodio"));
+                    imp.setPorcao(rst.getString("porcao"));
+                    
+                    imp.addProduto(rst.getString("id"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
     }
-
-    @Override
-    public List<NutricionalToledoVO> getNutricionalToledo() throws Exception {
-        return super.getNutricionalToledo(); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    
     
 }
