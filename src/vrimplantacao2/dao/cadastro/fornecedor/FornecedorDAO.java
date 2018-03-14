@@ -166,7 +166,7 @@ public class FornecedorDAO {
                                     sql.put("cnpj", vo.getCnpj());// numeric(14,0) NOT NULL,
                                     sql.put("revenda", false);// boolean NOT NULL,
                                     sql.put("id_situacaocadastro", vo.getSituacaoCadastro().getId());// integer NOT NULL,
-                                    sql.put("id_tipopagamento", 1);// integer NOT NULL,
+                                    sql.put("id_tipopagamento", vo.getTipoPagamento().getId());// integer NOT NULL,
                                     sql.put("numerodoc", 0);// integer NOT NULL,
                                     sql.put("pedidominimoqtd", vo.getPedidoMinimoQtd());// integer NOT NULL,
                                     sql.put("pedidominimovalor", vo.getPedidoMinimoValor());// numeric(11,2) NOT NULL,
@@ -566,7 +566,7 @@ public class FornecedorDAO {
             sql.put("cnpj", vo.getCnpj());// numeric(14,0) NOT NULL,
             sql.put("revenda", false);// boolean NOT NULL,
             sql.put("id_situacaocadastro", vo.getSituacaoCadastro().getId());// integer NOT NULL,
-            sql.put("id_tipopagamento", 1);// integer NOT NULL,
+            sql.put("id_tipopagamento", vo.getTipoPagamento().getId());// integer NOT NULL,
             sql.put("numerodoc", 0);// integer NOT NULL,
             sql.put("pedidominimoqtd", vo.getPedidoMinimoQtd());// integer NOT NULL,
             sql.put("pedidominimovalor", vo.getPedidoMinimoValor());// numeric(11,2) NOT NULL,
@@ -649,6 +649,9 @@ public class FornecedorDAO {
                 if (opt.contains(OpcaoFornecedor.ENDERECO)) {
                     sql.put("endereco", vo.getEndereco());
                 }
+                if (opt.contains(OpcaoFornecedor.NUMERO)) {
+                    sql.put("numero", vo.getNumero());
+                }
                 if (opt.contains(OpcaoFornecedor.BAIRRO)) {
                     sql.put("bairro", vo.getBairro());
                 }
@@ -668,6 +671,9 @@ public class FornecedorDAO {
                 }
                 if (opt.contains(OpcaoFornecedor.MUNICIPIO)) {
                     sql.put("id_municipio", vo.getMunicipio().getId());
+                }
+                if (opt.contains(OpcaoFornecedor.TIPO_PAGAMENTO)) {
+                    sql.put("id_tipopagamento", vo.getTipoPagamento().getId());
                 }
                 sql.setWhere("id = " + vo.getId());
                 stm.execute(sql.getUpdate());

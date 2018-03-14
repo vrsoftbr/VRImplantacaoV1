@@ -168,7 +168,8 @@ public class FornecedorRepository {
                             || (opt.contains(OpcaoFornecedor.CNPJ_CPF))
                             || (opt.contains(OpcaoFornecedor.INSCRICAO_ESTADUAL))
                             || (opt.contains(OpcaoFornecedor.BAIRRO))
-                            || (opt.contains(OpcaoFornecedor.MUNICIPIO))) {
+                            || (opt.contains(OpcaoFornecedor.MUNICIPIO))
+                            || (opt.contains(OpcaoFornecedor.TIPO_PAGAMENTO))) {
                         atualizarFornecedor(vo, opt);
                     }
                     
@@ -410,6 +411,7 @@ public class FornecedorRepository {
         }        
         vo.setTipoFornecedor(imp.getTipoFornecedor());
         vo.setTipoEmpresa(imp.getTipoEmpresa());
+        vo.setTipoPagamento(imp.getTipoPagamento());
         
         //<editor-fold defaultstate="collapsed" desc="ENDEREÇO">
         vo.setEndereco(imp.getEndereco());

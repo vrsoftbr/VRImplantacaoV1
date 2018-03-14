@@ -29,7 +29,9 @@ public enum OpcaoFornecedor {
     TIPO_EMPRESA,
     CNPJ_CPF,
     INSCRICAO_ESTADUAL,
-    MUNICIPIO;
+    MUNICIPIO,
+    TIPO_PAGAMENTO, 
+    NUMERO;
     
     private List<FornecedorIMP> listaEspecial;
 

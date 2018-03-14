@@ -362,7 +362,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	f.forcep cep,\n" +
                     "	f.forfone telefone,\n" +
                     "	f.forqtmincxa qtdminimapedido,\n" +
-                    "	f.forvlrmin valorminimopedido,\n" +
+                    "	f.forfatmin valorminimopedido,\n" +
                     "	f.forobserv observacao,\n" +
                     "	f.forentrega prazoentrega,\n" +
                     "	f.forvisita prazovisita,\n" +
@@ -390,12 +390,28 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIe_rg(rst.getString("inscricaoestadual"));
                     imp.setInsc_municipal(rst.getString("inscricaomunicipal"));
                     imp.setAtivo(rst.getBoolean("ativo"));
-                    imp.setEndereco(rst.getString("endereco"));
+                    
+                    String endereco = rst.getString("endereco");
+                    if (endereco == null) {
+                        endereco = "";
+                    }
+                    int index = endereco.indexOf(",");
+                    String numero = "SN";
+                    if (index >= 0) {
+                        numero = endereco.substring(index + 1, endereco.length());
+                        endereco = endereco.substring(0, index);
+                    }
+                    
+                    imp.setEndereco(endereco);
+                    imp.setNumero(numero);
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("municipio"));
                     imp.setUf(rst.getString("uf"));
                     imp.setIbge_municipio(rst.getInt("ibge_munic"));
                     imp.setCep(rst.getString("cep"));
+                    
+                    imp.copiarEnderecoParaCobranca();
+                    
                     imp.setTel_principal(rst.getString("telefone"));
                     imp.setQtd_minima_pedido(rst.getInt("qtdminimapedido"));
                     imp.setValor_minimo_pedido(rst.getDouble("valorminimopedido"));
