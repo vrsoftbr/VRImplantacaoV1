@@ -21,7 +21,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="pnlLista" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="chkAtivarCheque" min="-2" max="-2" attributes="0"/>
+                      <Component id="chkAtivar" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
               </Group>
@@ -33,7 +33,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="chkAtivarCheque" min="-2" max="-2" attributes="0"/>
+              <Component id="chkAtivar" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pnlLista" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -107,12 +107,12 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAtivarCheque">
+    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAtivar">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Cheque"/>
+        <Property name="text" type="java.lang.String" value="Cr&#xe9;dito Rotativo"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkAtivarChequeActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkAtivarActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

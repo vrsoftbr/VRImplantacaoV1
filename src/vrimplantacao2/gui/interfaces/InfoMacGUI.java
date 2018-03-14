@@ -1,5 +1,6 @@
-package vrimplantacao.gui.interfaces;
+package vrimplantacao2.gui.interfaces;
 
+import vrimplantacao.gui.interfaces.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -12,25 +13,26 @@ import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrframework.remote.ItemComboVO;
-import vrimplantacao.classe.ConexaoOracle;
+import vrimplantacao.classe.ConexaoADS;
+import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao.dao.cadastro.LojaDAO;
-import vrimplantacao.dao.interfaces.AriusDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.dao.interfaces.InfoMacDAO;
 import vrimplantacao2.parametro.Parametros;
 
-public class AriusGUI extends VRInternalFrame {    
+public class InfoMacGUI extends VRInternalFrame {    
     
-    private static final String NOME_SISTEMA = "Arius";
-    private static final String SERVIDOR_SQL = "Oracle";
-    private static AriusGUI instance;
+    private static final String NOME_SISTEMA = "InfoMac - Store";
+    private static final String SERVIDOR_SQL = "ADS";
+    private static InfoMacGUI instance;
     
-    private final AriusDAO ariusDAO = new AriusDAO();   
-    private final ConexaoOracle connSQL = new ConexaoOracle();
+    private final InfoMacDAO infoMacDAO = new InfoMacDAO();   
+    private final ConexaoADS connSQL = new ConexaoADS();
     
     private int vLojaCliente = -1;
     private int vLojaVR = -1;
@@ -38,20 +40,20 @@ public class AriusGUI extends VRInternalFrame {
     
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
-        txtHostOracle.setText(params.getWithNull("LOCALHOST", "ARIUS", "HOST"));
-        txtBancoDadosOracle.setText(params.getWithNull("ARIUS","ARIUS", "DATABASE"));
-        txtPortaOracle.setText(params.getWithNull("1521","ARIUS", "PORTA"));
-        txtUsuarioOracle.setText(params.getWithNull("ARIUS", "ARIUS", "USUARIO"));
-        txtSenhaOracle.setText(params.getWithNull("automa", "ARIUS", "SENHA"));
-        vLojaCliente = params.getInt("ARIUS", "LOJA_CLIENTE");
-        vLojaVR = params.getInt("ARIUS", "LOJA_VR");
-        vTipoVenda = params.getInt("ARIUS", "TIPO_VENDA");        
+        txtHostADS.setText(params.getWithNull("192.168.0.205", NOME_SISTEMA, "HOST"));
+        txtBancoDadosADS.setText(params.getWithNull("OMEGA", NOME_SISTEMA, "DATABASE"));
+        txtPortaADS.setText(params.getWithNull("6262", NOME_SISTEMA, "PORTA"));
+        txtUsuarioADS.setText(params.getWithNull("adssys", NOME_SISTEMA, "USUARIO"));
+        txtSenhaADS.setText(params.getWithNull("147852", NOME_SISTEMA, "SENHA"));
+        vLojaCliente = params.getInt(NOME_SISTEMA, "LOJA_CLIENTE");
+        vLojaVR = params.getInt(NOME_SISTEMA, "LOJA_VR");
+        vTipoVenda = params.getInt(NOME_SISTEMA, "TIPO_VENDA");        
         chkClClientes.setSelected(false);
         chkClEmpresas.setSelected(false);
         chkClFornecedores.setSelected(false);
         chkClTransp.setSelected(false);
         chkClAdminCard.setSelected(false);
-        JSONArray array = new JSONArray(params.getWithNull("[]", "ARIUS", "OPCOES_CLIENTE"));
+        JSONArray array = new JSONArray(params.getWithNull("[]", NOME_SISTEMA, "OPCOES_CLIENTE"));
         for (int i = 0; i < array.length(); i++) {
             switch (array.getInt(i)) {
                 case 0: chkClClientes.setSelected(true); break;
@@ -65,24 +67,24 @@ public class AriusGUI extends VRInternalFrame {
     
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
-        params.put(txtHostOracle.getText(), "ARIUS", "HOST");
-        params.put(txtBancoDadosOracle.getText(), "ARIUS", "DATABASE");
-        params.put(txtPortaOracle.getText(), "ARIUS", "PORTA");
-        params.put(txtUsuarioOracle.getText(), "ARIUS", "USUARIO");
-        params.put(txtSenhaOracle.getText(), "ARIUS", "SENHA");
+        params.put(txtHostADS.getText(), NOME_SISTEMA, "HOST");
+        params.put(txtBancoDadosADS.getText(), NOME_SISTEMA, "DATABASE");
+        params.put(txtPortaADS.getText(), NOME_SISTEMA, "PORTA");
+        params.put(txtUsuarioADS.getText(), NOME_SISTEMA, "USUARIO");
+        params.put(txtSenhaADS.getText(), NOME_SISTEMA, "SENHA");
         ItemComboVO cliente = (ItemComboVO) cmbLojaCliente.getSelectedItem();
         if (cliente != null) {
-            params.put(cliente.id, "ARIUS", "LOJA_CLIENTE");
+            params.put(cliente.id, NOME_SISTEMA, "LOJA_CLIENTE");
             vLojaCliente = cliente.id;
         }
         ItemComboVO tipoVenda = (ItemComboVO) cmbTipoVenda.getSelectedItem();
         if (tipoVenda != null) {
-            params.put(tipoVenda.id, "ARIUS", "TIPO_VENDA");
+            params.put(tipoVenda.id, NOME_SISTEMA, "TIPO_VENDA");
             vTipoVenda = tipoVenda.id;
         }
         ItemComboVO vr = (ItemComboVO) cmbLojaVR.getSelectedItem();
         if (vr != null) {
-            params.put(vr.id, "ARIUS", "LOJA_VR");
+            params.put(vr.id, NOME_SISTEMA, "LOJA_VR");
             vLojaVR = vr.id;
         }
         JSONArray array = new JSONArray();
@@ -91,13 +93,13 @@ public class AriusGUI extends VRInternalFrame {
         if (chkClFornecedores.isSelected()) { array.put(2); }
         if (chkClTransp.isSelected()) { array.put(3); }
         if (chkClAdminCard.isSelected()) { array.put(4); }
-        params.put(array.toString(), "ARIUS", "OPCOES_CLIENTES");
+        params.put(array.toString(), NOME_SISTEMA, "OPCOES_CLIENTES");
         
         params.salvar();
     }
     
 
-    private AriusGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private InfoMacGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
         
@@ -118,24 +120,24 @@ public class AriusGUI extends VRInternalFrame {
 
     }
 
-    public void validarDadosAcessoOracle() throws Exception {
-        if (txtHostOracle.getText().isEmpty()) {
+    public void validarDadosAcessoADS() throws Exception {
+        if (txtHostADS.getText().isEmpty()) {
             throw new VRException("Favor informar host do banco de dados " + SERVIDOR_SQL);
         }
-        if (txtBancoDadosOracle.getText().isEmpty()) {
+        if (txtBancoDadosADS.getText().isEmpty()) {
             throw new VRException("Favor informar nome do banco de dados " + SERVIDOR_SQL);
         }
 
-        if (txtSenhaOracle.getText().isEmpty()) {
+        if (txtSenhaADS.getText().isEmpty()) {
             throw new VRException("Favor informar a senha do banco de dados " + SERVIDOR_SQL);
         }
 
-        if (txtUsuarioOracle.getText().isEmpty()) {
+        if (txtUsuarioADS.getText().isEmpty()) {
             throw new VRException("Favor informar o usuário do banco de dados " + SERVIDOR_SQL);
         }
         
-        ConexaoOracle.abrirConexao(txtHostOracle.getText(), txtPortaOracle.getInt(), 
-                txtBancoDadosOracle.getText(), txtUsuarioOracle.getText(), txtSenhaOracle.getText());
+        ConexaoADS.abrirConexao(txtHostADS.getText(), txtPortaADS.getInt(), 
+                txtBancoDadosADS.getText(), txtUsuarioADS.getText(), txtSenhaADS.getText());
         
         carregarLojaVR();
         carregarLojaCliente();
@@ -144,10 +146,10 @@ public class AriusGUI extends VRInternalFrame {
         gravarParametros();
         
         tabRotativo.chkAtivar.setEnabled(true);
-        tabRotativo.setDao(ariusDAO);
+        tabRotativo.setDao(infoMacDAO);
         
         tabCheque.chkAtivarCheque.setEnabled(true);
-        tabCheque.setDao(ariusDAO);
+        tabCheque.setDao(infoMacDAO);
     }
 
 
@@ -169,7 +171,7 @@ public class AriusGUI extends VRInternalFrame {
         cmbLojaCliente.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (ItemComboVO loja: ariusDAO.getLojasCliente()) {
+        for (ItemComboVO loja: infoMacDAO.getLojasCliente()) {
             cmbLojaCliente.addItem(loja);
             if (loja.id == vLojaCliente) {
                 index = cont;
@@ -183,7 +185,7 @@ public class AriusGUI extends VRInternalFrame {
         cmbTipoVenda.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (ItemComboVO tipoVenda: ariusDAO.getTipoVenda()) {
+        for (ItemComboVO tipoVenda: infoMacDAO.getTipoVenda()) {
             cmbTipoVenda.addItem(tipoVenda);
             if (tipoVenda.id == vTipoVenda) {
                 index = cont;
@@ -206,16 +208,16 @@ public class AriusGUI extends VRInternalFrame {
                     idLojaCliente = ((ItemComboVO) cmbLojaCliente.getSelectedItem()).id;                                        
                     int idTipoVenda = ((ItemComboVO) cmbTipoVenda.getSelectedItem()).id;                                        
                     
-                    Importador importador = new Importador(ariusDAO);
+                    Importador importador = new Importador(infoMacDAO);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
                     importador.setLojaVR(idLojaVR);
                     
-                    ariusDAO.setImportarDeClientes(chkClClientes.isSelected());
-                    ariusDAO.setImportarDeEmpresas(chkClEmpresas.isSelected());
-                    ariusDAO.setImportarDeFornecedores(chkClFornecedores.isSelected());
-                    ariusDAO.setImportarDeTransportadoras(chkClTransp.isSelected());
-                    ariusDAO.setImportarDeAdminCartao(chkClAdminCard.isSelected());
-                    ariusDAO.setTipoVenda(idTipoVenda);
+                    infoMacDAO.setImportarDeClientes(chkClClientes.isSelected());
+                    infoMacDAO.setImportarDeEmpresas(chkClEmpresas.isSelected());
+                    infoMacDAO.setImportarDeFornecedores(chkClFornecedores.isSelected());
+                    infoMacDAO.setImportarDeTransportadoras(chkClTransp.isSelected());
+                    infoMacDAO.setImportarDeAdminCartao(chkClAdminCard.isSelected());
+                    infoMacDAO.setTipoVenda(idTipoVenda);
                     
                     if (tab.getSelectedIndex() == 0) {
                         if (chkFamiliaProduto.isSelected()) {                        
@@ -328,11 +330,11 @@ public class AriusGUI extends VRInternalFrame {
                             importador.importarClienteEventual(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
                         }                        
                         if (tabRotativo.isSelected()) {
-                            ariusDAO.setPlanoContaEntrada(tabRotativo.getPlanosSelecionados());
+                            infoMacDAO.setPlanoContaEntrada(tabRotativo.getPlanosSelecionados());
                             importador.importarCreditoRotativo();
                         }
                         if (tabCheque.isSelected()) {
-                            ariusDAO.setPlanoContaEntrada(tabCheque.getPlanosSelecionados());
+                            infoMacDAO.setPlanoContaEntrada(tabCheque.getPlanosSelecionados());
                             importador.importarCheque();
                         }
                     } else if (tab.getSelectedIndex() == 3) {
@@ -353,8 +355,8 @@ public class AriusGUI extends VRInternalFrame {
                         }
                     }  else if (tab.getSelectedIndex() == 4) {
                         if (chkPdvVendas.isSelected()) {
-                            ariusDAO.setVendaDataInicio(txtDtIInicioVenda.getDate());
-                            ariusDAO.setVendaDataTermino(txtDtTerminoVenda.getDate());
+                            infoMacDAO.setVendaDataInicio(txtDtIInicioVenda.getDate());
+                            infoMacDAO.setVendaDataTermino(txtDtTerminoVenda.getDate());
                             
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
@@ -366,7 +368,7 @@ public class AriusGUI extends VRInternalFrame {
 
                     Util.exibirMensagem("Importação " + NOME_SISTEMA + " realizada com sucesso!", getTitle());
                     
-                    ConexaoOracle.close();
+                    ConexaoADS.close();
                 } catch (Exception ex) {
                     ProgressBar.dispose();
                     Util.exibirMensagemErro(ex, getTitle());
@@ -381,7 +383,7 @@ public class AriusGUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();            
             if (instance == null || instance.isClosed()) {
-                instance = new AriusGUI(i_mdiFrame);
+                instance = new InfoMacGUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -398,6 +400,7 @@ public class AriusGUI extends VRInternalFrame {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         vRConsultaContaContabil1 = new vrframework.bean.consultaContaContabil.VRConsultaContaContabil();
+        vRPanel2 = new vrframework.bean.panel.VRPanel();
         vRToolBarPadrao3 = new vrframework.bean.toolBarPadrao.VRToolBarPadrao(this);
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
@@ -434,18 +437,6 @@ public class AriusGUI extends VRInternalFrame {
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkContatos = new vrframework.bean.checkBox.VRCheckBox();
-        tabCliente = new vrframework.bean.tabbedPane.VRTabbedPane();
-        tabClienteDados = new vrframework.bean.panel.VRPanel();
-        chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
-        chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
-        vRPanel1 = new vrframework.bean.panel.VRPanel();
-        chkClClientes = new javax.swing.JCheckBox();
-        chkClEmpresas = new javax.swing.JCheckBox();
-        chkClFornecedores = new javax.swing.JCheckBox();
-        chkClTransp = new javax.swing.JCheckBox();
-        chkClAdminCard = new javax.swing.JCheckBox();
-        tabRotativo = new vrimplantacao2.gui.interfaces.custom.arius.AriusPlanoContasRotativoGUI();
-        tabCheque = new vrimplantacao2.gui.interfaces.custom.arius.AriusPlanoContasChequeGUI();
         tabUnificacao = new vrframework.bean.panel.VRPanel();
         cbxUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
@@ -456,24 +447,47 @@ public class AriusGUI extends VRInternalFrame {
         chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
         txtDtIInicioVenda = new org.jdesktop.swingx.JXDatePicker();
         txtDtTerminoVenda = new org.jdesktop.swingx.JXDatePicker();
+        tabCliente = new vrframework.bean.tabbedPane.VRTabbedPane();
+        tabClienteDados = new vrframework.bean.panel.VRPanel();
+        chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
+        chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel1 = new vrframework.bean.panel.VRPanel();
+        chkClClientes = new javax.swing.JCheckBox();
+        chkClEmpresas = new javax.swing.JCheckBox();
+        chkClFornecedores = new javax.swing.JCheckBox();
+        chkClTransp = new javax.swing.JCheckBox();
+        chkClAdminCard = new javax.swing.JCheckBox();
+        tabRotativo = new vrimplantacao2.gui.interfaces.custom.infomac.InfoMacPlanoContasRotativoGUI();
+        tabCheque = new vrimplantacao2.gui.interfaces.custom.infomac.InfoMacPlanoContasChequeGUI();
         vRTabbedPane1 = new vrframework.bean.tabbedPane.VRTabbedPane();
         pnlConexao = new vrframework.bean.panel.VRPanel();
-        txtUsuarioOracle = new vrframework.bean.textField.VRTextField();
+        txtUsuarioADS = new vrframework.bean.textField.VRTextField();
         vRLabel4 = new vrframework.bean.label.VRLabel();
-        txtSenhaOracle = new vrframework.bean.passwordField.VRPasswordField();
+        txtSenhaADS = new vrframework.bean.passwordField.VRPasswordField();
         vRLabel5 = new vrframework.bean.label.VRLabel();
-        txtPortaOracle = new vrframework.bean.textField.VRTextField();
+        txtPortaADS = new vrframework.bean.textField.VRTextField();
         vRLabel7 = new vrframework.bean.label.VRLabel();
         vRLabel3 = new vrframework.bean.label.VRLabel();
-        txtHostOracle = new vrframework.bean.textField.VRTextField();
+        txtHostADS = new vrframework.bean.textField.VRTextField();
         vRLabel2 = new vrframework.bean.label.VRLabel();
-        btnConectarOracle = new javax.swing.JToggleButton();
+        btnConectarADS = new javax.swing.JToggleButton();
         vRLabel1 = new vrframework.bean.label.VRLabel();
-        txtBancoDadosOracle = new vrframework.bean.textField.VRTextField();
+        txtBancoDadosADS = new vrframework.bean.textField.VRTextField();
         cmbLojaCliente = new vrframework.bean.comboBox.VRComboBox();
         cmbTipoVenda = new vrframework.bean.comboBox.VRComboBox();
         vRLabel8 = new vrframework.bean.label.VRLabel();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
+
+        javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
+        vRPanel2.setLayout(vRPanel2Layout);
+        vRPanel2Layout.setHorizontalGroup(
+            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 96, Short.MAX_VALUE)
+        );
+        vRPanel2Layout.setVerticalGroup(
+            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 95, Short.MAX_VALUE)
+        );
 
         setBorder(javax.swing.BorderFactory.createEtchedBorder());
         setTitle("Arius");
@@ -761,76 +775,6 @@ public class AriusGUI extends VRInternalFrame {
 
         tab.addTab("Fornecedores", tabFornecedor);
 
-        tabClienteDados.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
-
-        chkClientePreferencial.setText("Cliente Preferencial");
-        chkClientePreferencial.setEnabled(true);
-        chkClientePreferencial.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkClientePreferencialActionPerformed(evt);
-            }
-        });
-
-        chkClienteEventual.setText("Cliente Eventual");
-        chkClienteEventual.setEnabled(true);
-        chkClienteEventual.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkClienteEventualActionPerformed(evt);
-            }
-        });
-
-        vRPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Obter clientes de"));
-        vRPanel1.setLayout(new java.awt.GridLayout(5, 1));
-
-        chkClClientes.setSelected(true);
-        chkClClientes.setText("Clientes");
-        vRPanel1.add(chkClClientes);
-
-        chkClEmpresas.setText("Empresas");
-        vRPanel1.add(chkClEmpresas);
-
-        chkClFornecedores.setText("Fornecedores");
-        vRPanel1.add(chkClFornecedores);
-
-        chkClTransp.setText("Transportadora");
-        vRPanel1.add(chkClTransp);
-
-        chkClAdminCard.setText("Administradora de Cartão");
-        vRPanel1.add(chkClAdminCard);
-
-        javax.swing.GroupLayout tabClienteDadosLayout = new javax.swing.GroupLayout(tabClienteDados);
-        tabClienteDados.setLayout(tabClienteDadosLayout);
-        tabClienteDadosLayout.setHorizontalGroup(
-            tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabClienteDadosLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(207, Short.MAX_VALUE))
-        );
-        tabClienteDadosLayout.setVerticalGroup(
-            tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabClienteDadosLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(tabClienteDadosLayout.createSequentialGroup()
-                        .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(vRPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-
-        tabCliente.addTab("Dados", tabClienteDados);
-        tabCliente.addTab("Rotativo", tabRotativo);
-        tabCliente.addTab("Cheque", tabCheque);
-
-        tab.addTab("Clientes", tabCliente);
-
         cbxUnifProdutos.setText("Unificar produtos (Somente EANs válidos)");
 
         cbxUnifFornecedores.setText("Unificar Fornecedores (Somente CPF/CNPJ válidos)");
@@ -906,33 +850,103 @@ public class AriusGUI extends VRInternalFrame {
 
         tab.addTab("Vendas", tabVendas);
 
-        pnlConexao.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Origem - ORACLE"));
+        tabClienteDados.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+
+        chkClientePreferencial.setText("Cliente Preferencial");
+        chkClientePreferencial.setEnabled(true);
+        chkClientePreferencial.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkClientePreferencialActionPerformed(evt);
+            }
+        });
+
+        chkClienteEventual.setText("Cliente Eventual");
+        chkClienteEventual.setEnabled(true);
+        chkClienteEventual.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkClienteEventualActionPerformed(evt);
+            }
+        });
+
+        vRPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Obter clientes de"));
+        vRPanel1.setLayout(new java.awt.GridLayout(5, 1));
+
+        chkClClientes.setSelected(true);
+        chkClClientes.setText("Clientes");
+        vRPanel1.add(chkClClientes);
+
+        chkClEmpresas.setText("Empresas");
+        vRPanel1.add(chkClEmpresas);
+
+        chkClFornecedores.setText("Fornecedores");
+        vRPanel1.add(chkClFornecedores);
+
+        chkClTransp.setText("Transportadora");
+        vRPanel1.add(chkClTransp);
+
+        chkClAdminCard.setText("Administradora de Cartão");
+        vRPanel1.add(chkClAdminCard);
+
+        javax.swing.GroupLayout tabClienteDadosLayout = new javax.swing.GroupLayout(tabClienteDados);
+        tabClienteDados.setLayout(tabClienteDadosLayout);
+        tabClienteDadosLayout.setHorizontalGroup(
+            tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabClienteDadosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(207, Short.MAX_VALUE))
+        );
+        tabClienteDadosLayout.setVerticalGroup(
+            tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabClienteDadosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(tabClienteDadosLayout.createSequentialGroup()
+                        .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(vRPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        tabCliente.addTab("Dados", tabClienteDados);
+        tabCliente.addTab("Crédito Rotativo", tabRotativo);
+        tabCliente.addTab("Cheque", tabCheque);
+
+        tab.addTab("Clientes", tabCliente);
+
+        pnlConexao.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Origem - ADS"));
         pnlConexao.setPreferredSize(new java.awt.Dimension(350, 350));
 
-        txtUsuarioOracle.setCaixaAlta(false);
-        txtUsuarioOracle.addActionListener(new java.awt.event.ActionListener() {
+        txtUsuarioADS.setCaixaAlta(false);
+        txtUsuarioADS.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtUsuarioOracleActionPerformed(evt);
+                txtUsuarioADSActionPerformed(evt);
             }
         });
 
         vRLabel4.setText("Usuário:");
 
-        txtSenhaOracle.setCaixaAlta(false);
-        txtSenhaOracle.setMascara("");
-        txtSenhaOracle.addActionListener(new java.awt.event.ActionListener() {
+        txtSenhaADS.setCaixaAlta(false);
+        txtSenhaADS.setMascara("");
+        txtSenhaADS.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtSenhaOracleActionPerformed(evt);
+                txtSenhaADSActionPerformed(evt);
             }
         });
 
         vRLabel5.setText("Senha:");
 
-        txtPortaOracle.setText("1521");
-        txtPortaOracle.setCaixaAlta(false);
-        txtPortaOracle.addActionListener(new java.awt.event.ActionListener() {
+        txtPortaADS.setText("1521");
+        txtPortaADS.setCaixaAlta(false);
+        txtPortaADS.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtPortaOracleActionPerformed(evt);
+                txtPortaADSActionPerformed(evt);
             }
         });
 
@@ -940,21 +954,21 @@ public class AriusGUI extends VRInternalFrame {
 
         vRLabel3.setText("Banco de Dados");
 
-        txtHostOracle.setCaixaAlta(false);
+        txtHostADS.setCaixaAlta(false);
 
         vRLabel2.setText("Host:");
 
-        btnConectarOracle.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/chat/desconectado.png"))); // NOI18N
-        btnConectarOracle.setText("Conectar");
-        btnConectarOracle.addActionListener(new java.awt.event.ActionListener() {
+        btnConectarADS.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/chat/desconectado.png"))); // NOI18N
+        btnConectarADS.setText("Conectar");
+        btnConectarADS.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnConectarOracleActionPerformed(evt);
+                btnConectarADSActionPerformed(evt);
             }
         });
 
         vRLabel1.setText("Loja (Cliente):");
 
-        txtBancoDadosOracle.setCaixaAlta(false);
+        txtBancoDadosADS.setCaixaAlta(false);
 
         cmbLojaCliente.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -973,7 +987,7 @@ public class AriusGUI extends VRInternalFrame {
                 .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlConexaoLayout.createSequentialGroup()
                         .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtPortaOracle, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtPortaADS, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -984,7 +998,7 @@ public class AriusGUI extends VRInternalFrame {
                             .addGroup(pnlConexaoLayout.createSequentialGroup()
                                 .addComponent(cmbLojaCliente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnConectarOracle, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(btnConectarADS, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(pnlConexaoLayout.createSequentialGroup()
                                 .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE))))
@@ -993,19 +1007,19 @@ public class AriusGUI extends VRInternalFrame {
                             .addGroup(pnlConexaoLayout.createSequentialGroup()
                                 .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 197, Short.MAX_VALUE))
-                            .addComponent(txtHostOracle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(txtHostADS, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtBancoDadosOracle, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtBancoDadosADS, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtUsuarioOracle, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtUsuarioADS, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(vRLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(vRLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtSenhaOracle, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(txtSenhaADS, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
         pnlConexaoLayout.setVerticalGroup(
@@ -1018,10 +1032,10 @@ public class AriusGUI extends VRInternalFrame {
                     .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(txtSenhaOracle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtUsuarioOracle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtBancoDadosOracle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtHostOracle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtSenhaADS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtUsuarioADS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtBancoDadosADS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtHostADS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(11, 11, 11)
                 .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1031,11 +1045,13 @@ public class AriusGUI extends VRInternalFrame {
                 .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(cmbLojaCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cmbTipoVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtPortaOracle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnConectarOracle)))
+                    .addComponent(txtPortaADS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnConectarADS)))
         );
 
         vRTabbedPane1.addTab("Conexão", pnlConexao);
+        pnlConexao.getAccessibleContext().setAccessibleName("Dados Origem - ADS");
+
         vRTabbedPane1.addTab("Importar Balança", pnlBalanca);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -1066,6 +1082,8 @@ public class AriusGUI extends VRInternalFrame {
                 .addContainerGap())
         );
 
+        getAccessibleContext().setAccessibleName("Info Mac - Store");
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
@@ -1082,28 +1100,28 @@ public class AriusGUI extends VRInternalFrame {
         }
     }//GEN-LAST:event_btnMigrarActionPerformed
 
-    private void txtUsuarioOracleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsuarioOracleActionPerformed
+    private void txtUsuarioADSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsuarioADSActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtUsuarioOracleActionPerformed
+    }//GEN-LAST:event_txtUsuarioADSActionPerformed
 
-    private void txtSenhaOracleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSenhaOracleActionPerformed
+    private void txtSenhaADSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSenhaADSActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtSenhaOracleActionPerformed
+    }//GEN-LAST:event_txtSenhaADSActionPerformed
 
-    private void txtPortaOracleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPortaOracleActionPerformed
+    private void txtPortaADSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPortaADSActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtPortaOracleActionPerformed
+    }//GEN-LAST:event_txtPortaADSActionPerformed
 
-    private void btnConectarOracleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectarOracleActionPerformed
+    private void btnConectarADSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectarADSActionPerformed
         try {
             this.setWaitCursor();
 
             if (connSQL != null) {
-                ConexaoOracle.close();
+                ConexaoADS.close();
             }
 
-            validarDadosAcessoOracle();
-            btnConectarOracle.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/chat/conectado.png")));
+            validarDadosAcessoADS();
+            btnConectarADS.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/chat/conectado.png")));
 
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, getTitle());
@@ -1111,7 +1129,7 @@ public class AriusGUI extends VRInternalFrame {
         } finally {
             this.setDefaultCursor();
         }
-    }//GEN-LAST:event_btnConectarOracleActionPerformed
+    }//GEN-LAST:event_btnConectarADSActionPerformed
 
     private void onClose(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_onClose
         instance = null;
@@ -1147,7 +1165,7 @@ public class AriusGUI extends VRInternalFrame {
     }//GEN-LAST:event_chkPdvVendasActionPerformed
 
     private void cmbLojaClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbLojaClienteActionPerformed
-        pnlBalanca.setSistema("ARIUS");
+        pnlBalanca.setSistema("Info Mac - Store");
         pnlBalanca.setLoja(String.valueOf(((ItemComboVO) cmbLojaCliente.getSelectedItem()).id));
     }//GEN-LAST:event_cmbLojaClienteActionPerformed
 
@@ -1156,7 +1174,7 @@ public class AriusGUI extends VRInternalFrame {
     }//GEN-LAST:event_chkContatosActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JToggleButton btnConectarOracle;
+    private javax.swing.JToggleButton btnConectarADS;
     private vrframework.bean.button.VRButton btnMigrar;
     private javax.swing.ButtonGroup buttonGroup1;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifCliEventual;
@@ -1206,21 +1224,21 @@ public class AriusGUI extends VRInternalFrame {
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrframework.bean.panel.VRPanel pnlConexao;
     private vrframework.bean.tabbedPane.VRTabbedPane tab;
-    private vrimplantacao2.gui.interfaces.custom.arius.AriusPlanoContasChequeGUI tabCheque;
+    private vrimplantacao2.gui.interfaces.custom.infomac.InfoMacPlanoContasChequeGUI tabCheque;
     private vrframework.bean.tabbedPane.VRTabbedPane tabCliente;
     private vrframework.bean.panel.VRPanel tabClienteDados;
     private vrframework.bean.panel.VRPanel tabDados;
     private vrframework.bean.panel.VRPanel tabFornecedor;
-    private vrimplantacao2.gui.interfaces.custom.arius.AriusPlanoContasRotativoGUI tabRotativo;
+    private vrimplantacao2.gui.interfaces.custom.infomac.InfoMacPlanoContasRotativoGUI tabRotativo;
     private vrframework.bean.panel.VRPanel tabUnificacao;
     private vrframework.bean.panel.VRPanel tabVendas;
-    private vrframework.bean.textField.VRTextField txtBancoDadosOracle;
+    private vrframework.bean.textField.VRTextField txtBancoDadosADS;
     private org.jdesktop.swingx.JXDatePicker txtDtIInicioVenda;
     private org.jdesktop.swingx.JXDatePicker txtDtTerminoVenda;
-    private vrframework.bean.textField.VRTextField txtHostOracle;
-    private vrframework.bean.textField.VRTextField txtPortaOracle;
-    private vrframework.bean.passwordField.VRPasswordField txtSenhaOracle;
-    private vrframework.bean.textField.VRTextField txtUsuarioOracle;
+    private vrframework.bean.textField.VRTextField txtHostADS;
+    private vrframework.bean.textField.VRTextField txtPortaADS;
+    private vrframework.bean.passwordField.VRPasswordField txtSenhaADS;
+    private vrframework.bean.textField.VRTextField txtUsuarioADS;
     private vrframework.bean.consultaContaContabil.VRConsultaContaContabil vRConsultaContaContabil1;
     private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.label.VRLabel vRLabel2;
@@ -1231,6 +1249,7 @@ public class AriusGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel7;
     private vrframework.bean.label.VRLabel vRLabel8;
     private vrframework.bean.panel.VRPanel vRPanel1;
+    private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane1;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;

@@ -1,5 +1,11 @@
-package vrimplantacao2.gui.interfaces.custom.arius;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package vrimplantacao2.gui.interfaces.custom.infomac;
 
+import vrimplantacao2.gui.interfaces.custom.arius.*;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,31 +16,31 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import vrframework.classe.Util;
-import vrimplantacao.dao.interfaces.AriusDAO;
+import vrimplantacao2.dao.interfaces.InfoMacDAO;
 
 /**
  *
  * @author Guilherme
  */
-public class AriusPlanoContasChequeGUI extends JPanel {
+public class InfoMacPlanoContasRotativoGUI extends JPanel {
     
-    private static final Logger LOG = Logger.getLogger(AriusPlanoContasChequeGUI.class.getName());
+    private static final Logger LOG = Logger.getLogger(InfoMacPlanoContasRotativoGUI.class.getName());
 
-    private AriusDAO dao;
+    private InfoMacDAO dao;
 
-    public void setDao(AriusDAO dao) {
+    public void setDao(InfoMacDAO dao) {
         this.dao = dao;
         atualizarListagem();        
     }
 
     public boolean isSelected() {
-        return chkAtivarCheque.isSelected();
+        return chkAtivar.isSelected();
     }
     
     /**
      * Creates new form AriusPlanoContasGUI
      */
-    public AriusPlanoContasChequeGUI() {
+    public InfoMacPlanoContasRotativoGUI() {
         initComponents();
         pnlLista.setEnabled(false);
             
@@ -54,7 +60,7 @@ public class AriusPlanoContasChequeGUI extends JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         lstPlanoContas = new vrframework.bean.list.VRList();
         vRLabel1 = new vrframework.bean.label.VRLabel();
-        chkAtivarCheque = new vrframework.bean.checkBox.VRCheckBox();
+        chkAtivar = new vrframework.bean.checkBox.VRCheckBox();
 
         pnlLista.setBorder(null);
 
@@ -91,10 +97,10 @@ public class AriusPlanoContasChequeGUI extends JPanel {
                 .addComponent(btnAtualizar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkAtivarCheque, "Cheque");
-        chkAtivarCheque.addActionListener(new java.awt.event.ActionListener() {
+        org.openide.awt.Mnemonics.setLocalizedText(chkAtivar, "Crédito Rotativo");
+        chkAtivar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkAtivarChequeActionPerformed(evt);
+                chkAtivarActionPerformed(evt);
             }
         });
 
@@ -107,7 +113,7 @@ public class AriusPlanoContasChequeGUI extends JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(pnlLista, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(chkAtivarCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(chkAtivar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -115,7 +121,7 @@ public class AriusPlanoContasChequeGUI extends JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkAtivarCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(chkAtivar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlLista, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -126,9 +132,9 @@ public class AriusPlanoContasChequeGUI extends JPanel {
         atualizarListagem();
     }//GEN-LAST:event_btnAtualizarActionPerformed
 
-    private void chkAtivarChequeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkAtivarChequeActionPerformed
-        pnlLista.setEnabled(chkAtivarCheque.isSelected());
-    }//GEN-LAST:event_chkAtivarChequeActionPerformed
+    private void chkAtivarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkAtivarActionPerformed
+        pnlLista.setEnabled(chkAtivar.isSelected());
+    }//GEN-LAST:event_chkAtivarActionPerformed
 
     public void atualizarListagem() {
         try {
@@ -142,11 +148,11 @@ public class AriusPlanoContasChequeGUI extends JPanel {
         }
     }
     
-    private class Model extends AbstractListModel<AriusDAO.PlanoConta> {
+    private class Model extends AbstractListModel<InfoMacDAO.PlanoConta> {
 
-        private List<AriusDAO.PlanoConta> planoContasEntrada = new ArrayList<>();
+        private List<InfoMacDAO.PlanoConta> planoContasEntrada = new ArrayList<>();
 
-        public void setPlanoContasEntrada(List<AriusDAO.PlanoConta> planoContasEntrada) {
+        public void setPlanoContasEntrada(List<InfoMacDAO.PlanoConta> planoContasEntrada) {
             this.planoContasEntrada = planoContasEntrada;
             fireContentsChanged(this.planoContasEntrada, 0, this.planoContasEntrada.size() - 1);
         }
@@ -157,7 +163,7 @@ public class AriusPlanoContasChequeGUI extends JPanel {
         }
 
         @Override
-        public AriusDAO.PlanoConta getElementAt(int index) {
+        public InfoMacDAO.PlanoConta getElementAt(int index) {
             return planoContasEntrada.get(index);
         }        
     
@@ -168,15 +174,15 @@ public class AriusPlanoContasChequeGUI extends JPanel {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             DefaultListCellRenderer c = (DefaultListCellRenderer) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            AriusDAO.PlanoConta val = (AriusDAO.PlanoConta) value;
+            InfoMacDAO.PlanoConta val = (InfoMacDAO.PlanoConta) value;
             c.setText(val.getId() + " - " + val.getDescricao());
             return c;
         }
         
     }
     
-    public List<AriusDAO.PlanoConta> getPlanosSelecionados() {
-        List<AriusDAO.PlanoConta> selectedValuesList = lstPlanoContas.getSelectedValuesList();
+    public List<InfoMacDAO.PlanoConta> getPlanosSelecionados() {
+        List<InfoMacDAO.PlanoConta> selectedValuesList = lstPlanoContas.getSelectedValuesList();
         
         return selectedValuesList;
     }
@@ -184,7 +190,7 @@ public class AriusPlanoContasChequeGUI extends JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public vrframework.bean.button.VRButton btnAtualizar;
-    public vrframework.bean.checkBox.VRCheckBox chkAtivarCheque;
+    public vrframework.bean.checkBox.VRCheckBox chkAtivar;
     public javax.swing.JScrollPane jScrollPane1;
     public vrframework.bean.list.VRList lstPlanoContas;
     public vrframework.bean.panel.VRPanel pnlLista;

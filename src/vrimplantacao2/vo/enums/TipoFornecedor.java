@@ -9,7 +9,12 @@ public enum TipoFornecedor {
     INDUSTRIA (0,"INDUSTRIA"),
     ATACADO (1,"ATACADO"),
     DISTRIBUIDOR (2,"DISTRIBUIDOR"),
-    PRESTADOR (3,"PRESTADOR SERVICO");
+    PRESTADOR (3,"PRESTADOR SERVICO"),
+    BROKER (4,"BROKER"),
+    OUTROS (5,"OUTROS"),
+    USOGERAL (6,"MP/ USO GERAL"),
+    MANUTENCAO (7,"MANUT/ SERVICOS");
+    
     
     public static TipoFornecedor getById(int id) {
         for (TipoFornecedor tf: values()) {

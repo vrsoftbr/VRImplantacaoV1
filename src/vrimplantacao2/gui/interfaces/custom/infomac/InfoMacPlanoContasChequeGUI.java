@@ -1,5 +1,6 @@
-package vrimplantacao2.gui.interfaces.custom.arius;
+package vrimplantacao2.gui.interfaces.custom.infomac;
 
+import vrimplantacao2.gui.interfaces.custom.arius.*;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,19 +11,19 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import vrframework.classe.Util;
-import vrimplantacao.dao.interfaces.AriusDAO;
+import vrimplantacao2.dao.interfaces.InfoMacDAO;
 
 /**
  *
  * @author Guilherme
  */
-public class AriusPlanoContasChequeGUI extends JPanel {
+public class InfoMacPlanoContasChequeGUI extends JPanel {
     
-    private static final Logger LOG = Logger.getLogger(AriusPlanoContasChequeGUI.class.getName());
+    private static final Logger LOG = Logger.getLogger(InfoMacPlanoContasChequeGUI.class.getName());
 
-    private AriusDAO dao;
+    private InfoMacDAO dao;
 
-    public void setDao(AriusDAO dao) {
+    public void setDao(InfoMacDAO dao) {
         this.dao = dao;
         atualizarListagem();        
     }
@@ -32,9 +33,9 @@ public class AriusPlanoContasChequeGUI extends JPanel {
     }
     
     /**
-     * Creates new form AriusPlanoContasGUI
+     * Creates new form InfoMacPlanoContasGUI
      */
-    public AriusPlanoContasChequeGUI() {
+    public InfoMacPlanoContasChequeGUI() {
         initComponents();
         pnlLista.setEnabled(false);
             
@@ -142,11 +143,11 @@ public class AriusPlanoContasChequeGUI extends JPanel {
         }
     }
     
-    private class Model extends AbstractListModel<AriusDAO.PlanoConta> {
+    private class Model extends AbstractListModel<InfoMacDAO.PlanoConta> {
 
-        private List<AriusDAO.PlanoConta> planoContasEntrada = new ArrayList<>();
+        private List<InfoMacDAO.PlanoConta> planoContasEntrada = new ArrayList<>();
 
-        public void setPlanoContasEntrada(List<AriusDAO.PlanoConta> planoContasEntrada) {
+        public void setPlanoContasEntrada(List<InfoMacDAO.PlanoConta> planoContasEntrada) {
             this.planoContasEntrada = planoContasEntrada;
             fireContentsChanged(this.planoContasEntrada, 0, this.planoContasEntrada.size() - 1);
         }
@@ -157,7 +158,7 @@ public class AriusPlanoContasChequeGUI extends JPanel {
         }
 
         @Override
-        public AriusDAO.PlanoConta getElementAt(int index) {
+        public InfoMacDAO.PlanoConta getElementAt(int index) {
             return planoContasEntrada.get(index);
         }        
     
@@ -168,15 +169,15 @@ public class AriusPlanoContasChequeGUI extends JPanel {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             DefaultListCellRenderer c = (DefaultListCellRenderer) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            AriusDAO.PlanoConta val = (AriusDAO.PlanoConta) value;
+            InfoMacDAO.PlanoConta val = (InfoMacDAO.PlanoConta) value;
             c.setText(val.getId() + " - " + val.getDescricao());
             return c;
         }
         
     }
     
-    public List<AriusDAO.PlanoConta> getPlanosSelecionados() {
-        List<AriusDAO.PlanoConta> selectedValuesList = lstPlanoContas.getSelectedValuesList();
+    public List<InfoMacDAO.PlanoConta> getPlanosSelecionados() {
+        List<InfoMacDAO.PlanoConta> selectedValuesList = lstPlanoContas.getSelectedValuesList();
         
         return selectedValuesList;
     }
