@@ -212,6 +212,9 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                             if (chkQtdEmbalagemEAN.isSelected()) {
                                 opcoes.add(OpcaoProduto.QTD_EMBALAGEM_EAN);
                             }
+                            if (chkPautaFiscalProduto.isSelected()) {
+                                opcoes.add(OpcaoProduto.PAUTA_FISCAL);
+                            }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
                             }
@@ -322,6 +325,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkNutricionalToledo = new vrframework.bean.checkBox.VRCheckBox();
         btnMapaTribut = new vrframework.bean.button.VRButton();
         chkPautaFiscal = new vrframework.bean.checkBox.VRCheckBox();
+        chkPautaFiscalProduto = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
@@ -465,6 +469,9 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkPautaFiscal.setText("Pauta Fiscal");
         tabProdutos.add(chkPautaFiscal);
+
+        chkPautaFiscalProduto.setText("Pauta Fiscal X Produto");
+        tabProdutos.add(chkPautaFiscalProduto);
 
         tabImportacao.addTab("Produtos", tabProdutos);
 
@@ -670,6 +677,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkNutricionalFilizola;
     private vrframework.bean.checkBox.VRCheckBox chkNutricionalToledo;
     private vrframework.bean.checkBox.VRCheckBox chkPautaFiscal;
+    private vrframework.bean.checkBox.VRCheckBox chkPautaFiscalProduto;
     private vrframework.bean.checkBox.VRCheckBox chkPisCofins;
     private vrframework.bean.checkBox.VRCheckBox chkPreco;
     private vrframework.bean.checkBox.VRCheckBox chkProdMercadologico;

@@ -70,6 +70,8 @@ public class ProdutoIMP {
     
     private String fornecedorFabricante;
     
+    private String pautaFiscalId;
+    
     public String getImportSistema() {
         return importSistema;
     }
@@ -512,6 +514,14 @@ public class ProdutoIMP {
 
     public void setFornecedorFabricante(String fornecedorFabricante) {
         this.fornecedorFabricante = fornecedorFabricante;
+    }
+
+    public String getPautaFiscalId() {
+        return pautaFiscalId;
+    }
+
+    public void setPautaFiscalId(String pautaFiscalId) {
+        this.pautaFiscalId = pautaFiscalId;
     }
 
 }

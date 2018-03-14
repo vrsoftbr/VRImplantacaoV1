@@ -294,6 +294,11 @@
                     <Property name="text" type="java.lang.String" value="Pauta Fiscal"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPautaFiscalProduto">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Pauta Fiscal X Produto"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="vRPanel2">

@@ -41,6 +41,7 @@ public class ProdutoVO {
     private boolean sugestaoCotacao = true;
     private boolean sugestaoPedido = true;
     private int idFornecedorFabricante = 0;
+    private int excecao = 0;
     
     private final MultiMap<Long, ProdutoAutomacaoVO> eans = new MultiMap<>(
         new Factory<ProdutoAutomacaoVO>() {
@@ -324,5 +325,13 @@ public class ProdutoVO {
 
     public void setIdFornecedorFabricante(int idFornecedorFabricante) {
         this.idFornecedorFabricante = idFornecedorFabricante;
+    }
+
+    public int getExcecao() {
+        return excecao;
+    }
+
+    public void setExcecao(int excecao) {
+        this.excecao = excecao;
     }
 }

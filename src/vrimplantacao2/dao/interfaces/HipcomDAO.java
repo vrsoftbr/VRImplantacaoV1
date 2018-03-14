@@ -270,14 +270,19 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	prc.prlcodtris icmssaidaid,\n" +
                     "	prc.prlcodtrie icmsentradaid,\n" +
                     "	prc.prlprvena precoatacado,\n" +
-                    "	prc.prlmargata margematacado\n" +
+                    "	prc.prlmargata margematacado,\n" +
+                    "	l.lojestado estado\n" +
+                    "	prc.prlpivast p_iva,\n" +
+                    "	prc.prlvivast v_iva,\n" +
                     "from\n" +
                     "	hippro p\n" +
+                    "	left join hiploj l on\n" +
+                    "		l.lojcod = " + getLojaOrigem() + "\n" +
                     "	left join hipbar ean on\n" +
                     "		ean.barcodplu = p.procodplu\n" +
                     "	left join hipprl prc on\n" +
                     "		prc.prlcodplu = p.procodplu and\n" +
-                    "		prc.prlloja = 1\n" +
+                    "		prc.prlloja = l.lojcod\n" +
                     "	left join cotemb cot on\n" +
                     "		cot.embcodplu = p.procodplu\n" +
                     "order by 1"
@@ -320,6 +325,12 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCreditoId(rst.getString("icmsentradaid"));
                     imp.setAtacadoPreco(rst.getDouble("precoatacado"));
                     imp.setAtacadoPorcentagem(rst.getDouble("margematacado"));
+                    imp.setPautaFiscalId(formatPautaFiscalId(
+                            rst.getString("uf"),
+                            rst.getString("ncm"),
+                            rst.getDouble("p_iva"),
+                            rst.getDouble("v_iva")
+                    ));
                     
                     result.add(imp);
                 }
@@ -531,13 +542,20 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	(pl.prlpivast != 0 or\n" +
                     "	pl.prlvivast != 0)\n" +
                     "order by 1,2"
-            )) {
+            )) {                
                 while (rst.next()) {
                     PautaFiscalIMP imp = new PautaFiscalIMP();
                     
+                    imp.setId(formatPautaFiscalId(
+                            rst.getString("uf"),
+                            rst.getString("ncm"),
+                            rst.getDouble("p_iva"),
+                            rst.getDouble("v_iva")
+                    ));
+                    
                     imp.setNcm(rst.getString("ncm"));
                     imp.setUf(rst.getString("uf"));
-                    imp.setId(imp.getUf() + "-" + imp.getNcm());
+                    
                     if (rst.getDouble("p_iva") != 0) {
                         imp.setTipoIva(TipoIva.PERCENTUAL);
                         imp.setIva(rst.getDouble("p_iva"));
@@ -545,6 +563,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setTipoIva(TipoIva.VALOR);
                         imp.setIva(rst.getDouble("v_iva"));
                     }
+                    
                     imp.setAliquotaDebitoId(rst.getString("icmsids"));
                     imp.setAliquotaCreditoId(rst.getString("icmside"));
                     
@@ -554,6 +573,10 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         
         return result;
+    }
+
+    private String formatPautaFiscalId(String uf, String ncm, double p_iva, double v_iva) {
+        return String.format("%s-%s-%.2f-%.2f", uf, ncm, p_iva, v_iva);
     }
     
     
