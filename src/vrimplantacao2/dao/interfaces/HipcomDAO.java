@@ -15,7 +15,10 @@ import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
+import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -257,10 +260,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	prc.prlctentr custocomimposto,\n" +
                     "	prc.prlctbal custosemimposto,\n" +
                     "	prc.prlprven precovenda,\n" +
-                    "	case prc.prlforalin\n" +
-                    "	when 'E' then 0\n" +
-                    "	else 1 end id_situacaocadastro,\n" +
-                    "	case prc.prlforalin when 'S' then 1 else 0 end descontinuacao,\n" +
+                    "	prc.prlforalin id_situacaocadastro,\n" +
                     "	case prc.prlcotacao when 'S' then 1 else 0 end cotacao,\n" +
                     "	p.proclasfisc ncm,\n" +
                     "	p.procest cest,\n" +
@@ -271,9 +271,9 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	prc.prlcodtrie icmsentradaid,\n" +
                     "	prc.prlprvena precoatacado,\n" +
                     "	prc.prlmargata margematacado,\n" +
-                    "	l.lojestado estado\n" +
+                    "	l.lojestado estado,\n" +
                     "	prc.prlpivast p_iva,\n" +
-                    "	prc.prlvivast v_iva,\n" +
+                    "	prc.prlvivast v_iva\n" +
                     "from\n" +
                     "	hippro p\n" +
                     "	left join hiploj l on\n" +
@@ -317,7 +317,30 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
-                    imp.setSituacaoCadastro(rst.getInt("id_situacaocadastro"));
+                    
+                    switch (Utils.acertarTexto(rst.getString("id_situacaocadastro"))) {
+                        case "S":
+                            imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+                            imp.setDescontinuado(false);
+                            imp.setVendaPdv(false);
+                            break;
+                        case "E":
+                            imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+                            imp.setDescontinuado(true);
+                            imp.setVendaPdv(true);
+                            break;
+                        case "A": 
+                            imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
+                            imp.setDescontinuado(false);
+                            imp.setVendaPdv(true);
+                            break;
+                        default:
+                            imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+                            imp.setDescontinuado(false);
+                            imp.setVendaPdv(true);
+                            break;
+                    }
+                    
                     imp.setPiscofinsCstCredito(rst.getString("piscofinsentrada"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofinssaida"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("piscofinsnatrec"));
@@ -326,7 +349,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setAtacadoPreco(rst.getDouble("precoatacado"));
                     imp.setAtacadoPorcentagem(rst.getDouble("margematacado"));
                     imp.setPautaFiscalId(formatPautaFiscalId(
-                            rst.getString("uf"),
+                            rst.getString("estado"),
                             rst.getString("ncm"),
                             rst.getDouble("p_iva"),
                             rst.getDouble("v_iva")
@@ -438,6 +461,14 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.addEmail("NFE", rst.getString("emailnfe"), TipoContato.NFE);
                     if (rst.getBoolean("produtorural")) {
                         imp.setProdutorRural();
+                    }
+                    switch (Utils.acertarTexto(rst.getString("tipofornecedor"))) {
+                        case "I": imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA); break;
+                        case "A": imp.setTipoFornecedor(TipoFornecedor.ATACADO); break;
+                        case "P": imp.setTipoFornecedor(TipoFornecedor.PRESTADOR); break;
+                    }
+                    if ("S".equals(Utils.acertarTexto(rst.getString("tipofornecedor")))) {
+                        imp.setTipoEmpresa(TipoEmpresa.ME_SIMPLES);
                     }
                     
                     result.add(imp);

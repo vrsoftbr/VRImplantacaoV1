@@ -215,6 +215,15 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                             if (chkPautaFiscalProduto.isSelected()) {
                                 opcoes.add(OpcaoProduto.PAUTA_FISCAL);
                             }
+                            if (chkPSitCadastro.isSelected()) {
+                                opcoes.add(OpcaoProduto.ATIVO);
+                            }
+                            if (chkPDescontinuado.isSelected()) {
+                                opcoes.add(OpcaoProduto.DESCONTINUADO);
+                            }
+                            if (chkPVendaPdv.isSelected()) {
+                                opcoes.add(OpcaoProduto.VENDA_PDV);
+                            }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
                             }
@@ -261,6 +270,12 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                                 }
                                 if (chkFNumero.isSelected()) {
                                     opcoes.add(OpcaoFornecedor.NUMERO);
+                                }
+                                if (chkFTipoEmp.isSelected()) {
+                                    opcoes.add(OpcaoFornecedor.TIPO_EMPRESA);
+                                }
+                                if (chkFTipoForn.isSelected()) {
+                                    opcoes.add(OpcaoFornecedor.TIPO_FORNECEDOR);
                                 }
 
                                 if (!opcoes.isEmpty()) {
@@ -337,6 +352,9 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         btnMapaTribut = new vrframework.bean.button.VRButton();
         chkPautaFiscal = new vrframework.bean.checkBox.VRCheckBox();
         chkPautaFiscalProduto = new vrframework.bean.checkBox.VRCheckBox();
+        chkPSitCadastro = new vrframework.bean.checkBox.VRCheckBox();
+        chkPDescontinuado = new vrframework.bean.checkBox.VRCheckBox();
+        chkPVendaPdv = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
@@ -344,6 +362,8 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkFTipoPagamento = new vrframework.bean.checkBox.VRCheckBox();
         chkFEndereco = new vrframework.bean.checkBox.VRCheckBox();
         chkFNumero = new vrframework.bean.checkBox.VRCheckBox();
+        chkFTipoEmp = new vrframework.bean.checkBox.VRCheckBox();
+        chkFTipoForn = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
@@ -487,6 +507,15 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkPautaFiscalProduto.setText("Pauta Fiscal X Produto");
         tabProdutos.add(chkPautaFiscalProduto);
 
+        chkPSitCadastro.setText("Sit. Cadastro");
+        tabProdutos.add(chkPSitCadastro);
+
+        chkPDescontinuado.setText("Descontinuado");
+        tabProdutos.add(chkPDescontinuado);
+
+        chkPVendaPdv.setText("Venda (PDV)");
+        tabProdutos.add(chkPVendaPdv);
+
         tabImportacao.addTab("Produtos", tabProdutos);
 
         chkFornecedor.setText("Fornecedor");
@@ -500,6 +529,10 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkFEndereco.setText("Endereço");
 
         chkFNumero.setText("Número");
+
+        chkFTipoEmp.setText("Tipo Empresa");
+
+        chkFTipoForn.setText("Tipo Fornecedor");
 
         javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
         vRPanel2.setLayout(vRPanel2Layout);
@@ -515,8 +548,10 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFTipoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkFNumero, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(226, Short.MAX_VALUE))
+                    .addComponent(chkFNumero, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkFTipoEmp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkFTipoForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(259, Short.MAX_VALUE))
         );
         vRPanel2Layout.setVerticalGroup(
             vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -533,7 +568,11 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                 .addComponent(chkFEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkFNumero, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(86, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkFTipoEmp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkFTipoForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(22, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Forncedores", vRPanel2);
@@ -554,7 +593,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(335, Short.MAX_VALUE))
+                .addContainerGap(368, Short.MAX_VALUE))
         );
         vRPanel3Layout.setVerticalGroup(
             vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -565,7 +604,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(137, Short.MAX_VALUE))
+                .addContainerGap(123, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", vRPanel3);
@@ -593,7 +632,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(cmbLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
+                .addComponent(cmbLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -697,6 +736,8 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFEndereco;
     private vrframework.bean.checkBox.VRCheckBox chkFNumero;
+    private vrframework.bean.checkBox.VRCheckBox chkFTipoEmp;
+    private vrframework.bean.checkBox.VRCheckBox chkFTipoForn;
     private vrframework.bean.checkBox.VRCheckBox chkFTipoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
     private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
@@ -708,6 +749,9 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkNatReceita;
     private vrframework.bean.checkBox.VRCheckBox chkNutricionalFilizola;
     private vrframework.bean.checkBox.VRCheckBox chkNutricionalToledo;
+    private vrframework.bean.checkBox.VRCheckBox chkPDescontinuado;
+    private vrframework.bean.checkBox.VRCheckBox chkPSitCadastro;
+    private vrframework.bean.checkBox.VRCheckBox chkPVendaPdv;
     private vrframework.bean.checkBox.VRCheckBox chkPautaFiscal;
     private vrframework.bean.checkBox.VRCheckBox chkPautaFiscalProduto;
     private vrframework.bean.checkBox.VRCheckBox chkPisCofins;

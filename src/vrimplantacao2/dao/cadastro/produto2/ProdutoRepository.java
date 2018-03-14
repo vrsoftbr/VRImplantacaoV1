@@ -554,6 +554,7 @@ public class ProdutoRepository {
         complemento.setCustoSemImposto(imp.getCustoSemImposto());
         complemento.setCustoComImposto(imp.getCustoComImposto());
         complemento.setDescontinuado(imp.isDescontinuado());
+        complemento.setSituacaoCadastro(imp.getSituacaoCadastro());
         
         return complemento;
     }
@@ -700,8 +701,7 @@ public class ProdutoRepository {
         }        
         
         vo.setPesoBruto(imp.getPesoBruto());
-        vo.setPesoLiquido(imp.getPesoLiquido());
-        vo.setSituacaoCadastro(imp.getSituacaoCadastro());        
+        vo.setPesoLiquido(imp.getPesoLiquido());     
         
         //<editor-fold defaultstate="collapsed" desc="Conversão do PIS/COFINS">
         convertPisCofins(imp, vo);
@@ -709,6 +709,7 @@ public class ProdutoRepository {
 
         vo.setValidade(imp.getValidade());
         vo.setExcecao(obterPautaFiscal(imp.getPautaFiscalId()));
+        vo.setVendaPdv(imp.isVendaPdv());
         
         return vo;
     }

@@ -140,8 +140,6 @@ public class FornecedorRepository {
                         imp.getImportId()
                 );
                 
-                System.out.println("CodForn: " + imp.getImportId()+" Cnpj: " + imp.getCnpj_cpf());
-                
                 if (anterior != null && anterior.getCodigoAtual() != null) {
                     
                     FornecedorVO vo = converter(imp);
@@ -169,6 +167,8 @@ public class FornecedorRepository {
                             || (opt.contains(OpcaoFornecedor.INSCRICAO_ESTADUAL))
                             || (opt.contains(OpcaoFornecedor.BAIRRO))
                             || (opt.contains(OpcaoFornecedor.MUNICIPIO))
+                            || (opt.contains(OpcaoFornecedor.TIPO_FORNECEDOR))
+                            || (opt.contains(OpcaoFornecedor.TIPO_EMPRESA))
                             || (opt.contains(OpcaoFornecedor.TIPO_PAGAMENTO))) {
                         atualizarFornecedor(vo, opt);
                     }

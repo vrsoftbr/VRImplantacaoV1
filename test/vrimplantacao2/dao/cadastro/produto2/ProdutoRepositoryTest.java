@@ -338,6 +338,7 @@ public class ProdutoRepositoryTest {
         assertEquals(2, actual.getIdLoja());
         assertEquals(7.12, actual.getPrecoVenda(),0.0001);
         assertEquals(7.12, actual.getPrecoDiaSeguinte(),0.0001);
+        assertEquals(SituacaoCadastro.ATIVO, actual.getSituacaoCadastro());
         assertNull(actual.getProduto());
     }
     
@@ -354,6 +355,7 @@ public class ProdutoRepositoryTest {
         assertEquals(2, actual.getIdLoja());
         assertEquals(17.12, actual.getPrecoVenda(),0.0001);
         assertEquals(17.12, actual.getPrecoDiaSeguinte(),0.0001);
+        assertEquals(SituacaoCadastro.EXCLUIDO, actual.getSituacaoCadastro());
         assertNull(actual.getProduto());
     }
     
@@ -600,7 +602,6 @@ public class ProdutoRepositoryTest {
         assertEquals(7, actual.getPisCofinsDebito().getCst());
         assertEquals(71, actual.getPisCofinsCredito().getCst());
         assertEquals(101, actual.getPisCofinsNaturezaReceita().getCodigo());
-        assertEquals(SituacaoCadastro.ATIVO, actual.getSituacaoCadastro());
         assertEquals(TipoEmbalagem.UN, actual.getTipoEmbalagem());
         assertEquals(0, actual.getValidade());
     }
@@ -753,7 +754,6 @@ public class ProdutoRepositoryTest {
         assertEquals(6, actual.getPisCofinsDebito().getCst());
         assertEquals(73, actual.getPisCofinsCredito().getCst());
         assertEquals(121, actual.getPisCofinsNaturezaReceita().getCodigo());
-        assertEquals(SituacaoCadastro.EXCLUIDO, actual.getSituacaoCadastro());
         assertEquals(TipoEmbalagem.KG, actual.getTipoEmbalagem());
         assertEquals(10, actual.getValidade());
     }

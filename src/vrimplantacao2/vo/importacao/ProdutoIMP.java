@@ -71,6 +71,7 @@ public class ProdutoIMP {
     private String fornecedorFabricante;
     
     private String pautaFiscalId;
+    private boolean vendaPdv = true;
     
     public String getImportSistema() {
         return importSistema;
@@ -522,6 +523,14 @@ public class ProdutoIMP {
 
     public void setPautaFiscalId(String pautaFiscalId) {
         this.pautaFiscalId = pautaFiscalId;
+    }
+
+    public boolean isVendaPdv() {
+        return vendaPdv;
+    }
+
+    public void setVendaPdv(boolean vendaPdv) {
+        this.vendaPdv = vendaPdv;
     }
 
 }

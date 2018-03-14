@@ -299,6 +299,21 @@
                     <Property name="text" type="java.lang.String" value="Pauta Fiscal X Produto"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPSitCadastro">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Sit. Cadastro"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPDescontinuado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Descontinuado"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPVendaPdv">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Venda (PDV)"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="vRPanel2">
@@ -325,8 +340,10 @@
                               <Component id="chkFTipoPagamento" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFEndereco" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFNumero" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFTipoEmp" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFTipoForn" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="226" max="32767" attributes="0"/>
+                          <EmptySpace pref="259" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -346,7 +363,11 @@
                           <Component id="chkFEndereco" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="chkFNumero" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="86" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkFTipoEmp" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkFTipoForn" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="22" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -382,6 +403,16 @@
                     <Property name="text" type="java.lang.String" value="N&#xfa;mero"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFTipoEmp">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo Empresa"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFTipoForn">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo Fornecedor"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="vRPanel3">
@@ -403,7 +434,7 @@
                               <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="335" max="32767" attributes="0"/>
+                          <EmptySpace pref="368" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -416,7 +447,7 @@
                           <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="137" max="32767" attributes="0"/>
+                          <EmptySpace pref="123" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -452,7 +483,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="cmbLojaVR" pref="327" max="32767" attributes="0"/>
+                  <Component id="cmbLojaVR" pref="360" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnMigrar" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>

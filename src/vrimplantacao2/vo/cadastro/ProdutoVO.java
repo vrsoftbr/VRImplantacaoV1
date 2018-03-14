@@ -32,7 +32,6 @@ public class ProdutoVO {
     private PisCofinsVO pisCofinsDebito = PisCofinsDAO.PISCOFINS_DEBITO_PADRAO;
     private PisCofinsVO pisCofinsCredito = PisCofinsDAO.PISCOFINS_CREDITO_PADRAO;
     private NaturezaReceitaVO pisCofinsNaturezaReceita;
-    private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
     private boolean pesavel = false;
     private boolean vendaPdv = true;
     private CestVO cest = null;
@@ -158,10 +157,6 @@ public class ProdutoVO {
         this.pisCofinsNaturezaReceita = pisCofinsNaturezaReceita;
     }
 
-    public void setSituacaoCadastro(SituacaoCadastro situacaoCadastro) {
-        this.situacaoCadastro = situacaoCadastro;
-    }
-
     public void setPesavel(boolean pesavel) {
         this.pesavel = pesavel;
     }
@@ -244,10 +239,6 @@ public class ProdutoVO {
 
     public NaturezaReceitaVO getPisCofinsNaturezaReceita() {
         return pisCofinsNaturezaReceita;
-    }
-
-    public SituacaoCadastro getSituacaoCadastro() {
-        return situacaoCadastro;
     }
 
     public boolean isPesavel() {

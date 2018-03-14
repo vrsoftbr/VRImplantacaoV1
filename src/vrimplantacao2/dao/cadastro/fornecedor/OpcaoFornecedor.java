@@ -31,7 +31,8 @@ public enum OpcaoFornecedor {
     INSCRICAO_ESTADUAL,
     MUNICIPIO,
     TIPO_PAGAMENTO, 
-    NUMERO;
+    NUMERO, 
+    TIPO_FORNECEDOR;
     
     private List<FornecedorIMP> listaEspecial;
 

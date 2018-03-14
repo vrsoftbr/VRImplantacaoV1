@@ -1,6 +1,7 @@
 package vrimplantacao2.vo.cadastro;
 
 import vrimplantacao2.utils.MathUtils;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 
 public class ProdutoComplementoVO {
     
@@ -14,6 +15,7 @@ public class ProdutoComplementoVO {
     private double custoComImposto = 0;
     private double precoVenda = 0;
     private double precoDiaSeguinte = 0;
+    private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
     private boolean descontinuado = false;
 
     public void setId(int id) {
@@ -103,5 +105,13 @@ public class ProdutoComplementoVO {
     public boolean isDescontinuado() {
         return descontinuado;
     }    
+
+    public SituacaoCadastro getSituacaoCadastro() {
+        return situacaoCadastro;
+    }
+
+    public void setSituacaoCadastro(SituacaoCadastro situacaoCadastro) {
+        this.situacaoCadastro = situacaoCadastro != null ? situacaoCadastro : SituacaoCadastro.ATIVO;
+    }
     
 }

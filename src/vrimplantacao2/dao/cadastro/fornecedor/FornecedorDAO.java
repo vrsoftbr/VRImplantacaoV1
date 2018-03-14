@@ -662,6 +662,9 @@ public class FornecedorDAO {
                 if (opt.contains(OpcaoFornecedor.TIPO_EMPRESA)) {
                     sql.put("id_tipoempresa", vo.getTipoEmpresa().getId());
                 }
+                if (opt.contains(OpcaoFornecedor.TIPO_FORNECEDOR)) {
+                    sql.put("id_tipofornecedor", vo.getTipoFornecedor().getId());
+                }
                 if (opt.contains(OpcaoFornecedor.CNPJ_CPF)) {
                     sql.put("cnpj", vo.getCnpj());
                     sql.put("id_tipoinscricao", vo.getTipoInscricao().getId());
