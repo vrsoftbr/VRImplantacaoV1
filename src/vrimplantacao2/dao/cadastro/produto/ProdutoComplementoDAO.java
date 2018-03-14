@@ -78,7 +78,7 @@ public class ProdutoComplementoDAO {
                     sql.put("id_aliquotacredito", 0);
                     sql.putNull("dataultimavenda");
                     sql.put("teclaassociada", 0);
-                    sql.put("id_situacaocadastro", vo.getProduto().getSituacaoCadastro().getId());
+                    sql.put("id_situacaocadastro", vo.getSituacaoCadastro().getId());
                     sql.put("id_loja", vo.getIdLoja());
                     sql.put("descontinuado", false);
                     sql.put("quantidadeultimaentrada", 0);
@@ -140,7 +140,7 @@ public class ProdutoComplementoDAO {
                 sql.put("id_aliquotacredito", 0);
                 sql.putNull("dataultimavenda");
                 sql.put("teclaassociada", 0);
-                sql.put("id_situacaocadastro", vo.getProduto().getSituacaoCadastro().getId());
+                sql.put("id_situacaocadastro", vo.getSituacaoCadastro().getId());
                 sql.put("id_loja", vo.getIdLoja());
                 sql.put("descontinuado", vo.isDescontinuado());
                 sql.put("quantidadeultimaentrada", 0);
@@ -195,7 +195,7 @@ public class ProdutoComplementoDAO {
                     sql.put("estoque", vo.getEstoque());
                 }
                 if (opt.contains(OpcaoProduto.ATIVO)) {
-                    sql.put("id_situacaocadastro", vo.getProduto().getSituacaoCadastro().getId());
+                    sql.put("id_situacaocadastro", vo.getSituacaoCadastro().getId());
                 }
                 sql.setWhere(
                         "id_produto = " + vo.getProduto().getId() + " and " +
@@ -240,7 +240,7 @@ public class ProdutoComplementoDAO {
                 sql.put("estoque", complemento.getEstoque());
             }
             if (opt.contains(OpcaoProduto.ATIVO)) {
-                sql.put("id_situacaocadastro", complemento.getProduto().getSituacaoCadastro().getId());
+                sql.put("id_situacaocadastro", complemento.getSituacaoCadastro().getId());
             }
             if (opt.contains(OpcaoProduto.DESCONTINUADO)) {
                 sql.put("descontinuado", complemento.isDescontinuado());

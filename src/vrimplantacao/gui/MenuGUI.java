@@ -49,7 +49,7 @@ import vrimplantacao.gui.interfaces.WisaSoftGUI_2;
 import vrimplantacao.gui.interfaces.GuiaSistemasGUI;
 import vrimplantacao.gui.interfaces.GCFGUI;
 import vrimplantacao.gui.interfaces.MultiPdvGUI;
-import vrimplantacao.gui.interfaces.OrionGUI;
+import vrimplantacao2.gui.interfaces.OrionGUI;
 import vrimplantacao.gui.interfaces.PCSistemasGUI;
 import vrimplantacao.gui.interfaces.PlanilhaChequeGUI;
 import vrimplantacao.gui.interfaces.BoechatSoftGUI;
@@ -147,6 +147,7 @@ import vrimplantacao2.gui.interfaces.AvanceGUI;
 import vrimplantacao2.gui.interfaces.TstiGUI;
 import vrimplantacao2.gui.interfaces.CPlusGUI;
 import vrimplantacao2.gui.interfaces.CissGUI;
+import vrimplantacao2.gui.interfaces.HipcomGUI;
 import vrimplantacao2.gui.interfaces.ScefGUI;
 import vrimplantacao2.gui.interfaces.SisMouraGUI;
 import vrimplantacao2.gui.interfaces.SolidusGUI;
@@ -575,6 +576,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSatecfe = new javax.swing.JMenuItem();
         mnuTsti = new javax.swing.JMenuItem();
         mnuAvance = new javax.swing.JMenuItem();
+        mnuHipcom = new javax.swing.JMenuItem();
         mnuOrion = new javax.swing.JMenu();
         jMenuItemOrion = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -1501,6 +1503,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu9.add(mnuAvance);
+
+        mnuHipcom.setText("Hipcom");
+        mnuHipcom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuHipcomActionPerformed(evt);
+            }
+        });
+        jMenu9.add(mnuHipcom);
 
         jMenu2.add(jMenu9);
 
@@ -2566,19 +2576,8 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemSoftaExActionPerformed
 
     private void jMenuItemOrionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemOrionActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarOrion == null || formImportarOrion.isClosed()) {
-                formImportarOrion = new OrionGUI(this);
-            }
-
-            formImportarOrion.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
+        
+        OrionGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemOrionActionPerformed
 
     private void jMenuItemUltraSystActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemUltraSystActionPerformed
@@ -3623,6 +3622,10 @@ public final class MenuGUI extends VRMdiFrame {
         InfoMacGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemInfoMacStoreActionPerformed
 
+    private void mnuHipcomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuHipcomActionPerformed
+        HipcomGUI.exibir(this);
+    }//GEN-LAST:event_mnuHipcomActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -3753,6 +3756,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuFarm2000;
     private javax.swing.JMenu mnuFerramentas;
     private javax.swing.JMenuItem mnuFlatan;
+    private javax.swing.JMenuItem mnuHipcom;
     private javax.swing.JMenuItem mnuHipicom;
     private javax.swing.JMenuItem mnuHostMundo;
     private javax.swing.JMenuItem mnuIdealSoft;

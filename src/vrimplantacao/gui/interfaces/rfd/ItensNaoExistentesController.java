@@ -225,8 +225,7 @@ public class ItensNaoExistentesController {
                 vo.setMercadologico(merc);
                 vo.setDescricaoCompleta(mapa.getDescricao());
                 vo.setDescricaoReduzida(mapa.getDescricao());
-                vo.setDescricaoGondola(mapa.getDescricao());     
-                vo.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
+                vo.setDescricaoGondola(mapa.getDescricao());
                 vo.setPisCofinsNaturezaReceita(new NaturezaReceitaVO(196, 7, 999, "OUTRAS RECEITAS COM ISENCAO"));
                 vo.setVendaPdv(false);
                 provider.salvar(vo);
@@ -244,7 +243,8 @@ public class ItensNaoExistentesController {
                 for (LojaVO loja: lojas) {
                     ProdutoComplementoVO compl = vo.getComplementos().make(loja.getId());
                     compl.setIdLoja(loja.getId());
-                    compl.setDescontinuado(true);
+                    compl.setDescontinuado(true);     
+                    compl.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
                     provider.complemento().salvar(compl, false);
                 }
                 

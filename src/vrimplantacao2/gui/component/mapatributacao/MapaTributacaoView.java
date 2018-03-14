@@ -246,14 +246,6 @@ public class MapaTributacaoView extends JPanel {
     javax.swing.JTextField txtSistema;
     // End of variables declaration//GEN-END:variables
 
-    private void atualizarMapa() throws Exception {
-        
-    }
-
-    private void buscar() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
     void refresh() throws Exception {
         List<VRColumnTable> vColunaProduto = new ArrayList();
         vColunaProduto.add(new VRColumnTable("Código", true, SwingConstants.LEFT, false, null));

@@ -91,8 +91,8 @@ public class FornecedorRepository {
                 if (vo != null) {
                     processarContatos(imp, vo, contatos);
                     
-                    if (imp.getCondicaoPagamento() > 0) {
-                        provider.gravarCondicaoPagamento(vo.getId(), imp.getCondicaoPagamento());
+                    for (Integer condicao: imp.getCondicoesPagamentos()) {
+                        provider.gravarCondicaoPagamento(vo.getId(), condicao);
                     }
 
                     if (imp.getPrazoEntrega() > 0 || imp.getPrazoSeguranca() > 0 || imp.getPrazoVisita() > 0) {
@@ -140,8 +140,6 @@ public class FornecedorRepository {
                         imp.getImportId()
                 );
                 
-                System.out.println("CodForn: " + imp.getImportId()+" Cnpj: " + imp.getCnpj_cpf());
-                
                 if (anterior != null && anterior.getCodigoAtual() != null) {
                     
                     FornecedorVO vo = converter(imp);
@@ -168,7 +166,10 @@ public class FornecedorRepository {
                             || (opt.contains(OpcaoFornecedor.CNPJ_CPF))
                             || (opt.contains(OpcaoFornecedor.INSCRICAO_ESTADUAL))
                             || (opt.contains(OpcaoFornecedor.BAIRRO))
-                            || (opt.contains(OpcaoFornecedor.MUNICIPIO))) {
+                            || (opt.contains(OpcaoFornecedor.MUNICIPIO))
+                            || (opt.contains(OpcaoFornecedor.TIPO_FORNECEDOR))
+                            || (opt.contains(OpcaoFornecedor.TIPO_EMPRESA))
+                            || (opt.contains(OpcaoFornecedor.TIPO_PAGAMENTO))) {
                         atualizarFornecedor(vo, opt);
                     }
                     
@@ -181,8 +182,8 @@ public class FornecedorRepository {
                     }
                     
                     if (opt.contains(OpcaoFornecedor.CONDICAO_PAGAMENTO)) {
-                        if (imp.getCondicaoPagamento() > 0) {
-                            provider.gravarCondicaoPagamento(vo.getId(), imp.getCondicaoPagamento());
+                        for (Integer condicao: imp.getCondicoesPagamentos()) {
+                            provider.gravarCondicaoPagamento(vo.getId(), condicao);
                         }
                     }
 
@@ -265,8 +266,8 @@ public class FornecedorRepository {
                 if (vo != null) {
                     processarContatos(imp, vo, contatos);
                     
-                    if (imp.getCondicaoPagamento() > 0) {
-                        provider.gravarCondicaoPagamento(vo.getId(), imp.getCondicaoPagamento());
+                    for (Integer condicao: imp.getCondicoesPagamentos()) {
+                        provider.gravarCondicaoPagamento(vo.getId(), condicao);
                     }
 
                     if (imp.getPrazoEntrega() > 0 || imp.getPrazoSeguranca() > 0 || imp.getPrazoVisita() > 0) {
@@ -410,6 +411,7 @@ public class FornecedorRepository {
         }        
         vo.setTipoFornecedor(imp.getTipoFornecedor());
         vo.setTipoEmpresa(imp.getTipoEmpresa());
+        vo.setTipoPagamento(imp.getTipoPagamento());
         
         //<editor-fold defaultstate="collapsed" desc="ENDEREÇO">
         vo.setEndereco(imp.getEndereco());

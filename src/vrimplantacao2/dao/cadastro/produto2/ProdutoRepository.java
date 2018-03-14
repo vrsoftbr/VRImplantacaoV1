@@ -130,7 +130,8 @@ public class ProdutoRepository {
 
                     id = idStack.obterID(strID, eBalanca);                    
                     
-                    ProdutoVO prod = converterIMP(imp, id, ean, unidade, eBalanca);            
+                    ProdutoVO prod = converterIMP(imp, id, ean, unidade, eBalanca);
+                    
                     anterior = converterImpEmAnterior(imp);
                     anterior.setCodigoAtual(prod);
                     ProdutoComplementoVO complemento = converterComplemento(imp);
@@ -553,6 +554,7 @@ public class ProdutoRepository {
         complemento.setCustoSemImposto(imp.getCustoSemImposto());
         complemento.setCustoComImposto(imp.getCustoComImposto());
         complemento.setDescontinuado(imp.isDescontinuado());
+        complemento.setSituacaoCadastro(imp.getSituacaoCadastro());
         
         return complemento;
     }
@@ -699,14 +701,15 @@ public class ProdutoRepository {
         }        
         
         vo.setPesoBruto(imp.getPesoBruto());
-        vo.setPesoLiquido(imp.getPesoLiquido());
-        vo.setSituacaoCadastro(imp.getSituacaoCadastro());        
+        vo.setPesoLiquido(imp.getPesoLiquido());     
         
         //<editor-fold defaultstate="collapsed" desc="Conversão do PIS/COFINS">
         convertPisCofins(imp, vo);
         //</editor-fold>
 
-        vo.setValidade(imp.getValidade());        
+        vo.setValidade(imp.getValidade());
+        vo.setExcecao(obterPautaFiscal(imp.getPautaFiscalId()));
+        vo.setVendaPdv(imp.isVendaPdv());
         
         return vo;
     }
@@ -958,6 +961,21 @@ public class ProdutoRepository {
         vo.setTipoOferta(imp.getTipoOferta());
         
         return vo;
+    }
+
+    
+    private Map<String, Integer> pautaExcecao;
+    public int obterPautaFiscal(String pautaFiscalId) throws Exception {
+        if (pautaExcecao == null) {
+            pautaExcecao = provider.getPautaExcecao();
+        }
+        if (pautaFiscalId != null) {
+            Integer excecao = pautaExcecao.get(pautaFiscalId);
+            if (excecao != null) {
+                return excecao;
+            }
+        }
+        return 0;
     }
 
     

@@ -17,11 +17,13 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.EstadoVO;
 import vrimplantacao.vo.vrimplantacao.MunicipioVO;
 import vrimplantacao2.dao.cadastro.LocalDAO;
+import vrimplantacao2.dao.cadastro.financeiro.diversos.TipoPagamentoDAO;
 import vrimplantacao2.dao.cadastro.local.MunicipioDAO;
 import vrimplantacao2.utils.logging.LoggingConfig;
 import vrimplantacao2.utils.logging.LoggingType;
 import vrimplantacao2.utils.multimap.KeyList;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.enums.TipoPagamento;
 
 /**
  * Classe responsável por manipular parâmetros armazenados no banco de dados.
@@ -48,6 +50,7 @@ public final class Parametros implements Iterable<Parametro>{
     private EstadoVO ufCache;
     private MunicipioVO municipioCache;
     private vrimplantacao2.vo.cadastro.local.MunicipioVO municipioCache2;
+    private TipoPagamento tipoPagamento;
     
     private Map<String, LoggingConfig> loggers;
     //</editor-fold>
@@ -95,6 +98,7 @@ public final class Parametros implements Iterable<Parametro>{
         ufCache = new LocalDAO().getEstado(Utils.stringToInt(params.get(LOCAL, UF)), false);
         municipioCache = new LocalDAO().getMunicipio(Utils.stringToInt(params.get(LOCAL, MUNICIPIO)));
         municipioCache2 = new MunicipioDAO().getMunicipio(Utils.stringToInt(params.get(LOCAL, MUNICIPIO)));
+        tipoPagamento = params.get("TIPO_PAGAMENTO_PADRAO") != null ? new TipoPagamentoDAO().getById(Utils.stringToInt(params.get("TIPO_PAGAMENTO_PADRAO"))) : null;
         
         loggers = new LinkedHashMap<>();
         
@@ -231,6 +235,18 @@ public final class Parametros implements Iterable<Parametro>{
         params.put(String.valueOf(cep), LOCAL, CEP);
         LOG.finer("CEP padrão alterado");
     }
+
+    public void setTipoPagamento(TipoPagamento tipoPagamento) {
+        this.tipoPagamento = tipoPagamento;
+        if (tipoPagamento != null) {
+            params.put(String.valueOf(tipoPagamento.getId()), "TIPO_PAGAMENTO_PADRAO");
+        }
+    }
+
+    public TipoPagamento getTipoPagamento() {
+        return tipoPagamento;
+    }
+    
 
     public void setParametrosConfigurados(boolean configurado) {
         params.put(String.valueOf(configurado), PARAMETROS_CONFIGURADOS);

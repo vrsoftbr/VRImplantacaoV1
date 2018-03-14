@@ -32,7 +32,6 @@ public class ProdutoVO {
     private PisCofinsVO pisCofinsDebito = PisCofinsDAO.PISCOFINS_DEBITO_PADRAO;
     private PisCofinsVO pisCofinsCredito = PisCofinsDAO.PISCOFINS_CREDITO_PADRAO;
     private NaturezaReceitaVO pisCofinsNaturezaReceita;
-    private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
     private boolean pesavel = false;
     private boolean vendaPdv = true;
     private CestVO cest = null;
@@ -41,6 +40,7 @@ public class ProdutoVO {
     private boolean sugestaoCotacao = true;
     private boolean sugestaoPedido = true;
     private int idFornecedorFabricante = 0;
+    private int excecao = 0;
     
     private final MultiMap<Long, ProdutoAutomacaoVO> eans = new MultiMap<>(
         new Factory<ProdutoAutomacaoVO>() {
@@ -157,10 +157,6 @@ public class ProdutoVO {
         this.pisCofinsNaturezaReceita = pisCofinsNaturezaReceita;
     }
 
-    public void setSituacaoCadastro(SituacaoCadastro situacaoCadastro) {
-        this.situacaoCadastro = situacaoCadastro;
-    }
-
     public void setPesavel(boolean pesavel) {
         this.pesavel = pesavel;
     }
@@ -245,10 +241,6 @@ public class ProdutoVO {
         return pisCofinsNaturezaReceita;
     }
 
-    public SituacaoCadastro getSituacaoCadastro() {
-        return situacaoCadastro;
-    }
-
     public boolean isPesavel() {
         return pesavel;
     }
@@ -324,5 +316,13 @@ public class ProdutoVO {
 
     public void setIdFornecedorFabricante(int idFornecedorFabricante) {
         this.idFornecedorFabricante = idFornecedorFabricante;
+    }
+
+    public int getExcecao() {
+        return excecao;
+    }
+
+    public void setExcecao(int excecao) {
+        this.excecao = excecao;
     }
 }

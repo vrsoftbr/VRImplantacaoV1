@@ -41,6 +41,9 @@ import vrimplantacao2.dao.cadastro.fornecedor.FornecedorRepositoryProvider;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.fornecedor.ProdutoFornecedorDAO;
 import vrimplantacao2.dao.cadastro.mercadologico.MercadologicoRepository;
+import vrimplantacao2.dao.cadastro.nutricional.NutricionalRepository;
+import vrimplantacao2.dao.cadastro.nutricional.NutricionalRepositoryProvider;
+import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.cadastro.venda.VendaRepository;
 import vrimplantacao2.dao.cadastro.venda.VendaRepositoryProvider;
@@ -66,6 +69,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -185,10 +189,28 @@ public class Importador {
         
         importarProduto(opcoes.toArray(new OpcaoProduto[]{}));
     }
+
+    @Deprecated
+    public void importarProdutoBalanca(boolean manterCodigoDeBalanca, boolean gerarNiveisComoSubniveis) throws Exception {
+        List<OpcaoProduto> opcoes = new ArrayList<>();
+        if (manterCodigoDeBalanca) {
+            opcoes.add(OpcaoProduto.IMPORTAR_MANTER_BALANCA);
+        }
+        if (gerarNiveisComoSubniveis) {
+            opcoes.add(OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC);
+        }
+        
+        importarProdutoBalanca(opcoes.toArray(new OpcaoProduto[]{}));
+    }
     
     @Deprecated
     public void importarProduto(boolean manterCodigoDeBalanca) throws Exception {
         this.importarProduto(manterCodigoDeBalanca, false);
+    }
+
+    @Deprecated
+    public void importarProdutoBalanca(boolean manterCodigoDeBalanca) throws Exception {
+        this.importarProdutoBalanca(manterCodigoDeBalanca, false);
     }
     
     public void importarProduto(OpcaoProduto... opcoes) throws Exception {
@@ -206,6 +228,21 @@ public class Importador {
         
     }
 
+    public void importarProdutoBalanca(OpcaoProduto... opcoes) throws Exception {
+        
+        ProgressBar.setStatus("Carregando produtos...");
+        List<ProdutoIMP> produtos = getInterfaceDAO().getProdutosBalanca();
+        ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
+        provider.setLoja(getLojaOrigem());
+        provider.setSistema(getSistema());
+        provider.setLojaVR(getLojaVR());
+        provider.setOpcoes(opcoes);
+        
+        ProdutoRepository repository = new ProdutoRepository(provider);
+        repository.salvar(produtos);
+        
+    }
+    
     /**
      * Executa a importação dos fornecedores.
      * @param opt
@@ -675,6 +712,24 @@ public class Importador {
 
             rep.importar(opt);
         }
+    }
+
+    /**
+     * Executa a importação dos nutricionais para as balanças que o VR trabalha.
+     * @param opcoes Opções de importação dos nutricionais.
+     * @throws Exception
+     */
+    public void importarNutricional(OpcaoNutricional... opcoes) throws Exception {
+        Set<OpcaoNutricional> opt = new HashSet<>(Arrays.asList(opcoes));
+        ProgressBar.setStatus("Nutricionais...Gerando listagem...");
+        List<NutricionalIMP> nutricionais = getInterfaceDAO().getNutricional(opt);
+        NutricionalRepositoryProvider provider = new NutricionalRepositoryProvider(
+                getSistema(),
+                getLojaOrigem(),
+                getLojaVR()
+        );
+        NutricionalRepository rep = new NutricionalRepository(provider);
+        rep.importar(nutricionais, opt);
     }
 
 }

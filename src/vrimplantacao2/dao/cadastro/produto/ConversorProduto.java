@@ -106,7 +106,6 @@ class ConversorProduto {
         
         vo.setPesoBruto(imp.getPesoBruto());
         vo.setPesoLiquido(imp.getPesoLiquido());
-        vo.setSituacaoCadastro(imp.getSituacaoCadastro());
         
         
         //<editor-fold defaultstate="collapsed" desc="Conversão do PIS/COFINS">
@@ -152,6 +151,7 @@ class ConversorProduto {
                     complemento.setPrecoVenda(imp.getPrecovenda());
                     complemento.setCustoSemImposto(imp.getCustoSemImposto());
                     complemento.setCustoComImposto(imp.getCustoComImposto());
+                    complemento.setSituacaoCadastro(imp.getSituacaoCadastro());
                 }
             }
         }

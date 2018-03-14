@@ -166,7 +166,7 @@ public class FornecedorDAO {
                                     sql.put("cnpj", vo.getCnpj());// numeric(14,0) NOT NULL,
                                     sql.put("revenda", false);// boolean NOT NULL,
                                     sql.put("id_situacaocadastro", vo.getSituacaoCadastro().getId());// integer NOT NULL,
-                                    sql.put("id_tipopagamento", 1);// integer NOT NULL,
+                                    sql.put("id_tipopagamento", vo.getTipoPagamento().getId());// integer NOT NULL,
                                     sql.put("numerodoc", 0);// integer NOT NULL,
                                     sql.put("pedidominimoqtd", vo.getPedidoMinimoQtd());// integer NOT NULL,
                                     sql.put("pedidominimovalor", vo.getPedidoMinimoValor());// numeric(11,2) NOT NULL,
@@ -287,8 +287,8 @@ public class FornecedorDAO {
                         }
                     }
 
-                    if (imp.getCondicaoPagamento() > 0) {
-                        pagamentoDAO.salvar(vo.getId(), imp.getCondicaoPagamento());
+                    for (Integer condicao: imp.getCondicoesPagamentos()) {
+                        pagamentoDAO.salvar(vo.getId(), condicao);
                     }
 
                     if (imp.getPrazoEntrega() > 0 || imp.getPrazoSeguranca() > 0 || imp.getPrazoVisita() > 0) {
@@ -566,7 +566,7 @@ public class FornecedorDAO {
             sql.put("cnpj", vo.getCnpj());// numeric(14,0) NOT NULL,
             sql.put("revenda", false);// boolean NOT NULL,
             sql.put("id_situacaocadastro", vo.getSituacaoCadastro().getId());// integer NOT NULL,
-            sql.put("id_tipopagamento", 1);// integer NOT NULL,
+            sql.put("id_tipopagamento", vo.getTipoPagamento().getId());// integer NOT NULL,
             sql.put("numerodoc", 0);// integer NOT NULL,
             sql.put("pedidominimoqtd", vo.getPedidoMinimoQtd());// integer NOT NULL,
             sql.put("pedidominimovalor", vo.getPedidoMinimoValor());// numeric(11,2) NOT NULL,
@@ -649,6 +649,9 @@ public class FornecedorDAO {
                 if (opt.contains(OpcaoFornecedor.ENDERECO)) {
                     sql.put("endereco", vo.getEndereco());
                 }
+                if (opt.contains(OpcaoFornecedor.NUMERO)) {
+                    sql.put("numero", vo.getNumero());
+                }
                 if (opt.contains(OpcaoFornecedor.BAIRRO)) {
                     sql.put("bairro", vo.getBairro());
                 }
@@ -659,6 +662,9 @@ public class FornecedorDAO {
                 if (opt.contains(OpcaoFornecedor.TIPO_EMPRESA)) {
                     sql.put("id_tipoempresa", vo.getTipoEmpresa().getId());
                 }
+                if (opt.contains(OpcaoFornecedor.TIPO_FORNECEDOR)) {
+                    sql.put("id_tipofornecedor", vo.getTipoFornecedor().getId());
+                }
                 if (opt.contains(OpcaoFornecedor.CNPJ_CPF)) {
                     sql.put("cnpj", vo.getCnpj());
                     sql.put("id_tipoinscricao", vo.getTipoInscricao().getId());
@@ -668,6 +674,9 @@ public class FornecedorDAO {
                 }
                 if (opt.contains(OpcaoFornecedor.MUNICIPIO)) {
                     sql.put("id_municipio", vo.getMunicipio().getId());
+                }
+                if (opt.contains(OpcaoFornecedor.TIPO_PAGAMENTO)) {
+                    sql.put("id_tipopagamento", vo.getTipoPagamento().getId());
                 }
                 sql.setWhere("id = " + vo.getId());
                 stm.execute(sql.getUpdate());

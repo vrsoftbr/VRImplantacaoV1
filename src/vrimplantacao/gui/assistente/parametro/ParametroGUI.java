@@ -16,6 +16,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
@@ -50,9 +51,11 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.EstadoVO;
 import vrimplantacao.vo.vrimplantacao.MunicipioVO;
 import vrimplantacao2.dao.cadastro.LocalDAO;
+import vrimplantacao2.dao.cadastro.financeiro.diversos.TipoPagamentoDAO;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.logging.LoggingConfig;
 import vrimplantacao2.utils.logging.LoggingType;
+import vrimplantacao2.vo.enums.TipoPagamento;
 
 /**
  *
@@ -115,6 +118,9 @@ public class ParametroGUI extends VRInternalFrame {
         chkGerarBancoImplantacao = new VRCheckBox();
         chkImportarBancoImplantacao = new VRCheckBox();
         txtBancoImplantacao = new VRFileChooser();
+        pnlDiversos = new VRPanel();
+        vRLabel4 = new VRLabel();
+        cmbTipoPagamento = new JComboBox();
         tabLogging = new VRPanel();
         btnLogGravar = new VRButton();
         btnLogCancelar = new VRButton();
@@ -252,14 +258,39 @@ public class ParametroGUI extends VRInternalFrame {
                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        pnlDiversos.setBorder(BorderFactory.createTitledBorder("Diversos"));
+
+        vRLabel4.setText("Tipo de Pagamento");
+
+        GroupLayout pnlDiversosLayout = new GroupLayout(pnlDiversos);
+        pnlDiversos.setLayout(pnlDiversosLayout);
+        pnlDiversosLayout.setHorizontalGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDiversosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlDiversosLayout.createSequentialGroup()
+                        .addComponent(vRLabel4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(cmbTipoPagamento, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        pnlDiversosLayout.setVerticalGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDiversosLayout.createSequentialGroup()
+                .addComponent(vRLabel4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cmbTipoPagamento, GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
         GroupLayout tabValorPadrãoLayout = new GroupLayout(tabValorPadrão);
         tabValorPadrão.setLayout(tabValorPadrãoLayout);
         tabValorPadrãoLayout.setHorizontalGroup(tabValorPadrãoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(GroupLayout.Alignment.TRAILING, tabValorPadrãoLayout.createSequentialGroup()
+            .addGroup(tabValorPadrãoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(tabValorPadrãoLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                    .addComponent(vRPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(pnlLocalizacao, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(tabValorPadrãoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(vRPanel1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnlLocalizacao, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnlDiversos, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         tabValorPadrãoLayout.setVerticalGroup(tabValorPadrãoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -268,7 +299,9 @@ public class ParametroGUI extends VRInternalFrame {
                 .addComponent(pnlLocalizacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(285, Short.MAX_VALUE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlDiversos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(205, Short.MAX_VALUE))
         );
 
         tabs.addTab("Valores padrão", tabValorPadrão);
@@ -526,9 +559,11 @@ public class ParametroGUI extends VRInternalFrame {
     private VRCheckBox chkGerarBancoImplantacao;
     private VRCheckBox chkImportarBancoImplantacao;
     private VRComboBox cmbMunicipioPadrao;
+    private JComboBox cmbTipoPagamento;
     private VRComboBox cmbUfPadrao;
     private JLabel jLabel1;
     private JScrollPane jScrollPane1;
+    private VRPanel pnlDiversos;
     private VRPanel pnlLocalizacao;
     private VRPanel pnlLogDados;
     private VRPanel pnlNivelLog;
@@ -556,6 +591,7 @@ public class ParametroGUI extends VRInternalFrame {
     private VRLabel vRLabel1;
     private VRLabel vRLabel2;
     private VRLabel vRLabel3;
+    private VRLabel vRLabel4;
     private VRPanel vRPanel1;
     // End of variables declaration//GEN-END:variables
 
@@ -569,8 +605,13 @@ public class ParametroGUI extends VRInternalFrame {
         }
     }
     
+    private void carregarTipoPagamento() throws Exception {        
+        cmbTipoPagamento.setModel(new DefaultComboBoxModel<>(new TipoPagamentoDAO().all().toArray(new TipoPagamento[]{})));
+    }
+    
     private void carregarParametros() throws Exception {        
-        carregarMunicipiosEstados();        
+        carregarMunicipiosEstados();  
+        carregarTipoPagamento();
 
         parametros.carregar();        
         if (parametros.getUfPadrao() != null) {
@@ -593,6 +634,9 @@ public class ParametroGUI extends VRInternalFrame {
         } else {
             txtBancoImplantacao.setArquivo("implantacao-" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + ".db");
         }
+
+        cmbTipoPagamento.setSelectedItem(parametros.getTipoPagamento());
+
         chkGerarBancoImplantacao.setSelected(parametros.isGerarBancoImplantacao());
         chkImportarBancoImplantacao.setSelected(parametros.isImportarBancoImplantacao());
         
@@ -608,6 +652,7 @@ public class ParametroGUI extends VRInternalFrame {
             parametros.setBancoImplantacao(txtBancoImplantacao.getArquivo());
             parametros.setGerarBancoImplantacao(chkGerarBancoImplantacao.isSelected());
             parametros.setImportarBancoImplantacao(chkImportarBancoImplantacao.isSelected());
+            parametros.setTipoPagamento((TipoPagamento) cmbTipoPagamento.getSelectedItem());
             parametros.salvar();
             Util.exibirMensagem("Parâmetros gravados com sucesso!", title);
         } else {
@@ -619,6 +664,7 @@ public class ParametroGUI extends VRInternalFrame {
         boolean valido = 
                 (cmbUfPadrao.getSelectedItem() != null) &&
                 (cmbMunicipioPadrao.getSelectedItem() != null) &&
+                (cmbTipoPagamento.getSelectedItem() != null) &&
                 (!"0".equals(Utils.formataNumero(txtCepPadrao.getText()))) &&
                 (!"".equals(txtBancoImplantacao.getArquivo()));
         return valido;
