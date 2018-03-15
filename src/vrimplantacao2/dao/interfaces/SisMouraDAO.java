@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -23,6 +24,7 @@ import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -32,7 +34,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author lucasrafael
  */
-public class SisMouraDAO extends InterfaceDAO {
+public class SisMouraDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(SisMouraDAO.class.getName());
 
@@ -56,6 +58,35 @@ public class SisMouraDAO extends InterfaceDAO {
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "Codigo,\n"
+                    + "Descricao,\n"
+                    + "'0' cst,\n"
+                    + "Icms,\n"
+                    + "'0' reducao\n"
+                    + "from Taxa_Tributaria"
+            )) {
+                while (rst.next()) {
+                    result.add(new MapaTributoIMP(
+                            rst.getString("Codigo"),
+                            rst.getString("Descricao"),
+                            rst.getInt("cst"),
+                            rst.getDouble("Icms"),
+                            rst.getDouble("reducao")
+                    ));
+                }
+            }
+        }
+
         return result;
     }
 
@@ -101,6 +132,7 @@ public class SisMouraDAO extends InterfaceDAO {
                     + "select @primeirocadastro = min(p.Data_Cadastro) from produto p\n"
                     + "select\n"
                     + "p.codigo id,\n"
+                    + "p.Taxa_Tributaria,\n"
                     + "p.nome descricaocompleta,\n"
                     + "case when ltrim(rtrim(p.Descricao_Reduzida)) = '' then p.nome else p.Descricao_Reduzida end descricaoreduzida,\n"
                     + "p.nome descricaogondola,\n"
@@ -174,9 +206,8 @@ public class SisMouraDAO extends InterfaceDAO {
                     imp.setPiscofinsCstDebito(rst.getInt("pisconfinssaida"));
                     imp.setPiscofinsCstCredito(rst.getInt("pisconfisentrada"));
                     imp.setPiscofinsNaturezaReceita(Integer.parseInt(Utils.formataNumero(rst.getString("pisconfinsnatureza"))));
-                    imp.setIcmsCst(Integer.parseInt(Utils.formataNumero(rst.getString("icms_cst"))));
-                    imp.setIcmsAliq(rst.getDouble("icms_aliquota"));
-                    imp.setIcmsReducao(rst.getDouble("icms_reducao"));
+                    imp.setIcmsDebitoId(rst.getString("Taxa_Tributaria"));
+                    imp.setIcmsCreditoId(rst.getString("Taxa_Tributaria"));
                     vResult.add(imp);
                 }
             }
@@ -282,7 +313,14 @@ public class SisMouraDAO extends InterfaceDAO {
                     imp.setIbge_municipio(rst.getInt("id_municipio"));
                     imp.setIbge_uf(rst.getInt("id_estado"));
                     imp.setDatacadastro(rst.getDate("dataCadastro"));
-                    imp.setTel_principal(rst.getString("fone1"));
+
+                    if ((rst.getString("fone1") != null)
+                            && (!rst.getString("fone1").trim().isEmpty())) {
+                        imp.setTel_principal(rst.getString("fone1"));
+                    } else {
+                        imp.setTel_principal(rst.getString("Fone2"));
+                    }
+
                     imp.setObservacao(rst.getString("Obs"));
                     imp.setAtivo((rst.getInt("id_situacaocadastro") == 1));
                     imp.setCob_endereco(rst.getString("cob_endereco"));
@@ -385,6 +423,7 @@ public class SisMouraDAO extends InterfaceDAO {
                     + "p.Limite_Credito limite,\n"
                     + "p.Fax,\n"
                     + "case p.Inativo when 'N' then 1 else 0 end id_situacaocadastro,\n"
+                    + "p.Inativo,\n"
                     + "p.Fone2 telefone2,\n"
                     + "p.Observacao,\n"
                     + "p.Data_Nasc datanascimento,\n"
@@ -418,14 +457,26 @@ public class SisMouraDAO extends InterfaceDAO {
                     imp.setMunicipio(rst.getString("Cidade"));
                     imp.setMunicipioIBGE(rst.getInt("id_municipio"));
                     imp.setCep(rst.getString("Cep"));
-                    imp.setTelefone(rst.getString("fone1"));
+                    imp.setTelefone(Utils.formataNumero(rst.getString("fone1")));
                     imp.setCnpj(rst.getString("cnpj"));
                     imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
                     imp.setSexo((rst.getInt("Sexo") == 1 ? TipoSexo.FEMININO : TipoSexo.MASCULINO));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setEmail(rst.getString("Email") == null ? "" : rst.getString("Email").toLowerCase());
                     imp.setValorLimite(rst.getDouble("limite"));
-                    imp.setAtivo((rst.getInt("id_situacaocadastro") == 1));
+
+                    if ((rst.getString("Inativo") != null)
+                            && (!rst.getString("Inativo").trim().isEmpty())) {
+
+                        if (!rst.getString("Inativo").contains("N")) {
+                            imp.setAtivo(true);
+                        } else {
+                            imp.setAtivo(false);
+                        }
+                    } else {
+                        imp.setAtivo(true);
+                    }
+
                     imp.setObservacao(rst.getString("Observacao"));
                     imp.setDataNascimento(rst.getDate("datanascimento"));
                     imp.setNomePai(rst.getString("nomePai"));
@@ -537,6 +588,7 @@ public class SisMouraDAO extends InterfaceDAO {
                     imp.setNome(rst.getString("Nome_Cliente"));
                     imp.setCpf(rst.getString("CPF"));
                     imp.setValor(rst.getDouble("Valor_Cheque"));
+                    imp.setNumeroCheque(rst.getString("Cheque"));
                     imp.setBanco(rst.getInt("Banco"));
                     imp.setAgencia(rst.getString("Agencia"));
                     imp.setConta(rst.getString("Conta"));

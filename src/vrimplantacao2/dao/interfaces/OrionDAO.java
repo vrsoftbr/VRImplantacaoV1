@@ -465,7 +465,7 @@ public class OrionDAO extends InterfaceDAO {
                     + "codigocli, "
                     + "terminal "
                     + "from receber "
-                    + "where estado not like '%Quit%'"
+                    + "where vlrpago = 0"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();

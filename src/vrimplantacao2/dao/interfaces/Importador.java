@@ -200,7 +200,7 @@ public class Importador {
             opcoes.add(OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC);
         }
         
-        importarProdutoBalanca(opcoes.toArray(new OpcaoProduto[]{}));
+        importarProduto(opcoes.toArray(new OpcaoProduto[]{}));
     }
     
     @Deprecated

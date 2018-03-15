@@ -15,6 +15,7 @@ public class ProdutoAutomacaoDescontoDAO {
     public void salvar(ProdutoAutomacaoDescontoVO precoAtacadoDesconto, Set<OpcaoProduto> opt) throws Exception {
         if (opt.contains(OpcaoProduto.ATACADO)) {
             try (Statement stm = Conexao.createStatement()) {
+                System.out.println("CodigoBarras " + precoAtacadoDesconto.getCodigoBarras() + " Loja " + precoAtacadoDesconto.getId_loja() + " Desconto " + precoAtacadoDesconto.getDesconto());
                 stm.execute(
                         "do $$\n" +
                         "declare\n" +

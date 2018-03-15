@@ -40,6 +40,7 @@ public enum OpcaoCliente {
     DATA_NASCIMENTO,
     ENDERECO, 
     TELEFONE,
+    CELULAR,
     ENDERECO_COMPLETO;
     
     

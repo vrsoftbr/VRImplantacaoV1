@@ -7,18 +7,27 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.classe.ConexaoMySQL;
+import vrimplantacao.classe.ConexaoOracle;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
+import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -26,7 +35,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author lucasrafael
  */
-public class ScefDAO extends InterfaceDAO {
+public class ScefDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(ScefDAO.class.getName());
     public String v_empresaConvenio = "";
@@ -60,92 +69,34 @@ public class ScefDAO extends InterfaceDAO {
     }
 
     @Override
-    public List<ProdutoIMP> getProdutosBalanca() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "p.procodigo,\n"
-                    + "b.codbarra,\n"
-                    + "e.prequantidade,\n"
-                    + "p.prodescricao,\n"
-                    + "p.prodesc_imp_fiscal,\n"
-                    + "p.propreco_custo_sem_icms custocomimposto,\n"
-                    + "p.propreco_custo_com_icms custosemimposto,\n"
-                    + "p.propreco_custo_medio_cicms,\n"
-                    + "p.propreco_custo_medio_sicms,\n"
-                    + "p.propreco_venda precovenda,\n"
-                    + "p.promargem,\n"
-                    + "p.proinclusao datacadastro,\n"
-                    + "p.probalanca,\n"
-                    + "case p.status when 'A' then '1' else '0' end status,\n"
-                    + "p.embcodigo,\n"
-                    + "p.embcodigo_unidade,\n"
-                    + "p.proicms,\n"
-                    + "p.proreducao_base_icms,\n"
-                    + "p.prodiasvencimento,\n"
-                    + "p.pro_sit_trib_nf,\n"
-                    + "p.proexclusao dataexclusao,\n"
-                    + "p.proncm,\n"
-                    + "p.stpcodigo,\n"
-                    + "p.stpcodigo_entrada,\n"
-                    + "p.stccodigo,\n"
-                    + "p.stccodigo_entrada,\n"
-                    + "c.cestchave,\n"
-                    + "s.prosit_tributaria sit_trib,\n"
-                    + "p.prosit_tributaria sit_prod,\n"
-                    + "s.pstdescricao sit_descricao\n"
-                    + "from produto p\n"
-                    + "left join cest c on c.cestcodigo = p.cestcodigo\n"
-                    + "left join prosituacao_tributaria s on s.prosit_tributaria = p.prosit_tributaria\n"
-                    + "left join proembala e on e.procodigo = p.procodigo\n"
-                    + "left join procodbarra b on b.precodigo = e.precodigo\n"
-                    + "where p.status = 'A' \n"
-                    + "and p.probalanca <> 'N'"
+                    + "sitcodigo, \n"
+                    + "sitdescricao,\n"
+                    + "pro_sit_trib_nf cst,\n"
+                    + "siticms aliq,\n"
+                    + "0 reducao\n"
+                    + "from situacaotributaria"
             )) {
                 while (rst.next()) {
-                    String ean;
-                    if ((rst.getString("codbarra") != null)
-                            && (!rst.getString("codbarra").trim().isEmpty())) {
-
-                        if ((rst.getString("codbarra").length() > 7)
-                                && (rst.getString("codbarra").contains("0000000"))) {
-
-                            ean = rst.getString("codbarra").substring(1, 5);
-
-                            ProdutoIMP imp = new ProdutoIMP();
-                            imp.setImportLoja(getLojaOrigem());
-                            imp.setImportSistema(getSistema());
-                            imp.setImportId(rst.getString("procodigo"));
-                            imp.setEan(ean);
-                            imp.seteBalanca((!"N".equals(rst.getString("probalanca"))));
-                            imp.setSituacaoCadastro(rst.getInt("status") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-                            imp.setTipoEmbalagem(rst.getString("embcodigo"));
-                            imp.setQtdEmbalagem(rst.getInt("prequantidade"));
-                            imp.setDataCadastro(rst.getDate("proinclusao"));
-                            imp.setDescricaoCompleta(rst.getString("prodescricao"));
-                            imp.setDescricaoReduzida(imp.getDescricaoCompleta());
-                            imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                            imp.setMargem(rst.getDouble("promargem"));
-                            imp.setCustoComImposto(rst.getDouble("custocomimposto"));
-                            imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                            imp.setPrecovenda(rst.getDouble("precovenda"));
-                            imp.setPiscofinsCstDebito(rst.getString("stpcodigo"));
-                            imp.setPiscofinsCstCredito(rst.getString("stpcodigo_entrada"));
-                            imp.setNcm(rst.getString("proncm"));
-                            imp.setCest(rst.getString("cestchave"));
-                            imp.setIcmsCst(rst.getInt("pro_sit_trib_nf"));
-                            imp.setIcmsAliq(rst.getDouble("proicms"));
-                            imp.setIcmsReducao(rst.getDouble("proreducao_base_icms"));
-                            result.add(imp);
-                        }
-                    }
+                    result.add(new MapaTributoIMP(
+                            rst.getString("sitcodigo"),
+                            rst.getString("sitdescricao"),
+                            rst.getInt("cst"),
+                            rst.getDouble("aliq"),
+                            rst.getDouble("reducao")
+                    ));
                 }
             }
         }
+        
         return result;
     }
-
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -154,6 +105,7 @@ public class ScefDAO extends InterfaceDAO {
                     "select\n"
                     + "p.procodigo,\n"
                     + "b.codbarra,\n"
+                    + "p.cifcodigo,\n"
                     + "e.prequantidade,\n"
                     + "p.prodescricao,\n"
                     + "p.prodesc_imp_fiscal,\n"
@@ -192,42 +144,76 @@ public class ScefDAO extends InterfaceDAO {
                     + "left join procodbarra b on b.precodigo = e.precodigo\n"
                     + "where p.status = 'A'"
             )) {
-                while (rst.next()) {
-                    String codigobarras;
-
-                    codigobarras = rst.getString("codbarra");
-
-
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
+                while (rst.next()) {                   
+                    
                     ProdutoIMP imp = new ProdutoIMP();
+                    ProdutoBalancaVO produtoBalanca;
+                    String ean;
+                    long codigoProduto;
+                    
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("procodigo"));
-
-                    if (rst.getInt("prequantidade") > 1) {
-                        if ((codigobarras != null)
-                                && (!codigobarras.trim().isEmpty())
-                                && (codigobarras.trim().length() < 7)) {
-
-                            if (codigobarras.trim().length() == 1) {
-                                codigobarras = "9999999" + codigobarras.trim();
-                            } else if (codigobarras.trim().length() == 2) {
-                                codigobarras = "999999" + codigobarras.trim();
-                            } else if (codigobarras.trim().length() == 3) {
-                                codigobarras = "99999" + codigobarras.trim();
-                            } else if (codigobarras.trim().length() == 4) {
-                                codigobarras = "9999" + codigobarras.trim();
-                            } else if (codigobarras.trim().length() == 5) {
-                                codigobarras = "999" + codigobarras.trim();
+                    
+                    ean = rst.getString("codbarra");
+                    
+                    if ((ean != null)
+                            && (!ean.trim().isEmpty())) {
+                        if ((ean.trim().length() > 7) && (ean.contains("0000000"))) {
+                            ean = ean.substring(1, 5);
+                            
+                            codigoProduto = Long.parseLong(ean);
+                            if (codigoProduto <= Integer.MAX_VALUE) {
+                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
                             } else {
-                                codigobarras = "99" + codigobarras.trim();
+                                produtoBalanca = null;
                             }
-                        } else {
-                            codigobarras = StringUtils.leftPad(imp.getImportId(), 8, "9");
+
+                            if (produtoBalanca != null) {
+                                imp.seteBalanca(true);
+                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
+                                imp.setEan(ean);
+                            } else {
+                                imp.setValidade(0);
+                                imp.seteBalanca(false);
+                                imp.setEan(rst.getString("codbarra"));
+                            }                            
+                        } else if ((ean.trim().length() > 7) && (!ean.contains("0000000"))) {
+                          
+                            imp.setEan(ean);
+                            imp.seteBalanca(false);
+                            
+                        } else if (ean.trim().length() < 7) {
+                            
+                            imp.seteBalanca(false);
+                            
+                            if ((rst.getInt("prequantidade") > 1)) {
+
+                                if (ean.trim().length() == 1) {
+                                    ean = "9999999" + ean.trim();
+                                } else if (ean.trim().length() == 2) {
+                                    ean = "999999" + ean.trim();
+                                } else if (ean.trim().length() == 3) {
+                                    ean = "99999" + ean.trim();
+                                } else if (ean.trim().length() == 4) {
+                                    ean = "9999" + ean.trim();
+                                } else if (ean.trim().length() == 5) {
+                                    ean = "999" + ean.trim();
+                                } else {
+                                    ean = "99" + ean.trim();
+                                }
+                                
+                                imp.setEan(ean);
+                            }
+                        }
+                    } else {                        
+                        imp.seteBalanca(false);                        
+                        if (rst.getInt("prequantidade") > 1) {
+                            imp.setEan(StringUtils.leftPad(imp.getImportId(), 8, "9"));
                         }
                     }
                     
-                    imp.setEan(codigobarras);
-                    imp.seteBalanca((!"N".equals(rst.getString("probalanca"))));
                     imp.setSituacaoCadastro(rst.getInt("status") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setTipoEmbalagem(rst.getString("embcodigo"));
                     imp.setQtdEmbalagem(rst.getInt("prequantidade"));
@@ -244,16 +230,14 @@ public class ScefDAO extends InterfaceDAO {
                     imp.setPiscofinsCstCredito(rst.getString("stpcodigo_entrada"));
                     imp.setNcm(rst.getString("proncm"));
                     imp.setCest(rst.getString("cestchave"));
-                    imp.setIcmsCst(rst.getInt("pro_sit_trib_nf"));
-                    imp.setIcmsAliq(rst.getDouble("proicms"));
-                    imp.setIcmsReducao(rst.getDouble("proreducao_base_icms"));
+                    imp.setIcmsDebitoId(rst.getString("cifcodigo"));
+                    imp.setIcmsCreditoId(rst.getString("cifcodigo"));
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opcao) throws Exception {
         if (opcao == OpcaoProduto.ESTOQUE) {
@@ -279,61 +263,6 @@ public class ScefDAO extends InterfaceDAO {
             }
         }
         return null;
-    }
-
-    @Override
-    public List<ProdutoIMP> getEANs() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "p.procodigo,\n"
-                    + "b.codbarra,\n"
-                    + "e.prequantidade\n"
-                    + "from produto p\n"
-                    + "left join proembala e on e.procodigo = p.procodigo\n"
-                    + "left join procodbarra b on b.precodigo = e.precodigo\n"
-                    + "where p.status = 'A'\n"
-                    + "and e.prequantidade is not null"
-            )) {
-                while (rst.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("procodigo"));
-                    imp.setQtdEmbalagem(rst.getInt("prequantidade"));
-
-                    String codigobarras = rst.getString("codbarra");
-
-                    if ((codigobarras != null)
-                            && (!codigobarras.trim().isEmpty())) {
-
-                        if (codigobarras.trim().length() < 7) {
-
-                            if (codigobarras.trim().length() == 1) {
-                                imp.setEan("9999999" + codigobarras.trim());
-                            } else if (codigobarras.trim().length() == 2) {
-                                imp.setEan("999999" + codigobarras.trim());
-                            } else if (codigobarras.trim().length() == 3) {
-                                imp.setEan("99999" + codigobarras.trim());
-                            } else if (codigobarras.trim().length() == 4) {
-                                imp.setEan("9999" + codigobarras.trim());
-                            } else if (codigobarras.trim().length() == 5) {
-                                imp.setEan("999" + codigobarras.trim());
-                            } else {
-                                imp.setEan("99" + codigobarras.trim());
-                            }
-                        } else {
-                            imp.setEan(codigobarras);
-                        }
-                    } else {
-                        imp.setEan(StringUtils.leftPad(imp.getImportId(), 8, "9"));
-                    }
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
     }
 
     @Override
@@ -535,6 +464,40 @@ public class ScefDAO extends InterfaceDAO {
                     imp.setBloqueado(false);
                     imp.setConvenioLimite(rst.getDouble("pcllimitecredito"));
                     imp.setLojaCadastro(v_lojaVR);
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
+        List<ConvenioTransacaoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "titcodigo,\n"
+                    + "pescodigo, \n"
+                    + "titdocumento,\n"
+                    + "(titvalor - tittotalpago) valor,\n"
+                    + "titemissao,\n"
+                    + "titobservacao,\n"
+                    + "titnumparcelas,\n"
+                    + "titstatus\n"
+                    + "from titulo\n"
+                    + "where titstatus = 'A'\n"
+                    + "and empcodigo = " + getLojaOrigem()
+            )) {
+                SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
+                while (rst.next()) {
+                    ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
+                    imp.setId(rst.getString("titcodigo"));
+                    imp.setIdConveniado(rst.getString("pescodigo"));
+                    imp.setNumeroCupom(rst.getString("titdocumento"));
+                    imp.setDataHora(rst.getTimestamp("titemissao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("titobservacao"));
                     result.add(imp);
                 }
             }

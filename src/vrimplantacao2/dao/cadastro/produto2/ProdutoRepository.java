@@ -277,6 +277,7 @@ public class ProdutoRepository {
 
                         ProdutoAutomacaoLojaVO precoAtacadoLoja = converterProdutoAutomacaoLoja(imp);
                         ProdutoAutomacaoDescontoVO precoAtacadoDesconto = converterProdutoAutomacaoDesconto(imp);
+                        precoAtacadoDesconto.setProduto(prod);
 
                         provider.atualizar(prod, optSimples);
                         provider.complemento().atualizar(complemento, optSimples);

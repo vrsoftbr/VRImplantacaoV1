@@ -156,6 +156,7 @@ import vrimplantacao2.gui.interfaces.SysPdvGUI;
 import vrimplantacao2.gui.interfaces.VisualComercioGUI;
 import vrimplantacao2.gui.interfaces.Wm_byFileGUI;
 import vrimplantacao2.gui.interfaces.WmsiGUI;
+import vrimplantacao2.gui.interfaces.PdvVrGUI;
 
 public final class MenuGUI extends VRMdiFrame {
 
@@ -2666,19 +2667,7 @@ public final class MenuGUI extends VRMdiFrame {
 
     private void jMenuItemVRPdvActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemVRPdvActionPerformed
 
-        try {
-            this.setWaitCursor();
-            if (formImportarVRSoftwarePDV == null || formImportarVRSoftwarePDV.isClosed()) {
-                formImportarVRSoftwarePDV = new VRSoftwarePDVGUI(this);
-            }
-            formImportarVRSoftwarePDV.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
-
+        PdvVrGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemVRPdvActionPerformed
 
     private void jMenuItemEcosInformaticaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemEcosInformaticaActionPerformed
