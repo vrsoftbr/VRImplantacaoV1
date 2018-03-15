@@ -160,6 +160,10 @@ public class ProdutoRepositoryProvider {
         return new FornecedorAnteriorDAO().getFornecedoresImportados(sistema, loja);
     }
 
+    public Map<String, Integer> getPautaExcecao() {
+        return new HashMap<>();//TODO: Terminar o método.
+    }
+
     
     public class Anterior {
         

@@ -8,7 +8,6 @@ import java.util.TreeSet;
 import vrframework.classe.Conexao;
 import vrframework.classe.Util;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.utils.sql.SQLBuilder;
@@ -268,6 +267,9 @@ public class ProdutoDAO {
         }
         if (opt.contains(OpcaoProduto.DATA_CADASTRO)) {
             sql.put("datacadastro", vo.getDatacadastro());
+        }
+        if (opt.contains(OpcaoProduto.VENDA_PDV)) {
+            sql.put("vendapdv", vo.isVendaPdv());
         }
         
         sql.setWhere("id = " + vo.getId());

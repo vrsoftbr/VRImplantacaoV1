@@ -6,6 +6,7 @@ import vrframework.classe.ProgressBar;
 import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaVO;
 import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
+import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.nutricional.NutricionalAnteriorVO;
 
@@ -117,6 +118,14 @@ public class NutricionalRepositoryProvider {
     
     public void gravarItemToledo(Integer idNutricional, Integer idProduto) throws Exception {
         this.toledoDAO.gravarItem(idNutricional, idProduto);
+    }
+
+    public IDStack getIdsVagosFilizola() throws Exception {
+        return this.filizolaDAO.getIdsVagos(9999);
+    }
+
+    public IDStack getIdsVagosToledo() throws Exception {
+        return this.toledoDAO.getIdsVagos(9999);
     }
 
     

@@ -139,6 +139,16 @@ public enum OpcaoProduto {
         public String toString() {
             return "Data Cadastro";
         }
+    }, PAUTA_FISCAL {
+        @Override
+        public String toString() {
+            return "Pauta Fiscal";
+        }        
+    }, VENDA_PDV {
+        @Override
+        public String toString() {
+            return "Venda (PDV)";
+        }        
     }, IMPORTAR_RESETAR_BALANCA, IMPORTAR_GERAR_SUBNIVEL_MERC, IMPORTAR_MANTER_BALANCA, 
     CATEGORIA;
     

@@ -2,6 +2,7 @@ package vrimplantacao2.vo.cadastro.fornecedor;
 
 import java.util.Date;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.Factory;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.local.EstadoVO;
@@ -10,6 +11,7 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoInscricao;
+import vrimplantacao2.vo.enums.TipoPagamento;
 
 public class FornecedorVO {
     private int id;
@@ -48,6 +50,7 @@ public class FornecedorVO {
     
     private TipoFornecedor tipoFornecedor = TipoFornecedor.ATACADO;
     private TipoEmpresa tipoEmpresa = TipoEmpresa.LUCRO_REAL;
+    private TipoPagamento tipoPagamento = Parametros.get().getTipoPagamento();
     
     private final MultiMap<String, FornecedorContatoVO> contatos = new MultiMap<>(
         new Factory<FornecedorContatoVO>() {
@@ -332,6 +335,13 @@ public class FornecedorVO {
     public void setTipoEmpresa(TipoEmpresa tipoEmpresa) {
         this.tipoEmpresa = tipoEmpresa == null ? TipoEmpresa.LUCRO_REAL : tipoEmpresa;
     }
-    
+
+    public TipoPagamento getTipoPagamento() {
+        return tipoPagamento;
+    }
+
+    public void setTipoPagamento(TipoPagamento tipoPagamento) {
+        this.tipoPagamento = tipoPagamento == null ? Parametros.get().getTipoPagamento(): tipoPagamento;
+    }
     
 }

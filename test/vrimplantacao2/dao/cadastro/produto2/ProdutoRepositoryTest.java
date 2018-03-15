@@ -1,5 +1,7 @@
 package vrimplantacao2.dao.cadastro.produto2;
 
+import java.util.HashMap;
+import java.util.Map;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import org.junit.Before;
@@ -113,6 +115,13 @@ public class ProdutoRepositoryTest {
         merc.setDescricao("BOVINA");
         when(provider.getMercadologico("ACOUGUE", "BOVINO", "", "", "")).thenReturn(merc);
         
+        Map<String, Integer> pautas = new HashMap<>();
+        pautas.put("0402.99.00-A", 1);
+        pautas.put("0402.99.00-B", 2);
+        pautas.put("0402.99.00-C", 3);
+        pautas.put("0402.99.00-D", 4);
+        when(provider.getPautaExcecao()).thenReturn(pautas);
+        
         when(provider.tributo().getPisConfisDebito(eq(1))).thenReturn(new PisCofinsVO(0, "TRIBUTADO", 1, false));
         when(provider.tributo().getPisConfisCredito(eq(50))).thenReturn(new PisCofinsVO(12, "TRIBUTADO (E)", 50, true));
         when(provider.tributo().getNaturezaReceita(anyInt(), anyInt())).thenReturn(null);
@@ -179,6 +188,7 @@ public class ProdutoRepositoryTest {
         imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
         imp.setNcm("0402.99.00");
         imp.setCest("17.020.00");
+        imp.setPautaFiscalId("0402.99.00-B");
 
         imp.setPiscofinsCstDebito(7);
         imp.setPiscofinsCstCredito(71);
@@ -227,6 +237,7 @@ public class ProdutoRepositoryTest {
         imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
         imp.setNcm("0402.99.00");
         imp.setCest("17.020.00");
+        imp.setPautaFiscalId("A");
 
         imp.setPiscofinsCstDebito(7);
         imp.setPiscofinsCstCredito(71);
@@ -327,6 +338,7 @@ public class ProdutoRepositoryTest {
         assertEquals(2, actual.getIdLoja());
         assertEquals(7.12, actual.getPrecoVenda(),0.0001);
         assertEquals(7.12, actual.getPrecoDiaSeguinte(),0.0001);
+        assertEquals(SituacaoCadastro.ATIVO, actual.getSituacaoCadastro());
         assertNull(actual.getProduto());
     }
     
@@ -343,6 +355,7 @@ public class ProdutoRepositoryTest {
         assertEquals(2, actual.getIdLoja());
         assertEquals(17.12, actual.getPrecoVenda(),0.0001);
         assertEquals(17.12, actual.getPrecoDiaSeguinte(),0.0001);
+        assertEquals(SituacaoCadastro.EXCLUIDO, actual.getSituacaoCadastro());
         assertNull(actual.getProduto());
     }
     
@@ -580,6 +593,7 @@ public class ProdutoRepositoryTest {
         assertEquals(402, actual.getNcm().getNcm1());
         assertEquals(99, actual.getNcm().getNcm2());
         assertEquals(0, actual.getNcm().getNcm3());
+        assertEquals(2, actual.getExcecao());
         assertEquals("LEITE CONDENSADO(NCM)", actual.getNcm().getDescricao());
         assertEquals(NormaReposicao.CAIXA, actual.getNormaCompra());
         assertEquals(NormaReposicao.CAIXA, actual.getNormaReposicao());
@@ -588,7 +602,6 @@ public class ProdutoRepositoryTest {
         assertEquals(7, actual.getPisCofinsDebito().getCst());
         assertEquals(71, actual.getPisCofinsCredito().getCst());
         assertEquals(101, actual.getPisCofinsNaturezaReceita().getCodigo());
-        assertEquals(SituacaoCadastro.ATIVO, actual.getSituacaoCadastro());
         assertEquals(TipoEmbalagem.UN, actual.getTipoEmbalagem());
         assertEquals(0, actual.getValidade());
     }
@@ -741,7 +754,6 @@ public class ProdutoRepositoryTest {
         assertEquals(6, actual.getPisCofinsDebito().getCst());
         assertEquals(73, actual.getPisCofinsCredito().getCst());
         assertEquals(121, actual.getPisCofinsNaturezaReceita().getCodigo());
-        assertEquals(SituacaoCadastro.EXCLUIDO, actual.getSituacaoCadastro());
         assertEquals(TipoEmbalagem.KG, actual.getTipoEmbalagem());
         assertEquals(10, actual.getValidade());
     }

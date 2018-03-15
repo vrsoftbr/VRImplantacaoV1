@@ -37,7 +37,7 @@ public class RCNetDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT Filial, Nome FROM dadosempresa order by Filial"
+                    "select CodLoja as Filial, concat(nome, \" - \", local) as Nome from loja"
             )) {
                 while (rst.next()) {
                     result.add(
@@ -129,6 +129,44 @@ public class RCNetDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         
+        String sql = "SELECT\n" +
+                    "  p.ninterno id,\n" +
+                    "  p.datahoraalteracao,\n" +
+                    "  p.codigobarra ean,\n" +
+                    "  case when coalesce(p.qtdemb,1) >= 1 then coalesce(p.qtdemb,1) else 1 end qtdembalagem,\n" +
+                    "  case when p.peso = 1 and p.tipobalanca = 'P' then 'KG' else 'UN' end tipoembalagem,\n" +
+                    "  p.peso ebalanca,\n" +
+                    "  p.validade,\n" +
+                    "  p.descricao descricaocompleta,\n" +
+                    "  p.abreviacao descricaoreduzida,\n" +
+                    "  p.codgrupo merc1,\n" +
+                    "  p.codgruposub merc2,\n" +
+                    "  p.codgrupomarca merc3,\n" +
+                    "  (select codgrupo from familiaprecoproduto where codigobarra = p.codigobarra and p.coddesativado = 0 limit 1) idfamiliaproduto,\n" +
+                    "  coalesce(est.qtd,0) estoque,\n" +
+                    "  p.estmin" + getLojaOrigem() + " estoqueminimo,\n" +
+                    "  p.estmax" + getLojaOrigem() + " estoquemaximo,\n" +
+                    "  p.m1 margem,\n" +
+                    "  p.p" + getLojaOrigem() + " preco,\n" +
+                    "  coalesce(cus.custo, 0) custosemimposto,\n" +
+                    "  coalesce(cus.custo, 0) custocomimposto,\n" +
+                    //"  coalesce(cus.custoformacao, 0) custocomimposto,\n" +
+                    "  case p.coddesativado when 1 then 0 else 1 end id_situacaocadastro,\n" +
+                    "  p.codigoncm ncm,\n" +
+                    "  p.cest,\n" +
+                    "  p.codpiscofinssaida piscofins_saida,\n" +
+                    "  p.tabelacstpiscofins piscofins_natreceita,\n" +
+                    "  p.cst icms_cst,\n" +
+                    "  p.icmssaida icms_aliq_saida,\n" +
+                    "  p.icmsentrada icms_saliq_entrada,\n" +
+                    "  p.st\n" +
+                    "FROM\n" +
+                    "  itens p\n" +
+                    "  left join estoquen" + getLojaOrigem() + " est on p.codigobarra = est.codigobarra\n" +
+                    "  left join custoloja" + getLojaOrigem() + " cus on p.codigobarra = cus.codigobarra";
+                    
+                    System.out.println(sql);
+        
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n" +
@@ -215,6 +253,7 @@ public class RCNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         c1 = 0;
                         ProgressBar.setStatus("Carregando produtos..." + c2);
                     }
+                                      
                 }
             }
         }
@@ -340,14 +379,14 @@ public class RCNetDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n" +
                     "  st,\n" +
-                    "  rel\n" +
+                    "  descricao\n" +
                     "FROM st s;"
             )) {
                 while (rst.next()) {
                     result.add(
                         new MapaTributoIMP(
                             rst.getString("st"),
-                            rst.getString("rel")
+                            rst.getString("descricao")
                         )
                     );
                 }

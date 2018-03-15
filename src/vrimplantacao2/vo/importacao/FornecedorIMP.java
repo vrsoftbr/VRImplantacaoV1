@@ -4,12 +4,14 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.Factory;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoInscricao;
+import vrimplantacao2.vo.enums.TipoPagamento;
 
 public class FornecedorIMP {
 
@@ -60,6 +62,7 @@ public class FornecedorIMP {
     private TipoFornecedor tipoFornecedor = TipoFornecedor.ATACADO;
     
     private TipoEmpresa tipoEmpresa = TipoEmpresa.LUCRO_REAL;
+    private TipoPagamento tipoPagamento;
 
     public Set<Integer> getCondicoesPagamentos() {
         return condicoesPagamentos;
@@ -572,4 +575,13 @@ public class FornecedorIMP {
             this.tipoEmpresa = TipoEmpresa.PRODUTOR_RURAL_JURIDICO;
         }
     }
+
+    public TipoPagamento getTipoPagamento() {
+        return tipoPagamento;
+    }
+
+    public void setTipoPagamento(TipoPagamento tipoPagamento) {
+        this.tipoPagamento = tipoPagamento;
+    }
+    
 }

@@ -381,7 +381,7 @@ public class Importador {
         CreditoRotativoRepository rep = new CreditoRotativoRepository(provider);
         rep.importarCreditoRotativo(rotativo);
     }
-
+    
     public void unificarCreditoRotativo() throws Exception {
         ProgressBar.setStatus("Carregando crédito rotativo...");
         List<CreditoRotativoIMP> rotativo = getInterfaceDAO().getCreditoRotativo();
