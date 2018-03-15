@@ -49,6 +49,7 @@ import vrimplantacao2.vo.cadastro.financeiro.ReceberDevolucaoVO;
 import vrimplantacao2.vo.cadastro.financeiro.ReceberVerbaVO;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -85,6 +86,36 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     result.add(new Estabelecimento(rst.getString("id"), rst.getString("descricao")));
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                  "select p.codprod, "
+                    + "   cast(p.dataini as date) as dataini, "
+                    + "	  cast(p.datafim as date) as datafim, "
+                    + "	  p.preco_unit precooferta, "
+                    + "   prod.preco_unit as preconormal "
+                 + "from  promocao p "
+           + "inner join  produtos prod on p.codprod = prod.codprod "
+                + "where  datafim >= '2018-03-15' "
+            + "order  by  p.dataini"
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    imp.setIdProduto(rst.getString("codprod"));
+                    imp.setDataInicio(rst.getDate("dataini"));
+                    imp.setDataFim(rst.getDate("datafim"));
+                    imp.setPrecoOferta(rst.getDouble("precooferta"));
+                    result.add(imp);
                 }
             }
         }
@@ -268,9 +299,9 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(rst.getString("MERC2"));
                     imp.setCodMercadologico3(rst.getString("MERC3"));
                     imp.setSituacaoCadastro(("S".equals(rst.getString("ATIVO")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
-                    if(rst.getString("DESATIVACOMPRA") == "S"){
+                    if (rst.getString("DESATIVACOMPRA") == "S") {
                         imp.setDescontinuado(true);
-                    }else {
+                    } else {
                         imp.setDescontinuado(false);
                     }
                     imp.setTipoEmbalagem(rst.getString("unidade"));
@@ -338,7 +369,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "f.CONTATO, f.IE, f.CNPJ_CPF, f.AGENCIA, f.BANCO, f.CONTA,  f.DTCAD, "
                     + "f.VALOR_COMPRA, f.ATIVO, "
                     + "OBS, "
-                    + "c.descricao as descricaopag, " 
+                    + "c.descricao as descricaopag, "
                     + "f.PENTREGA, "
                     + "f.PVISITA, "
                     + "coalesce(case "
@@ -350,9 +381,9 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "when CODTIPOFORNEC = 6 then 6 "
                     + "when CODTIPOFORNEC = 7 then 7 "
                     + "END, 0) as CODTIPOFORNEC "
-                  + "FROM "
-                  + "FORNECEDORES f left join CONDPAGTO c on (f.CODCONDPAGTO = c.CODCONDPAGTO) "
-                  + "order by codfornec"
+                    + "FROM "
+                    + "FORNECEDORES f left join CONDPAGTO c on (f.CODCONDPAGTO = c.CODCONDPAGTO) "
+                    + "order by codfornec"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -371,8 +402,8 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIe_rg(rst.getString("IE"));
                     imp.setTel_principal(rst.getString("TELEFONE"));
                     imp.setAtivo("S".equals(rst.getString("ATIVO")));
-                    imp.setObservacao(rst.getString("OBS") + "Cond. pag: " 
-                            + Utils.acertarTexto(rst.getString("DESCRICAOPAG")) 
+                    imp.setObservacao(rst.getString("OBS") + "Cond. pag: "
+                            + Utils.acertarTexto(rst.getString("DESCRICAOPAG"))
                             + "Prazo entrega: " + rst.getInt("PENTREGA") + "Prazo visita: " + rst.getInt("PVISITA"));
                     imp.setDatacadastro(rst.getDate("DTCAD"));
                     imp.setTipoFornecedor(TipoFornecedor.getById(rst.getInt("CODTIPOFORNEC")));
@@ -431,7 +462,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                                 null
                         );
                     }
-                    
+
                     try (Statement stm2 = ConexaoSqlServer.getConexao().createStatement()) {
                         try (ResultSet rst2 = stm2.executeQuery(
                                 "select f.CODFORNEC, cp.CODCONDPAGTO, cp.DESCRICAO, cp.NPARCELAS\n"
@@ -1326,14 +1357,14 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
          */
         public void obterAliquota(VendaItemIMP item, String icms) throws SQLException {
             /*
-            TA	7.00	ALIQUOTA 07%
-            TB	12.00	ALIQUOTA 12%
-            TC	18.00	ALIQUOTA 18%
-            TD	25.00	ALIQUOTA 25%
-            TE	11.00	ALIQUOTA 11%
-            I	0.00	ISENTO
-            F	0.00	SUBST TRIBUTARIA
-            N	0.00	NAO INCIDENTE
+             TA	7.00	ALIQUOTA 07%
+             TB	12.00	ALIQUOTA 12%
+             TC	18.00	ALIQUOTA 18%
+             TD	25.00	ALIQUOTA 25%
+             TE	11.00	ALIQUOTA 11%
+             I	0.00	ISENTO
+             F	0.00	SUBST TRIBUTARIA
+             N	0.00	NAO INCIDENTE
              */
             int cst;
             double aliq;

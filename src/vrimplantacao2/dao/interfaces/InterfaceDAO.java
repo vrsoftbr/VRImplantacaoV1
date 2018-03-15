@@ -299,7 +299,7 @@ public abstract class InterfaceDAO {
     
     /**
      * Retorna a lista de ofertas do sistema cuja data de termino seja maior ou igual ao periodo informado.
-     * @param dataTermino Todas as ofertas com data de termino maior ou igual a este parâmetro serã importadas.
+     * @param dataTermino Todas as ofertas com data de termino maior ou igual a este parâmetro serão importadas.
      * @return Lista com todas as ofertas.
      * @throws Exception 
      */

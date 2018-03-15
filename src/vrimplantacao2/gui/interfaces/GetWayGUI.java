@@ -296,7 +296,7 @@ public class GetWayGUI extends VRInternalFrame {
                         }
                         
                         if (chkOfertas.isSelected()) {
-                            //getWayDAO.importarOfertas(idLojaVR, idLojaVR, idLojaCliente);
+                            importador.importarOfertas(null);
                         }
                         if (chkT1EAN.isSelected()) {
                             importador.importarEAN();
