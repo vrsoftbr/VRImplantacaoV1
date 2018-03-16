@@ -38,6 +38,9 @@ public class NutricionalRepository {
         IDStack idsFilizola = provider.getIdsVagosFilizola();
         IDStack idsToledo = provider.getIdsVagosToledo();
         
+        LOG.finest("idsFilizola: " + idsFilizola.size());
+        LOG.finest("idsToledo: " + idsToledo.size());
+        
         if (opt.contains(OpcaoNutricional.FILIZOLA)) {
             nutricionaisFilizola = provider.getNutricionaisFilizola();
         }
@@ -60,7 +63,7 @@ public class NutricionalRepository {
                     if (opt.contains(OpcaoNutricional.FILIZOLA)) {
                         NutricionalFilizolaVO vo = converterNutricionalFilizola(imp);
                         
-                        vo.setId((int) idsFilizola.pop());
+                        vo.setId((int) idsFilizola.pop(imp.getId()));
                         
                         provider.gravar(vo);
                         
@@ -71,7 +74,7 @@ public class NutricionalRepository {
                     if (opt.contains(OpcaoNutricional.TOLEDO)) {
                         NutricionalToledoVO vo = converterNutricionalToledo(imp);
                         
-                        vo.setId((int) idsToledo.pop());
+                        vo.setId((int) idsToledo.pop(imp.getId()));
                         
                         provider.gravar(vo);
                         
