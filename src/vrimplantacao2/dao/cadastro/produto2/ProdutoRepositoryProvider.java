@@ -17,6 +17,7 @@ import vrimplantacao.vo.vrimplantacao.CestVO;
 import vrimplantacao.vo.vrimplantacao.EstadoVO;
 import vrimplantacao2.dao.cadastro.FamiliaProdutoDAO;
 import vrimplantacao2.dao.cadastro.MercadologicoDAO;
+import vrimplantacao2.dao.cadastro.fiscal.pautafiscal.PautaFiscalDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto.NcmDAO;
 import vrimplantacao2.dao.cadastro.produto.OfertaDAO;
@@ -59,7 +60,8 @@ public class ProdutoRepositoryProvider {
     private MultiMap<String, FamiliaProdutoVO> familias;
     private MercadologicoDAO mercadologicoDAO = new MercadologicoDAO();  
     private ProdutoDAO produtoDAO = new ProdutoDAO(); 
-    private Set<OpcaoProduto> opcoes = new HashSet<>();
+    private Set<OpcaoProduto> opcoes = new HashSet<>();    
+    private PautaFiscalDAO pautaDao = new PautaFiscalDAO();
 
     public String getSistema() {
         return sistema;
@@ -147,21 +149,17 @@ public class ProdutoRepositoryProvider {
         return nivelMaximoMercadologico;
     }
 
-    private Map<String, Integer> fornecedores  = null;
     /**
      * Retorna {@link Map} com IDs de fornecedores importados.
      * @return {@link Map} com os IDs importados.
      * @throws Exception 
      */
     public Map<String, Integer> getFornecedoresImportados() throws Exception {
-        if (fornecedores == null) {
-            
-        }
         return new FornecedorAnteriorDAO().getFornecedoresImportados(sistema, loja);
     }
 
-    public Map<String, Integer> getPautaExcecao() {
-        return new HashMap<>();//TODO: Terminar o método.
+    public Map<String, Integer> getPautaExcecao() throws Exception {
+        return pautaDao.getPautaExcecao(sistema, loja);
     }
 
     

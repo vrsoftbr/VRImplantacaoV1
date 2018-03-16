@@ -155,6 +155,9 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkProdutos.isSelected()) {
                             importador.importarProduto(chkManterBalanca.isSelected());
                         }
+                        if (chkPautaFiscal.isSelected()) {
+                            importador.importarPautaFiscal(OpcaoFiscal.NOVOS);
+                        }
 
                         {
                             List<OpcaoProduto> opcoes = new ArrayList<>();
@@ -213,7 +216,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                                 opcoes.add(OpcaoProduto.QTD_EMBALAGEM_EAN);
                             }
                             if (chkPautaFiscalProduto.isSelected()) {
-                                opcoes.add(OpcaoProduto.PAUTA_FISCAL);
+                                opcoes.add(OpcaoProduto.EXCECAO);
                             }
                             if (chkPSitCadastro.isSelected()) {
                                 opcoes.add(OpcaoProduto.ATIVO);
@@ -233,9 +236,6 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                         }
                         if (chkEANemBranco.isSelected()) {
                             importador.importarEANemBranco();
-                        }
-                        if (chkPautaFiscal.isSelected()) {
-                            importador.importarPautaFiscal(OpcaoFiscal.NOVOS);
                         }
                         
                         {

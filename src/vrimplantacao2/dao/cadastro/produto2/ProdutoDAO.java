@@ -125,7 +125,7 @@ public class ProdutoDAO {
             sql.put("descricaogondola", vo.getDescricaoGondola());
             sql.put("dataalteracao", new Date());
             sql.putNull("id_produtovasilhame");
-            sql.put("excecao", 0);
+            sql.put("excecao", vo.getExcecao());
             sql.put("id_tipomercadoria", 99);
             sql.put("sugestaopedido", true);
             sql.put("aceitamultiplicacaopdv", true);
@@ -270,6 +270,9 @@ public class ProdutoDAO {
         }
         if (opt.contains(OpcaoProduto.VENDA_PDV)) {
             sql.put("vendapdv", vo.isVendaPdv());
+        }
+        if (opt.contains(OpcaoProduto.EXCECAO)) {
+            sql.put("excecao", vo.getExcecao());
         }
         
         sql.setWhere("id = " + vo.getId());
