@@ -2024,3 +2024,67 @@ public class InfoStoreDAO {
         }
     }
 }
+
+
+/*
+select
+m1.grupo merc1_cod,
+m1.descricao merc_desc,
+m2.subgrupo merc2_cod,
+m2.descricao merc2_desc,
+'1' merc3_cod,
+m2.descricao merc3_desc
+from slbdgrup m1
+inner join slbdsbgp m2 on m2.grupo = m1.grupo
+order by m1.grupo, m2.subgrupo;
+
+select 
+p.produto id,
+p.barra codigobarras,
+'1' qtdembalagem,
+p.unidade,
+case p.servico when 'B' then 'S' else 'N' end balanca,
+p.descricao descricaocompleta,
+p.desc_redu descricaoreduzida,
+p.desc_etiq descricaogondola,
+p.grupo cod_mercadologico1,
+p.desc_grp mercadologico1,
+p.subgrupo cod_mercadologico2,
+p.desc_sbg mercadologico2,
+'1' cod_mercadologico3,
+p.desc_sbg mercadologico3,
+'' cod_mercadologico4,
+'' mercadologico4,
+'' cod_mercadologico5,
+'' mercadologico5,
+'' id_familiaproduto,
+'' familiaproduto,
+'0,00' pesobruto,
+'0,00' pesoliquido,
+p.dt_cada datacadastro,
+p.validad validade,
+p.lucro margem,
+l.estoqma estoquemaximo,
+l.estoqmi estoqueminimo,
+l.estoqlo estoque,
+l.custopmz custocomimposto,
+l.custo custosemimposto,
+p.preco precovenda,
+case p.inativa when 'N' then 'S' else 'N' end ativo,
+p.ncm,
+p.cest,
+p.pis_cofins piscofins_cst_debito,
+p.pis_cofins piscofins_cst_credito,
+'' piscofins_natureza_receita,
+c.cst icms_cst,
+c.aliquota icms_aliquota,
+c.redbase icms_reduzido
+from slbdprod p
+left join slbdploj l on l.produto = p.produto
+left join slbdclas c on c.classe = p.classe;
+
+select * from slbdprod;
+select * from slbdploj;
+select * from slbdclas;
+
+*/

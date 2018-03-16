@@ -25,7 +25,7 @@ public class ChequeIMP {
     private String telefone;
     private String nome;
     private String observacao;
-    private SituacaoCheque situacaoCheque = SituacaoCheque.ABERTO;
+    private SituacaoCheque situacaoCheque  = SituacaoCheque.ABERTO;
     private String cmc7;    
     private int alinea = 0;
     private double valorJuros = 0;

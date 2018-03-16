@@ -891,6 +891,21 @@
                         </MenuItem>
                       </SubComponents>
                     </Menu>
+                    <Menu class="javax.swing.JMenu" name="mnuADT">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="ADS"/>
+                      </Properties>
+                      <SubComponents>
+                        <MenuItem class="javax.swing.JMenuItem" name="jMenuItemInfoMacStore">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="InfoMac - Store"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItemInfoMacStoreActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                      </SubComponents>
+                    </Menu>
                   </SubComponents>
                 </Menu>
                 <Menu class="javax.swing.JMenu" name="jMenu3">

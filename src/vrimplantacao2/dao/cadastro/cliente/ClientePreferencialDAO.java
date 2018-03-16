@@ -252,6 +252,9 @@ public class ClientePreferencialDAO {
                 if (opt.contains(OpcaoCliente.TELEFONE)) {
                     sql.put("telefone", vo.getTelefone());
                 }
+                if (opt.contains(OpcaoCliente.CELULAR)) {
+                    sql.put("celular", vo.getCelular());
+                }
                 if (opt.contains(OpcaoCliente.ENDERECO_COMPLETO)) {
                     sql.put("endereco", vo.getEndereco());
                     sql.put("numero", vo.getNumero());
@@ -262,7 +265,7 @@ public class ClientePreferencialDAO {
 
                 sql.setWhere("id = " + vo.getId());
                 stm.execute(sql.getUpdate());
-                
+
             }
         }
     }

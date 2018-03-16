@@ -1,4 +1,4 @@
-package vrimplantacao.dao.interfaces;
+package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,9 +15,9 @@ import java.util.logging.Logger;
 import vrframework.classe.ProgressBar;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoOracle;
+import vrimplantacao.dao.interfaces.AriusDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.venda.MultiStatementIterator;
-import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -35,7 +35,11 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
-public class AriusDAO extends InterfaceDAO {
+/**
+ *
+ * @author Importacao
+ */
+public class InfoMacDAO extends InterfaceDAO {
 
     private static final Logger LOG = Logger.getLogger(AriusDAO.class.getName());
 
@@ -100,7 +104,7 @@ public class AriusDAO extends InterfaceDAO {
 
     @Override
     public String getSistema() {
-        return "ARIUS";
+        return "InfoMac - Store";
     }
 
     @Override
@@ -1537,5 +1541,5 @@ public class AriusDAO extends InterfaceDAO {
         }
 
     }
-
+    
 }

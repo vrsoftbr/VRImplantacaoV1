@@ -57,6 +57,7 @@ import vrimplantacao.vo.vrimplantacao.ReceberChequeVO;
 import vrimplantacao.vo.vrimplantacao.ReceberCreditoRotativoVO;
 import vrimplantacao.vo.vrimplantacao.ProdutoAutomacaoLojaVO;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 
 public class GetWayDAO {
 
@@ -66,6 +67,8 @@ public class GetWayDAO {
 
     public List<ProdutoVO> carregarSituacaoProduto(int idLojaVR, int idLojaCliente) throws Exception {
         List<ProdutoVO> vProduto = new ArrayList<>();
+        FornecedorIMP iFornecedor = new FornecedorIMP(); 
+                
         long codigoBarras;
         int idProduto, idSituacaoCadastro;
         
@@ -2464,7 +2467,7 @@ public class GetWayDAO {
         String razaosocial, nomefantasia, obs, inscricaoestadual,
                 endereco, bairro, Numero = "", Telefone = "", email = "",
                 cidade, datacadastro, fax, telefone2, celular;
-        int id, id_municipio = 0, id_estado, id_tipoinscricao, Linha = 0;
+        int id, id_municipio = 0, id_estado, id_tipoinscricao, Linha = 0, id_tipofornecedor;
         long cnpj, cep;
         boolean ativo = true;
 
@@ -2473,8 +2476,9 @@ public class GetWayDAO {
             sql = new StringBuilder();
             sql.append(" SELECT CODFORNEC, RAZAO, FANTASIA, ENDERECO, NUMERO, BAIRRO, CIDADE, ESTADO, CEP, ");
             sql.append(" TELEFONE, FAX, EMAIL, CELULAR, FONE1, CONTATO, IE, CNPJ_CPF, AGENCIA,BANCO, ");
-            sql.append(" CONTA,  DTCAD, VALOR_COMPRA, ATIVO, OBS ");
-            sql.append(" FROM FORNECEDORES  order by codfornec ");
+            sql.append(" CONTA,  DTCAD, VALOR_COMPRA, ATIVO,");
+            sql.append("(f.OBS");
+            sql.append("FROM FORNECEDORES order by codfornec ");
             rst = stm.executeQuery(sql.toString());
             Linha = 0;
             try {

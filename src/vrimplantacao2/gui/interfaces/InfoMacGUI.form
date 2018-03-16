@@ -6,6 +6,21 @@
     </Component>
     <Component class="vrframework.bean.consultaContaContabil.VRConsultaContaContabil" name="vRConsultaContaContabil1">
     </Component>
+    <Container class="vrframework.bean.panel.VRPanel" name="vRPanel2">
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <EmptySpace min="0" pref="96" max="32767" attributes="0"/>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <EmptySpace min="0" pref="95" max="32767" attributes="0"/>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+    </Container>
   </NonVisualComponents>
   <Properties>
     <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
@@ -15,6 +30,9 @@
     </Property>
     <Property name="title" type="java.lang.String" value="Arius"/>
   </Properties>
+  <AccessibilityProperties>
+    <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Info Mac - Store"/>
+  </AccessibilityProperties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
   </SyntheticProperties>
@@ -515,6 +533,129 @@
             </Component>
           </SubComponents>
         </Container>
+        <Container class="vrframework.bean.panel.VRPanel" name="tabUnificacao">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Unifica&#xe7;&#xe3;o">
+                <Property name="tabTitle" type="java.lang.String" value="Unifica&#xe7;&#xe3;o"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="cbxUnifProdutos" min="-2" max="-2" attributes="0"/>
+                          <Component id="cbxUnifFornecedores" min="-2" max="-2" attributes="0"/>
+                          <Component id="cbxUnifProdutoForn" min="-2" max="-2" attributes="0"/>
+                          <Component id="cbxUnifCliPreferencial" min="-2" max="-2" attributes="0"/>
+                          <Component id="cbxUnifCliEventual" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="304" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="cbxUnifProdutos" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="cbxUnifFornecedores" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="cbxUnifProdutoForn" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="cbxUnifCliPreferencial" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="cbxUnifCliEventual" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="89" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="cbxUnifProdutos">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Unificar produtos (Somente EANs v&#xe1;lidos)"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="cbxUnifFornecedores">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Unificar Fornecedores (Somente CPF/CNPJ v&#xe1;lidos)"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="cbxUnifProdutoForn">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Unificar Produto Fornecedor (Somente CPF/CNPJ v&#xe1;lidos)"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="cbxUnifCliPreferencial">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Unificar Cliente Preferencial (Somente CPF/CNPJ v&#xe1;lidos)"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="cbxUnifCliEventual">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Unificar Cliente Eventual (Somente CPF/CNPJ v&#xe1;lidos)"/>
+              </Properties>
+            </Component>
+          </SubComponents>
+        </Container>
+        <Container class="vrframework.bean.panel.VRPanel" name="tabVendas">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Vendas">
+                <Property name="tabTitle" type="java.lang.String" value="Vendas"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="chkPdvVendas" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="txtDtIInicioVenda" min="-2" pref="92" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="txtDtTerminoVenda" min="-2" pref="92" max="-2" attributes="0"/>
+                      <EmptySpace pref="322" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="chkPdvVendas" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtDtIInicioVenda" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtDtTerminoVenda" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="177" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPdvVendas">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Vendas (PDV)"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkPdvVendasActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDtIInicioVenda">
+            </Component>
+            <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDtTerminoVenda">
+            </Component>
+          </SubComponents>
+        </Container>
         <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="tabCliente">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
@@ -642,16 +783,16 @@
                 </Container>
               </SubComponents>
             </Container>
-            <Component class="vrimplantacao2.gui.interfaces.custom.arius.AriusPlanoContasRotativoGUI" name="tabRotativo">
+            <Component class="vrimplantacao2.gui.interfaces.custom.infomac.InfoMacPlanoContasRotativoGUI" name="tabRotativo">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="Rotativo">
-                    <Property name="tabTitle" type="java.lang.String" value="Rotativo"/>
+                  <JTabbedPaneConstraints tabName="Cr&#xe9;dito Rotativo">
+                    <Property name="tabTitle" type="java.lang.String" value="Cr&#xe9;dito Rotativo"/>
                   </JTabbedPaneConstraints>
                 </Constraint>
               </Constraints>
             </Component>
-            <Component class="vrimplantacao2.gui.interfaces.custom.arius.AriusPlanoContasChequeGUI" name="tabCheque">
+            <Component class="vrimplantacao2.gui.interfaces.custom.infomac.InfoMacPlanoContasChequeGUI" name="tabCheque">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
                   <JTabbedPaneConstraints tabName="Cheque">
@@ -659,129 +800,6 @@
                   </JTabbedPaneConstraints>
                 </Constraint>
               </Constraints>
-            </Component>
-          </SubComponents>
-        </Container>
-        <Container class="vrframework.bean.panel.VRPanel" name="tabUnificacao">
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Unifica&#xe7;&#xe3;o">
-                <Property name="tabTitle" type="java.lang.String" value="Unifica&#xe7;&#xe3;o"/>
-              </JTabbedPaneConstraints>
-            </Constraint>
-          </Constraints>
-
-          <Layout>
-            <DimensionLayout dim="0">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="cbxUnifProdutos" min="-2" max="-2" attributes="0"/>
-                          <Component id="cbxUnifFornecedores" min="-2" max="-2" attributes="0"/>
-                          <Component id="cbxUnifProdutoForn" min="-2" max="-2" attributes="0"/>
-                          <Component id="cbxUnifCliPreferencial" min="-2" max="-2" attributes="0"/>
-                          <Component id="cbxUnifCliEventual" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace pref="304" max="32767" attributes="0"/>
-                  </Group>
-              </Group>
-            </DimensionLayout>
-            <DimensionLayout dim="1">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="cbxUnifProdutos" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="cbxUnifFornecedores" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="cbxUnifProdutoForn" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="cbxUnifCliPreferencial" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="cbxUnifCliEventual" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="89" max="32767" attributes="0"/>
-                  </Group>
-              </Group>
-            </DimensionLayout>
-          </Layout>
-          <SubComponents>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="cbxUnifProdutos">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Unificar produtos (Somente EANs v&#xe1;lidos)"/>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="cbxUnifFornecedores">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Unificar Fornecedores (Somente CPF/CNPJ v&#xe1;lidos)"/>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="cbxUnifProdutoForn">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Unificar Produto Fornecedor (Somente CPF/CNPJ v&#xe1;lidos)"/>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="cbxUnifCliPreferencial">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Unificar Cliente Preferencial (Somente CPF/CNPJ v&#xe1;lidos)"/>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="cbxUnifCliEventual">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Unificar Cliente Eventual (Somente CPF/CNPJ v&#xe1;lidos)"/>
-              </Properties>
-            </Component>
-          </SubComponents>
-        </Container>
-        <Container class="vrframework.bean.panel.VRPanel" name="tabVendas">
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Vendas">
-                <Property name="tabTitle" type="java.lang.String" value="Vendas"/>
-              </JTabbedPaneConstraints>
-            </Constraint>
-          </Constraints>
-
-          <Layout>
-            <DimensionLayout dim="0">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="chkPdvVendas" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="txtDtIInicioVenda" min="-2" pref="92" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="txtDtTerminoVenda" min="-2" pref="92" max="-2" attributes="0"/>
-                      <EmptySpace pref="322" max="32767" attributes="0"/>
-                  </Group>
-              </Group>
-            </DimensionLayout>
-            <DimensionLayout dim="1">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="chkPdvVendas" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtDtIInicioVenda" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtDtTerminoVenda" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace pref="177" max="32767" attributes="0"/>
-                  </Group>
-              </Group>
-            </DimensionLayout>
-          </Layout>
-          <SubComponents>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPdvVendas">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Vendas (PDV)"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkPdvVendasActionPerformed"/>
-              </Events>
-            </Component>
-            <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDtIInicioVenda">
-            </Component>
-            <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDtTerminoVenda">
             </Component>
           </SubComponents>
         </Container>
@@ -795,13 +813,16 @@
           <Properties>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                <TitledBorder title="Dados Origem - ORACLE"/>
+                <TitledBorder title="Dados Origem - ADS"/>
               </Border>
             </Property>
             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[350, 350]"/>
             </Property>
           </Properties>
+          <AccessibilityProperties>
+            <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Dados Origem - ADS"/>
+          </AccessibilityProperties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Conex&#xe3;o">
@@ -818,7 +839,7 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="txtPortaOracle" alignment="0" min="-2" pref="65" max="-2" attributes="0"/>
+                                  <Component id="txtPortaADS" alignment="0" min="-2" pref="65" max="-2" attributes="0"/>
                                   <Component id="vRLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
@@ -831,7 +852,7 @@
                                   <Group type="102" attributes="0">
                                       <Component id="cmbLojaCliente" max="32767" attributes="0"/>
                                       <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
-                                      <Component id="btnConectarOracle" min="-2" pref="114" max="-2" attributes="0"/>
+                                      <Component id="btnConectarADS" min="-2" pref="114" max="-2" attributes="0"/>
                                   </Group>
                                   <Group type="102" attributes="0">
                                       <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
@@ -845,22 +866,22 @@
                                       <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace min="0" pref="197" max="32767" attributes="0"/>
                                   </Group>
-                                  <Component id="txtHostOracle" max="32767" attributes="0"/>
+                                  <Component id="txtHostADS" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="txtBancoDadosOracle" min="-2" pref="138" max="-2" attributes="0"/>
+                                  <Component id="txtBancoDadosADS" min="-2" pref="138" max="-2" attributes="0"/>
                                   <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="txtUsuarioOracle" min="-2" pref="108" max="-2" attributes="0"/>
+                                  <Component id="txtUsuarioADS" min="-2" pref="108" max="-2" attributes="0"/>
                                   <Component id="vRLabel4" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="vRLabel5" min="-2" max="-2" attributes="0"/>
-                                  <Component id="txtSenhaOracle" min="-2" pref="96" max="-2" attributes="0"/>
+                                  <Component id="txtSenhaADS" min="-2" pref="96" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -879,10 +900,10 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="2" attributes="0">
-                          <Component id="txtSenhaOracle" alignment="2" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtUsuarioOracle" alignment="2" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtBancoDadosOracle" alignment="2" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtHostOracle" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtSenhaADS" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtUsuarioADS" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtBancoDadosADS" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtHostADS" alignment="2" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="2" attributes="0">
@@ -894,20 +915,20 @@
                       <Group type="103" groupAlignment="2" attributes="0">
                           <Component id="cmbLojaCliente" alignment="2" min="-2" max="-2" attributes="0"/>
                           <Component id="cmbTipoVenda" alignment="2" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtPortaOracle" alignment="2" min="-2" max="-2" attributes="0"/>
-                          <Component id="btnConectarOracle" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtPortaADS" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnConectarADS" alignment="2" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Component class="vrframework.bean.textField.VRTextField" name="txtUsuarioOracle">
+            <Component class="vrframework.bean.textField.VRTextField" name="txtUsuarioADS">
               <Properties>
                 <Property name="caixaAlta" type="boolean" value="false"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtUsuarioOracleActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtUsuarioADSActionPerformed"/>
               </Events>
             </Component>
             <Component class="vrframework.bean.label.VRLabel" name="vRLabel4">
@@ -915,13 +936,13 @@
                 <Property name="text" type="java.lang.String" value="Usu&#xe1;rio:"/>
               </Properties>
             </Component>
-            <Component class="vrframework.bean.passwordField.VRPasswordField" name="txtSenhaOracle">
+            <Component class="vrframework.bean.passwordField.VRPasswordField" name="txtSenhaADS">
               <Properties>
                 <Property name="caixaAlta" type="boolean" value="false"/>
                 <Property name="mascara" type="java.lang.String" value=""/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtSenhaOracleActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtSenhaADSActionPerformed"/>
               </Events>
             </Component>
             <Component class="vrframework.bean.label.VRLabel" name="vRLabel5">
@@ -929,13 +950,13 @@
                 <Property name="text" type="java.lang.String" value="Senha:"/>
               </Properties>
             </Component>
-            <Component class="vrframework.bean.textField.VRTextField" name="txtPortaOracle">
+            <Component class="vrframework.bean.textField.VRTextField" name="txtPortaADS">
               <Properties>
                 <Property name="text" type="java.lang.String" value="1521"/>
                 <Property name="caixaAlta" type="boolean" value="false"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtPortaOracleActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtPortaADSActionPerformed"/>
               </Events>
             </Component>
             <Component class="vrframework.bean.label.VRLabel" name="vRLabel7">
@@ -948,7 +969,7 @@
                 <Property name="text" type="java.lang.String" value="Banco de Dados"/>
               </Properties>
             </Component>
-            <Component class="vrframework.bean.textField.VRTextField" name="txtHostOracle">
+            <Component class="vrframework.bean.textField.VRTextField" name="txtHostADS">
               <Properties>
                 <Property name="caixaAlta" type="boolean" value="false"/>
               </Properties>
@@ -958,7 +979,7 @@
                 <Property name="text" type="java.lang.String" value="Host:"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JToggleButton" name="btnConectarOracle">
+            <Component class="javax.swing.JToggleButton" name="btnConectarADS">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/vrframework/img/chat/desconectado.png"/>
@@ -966,7 +987,7 @@
                 <Property name="text" type="java.lang.String" value="Conectar"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnConectarOracleActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnConectarADSActionPerformed"/>
               </Events>
             </Component>
             <Component class="vrframework.bean.label.VRLabel" name="vRLabel1">
@@ -974,7 +995,7 @@
                 <Property name="text" type="java.lang.String" value="Loja (Cliente):"/>
               </Properties>
             </Component>
-            <Component class="vrframework.bean.textField.VRTextField" name="txtBancoDadosOracle">
+            <Component class="vrframework.bean.textField.VRTextField" name="txtBancoDadosADS">
               <Properties>
                 <Property name="caixaAlta" type="boolean" value="false"/>
               </Properties>

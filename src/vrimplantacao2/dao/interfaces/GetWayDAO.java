@@ -47,6 +47,7 @@ import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.cadastro.financeiro.ReceberDevolucaoVO;
 import vrimplantacao2.vo.cadastro.financeiro.ReceberVerbaVO;
+import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
@@ -267,6 +268,11 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(rst.getString("MERC2"));
                     imp.setCodMercadologico3(rst.getString("MERC3"));
                     imp.setSituacaoCadastro(("S".equals(rst.getString("ATIVO")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
+                    if(rst.getString("DESATIVACOMPRA") == "S"){
+                        imp.setDescontinuado(true);
+                    }else {
+                        imp.setDescontinuado(false);
+                    }
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.setQtdEmbalagem(rst.getInt("QTD_EMBVENDA") == 0 ? 1 : rst.getInt("QTD_EMBVENDA"));
                     imp.setDataCadastro(rst.getDate("dtinclui"));
@@ -327,13 +333,26 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT "
-                    + "CODFORNEC, RAZAO, FANTASIA, ENDERECO, NUMERO, BAIRRO, "
-                    + "CIDADE, ESTADO, CEP, TELEFONE, FAX, EMAIL, CELULAR, FONE1, "
-                    + "CONTATO, IE, CNPJ_CPF, AGENCIA, BANCO, CONTA,  DTCAD, "
-                    + "VALOR_COMPRA, ATIVO, OBS "
-                    + "FROM "
-                    + "FORNECEDORES "
-                    + "order by codfornec "
+                    + "f.CODFORNEC, f.RAZAO, f.FANTASIA, f.ENDERECO, f.NUMERO, f.BAIRRO, "
+                    + "f.CIDADE, f.ESTADO, f.CEP, f.TELEFONE, f.FAX, f.EMAIL, f.CELULAR, f.FONE1, "
+                    + "f.CONTATO, f.IE, f.CNPJ_CPF, f.AGENCIA, f.BANCO, f.CONTA,  f.DTCAD, "
+                    + "f.VALOR_COMPRA, f.ATIVO, "
+                    + "OBS, "
+                    + "c.descricao as descricaopag, " 
+                    + "f.PENTREGA, "
+                    + "f.PVISITA, "
+                    + "coalesce(case "
+                    + "when CODTIPOFORNEC = 1 then 1 "
+                    + "when CODTIPOFORNEC = 2 then 2 "
+                    + "when CODTIPOFORNEC = 3 then 4 "
+                    + "when CODTIPOFORNEC = 4 then 0 "
+                    + "when CODTIPOFORNEC = 5 then 5 "
+                    + "when CODTIPOFORNEC = 6 then 6 "
+                    + "when CODTIPOFORNEC = 7 then 7 "
+                    + "END, 0) as CODTIPOFORNEC "
+                  + "FROM "
+                  + "FORNECEDORES f left join CONDPAGTO c on (f.CODCONDPAGTO = c.CODCONDPAGTO) "
+                  + "order by codfornec"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -352,8 +371,11 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIe_rg(rst.getString("IE"));
                     imp.setTel_principal(rst.getString("TELEFONE"));
                     imp.setAtivo("S".equals(rst.getString("ATIVO")));
-                    imp.setObservacao(rst.getString("OBS"));
+                    imp.setObservacao(rst.getString("OBS") + "Cond. pag: " 
+                            + Utils.acertarTexto(rst.getString("DESCRICAOPAG")) 
+                            + "Prazo entrega: " + rst.getInt("PENTREGA") + "Prazo visita: " + rst.getInt("PVISITA"));
                     imp.setDatacadastro(rst.getDate("DTCAD"));
+                    imp.setTipoFornecedor(TipoFornecedor.getById(rst.getInt("CODTIPOFORNEC")));
                     if ((rst.getString("FAX") != null)
                             && (!rst.getString("FAX").trim().isEmpty())) {
                         imp.addContato(
@@ -402,14 +424,14 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                             && (!rst.getString("CONTATO").trim().isEmpty())) {
                         imp.addContato(
                                 "5",
-                                "CONTATO",
+                                rst.getString("CONTATO"),
                                 null,
                                 null,
                                 TipoContato.COMERCIAL,
                                 null
                         );
                     }
-
+                    
                     try (Statement stm2 = ConexaoSqlServer.getConexao().createStatement()) {
                         try (ResultSet rst2 = stm2.executeQuery(
                                 "select f.CODFORNEC, cp.CODCONDPAGTO, cp.DESCRICAO, cp.NPARCELAS\n"
@@ -567,6 +589,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "CODCLIE, "
                     + "RAZAO, "
                     + "ENDERECO, "
+                    + "COMPLEMENTO, "
                     + "BAIRRO, "
                     + "CIDADE, "
                     + "ESTADO, "
@@ -603,7 +626,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "WHEN 'V' THEN 3 "
                     + "WHEN 'A' THEN 4 "
                     + "WHEN 'O' THEN 5 ELSE 0 END AS ESTADOCIVILNOVO, "
-                    + "COMPLEMENTO+' '+CONTATO+' '+REF1_NOME+' '+REF2_NOME+' '+FONE1 AS OBS, "
+                    + "coalesce(CONTATO,'')+' '+coalesce(REF1_NOME,'')+' '+coalesce(REF2_NOME,'')+' '+coalesce(FONE1,'') AS OBS, "
                     + "BLOQCARTAO "
                     + "FROM "
                     + "CLIENTES "
@@ -615,6 +638,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rst.getString("CODCLIE"));
                     imp.setRazao(rst.getString("RAZAO"));
                     imp.setEndereco(rst.getString("ENDERECO"));
+                    imp.setComplemento(rst.getString("COMPLEMENTO"));
                     imp.setBairro(rst.getString("BAIRRO"));
                     imp.setNumero(rst.getString("NUMERO"));
                     imp.setMunicipio(rst.getString("CIDADE"));

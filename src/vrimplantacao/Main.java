@@ -14,7 +14,6 @@ public class Main {
     public static void main(String[] args) {
         try {
             Util.setLookAndFeel();
-            
             new PropertiesDAO().verficarConfiguracao();
 
             SplashScreen.show();

@@ -200,7 +200,7 @@ public class Importador {
             opcoes.add(OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC);
         }
         
-        importarProdutoBalanca(opcoes.toArray(new OpcaoProduto[]{}));
+        importarProduto(opcoes.toArray(new OpcaoProduto[]{}));
     }
     
     @Deprecated
@@ -381,7 +381,7 @@ public class Importador {
         CreditoRotativoRepository rep = new CreditoRotativoRepository(provider);
         rep.importarCreditoRotativo(rotativo);
     }
-
+    
     public void unificarCreditoRotativo() throws Exception {
         ProgressBar.setStatus("Carregando crédito rotativo...");
         List<CreditoRotativoIMP> rotativo = getInterfaceDAO().getCreditoRotativo();
