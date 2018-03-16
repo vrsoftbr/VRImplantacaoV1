@@ -60,6 +60,7 @@ public class ClienteRepository {
                 opt.add(OpcaoCliente.SITUACAO_CADASTRO);
                 opt.add(OpcaoCliente.INSCRICAO_ESTADUAL);
                 opt.add(OpcaoCliente.DATA_NASCIMENTO);
+                opt.add(OpcaoCliente.CELULAR);
             }
 
             this.provider.begin();
@@ -147,6 +148,10 @@ public class ClienteRepository {
                             cliente.setId(anterior.getCodigoAtual().getId());
                             atualizarClientePreferencial(cliente, opt);
                         } else if (opt.contains(OpcaoCliente.TELEFONE)) {
+                            cliente = converterClientePreferencial(imp);
+                            cliente.setId(anterior.getCodigoAtual().getId());
+                            atualizarClientePreferencial(cliente, opt);
+                        } else if (opt.contains(OpcaoCliente.CELULAR)) {
                             cliente = converterClientePreferencial(imp);
                             cliente.setId(anterior.getCodigoAtual().getId());
                             atualizarClientePreferencial(cliente, opt);

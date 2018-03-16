@@ -121,11 +121,11 @@ public class NutricionalRepositoryProvider {
     }
 
     public IDStack getIdsVagosFilizola() throws Exception {
-        return this.filizolaDAO.getIdsVagos(9999);
+        return this.filizolaDAO.getIdsVagos(999999);
     }
 
     public IDStack getIdsVagosToledo() throws Exception {
-        return this.toledoDAO.getIdsVagos(9999);
+        return this.toledoDAO.getIdsVagos(999999);
     }
 
     

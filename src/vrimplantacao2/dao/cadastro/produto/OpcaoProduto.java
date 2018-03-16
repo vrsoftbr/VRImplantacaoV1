@@ -149,6 +149,11 @@ public enum OpcaoProduto {
         public String toString() {
             return "Venda (PDV)";
         }        
+    }, EXCECAO {
+        @Override
+        public String toString() {
+            return "Exceção";
+        }
     }, IMPORTAR_RESETAR_BALANCA, IMPORTAR_GERAR_SUBNIVEL_MERC, IMPORTAR_MANTER_BALANCA, 
     CATEGORIA;
     

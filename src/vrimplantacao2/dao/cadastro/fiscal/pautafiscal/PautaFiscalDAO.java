@@ -2,6 +2,8 @@ package vrimplantacao2.dao.cadastro.fiscal.pautafiscal;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
@@ -12,7 +14,7 @@ import vrimplantacao2.vo.enums.OpcaoFiscal;
  *
  * @author Leandro
  */
-class PautaFiscalDAO {
+public class PautaFiscalDAO {
 
     public void atualizar(PautaFiscalVO vo, Set<OpcaoFiscal> opt) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
@@ -55,6 +57,34 @@ class PautaFiscalDAO {
                 vo.setExcecao(rst.getInt("excecao"));
             }
         }
+    }
+
+    public Map<String, Integer> getPautaExcecao(String sistema, String loja) throws Exception {
+        Map<String, Integer> result = new HashMap<>();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	ant.id,\n" +
+                    "	pf.excecao,\n" +
+                    "	lpad(pf.ncm1::varchar,4,'0') || lpad(pf.ncm2::varchar,2,'0') || lpad(pf.ncm3::varchar,2,'0') ncm\n" +
+                    "from\n" +
+                    "	implantacao.codant_pautafiscal ant\n" +
+                    "	join pautafiscal pf on\n" +
+                    "		ant.codigoatual = pf.id\n" +
+                    "where\n" +
+                    "	ant.sistema = '" + sistema + "' and\n" +
+                    "	ant.loja = '" + loja + "'\n" +
+                    "order by\n" +
+                    "	1"
+            )) {
+                while (rst.next()) {
+                    result.put(rst.getString("id"), rst.getInt("excecao"));
+                }
+            }
+        }
+        
+        return result;
     }
     
 }

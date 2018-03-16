@@ -11,6 +11,7 @@ public class ProdutoAutomacaoDescontoVO {
     private long codigoBarras;
     private int id_loja;
     private double desconto;
+    private ProdutoVO produto;
 
     public int getId() {
         return id;
@@ -32,6 +33,14 @@ public class ProdutoAutomacaoDescontoVO {
         this.id = id;
     }
 
+    public ProdutoVO getProduto() {
+        return produto;
+    }
+    
+    public void setProduto(ProdutoVO produto) {
+        this.produto = produto;
+    }
+    
     public void setCodigoBarras(long codigoBarras) {
         if (codigoBarras <= 99999999999999L) {
             this.codigoBarras = codigoBarras;

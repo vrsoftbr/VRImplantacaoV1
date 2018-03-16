@@ -151,9 +151,9 @@ public class InfoStoreDAO {
                     Cell cellDescricao = sheet.getCell(3, i);
 
                     mercadologico1 = Integer.parseInt(cellMercadologico1.getContents().trim());
-                    
-                    if ((cellDescricao.getContents() != null) &&
-                            (!cellDescricao.getContents().trim().isEmpty())) {
+
+                    if ((cellDescricao.getContents() != null)
+                            && (!cellDescricao.getContents().trim().isEmpty())) {
                         descricao = cellDescricao.getContents().trim();
                     } else {
                         descricao = "SEM DESCRICAO";
@@ -230,15 +230,14 @@ public class InfoStoreDAO {
                     } else if (nivel == 3) {
                         mercadologico3 = 1;
                     }
-                    if ((cellDescricao.getContents() != null) &&
-                            (!cellDescricao.getContents().trim().isEmpty())) {
+                    if ((cellDescricao.getContents() != null)
+                            && (!cellDescricao.getContents().trim().isEmpty())) {
                         descricao = cellDescricao.getContents().trim();
                     } else {
                         descricao = "SEM DESCRICAO";
                     }
 
                     //descricao = (cellDescricao.getContents() == null ? "" : cellDescricao.getContents().trim());
-
                     if (mercadologico2 > 0) {
                         MercadologicoVO oMercadologico = new MercadologicoVO();
                         oMercadologico.setMercadologico1(mercadologico1);
@@ -357,13 +356,13 @@ public class InfoStoreDAO {
                     }
 
                     /*if ((cellDataCadastro.getContents() != null)
-                            && (!cellDataCadastro.getContents().trim().isEmpty())) {
-                        dataCadastro = cellDataCadastro.getContents().substring(6, 10);
-                        dataCadastro = dataCadastro + "/" + cellDataCadastro.getContents().substring(3, 5);
-                        dataCadastro = dataCadastro + "/" + cellDataCadastro.getContents().substring(0, 2);
-                        oProduto.setDataCadastro(dataCadastro);
-                    } else {*/
-                        oProduto.setDataCadastro("");
+                     && (!cellDataCadastro.getContents().trim().isEmpty())) {
+                     dataCadastro = cellDataCadastro.getContents().substring(6, 10);
+                     dataCadastro = dataCadastro + "/" + cellDataCadastro.getContents().substring(3, 5);
+                     dataCadastro = dataCadastro + "/" + cellDataCadastro.getContents().substring(0, 2);
+                     oProduto.setDataCadastro(dataCadastro);
+                     } else {*/
+                    oProduto.setDataCadastro("");
                     //}
 
                     if ((cellCodigoGrupo.getContents() != null)
@@ -464,8 +463,8 @@ public class InfoStoreDAO {
                     }
 
                     long codigoProduto;
-                    
-                    if (cellCodigoBarras.getContents().trim().length() > 14) {                    
+
+                    if (cellCodigoBarras.getContents().trim().length() > 14) {
                         codigoProduto = Long.parseLong(Utils.formataNumero(cellCodigoBarras.getContents().trim().substring(0, 14)));
                     } else {
                         codigoProduto = Long.parseLong(Utils.formataNumero(cellCodigoBarras.getContents().trim()));
@@ -526,9 +525,9 @@ public class InfoStoreDAO {
                     }
 
                     oAutomacao.setIdTipoEmbalagem((Utils.converteTipoEmbalagem(cellUnidade.getContents().trim())));
-                    oAutomacao.setIdTipoEmbalagem((oAutomacao.getIdTipoEmbalagem() == -1 ? 0 : oAutomacao.getIdTipoEmbalagem()));                   
+                    oAutomacao.setIdTipoEmbalagem((oAutomacao.getIdTipoEmbalagem() == -1 ? 0 : oAutomacao.getIdTipoEmbalagem()));
                     oProduto.setIdTipoEmbalagem(oAutomacao.getIdTipoEmbalagem());
-                    oAutomacao.setQtdEmbalagem(1);                    
+                    oAutomacao.setQtdEmbalagem(1);
                     oProduto.setSugestaoPedido(true);
                     oProduto.setAceitaMultiplicacaoPdv(true);
                     oProduto.setSazonal(false);
@@ -548,7 +547,7 @@ public class InfoStoreDAO {
 
                     if ((cellPrecoVenda.getContents() != null)
                             && (!cellPrecoVenda.getContents().trim().isEmpty())) {
-                        
+
                         if (Double.parseDouble(cellPrecoVenda.getContents().replace(".", "").replace(",", ".")) > Double.MAX_VALUE) {
                             oComplemento.setPrecoVenda(0);
                         } else {
@@ -709,7 +708,7 @@ public class InfoStoreDAO {
 
                     ProdutoVO oProduto = new ProdutoVO();
                     ProdutoComplementoVO oComplemento = new ProdutoComplementoVO();
-                    
+
                     Cell cellCodigoProduto = sheet.getCell(2, i);
                     Cell cellPrecoVenda = sheet.getCell(58, i);
 
@@ -771,7 +770,7 @@ public class InfoStoreDAO {
                     //Inclui elas nas listas
                     oProduto.getvComplemento().add(oComplemento);
                     oProduto.setId(Integer.parseInt(Utils.formataNumero(cellCodigoProduto.getContents().trim())));
-                    
+
                     oComplemento.setIdLoja(idLoja);
 
                     if (custo) {
@@ -860,7 +859,7 @@ public class InfoStoreDAO {
             throw ex;
         }
     }
-    
+
     private List<ProdutoVO> carregarProdutoPrecoIntegracao(String i_arquivo, int idLoja) throws Exception {
         WorkbookSettings settings = new WorkbookSettings();
         Workbook arquivo = Workbook.getWorkbook(new File(i_arquivo), settings);
@@ -881,7 +880,7 @@ public class InfoStoreDAO {
 
                     ProdutoVO oProduto = new ProdutoVO();
                     ProdutoComplementoVO oComplemento = new ProdutoComplementoVO();
-                    
+
                     Cell cellCodigoProduto = sheet.getCell(1, i);
                     Cell cellCodigoBarras = sheet.getCell(2, i);
                     Cell cellPrecoVenda = sheet.getCell(3, i);
@@ -907,7 +906,7 @@ public class InfoStoreDAO {
                         }
                     } else {
                         oProduto.setCodigoBarras(-2);
-                    }                    
+                    }
 
                     //Inclui elas nas listas
                     oProduto.getvComplemento().add(oComplemento);
@@ -915,8 +914,8 @@ public class InfoStoreDAO {
                     oProduto.setId(Integer.parseInt(cellCodigoProduto.getContents().trim()));
 
                     if ((cellPrecoVenda.getContents() != null)
-                            && (!cellPrecoVenda.getContents().trim().isEmpty()) &&
-                            (!Utils.encontrouLetraCampoNumerico(cellPrecoVenda.getContents().trim()))) {
+                            && (!cellPrecoVenda.getContents().trim().isEmpty())
+                            && (!Utils.encontrouLetraCampoNumerico(cellPrecoVenda.getContents().trim()))) {
                         oComplemento.setPrecoVenda(Double.parseDouble(cellPrecoVenda.getContents().replace(".", "").replace(",", ".")));
                     } else {
                         oComplemento.setPrecoVenda(0);
@@ -930,7 +929,7 @@ public class InfoStoreDAO {
             throw ex;
         }
     }
-    
+
     public void importarProdutoIntegrarPreco(String i_arquivo, int idLoja) throws Exception {
         List<ProdutoVO> vProduto = new ArrayList<>();
         try {
@@ -964,10 +963,10 @@ public class InfoStoreDAO {
 
                     strCodigoBarras = "";
                     codigoBarras = -2;
-                    
+
                     ProdutoVO oProduto = new ProdutoVO();
                     ProdutoComplementoVO oComplemento = new ProdutoComplementoVO();
-                    
+
                     Cell cellCodigoBarras = sheet.getCell(2, i);
                     Cell cellCustoSemImposto = sheet.getCell(3, i);
                     Cell cellCustoComImposto = sheet.getCell(4, i);
@@ -988,28 +987,28 @@ public class InfoStoreDAO {
                         }
                     } else {
                         codigoBarras = -2;
-                    }                    
+                    }
 
                     //Inclui elas nas listas
                     oProduto.getvComplemento().add(oComplemento);
                     oProduto.setCodigoBarras(codigoBarras);
 
                     if ((cellCustoSemImposto.getContents() != null)
-                            && (!cellCustoSemImposto.getContents().trim().isEmpty()) &&
-                            (!Utils.encontrouLetraCampoNumerico(cellCustoSemImposto.getContents().trim()))) {
+                            && (!cellCustoSemImposto.getContents().trim().isEmpty())
+                            && (!Utils.encontrouLetraCampoNumerico(cellCustoSemImposto.getContents().trim()))) {
                         oComplemento.setCustoSemImposto(Double.parseDouble(cellCustoSemImposto.getContents().replace(".", "").replace(",", ".")));
                     } else {
                         oComplemento.setCustoSemImposto(0);
                     }
 
-                    if ((cellCustoComImposto.getContents() != null) &&
-                            (!cellCustoComImposto.getContents().trim().isEmpty()) &&
-                            (!Utils.encontrouLetraCampoNumerico(cellCustoComImposto.getContents().trim()))) {
+                    if ((cellCustoComImposto.getContents() != null)
+                            && (!cellCustoComImposto.getContents().trim().isEmpty())
+                            && (!Utils.encontrouLetraCampoNumerico(cellCustoComImposto.getContents().trim()))) {
                         oComplemento.setCustoComImposto(Double.parseDouble(cellCustoComImposto.getContents().replace(".", "").replace(",", ".")));
                     } else {
                         oComplemento.setCustoComImposto(0);
                     }
-                    
+
                     vProduto.add(oProduto);
                 }
             }
@@ -1018,7 +1017,7 @@ public class InfoStoreDAO {
             throw ex;
         }
     }
-    
+
     public void importarProdutoIntegrarCusto(String i_arquivo, int idLoja) throws Exception {
         List<ProdutoVO> vProduto = new ArrayList<>();
         try {
@@ -1052,10 +1051,10 @@ public class InfoStoreDAO {
 
                     strCodigoBarras = "";
                     codigoBarras = -2;
-                    
+
                     ProdutoVO oProduto = new ProdutoVO();
                     ProdutoComplementoVO oComplemento = new ProdutoComplementoVO();
-                    
+
                     Cell cellCodigoBarras = sheet.getCell(2, i);
                     Cell cellEstoque = sheet.getCell(5, i);
                     Cell cellEstoqueMinimo = sheet.getCell(6, i);
@@ -1077,36 +1076,36 @@ public class InfoStoreDAO {
                         }
                     } else {
                         codigoBarras = -2;
-                    }                    
+                    }
 
                     //Inclui elas nas listas
                     oProduto.getvComplemento().add(oComplemento);
                     oProduto.setCodigoBarras(codigoBarras);
 
-                    if ((cellEstoque.getContents() != null) &&
-                            (!cellEstoque.getContents().trim().isEmpty()) &&
-                            (!Utils.encontrouLetraCampoNumerico(cellEstoque.getContents().trim()))) {
+                    if ((cellEstoque.getContents() != null)
+                            && (!cellEstoque.getContents().trim().isEmpty())
+                            && (!Utils.encontrouLetraCampoNumerico(cellEstoque.getContents().trim()))) {
                         oComplemento.setEstoque(Double.parseDouble(cellEstoque.getContents().replace(".", "").replace(",", ".")));
                     } else {
                         oComplemento.setEstoque(0);
                     }
-                    
-                    if ((cellEstoqueMinimo.getContents() != null) &&
-                            (!cellEstoqueMinimo.getContents().trim().isEmpty()) &&
-                            (!Utils.encontrouLetraCampoNumerico(cellEstoqueMinimo.getContents().trim()))) {
+
+                    if ((cellEstoqueMinimo.getContents() != null)
+                            && (!cellEstoqueMinimo.getContents().trim().isEmpty())
+                            && (!Utils.encontrouLetraCampoNumerico(cellEstoqueMinimo.getContents().trim()))) {
                         oComplemento.setEstoqueMinimo(Double.parseDouble(cellEstoqueMinimo.getContents().replace(".", "").replace(",", ".")));
                     } else {
                         oComplemento.setEstoqueMinimo(0);
                     }
-                    
-                    if ((cellEstoqueMaximo.getContents() != null) &&
-                            (!cellEstoqueMaximo.getContents().trim().isEmpty()) &&
-                            (!Utils.encontrouLetraCampoNumerico(cellEstoqueMaximo.getContents().trim()))) {
+
+                    if ((cellEstoqueMaximo.getContents() != null)
+                            && (!cellEstoqueMaximo.getContents().trim().isEmpty())
+                            && (!Utils.encontrouLetraCampoNumerico(cellEstoqueMaximo.getContents().trim()))) {
                         oComplemento.setEstoqueMaximo(Double.parseDouble(cellEstoqueMaximo.getContents().replace(".", "").replace(",", ".")));
                     } else {
                         oComplemento.setEstoqueMaximo(0);
                     }
-                    
+
                     vProduto.add(oProduto);
                 }
             }
@@ -1115,7 +1114,7 @@ public class InfoStoreDAO {
             throw ex;
         }
     }
-    
+
     public void importarProdutoIntegrarEstoque(String i_arquivo, int idLoja) throws Exception {
         List<ProdutoVO> vProduto = new ArrayList<>();
         try {
@@ -1126,7 +1125,7 @@ public class InfoStoreDAO {
             throw ex;
         }
     }
-    
+
     private List<FornecedorVO> carregarFornecedor(String i_arquivo) throws Exception {
         List<FornecedorVO> vFornecedor = new ArrayList<>();
         WorkbookSettings settings = new WorkbookSettings();
@@ -1447,16 +1446,15 @@ public class InfoStoreDAO {
                             && ("C".equals(cellTipoPessoa.getContents().trim()))) {
 
                         /*if ((cellSituacaoCadastro.getContents() != null)
-                                && (!cellSituacaoCadastro.getContents().trim().isEmpty())) {
-                            if ("False".equals(cellSituacaoCadastro.getContents().trim())) {
-                                idSituacaoCadastro = 0;
-                            } else {
-                                idSituacaoCadastro = 1;
-                            }
-                        } else {
-                            idSituacaoCadastro = 1;
-                        }*/
-
+                         && (!cellSituacaoCadastro.getContents().trim().isEmpty())) {
+                         if ("False".equals(cellSituacaoCadastro.getContents().trim())) {
+                         idSituacaoCadastro = 0;
+                         } else {
+                         idSituacaoCadastro = 1;
+                         }
+                         } else {
+                         idSituacaoCadastro = 1;
+                         }*/
                         if ((cellTipoInscricao.getContents() != null)
                                 && (!cellTipoInscricao.getContents().trim().isEmpty())) {
                             if ("False".equals(cellTipoInscricao.getContents().trim())) {
@@ -1936,11 +1934,11 @@ public class InfoStoreDAO {
             throw ex;
         }
     }
-    
+
     public void importarReceberCheque(String i_arquivo, int idLoja) throws Exception {
         List<ReceberChequeVO> vReceberCheque = new ArrayList<>();
         try {
-            ProgressBar.setStatus("Carregando dados...Receber Cheque Loja " + idLoja+"...");
+            ProgressBar.setStatus("Carregando dados...Receber Cheque Loja " + idLoja + "...");
             vReceberCheque = carregarReceberCheque(i_arquivo, idLoja);
             if (!vReceberCheque.isEmpty()) {
                 new ReceberChequeDAO().salvar(vReceberCheque, idLoja);
@@ -1949,7 +1947,7 @@ public class InfoStoreDAO {
             throw ex;
         }
     }
-    
+
     private Map<Long, ProdutoVO> carregarCodigoBarras(String i_arquivo) throws Exception {
         Map<Long, ProdutoVO> vResult = new HashMap<>();
         WorkbookSettings settings = new WorkbookSettings();
@@ -1971,7 +1969,7 @@ public class InfoStoreDAO {
 
                     Cell cellCodigoProduto = sheet.getCell(2, i);
                     Cell cellEan13 = sheet.getCell(11, i);
-                    
+
                     idProduto = Integer.parseInt(Utils.formataNumero(cellCodigoProduto.getContents().trim()));
                     if ((cellEan13.getContents() != null)
                             && (!cellEan13.getContents().trim().isEmpty())) {
@@ -1999,7 +1997,7 @@ public class InfoStoreDAO {
             throw ex;
         }
     }
-    
+
     public void importarCodigoBarraGetWay(String i_arquivo, int id_loja) throws Exception {
         List<ProdutoVO> vProdutoNovo = new ArrayList<>();
         ProdutoDAO produto = new ProdutoDAO();
@@ -2024,3 +2022,242 @@ public class InfoStoreDAO {
         }
     }
 }
+
+
+/*
+ select
+ m1.grupo merc1_cod,
+ m1.descricao merc_desc,
+ m2.subgrupo merc2_cod,
+ m2.descricao merc2_desc,
+ '1' merc3_cod,
+ m2.descricao merc3_desc
+ from slbdgrup m1
+ inner join slbdsbgp m2 on m2.grupo = m1.grupo
+ order by m1.grupo, m2.subgrupo;
+
+ select 
+ p.produto id,
+ p.barra codigobarras,
+ '1' qtdembalagem,
+ p.unidade,
+ case p.servico when 'B' then 'S' else 'N' end balanca,
+ p.descricao descricaocompleta,
+ p.desc_redu descricaoreduzida,
+ p.desc_etiq descricaogondola,
+ p.grupo cod_mercadologico1,
+ p.desc_grp mercadologico1,
+ p.subgrupo cod_mercadologico2,
+ p.desc_sbg mercadologico2,
+ '1' cod_mercadologico3,
+ p.desc_sbg mercadologico3,
+ '' cod_mercadologico4,
+ '' mercadologico4,
+ '' cod_mercadologico5,
+ '' mercadologico5,
+ '' id_familiaproduto,
+ '' familiaproduto,
+ '0,00' pesobruto,
+ '0,00' pesoliquido,
+ p.dt_cada datacadastro,
+ p.validad validade,
+ p.lucro margem,
+ l.estoqma estoquemaximo,
+ l.estoqmi estoqueminimo,
+ l.estoqlo estoque,
+ l.custopmz custocomimposto,
+ l.custo custosemimposto,
+ p.preco precovenda,
+ case p.inativa when 'N' then 'S' else 'N' end ativo,
+ p.ncm,
+ p.cest,
+ p.pis_cofins piscofins_cst_debito,
+ p.pis_cofins piscofins_cst_credito,
+ '' piscofins_natureza_receita,
+ c.cst icms_cst,
+ c.aliquota icms_aliquota,
+ c.redbase icms_reduzido
+ from slbdprod p
+ left join slbdploj l on l.produto = p.produto
+ left join slbdclas c on c.classe = p.classe;
+
+ select 
+ p.produto id,
+ p.ean13 codigobarras,
+ '1' qtdembalagem,
+ p.unidade,
+ case p.servico when 'B' then 'S' else 'N' end balanca,
+ p.descricao descricaocompleta,
+ p.desc_redu descricaoreduzida,
+ p.desc_etiq descricaogondola,
+ p.grupo cod_mercadologico1,
+ p.desc_grp mercadologico1,
+ p.subgrupo cod_mercadologico2,
+ p.desc_sbg mercadologico2,
+ '1' cod_mercadologico3,
+ p.desc_sbg mercadologico3,
+ '' cod_mercadologico4,
+ '' mercadologico4,
+ '' cod_mercadologico5,
+ '' mercadologico5,
+ '' id_familiaproduto,
+ '' familiaproduto,
+ '0,00' pesobruto,
+ '0,00' pesoliquido,
+ p.dt_cada datacadastro,
+ p.validad validade,
+ p.lucro margem,
+ l.estoqma estoquemaximo,
+ l.estoqmi estoqueminimo,
+ l.estoqlo estoque,
+ l.custopmz custocomimposto,
+ l.custo custosemimposto,
+ p.preco precovenda,
+ case p.inativa when 'N' then 'S' else 'N' end ativo,
+ p.ncm,
+ p.cest,
+ p.pis_cofins piscofins_cst_debito,
+ p.pis_cofins piscofins_cst_credito,
+ '' piscofins_natureza_receita,
+ c.cst icms_cst,
+ c.aliquota icms_aliquota,
+ c.redbase icms_reduzido
+ from slbdprod p
+ left join slbdploj l on l.produto = p.produto
+ left join slbdclas c on c.classe = p.classe;
+
+ /* fornecedores */
+/*select
+ clifor id,
+ nome razao,
+ fantasia,
+ cgc cnpj,
+ insc_est ie_rg,
+ '' insc_municipal,
+ '0' suframa,
+ case ativo when False then 'N' else 'S' end ativo,
+ endereco,
+ numero,
+ '' complemento,
+ bairro,
+ '0' ibge_municipio,
+ cidade municipio,
+ '0' ibge_uf,
+ estado uf,
+ cep,
+ endcobr cob_endereco,
+ numcobr cob_numero,
+ '' cob_complemento,
+ '' cob_bairro,
+ '' cob_ibge_municipio,
+ '' cob_municipio,
+ '' cob_ibge_uf,
+ '' cob_uf,
+ '' cob_cep,
+ telefone tel_principal,
+ '0' qtd_minima_pedido,
+ '0' valor_minimo_pedido,
+ dt_cada datacadastro,
+ obs observacao,
+ '' cont1_nome,
+ tel_come cont1_telefone,
+ tel_celu cont1_celular,
+ email cont1_email,
+ '' cont2_nome,
+ '' cont2_telefone
+ from slbdclfo
+ where tipo = 'F'
+ order by clifor;
+
+ /* produto fornecedor */
+/*select
+ clifor ID_FORNECEDOR,
+ produto ID_PRODUTO,
+ codigo cod_produto_fornecedor
+ from slbdpfor;
+
+ /* cliente preferencial */
+/*select 
+clifor id,
+codigo cnpj,
+insc_est inscricaoestadual,
+'' orgaoemissor,
+nome razao,
+fantasia,
+case ativo when False then 'N' else 'S' end ativo,
+'N' bloqueado,
+'' databloqueio,
+endereco,
+numero,
+'' complemento,
+bairro,
+'' municipioibge,
+cidade municipio,
+'' ibgeuf,
+estado uf,
+cep,
+'NAO' estadocivil,
+nascim datanascimento,
+dt_cada datacadastro,
+'M' sexo,
+loctrab empresa,
+'' empresaendereco,
+'' empresanumero,
+'' empresacomplemento,
+'' empresabairro,
+'' empresamunicipioibge,
+'' empresamunicipio,
+'' empresaufibge,
+'' empresauf,
+'' empresacep,
+te_trab empresatelefone,
+dt_trab dataadmissao,
+'' cargo,
+salario,
+limite valorlimite,
+'' nomeconjuge,
+'' nomepai,
+'' nomemae,
+obs observacao,
+'0' diavencimento,
+'S' permitecreditorotativo,
+'S' permitecheque,
+telefone,
+tel_celu celular,
+email,
+'' fax,
+'' cobrancatelefone,
+'0' prazopagamento,
+endcobr cobrancaendereco,
+numcobr cobrancanumero,
+'' cobrancacomplemento,
+'' cobrancabairro,
+'' cobrancamunicipioibge,
+'' cobrancamunicipio,
+'' cobrancaufibge,
+'' cobrancauf,
+'' cobrancacep,
+'NENHUM' tipoorgaopublico,
+'0' limitecompra,
+'' inscricaomunicipal,
+'NAO CONTRIBUINTE' tipoindicadorie,
+'' id_cliente,
+'' cont1_nome,
+tel_come cont1_telefone,
+'' cont1_email,
+'' cont1_celular,
+'' cont2_nome,
+'' cont2_telefone,
+'' cont2_email,
+'' cont2_celular
+from slbdclfo where tipo = 'C'
+order by clifor;
+
+select * from slbdpfor;
+select * from slbdprod;
+select * from slbdploj;
+select * from slbdclas;
+select * from slbdclfo;
+select * from slbdlanc where pago <> 'S' order by contador;
+select distinct(tipo) from slbdlanc;
+*/

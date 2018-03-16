@@ -10,6 +10,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.utils.MathUtils;
 
 public class NutricionalFilizolaVO {
     private int id = 0;
@@ -222,7 +223,7 @@ public class NutricionalFilizolaVO {
      * @param fibra the fibra to set
      */
     public void setFibra(double fibra) {
-        this.fibra = fibra;
+        this.fibra = MathUtils.trunc(fibra, 1);
     }
 
     /**
