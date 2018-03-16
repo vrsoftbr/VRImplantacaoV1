@@ -257,16 +257,16 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.propeso peso,\n" +
                     "	prc.prlestoq estoque,\n" +
                     "	prc.prlmargind margemunit,\n" +
-                    "	prc.prlctentr custocomimposto,\n" +
-                    "	prc.prlctbal custosemimposto,\n" +
-                    "	prc.prlprven precovenda,\n" +
+                    "	prc.prlctentru custosemimposto,\n" +
+                    "	prc.prlctnfu custocomimposto,\n" +
+                    "	prc.prlprconc1 precovenda,\n" +
                     "	prc.prlforalin id_situacaocadastro,\n" +
                     "	case prc.prlcotacao when 'S' then 1 else 0 end cotacao,\n" +
                     "	p.proclasfisc ncm,\n" +
                     "	p.procest cest,\n" +
                     "	prc.prlcodpiscofe piscofinsentrada,\n" +
                     "	prc.prlcodpiscofs piscofinssaida,\n" +
-                    "	prc.prlcodrec piscofinsnatrec,\n" +
+                    "	prc.prltabpiscof piscofinsnatrec,\n" +
                     "	prc.prlcodtris icmssaidaid,\n" +
                     "	prc.prlcodtrie icmsentradaid,\n" +
                     "	prc.prlprvena precoatacado,\n" +
@@ -505,8 +505,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
                     imp.setIdProduto(rst.getString("idproduto"));
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
-                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));                    
-                    imp.setCustoTabela(MathUtils.round(rst.getDouble("precopacote") / rst.getDouble("qtdembalagem"), 2));                                        
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    //imp.setCustoTabela(MathUtils.round(rst.getDouble("precopacote") / rst.getDouble("qtdembalagem"), 2));                                        
                     
                     result.add(imp);
                 }
@@ -545,13 +545,13 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rst.getString("id"));
                     imp.setDescricao(rst.getString("descricao"));
                     imp.setCaloria(rst.getInt("caloria"));
-                    imp.setCarboidrato(rst.getInt("carboidrato"));
-                    imp.setProteina(rst.getInt("proteina"));
-                    imp.setGordura(rst.getInt("gordura"));
-                    imp.setGorduraSaturada(rst.getInt("gordurasaturada"));
-                    imp.setGorduraTrans(rst.getInt("gorduratrans"));
-                    imp.setFibra(rst.getInt("fibra"));
-                    imp.setSodio(rst.getInt("sodio"));
+                    imp.setCarboidrato(rst.getDouble("carboidrato"));
+                    imp.setProteina(rst.getDouble("proteina"));
+                    imp.setGordura(rst.getDouble("gordura"));
+                    imp.setGorduraSaturada(rst.getDouble("gordurasaturada"));
+                    imp.setGorduraTrans(rst.getDouble("gorduratrans"));
+                    imp.setFibra(rst.getDouble("fibra"));
+                    imp.setSodio(rst.getDouble("sodio"));
                     imp.setPorcao(rst.getString("porcao"));
                     
                     imp.addProduto(rst.getString("id"));
