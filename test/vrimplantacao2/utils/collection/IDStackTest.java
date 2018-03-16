@@ -106,6 +106,33 @@ public class IDStackTest {
     }
     
     @Test
+    public void testPop3() {
+        getDesc("pop3");
+                
+        assertEquals(10L, stack.pop("010"));
+        assertEquals(84L, stack.pop("84"));
+        assertEquals(784L, stack.pop("00784"));
+        
+        assertEquals(1L, stack.pop());
+        assertEquals(5L, stack.pop());
+        assertEquals(12L, stack.pop());
+        assertEquals(18L, stack.pop());
+        assertEquals(23L, stack.pop());
+        assertEquals(31L, stack.pop());
+        assertEquals(43L, stack.pop());
+        assertEquals(48L, stack.pop());
+        assertEquals(50L, stack.pop());
+        assertEquals(53L, stack.pop());
+        assertEquals(61L, stack.pop());
+        assertEquals(78L, stack.pop());
+        assertEquals(86L, stack.pop());
+        assertEquals(99L, stack.pop());
+        assertEquals(201L, stack.pop());
+        assertEquals(416L, stack.pop());
+        assertEquals(986L, stack.pop());
+    }
+    
+    @Test
     public void testClear() {
         getDesc("clear");
         assertEquals(20, this.stack.size());

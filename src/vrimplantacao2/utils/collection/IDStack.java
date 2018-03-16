@@ -5,6 +5,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 
 /**
  * Pilha utilizada para ordenar e trabalhar com IDs vagos, fornecendo sempre
@@ -12,6 +13,8 @@ import java.util.TreeSet;
  * @author Leandro
  */
 public class IDStack {
+    
+    private static final Logger LOG = Logger.getLogger(IDStack.class.getName());
     
     private final long intervalo = 10000;
     private final SortedMap<Long, SortedSet<Long>> stacks = new TreeMap<>();
@@ -42,6 +45,34 @@ public class IDStack {
         }
         if (stack.add(id)) {
             size++;
+        }
+    }
+    
+    /**
+     * Se o ID informado estiver disponível para uso na pilha, retorna esse id
+     * e o remove da pilha de disponíveis, senão retorna o menor ID disponível.
+     * @param strId ID para verificar disponíbilidade.
+     * @return 
+     */
+    public long pop(String strId) {
+        StringBuilder string = new StringBuilder("------------------------\n");
+        try {
+            string.append("IDSTR: ").append(strId).append("\n");
+            long id = Long.parseLong(strId);
+            if (id <= 999999) {
+                string.append("999999 <= TRUE\n");
+                if (getStack(id).contains(id)) {
+                    string.append("ID Disponível\n");
+                    this.remove(id);
+                    return id;
+                }
+            }
+            return this.pop();
+        } catch (NumberFormatException e) {
+            return this.pop();
+        } finally {
+            string.append("------------------------");
+            LOG.finest(string.toString());
         }
     }
     
