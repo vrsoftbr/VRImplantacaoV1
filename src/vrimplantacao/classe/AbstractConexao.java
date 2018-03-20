@@ -40,6 +40,7 @@ public abstract class AbstractConexao {
         senha = i_senha;
 
         try {
+            DriverManager.setLoginTimeout(15);
             setConnection(DriverManager.getConnection(buildStringDeConexao(), usuario, senha));
 
         } catch (Exception ex) {

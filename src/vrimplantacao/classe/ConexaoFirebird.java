@@ -54,6 +54,20 @@ public class ConexaoFirebird {
             throw ex;
         }
     }
+    
+    public static Connection getNewConnection(String host, int port, String database, String user, String pass, String encoding) throws Exception {
+        Class.forName("org.firebirdsql.jdbc.FBDriver");
+
+        try {
+            String extra = "";
+            if (encoding != null && !encoding.equals("")) {
+                extra = "encoding=" + encoding;
+            }
+            return DriverManager.getConnection("jdbc:firebirdsql:" + host + "/" + port + ":" + database + ("".equals(extra) ? "" : "?" + extra), user, pass);
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
 
     public static Connection getConexao() {
         return con;
@@ -66,7 +80,7 @@ public class ConexaoFirebird {
 
         return con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
     }
-
+    
     public void begin() throws Exception {
         if (con == null) {
             testarConexao();
@@ -111,11 +125,8 @@ public class ConexaoFirebird {
     }
 
     public void testarConexao() throws Exception {
-        Statement stm = null;
 
-        try {
-            stm = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-
+        try (Statement stm = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);) {
             stm.execute("SELECT CURRENT_DATE FROM RDB$DATABASE");
             stm.close();
 

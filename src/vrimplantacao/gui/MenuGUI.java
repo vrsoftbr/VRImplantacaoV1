@@ -141,6 +141,7 @@ import vrimplantacao2.gui.interfaces.PomaresGUI;
 import vrimplantacao2.gui.interfaces.SDInformaticaGUI;
 import vrimplantacao2.gui.interfaces.CPGestorGUI;
 import vrimplantacao.gui.interfaces.AlterarProdutoPdvVendaItemGUI;
+import vrimplantacao2.gui.component.sqleditor.SQLEditor;
 import vrimplantacao2.gui.interfaces.AsefeGUI;
 import vrimplantacao2.gui.interfaces.AutoSystemGUI;
 import vrimplantacao2.gui.interfaces.AvanceGUI;
@@ -646,6 +647,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuMapeamentoMercadologico = new javax.swing.JMenuItem();
         mnuImportarNCM = new javax.swing.JMenuItem();
         mnuParametros = new javax.swing.JMenuItem();
+        mnuParametros1 = new javax.swing.JMenuItem();
         mnuJanela = new javax.swing.JMenu();
         mnuAjuda = new javax.swing.JMenu();
         jSeparator4 = new javax.swing.JSeparator();
@@ -1994,6 +1996,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuAvancadas.add(mnuParametros);
+
+        mnuParametros1.setText("Editor SQL");
+        mnuParametros1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuParametros1ActionPerformed(evt);
+            }
+        });
+        mnuAvancadas.add(mnuParametros1);
 
         mnuFerramentas.add(mnuAvancadas);
 
@@ -3616,6 +3626,10 @@ public final class MenuGUI extends VRMdiFrame {
         HipcomGUI.exibir(this);
     }//GEN-LAST:event_mnuHipcomActionPerformed
 
+    private void mnuParametros1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuParametros1ActionPerformed
+        SQLEditor.exibir(this);
+    }//GEN-LAST:event_mnuParametros1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -3764,6 +3778,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuBar mnuMenu;
     private javax.swing.JMenu mnuOrion;
     private javax.swing.JMenuItem mnuParametros;
+    private javax.swing.JMenuItem mnuParametros1;
     private javax.swing.JMenuItem mnuPlanilhaForn;
     private javax.swing.JMenuItem mnuPlanilhaPadrao;
     private javax.swing.JMenuItem mnuPlanilhaV2;
