@@ -17,8 +17,10 @@ import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
+import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoIva;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -624,7 +626,114 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     private String formatPautaFiscalId(String uf, String ncm, double p_iva, double v_iva) {
         return String.format("%s-%s-%.2f-%.2f", uf, ncm, p_iva, v_iva);
     }
-    
-    
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	concat(c.cliloja,'-',c.clicod) id,\n" +
+                    "	c.clicpfcnpj cnpj,\n" +
+                    "	c.clirgie inscricaoestadual,\n" +
+                    "	c.cliorgaopublic,\n" +
+                    "	c.clinome razao,\n" +
+                    "	coalesce(nullif(trim(c.clireduzid),''), c.clinome) fantasia,\n" +
+                    "	1 ativo,\n" +
+                    "	case sit.sitlicsn\n" +
+                    "	when 'S' then 0\n" +
+                    "	else 1 end as bloqueado,\n" +
+                    "	c.cliender endereco,\n" +
+                    "	c.clicompl complemento,\n" +
+                    "	c.clibairro bairro,\n" +
+                    "	c.clicidade cidade,\n" +
+                    "	c.cliestado estado,\n" +
+                    "	c.clicep cep,\n" +
+                    "	c.cliestciv estadocivil,\n" +
+                    "	c.clidtcadas datacadastro,\n" +
+                    "	c.clidtnasc datanascimento,\n" +
+                    "	c.clirazcom empresa,\n" +
+                    "	c.cliendcom endereco_empresa,\n" +
+                    "	c.clibaicom bairro_empresa,\n" +
+                    "	c.clicidcom cidade_empresa,\n" +
+                    "	c.cliestcom estado_empresa,\n" +
+                    "	c.clicepcom cep_empresa,\n" +
+                    "	c.clifonecom telefone_empresa,\n" +
+                    "	c.clirenda salario,\n" +
+                    "	c.clilimite valorlimite,\n" +
+                    "	c.clicontconj conjuge,\n" +
+                    "	c.clinomepai pai,\n" +
+                    "	c.clinomemae mae,\n" +
+                    "	c.clivdd,\n" +
+                    "	c.cliprazopag prazopagamento,\n" +
+                    "	c.clifoneres fone,\n" +
+                    "	c.clifonepro,\n" +
+                    "	c.cliemail email,\n" +
+                    "	c.clicontato,\n" +
+                    "	c.clifax\n" +
+                    "from\n" +
+                    "	clicli c\n" +
+                    "	left join clisit sit on\n" +
+                    "		c.clicodsitu = sit.sitcod\n" +
+                    "order by\n" +
+                    "	1"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setBloqueado(rst.getBoolean("bloqueado"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setCep(rst.getString("cep"));
+                    String estCiv = Utils.acertarTexto(rst.getString("estadocivil"));
+                    if (estCiv.startsWith("CAS")) {
+                        imp.setEstadoCivil(TipoEstadoCivil.CASADO);
+                    } else if (estCiv.startsWith("DIV")) {
+                        imp.setEstadoCivil(TipoEstadoCivil.DIVORCIADO);
+                    } else if (estCiv.startsWith("SOL")) {
+                        imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
+                    } else if (estCiv.startsWith("SEP")) {
+                        imp.setEstadoCivil(TipoEstadoCivil.CASADO);
+                    } else {
+                        imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
+                    }
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setDataNascimento(rst.getDate("datanascimento"));
+                    imp.setEmpresa(rst.getString("empresa"));
+                    imp.setEmpresaEndereco(rst.getString("endereco_empresa"));
+                    imp.setEmpresaBairro(rst.getString("bairro_empresa"));
+                    imp.setEmpresaMunicipio(rst.getString("cidade_empresa"));
+                    imp.setEmpresaUf(rst.getString("estado_empresa"));
+                    imp.setEmpresaCep(rst.getString("cep_empresa"));
+                    imp.setEmpresaTelefone(rst.getString("telefone_empresa"));
+                    imp.setSalario(rst.getDouble("salario"));
+                    imp.setValorLimite(rst.getDouble("valorlimite"));
+                    imp.setNomeConjuge(rst.getString("conjuge"));
+                    imp.setNomePai(rst.getString("pai"));
+                    imp.setNomeMae(rst.getString("mae"));
+                    imp.setPrazoPagamento(rst.getInt("prazopagamento"));
+                    imp.setTelefone(rst.getString("fone"));
+                    imp.setCelular(rst.getString("clifonepro"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.addContato("A", rst.getString("clicontato"), "", "", "");
+                    imp.setFax(rst.getString("clifax"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
     
 }
