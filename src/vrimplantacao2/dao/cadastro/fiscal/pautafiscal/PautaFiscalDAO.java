@@ -62,7 +62,9 @@ public class PautaFiscalDAO {
     public Map<String, Integer> getPautaExcecao(String sistema, String loja) throws Exception {
         Map<String, Integer> result = new HashMap<>();
         
-        try (Statement stm = Conexao.createStatement()) {
+        PautaFiscalAnteriorDAO.createTable();
+        
+        try (Statement stm = Conexao.createStatement()) {            
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
                     "	ant.id,\n" +

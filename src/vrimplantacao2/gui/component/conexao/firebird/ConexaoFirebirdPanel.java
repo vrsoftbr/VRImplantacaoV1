@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package vrimplantacao2.gui.component.conexao.firebird;
 
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
@@ -215,16 +210,16 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
 
     public void validarDadosAcessoMySQL() throws Exception {
         if (txtHost.getText().isEmpty()) {
-            throw new VRException("Favor informar host do banco de dados MySQL!");
+            throw new VRException("Favor informar host do banco de dados Firebird!");
         }
         if (txtPorta.getText().isEmpty()) {
-            throw new VRException("Favor informar a porta do banco de dados MySQL!");
+            throw new VRException("Favor informar a porta do banco de dados Firebird!");
         }
         if (txtDatabase.getArquivo().isEmpty()) {
-            throw new VRException("Favor informar nome do banco de dados MySQL!");
+            throw new VRException("Favor informar nome do banco de dados Firebird!");
         }
         if (txtUsuario.getText().isEmpty()) {
-            throw new VRException("Favor informar o usuário do banco de dados MySQL!");
+            throw new VRException("Favor informar o usuário do banco de dados Firebird!");
         }
 
         if (tabsCon.getSelectedIndex() == 0) {

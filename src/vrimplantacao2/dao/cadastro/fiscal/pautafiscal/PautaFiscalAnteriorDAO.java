@@ -16,7 +16,7 @@ import vrimplantacao2.vo.cadastro.fiscal.pautafiscal.PautaFiscalVO;
  */
 public final class PautaFiscalAnteriorDAO {
     
-    public void createTable() throws Exception {
+    public static void createTable() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute(
                     "create table if not exists implantacao.codant_pautafiscal(\n" +

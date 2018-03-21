@@ -246,7 +246,9 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                             if (chkNutricionalToledo.isSelected()) {
                                 opcoes.add(OpcaoNutricional.TOLEDO);
                             }
-                            importador.importarNutricional(opcoes.toArray(new OpcaoNutricional[] {}));
+                            if (!opcoes.isEmpty()) {
+                                importador.importarNutricional(opcoes.toArray(new OpcaoNutricional[] {}));
+                            }                            
                         }
 
                         if (chkFornecedor.isSelected()) {

@@ -40,7 +40,7 @@ public class CissGUI extends VRInternalFrame {
         txtDatabase.setText(params.getWithNull("RILDA", SISTEMA, "DATABASE"));
         txtPorta.setText(params.getWithNull("50000", SISTEMA, "PORTA"));
         txtUsuario.setText(params.getWithNull("dba", SISTEMA, "USUARIO"));
-        txtSenha.setText(params.getWithNull("overheade", SISTEMA, "SENHA"));
+        txtSenha.setText(params.getWithNull("overhead", SISTEMA, "SENHA"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
