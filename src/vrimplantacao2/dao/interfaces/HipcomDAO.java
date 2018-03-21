@@ -2,7 +2,9 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -13,6 +15,8 @@ import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
+import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -20,11 +24,14 @@ import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoIva;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -36,6 +43,17 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     
     private static final Logger LOG = Logger.getLogger(HipcomDAO.class.getName());
+    
+    private Date rotativoDataInicial;
+    private Date rotativoDataFinal;
+
+    public void setRotativoDataInicial(Date rotativoDataInicial) {
+        this.rotativoDataInicial = rotativoDataInicial;
+    }
+
+    public void setRotativoDataFinal(Date rotativoDataFinal) {
+        this.rotativoDataFinal = rotativoDataFinal;
+    }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
@@ -735,5 +753,88 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyy-MM-dd");
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	concat(r.ctrtipo,'-',r.ctrcod,'-',r.ctrclilj,'-',r.ctrdoc,'-',r.ctrserie,'-',r.ctrparc,'-',r.ctrloja) id,\n" +
+                    "	r.ctrdtemiss dataemissao,\n" +
+                    "	r.ctrdoc numerocupom,\n" +
+                    "	r.ctrcaixa ecf,\n" +
+                    "	r.ctrvalor valor,\n" +
+                    "	r.ctrjuros juros,\n" +
+                    "	r.ctrdesc desconto,\n" +
+                    "	r.ctrvalabt abatimento,\n" +
+                    "	r.ctrsaldo valorfinal,\n" +
+                    "	r.ctrobs observacao,\n" +
+                    "	concat(r.ctrclilj,'-',r.ctrcod) idcliente,\n" +
+                    "	r.ctrdtvenc vencimento,\n" +
+                    "	r.ctrparc parcela\n" +
+                    "from\n" +
+                    "	finctr r\n" +
+                    "where\n" +
+                    "	r.ctrdtemiss >= '" + dateFormat.format(rotativoDataInicial) + "' and\n" +
+                    "	r.ctrdtemiss <= '" + dateFormat.format(rotativoDataFinal) + "' and\n" +
+                    "	r.ctrloja = " + getLojaOrigem() + " and\n" +
+                    "	r.ctrvalor > 0 and r.ctrsaldo > 0 and\n" +
+                    "	r.ctrtipo = 'C'\n" +
+                    "order by\n" +
+                    "	r.ctrdtemiss"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setValor(rst.getDouble("valorfinal"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setIdCliente(rst.getString("idcliente"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setParcela(rst.getInt("parcela"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    ""
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    
+                    imp.setIdProduto(rst.getString(""));
+                    imp.setDataInicio(rst.getDate(""));
+                    imp.setDataFim(rst.getDate(""));
+                    imp.setPrecoOferta(rst.getDouble(""));
+                    imp.setSituacaoOferta(SituacaoOferta.ATIVO);
+                    imp.setTipoOferta(TipoOfertaVO.CAPA);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    
+    
+    
     
 }
