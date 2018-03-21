@@ -151,6 +151,9 @@
             <Property name="text" type="java.lang.String" value="Mapear produto n&#xe3;o cadastrado (EAN)"/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkMapearProdutoEANActionPerformed"/>
+          </Events>
         </Component>
         <Component class="vrframework.bean.button.VRButton" name="btnMapDivergencias">
           <Properties>

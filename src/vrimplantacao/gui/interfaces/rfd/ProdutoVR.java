@@ -1,6 +1,6 @@
 package vrimplantacao.gui.interfaces.rfd;
 
-class ProdutoVR {
+public class ProdutoVR {
     private int id;
     private String descricaoCompleta;
     private String descricaoReduzida;
