@@ -299,7 +299,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
             return result;
-        } else if (opcao == OpcaoProduto.CATEGORIA) {
+        } else if (opcao == OpcaoProduto.SUGESTAO_COTACAO || opcao == OpcaoProduto.SUGESTAO_PEDIDO) {
             List<ProdutoIMP> result = new ArrayList<>();
             try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(

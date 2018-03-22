@@ -258,10 +258,12 @@ public class ProdutoDAO {
             sql.put("ncm2", vo.getNcm().getNcm2());
             sql.put("ncm3", vo.getNcm().getNcm3());
         }
-        if (opt.contains(OpcaoProduto.CATEGORIA)) {
+        if (opt.contains(OpcaoProduto.SUGESTAO_COTACAO)) {
             sql.put("sugestaocotacao", vo.isSugestaoCotacao());
-            sql.put("sugestaopedido", vo.isSugestaoPedido());
         }
+        if (opt.contains(OpcaoProduto.SUGESTAO_PEDIDO)) {
+            sql.put("sugestaopedido", vo.isSugestaoPedido());
+        }        
         if (opt.contains(OpcaoProduto.FABRICANTE)) {
             sql.put("id_fornecedorfabricante", vo.getIdFornecedorFabricante());
         }

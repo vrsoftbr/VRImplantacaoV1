@@ -208,7 +208,6 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="chkTipoEmbProduto" min="-2" max="-2" attributes="0"/>
                               <Component id="chkQtdEmbalagemEAN" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkCategoria" min="-2" max="-2" attributes="0"/>
                               <Component id="chkTipoEmbalagemEAN" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFamilia" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkValidade" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -247,10 +246,7 @@
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="chkT1DescGondola" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="3" attributes="0">
-                                          <Component id="chkT1ProdMercadologico" alignment="3" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkTipoEmbProduto" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      </Group>
+                                      <Component id="chkT1ProdMercadologico" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <Group type="102" attributes="0">
                                       <Component id="chkFamiliaProduto" min="-2" max="-2" attributes="0"/>
@@ -300,11 +296,11 @@
                                           </Group>
                                       </Group>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="chkCategoria" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkTipoEmbProduto" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace pref="31" max="32767" attributes="0"/>
+                          <EmptySpace pref="39" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -431,11 +427,6 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkQtdEmbalagemEAN">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Qtd. Emb. EAN"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCategoria">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Categoria"/>
                   </Properties>
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCustoComImposto">
@@ -981,11 +972,6 @@
           </SubComponents>
         </Container>
         <Component class="vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel" name="vRImportaArquivBalancaPanel2">
-          <Properties>
-            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-              <Border info="null"/>
-            </Property>
-          </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Importar Arquivo de Balan&#xe7;a">

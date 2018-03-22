@@ -197,7 +197,6 @@
                                           </Group>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Group type="103" groupAlignment="0" attributes="0">
-                                              <Component id="chkCategoria" min="-2" max="-2" attributes="0"/>
                                               <Component id="chkQtdEmbalagemEAN" min="-2" max="-2" attributes="0"/>
                                               <Component id="chkTipoEmbalagemEAN" min="-2" max="-2" attributes="0"/>
                                               <Component id="chkFamilia" min="-2" max="-2" attributes="0"/>
@@ -291,7 +290,6 @@
                                   <Group type="103" groupAlignment="3" attributes="0">
                                       <Component id="chkT1AtivoInativo" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkNutricionalToledo" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkCategoria" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
@@ -301,7 +299,7 @@
                               <Component id="vRTextField1" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="txtEstado" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="35" max="32767" attributes="0"/>
+                          <EmptySpace pref="39" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -440,11 +438,6 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkQtdEmbalagemEAN">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Qtd. Emb. EAN"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCategoria">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Categoria"/>
                   </Properties>
                 </Component>
                 <Component class="vrframework.bean.label.VRLabel" name="vRLabel1">

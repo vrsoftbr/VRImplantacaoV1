@@ -412,7 +412,11 @@
                                               <Group type="103" groupAlignment="0" attributes="0">
                                                   <Component id="chkFamilia" alignment="0" min="-2" max="-2" attributes="0"/>
                                                   <Component id="chkTipoEmbalagemEAN" alignment="0" min="-2" max="-2" attributes="0"/>
-                                                  <Component id="chkCategoria" alignment="0" min="-2" max="-2" attributes="0"/>
+                                                  <Group type="102" alignment="0" attributes="0">
+                                                      <Component id="chkSugPedido" min="-2" max="-2" attributes="0"/>
+                                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                                      <Component id="chkSugCotacao" min="-2" max="-2" attributes="0"/>
+                                                  </Group>
                                                   <Component id="chkQtdEmbalagemEAN" alignment="0" min="-2" max="-2" attributes="0"/>
                                                   <Component id="chkOfertas" alignment="0" min="-2" max="-2" attributes="0"/>
                                                   <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
@@ -425,7 +429,7 @@
                                   </Group>
                                   <Component id="btnMapaTribut" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="98" max="32767" attributes="0"/>
+                              <EmptySpace pref="19" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -500,8 +504,9 @@
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="3" attributes="0">
                                           <Component id="chkNutricionalToledo" alignment="3" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkCategoria" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkSugPedido" alignment="3" min="-2" max="-2" attributes="0"/>
                                           <Component id="chkT1NCM" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkSugCotacao" alignment="3" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                               </Group>
@@ -521,7 +526,7 @@
                               </Group>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" attributes="0">
-                                      <EmptySpace pref="6" max="32767" attributes="0"/>
+                                      <EmptySpace pref="10" max="32767" attributes="0"/>
                                       <Component id="btnMapaTribut" min="-2" pref="35" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                   </Group>
@@ -703,9 +708,14 @@
                         <Property name="text" type="java.lang.String" value="Qtd. Emb. EAN"/>
                       </Properties>
                     </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCategoria">
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkSugPedido">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Categoria"/>
+                        <Property name="text" type="java.lang.String" value="Sug. Pedido"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkSugCotacao">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Sug. Cota&#xe7;&#xe3;o"/>
                       </Properties>
                     </Component>
                     <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkOfertas">
@@ -775,7 +785,7 @@
                               <Component id="chkFCondicaoPagamento" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkSituacaoCadastroForn" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="117" max="32767" attributes="0"/>
+                              <EmptySpace pref="125" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -883,7 +893,7 @@
                               <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="140" max="32767" attributes="0"/>
+                              <EmptySpace pref="148" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -956,7 +966,7 @@
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="272" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="280" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
