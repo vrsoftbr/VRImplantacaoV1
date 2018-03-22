@@ -24,7 +24,6 @@ import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoIva;
-import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -292,7 +291,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	prc.prlmargata margematacado,\n" +
                     "	l.lojestado estado,\n" +
                     "	prc.prlpivast p_iva,\n" +
-                    "	prc.prlvivast v_iva\n" +
+                    "	prc.prlvivast v_iva,\n" +
+                    "	prc.prlcotacao sugestaocotacao\n" +
                     "from\n" +
                     "	hippro p\n" +
                     "	left join hiploj l on\n" +
@@ -373,6 +373,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                             rst.getDouble("p_iva"),
                             rst.getDouble("v_iva")
                     ));
+                    imp.setSugestaoCotacao("S".equals(rst.getString("sugestaocotacao")));
                     
                     result.add(imp);
                 }
