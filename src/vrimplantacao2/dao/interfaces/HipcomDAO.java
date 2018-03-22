@@ -25,6 +25,7 @@ import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CompradorIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -292,7 +293,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	l.lojestado estado,\n" +
                     "	prc.prlpivast p_iva,\n" +
                     "	prc.prlvivast v_iva,\n" +
-                    "	prc.prlcotacao sugestaocotacao\n" +
+                    "	prc.prlcotacao sugestaocotacao,\n" +
+                    "	prc.prlcodcmp id_comprador\n" +
                     "from\n" +
                     "	hippro p\n" +
                     "	left join hiploj l on\n" +
@@ -374,6 +376,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                             rst.getDouble("v_iva")
                     ));
                     imp.setSugestaoCotacao("S".equals(rst.getString("sugestaocotacao")));
+                    imp.setIdComprador(rst.getString("id_comprador"));
                     
                     result.add(imp);
                 }
@@ -807,6 +810,30 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+
+    @Override
+    public List<CompradorIMP> getCompradores() throws Exception {
+        List<CompradorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct cmpcod, cmpnome from hipcmp order by 1"
+            )) {
+                while (rst.next()) {
+                    CompradorIMP imp = new CompradorIMP();
+                    
+                    imp.setId(rst.getString("cmpcod"));
+                    imp.setDescricao(rst.getString("cmpnome"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    
 
     @Override
     public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {

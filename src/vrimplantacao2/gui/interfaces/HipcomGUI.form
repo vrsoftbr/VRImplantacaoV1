@@ -323,6 +323,16 @@
                     <Property name="text" type="java.lang.String" value="Sugest&#xe3;o Cota&#xe7;&#xe3;o"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPComprador">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Comprador"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPProdComprador">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Produto Comprador"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="vRPanel2">

@@ -166,6 +166,9 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkPautaFiscal.isSelected()) {
                             importador.importarPautaFiscal(OpcaoFiscal.NOVOS);
                         }
+                        if (chkPComprador.isSelected()) {
+                            importador.importarComprador();
+                        }                        
 
                         {
                             List<OpcaoProduto> opcoes = new ArrayList<>();
@@ -237,6 +240,9 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                             }
                             if (chkPSugestaoCotacao.isSelected()) {
                                 opcoes.add(OpcaoProduto.SUGESTAO_COTACAO);
+                            }
+                            if (chkPProdComprador.isSelected()) {
+                                opcoes.add(OpcaoProduto.COMPRADOR);
                             }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
@@ -372,6 +378,8 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkPDescontinuado = new vrframework.bean.checkBox.VRCheckBox();
         chkPVendaPdv = new vrframework.bean.checkBox.VRCheckBox();
         chkPSugestaoCotacao = new vrframework.bean.checkBox.VRCheckBox();
+        chkPComprador = new vrframework.bean.checkBox.VRCheckBox();
+        chkPProdComprador = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
@@ -540,6 +548,12 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkPSugestaoCotacao.setText("Sugestão Cotação");
         tabProdutos.add(chkPSugestaoCotacao);
+
+        chkPComprador.setText("Comprador");
+        tabProdutos.add(chkPComprador);
+
+        chkPProdComprador.setText("Produto Comprador");
+        tabProdutos.add(chkPProdComprador);
 
         tabImportacao.addTab("Produtos", tabProdutos);
 
@@ -819,7 +833,9 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkNatReceita;
     private vrframework.bean.checkBox.VRCheckBox chkNutricionalFilizola;
     private vrframework.bean.checkBox.VRCheckBox chkNutricionalToledo;
+    private vrframework.bean.checkBox.VRCheckBox chkPComprador;
     private vrframework.bean.checkBox.VRCheckBox chkPDescontinuado;
+    private vrframework.bean.checkBox.VRCheckBox chkPProdComprador;
     private vrframework.bean.checkBox.VRCheckBox chkPSitCadastro;
     private vrframework.bean.checkBox.VRCheckBox chkPSugestaoCotacao;
     private vrframework.bean.checkBox.VRCheckBox chkPVendaPdv;
