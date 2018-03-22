@@ -1,11 +1,19 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
@@ -20,8 +28,12 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 public class AsefeDAO extends InterfaceDAO {
+
+    private static final Logger LOG = Logger.getLogger(AsefeDAO.class.getName());
 
     @Override
     public String getSistema() {
@@ -492,4 +504,383 @@ public class AsefeDAO extends InterfaceDAO {
         }
         return result;
     }
+
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
+
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
+
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new AsefeDAO.VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new AsefeDAO.VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+    }
+
+    private static class VendaIterator implements Iterator<VendaIMP> {
+
+        private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+
+        private Statement stm = ConexaoSqlServer.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaIMP next;
+        private Set<String> uk = new HashSet<>();
+
+        private void obterNext() {
+            try {
+                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaIMP();
+                        String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        if (!uk.add(id)) {
+                            LOG.warning("Venda " + id + " já existe na listagem");
+                        }
+                        next.setId(id);
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                        next.setData(rst.getDate("data"));
+                        next.setIdClientePreferencial(rst.getString("idclientepreferencial"));
+                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
+                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horatermino");
+                        next.setHoraInicio(timestamp.parse(horaInicio));
+                        next.setHoraTermino(timestamp.parse(horaTermino));
+                        next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
+                        next.setCpf(rst.getString("cpf"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
+                        next.setNumeroSerie(rst.getString("numeroserie"));
+                        next.setModeloImpressora(rst.getString("modelo"));
+                        next.setNomeCliente(rst.getString("nomecliente"));
+                        String endereco
+                                = Utils.acertarTexto(rst.getString("endereco")) + ","
+                                + Utils.acertarTexto(rst.getString("numero")) + ","
+                                + Utils.acertarTexto(rst.getString("complemento")) + ","
+                                + Utils.acertarTexto(rst.getString("bairro")) + ","
+                                + Utils.acertarTexto(rst.getString("cidade")) + "-"
+                                + Utils.acertarTexto(rst.getString("estado")) + ","
+                                + Utils.acertarTexto(rst.getString("cep"));
+                        next.setEnderecoCliente(endereco);
+                    }
+                }
+            } catch (SQLException | ParseException ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            this.sql
+                    = "select \n"
+                    + "vc.COO as numerocupom,\n"
+                    + "vc.NumeroCaixa as ecf,\n"
+                    + "vc.Data as data,\n"
+                    + "vc.CodCliente as id_clientepreferencial,\n"
+                    + "MIN(CONVERT(nvarchar(5), Data, 108)) as horainicio,\n"
+                    + "MAX(CONVERT(nvarchar(5), Data, 108)) as horatermino,\n"
+                    + "'N' as cancelado,\n"
+                    + "vc.ValorTotal as subtotalimpressora,\n"
+                    + "vc.CPFConsumidor as cpf,\n"
+                    + "ISNULL(vc.DescAcr, 0) as desconto,\n"
+                    + "0 as acrescimo,\n"
+                    + "(SELECT \n"
+                    + "	DISTINCT\n"
+                    + "	SerieECF\n"
+                    + "	FROM dbo.ExpCucaPrincipal\n"
+                    + "	WHERE \n"
+                    + "	(Data = (SELECT MAX(Data) AS Expr1\n"
+                    + "					FROM dbo.ExpCucaPrincipal AS AUX\n"
+                    + "                   WHERE (SerieECF = dbo.ExpCucaPrincipal.SerieECF)))\n"
+                    + "                   and OrdemECF = vc.OrdemECF\n"
+                    + "                   and CodEmpresa = " + idLojaCliente + "\n"
+                    + ") as numeroserie,\n"
+                    + "(SELECT \n"
+                    + "	DISTINCT\n"
+                    + "	ECF_Mod\n"
+                    + "	FROM dbo.ExpCucaPrincipal\n"
+                    + "	WHERE \n"
+                    + "	(Data = (SELECT MAX(Data) AS Expr1\n"
+                    + "					FROM dbo.ExpCucaPrincipal AS AUX\n"
+                    + "                   WHERE (SerieECF = dbo.ExpCucaPrincipal.SerieECF)))\n"
+                    + "                   and OrdemECF = vc.OrdemECF\n"
+                    + "                   and CodEmpresa = " + idLojaCliente + "\n"
+                    + ") as modelo,\n"
+                    + "'' as marca,\n"
+                    + "vc.NomeConsumidor as nomecliente,\n"
+                    + "vc.Endereco as endereco,\n"
+                    + "'' as numero,\n"
+                    + "'' as complemento,\n"
+                    + "vc.Bairro as bairro,\n"
+                    + "vc.Cidade as cidade,\n"
+                    + "'' as estado,\n"
+                    + "vc.Cep as cep\n"
+                    + "from CE_VendasCaixa vc \n"
+                    + "where vc.CodCliente is null\n"
+                    + "and (vc.Data between CONVERT(datetime, '" + FORMAT.format(dataInicio) + "', 103)\n"
+                    + "		and CONVERT(datetime, '" + FORMAT.format(dataTermino) + "', 103))\n"
+                    + "and vc.CodEmpresa = " + idLojaCliente + "\n"
+                    + "group by \n"
+                    + "vc.COO, \n"
+                    + "vc.NumeroCaixa, \n"
+                    + "vc.Data, \n"
+                    + "vc.CodCliente,\n"
+                    + "vc.ValorTotal,\n"
+                    + "vc.CPFConsumidor,\n"
+                    + "vc.DescAcr,\n"
+                    + "vc.NomeConsumidor,\n"
+                    + "vc.Endereco,\n"
+                    + "vc.Bairro,\n"
+                    + "vc.Cidade,\n"
+                    + "vc.Cep,\n"
+                    + "vc.OrdemECF\n"
+                    + "union all\n"
+                    + "select\n"
+                    + "vc.COO as numerocupom,\n"
+                    + "vc.NumeroCaixa as ecf,\n"
+                    + "vc.Data as data,\n"
+                    + "cli.CodCliente as id_clientepreferencial,\n"
+                    + "MIN(CONVERT(nvarchar(5), Data, 108)) as horainicio,\n"
+                    + "MAX(CONVERT(nvarchar(5), Data, 108)) as horatermino,\n"
+                    + "'N' as cancelado,\n"
+                    + "vc.ValorTotal as subtotalimpressora,\n"
+                    + "cli.CpfCliente as cpf,\n"
+                    + "ISNULL(vc.DescAcr, 0) as desconto,\n"
+                    + "0 as acrescimo,\n"
+                    + "(SELECT \n"
+                    + "	DISTINCT\n"
+                    + "	SerieECF\n"
+                    + "	FROM dbo.ExpCucaPrincipal\n"
+                    + "	WHERE \n"
+                    + "	(Data = (SELECT MAX(Data) AS Expr1\n"
+                    + "					FROM dbo.ExpCucaPrincipal AS AUX\n"
+                    + "                   WHERE (SerieECF = dbo.ExpCucaPrincipal.SerieECF)))\n"
+                    + "                   and OrdemECF = vc.OrdemECF\n"
+                    + "                   and CodEmpresa = " + idLojaCliente + "\n"
+                    + ") as numeroserie,\n"
+                    + "(SELECT \n"
+                    + "	DISTINCT\n"
+                    + "	ECF_Mod\n"
+                    + "	FROM dbo.ExpCucaPrincipal\n"
+                    + "	WHERE \n"
+                    + "	(Data = (SELECT MAX(Data) AS Expr1\n"
+                    + "					FROM dbo.ExpCucaPrincipal AS AUX\n"
+                    + "                   WHERE (SerieECF = dbo.ExpCucaPrincipal.SerieECF)))\n"
+                    + "                   and OrdemECF = vc.OrdemECF\n"
+                    + "                   and CodEmpresa = " + idLojaCliente + "\n"
+                    + ") as modelo,\n"
+                    + "'' as marca,\n"
+                    + "cli.NomeCliente as nomecliente,\n"
+                    + "cli.EnderecoCliente as endereco,\n"
+                    + "cli.NUMERO as numero,\n"
+                    + "'' as complemento,\n"
+                    + "cli.BairroCliente as bairro,\n"
+                    + "cli.CidadeCliente as cidade,\n"
+                    + "cli.UF as estado,\n"
+                    + "cli.CepCliente as cep\n"
+                    + "from CE_VendasCaixa vc\n"
+                    + "left join CONTROLE_CLIENTES.dbo.CC_Clientes cli on cli.CodCliente = vc.CodCliente \n"
+                    + "where vc.CodCliente is not null\n"
+                    + "/*and (vc.Data between CONVERT(datetime, '" + FORMAT.format(dataInicio) + "', 103)\n"
+                    + "		and CONVERT(datetime, '" + FORMAT.format(dataTermino) + "', 103))*/\n"
+                    + "and vc.CodEmpresa = " + idLojaCliente + "\n"
+                    + "group by \n"
+                    + "vc.COO, \n"
+                    + "vc.NumeroCaixa, \n"
+                    + "vc.Data, \n"
+                    + "cli.CodCliente,\n"
+                    + "vc.ValorTotal,\n"
+                    + "cli.CpfCliente,\n"
+                    + "vc.DescAcr,\n"
+                    + "cli.NomeCliente,\n"
+                    + "cli.EnderecoCliente,\n"
+                    + "cli.NUMERO,\n"
+                    + "cli.BairroCliente,\n"
+                    + "cli.CidadeCliente,\n"
+                    + "cli.UF,\n"
+                    + "cli.CepCliente,\n"
+                    + "vc.OrdemECF";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaIMP next() {
+            obterNext();
+            VendaIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+
+    }
+
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+
+        private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+
+        private Statement stm = ConexaoSqlServer.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaItemIMP next;
+
+        private void obterNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaItemIMP();
+                        String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+
+                        next.setId(rst.getString("id"));
+                        next.setVenda(id);
+                        next.setProduto(rst.getString("produto"));
+                        next.setDescricaoReduzida(rst.getString("descricao"));
+                        next.setQuantidade(rst.getDouble("quantidade"));
+                        next.setTotalBruto(rst.getDouble("total"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setCodigoBarras(rst.getString("codigobarras"));
+                        next.setUnidadeMedida(rst.getString("unidade"));
+
+                        String trib = rst.getString("codaliq_venda");
+                        if (trib == null || "".equals(trib)) {
+                            trib = rst.getString("codaliq_produto");
+                        }
+
+                        obterAliquota(next, trib);
+                    }
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        /**
+         * Método temporario, desenvolver um mapeamento eficiente da tributação.
+         *
+         * @param item
+         * @throws SQLException
+         */
+        public void obterAliquota(VendaItemIMP item, String icms) throws SQLException {
+            /*
+             TA	7.00	ALIQUOTA 07%
+             TB	12.00	ALIQUOTA 12%
+             TC	18.00	ALIQUOTA 18%
+             TD	25.00	ALIQUOTA 25%
+             TE	11.00	ALIQUOTA 11%
+             I	0.00	ISENTO
+             F	0.00	SUBST TRIBUTARIA
+             N	0.00	NAO INCIDENTE
+             */
+            int cst;
+            double aliq;
+            switch (icms) {
+                case "TA":
+                    cst = 0;
+                    aliq = 7;
+                    break;
+                case "TB":
+                    cst = 0;
+                    aliq = 12;
+                    break;
+                case "TC":
+                    cst = 0;
+                    aliq = 18;
+                    break;
+                case "TD":
+                    cst = 0;
+                    aliq = 25;
+                    break;
+                case "TE":
+                    cst = 0;
+                    aliq = 11;
+                    break;
+                case "F":
+                    cst = 60;
+                    aliq = 0;
+                    break;
+                case "N":
+                    cst = 41;
+                    aliq = 0;
+                    break;
+                default:
+                    cst = 40;
+                    aliq = 0;
+                    break;
+            }
+            item.setIcmsCst(cst);
+            item.setIcmsAliq(aliq);
+        }
+
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            this.sql
+                    = "select \n"
+                    + "vc.COO as numerocupom,\n"
+                    + "vc.NumeroCaixa as ecf,\n"
+                    + "vc.Data as data,\n"
+                    + "pro.CODPROD_PRODUTOS as produto,\n"
+                    + "pro.DescricaoCompleta as descricao,\n"
+                    + "ISNULL(mov.qtd_mov, 0) quatidade,\n"
+                    + "ISNULL(mov.venda_mov, 0) as total,\n"
+                    + "mov.Cancelada as cancelado,\n"
+                    + "0 as desconto,\n"
+                    + "0 as acrescimo,\n"
+                    + "mov.codbarra_mov as codigobarras,\n"
+                    + "pro.UNIDADE_PRODUTOS as unidade,\n"
+                    + "mov.S_Trib_Aliquota codaliq_venda,\n"
+                    + "'I' as codaliq_produto,\n"
+                    + "'' as trib_desc\n"
+                    + "from CE_VendasCaixa vc\n"
+                    + "inner join CE_MOVIMENTACAO mov on mov.caixa_mov = vc.NumeroCaixa and vc.COO = mov.coo\n"
+                    + "inner join CE_PRODUTOS pro on pro.CODBARRA_PRODUTOS = mov.codbarra_mov \n"
+                    + "where vc.CodEmpresa = " + idLojaCliente + "\n"
+                    + "/*and (vc.Data between CONVERT(datetime, " + FORMAT.format(dataInicio) + ", 103)\n"
+                    + "		and CONVERT(datetime, " + FORMAT.format(dataTermino) + ", 103))";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            obterNext();
+            VendaItemIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+    }
+
 }
