@@ -103,7 +103,7 @@ public class ProdutoDAO {
             sql.put("mercadologico3", vo.getMercadologico().getMercadologico3());
             sql.put("mercadologico4", vo.getMercadologico().getMercadologico4());
             sql.put("mercadologico5", vo.getMercadologico().getMercadologico5());
-            sql.put("id_comprador", 1);
+            sql.put("id_comprador", vo.getIdComprador());
             sql.put("custofinal", 0.0);
             sql.put("id_familiaproduto", vo.getFamiliaProduto() != null ? vo.getFamiliaProduto().getId() : -1, -1);
             sql.put("descricaoreduzida", vo.getDescricaoReduzida());
@@ -252,6 +252,9 @@ public class ProdutoDAO {
             } else {
                 sql.putNull("id_familiaproduto");
             }
+        }
+        if (opt.contains(OpcaoProduto.COMPRADOR)) {
+            sql.put("id_comprador", vo.getIdComprador());
         }
         if (opt.contains(OpcaoProduto.NCM)) {
             sql.put("ncm1", vo.getNcm().getNcm1());

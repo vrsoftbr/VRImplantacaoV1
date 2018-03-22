@@ -17,6 +17,7 @@ import vrimplantacao.vo.vrimplantacao.CestVO;
 import vrimplantacao.vo.vrimplantacao.EstadoVO;
 import vrimplantacao2.dao.cadastro.FamiliaProdutoDAO;
 import vrimplantacao2.dao.cadastro.MercadologicoDAO;
+import vrimplantacao2.dao.cadastro.comprador.CompradorAnteriorDAO;
 import vrimplantacao2.dao.cadastro.fiscal.pautafiscal.PautaFiscalDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto.NcmDAO;
@@ -160,6 +161,14 @@ public class ProdutoRepositoryProvider {
 
     public Map<String, Integer> getPautaExcecao() throws Exception {
         return pautaDao.getPautaExcecao(sistema, loja);
+    }
+
+    /**
+     * Retorna um {@link Map} com os IDs de compradores importados.
+     * @return {@link Map} com os IDs importados.
+     */
+    public Map<String, Integer> getCompradores() throws Exception {
+        return new CompradorAnteriorDAO().getCompradoresImportador(sistema, loja);
     }
 
     

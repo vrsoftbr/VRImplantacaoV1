@@ -21,6 +21,8 @@ import vrimplantacao2.dao.cadastro.cheque.ChequeRepositoryProvider;
 import vrimplantacao2.dao.cadastro.cliente.ClienteRepository;
 import vrimplantacao2.dao.cadastro.cliente.ClienteRepositoryProvider;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.comprador.CompradorRepository;
+import vrimplantacao2.dao.cadastro.comprador.CompradorRepositoryProvider;
 import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.CreditoRotativoProvider;
 import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.CreditoRotativoRepository;
 import vrimplantacao2.dao.cadastro.convenio.conveniado.ConvenioConveniadoRepository;
@@ -60,6 +62,7 @@ import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CompradorIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
@@ -730,6 +733,18 @@ public class Importador {
         );
         NutricionalRepository rep = new NutricionalRepository(provider);
         rep.importar(nutricionais, opt);
+    }
+    
+    public void importarComprador() throws Exception {
+        ProgressBar.setStatus("Compradores...Gerando listagem...");
+        List<CompradorIMP> compradores = getInterfaceDAO().getCompradores();
+        CompradorRepositoryProvider provider = new CompradorRepositoryProvider(
+                getSistema(),
+                getLojaOrigem(),
+                getLojaVR()
+        );
+        CompradorRepository rep = new CompradorRepository(provider);
+        rep.importar(compradores);
     }
 
 }

@@ -132,6 +132,8 @@ public class ProdutoRepository {
                     
                     ProdutoVO prod = converterIMP(imp, id, ean, unidade, eBalanca);
                     
+                    
+                    
                     anterior = converterImpEmAnterior(imp);
                     anterior.setCodigoAtual(prod);
                     ProdutoComplementoVO complemento = converterComplemento(imp);
@@ -579,6 +581,7 @@ public class ProdutoRepository {
 
     
     private Map<String, Integer> fabricantes  = null;
+    private Map<String, Integer> compradores = null;
     
     private String fillNull(String value) {
         return value != null ? value : "";
@@ -598,6 +601,9 @@ public class ProdutoRepository {
         
         if (fabricantes == null) {
             fabricantes = provider.getFornecedoresImportados();
+        }
+        if (compradores == null) {
+            compradores = provider.getCompradores();
         }
         
         ProdutoVO vo = new ProdutoVO();
@@ -711,6 +717,14 @@ public class ProdutoRepository {
         vo.setValidade(imp.getValidade());
         vo.setExcecao(obterPautaFiscal(imp.getPautaFiscalId()));
         vo.setVendaPdv(imp.isVendaPdv());
+        
+        /**
+         * Busca e se existir, relaciona o produto com o comprador.
+         */
+        Integer comprador = compradores.get(imp.getIdComprador());
+        if (comprador != null) {
+            vo.setIdComprador(comprador);
+        }
         
         return vo;
     }

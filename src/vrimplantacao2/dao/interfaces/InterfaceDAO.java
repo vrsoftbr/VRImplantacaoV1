@@ -17,6 +17,7 @@ import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CompradorIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
@@ -347,6 +348,15 @@ public abstract class InterfaceDAO {
      * @throws Exception 
      */    
     public List<NutricionalIMP> getNutricional(Set<OpcaoNutricional> opcoes) throws Exception {
+        return new ArrayList<>();
+    }
+
+    /**
+     * Listagem de compradores.
+     * @return Listagem de compradores a serem importados.
+     * @throws Exception 
+     */
+    public List<CompradorIMP> getCompradores() throws Exception {
         return new ArrayList<>();
     }
     

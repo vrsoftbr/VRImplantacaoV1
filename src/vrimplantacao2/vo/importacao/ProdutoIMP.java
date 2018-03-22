@@ -72,6 +72,7 @@ public class ProdutoIMP {
     
     private String pautaFiscalId;
     private boolean vendaPdv = true;
+    private String idComprador;
     
     public String getImportSistema() {
         return importSistema;
@@ -531,6 +532,14 @@ public class ProdutoIMP {
 
     public void setVendaPdv(boolean vendaPdv) {
         this.vendaPdv = vendaPdv;
+    }
+
+    public String getIdComprador() {
+        return idComprador;
+    }
+
+    public void setIdComprador(String idComprador) {
+        this.idComprador = idComprador;
     }
 
 }
