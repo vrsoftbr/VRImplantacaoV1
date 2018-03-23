@@ -239,7 +239,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                                             + "	 bar.QTD qtd_emb\n"
                                         + " from\n"
                                             + "  embalagens bar\n"
-                                          + "and len(bar.barra_emb) > 6\n"
+                                        + "where len(bar.barra_emb) > 6\n"
                                     + "union all\n"
                                        + "select\n"
                                               + "pro.codprod,\n"
@@ -330,27 +330,28 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         List<FornecedorIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT "
-                    + "f.CODFORNEC, f.RAZAO, f.FANTASIA, f.ENDERECO, f.NUMERO, f.BAIRRO, "
-                    + "f.CIDADE, f.ESTADO, f.CEP, f.TELEFONE, f.FAX, f.EMAIL, f.CELULAR, f.FONE1, "
-                    + "f.CONTATO, f.IE, f.CNPJ_CPF, f.AGENCIA, f.BANCO, f.CONTA,  f.DTCAD, "
-                    + "f.VALOR_COMPRA, f.ATIVO, "
-                    + "OBS, "
-                    + "c.descricao as descricaopag, "
-                    + "f.PENTREGA, "
-                    + "f.PVISITA, "
-                    + "coalesce(case "
-                    + "when CODTIPOFORNEC = 1 then 1 "
-                    + "when CODTIPOFORNEC = 2 then 2 "
-                    + "when CODTIPOFORNEC = 3 then 4 "
-                    + "when CODTIPOFORNEC = 4 then 0 "
-                    + "when CODTIPOFORNEC = 5 then 5 "
-                    + "when CODTIPOFORNEC = 6 then 6 "
-                    + "when CODTIPOFORNEC = 7 then 7 "
-                    + "END, 0) as CODTIPOFORNEC "
-                    + "FROM "
-                    + "FORNECEDORES f left join CONDPAGTO c on (f.CODCONDPAGTO = c.CODCONDPAGTO) "
-                    + "order by codfornec"
+                    "select \n" +
+                    "    f.codfornec, f.razao, f.fantasia, f.endereco, f.numero, f.bairro, \n" +
+                    "    f.cidade, f.estado, f.cep, f.telefone, f.fax, f.email, f.celular, f.fone1, \n" +
+                    "    f.contato, f.ie, f.cnpj_cpf, f.agencia, f.banco, f.conta,  f.dtcad, \n" +
+                    "    f.valor_compra, f.ativo, \n" +
+                    "    obs, \n" +
+                    "    c.descricao as descricaopag, \n" +
+                    "    f.pentrega, \n" +
+                    "    f.pvisita, \n" +
+                    "    coalesce(case \n" +
+                    "    when codtipofornec = 1 then 0 \n" +
+                    "    when codtipofornec = 2 then 1 \n" +
+                    "    when codtipofornec = 3 then 4 \n" +
+                    "    when codtipofornec = 4 then 3 \n" +
+                    "    when codtipofornec = 5 then 5 \n" +
+                    "    when codtipofornec = 6 then 6 \n" +
+                    "    when codtipofornec = 7 then 7\n" +
+                    "    when codtipofornec = 8 then 8 \n" +
+                    "    end, 9) as codtipofornec \n" +
+                "    from \n" +
+                "    fornecedores f left join condpagto c on (f.codcondpagto = c.codcondpagto) \n" +
+                "    order by codfornec"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -369,9 +370,9 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIe_rg(rst.getString("IE"));
                     imp.setTel_principal(rst.getString("TELEFONE"));
                     imp.setAtivo("S".equals(rst.getString("ATIVO")));
-                    imp.setObservacao(rst.getString("OBS") + "Cond. pag: "
+                    imp.setObservacao(rst.getString("OBS") + " Cond. pag: "
                             + Utils.acertarTexto(rst.getString("DESCRICAOPAG"))
-                            + "Prazo entrega: " + rst.getInt("PENTREGA") + "Prazo visita: " + rst.getInt("PVISITA"));
+                            + " Prazo entrega: " + rst.getInt("PENTREGA") + " Prazo visita: " + rst.getInt("PVISITA"));
                     imp.setDatacadastro(rst.getDate("DTCAD"));
                     imp.setTipoFornecedor(TipoFornecedor.getById(rst.getInt("CODTIPOFORNEC")));
                     if ((rst.getString("FAX") != null)
