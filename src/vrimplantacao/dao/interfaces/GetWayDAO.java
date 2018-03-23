@@ -1819,7 +1819,7 @@ public class GetWayDAO {
 
             sql.append("SELECT promo.CODPROD, promo.DATAINI, promo.DATAFIM, promo.BARRA,   ");
             sql.append("       prod.PRECO_UNIT as PRECONORMAL, promo.PRECO_UNIT as  PRECOOFERTA ");
-            sql.append("  FROM [GWOLAP].[dbo].PROMOCAO promo ");
+            sql.append(" FROM [GWOLAP].[dbo].PROMOCAO promo ");
             sql.append("INNER JOIN PRODUTOS prod ON ");
             sql.append("     prod.CODPROD = promo.CODPROD ");
             sql.append("WHERE promo.DATAFIM >= '2016-02-18' ");

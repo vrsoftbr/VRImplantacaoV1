@@ -17,18 +17,19 @@ public class ImportacaoLogVendaGUI extends VRInternalFrame {
 
     private List<LojaVO> vLojaDestino = new ArrayList<>();
     LogVendaDAO dao = new LogVendaDAO();
+
     public ImportacaoLogVendaGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
         centralizarForm();
-        
+
         chkExibeDivergenciaProduto.setSelected(true);
         flcArquivo.setMultiplosSelecionados(true);
-        
+
         vLojaDestino = new LojaDAO().carregar();
-        
-        carregarLojaDestino();        
+
+        carregarLojaDestino();
     }
 
     public void carregarLojaDestino() throws Exception {
@@ -38,13 +39,13 @@ public class ImportacaoLogVendaGUI extends VRInternalFrame {
         }
 
     }
-    
+
     @Override
     public void importar() throws Exception {
         Util.validarCampoTela(this.getCampoObrigatorio());
         Thread thread = new Thread() {
             int idLojaDestino = cmbLoja.getId();
-            
+
             @Override
             public void run() {
                 try {
@@ -53,10 +54,10 @@ public class ImportacaoLogVendaGUI extends VRInternalFrame {
 
                     String[] arquivos = flcArquivo.getArquivo().split(";");
                     ArrayList<DivergenciaVO> vDivergencia = new ArrayList();
-                            
-                    for(String arq : arquivos){
+
+                    for (String arq : arquivos) {
                         vDivergencia = dao.importar(arq, chkExibeDivergenciaProduto.isSelected(),
-                                chkVerificarCodAnterior.isSelected(), chkVerificarCodigoBarras.isSelected(), 
+                                chkVerificarCodAnterior.isSelected(), chkVerificarCodigoBarras.isSelected(),
                                 idLojaDestino);
                     }
 
@@ -74,7 +75,6 @@ public class ImportacaoLogVendaGUI extends VRInternalFrame {
                         Util.exibirMensagem("Arquivo(s) importado(s) com sucesso!", getTitle());
                     }
 
-
                 } catch (Exception ex) {
                     ProgressBar.dispose();
                     Util.exibirMensagemErro(ex, getTitle());
@@ -85,7 +85,7 @@ public class ImportacaoLogVendaGUI extends VRInternalFrame {
         thread.start();
     }
 
-    
+
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -125,6 +125,11 @@ public class ImportacaoLogVendaGUI extends VRInternalFrame {
 
         chkMapearProdutoEAN.setText("Mapear produto não cadastrado (EAN)");
         chkMapearProdutoEAN.setEnabled(false);
+        chkMapearProdutoEAN.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkMapearProdutoEANActionPerformed(evt);
+            }
+        });
 
         btnMapDivergencias.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
         btnMapDivergencias.setText("Divergências");
@@ -282,6 +287,10 @@ public class ImportacaoLogVendaGUI extends VRInternalFrame {
     private void btnMapDivergenciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapDivergenciasActionPerformed
         ItensNaoExistenteGUI.exibir(this.mdiFrame);
     }//GEN-LAST:event_btnMapDivergenciasActionPerformed
+
+    private void chkMapearProdutoEANActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkMapearProdutoEANActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkMapearProdutoEANActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.label.VRLabel Arquivo;

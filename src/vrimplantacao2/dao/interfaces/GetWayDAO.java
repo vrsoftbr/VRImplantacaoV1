@@ -49,6 +49,7 @@ import vrimplantacao2.vo.cadastro.financeiro.ReceberDevolucaoVO;
 import vrimplantacao2.vo.cadastro.financeiro.ReceberVerbaVO;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -85,6 +86,36 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     result.add(new Estabelecimento(rst.getString("id"), rst.getString("descricao")));
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select p.codprod, "
+                    + "   cast(p.dataini as date) as dataini, "
+                    + "	  cast(p.datafim as date) as datafim, "
+                    + "	  p.preco_unit precooferta, "
+                    + "   prod.preco_unit as preconormal "
+                    + "from  promocao p "
+                    + "inner join  produtos prod on p.codprod = prod.codprod "
+                    + "where  datafim >= '" + new SimpleDateFormat("yyyy-MM-dd").format(dataTermino) + "' "
+                    + "order  by  p.dataini"
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    imp.setIdProduto(rst.getString("codprod"));
+                    imp.setDataInicio(rst.getDate("dataini"));
+                    imp.setDataFim(rst.getDate("datafim"));
+                    imp.setPrecoOferta(rst.getDouble("precooferta"));
+                    result.add(imp);
                 }
             }
         }
@@ -157,100 +188,67 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         double valIcmsCredito;
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "    fam.codfamilia,\n"
-                    + "    prod.validade,\n"
-                    + "    prod.codprod,\n"
-                    + "    prod.descricao,\n"
-                    + "    prod.desc_pdv,\n"
-                    + "    coalesce(merc.codcreceita, 1) as merc1,\n"
-                    + "    coalesce(merc.codgrupo, 1) as merc2,\n"
-                    + "    coalesce(merc.codcategoria, 1) as merc3,\n"
-                    + "    prod.codaliq,\n"
-                    + "    prod.barra ean,\n"
-                    + "    prod.unidade,\n"
-                    + "    prod.estoque,\n"
-                    + "    prod.preco_cust,\n"
-                    + "    prod.preco_unit,\n"
-                    + "    prod.margem_bruta,\n"
-                    + "    prod.margem_param,\n"
-                    + "    prod.codaliq_nf,\n"
-                    + "    prod.obs,\n"
-                    + "    prod.dtaltera,\n"
-                    + "    prod.dtinclui,\n"
-                    + "    prod.qtd_emb,\n"
-                    + "    prod.preco_especial,\n"
-                    + "    prod.cst_pisentrada,\n"
-                    + "    prod.cst_pissaida,\n"
-                    + "    prod.cst_cofinsentrada,\n"
-                    + "    prod.cst_cofinssaida,\n"
-                    + "    prod.nat_rec,\n"
-                    + "    prod.generoitem_sef2,\n"
-                    + "    prod.aliquota_ibpt,\n"
-                    + "    prod.aliquota_ibptest,\n"
-                    + "    prod.aliquota_ibptmun,\n"
-                    + "    prod.codncm,\n"
-                    + "    prod.ativo,\n"
-                    + "    prod.codcest,\n"
-                    + "    prod.qtd_embvenda,\n"
-                    + "    prod.codaliq cst_debito,\n"
-                    + "    prod.codaliq_nf cst_entrada,\n"
-                    + "    prod.codcest,\n"
-                    + "    prod.dtinclui,\n"
-                    + "    prod.desativacompra\n"
-                    + "from\n"
-                    + "    produtos prod\n"
-                    + "    left outer join categoria merc on merc.codcreceita = prod.codcreceita and merc.codgrupo = prod.codgrupo and merc.codcategoria = prod.codcategoria\n"
-                    + "    left outer join prod_familia fam on fam.codprod = prod.codprod and prod.codprod > 0\n"
-                    + "union all\n"
-                    + "select\n"
-                    + "    fam.codfamilia,\n"
-                    + "    prod.validade,\n"
-                    + "    prod.codprod,\n"
-                    + "    prod.descricao,\n"
-                    + "    prod.desc_pdv,\n"
-                    + "    coalesce(merc.codcreceita, 1) as merc1,\n"
-                    + "    coalesce(merc.codgrupo, 1) as merc2,\n"
-                    + "    coalesce(merc.codcategoria, 1) as merc3,\n"
-                    + "    prod.codaliq,\n"
-                    + "    bar.barra ean,\n"
-                    + "    prod.unidade,\n"
-                    + "    prod.estoque,\n"
-                    + "    prod.preco_cust,\n"
-                    + "    prod.preco_unit,\n"
-                    + "    prod.margem_bruta,\n"
-                    + "    prod.margem_param,\n"
-                    + "    prod.codaliq_nf,\n"
-                    + "    prod.obs,\n"
-                    + "    prod.dtaltera,\n"
-                    + "    prod.dtinclui,\n"
-                    + "    prod.qtd_emb,\n"
-                    + "    prod.preco_especial,\n"
-                    + "    prod.cst_pisentrada,\n"
-                    + "    prod.cst_pissaida,\n"
-                    + "    prod.cst_cofinsentrada,\n"
-                    + "    prod.cst_cofinssaida,\n"
-                    + "    prod.nat_rec,\n"
-                    + "    prod.generoitem_sef2,\n"
-                    + "    prod.aliquota_ibpt,\n"
-                    + "    prod.aliquota_ibptest,\n"
-                    + "    prod.aliquota_ibptmun,\n"
-                    + "    prod.codncm,\n"
-                    + "    prod.ativo,\n"
-                    + "    prod.codcest,\n"
-                    + "    prod.qtd_embvenda,\n"
-                    + "    prod.codaliq cst_debito,\n"
-                    + "    prod.codaliq_nf cst_credito,\n"
-                    + "    prod.codcest,\n"
-                    + "    prod.dtinclui,\n"
-                    + "    prod.desativacompra\n"
-                    + "from\n"
-                    + "    produtos prod\n"
-                    + "    left outer join categoria merc on merc.codcreceita = prod.codcreceita and merc.codgrupo = prod.codgrupo and merc.codcategoria = prod.codcategoria\n"
-                    + "    left outer join prod_familia fam on fam.codprod = prod.codprod and prod.codprod > 0\n"
-                    + "    inner join alternativo bar on bar.codprod = prod.codprod and len(bar.barra) > 6\n"
-                    + "order by\n"
-                    + "    prod.codprod"
+                   "select\n"
+                    + "	 fam.codfamilia,\n"
+                    + "	 prod.validade,\n"
+                    + "	 prod.codprod,\n"
+                    + "	 prod.descricao,\n"
+                    + "	 prod.desc_pdv,\n"
+                    + "	 coalesce(merc.codcreceita, 1) as merc1,\n"
+                    + "	 coalesce(merc.codgrupo, 1) as merc2,\n"
+                    + "	 coalesce(merc.codcategoria, 1) as merc3,\n"
+                    + "	 prod.codaliq,\n"
+                    + "	 x.ean,\n"
+                    + "	 prod.unidade,\n"
+                    + "	 prod.estoque,\n"
+                    + "	 prod.preco_cust,\n"
+                    + "	 prod.preco_unit,\n"
+                    + "	 prod.margem_bruta,\n"
+                    + "	 prod.margem_param,\n"
+                    + "	 prod.codaliq_nf,\n"
+                    + "	 prod.obs,\n"
+                    + "	 prod.dtaltera,\n"
+                    + "	 prod.dtinclui,\n"
+                    + "	 x.qtd_emb,\n"
+                    + "	 prod.preco_especial,\n"
+                    + "	 prod.cst_pisentrada,\n"
+                    + "	 prod.cst_pissaida,\n"
+                    + "	 prod.cst_cofinsentrada,\n"
+                    + "	 prod.cst_cofinssaida,\n"
+                    + "	 prod.nat_rec,\n"
+                    + "	 prod.generoitem_sef2,\n"
+                    + "	 prod.aliquota_ibpt,\n"
+                    + "	 prod.aliquota_ibptest,\n"
+                    + "	 prod.aliquota_ibptmun,\n"
+                    + "	 prod.codncm,\n"
+                    + "	 prod.ativo,\n"
+                    + "	 prod.codcest,\n"
+                    + "	 prod.qtd_embvenda,\n"
+                    + "	 prod.codaliq cst_debito,\n"
+                    + "	 prod.codaliq_nf cst_entrada,\n"
+                    + "	 prod.codcest,\n"
+                    + "	 prod.dtinclui,\n"
+                    + "	 prod.desativacompra\n"
+                  + "from\n"
+                    + "	 produtos prod\n"
+                    + "	 left outer join categoria merc on merc.codcreceita = prod.codcreceita and merc.codgrupo = prod.codgrupo and merc.codcategoria = prod.codcategoria\n"
+                    + "	 left outer join prod_familia fam on fam.codprod = prod.codprod and prod.codprod > 0\n"
+                    + "	 left outer join (select\n"                                         
+                                            + "  bar.codprod,\n"                                            
+                                            + "  bar.barra_emb ean,\n"                                            
+                                            + "	 bar.QTD qtd_emb\n"
+                                        + " from\n"
+                                            + "  embalagens bar\n"
+                                        + "where len(bar.barra_emb) > 6\n"
+                                    + "union all\n"
+                                       + "select\n"
+                                              + "pro.codprod,\n"
+                                              + "pro.barra ean,\n"
+                                              + "pro.qtd_emb\n"
+                                         + "from produtos pro\n"
+                                        + "where len(pro.barra) > 6) x\n"
+                   + "on x.CODPROD = prod.CODPROD\n"
+                     + " order by prod.descricao"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
@@ -268,13 +266,13 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(rst.getString("MERC2"));
                     imp.setCodMercadologico3(rst.getString("MERC3"));
                     imp.setSituacaoCadastro(("S".equals(rst.getString("ATIVO")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
-                    if(rst.getString("DESATIVACOMPRA") == "S"){
+                    if (rst.getString("DESATIVACOMPRA") == "S") {
                         imp.setDescontinuado(true);
-                    }else {
+                    } else {
                         imp.setDescontinuado(false);
                     }
                     imp.setTipoEmbalagem(rst.getString("unidade"));
-                    imp.setQtdEmbalagem(rst.getInt("QTD_EMBVENDA") == 0 ? 1 : rst.getInt("QTD_EMBVENDA"));
+                    imp.setQtdEmbalagem(rst.getInt("qtd_emb") == 0 ? 1 : rst.getInt("qtd_emb"));
                     imp.setDataCadastro(rst.getDate("dtinclui"));
                     if (usarMargemBruta) {
                         imp.setMargem(rst.getDouble("margem_bruta"));
@@ -332,27 +330,28 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         List<FornecedorIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT "
-                    + "f.CODFORNEC, f.RAZAO, f.FANTASIA, f.ENDERECO, f.NUMERO, f.BAIRRO, "
-                    + "f.CIDADE, f.ESTADO, f.CEP, f.TELEFONE, f.FAX, f.EMAIL, f.CELULAR, f.FONE1, "
-                    + "f.CONTATO, f.IE, f.CNPJ_CPF, f.AGENCIA, f.BANCO, f.CONTA,  f.DTCAD, "
-                    + "f.VALOR_COMPRA, f.ATIVO, "
-                    + "OBS, "
-                    + "c.descricao as descricaopag, " 
-                    + "f.PENTREGA, "
-                    + "f.PVISITA, "
-                    + "coalesce(case "
-                    + "when CODTIPOFORNEC = 1 then 1 "
-                    + "when CODTIPOFORNEC = 2 then 2 "
-                    + "when CODTIPOFORNEC = 3 then 4 "
-                    + "when CODTIPOFORNEC = 4 then 0 "
-                    + "when CODTIPOFORNEC = 5 then 5 "
-                    + "when CODTIPOFORNEC = 6 then 6 "
-                    + "when CODTIPOFORNEC = 7 then 7 "
-                    + "END, 0) as CODTIPOFORNEC "
-                  + "FROM "
-                  + "FORNECEDORES f left join CONDPAGTO c on (f.CODCONDPAGTO = c.CODCONDPAGTO) "
-                  + "order by codfornec"
+                    "select \n" +
+                    "    f.codfornec, f.razao, f.fantasia, f.endereco, f.numero, f.bairro, \n" +
+                    "    f.cidade, f.estado, f.cep, f.telefone, f.fax, f.email, f.celular, f.fone1, \n" +
+                    "    f.contato, f.ie, f.cnpj_cpf, f.agencia, f.banco, f.conta,  f.dtcad, \n" +
+                    "    f.valor_compra, f.ativo, \n" +
+                    "    obs, \n" +
+                    "    c.descricao as descricaopag, \n" +
+                    "    f.pentrega, \n" +
+                    "    f.pvisita, \n" +
+                    "    coalesce(case \n" +
+                    "    when codtipofornec = 1 then 0 \n" +
+                    "    when codtipofornec = 2 then 1 \n" +
+                    "    when codtipofornec = 3 then 4 \n" +
+                    "    when codtipofornec = 4 then 3 \n" +
+                    "    when codtipofornec = 5 then 5 \n" +
+                    "    when codtipofornec = 6 then 6 \n" +
+                    "    when codtipofornec = 7 then 7\n" +
+                    "    when codtipofornec = 8 then 8 \n" +
+                    "    end, 9) as codtipofornec \n" +
+                "    from \n" +
+                "    fornecedores f left join condpagto c on (f.codcondpagto = c.codcondpagto) \n" +
+                "    order by codfornec"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -371,9 +370,9 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIe_rg(rst.getString("IE"));
                     imp.setTel_principal(rst.getString("TELEFONE"));
                     imp.setAtivo("S".equals(rst.getString("ATIVO")));
-                    imp.setObservacao(rst.getString("OBS") + "Cond. pag: " 
-                            + Utils.acertarTexto(rst.getString("DESCRICAOPAG")) 
-                            + "Prazo entrega: " + rst.getInt("PENTREGA") + "Prazo visita: " + rst.getInt("PVISITA"));
+                    imp.setObservacao(rst.getString("OBS") + " Cond. pag: "
+                            + Utils.acertarTexto(rst.getString("DESCRICAOPAG"))
+                            + " Prazo entrega: " + rst.getInt("PENTREGA") + " Prazo visita: " + rst.getInt("PVISITA"));
                     imp.setDatacadastro(rst.getDate("DTCAD"));
                     imp.setTipoFornecedor(TipoFornecedor.getById(rst.getInt("CODTIPOFORNEC")));
                     if ((rst.getString("FAX") != null)
@@ -431,7 +430,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                                 null
                         );
                     }
-                    
+
                     try (Statement stm2 = ConexaoSqlServer.getConexao().createStatement()) {
                         try (ResultSet rst2 = stm2.executeQuery(
                                 "select f.CODFORNEC, cp.CODCONDPAGTO, cp.DESCRICAO, cp.NPARCELAS\n"
@@ -1326,14 +1325,14 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
          */
         public void obterAliquota(VendaItemIMP item, String icms) throws SQLException {
             /*
-            TA	7.00	ALIQUOTA 07%
-            TB	12.00	ALIQUOTA 12%
-            TC	18.00	ALIQUOTA 18%
-            TD	25.00	ALIQUOTA 25%
-            TE	11.00	ALIQUOTA 11%
-            I	0.00	ISENTO
-            F	0.00	SUBST TRIBUTARIA
-            N	0.00	NAO INCIDENTE
+             TA	7.00	ALIQUOTA 07%
+             TB	12.00	ALIQUOTA 12%
+             TC	18.00	ALIQUOTA 18%
+             TD	25.00	ALIQUOTA 25%
+             TE	11.00	ALIQUOTA 11%
+             I	0.00	ISENTO
+             F	0.00	SUBST TRIBUTARIA
+             N	0.00	NAO INCIDENTE
              */
             int cst;
             double aliq;

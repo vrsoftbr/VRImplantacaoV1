@@ -61,7 +61,6 @@ import vrimplantacao.vo.vrimplantacao.ReceberCreditoRotativoVO;
 public class KairosDAO {
 
     //CARREGAMENTOS
-    
     private List<NutricionalFilizolaVO> carregarNutricionalFilizola() throws Exception {
         StringBuilder sql = null;
         Statement stm = null;
@@ -69,12 +68,12 @@ public class KairosDAO {
         List<NutricionalFilizolaVO> vNutricionalFilizola = new ArrayList<>();
         int caloria;
         double carboidratos, proteinas, gordurasTotais, gordurasSaturadas,
-               gordurasTrans, fibra, sodio, idProduto;
+                gordurasTrans, fibra, sodio, idProduto;
         String descricao = "", porcao = "", porcaoQuantidade;
-        
+
         try {
             stm = ConexaoSqlServer.getConexao().createStatement();
-            
+
             sql = new StringBuilder();
             sql.append("select ");
             sql.append("CodigoProduto, ");
@@ -95,11 +94,11 @@ public class KairosDAO {
             sql.append("InfoNutObservacao ");
             sql.append("from Produto ");
             sql.append("where InfoNutPorcaoQuantidade > 0 ");
-            
+
             rst = stm.executeQuery(sql.toString());
-            
+
             while (rst.next()) {
-                
+
                 idProduto = Double.parseDouble(rst.getString("CodigoProduto").trim());
                 porcaoQuantidade = rst.getString("InfoNutPorcaoQuantidade");
                 caloria = rst.getInt("InfoNutValorEnergetico");
@@ -110,19 +109,19 @@ public class KairosDAO {
                 gordurasTrans = rst.getDouble("InfoNutGordurasTrans");
                 fibra = rst.getDouble("InfoNutFibraAlimentar");
                 sodio = rst.getDouble("InfoNutSodio");
-                
-                porcao = "PORCAOQTD: "+porcaoQuantidade;                
-                porcao = porcao+" => "+Utils.acertarTexto(rst.getString("InfoNutObservacao").trim());
+
+                porcao = "PORCAOQTD: " + porcaoQuantidade;
+                porcao = porcao + " => " + Utils.acertarTexto(rst.getString("InfoNutObservacao").trim());
                 descricao = Utils.acertarTexto(rst.getString("Descricao").trim().replace("'", ""));
-                
+
                 if (porcao.length() > 35) {
                     porcao = porcao.substring(0, 35);
                 }
-                
+
                 if (descricao.length() > 20) {
                     descricao = descricao.substring(0, 20);
                 }
-                                
+
                 NutricionalFilizolaVO oNutricionalFilizola = new NutricionalFilizolaVO();
                 oNutricionalFilizola.setCaloria(caloria);
                 oNutricionalFilizola.setCarboidrato(carboidratos);
@@ -134,17 +133,17 @@ public class KairosDAO {
                 oNutricionalFilizola.setSodio(sodio);
                 oNutricionalFilizola.setDescricao(descricao);
                 oNutricionalFilizola.setPorcao(porcao);
-                
+
                 NutricionalFilizolaItemVO oNutricionalFilizolaItem = new NutricionalFilizolaItemVO();
                 oNutricionalFilizolaItem.setId_produtoDouble(idProduto);
                 oNutricionalFilizola.vNutricionalFilizolaItem.add(oNutricionalFilizolaItem);
-                
+
                 vNutricionalFilizola.add(oNutricionalFilizola);
             }
-            
+
             stm.close();
             return vNutricionalFilizola;
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw ex;
         }
     }
@@ -156,12 +155,12 @@ public class KairosDAO {
         List<NutricionalToledoVO> vNutricionalToledo = new ArrayList<>();
         int caloria, quantidade, idTipoMedida;
         double carboidratos, proteinas, gordurasTotais, gordurasSaturadas,
-               gordurasTrans, fibra, sodio, idProduto;
+                gordurasTrans, fibra, sodio, idProduto;
         String descricao = "", porcao = "";
-        
+
         try {
             stm = ConexaoSqlServer.getConexao().createStatement();
-            
+
             sql = new StringBuilder();
             sql.append("select ");
             sql.append("CodigoProduto, ");
@@ -182,11 +181,11 @@ public class KairosDAO {
             sql.append("InfoNutObservacao ");
             sql.append("from Produto ");
             sql.append("where InfoNutPorcaoQuantidade > 0 ");
-            
+
             rst = stm.executeQuery(sql.toString());
-            
+
             while (rst.next()) {
-                
+
                 idProduto = Double.parseDouble(rst.getString("CodigoProduto").trim());
                 quantidade = rst.getInt("InfoNutPorcaoQuantidade");
                 caloria = rst.getInt("InfoNutValorEnergetico");
@@ -197,26 +196,26 @@ public class KairosDAO {
                 gordurasTrans = rst.getDouble("InfoNutGordurasTrans");
                 fibra = rst.getDouble("InfoNutFibraAlimentar");
                 sodio = rst.getDouble("InfoNutSodio");
-                              
+
                 porcao = Utils.acertarTexto(rst.getString("InfoNutObservacao").trim());
                 descricao = Utils.acertarTexto(rst.getString("Descricao").trim().replace("'", ""));
-                
-                if (porcao.contains("GRAMAS") ||
-                        (porcao.contains("gramas")) ||
-                        (porcao.contains("g"))) {
+
+                if (porcao.contains("GRAMAS")
+                        || (porcao.contains("gramas"))
+                        || (porcao.contains("g"))) {
                     idTipoMedida = 0;
                 } else {
                     idTipoMedida = 2;
                 }
-                
+
                 if (porcao.length() > 35) {
                     porcao = porcao.substring(0, 35);
                 }
-                
+
                 if (descricao.length() > 20) {
                     descricao = descricao.substring(0, 20);
                 }
-                                
+
                 NutricionalToledoVO oNutricionalToledo = new NutricionalToledoVO();
                 oNutricionalToledo.setCaloria(caloria);
                 oNutricionalToledo.setCarboidrato(carboidratos);
@@ -228,21 +227,21 @@ public class KairosDAO {
                 oNutricionalToledo.setSodio(sodio);
                 oNutricionalToledo.setDescricao(descricao);
                 oNutricionalToledo.setId_tipomedida(idTipoMedida);
-                
+
                 NutricionalToledoItemVO oNutricionalToledoItem = new NutricionalToledoItemVO();
                 oNutricionalToledoItem.setId_produtoDouble(idProduto);
                 oNutricionalToledo.vNutricionalToledoItem.add(oNutricionalToledoItem);
-                
+
                 vNutricionalToledo.add(oNutricionalToledo);
             }
-            
+
             stm.close();
             return vNutricionalToledo;
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw ex;
         }
     }
-    
+
     public List<MercadologicoVO> carregarMercadologicoKairos(int nivel) throws Exception {
         StringBuilder sql = null;
         Statement stm = null;
@@ -492,9 +491,9 @@ public class KairosDAO {
                         codigoBalanca = -1;
                         eBalanca = false;
                         pesavel = false;
-                        
-                        if ((rst.getString("PrazoValidade") != null) &&
-                                (!rst.getString("PrazoValidade").trim().isEmpty())) {
+
+                        if ((rst.getString("PrazoValidade") != null)
+                                && (!rst.getString("PrazoValidade").trim().isEmpty())) {
                             validade = Integer.parseInt(rst.getString("PrazoValidade").trim());
                         } else {
                             validade = 0;
@@ -513,7 +512,7 @@ public class KairosDAO {
                                     break;
                             }
                         }
-                    }                    
+                    }
                 } else {
                     codigoBalanca = -1;
                     eBalanca = false;
@@ -525,7 +524,7 @@ public class KairosDAO {
                     } else {
                         validade = 0;
                     }
-                    
+
                     if (null != rst.getString("SiglaUnidade").trim()) {
                         switch (rst.getString("SiglaUnidade").trim()) {
                             case "KG":
@@ -703,8 +702,8 @@ public class KairosDAO {
                     tipoNaturezaReceita = Utils.retornarTipoNaturezaReceita(idTipoPisCofins, "");
                 }
 
-                if ((rst.getString("CodigoGrupoFiscal") != null) &&
-                        (!rst.getString("CodigoGrupoFiscal").trim().isEmpty())) {
+                if ((rst.getString("CodigoGrupoFiscal") != null)
+                        && (!rst.getString("CodigoGrupoFiscal").trim().isEmpty())) {
                     idAliquota = retornarIcmsKairos(rst.getString("CodigoGrupoFiscal").trim());
                 } else {
                     idAliquota = 8;
@@ -1000,13 +999,13 @@ public class KairosDAO {
                         eBalanca = false;
                         pesavel = false;
 
-                        if ((rst.getString("PrazoValidade") != null) &&
-                                (!rst.getString("PrazoValidade").trim().isEmpty())) {
+                        if ((rst.getString("PrazoValidade") != null)
+                                && (!rst.getString("PrazoValidade").trim().isEmpty())) {
                             validade = Integer.parseInt(rst.getString("PrazoValidade").trim());
                         } else {
                             validade = 0;
                         }
-                        
+
                         if (null != rst.getString("SiglaUnidade").trim()) {
                             switch (rst.getString("SiglaUnidade").trim()) {
                                 case "KG":
@@ -1020,7 +1019,7 @@ public class KairosDAO {
                                     break;
                             }
                         }
-                    }                    
+                    }
                 } else {
                     codigoBalanca = -1;
                     eBalanca = false;
@@ -1210,8 +1209,8 @@ public class KairosDAO {
                     tipoNaturezaReceita = Utils.retornarTipoNaturezaReceita(idTipoPisCofins, "");
                 }
 
-                if ((rst.getString("CodigoGrupoFiscal") != null) &&
-                        (!rst.getString("CodigoGrupoFiscal").trim().isEmpty())) {
+                if ((rst.getString("CodigoGrupoFiscal") != null)
+                        && (!rst.getString("CodigoGrupoFiscal").trim().isEmpty())) {
                     idAliquota = retornarIcmsKairos(rst.getString("CodigoGrupoFiscal").trim());
                 } else {
                     idAliquota = 8;
@@ -1411,18 +1410,18 @@ public class KairosDAO {
             stm = ConexaoSqlServer.getConexao().createStatement();
 
             sql = new StringBuilder();
-            
+
             sql.append("select CodigoProduto, SiglaUnidade, PrecoNormal ");
             sql.append("from vwPrecoVendaProduto ");
-            sql.append("where CodigoFilial = "+ id_lojaCliente + " ");
+            sql.append("where CodigoFilial = " + id_lojaCliente + " ");
             sql.append("and PrecoNormal <> 0 ");
             sql.append("and CodigoCondicaoPagamento = 1 ");
             sql.append("and CodigoPrazoPagamento = 30 ");
             /*sql.append("select CodigoProduto, PrecoNormal ");
-            sql.append("from PrecoVendaProduto ");
-            sql.append("where CodigoFilial = " + id_lojaCliente + " ");
-            sql.append("and SiglaUnidade <> 'DP' ");
-            sql.append("and PrecoNormal <> 0 ");*/
+             sql.append("from PrecoVendaProduto ");
+             sql.append("where CodigoFilial = " + id_lojaCliente + " ");
+             sql.append("and SiglaUnidade <> 'DP' ");
+             sql.append("and PrecoNormal <> 0 ");*/
 
             rst = stm.executeQuery(sql.toString());
 
@@ -1607,14 +1606,14 @@ public class KairosDAO {
                     + "from vwEstoqueDisponivelProduto v "
                     + "inner join CodigoBarraProduto b on b.CodigoProduto = v.CodigoProduto "
                     + "inner join Produto p on p.CodigoProduto = v.CodigoProduto "
-                    + "where CodigoFilial = " + id_lojaCliente 
+                    + "where CodigoFilial = " + id_lojaCliente
                     + " and SaldoEstoque <> 0 ");
             rst = stm.executeQuery(sql.toString());
 
             while (rst.next()) {
                 isLoja = true;
                 codigoDeposito = rst.getInt("CodigoDeposito");
-                
+
                 if (codigoDeposito == 1000) {
                     codigoDeposito = 100;
                 } else if (codigoDeposito == 3000) {
@@ -1624,7 +1623,7 @@ public class KairosDAO {
                 } else if (codigoDeposito == 4000) {
                     codigoDeposito = 400;
                 }
-                
+
                 LojaVO oLoja = new LojaDAO().carregar2(codigoDeposito);
                 isLoja = new LojaDAO().isLoja(oLoja.id);
                 if (isLoja) {
@@ -1643,7 +1642,7 @@ public class KairosDAO {
             throw ex;
         }
     }
-    
+
     public Map<Long, ProdutoVO> carregarCodigoBarrasKairos() throws Exception {
         StringBuilder sql = null;
         Statement stm = null;
@@ -1702,7 +1701,7 @@ public class KairosDAO {
             throw ex;
         }
     }
-    
+
     private List<ProdutoVO> carregarCodigoBarrasAnteriorKairos() throws Exception {
         List<ProdutoVO> vProduto = new ArrayList<>();
         StringBuilder sql = null;
@@ -1710,7 +1709,7 @@ public class KairosDAO {
         ResultSet rst = null;
         double idProduto = 0;
         long codigoBarras = 0;
-        
+
         try {
             stm = ConexaoSqlServer.getConexao().createStatement();
             sql = new StringBuilder();
@@ -1718,14 +1717,14 @@ public class KairosDAO {
             sql.append("       SiglaUnidade, QuantidadeProduto ");
             sql.append("  from CodigoBarraProduto");
             rst = stm.executeQuery(sql.toString());
-            
-            while(rst.next()) {
-                if ((rst.getString("NumeroCodigoBarraProduto") != null) &&
-                        (!rst.getString("NumeroCodigoBarraProduto").trim().isEmpty())) {
-                    
-                    idProduto = Double.parseDouble(Utils.acertarTexto(rst.getString("CodigoProduto").trim()));    
+
+            while (rst.next()) {
+                if ((rst.getString("NumeroCodigoBarraProduto") != null)
+                        && (!rst.getString("NumeroCodigoBarraProduto").trim().isEmpty())) {
+
+                    idProduto = Double.parseDouble(Utils.acertarTexto(rst.getString("CodigoProduto").trim()));
                     codigoBarras = Long.parseLong(Utils.formataNumero(rst.getString("NumeroCodigoBarraProduto").trim()));
-                    
+
                     ProdutoVO oProduto = new ProdutoVO();
                     oProduto.idDouble = idProduto;
                     oProduto.codigoBarras = codigoBarras;
@@ -1734,7 +1733,7 @@ public class KairosDAO {
             }
             stm.close();
             return vProduto;
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw ex;
         }
     }
@@ -1746,42 +1745,42 @@ public class KairosDAO {
         ResultSet rst = null;
         double idProduto = 0;
         String dataCadastro = "";
-        
+
         try {
             stm = ConexaoSqlServer.getConexao().createStatement();
-            
+
             sql = new StringBuilder();
             sql.append("select CodigoProduto, DataCadastro ");
             sql.append("from Produto ");
-            
+
             rst = stm.executeQuery(sql.toString());
-            
+
             while (rst.next()) {
-                
+
                 idProduto = Double.parseDouble(Utils.formataNumero(rst.getString("CodigoProduto").trim()));
-                
-                if ((rst.getString("DataCadastro") != null) &&
-                        (!rst.getString("DataCadastro").trim().isEmpty())) {
-                    
+
+                if ((rst.getString("DataCadastro") != null)
+                        && (!rst.getString("DataCadastro").trim().isEmpty())) {
+
                     dataCadastro = rst.getString("DataCadastro").trim().substring(0, 10).replace(".", "/").replace("-", "/");
-                    
+
                 } else {
                     dataCadastro = "";
                 }
-                
+
                 ProdutoVO oProduto = new ProdutoVO();
                 oProduto.idDouble = idProduto;
                 oProduto.dataCadastro = dataCadastro;
-                
+
                 vProduto.add(oProduto);
             }
-            
+
             return vProduto;
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw ex;
         }
     }
-    
+
     private List<ProdutoVO> carregarIcmsProduto() throws Exception {
         StringBuilder sql = null;
         Statement stm = null;
@@ -1789,12 +1788,12 @@ public class KairosDAO {
         List<ProdutoVO> vProduto = new ArrayList<>();
         double idProduto;
         int idEstado, idAliquota;
-        
+
         try {
             stm = ConexaoSqlServer.getConexao().createStatement();
-            
+
             sql = new StringBuilder();
-            
+
             sql.append("select CodigoProduto, PercentualICMS, PercentualICMSReduzido, DestinoSiglaUF ");
             sql.append("from ImpostoProduto ");
             sql.append("where OrigemSiglaUF = 'PE' ");
@@ -1802,46 +1801,46 @@ public class KairosDAO {
             sql.append("and OrigemSiglaPais = 'BRA' ");
             sql.append("and DestinoSiglaPais = 'BRA' ");
             sql.append("order by CodigoProduto ");
-            
+
             rst = stm.executeQuery(sql.toString());
-            
+
             while (rst.next()) {
-                
+
                 idProduto = Double.parseDouble(rst.getString("CodigoProduto"));
-                
-                if ((rst.getString("PercentualICMS") != null) &&
-                        (!rst.getString("PercentualICMS").trim().isEmpty()) &&
-                        (rst.getString("PercentualICMSReduzido") != null) &&
-                        (!rst.getString("PercentualICMSReduzido").trim().isEmpty())) {
-                    
-                    if ("7.000".equals(rst.getString("PercentualICMS")) &&
-                            ("0.000".equals(rst.getString("PercentualICMSReduzido")))) {
+
+                if ((rst.getString("PercentualICMS") != null)
+                        && (!rst.getString("PercentualICMS").trim().isEmpty())
+                        && (rst.getString("PercentualICMSReduzido") != null)
+                        && (!rst.getString("PercentualICMSReduzido").trim().isEmpty())) {
+
+                    if ("7.000".equals(rst.getString("PercentualICMS"))
+                            && ("0.000".equals(rst.getString("PercentualICMSReduzido")))) {
                         idAliquota = 0;
-                    } else if ("12.000".equals(rst.getString("PercentualICMS")) &&
-                            ("0.000".equals(rst.getString("PercentualICMSReduzido")))) {
+                    } else if ("12.000".equals(rst.getString("PercentualICMS"))
+                            && ("0.000".equals(rst.getString("PercentualICMSReduzido")))) {
                         idAliquota = 1;
-                    } else if ("18.000".equals(rst.getString("PercentualICMS")) &&
-                            ("0.000".equals(rst.getString("PercentualICMSReduzido")))) {
+                    } else if ("18.000".equals(rst.getString("PercentualICMS"))
+                            && ("0.000".equals(rst.getString("PercentualICMSReduzido")))) {
                         idAliquota = 2;
-                    } else if ("25.000".equals(rst.getString("PercentualICMS")) &&
-                            ("0.000".equals(rst.getString("PercentualICMSReduzido")))) {
+                    } else if ("25.000".equals(rst.getString("PercentualICMS"))
+                            && ("0.000".equals(rst.getString("PercentualICMSReduzido")))) {
                         idAliquota = 3;
-                    } else if ("17.000".equals(rst.getString("PercentualICMS")) &&
-                            ("0.000".equals(rst.getString("PercentualICMSReduzido")))) {
+                    } else if ("17.000".equals(rst.getString("PercentualICMS"))
+                            && ("0.000".equals(rst.getString("PercentualICMSReduzido")))) {
                         idAliquota = 18;
-                    } else if ("27.000".equals(rst.getString("PercentualICMS")) &&
-                            ("0.000".equals(rst.getString("PercentualICMSReduzido")))) {
+                    } else if ("27.000".equals(rst.getString("PercentualICMS"))
+                            && ("0.000".equals(rst.getString("PercentualICMSReduzido")))) {
                         idAliquota = 19;
                     } else {
                         idAliquota = 8;
                     }
- 
-                    if ((rst.getString("DestinoSiglaUF") != null) &&
-                            (!rst.getString("DestinoSiglaUF").trim().isEmpty())) {
+
+                    if ((rst.getString("DestinoSiglaUF") != null)
+                            && (!rst.getString("DestinoSiglaUF").trim().isEmpty())) {
                         idEstado = Utils.retornarEstadoDescricao(rst.getString("DestinoSiglaUF").trim());
-                      
+
                         if (idEstado != 0) {
-                            
+
                             ProdutoVO oProduto = new ProdutoVO();
                             oProduto.idDouble = idProduto;
 
@@ -1855,17 +1854,17 @@ public class KairosDAO {
                             oProduto.vAliquota.add(oAliquota);
 
                             vProduto.add(oProduto);
-                        }                        
-                    } 
+                        }
+                    }
                 }
             }
             stm.close();
             return vProduto;
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw ex;
         }
     }
-    
+
     public List<FornecedorVO> carregarFornecedorKairos() throws Exception {
         StringBuilder sql = null;
         Statement stm = null;
@@ -2122,11 +2121,11 @@ public class KairosDAO {
         List<FornecedorContatoVO> vFornecedorContato = new ArrayList<>();
         long idFornecedor = 0;
         String telefone = "", email = "", numeroRamal = "", contato = "";
-        
+
         try {
-            
+
             stm = ConexaoSqlServer.getConexao().createStatement();
-            
+
             sql = new StringBuilder();
             sql.append("select p.CodigoPessoa, telP.NumeroTelefone, telP.NumeroRamal, ");
             sql.append("telP.ContatoTelefone, em.EnderecoEletronicoPessoa ");
@@ -2134,58 +2133,58 @@ public class KairosDAO {
             sql.append("left join TelefonePessoa telP on telP.CodigoPessoa = p.CodigoPessoa ");
             sql.append("left join EnderecoEletronicoPessoa em on em.CodigoPessoa = p.CodigoPessoa ");
             sql.append("inner join TipoPessoa tp on tp.CodigoPessoa = p.CodigoPessoa and tp.CodigoTipoPessoa = 'F' ");
-            
+
             rst = stm.executeQuery(sql.toString());
-            
+
             while (rst.next()) {
-                
+
                 idFornecedor = Long.parseLong(rst.getString("CodigoPessoa").trim());
-                
-                if ((rst.getString("NumeroTelefone") != null) &&
-                        (!rst.getString("NumeroTelefone").trim().isEmpty())) {
+
+                if ((rst.getString("NumeroTelefone") != null)
+                        && (!rst.getString("NumeroTelefone").trim().isEmpty())) {
                     telefone = Utils.formataNumero(rst.getString("NumeroTelefone").trim());
                 } else {
                     telefone = "";
                 }
-                
-                if ((rst.getString("NumeroRamal") != null) &&
-                        (!rst.getString("NumeroRamal").trim().isEmpty())) {
+
+                if ((rst.getString("NumeroRamal") != null)
+                        && (!rst.getString("NumeroRamal").trim().isEmpty())) {
                     numeroRamal = "RAMAL: " + Utils.formataNumero(rst.getString("NumeroRamal").trim());
                 } else {
                     numeroRamal = "";
                 }
-                
-                if ((rst.getString("ContatoTelefone") != null) &&
-                        (!rst.getString("ContatoTelefone").trim().isEmpty())) {
+
+                if ((rst.getString("ContatoTelefone") != null)
+                        && (!rst.getString("ContatoTelefone").trim().isEmpty())) {
                     contato = "CONTATO: " + Utils.acertarTexto(rst.getString("ContatoTelefone").trim().replace("'", ""));
                 } else {
                     contato = "CONTATO";
                 }
-                
-                if ((rst.getString("EnderecoEletronicoPessoa") != null) &&
-                        (!rst.getString("EnderecoEletronicoPessoa").trim().isEmpty()) &&
-                        (rst.getString("EnderecoEletronicoPessoa").contains("@"))) {
+
+                if ((rst.getString("EnderecoEletronicoPessoa") != null)
+                        && (!rst.getString("EnderecoEletronicoPessoa").trim().isEmpty())
+                        && (rst.getString("EnderecoEletronicoPessoa").contains("@"))) {
                     email = Utils.acertarTexto(rst.getString("EnderecoEletronicoPessoa").trim().replace("'", ""));
                     email = email.toLowerCase();
                 } else {
                     email = "";
                 }
-                
+
                 FornecedorContatoVO oFornecedorContato = new FornecedorContatoVO();
                 oFornecedorContato.setNome(contato);
                 oFornecedorContato.setIdFornecedorAnterior(idFornecedor);
                 oFornecedorContato.setTelefone(telefone);
                 oFornecedorContato.setEmail(email);
-                
+
                 vFornecedorContato.add(oFornecedorContato);
             }
-            
+
             return vFornecedorContato;
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw ex;
         }
     }
-    
+
     public List<ProdutoFornecedorVO> carregarProdutoFornecedorKairos() throws Exception {
         StringBuilder sql = null;
         Statement stm = null;
@@ -2218,9 +2217,9 @@ public class KairosDAO {
                 } else {
                     codigoExterno = "";
                 }
-                
-                if ((rst.getString("AlteracaoDataHora") != null) &&
-                        (!rst.getString("AlteracaoDataHora").trim().isEmpty())) {
+
+                if ((rst.getString("AlteracaoDataHora") != null)
+                        && (!rst.getString("AlteracaoDataHora").trim().isEmpty())) {
                     dataAlteracao = new java.sql.Date(
                             sdf.parse(rst.getString("AlteracaoDataHora").substring(0, 10).replace("-", "/")).getTime());
                 } else {
@@ -2316,7 +2315,7 @@ public class KairosDAO {
                     if ((rst.getString("Cnpj") != null)
                             && (!rst.getString("Cnpj").trim().isEmpty())) {
                         cnpj = Long.parseLong(Utils.formataNumero(rst.getString("Cnpj").trim()));
-                        
+
                         if (rst.getString("Cnpj").trim().length() < 14) {
                             id_tipoinscricao = 1;
                         } else {
@@ -2333,12 +2332,12 @@ public class KairosDAO {
                         String textoAcertado = new String(bytes, "ISO-8859-1");
                         nome = Utils.acertarTexto(textoAcertado.replace("'", "").trim());
                     } else {
-                        
-                        if ((rst.getString("NomeFantasia") != null) &&
-                                (!rst.getString("NomeFantasia").trim().isEmpty())) {
+
+                        if ((rst.getString("NomeFantasia") != null)
+                                && (!rst.getString("NomeFantasia").trim().isEmpty())) {
                             byte[] bytes = rst.getBytes("RazaoSocial");
                             String textoAcertado = new String(bytes, "ISO-8859-1");
-                            nome = Utils.acertarTexto(textoAcertado.replace("'", "").trim());                            
+                            nome = Utils.acertarTexto(textoAcertado.replace("'", "").trim());
                         } else {
                             nome = "SEM NOME VR " + id;
                         }
@@ -2371,7 +2370,7 @@ public class KairosDAO {
                     } else {
                         complemento = "";
                     }
-                    
+
                     if ((rst.getString("Telefone") != null)
                             && (!rst.getString("Telefone").trim().isEmpty())) {
                         telefone1 = Utils.formataNumero(rst.getString("Telefone").trim());
@@ -2419,16 +2418,16 @@ public class KairosDAO {
 
                     if ((rst.getString("LimiteCredito") != null)
                             && (!rst.getString("LimiteCredito").trim().isEmpty())) {
-                        
+
                         limite = rst.getDouble("LimiteCredito");
 
                         if (limite == 1000000000) {
                             limite = 100000000;
-                            observacao2 = "VALOR LIMITE SISTEMA KAIROS: " +  
-                                    rst.getString("LimiteCredito") + " = VALOR LIMITE VR: " + limite + ", VALOR SISTEMA KAIROS NÃO SUPORTADO PELO VR.";
-                            
+                            observacao2 = "VALOR LIMITE SISTEMA KAIROS: "
+                                    + rst.getString("LimiteCredito") + " = VALOR LIMITE VR: " + limite + ", VALOR SISTEMA KAIROS NÃO SUPORTADO PELO VR.";
+
                         }
-                        
+
                     } else {
                         limite = 0;
                     }
@@ -2440,16 +2439,16 @@ public class KairosDAO {
                         inscricaoestadual = inscricaoestadual.replace("-", "");
                         inscricaoestadual = inscricaoestadual.replace(".", "");
                     } else {
-                        
-                        if ((rst.getString("RG") != null) &&
-                                (!rst.getString("RG").trim().isEmpty())) {
+
+                        if ((rst.getString("RG") != null)
+                                && (!rst.getString("RG").trim().isEmpty())) {
                             inscricaoestadual = Utils.acertarTexto(rst.getString("RG").trim());
                             inscricaoestadual = inscricaoestadual.replace("'", "");
                             inscricaoestadual = inscricaoestadual.replace("-", "");
                             inscricaoestadual = inscricaoestadual.replace(".", "");
-                            
-                            if ((rst.getString("OrgaoExp") != null) &&
-                                    (!rst.getString("OrgaoExp").trim().isEmpty())) {
+
+                            if ((rst.getString("OrgaoExp") != null)
+                                    && (!rst.getString("OrgaoExp").trim().isEmpty())) {
                                 orgaoExp = Utils.acertarTexto(rst.getString("OrgaoExp").trim().replace("'", ""));
                             } else {
                                 orgaoExp = "";
@@ -2480,7 +2479,7 @@ public class KairosDAO {
                     nomeMae = "";
 
                     telefone2 = "";
-                        
+
                     fax = "";
 
                     if ((rst.getString("Observacoes") != null)
@@ -2515,17 +2514,18 @@ public class KairosDAO {
 
                     if ((rst.getString("EstadoCivil") != null)
                             && (!rst.getString("EstadoCivil").trim().isEmpty())) {
-                        if (null != rst.getString("EstadoCivil").trim()) 
+                        if (null != rst.getString("EstadoCivil").trim()) {
                             switch (rst.getString("EstadoCivil").trim()) {
-                            case "C":
-                                estadoCivil = 2;
-                                break;
-                            case "S":
-                                estadoCivil = 1;
-                                break;
-                            case "O":
-                                estadoCivil = 5;
-                                break;
+                                case "C":
+                                    estadoCivil = 2;
+                                    break;
+                                case "S":
+                                    estadoCivil = 1;
+                                    break;
+                                case "O":
+                                    estadoCivil = 5;
+                                    break;
+                            }
                         }
                     } else {
                         estadoCivil = 0;
@@ -2572,7 +2572,7 @@ public class KairosDAO {
                     if (email.length() > 50) {
                         email = email.substring(0, 50);
                     }
-                    
+
                     if (observacao.length() > 80) {
                         observacao = observacao.substring(0, 80);
                     }
@@ -2614,11 +2614,11 @@ public class KairosDAO {
                     //oClienteEventual.orgaoemissor = orgaoExp;
                     vClienteEventual.add(oClienteEventual);
                 }
-                
+
                 stm.close();
             } catch (Exception ex) {
                 throw ex;
-                    //if (Linha > 0) {
+                //if (Linha > 0) {
                 //    throw new VRException("Linha " + Linha + ": " + ex.getMessage());
                 //} else {
                 //    throw ex;
@@ -2638,11 +2638,11 @@ public class KairosDAO {
         List<ClienteEventualContatoVO> vClienteEventualContato = new ArrayList<>();
         long idCliente = 0;
         String telefone = "", email = "", numeroRamal = "", contato = "";
-        
+
         try {
-            
+
             stm = ConexaoSqlServer.getConexao().createStatement();
-            
+
             sql = new StringBuilder();
             sql.append("select p.CodigoPessoa, telP.NumeroTelefone, telP.NumeroRamal, ");
             sql.append("telP.ContatoTelefone, em.EnderecoEletronicoPessoa ");
@@ -2650,58 +2650,58 @@ public class KairosDAO {
             sql.append("left join TelefonePessoa telP on telP.CodigoPessoa = p.CodigoPessoa ");
             sql.append("left join EnderecoEletronicoPessoa em on em.CodigoPessoa = p.CodigoPessoa ");
             sql.append("inner join TipoPessoa tp on tp.CodigoPessoa = p.CodigoPessoa and tp.CodigoTipoPessoa = 'C' ");
-            
+
             rst = stm.executeQuery(sql.toString());
-            
+
             while (rst.next()) {
-                
+
                 idCliente = Long.parseLong(rst.getString("CodigoPessoa").trim());
-                
-                if ((rst.getString("NumeroTelefone") != null) &&
-                        (!rst.getString("NumeroTelefone").trim().isEmpty())) {
+
+                if ((rst.getString("NumeroTelefone") != null)
+                        && (!rst.getString("NumeroTelefone").trim().isEmpty())) {
                     telefone = Utils.formataNumero(rst.getString("NumeroTelefone").trim());
                 } else {
                     telefone = "";
                 }
-                
-                if ((rst.getString("NumeroRamal") != null) &&
-                        (!rst.getString("NumeroRamal").trim().isEmpty())) {
+
+                if ((rst.getString("NumeroRamal") != null)
+                        && (!rst.getString("NumeroRamal").trim().isEmpty())) {
                     numeroRamal = "RAMAL: " + Utils.formataNumero(rst.getString("NumeroRamal").trim());
                 } else {
                     numeroRamal = "";
                 }
-                
-                if ((rst.getString("ContatoTelefone") != null) &&
-                        (!rst.getString("ContatoTelefone").trim().isEmpty())) {
+
+                if ((rst.getString("ContatoTelefone") != null)
+                        && (!rst.getString("ContatoTelefone").trim().isEmpty())) {
                     contato = "CONTATO: " + Utils.acertarTexto(rst.getString("ContatoTelefone").trim().replace("'", ""));
                 } else {
                     contato = "CONTATO";
                 }
-                
-                if ((rst.getString("EnderecoEletronicoPessoa") != null) &&
-                        (!rst.getString("EnderecoEletronicoPessoa").trim().isEmpty()) &&
-                        (rst.getString("EnderecoEletronicoPessoa").contains("@"))) {
+
+                if ((rst.getString("EnderecoEletronicoPessoa") != null)
+                        && (!rst.getString("EnderecoEletronicoPessoa").trim().isEmpty())
+                        && (rst.getString("EnderecoEletronicoPessoa").contains("@"))) {
                     email = Utils.acertarTexto(rst.getString("EnderecoEletronicoPessoa").trim().replace("'", ""));
                     email = email.toLowerCase();
                 } else {
                     email = "";
                 }
-                
+
                 ClienteEventualContatoVO oClienteEventualContato = new ClienteEventualContatoVO();
                 oClienteEventualContato.setNome(contato);
                 oClienteEventualContato.setIdClienteEventualAnterior(idCliente);
                 oClienteEventualContato.setTelefone(telefone);
                 oClienteEventualContato.setEmail(email);
-                
+
                 vClienteEventualContato.add(oClienteEventualContato);
             }
-            
+
             return vClienteEventualContato;
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw ex;
         }
     }
-    
+
     public List<ReceberChequeVO> carregarReceberCheque(int id_loja, int id_lojaCliente) throws Exception {
 
         StringBuilder sql = null;
@@ -2986,7 +2986,7 @@ public class KairosDAO {
             throw ex;
         }
     }
-    
+
     private List<ProdutoVO> carregarMercadologicoProdutoKairos() throws Exception {
         StringBuilder sql = null;
         Statement stm = null, stmPostgres = null;
@@ -2995,20 +2995,20 @@ public class KairosDAO {
         double idProduto = 0;
         int mercad1, mercad2, mercad3;
         Utils util = new Utils();
-        
+
         try {
-            
+
             stm = ConexaoSqlServer.getConexao().createStatement();
             stmPostgres = Conexao.createStatement();
-            
+
             sql = new StringBuilder();
             sql.append("select p.CodigoProduto, p.CodigoGrupoProduto, p.CodigoSubGrupoProduto ");
             sql.append("from Produto p ");
             rst = stm.executeQuery(sql.toString());
-            
+
             while (rst.next()) {
                 idProduto = Double.parseDouble(rst.getString("CodigoProduto"));
-                
+
                 if ((rst.getString("CodigoGrupoProduto") != null)
                         && (!rst.getString("CodigoGrupoProduto").trim().isEmpty())) {
                     mercad1 = Integer.parseInt(rst.getString("CodigoGrupoProduto"));
@@ -3045,7 +3045,7 @@ public class KairosDAO {
                         mercad3 = 1;
                     }
                 }
-                
+
                 ProdutoVO oProduto = new ProdutoVO();
                 oProduto.idDouble = idProduto;
                 oProduto.mercadologico1 = mercad1;
@@ -3053,29 +3053,29 @@ public class KairosDAO {
                 oProduto.mercadologico3 = mercad3;
                 vProduto.add(oProduto);
             }
-            
+
             stm.close();
             stmPostgres.close();
             return vProduto;
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw ex;
         }
     }
-    
+
     public List<AtacadoVendedorVO> carregarVendedor() throws Exception {
         StringBuilder sql = null;
         Statement stm = null;
         ResultSet rst = null;
         List<AtacadoVendedorVO> v_vendedor = new ArrayList<>();
-        
+
         try {
             stm = ConexaoSqlServer.getConexao().createStatement();
             sql = new StringBuilder();
-            sql.append("select p.CodigoPessoa, p.RazaoSocial, p.NomeFantasia, tp.CodigoPessoa as codigo \n" +
-                        "from Pessoa p\n" +
-                        "inner join TipoPessoa tp on tp.CodigoPessoa = p.CodigoPessoa\n" +
-                        "where tp.CodigoTipoPessoa = 'V'\n" +
-                        "order by p.CodigoPessoa");            
+            sql.append("select p.CodigoPessoa, p.RazaoSocial, p.NomeFantasia, tp.CodigoPessoa as codigo \n"
+                    + "from Pessoa p\n"
+                    + "inner join TipoPessoa tp on tp.CodigoPessoa = p.CodigoPessoa\n"
+                    + "where tp.CodigoTipoPessoa = 'V'\n"
+                    + "order by p.CodigoPessoa");
             rst = stm.executeQuery(sql.toString());
             while (rst.next()) {
                 AtacadoVendedorVO oAtacadoVendedor = new AtacadoVendedorVO();
@@ -3089,9 +3089,9 @@ public class KairosDAO {
             throw ex;
         }
     }
-    
+
     public void importarVendedor() throws Exception {
-        List <AtacadoVendedorVO> v_vendedor = new ArrayList<>();
+        List<AtacadoVendedorVO> v_vendedor = new ArrayList<>();
         try {
             ProgressBar.setStatus("Carregando dados...atacado.vendedor...");
             v_vendedor = carregarVendedor();
@@ -3102,13 +3102,13 @@ public class KairosDAO {
             throw ex;
         }
     }
-    
+
     public List<AtacadoVendedorClienteVO> carregarVendedorCliente() throws Exception {
         StringBuilder sql = null;
         Statement stm = null;
         ResultSet rst = null;
         List<AtacadoVendedorClienteVO> v_vendedorCliente = new ArrayList<>();
-        
+
         try {
             stm = ConexaoSqlServer.getConexao().createStatement();
             sql = new StringBuilder();
@@ -3122,14 +3122,14 @@ public class KairosDAO {
                 v_vendedorCliente.add(oVendedorCliente);
             }
             stm.close();
-            return  v_vendedorCliente;
+            return v_vendedorCliente;
         } catch (Exception ex) {
             throw ex;
         }
     }
 
     public void importarVendedorCliente() throws Exception {
-        List <AtacadoVendedorClienteVO> v_vendedorCliente = new ArrayList<>();
+        List<AtacadoVendedorClienteVO> v_vendedorCliente = new ArrayList<>();
         try {
             ProgressBar.setStatus("Carregando dados...atacado.vendedorcliente...");
             v_vendedorCliente = carregarVendedorCliente();
@@ -3140,24 +3140,23 @@ public class KairosDAO {
             throw ex;
         }
     }
-    
+
     //IMPORTAÇÕES
-    
     public void importarAcertarMercadologicoProduto() throws Exception {
         List<ProdutoVO> vProduto = new ArrayList<>();
-        
+
         try {
             ProgressBar.setStatus("Carregando dados...Mercadologico Produto...");
             vProduto = carregarMercadologicoProdutoKairos();
-            
+
             if (!vProduto.isEmpty()) {
                 new ProdutoDAO().alterarMercadologicoProdutoRapido(vProduto);
             }
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw ex;
         }
     }
-    
+
     public void importarProdutoBalanca(String arquivo, int opcao) throws Exception {
 
         try {
@@ -3171,7 +3170,7 @@ public class KairosDAO {
             throw ex;
         }
     }
-    
+
     public void importarMercadologico() throws Exception {
 
         List<MercadologicoVO> vMercadologico = new ArrayList<>();
@@ -3189,13 +3188,12 @@ public class KairosDAO {
             new MercadologicoDAO().salvar2(vMercadologico, false);
 
             //new MercadologicoDAO().salvarMax();
-
         } catch (Exception ex) {
 
             throw ex;
         }
     }
-    
+
     public void importarProduto6(int id_loja) throws Exception {
 
         List<ProdutoVO> vProdutoNovo = new ArrayList<>();
@@ -3269,7 +3267,7 @@ public class KairosDAO {
             throw ex;
         }
     }
-    
+
     public void importarPrecoProduto(int id_loja, int id_lojaCliente) throws Exception {
         List<ProdutoVO> vProdutoNovo = new ArrayList<>();
         ProdutoDAO produto = new ProdutoDAO();
@@ -3299,7 +3297,7 @@ public class KairosDAO {
             throw ex;
         }
     }
-    
+
     public void importarCustoProduto(int id_loja, int id_lojaCliente) throws Exception {
         List<ProdutoVO> vProdutoNovo = new ArrayList<>();
         ProdutoDAO produto = new ProdutoDAO();
@@ -3329,7 +3327,7 @@ public class KairosDAO {
             throw ex;
         }
     }
-    
+
     public void importarEstoqueProduto(int id_loja, int id_lojaCliente) throws Exception {
         List<ProdutoVO> vProdutoNovo = new ArrayList<>();
         ProdutoDAO produto = new ProdutoDAO();
@@ -3357,7 +3355,7 @@ public class KairosDAO {
             throw ex;
         }
     }
-    
+
     public void importarCodigoBarra() throws Exception {
         List<ProdutoVO> vProdutoNovo = new ArrayList<>();
         ProdutoDAO produto = new ProdutoDAO();
@@ -3389,31 +3387,32 @@ public class KairosDAO {
     public void importarDataCadastroProduto() throws Exception {
         List<ProdutoVO> vProduto = new ArrayList<>();
         try {
-            
+
             ProgressBar.setStatus("Carregando dados...Data Cadastro Produto...");
             vProduto = carregarDataCadastroProduto();
-            
+
             if (!vProduto.isEmpty()) {
                 new ProdutoDAO().altertarDataCadastroProdutoGdoor(vProduto);
             }
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw ex;
         }
     }
-    
+
     public void importarIcmsProduto() throws Exception {
         List<ProdutoVO> vProduto = new ArrayList<>();
         try {
             ProgressBar.setStatus("Carregando dados...Icms Produtos...");
             vProduto = carregarIcmsProduto();
-            
+
             if (!vProduto.isEmpty()) {
                 new ProdutoDAO().adicionarIcmsProduto(vProduto);
             }
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw ex;
         }
     }
+
     public void importarFornecedor() throws Exception {
 
         try {
@@ -3428,7 +3427,7 @@ public class KairosDAO {
             throw ex;
         }
     }
-    
+
     public void importarFornecedorCnpj() throws Exception {
 
         try {
@@ -3443,24 +3442,23 @@ public class KairosDAO {
             throw ex;
         }
     }
-    
 
     public void importarFornecedorContato() throws Exception {
-        try {            
+        try {
 
             ProgressBar.setStatus("Carregando dados...Contatos Fornecedores...");
-            
+
             List<FornecedorContatoVO> v_fornecedorContato = carregarFornecedorContato();
-            
+
             if (!v_fornecedorContato.isEmpty()) {
                 new FornecedorContatoDAO().salvar(v_fornecedorContato);
             }
 
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw ex;
         }
     }
-    
+
     public void importarProdutoFornecedor() throws Exception {
         try {
 
@@ -3474,7 +3472,7 @@ public class KairosDAO {
             throw ex;
         }
     }
-    
+
     public void importarClienteEventual(int idLoja, int idLojaCliente) throws Exception {
 
         try {
@@ -3488,29 +3486,29 @@ public class KairosDAO {
             throw ex;
         }
     }
-    
+
     public void importarClienteEventualContato() throws Exception {
-        try {            
+        try {
 
             ProgressBar.setStatus("Carregando dados...Contatos Cliente Eventual...");
-            
+
             List<ClienteEventualContatoVO> v_clienteEventualContato = carregarClienteEventualContato();
-            
+
             if (!v_clienteEventualContato.isEmpty()) {
                 new ClienteEventualContatoDAO().salvar(v_clienteEventualContato);
             }
 
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw ex;
         }
     }
 
     public void importarNutricionalFilizola() throws Exception {
         try {
-            
+
             ProgressBar.setStatus("Carregando dados...Nutricional Filizola...");
             List<NutricionalFilizolaVO> vNutricionalFilizola = carregarNutricionalFilizola();
-            
+
             if (!vNutricionalFilizola.isEmpty()) {
                 new NutricionalFilizolaDAO().salvar(vNutricionalFilizola);
             }
@@ -3521,10 +3519,10 @@ public class KairosDAO {
 
     public void importarNutricionalToledo() throws Exception {
         try {
-            
+
             ProgressBar.setStatus("Carregando dados...Nutricional Toledo...");
             List<NutricionalToledoVO> vNutricionalToledo = carregarNutricionalToledo();
-            
+
             if (!vNutricionalToledo.isEmpty()) {
                 new NutricionalToledoDAO().salvar(vNutricionalToledo);
             }
@@ -3532,21 +3530,21 @@ public class KairosDAO {
             throw ex;
         }
     }
-    
+
     public void importarCodigoBarrasAnterior() throws Exception {
         List<ProdutoVO> vProduto = new ArrayList<>();
         try {
             ProgressBar.setStatus("Carregando dados...Codigo Barras Anterior...");
             vProduto = carregarCodigoBarrasAnteriorKairos();
-            
+
             if (!vProduto.isEmpty()) {
                 new ProdutoDAO().salvarCodigoBarrasAnterior(vProduto);
             }
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw ex;
         }
     }
-    
+
     public void importarEstoqueTerceiro(int idLoja, int idLojaFilial) throws Exception {
         try {
             ProgressBar.setStatus("Carregando dados...Estoque Terceiro...");
@@ -3554,49 +3552,50 @@ public class KairosDAO {
             if (!v_estoqueTerceiro.isEmpty()) {
                 new ProdutoDAO().inserirEstoqueTerceiro(v_estoqueTerceiro);
             }
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             throw ex;
         }
     }
-    
+
     // métodos Kairos
     private int retornarIcmsKairos(String codigoIcms) {
         int retorno = 8;
-        
-        if (null != codigoIcms) 
+
+        if (null != codigoIcms) {
             switch (codigoIcms) {
-            case "07P":
-                retorno = 1;
-                break;
-            case "17P":
-                retorno = 21;
-                break;
-            case "25P":
-                retorno = 3;
-                break;
-            case "00I":
-                retorno = 6;
-                break;
-            case "00S":
-                retorno = 7;
-                break;
-            case "27P":
-                retorno = 22;
-                break;
-            case "12P":
-                retorno = 1;
-                break;
-            case "18P":
-                retorno = 2;
-                break;
-            case "18B":
-                retorno = 2;
-                break;
-            case "18A":
-                retorno = 2;
-                break;                
+                case "07P":
+                    retorno = 1;
+                    break;
+                case "17P":
+                    retorno = 21;
+                    break;
+                case "25P":
+                    retorno = 3;
+                    break;
+                case "00I":
+                    retorno = 6;
+                    break;
+                case "00S":
+                    retorno = 7;
+                    break;
+                case "27P":
+                    retorno = 22;
+                    break;
+                case "12P":
+                    retorno = 1;
+                    break;
+                case "18P":
+                    retorno = 2;
+                    break;
+                case "18B":
+                    retorno = 2;
+                    break;
+                case "18A":
+                    retorno = 2;
+                    break;
+            }
         }
-        
+
         return retorno;
     }
 }

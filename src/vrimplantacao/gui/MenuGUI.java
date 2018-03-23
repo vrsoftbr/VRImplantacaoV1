@@ -601,7 +601,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuBrainSoft = new javax.swing.JMenuItem();
         mnuFarm2000 = new javax.swing.JMenuItem();
         mnuADT = new javax.swing.JMenu();
-        jMenuItemInfoMacStore = new javax.swing.JMenuItem();
+        mnuInfoMacStore = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem17 = new javax.swing.JMenuItem();
         jMenu10 = new javax.swing.JMenu();
@@ -1660,13 +1660,13 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuADT.setText("ADS");
 
-        jMenuItemInfoMacStore.setText("InfoMac - Store");
-        jMenuItemInfoMacStore.addActionListener(new java.awt.event.ActionListener() {
+        mnuInfoMacStore.setText("InfoMac - Store");
+        mnuInfoMacStore.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemInfoMacStoreActionPerformed(evt);
+                mnuInfoMacStoreActionPerformed(evt);
             }
         });
-        mnuADT.add(jMenuItemInfoMacStore);
+        mnuADT.add(mnuInfoMacStore);
 
         jMenu2.add(mnuADT);
 
@@ -3618,9 +3618,9 @@ public final class MenuGUI extends VRMdiFrame {
         ScefGUI.exibir(this);
     }//GEN-LAST:event_mnuScefActionPerformed
 
-    private void jMenuItemInfoMacStoreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemInfoMacStoreActionPerformed
+    private void mnuInfoMacStoreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuInfoMacStoreActionPerformed
         InfoMacGUI.exibir(this);
-    }//GEN-LAST:event_jMenuItemInfoMacStoreActionPerformed
+    }//GEN-LAST:event_mnuInfoMacStoreActionPerformed
 
     private void mnuHipcomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuHipcomActionPerformed
         HipcomGUI.exibir(this);
@@ -3697,7 +3697,6 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem jMenuItemGuiaSistemas;
     private javax.swing.JMenuItem jMenuItemIdeal;
     private javax.swing.JMenuItem jMenuItemInfoBrasil;
-    private javax.swing.JMenuItem jMenuItemInfoMacStore;
     private javax.swing.JMenuItem jMenuItemJMaster;
     private javax.swing.JMenuItem jMenuItemKairos;
     private javax.swing.JMenuItem jMenuItemMilenio;
@@ -3766,6 +3765,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuIdealSoft;
     private javax.swing.JMenuItem mnuImportarNCM;
     private javax.swing.JMenuItem mnuImportarNfce;
+    private javax.swing.JMenuItem mnuInfoMacStore;
     private javax.swing.JMenuItem mnuInteragem;
     private javax.swing.JMenu mnuInterface;
     private javax.swing.JMenuItem mnuJacsys;

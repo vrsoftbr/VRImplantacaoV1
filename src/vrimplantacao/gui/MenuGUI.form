@@ -896,12 +896,12 @@
                         <Property name="text" type="java.lang.String" value="ADS"/>
                       </Properties>
                       <SubComponents>
-                        <MenuItem class="javax.swing.JMenuItem" name="jMenuItemInfoMacStore">
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuInfoMacStore">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="InfoMac - Store"/>
                           </Properties>
                           <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItemInfoMacStoreActionPerformed"/>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuInfoMacStoreActionPerformed"/>
                           </Events>
                         </MenuItem>
                       </SubComponents>
