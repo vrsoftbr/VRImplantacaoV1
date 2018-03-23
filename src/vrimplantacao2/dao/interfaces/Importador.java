@@ -53,12 +53,15 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoRepository;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoRepositoryProvider;
+import vrimplantacao2.dao.cadastro.receita.ReceitaBalancaRepository;
+import vrimplantacao2.dao.cadastro.receita.ReceitaBalancaRepositoryProvider;
 import vrimplantacao2.dao.cadastro.venda.VendaHistoricoDAO;
 import vrimplantacao2.dao.cadastro.venda.VendaHistoricoRepository;
 import vrimplantacao2.dao.cadastro.venda.VendaImpDao;
 import vrimplantacao2.dao.cadastro.venda.VendaItemImpDao;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -78,6 +81,7 @@ import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.RecebimentoCaixaIMP;
+import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 
 public class Importador {
     
@@ -745,6 +749,19 @@ public class Importador {
         );
         CompradorRepository rep = new CompradorRepository(provider);
         rep.importar(compradores);
+    }
+
+    public void importarReceitaBalanca(OpcaoReceitaBalanca... opcoes) throws Exception {
+        Set<OpcaoReceitaBalanca> opt = new HashSet<>(Arrays.asList(opcoes));
+        ProgressBar.setStatus("Receita Balança...Gerando listagem...");
+        List<ReceitaBalancaIMP> receita = getInterfaceDAO().getReceitaBalanca(opt);
+        ReceitaBalancaRepositoryProvider provider = new ReceitaBalancaRepositoryProvider(
+                getSistema(),
+                getLojaOrigem(),
+                getLojaVR()
+        );
+        ReceitaBalancaRepository rep = new ReceitaBalancaRepository(provider);
+        rep.importar(receita, opt);
     }
 
 }

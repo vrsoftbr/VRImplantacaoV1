@@ -14,6 +14,7 @@ import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.venda.VendaHistoricoIMP;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -33,6 +34,7 @@ import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.RecebimentoCaixaIMP;
+import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -357,6 +359,16 @@ public abstract class InterfaceDAO {
      * @throws Exception 
      */
     public List<CompradorIMP> getCompradores() throws Exception {
+        return new ArrayList<>();
+    }
+
+    /**
+     * Listagem com as receitas de balança.
+     * @param opt Opções de importação de receita de balança.
+     * @return Lista com as receitas de balança.
+     * @throws Exception
+     */
+    public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
         return new ArrayList<>();
     }
     

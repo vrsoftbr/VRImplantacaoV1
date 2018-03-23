@@ -5,7 +5,9 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoMySQL;
@@ -17,6 +19,7 @@ import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
+import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -35,6 +38,7 @@ import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 
 /**
  *
@@ -861,7 +865,49 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    
+    @Override
+    public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	p.procodplu,\n" +
+                    "	p.prodescr,\n" +
+                    "	a.reccod,\n" +
+                    "	a.recdescr,\n" +
+                    "	a.recmemo\n" +
+                    "from\n" +
+                    "	hiprec a\n" +
+                    "	join hipprl pl on\n" +
+                    "		a.reccod = pl.prlcodrec and\n" +
+                    "		pl.prlloja = " + getLojaOrigem() + "\n" +
+                    "	join hippro p on\n" +
+                    "		p.procodplu = pl.prlcodplu\n" +
+                    "order by\n" +
+                    "	reccod, prlcodplu"
+            )) {
+                Map<String, ReceitaBalancaIMP> receitas = new HashMap<>();
+                
+                while (rst.next()) {
+                    
+                    ReceitaBalancaIMP imp = receitas.get(rst.getString("reccod"));
+                    
+                    if (imp == null) {
+                       imp = new ReceitaBalancaIMP();
+                       imp.setId(rst.getString("reccod"));
+                       imp.setDescricao(rst.getString("recdescr"));
+                       imp.setReceita(rst.getString("recmemo"));
+                       receitas.put(imp.getId(), imp);
+                    }
+                    
+                    imp.getProdutos().add(rst.getString("procodplu"));
+                }
+                
+                return new ArrayList<>(receitas.values());
+            }
+        }
+       
+    }
     
     
     

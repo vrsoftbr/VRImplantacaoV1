@@ -27,7 +27,8 @@ public class CompradorAnteriorDAO {
                     "	loja varchar not null,\n" +
                     "	id varchar not null,\n" +
                     "	codigoatual integer,\n" +
-                    "	descricao varchar\n" +
+                    "	descricao varchar,\n" +
+                    "	primary key (sistema, loja, id)\n" +
                     ")"
             );
         }

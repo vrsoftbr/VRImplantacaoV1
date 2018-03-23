@@ -333,6 +333,16 @@
                     <Property name="text" type="java.lang.String" value="Produto Comprador"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPReceitaFilizola">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Receita (Filizola)"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPReceitaToledo">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Receita (Toledo)"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="vRPanel2">

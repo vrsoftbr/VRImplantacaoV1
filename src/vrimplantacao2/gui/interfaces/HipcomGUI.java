@@ -21,6 +21,7 @@ import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoView;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 
 public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
@@ -168,7 +169,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                         }
                         if (chkPComprador.isSelected()) {
                             importador.importarComprador();
-                        }                        
+                        }             
 
                         {
                             List<OpcaoProduto> opcoes = new ArrayList<>();
@@ -253,7 +254,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                         }
                         if (chkEANemBranco.isSelected()) {
                             importador.importarEANemBranco();
-                        }
+                        }                        
                         
                         {
                             List<OpcaoNutricional> opcoes = new ArrayList<>();
@@ -265,6 +266,19 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                             }
                             if (!opcoes.isEmpty()) {
                                 importador.importarNutricional(opcoes.toArray(new OpcaoNutricional[] {}));
+                            }                            
+                        }
+                        
+                        {
+                            List<OpcaoReceitaBalanca> opcoes = new ArrayList<>();
+                            if (chkPReceitaFilizola.isSelected()) {
+                                opcoes.add(OpcaoReceitaBalanca.FILIZOLA);
+                            }
+                            if (chkPReceitaToledo.isSelected()) {
+                                opcoes.add(OpcaoReceitaBalanca.TOLEDO);
+                            }
+                            if (!opcoes.isEmpty()) {
+                                importador.importarReceitaBalanca(opcoes.toArray(new OpcaoReceitaBalanca[] {}));
                             }                            
                         }
 
@@ -380,6 +394,8 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkPSugestaoCotacao = new vrframework.bean.checkBox.VRCheckBox();
         chkPComprador = new vrframework.bean.checkBox.VRCheckBox();
         chkPProdComprador = new vrframework.bean.checkBox.VRCheckBox();
+        chkPReceitaFilizola = new vrframework.bean.checkBox.VRCheckBox();
+        chkPReceitaToledo = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
@@ -554,6 +570,12 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkPProdComprador.setText("Produto Comprador");
         tabProdutos.add(chkPProdComprador);
+
+        chkPReceitaFilizola.setText("Receita (Filizola)");
+        tabProdutos.add(chkPReceitaFilizola);
+
+        chkPReceitaToledo.setText("Receita (Toledo)");
+        tabProdutos.add(chkPReceitaToledo);
 
         tabImportacao.addTab("Produtos", tabProdutos);
 
@@ -836,6 +858,8 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkPComprador;
     private vrframework.bean.checkBox.VRCheckBox chkPDescontinuado;
     private vrframework.bean.checkBox.VRCheckBox chkPProdComprador;
+    private vrframework.bean.checkBox.VRCheckBox chkPReceitaFilizola;
+    private vrframework.bean.checkBox.VRCheckBox chkPReceitaToledo;
     private vrframework.bean.checkBox.VRCheckBox chkPSitCadastro;
     private vrframework.bean.checkBox.VRCheckBox chkPSugestaoCotacao;
     private vrframework.bean.checkBox.VRCheckBox chkPVendaPdv;
