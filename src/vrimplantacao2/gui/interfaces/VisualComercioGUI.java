@@ -240,9 +240,6 @@ public class VisualComercioGUI extends VRInternalFrame {
                             if (chkTipoEmbProduto.isSelected()) {
                                 opcoes.add(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO);
                             }
-                            if (chkCategoria.isSelected()) {
-                                opcoes.add(OpcaoProduto.CATEGORIA);
-                            }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
                             }
@@ -359,7 +356,6 @@ public class VisualComercioGUI extends VRInternalFrame {
         chkFamilia = new vrframework.bean.checkBox.VRCheckBox();
         chkTipoEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
-        chkCategoria = new vrframework.bean.checkBox.VRCheckBox();
         chkCustoComImposto = new vrframework.bean.checkBox.VRCheckBox();
         chkCustoSemImposto = new vrframework.bean.checkBox.VRCheckBox();
         chkTipoEmbProduto = new vrframework.bean.checkBox.VRCheckBox();
@@ -505,8 +501,6 @@ public class VisualComercioGUI extends VRInternalFrame {
 
         chkQtdEmbalagemEAN.setText("Qtd. Emb. EAN");
 
-        chkCategoria.setText("Categoria");
-
         chkCustoComImposto.setText("Custo Com Imposto");
 
         chkCustoSemImposto.setText("Custo Sem Imposto");
@@ -549,7 +543,6 @@ public class VisualComercioGUI extends VRInternalFrame {
                 .addGroup(pnlProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkTipoEmbProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkQtdEmbalagemEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkTipoEmbalagemEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFamilia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkValidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -581,9 +574,7 @@ public class VisualComercioGUI extends VRInternalFrame {
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(chkT1DescGondola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(pnlProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(chkT1ProdMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(chkTipoEmbProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(chkT1ProdMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGroup(pnlProdutoLayout.createSequentialGroup()
                             .addComponent(chkFamiliaProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -621,8 +612,8 @@ public class VisualComercioGUI extends VRInternalFrame {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(chkTipoEmbalagemEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(chkCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(31, Short.MAX_VALUE))
+                            .addComponent(chkTipoEmbProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(39, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Produtos", pnlProduto);
@@ -969,8 +960,6 @@ public class VisualComercioGUI extends VRInternalFrame {
         );
 
         tabsConn.addTab("Conexão DB2", vRPanel1);
-
-        vRImportaArquivBalancaPanel2.setBorder(null);
         tabsConn.addTab("Importar Arquivo de Balança", vRImportaArquivBalancaPanel2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -1116,7 +1105,6 @@ public class VisualComercioGUI extends VRInternalFrame {
     private javax.swing.JToggleButton btnConectar;
     private vrframework.bean.button.VRButton btnMapaTribut;
     private vrframework.bean.button.VRButton btnMigrar;
-    private vrframework.bean.checkBox.VRCheckBox chkCategoria;
     private vrframework.bean.checkBox.VRCheckBox chkCliCredRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkCliEvent;
     private vrframework.bean.checkBox.VRCheckBox chkCliPref;

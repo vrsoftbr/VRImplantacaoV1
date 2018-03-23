@@ -48,8 +48,8 @@
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
                   <Component id="vRImportaArquivBalancaPanel1" alignment="0" max="32767" attributes="0"/>
-                  <Component id="vRPanel6" alignment="0" pref="638" max="32767" attributes="0"/>
-                  <Component id="tabs" alignment="0" pref="638" max="32767" attributes="0"/>
+                  <Component id="vRPanel6" alignment="0" pref="630" max="32767" attributes="0"/>
+                  <Component id="tabs" alignment="0" pref="0" max="32767" attributes="0"/>
                   <Component id="vRPanel3" alignment="1" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -232,11 +232,9 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
                                   <Component id="chkOfertas" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="43" max="-2" attributes="0"/>
-                                  <Component id="chkCategoria" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace min="-2" pref="65" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="147" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -279,7 +277,6 @@
                                       <Group type="103" groupAlignment="3" attributes="0">
                                           <Component id="chkCustoComImposto" alignment="3" min="-2" max="-2" attributes="0"/>
                                           <Component id="chkOfertas" alignment="3" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkCategoria" alignment="3" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="3" attributes="0">
@@ -321,7 +318,7 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace pref="81" max="32767" attributes="0"/>
+                          <EmptySpace pref="85" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -455,11 +452,6 @@
                     <Property name="text" type="java.lang.String" value="Qtd. Emb. EAN"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCategoria">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Categoria"/>
-                  </Properties>
-                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCustoComImposto">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Custo Com Imposto"/>
@@ -504,7 +496,7 @@
                           </Group>
                           <EmptySpace min="-2" pref="57" max="-2" attributes="0"/>
                           <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="359" max="32767" attributes="0"/>
+                          <EmptySpace pref="351" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -584,7 +576,7 @@
                               <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="499" max="32767" attributes="0"/>
+                          <EmptySpace pref="491" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -648,7 +640,7 @@
                           <Component id="chkUnifClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="chkUnifClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="376" max="32767" attributes="0"/>
+                      <EmptySpace pref="368" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -749,19 +741,19 @@
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Component id="vRLabel25" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txtDatabase" min="-2" pref="244" max="-2" attributes="0"/>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
+                          <Component id="txtDatabase" pref="244" max="32767" attributes="0"/>
+                          <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Component id="txtLojaCliente" min="-2" pref="57" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Component id="btnConectar" min="-2" pref="114" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
                           <Component id="vRTextField1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="12" max="32767" attributes="0"/>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>

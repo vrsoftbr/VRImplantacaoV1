@@ -324,11 +324,6 @@
                     <Property name="text" type="java.lang.String" value="Qtd. Emb. EAN"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCategoria">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Categoria"/>
-                  </Properties>
-                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCustoComImposto">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Custo Com Imposto"/>

@@ -154,8 +154,23 @@ public enum OpcaoProduto {
         public String toString() {
             return "Exceção";
         }
-    }, IMPORTAR_RESETAR_BALANCA, IMPORTAR_GERAR_SUBNIVEL_MERC, IMPORTAR_MANTER_BALANCA, 
-    CATEGORIA;
+    }, SUGESTAO_COTACAO {
+        @Override
+        public String toString() {
+            return "Sugestão de Cotação";
+        }
+    }, SUGESTAO_PEDIDO {
+        @Override
+        public String toString() {
+            return "Sugestão de Pedido";
+        }
+    }, COMPRADOR {
+        @Override
+        public String toString() {
+            return "Comprador";
+        }
+    },
+    IMPORTAR_RESETAR_BALANCA, IMPORTAR_GERAR_SUBNIVEL_MERC, IMPORTAR_MANTER_BALANCA, ;
     
     private List<ProdutoIMP> listaEspecial;
     

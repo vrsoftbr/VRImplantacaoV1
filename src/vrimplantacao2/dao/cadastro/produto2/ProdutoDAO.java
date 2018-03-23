@@ -103,7 +103,7 @@ public class ProdutoDAO {
             sql.put("mercadologico3", vo.getMercadologico().getMercadologico3());
             sql.put("mercadologico4", vo.getMercadologico().getMercadologico4());
             sql.put("mercadologico5", vo.getMercadologico().getMercadologico5());
-            sql.put("id_comprador", 1);
+            sql.put("id_comprador", vo.getIdComprador());
             sql.put("custofinal", 0.0);
             sql.put("id_familiaproduto", vo.getFamiliaProduto() != null ? vo.getFamiliaProduto().getId() : -1, -1);
             sql.put("descricaoreduzida", vo.getDescricaoReduzida());
@@ -253,15 +253,20 @@ public class ProdutoDAO {
                 sql.putNull("id_familiaproduto");
             }
         }
+        if (opt.contains(OpcaoProduto.COMPRADOR)) {
+            sql.put("id_comprador", vo.getIdComprador());
+        }
         if (opt.contains(OpcaoProduto.NCM)) {
             sql.put("ncm1", vo.getNcm().getNcm1());
             sql.put("ncm2", vo.getNcm().getNcm2());
             sql.put("ncm3", vo.getNcm().getNcm3());
         }
-        if (opt.contains(OpcaoProduto.CATEGORIA)) {
+        if (opt.contains(OpcaoProduto.SUGESTAO_COTACAO)) {
             sql.put("sugestaocotacao", vo.isSugestaoCotacao());
-            sql.put("sugestaopedido", vo.isSugestaoPedido());
         }
+        if (opt.contains(OpcaoProduto.SUGESTAO_PEDIDO)) {
+            sql.put("sugestaopedido", vo.isSugestaoPedido());
+        }        
         if (opt.contains(OpcaoProduto.FABRICANTE)) {
             sql.put("id_fornecedorfabricante", vo.getIdFornecedorFabricante());
         }
