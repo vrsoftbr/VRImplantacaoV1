@@ -1,15 +1,22 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -39,6 +46,8 @@ import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
@@ -50,6 +59,9 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     
     private Date rotativoDataInicial;
     private Date rotativoDataFinal;
+    
+    private Date vendaDataInicial;
+    private Date vendaDataFinal;
 
     public void setRotativoDataInicial(Date rotativoDataInicial) {
         this.rotativoDataInicial = rotativoDataInicial;
@@ -57,6 +69,14 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setRotativoDataFinal(Date rotativoDataFinal) {
         this.rotativoDataFinal = rotativoDataFinal;
+    }
+
+    public void setVendaDataInicial(Date vendaDataInicial) {
+        this.vendaDataInicial = vendaDataInicial;
+    }
+
+    public void setVendaDataFinal(Date vendaDataFinal) {
+        this.vendaDataFinal = vendaDataFinal;
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -908,7 +928,329 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         }
        
     }
+
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new VendaIterator(getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new VendaItemIterator(getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
+    }
     
+    private static class VendaIterator implements Iterator<VendaIMP> {
+        
+        private static final SimpleDateFormat TIMESTAMP_DATE = new SimpleDateFormat("yyyy-MM-dd");
+        private static final SimpleDateFormat TIMESTAMP = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+
+        private Statement stm = ConexaoMySQL.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaIMP next;
+        private Set<String> uk = new HashSet<>();
+        
+        public static String makeId(String idLoja, Date data, String ecf, String idCaixa, String numeroCupom) {
+            return idLoja + "-" + TIMESTAMP_DATE.format(data) + "-" + ecf + "-" + idCaixa + "-" + numeroCupom;
+        }
+
+        private void obterNext() {
+            try {
+                
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaIMP();
+                        String id = makeId(rst.getString("id_loja"), rst.getDate("data"), rst.getString("ecf"), rst.getString("id_caixa"), rst.getString("numerocupom"));
+                        if (!uk.add(id)) {
+                            LOG.warning("Venda " + id + " já existe na listagem");
+                        }
+                        next.setId(id);
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                        next.setData(rst.getDate("data"));
+                        String horaInicio = TIMESTAMP_DATE.format(rst.getDate("data")) + " " + rst.getString("horainicio");
+                        String horaTermino = TIMESTAMP_DATE.format(rst.getDate("data")) + " " + rst.getString("horatermino");
+                        next.setHoraInicio(TIMESTAMP.parse(horaInicio));
+                        next.setHoraTermino(TIMESTAMP.parse(horaTermino));
+                        next.setCancelado("S".equals(rst.getString("cancelado")));
+                        next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
+                    }
+                }
+            } catch (SQLException | ParseException ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        private String getVendaSQL(String ano, String idLojaCliente, Date dataInicio, Date dataTermino) {
+            
+            String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
+            String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
+            
+            return "select\n" +
+                    "	v.loja id_loja,\n" +
+                    "	v.codigo_caixa id_caixa,\n" +
+                    "	v.numero_cupom_fiscal numerocupom,\n" +
+                    "	v.codigo_terminal ecf,\n" +
+                    "	v.data,\n" +
+                    "	min(v.hora) horainicio,\n" +
+                    "	max(v.hora) horatermino,	\n" +
+                    "	min(v.cupom_cancelado) cancelado,\n" +
+                    "	sum(v.valor_total) subtotalimpressora\n" +
+                    "from\n" +
+                    "	hip_cupom_item_semcript" + (ano == null ? "" : "_" + ano) + " v\n" +
+                    "where\n" +
+                    "	v.loja = " + idLojaCliente + " and\n" +
+                    "	v.data >= '" + strDataInicio + "' and\n" +
+                    "	v.data <= '" + strDataTermino + "'\n" +
+                    "group by\n" +
+                    "	id_loja,\n" +
+                    "	id_caixa,\n" +
+                    "	numerocupom,\n" +
+                    "	ecf,\n" +
+                    "	data\n";
+        }
+        
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            
+            StringBuilder str = new StringBuilder();
+            
+            str.append(getVendaSQL(null, idLojaCliente, dataInicio, dataTermino));
+            str.append("union\n");
+            str.append(getVendaSQL("2017", idLojaCliente, dataInicio, dataTermino));
+            str.append("union\n");
+            str.append(getVendaSQL("2016", idLojaCliente, dataInicio, dataTermino));
+            str.append("union\n");
+            str.append(getVendaSQL("2015", idLojaCliente, dataInicio, dataTermino));
+            str.append("union\n");
+            str.append(getVendaSQL("2014", idLojaCliente, dataInicio, dataTermino));
+            str.append("union\n");
+            str.append(getVendaSQL("2013", idLojaCliente, dataInicio, dataTermino));
+            
+            this.sql = str.toString();
+                    
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaIMP next() {
+            obterNext();
+            VendaIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+        
+    }
     
+    private static class SmProduto {
+        public String id;
+        public String ean;
+        public String descricao;
+        public String embalagem;
+
+        public SmProduto(String id, String ean, String descricao, String embalagem) {
+            this.id = id;
+            this.ean = ean;
+            this.descricao = descricao;
+            this.embalagem = embalagem;
+        }
+        
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 31 * hash + Objects.hashCode(this.id);
+            hash = 31 * hash + Objects.hashCode(this.ean);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final SmProduto other = (SmProduto) obj;
+            if (!Objects.equals(this.id, other.id)) {
+                return false;
+            }
+            return Objects.equals(this.ean, other.ean);
+        }
+
+        @Override
+        public String toString() {
+            return "SmProduto{" + "id=" + id + ", ean=" + ean + ", descricao=" + descricao + '}';
+        }
+    }
+    
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+
+        private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+
+        private Statement stm = ConexaoMySQL.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaItemIMP next;
+        private Map<String, SmProduto> produtos;
+
+        private void obterNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+                        
+                        SmProduto prod = produtos.get(rst.getString("ean"));
+                        
+                        if (prod == null) {
+                            LOG.severe("Produto " + rst.getString("ean") + " não encontrado");                            
+                        } else {
+                            next = new VendaItemIMP();
+                            String id = VendaIterator.makeId(rst.getString("id_loja"), rst.getDate("data"), rst.getString("ecf"), rst.getString("id_caixa"), rst.getString("numerocupom"));
+                            next.setId(id + "-" + rst.getString("id"));
+                            next.setVenda(id);
+                            next.setSequencia(rst.getInt("sequencia"));
+                            next.setProduto(prod.id);
+                            next.setDescricaoReduzida(prod.descricao);
+                            next.setUnidadeMedida(prod.embalagem);
+                            next.setCodigoBarras(prod.ean);
+                            next.setQuantidade(rst.getDouble("quantidade"));
+                            next.setTotalBruto(rst.getDouble("total_bruto"));
+                            next.setValorDesconto(0);
+                            next.setValorAcrescimo(0);
+                            next.setCancelado("S".equals(rst.getString("cancelado")));
+                            next.setIcmsCst(Utils.stringToInt(rst.getString("cst")));
+                            next.setIcmsAliq(rst.getDouble("aliquota"));
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+        
+        private String getVendaSQL(String ano, String idLojaCliente, Date dataInicio, Date dataTermino) {
+            
+            String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
+            String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
+            
+            return 
+                "select\n" +
+                "	v.loja id_loja,\n" +
+                "	v.data,\n" +
+                "	v.codigo_terminal ecf,\n" +
+                "	v.codigo_caixa id_caixa,\n" +
+                "	v.numero_cupom_fiscal numerocupom,\n" +
+                "	v.sequencia,\n" +
+                "	v.codigo_plu_bar ean,\n" +
+                "	v.quantidade_itens quantidade,\n" +
+                "	v.valor_total total_bruto,\n" +
+                "	v.item_cancelado cancelado,\n" +
+                "	v.legenda icms,\n" +
+                "	case substring(v.legenda,1,1)\n" +
+                "	when 'T' then 0\n" +
+                "	when '0' then 0\n" +
+                "	when 'F' then 60\n" +
+                "	when 'I' then 40\n" +
+                "	else 40\n" +
+                "	end as cst,\n" +
+                "	case substring(v.legenda,1,1)\n" +
+                "	when 'T' then v.aliquota\n" +
+                "	when '0' then v.aliquota\n" +
+                "	when 'F' then 0\n" +
+                "	when 'I' then 0\n" +
+                "	else 0\n" +
+                "	end as aliquota\n" +
+                "from\n" +
+                "	hip_cupom_item_semcript" + (ano == null ? "" : "_" + ano) + " v\n" +
+                "where\n" +
+                "	v.loja = " + idLojaCliente + " and\n" +
+                "	v.data >= '" + strDataInicio + "' and\n" +
+                "	v.data <= '" + strDataTermino + "'\n";
+        }
+        
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            StringBuilder str = new StringBuilder();
+            
+            str.append(getVendaSQL(null, idLojaCliente, dataInicio, dataTermino));
+            str.append("union\n");
+            str.append(getVendaSQL("2017", idLojaCliente, dataInicio, dataTermino));
+            str.append("union\n");
+            str.append(getVendaSQL("2016", idLojaCliente, dataInicio, dataTermino));
+            str.append("union\n");
+            str.append(getVendaSQL("2015", idLojaCliente, dataInicio, dataTermino));
+            str.append("union\n");
+            str.append(getVendaSQL("2014", idLojaCliente, dataInicio, dataTermino));
+            str.append("union\n");
+            str.append(getVendaSQL("2013", idLojaCliente, dataInicio, dataTermino));
+            str.append("order by id_loja, data, ecf, numerocupom");
+            
+            this.sql = str.toString();
+                    
+            LOG.log(Level.FINE, "SQL da venda item: " + sql);
+            rst = stm.executeQuery(sql);
+            
+            this.produtos = new HashMap<>();
+            
+            ProgressBar.setStatus("Vendas(Itens)...Carregando produtos");
+            
+            try (Statement st = ConexaoMySQL.getConexao().createStatement()) {
+                try (ResultSet rs = st.executeQuery(
+                        "select distinct\n" +
+                        "	coalesce(ean.barcodbar, p.procodplu) ean,\n" +
+                        "	p.procodplu id,\n" +
+                        "	coalesce(nullif(trim(p.prodescres),''),p.prodescr) descricao,\n" +
+                        "	substring(p.proembu, 1,2) embalagem\n" +
+                        "from\n" +
+                        "	hippro p\n" +
+                        "	left join hipbar ean on\n" +
+                        "		ean.barcodplu = p.procodplu"
+                )) {
+                    while (rs.next()) {
+                        SmProduto smProduto = new SmProduto(
+                                rs.getString("id"),
+                                rs.getString("ean"),
+                                rs.getString("descricao"),
+                                rs.getString("embalagem")
+                        );
+                        produtos.put(smProduto.ean, smProduto);
+                    }
+                }
+            }
+            
+            ProgressBar.setStatus("Vendas(Itens)...Carregando os itens da venda");
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            obterNext();
+            VendaItemIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+    }
     
 }
