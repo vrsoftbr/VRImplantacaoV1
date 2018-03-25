@@ -42,6 +42,7 @@ public final class Parametros implements Iterable<Parametro>{
     private static final String BANCO_IMPL = "BANCO_IMPL";
     private static final String GERAR_BANCO_IMPLANTACAO = "GERAR_BANCO_IMPLANTACAO";
     private static final String IMPORTAR_BANCO_IMPLANTACAO = "IMPORTAR_BANCO_IMPLANTACAO";
+    private static final String ITEM_VENDA_PADRAO = "ITEM_VENDA_PADRAO";
     private static final SimpleDateFormat DATA_FORMAT= new SimpleDateFormat("yyyy-MM-dd");
     
     private final ParametroImportacaoDAO dao = new ParametroImportacaoDAO();
@@ -293,6 +294,14 @@ public final class Parametros implements Iterable<Parametro>{
         return getBool(PARAMETROS_CONFIGURADOS);
     }
 
+    public int getItemVendaPadrao() {
+        return Utils.stringToInt(params.get(ITEM_VENDA_PADRAO));
+    }
+
+    public void setItemVendaPadrao(int itemVendaPadrao) {
+        this.params.put(itemVendaPadrao == 0 ? null : String.valueOf(itemVendaPadrao), ITEM_VENDA_PADRAO);
+    }
+
     /**
      * Inclui um parâmetro como String.
      * @param param Valor do parâmetro.
@@ -432,5 +441,7 @@ public final class Parametros implements Iterable<Parametro>{
             return nullValue;
         }
     }
+
+   
 
 }

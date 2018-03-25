@@ -1018,14 +1018,14 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
             str.append(getVendaSQL(null, idLojaCliente, dataInicio, dataTermino));
             str.append("union\n");
             str.append(getVendaSQL("2017", idLojaCliente, dataInicio, dataTermino));
-            str.append("union\n");
+            /*str.append("union\n");
             str.append(getVendaSQL("2016", idLojaCliente, dataInicio, dataTermino));
             str.append("union\n");
             str.append(getVendaSQL("2015", idLojaCliente, dataInicio, dataTermino));
             str.append("union\n");
             str.append(getVendaSQL("2014", idLojaCliente, dataInicio, dataTermino));
             str.append("union\n");
-            str.append(getVendaSQL("2013", idLojaCliente, dataInicio, dataTermino));
+            str.append(getVendaSQL("2013", idLojaCliente, dataInicio, dataTermino));*/
             
             this.sql = str.toString();
                     
@@ -1098,8 +1098,6 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
-        private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
-
         private Statement stm = ConexaoMySQL.getConexao().createStatement();
         private ResultSet rst;
         private String sql;
@@ -1113,26 +1111,30 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                         
                         SmProduto prod = produtos.get(rst.getString("ean"));
                         
-                        if (prod == null) {
-                            LOG.severe("Produto " + rst.getString("ean") + " não encontrado");                            
-                        } else {
-                            next = new VendaItemIMP();
-                            String id = VendaIterator.makeId(rst.getString("id_loja"), rst.getDate("data"), rst.getString("ecf"), rst.getString("id_caixa"), rst.getString("numerocupom"));
-                            next.setId(id + "-" + rst.getString("id"));
-                            next.setVenda(id);
-                            next.setSequencia(rst.getInt("sequencia"));
+                        next = new VendaItemIMP();
+                        String id = VendaIterator.makeId(rst.getString("id_loja"), rst.getDate("data"), rst.getString("ecf"), rst.getString("id_caixa"), rst.getString("numerocupom"));
+                        next.setId(id + "-" + rst.getString("sequencia"));
+                        next.setVenda(id);
+                        next.setSequencia(rst.getInt("sequencia"));
+                        if (prod != null) {
                             next.setProduto(prod.id);
                             next.setDescricaoReduzida(prod.descricao);
                             next.setUnidadeMedida(prod.embalagem);
                             next.setCodigoBarras(prod.ean);
-                            next.setQuantidade(rst.getDouble("quantidade"));
-                            next.setTotalBruto(rst.getDouble("total_bruto"));
-                            next.setValorDesconto(0);
-                            next.setValorAcrescimo(0);
-                            next.setCancelado("S".equals(rst.getString("cancelado")));
-                            next.setIcmsCst(Utils.stringToInt(rst.getString("cst")));
-                            next.setIcmsAliq(rst.getDouble("aliquota"));
+                        } else {
+                            next.setProduto("");
+                            next.setDescricaoReduzida("SEM DESCRICAO");
+                            next.setUnidadeMedida("UN");
+                            next.setCodigoBarras(rst.getString("ean"));
                         }
+                        next.setQuantidade(rst.getDouble("quantidade"));
+                        next.setTotalBruto(rst.getDouble("total_bruto"));
+                        next.setValorDesconto(0);
+                        next.setValorAcrescimo(0);
+                        next.setCancelado("S".equals(rst.getString("cancelado")));
+                        next.setIcmsCst(Utils.stringToInt(rst.getString("cst")));
+                        next.setIcmsAliq(rst.getDouble("aliquota"));
+
                     }
                 }
             } catch (Exception ex) {
@@ -1187,14 +1189,14 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
             str.append(getVendaSQL(null, idLojaCliente, dataInicio, dataTermino));
             str.append("union\n");
             str.append(getVendaSQL("2017", idLojaCliente, dataInicio, dataTermino));
-            str.append("union\n");
+            /*str.append("union\n");
             str.append(getVendaSQL("2016", idLojaCliente, dataInicio, dataTermino));
             str.append("union\n");
             str.append(getVendaSQL("2015", idLojaCliente, dataInicio, dataTermino));
             str.append("union\n");
             str.append(getVendaSQL("2014", idLojaCliente, dataInicio, dataTermino));
             str.append("union\n");
-            str.append(getVendaSQL("2013", idLojaCliente, dataInicio, dataTermino));
+            str.append(getVendaSQL("2013", idLojaCliente, dataInicio, dataTermino));*/
             str.append("order by id_loja, data, ecf, numerocupom");
             
             this.sql = str.toString();
@@ -1229,6 +1231,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                 }
             }
+            
+            LOG.fine("Quantidade de produtos SM: " + produtos.size());
             
             ProgressBar.setStatus("Vendas(Itens)...Carregando os itens da venda");
         }

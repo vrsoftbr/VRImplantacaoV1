@@ -16,6 +16,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -121,6 +122,8 @@ public class ParametroGUI extends VRInternalFrame {
         pnlDiversos = new VRPanel();
         vRLabel4 = new VRLabel();
         cmbTipoPagamento = new JComboBox();
+        txtVendaProdutoPadrao = new VRTextField();
+        vRLabel5 = new VRLabel();
         tabLogging = new VRPanel();
         btnLogGravar = new VRButton();
         btnLogCancelar = new VRButton();
@@ -207,7 +210,7 @@ public class ParametroGUI extends VRInternalFrame {
                 .addGroup(pnlLocalizacaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addGroup(pnlLocalizacaoLayout.createSequentialGroup()
                         .addComponent(vRLabel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 272, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(cmbMunicipioPadrao, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlLocalizacaoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -239,7 +242,7 @@ public class ParametroGUI extends VRInternalFrame {
         GroupLayout vRPanel1Layout = new GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
         vRPanel1Layout.setHorizontalGroup(vRPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(GroupLayout.Alignment.TRAILING, vRPanel1Layout.createSequentialGroup()
+            .addGroup(vRPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkGerarBancoImplantacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
@@ -250,17 +253,20 @@ public class ParametroGUI extends VRInternalFrame {
         );
         vRPanel1Layout.setVerticalGroup(vRPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(vRPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                     .addComponent(chkGerarBancoImplantacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtBancoImplantacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkImportarBancoImplantacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(chkImportarBancoImplantacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
         );
 
         pnlDiversos.setBorder(BorderFactory.createTitledBorder("Diversos"));
 
         vRLabel4.setText("Tipo de Pagamento");
+
+        txtVendaProdutoPadrao.setMascara("Numero");
+
+        vRLabel5.setText("ID Prod. Padrão (Para Vendas)");
 
         GroupLayout pnlDiversosLayout = new GroupLayout(pnlDiversos);
         pnlDiversos.setLayout(pnlDiversosLayout);
@@ -270,15 +276,26 @@ public class ParametroGUI extends VRInternalFrame {
                 .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addGroup(pnlDiversosLayout.createSequentialGroup()
                         .addComponent(vRLabel4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(0, 234, Short.MAX_VALUE))
                     .addComponent(cmbTipoPagamento, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(txtVendaProdutoPadrao, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(vRLabel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         pnlDiversosLayout.setVerticalGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(pnlDiversosLayout.createSequentialGroup()
-                .addComponent(vRLabel4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cmbTipoPagamento, GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE)
+                .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                    .addGroup(pnlDiversosLayout.createSequentialGroup()
+                        .addComponent(vRLabel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addGap(26, 26, 26))
+                    .addGroup(pnlDiversosLayout.createSequentialGroup()
+                        .addComponent(vRLabel4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(cmbTipoPagamento, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtVendaProdutoPadrao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
 
@@ -301,7 +318,7 @@ public class ParametroGUI extends VRInternalFrame {
                 .addComponent(vRPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlDiversos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(205, Short.MAX_VALUE))
+                .addContainerGap(208, Short.MAX_VALUE))
         );
 
         tabs.addTab("Valores padrão", tabValorPadrão);
@@ -422,7 +439,7 @@ public class ParametroGUI extends VRInternalFrame {
         tabLoggingLayout.setHorizontalGroup(tabLoggingLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(GroupLayout.Alignment.TRAILING, tabLoggingLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(tabLoggingLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addGroup(GroupLayout.Alignment.TRAILING, tabLoggingLayout.createSequentialGroup()
@@ -588,10 +605,12 @@ public class ParametroGUI extends VRInternalFrame {
     private VRFileChooser txtBancoImplantacao;
     private VRTextField txtCepPadrao;
     private JTextField txtLogNome;
+    private VRTextField txtVendaProdutoPadrao;
     private VRLabel vRLabel1;
     private VRLabel vRLabel2;
     private VRLabel vRLabel3;
     private VRLabel vRLabel4;
+    private VRLabel vRLabel5;
     private VRPanel vRPanel1;
     // End of variables declaration//GEN-END:variables
 
@@ -639,6 +658,7 @@ public class ParametroGUI extends VRInternalFrame {
 
         chkGerarBancoImplantacao.setSelected(parametros.isGerarBancoImplantacao());
         chkImportarBancoImplantacao.setSelected(parametros.isImportarBancoImplantacao());
+        txtVendaProdutoPadrao.setInt(parametros.getItemVendaPadrao());
         
         LOG.fine("Parametros carregados na tela");
     }
@@ -653,6 +673,7 @@ public class ParametroGUI extends VRInternalFrame {
             parametros.setGerarBancoImplantacao(chkGerarBancoImplantacao.isSelected());
             parametros.setImportarBancoImplantacao(chkImportarBancoImplantacao.isSelected());
             parametros.setTipoPagamento((TipoPagamento) cmbTipoPagamento.getSelectedItem());
+            parametros.setItemVendaPadrao(txtVendaProdutoPadrao.getInt());
             parametros.salvar();
             Util.exibirMensagem("Parâmetros gravados com sucesso!", title);
         } else {

@@ -17,5 +17,9 @@ public enum OpcaoVenda {
     /**
      * Determina que a verificação dos produtos será feita através dos EAN atual deles.
      */
-    IMPORTAR_POR_EAN_ATUAL
+    IMPORTAR_POR_EAN_ATUAL,
+    /**
+     * Caso o produto não seja encontrado na venda, será utilizado um item padrão para importar.
+     */
+    UTILIZAR_ITEM_PADRAO
 }

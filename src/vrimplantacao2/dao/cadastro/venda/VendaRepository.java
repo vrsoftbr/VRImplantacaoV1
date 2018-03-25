@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.cliente.ClienteEventualVO;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialVO;
 import vrimplantacao2.vo.cadastro.venda.PdvVendaItemVO;
@@ -54,6 +55,8 @@ public class VendaRepository {
             System.gc();
             
             provider.notificar("Vendas...Convertendo as vendas", (int) provider.getVendaImpSize());
+            
+            int produtoPadrao = Parametros.get().getItemVendaPadrao();
 
             for ( Iterator<VendaIMP> iterator = provider.getVendaIMP(); iterator.hasNext(); ) {
                 
@@ -131,6 +134,9 @@ public class VendaRepository {
                     if ( produto == null && String.valueOf(item.getCodigoBarras()).length() > 6 ) {
                         produto = provider.getProdutoPorEANAtual(item.getCodigoBarras());
                     }  
+                    if (produto == null && produtoPadrao != 0) {
+                        produto = produtoPadrao;
+                    }
                     if ( produto == null ) {
                         haDivergencia = true;
                         LOG.warning(
