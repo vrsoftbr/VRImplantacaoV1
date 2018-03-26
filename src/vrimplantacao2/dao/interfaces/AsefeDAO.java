@@ -543,36 +543,78 @@ public class AsefeDAO extends InterfaceDAO {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        String id = rst.getString("id") + "-" + rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
                         next.setId(id);
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
-                        next.setData(rst.getDate("data"));
-                        next.setIdClientePreferencial(rst.getString("idclientepreferencial"));
+                        next.setData(rst.getDate("data"));                        
+
+                        String endereco;
+
+                        if ((rst.getString("vc_clientepreferencial") != null)
+                                && (!rst.getString("vc_clientepreferencial").trim().isEmpty())) {
+
+                            if (!"0".equals(rst.getString("vc_clientepreferencial").trim())) {
+
+                                next.setCpf(rst.getString("cli_cpf"));
+                                next.setNomeCliente(rst.getString("cli_nomecliente"));
+                                next.setIdClientePreferencial(rst.getString("vc_clientepreferencial"));
+
+                                endereco
+                                        = Utils.acertarTexto(rst.getString("cli_endereco")) + ","
+                                        + Utils.acertarTexto(rst.getString("cli_numero")) + ","
+                                        + Utils.acertarTexto(rst.getString("complemento")) + ","
+                                        + Utils.acertarTexto(rst.getString("cli_bairro")) + ","
+                                        + Utils.acertarTexto(rst.getString("cli_cidade")) + "-"
+                                        + Utils.acertarTexto(rst.getString("cli_estado")) + ","
+                                        + Utils.acertarTexto(rst.getString("cli_cep"));
+                                next.setEnderecoCliente(endereco);
+                            } else {
+
+                                next.setCpf(rst.getString("vc_cpf"));
+                                next.setNomeCliente(rst.getString("vc_nomecliente"));
+                                next.setIdClientePreferencial(null);
+
+                                endereco
+                                        = Utils.acertarTexto(rst.getString("vc_endereco")) + ","
+                                        + Utils.acertarTexto(rst.getString("vc_numero")) + ","
+                                        + Utils.acertarTexto(rst.getString("complemento")) + ","
+                                        + Utils.acertarTexto(rst.getString("vc_bairro")) + ","
+                                        + Utils.acertarTexto(rst.getString("vc_cidade")) + "-"
+                                        + Utils.acertarTexto(rst.getString("vc_estado")) + ","
+                                        + Utils.acertarTexto(rst.getString("vc_cep"));
+                                next.setEnderecoCliente(endereco);
+                            }
+                        } else {
+
+                            next.setCpf(rst.getString("vc_cpf"));
+                            next.setNomeCliente(rst.getString("vc_nomecliente"));
+                            next.setIdClientePreferencial(null);
+
+                            endereco
+                                    = Utils.acertarTexto(rst.getString("vc_endereco")) + ","
+                                    + Utils.acertarTexto(rst.getString("vc_numero")) + ","
+                                    + Utils.acertarTexto(rst.getString("complemento")) + ","
+                                    + Utils.acertarTexto(rst.getString("vc_bairro")) + ","
+                                    + Utils.acertarTexto(rst.getString("vc_cidade")) + "-"
+                                    + Utils.acertarTexto(rst.getString("vc_estado")) + ","
+                                    + Utils.acertarTexto(rst.getString("vc_cep"));
+                            next.setEnderecoCliente(endereco);
+                        }
+
                         String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
                         String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horatermino");
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
                         next.setCancelado(rst.getBoolean("cancelado"));
                         next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
-                        next.setCpf(rst.getString("cpf"));
                         next.setValorDesconto(rst.getDouble("desconto"));
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setNumeroSerie(rst.getString("numeroserie"));
                         next.setModeloImpressora(rst.getString("modelo"));
-                        next.setNomeCliente(rst.getString("nomecliente"));
-                        String endereco
-                                = Utils.acertarTexto(rst.getString("endereco")) + ","
-                                + Utils.acertarTexto(rst.getString("numero")) + ","
-                                + Utils.acertarTexto(rst.getString("complemento")) + ","
-                                + Utils.acertarTexto(rst.getString("bairro")) + ","
-                                + Utils.acertarTexto(rst.getString("cidade")) + "-"
-                                + Utils.acertarTexto(rst.getString("estado")) + ","
-                                + Utils.acertarTexto(rst.getString("cep"));
-                        next.setEnderecoCliente(endereco);
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -584,17 +626,35 @@ public class AsefeDAO extends InterfaceDAO {
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select \n"
+                    + "vc.Codigo as id,\n"
                     + "vc.COO as numerocupom,\n"
                     + "vc.NumeroCaixa as ecf,\n"
                     + "vc.Data as data,\n"
-                    + "vc.CodCliente as id_clientepreferencial,\n"
+                    + "vc.CodCliente as vc_clientepreferencial,\n"
+                    + "cli.CodCliente as cli_clientepreferencial,\n"
                     + "MIN(CONVERT(nvarchar(5), Data, 108)) as horainicio,\n"
                     + "MAX(CONVERT(nvarchar(5), Data, 108)) as horatermino,\n"
                     + "'N' as cancelado,\n"
                     + "vc.ValorTotal as subtotalimpressora,\n"
-                    + "vc.CPFConsumidor as cpf,\n"
+                    + "vc.CPFConsumidor as vc_cpf,\n"
+                    + "cli.CpfCliente as cli_cpf,\n"
                     + "ISNULL(vc.DescAcr, 0) as desconto,\n"
                     + "0 as acrescimo,\n"
+                    + "vc.NomeConsumidor as vc_nomecliente,\n"
+                    + "cli.NomeCliente as cli_nomecliente,\n"
+                    + "vc.Endereco as vc_endereco,\n"
+                    + "cli.EnderecoCliente as cli_endereco,\n"
+                    + "'' as vc_numero,\n"
+                    + "cli.NUMERO as cli_numero,\n"
+                    + "'' as complemento,\n"
+                    + "vc.Bairro as vc_bairro,\n"
+                    + "cli.BairroCliente as cli_bairro,\n"
+                    + "vc.Cidade as vc_cidade,\n"
+                    + "cli.CidadeCliente as cli_cidade,\n"
+                    + "'' as vc_estado,\n"
+                    + "cli.UF as cli_estado,\n"
+                    + "vc.Cep as vc_cep,\n"
+                    + "cli.CepCliente as cli_cep,\n"
                     + "(SELECT \n"
                     + "	DISTINCT\n"
                     + "	SerieECF\n"
@@ -617,100 +677,37 @@ public class AsefeDAO extends InterfaceDAO {
                     + "                   and OrdemECF = vc.OrdemECF\n"
                     + "                   and CodEmpresa = " + idLojaCliente + "\n"
                     + ") as modelo,\n"
-                    + "'' as marca,\n"
-                    + "vc.NomeConsumidor as nomecliente,\n"
-                    + "vc.Endereco as endereco,\n"
-                    + "'' as numero,\n"
-                    + "'' as complemento,\n"
-                    + "vc.Bairro as bairro,\n"
-                    + "vc.Cidade as cidade,\n"
-                    + "'' as estado,\n"
-                    + "vc.Cep as cep\n"
+                    + "'' as marca\n"
                     + "from CE_VendasCaixa vc \n"
-                    + "where vc.CodCliente is null\n"
-                    + "and (vc.Data between CONVERT(datetime, '" + FORMAT.format(dataInicio) + "', 103)\n"
+                    + "left join CONTROLE_CLIENTES.dbo.CC_Clientes cli on cli.CodCliente = vc.CodCliente\n"
+                    + "where (vc.Data between CONVERT(datetime, '" + FORMAT.format(dataInicio) + "', 103)\n"
                     + "		and CONVERT(datetime, '" + FORMAT.format(dataTermino) + "', 103))\n"
                     + "and vc.CodEmpresa = " + idLojaCliente + "\n"
                     + "group by \n"
+                    + "vc.Codigo,\n"
                     + "vc.COO, \n"
                     + "vc.NumeroCaixa, \n"
                     + "vc.Data, \n"
                     + "vc.CodCliente,\n"
-                    + "vc.ValorTotal,\n"
-                    + "vc.CPFConsumidor,\n"
-                    + "vc.DescAcr,\n"
-                    + "vc.NomeConsumidor,\n"
-                    + "vc.Endereco,\n"
-                    + "vc.Bairro,\n"
-                    + "vc.Cidade,\n"
-                    + "vc.Cep,\n"
-                    + "vc.OrdemECF\n"
-                    + "union all\n"
-                    + "select\n"
-                    + "vc.COO as numerocupom,\n"
-                    + "vc.NumeroCaixa as ecf,\n"
-                    + "vc.Data as data,\n"
-                    + "cli.CodCliente as id_clientepreferencial,\n"
-                    + "MIN(CONVERT(nvarchar(5), Data, 108)) as horainicio,\n"
-                    + "MAX(CONVERT(nvarchar(5), Data, 108)) as horatermino,\n"
-                    + "'N' as cancelado,\n"
-                    + "vc.ValorTotal as subtotalimpressora,\n"
-                    + "cli.CpfCliente as cpf,\n"
-                    + "ISNULL(vc.DescAcr, 0) as desconto,\n"
-                    + "0 as acrescimo,\n"
-                    + "(SELECT \n"
-                    + "	DISTINCT\n"
-                    + "	SerieECF\n"
-                    + "	FROM dbo.ExpCucaPrincipal\n"
-                    + "	WHERE \n"
-                    + "	(Data = (SELECT MAX(Data) AS Expr1\n"
-                    + "					FROM dbo.ExpCucaPrincipal AS AUX\n"
-                    + "                   WHERE (SerieECF = dbo.ExpCucaPrincipal.SerieECF)))\n"
-                    + "                   and OrdemECF = vc.OrdemECF\n"
-                    + "                   and CodEmpresa = " + idLojaCliente + "\n"
-                    + ") as numeroserie,\n"
-                    + "(SELECT \n"
-                    + "	DISTINCT\n"
-                    + "	ECF_Mod\n"
-                    + "	FROM dbo.ExpCucaPrincipal\n"
-                    + "	WHERE \n"
-                    + "	(Data = (SELECT MAX(Data) AS Expr1\n"
-                    + "					FROM dbo.ExpCucaPrincipal AS AUX\n"
-                    + "                   WHERE (SerieECF = dbo.ExpCucaPrincipal.SerieECF)))\n"
-                    + "                   and OrdemECF = vc.OrdemECF\n"
-                    + "                   and CodEmpresa = " + idLojaCliente + "\n"
-                    + ") as modelo,\n"
-                    + "'' as marca,\n"
-                    + "cli.NomeCliente as nomecliente,\n"
-                    + "cli.EnderecoCliente as endereco,\n"
-                    + "cli.NUMERO as numero,\n"
-                    + "'' as complemento,\n"
-                    + "cli.BairroCliente as bairro,\n"
-                    + "cli.CidadeCliente as cidade,\n"
-                    + "cli.UF as estado,\n"
-                    + "cli.CepCliente as cep\n"
-                    + "from CE_VendasCaixa vc\n"
-                    + "left join CONTROLE_CLIENTES.dbo.CC_Clientes cli on cli.CodCliente = vc.CodCliente \n"
-                    + "where vc.CodCliente is not null\n"
-                    + "/*and (vc.Data between CONVERT(datetime, '" + FORMAT.format(dataInicio) + "', 103)\n"
-                    + "		and CONVERT(datetime, '" + FORMAT.format(dataTermino) + "', 103))*/\n"
-                    + "and vc.CodEmpresa = " + idLojaCliente + "\n"
-                    + "group by \n"
-                    + "vc.COO, \n"
-                    + "vc.NumeroCaixa, \n"
-                    + "vc.Data, \n"
                     + "cli.CodCliente,\n"
                     + "vc.ValorTotal,\n"
+                    + "vc.CPFConsumidor,\n"
                     + "cli.CpfCliente,\n"
                     + "vc.DescAcr,\n"
+                    + "vc.NomeConsumidor,\n"
                     + "cli.NomeCliente,\n"
+                    + "vc.Endereco,\n"
                     + "cli.EnderecoCliente,\n"
                     + "cli.NUMERO,\n"
+                    + "vc.Bairro,\n"
                     + "cli.BairroCliente,\n"
+                    + "vc.Cidade,\n"
                     + "cli.CidadeCliente,\n"
                     + "cli.UF,\n"
+                    + "vc.Cep,\n"
                     + "cli.CepCliente,\n"
                     + "vc.OrdemECF";
+            
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -750,10 +747,11 @@ public class AsefeDAO extends InterfaceDAO {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
-
-                        next.setId(rst.getString("id"));
-                        next.setVenda(id);
+                        String idVenda = rst.getString("id_venda") + "-" + rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        String id = rst.getString("id") + "-" + rst.getString("id_venda") + "-" + rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                                
+                        next.setId(id);
+                        next.setVenda(idVenda);
                         next.setProduto(rst.getString("produto"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
@@ -764,9 +762,9 @@ public class AsefeDAO extends InterfaceDAO {
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setUnidadeMedida(rst.getString("unidade"));
 
-                        String trib = rst.getString("codaliq_venda");
+                        String trib = Utils.acertarTexto(rst.getString("codaliq_venda"));
                         if (trib == null || "".equals(trib)) {
-                            trib = rst.getString("codaliq_produto");
+                            trib = Utils.acertarTexto(rst.getString("codaliq_produto"));
                         }
 
                         obterAliquota(next, trib);
@@ -786,35 +784,35 @@ public class AsefeDAO extends InterfaceDAO {
          */
         public void obterAliquota(VendaItemIMP item, String icms) throws SQLException {
             /*
-             TA	7.00	ALIQUOTA 07%
-             TB	12.00	ALIQUOTA 12%
-             TC	18.00	ALIQUOTA 18%
-             TD	25.00	ALIQUOTA 25%
-             TE	11.00	ALIQUOTA 11%
-             I	0.00	ISENTO
-             F	0.00	SUBST TRIBUTARIA
-             N	0.00	NAO INCIDENTE
+             0700   7.00    ALIQUOTA 07%
+             1200   12.00   ALIQUOTA 12%
+             1800   18.00   ALIQUOTA 18%
+             2500   25.00   ALIQUOTA 25%
+             1100   11.00   ALIQUOTA 11%
+             I      0.00    ISENTO
+             F      0.00    SUBST TRIBUTARIA
+             N      0.00    NAO INCIDENTE
              */
             int cst;
             double aliq;
             switch (icms) {
-                case "TA":
+                case "0700":
                     cst = 0;
                     aliq = 7;
                     break;
-                case "TB":
+                case "1200":
                     cst = 0;
                     aliq = 12;
                     break;
-                case "TC":
+                case "1800":
                     cst = 0;
                     aliq = 18;
                     break;
-                case "TD":
+                case "2500":
                     cst = 0;
                     aliq = 25;
                     break;
-                case "TE":
+                case "1100":
                     cst = 0;
                     aliq = 11;
                     break;
@@ -838,12 +836,14 @@ public class AsefeDAO extends InterfaceDAO {
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select \n"
+                    + "mov.cod_mov as id,\n"
+                    + "vc.Codigo as id_venda,\n"
                     + "vc.COO as numerocupom,\n"
                     + "vc.NumeroCaixa as ecf,\n"
                     + "vc.Data as data,\n"
                     + "pro.CODPROD_PRODUTOS as produto,\n"
                     + "pro.DescricaoCompleta as descricao,\n"
-                    + "ISNULL(mov.qtd_mov, 0) quatidade,\n"
+                    + "ISNULL(mov.qtd_mov, 0) quantidade,\n"
                     + "ISNULL(mov.venda_mov, 0) as total,\n"
                     + "mov.Cancelada as cancelado,\n"
                     + "0 as desconto,\n"
@@ -857,8 +857,9 @@ public class AsefeDAO extends InterfaceDAO {
                     + "inner join CE_MOVIMENTACAO mov on mov.caixa_mov = vc.NumeroCaixa and vc.COO = mov.coo\n"
                     + "inner join CE_PRODUTOS pro on pro.CODBARRA_PRODUTOS = mov.codbarra_mov \n"
                     + "where vc.CodEmpresa = " + idLojaCliente + "\n"
-                    + "/*and (vc.Data between CONVERT(datetime, " + FORMAT.format(dataInicio) + ", 103)\n"
-                    + "		and CONVERT(datetime, " + FORMAT.format(dataTermino) + ", 103))";
+                    + "and (vc.Data between CONVERT(datetime, '" + FORMAT.format(dataInicio) + "', 103)\n"
+                    + "		and CONVERT(datetime, '" + FORMAT.format(dataTermino) + "', 103))";
+
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

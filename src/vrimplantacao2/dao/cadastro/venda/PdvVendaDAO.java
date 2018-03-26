@@ -76,7 +76,7 @@ public class PdvVendaDAO {
             if (vo.getTipoDesconto() != null) {
                 sql.put("id_tipodesconto", vo.getTipoDesconto().getId());
             }
-            sql.put("chavenfcecontingencia", vo.getChaveNfceContingencia());
+            //sql.put("chavenfcecontingencia", vo.getChaveNfceContingencia());
             
             LOG.finer(
                     "Incluindo a Venda { "
