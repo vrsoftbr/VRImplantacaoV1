@@ -188,7 +188,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         double valIcmsCredito;
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                   "select\n"
+                    "select\n"
                     + "	 fam.codfamilia,\n"
                     + "	 prod.validade,\n"
                     + "	 prod.codprod,\n"
@@ -198,7 +198,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	 coalesce(merc.codgrupo, 1) as merc2,\n"
                     + "	 coalesce(merc.codcategoria, 1) as merc3,\n"
                     + "	 prod.codaliq,\n"
-                    + "	 x.ean,\n"
+                    + "	 prod.BARRA as ean,\n"
                     + "	 prod.unidade,\n"
                     + "	 prod.estoque,\n"
                     + "	 prod.preco_cust,\n"
@@ -209,7 +209,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	 prod.obs,\n"
                     + "	 prod.dtaltera,\n"
                     + "	 prod.dtinclui,\n"
-                    + "	 x.qtd_emb,\n"
+                    + "	 prod.qtd_emb,\n"
                     + "	 prod.preco_especial,\n"
                     + "	 prod.cst_pisentrada,\n"
                     + "	 prod.cst_pissaida,\n"
@@ -229,26 +229,14 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	 prod.codcest,\n"
                     + "	 prod.dtinclui,\n"
                     + "	 prod.desativacompra\n"
-                  + "from\n"
+                    + "from\n"
                     + "	 produtos prod\n"
-                    + "	 left outer join categoria merc on merc.codcreceita = prod.codcreceita and merc.codgrupo = prod.codgrupo and merc.codcategoria = prod.codcategoria\n"
-                    + "	 left outer join prod_familia fam on fam.codprod = prod.codprod and prod.codprod > 0\n"
-                    + "	 left outer join (select\n"                                         
-                                            + "  bar.codprod,\n"                                            
-                                            + "  bar.barra_emb ean,\n"                                            
-                                            + "	 bar.QTD qtd_emb\n"
-                                        + " from\n"
-                                            + "  embalagens bar\n"
-                                        + "where len(bar.barra_emb) > 6\n"
-                                    + "union all\n"
-                                       + "select\n"
-                                              + "pro.codprod,\n"
-                                              + "pro.barra ean,\n"
-                                              + "pro.qtd_emb\n"
-                                         + "from produtos pro\n"
-                                        + "where len(pro.barra) > 6) x\n"
-                   + "on x.CODPROD = prod.CODPROD\n"
-                     + " order by prod.descricao"
+                    + "	 left outer join categoria merc on merc.codcreceita = prod.codcreceita \n"
+                    + " and merc.codgrupo = prod.codgrupo \n"
+                    + " and merc.codcategoria = prod.codcategoria\n"
+                    + "	 left outer join prod_familia fam on fam.codprod = prod.codprod \n"
+                    + " and prod.codprod > 0\n"
+                    + "  order by prod.DESCRICAO"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
@@ -257,7 +245,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("codprod"));
-                    imp.setEan(rst.getString("ean"));
+                    imp.setEan(rst.getString("ean").trim());
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(rst.getString("desc_pdv"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -300,7 +288,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                         if (v_usar_arquivoBalanca) {
                             ProdutoBalancaVO produtoBalanca;
                             long codigoProduto;
-                            codigoProduto = Long.parseLong(imp.getEan());
+                            codigoProduto = Long.parseLong(imp.getEan().trim());
                             if (codigoProduto <= Integer.MAX_VALUE) {
                                 produtoBalanca = produtosBalanca.get((int) codigoProduto);
                             } else {
@@ -326,32 +314,58 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select codprod,\n"
+                         + "barra_emb,\n"
+                         + "qtd\n"
+                    + "from embalagens\n"
+                   + "where BARRA_EMB is not null\n"
+                + "order by 1"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("codprod"));
+                    imp.setEan(rst.getString("barra_emb").trim());
+                    imp.setQtdEmbalagem(rst.getInt("qtd"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n" +
-                    "    f.codfornec, f.razao, f.fantasia, f.endereco, f.numero, f.bairro, \n" +
-                    "    f.cidade, f.estado, f.cep, f.telefone, f.fax, f.email, f.celular, f.fone1, \n" +
-                    "    f.contato, f.ie, f.cnpj_cpf, f.agencia, f.banco, f.conta,  f.dtcad, \n" +
-                    "    f.valor_compra, f.ativo, \n" +
-                    "    obs, \n" +
-                    "    c.descricao as descricaopag, \n" +
-                    "    f.pentrega, \n" +
-                    "    f.pvisita, \n" +
-                    "    coalesce(case \n" +
-                    "    when codtipofornec = 1 then 0 \n" +
-                    "    when codtipofornec = 2 then 1 \n" +
-                    "    when codtipofornec = 3 then 4 \n" +
-                    "    when codtipofornec = 4 then 3 \n" +
-                    "    when codtipofornec = 5 then 5 \n" +
-                    "    when codtipofornec = 6 then 6 \n" +
-                    "    when codtipofornec = 7 then 7\n" +
-                    "    when codtipofornec = 8 then 8 \n" +
-                    "    end, 9) as codtipofornec \n" +
-                "    from \n" +
-                "    fornecedores f left join condpagto c on (f.codcondpagto = c.codcondpagto) \n" +
-                "    order by codfornec"
+                    "select \n"
+                    + "    f.codfornec, f.razao, f.fantasia, f.endereco, f.numero, f.bairro, \n"
+                    + "    f.cidade, f.estado, f.cep, f.telefone, f.fax, f.email, f.celular, f.fone1, \n"
+                    + "    f.contato, f.ie, f.cnpj_cpf, f.agencia, f.banco, f.conta,  f.dtcad, \n"
+                    + "    f.valor_compra, f.ativo, \n"
+                    + "    obs, \n"
+                    + "    c.descricao as descricaopag, \n"
+                    + "    f.pentrega, \n"
+                    + "    f.pvisita, \n"
+                    + "    coalesce(case \n"
+                    + "    when codtipofornec = 1 then 0 \n"
+                    + "    when codtipofornec = 2 then 1 \n"
+                    + "    when codtipofornec = 3 then 4 \n"
+                    + "    when codtipofornec = 4 then 3 \n"
+                    + "    when codtipofornec = 5 then 5 \n"
+                    + "    when codtipofornec = 6 then 6 \n"
+                    + "    when codtipofornec = 7 then 7\n"
+                    + "    when codtipofornec = 8 then 8 \n"
+                    + "    end, 9) as codtipofornec \n"
+                    + "    from \n"
+                    + "    fornecedores f left join condpagto c on (f.codcondpagto = c.codcondpagto) \n"
+                    + "    order by codfornec"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -433,7 +447,10 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     try (Statement stm2 = ConexaoSqlServer.getConexao().createStatement()) {
                         try (ResultSet rst2 = stm2.executeQuery(
-                                "select f.CODFORNEC, cp.CODCONDPAGTO, cp.DESCRICAO, cp.NPARCELAS\n"
+                                "select f.CODFORNEC, "
+                                + "cp.CODCONDPAGTO, "
+                                + "replace(cp.DESCRICAO,'-','/') descricao, "
+                                + "cp.NPARCELAS\n"
                                 + "from FORNECEDORES f\n"
                                 + "inner join CONDPAGTO cp on cp.CODCONDPAGTO = f.CODCONDPAGTO \n"
                                 + "where f.CODFORNEC = " + imp.getImportId()
