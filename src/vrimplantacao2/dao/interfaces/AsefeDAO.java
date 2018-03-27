@@ -615,6 +615,7 @@ public class AsefeDAO extends InterfaceDAO {
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setNumeroSerie(rst.getString("numeroserie"));
                         next.setModeloImpressora(rst.getString("modelo"));
+                        next.setChaveCfe(rst.getString("ChaveCfe"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -677,7 +678,8 @@ public class AsefeDAO extends InterfaceDAO {
                     + "                   and OrdemECF = vc.OrdemECF\n"
                     + "                   and CodEmpresa = " + idLojaCliente + "\n"
                     + ") as modelo,\n"
-                    + "'' as marca\n"
+                    + "'' as marca,\n"
+                    + "vc.ChaveCfe\n"
                     + "from CE_VendasCaixa vc \n"
                     + "left join CONTROLE_CLIENTES.dbo.CC_Clientes cli on cli.CodCliente = vc.CodCliente\n"
                     + "where (vc.Data between CONVERT(datetime, '" + FORMAT.format(dataInicio) + "', 103)\n"
@@ -706,7 +708,8 @@ public class AsefeDAO extends InterfaceDAO {
                     + "cli.UF,\n"
                     + "vc.Cep,\n"
                     + "cli.CepCliente,\n"
-                    + "vc.OrdemECF";
+                    + "vc.OrdemECF,"
+                    + "vc.ChaveCfe";
             
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -854,10 +857,15 @@ public class AsefeDAO extends InterfaceDAO {
                     + "'I' as codaliq_produto,\n"
                     + "'' as trib_desc\n"
                     + "from CE_VendasCaixa vc\n"
-                    + "inner join CE_MOVIMENTACAO mov on mov.caixa_mov = vc.NumeroCaixa and vc.COO = mov.coo\n"
+                    + "inner join CE_MOVIMENTACAO mov on mov.caixa_mov = vc.NumeroCaixa "
+                    + "and vc.COO = mov.coo\n"
+                    + "and vc.numimpfiscal = mov.NumImpFiscal\n"
                     + "inner join CE_PRODUTOS pro on pro.CODBARRA_PRODUTOS = mov.codbarra_mov \n"
                     + "where vc.CodEmpresa = " + idLojaCliente + "\n"
+                    + "and mov.CodEmpresa = " + idLojaCliente + "\n"
                     + "and (vc.Data between CONVERT(datetime, '" + FORMAT.format(dataInicio) + "', 103)\n"
+                    + "		and CONVERT(datetime, '" + FORMAT.format(dataTermino) + "', 103))"
+                    + "and (mov.data_mov between CONVERT(datetime, '" + FORMAT.format(dataInicio) + "', 103)\n"
                     + "		and CONVERT(datetime, '" + FORMAT.format(dataTermino) + "', 103))";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
