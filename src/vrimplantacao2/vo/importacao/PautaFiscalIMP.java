@@ -145,6 +145,10 @@ public class PautaFiscalIMP {
     public void setAliquotaCreditoForaEstado(AliquotaVO aliquotaCreditoForaEstado) {
         this.aliquotaCreditoForaEstado = aliquotaCreditoForaEstado;
     }
+    
+    public void setAliquotaCreditoForaEstado(int cst, double aliquota, double reduzido) {
+        this.aliquotaCreditoForaEstado = new AliquotaVO(-1, "", cst, aliquota, reduzido);
+    }
 
     public String getAliquotaCreditoForaEstadoId() {
         return aliquotaCreditoForaEstadoId;
@@ -153,5 +157,5 @@ public class PautaFiscalIMP {
     public void setAliquotaCreditoForaEstadoId(String aliquotaCreditoForaEstadoId) {
         this.aliquotaCreditoForaEstadoId = aliquotaCreditoForaEstadoId;
     }
-    
+        
 }

@@ -33,6 +33,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
+import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
@@ -302,7 +303,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	prc.prlmargind margemunit,\n" +
                     "	prc.prlctentru custosemimposto,\n" +
                     "	prc.prlctnfu custocomimposto,\n" +
-                    "	prc.prlprconc1 precovenda,\n" +
+                    "	prc.prlprvenu precovenda,\n" +
                     "	prc.prlforalin id_situacaocadastro,\n" +
                     "	case prc.prlcotacao when 'S' then 1 else 0 end cotacao,\n" +
                     "	p.proclasfisc ncm,\n" +
@@ -397,7 +398,9 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                             rst.getString("estado"),
                             rst.getString("ncm"),
                             rst.getDouble("p_iva"),
-                            rst.getDouble("v_iva")
+                            rst.getDouble("v_iva"),
+                            rst.getInt("icmssaidaid"),
+                            rst.getInt("icmsentradaid")
                     ));
                     imp.setSugestaoCotacao("S".equals(rst.getString("sugestaocotacao")));
                     imp.setIdComprador(rst.getString("id_comprador"));
@@ -623,14 +626,26 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pl.prlpivast p_iva,\n" +
                     "	pl.prlvivast v_iva,\n" +
                     "	#pl.prlvpauta pauta,\n" +
-                    "	pl.prlcodtrie icmside,\n" +
-                    "	pl.prlcodtris icmsids\n" +
+                    "	trs.trbstrib s_cst,\n" +
+                    "	trs.trbaliq s_aliq,\n" +
+                    "	trs.trbreduc s_reduc,\n" +
+                    "	trs.trbicmsst s_aliqst,\n" +
+                    "	tre.trbstrib e_cst,\n" +
+                    "	tre.trbaliq e_aliq,\n" +
+                    "	tre.trbreduc e_reduc,\n" +
+                    "	tre.trbicmsst e_aliqst,\n" +
+                    "	pl.prlcodtris icmssaidaid,\n" +
+                    "	pl.prlcodtrie icmsentradaid\n" +
                     "from\n" +
                     "	hipprl pl\n" +
                     "	join hiploj l on\n" +
                     "		pl.prlloja = l.lojcod\n" +
                     "	join hippro p on\n" +
                     "		pl.prlcodplu = p.procodplu\n" +
+                    "	join hiptrb trs on\n" +
+                    "		pl.prlcodtris = trs.trbcod \n" +
+                    "	join hiptrb tre on\n" +
+                    "		pl.prlcodtrie = tre.trbcod\n" +
                     "where\n" +
                     "	pl.prlloja = " + getLojaOrigem() + " and\n" +
                     "	(pl.prlpivast != 0 or\n" +
@@ -644,7 +659,9 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                             rst.getString("uf"),
                             rst.getString("ncm"),
                             rst.getDouble("p_iva"),
-                            rst.getDouble("v_iva")
+                            rst.getDouble("v_iva"),
+                            rst.getInt("icmssaidaid"),
+                            rst.getInt("icmsentradaid")
                     ));
                     
                     imp.setNcm(rst.getString("ncm"));
@@ -658,8 +675,33 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setIva(rst.getDouble("v_iva"));
                     }
                     
-                    imp.setAliquotaDebitoId(rst.getString("icmsids"));
-                    imp.setAliquotaCreditoId(rst.getString("icmside"));
+                    if (rst.getInt("s_cst") == 60) {
+                        imp.setAliquotaDebito(0, rst.getDouble("s_aliqst"), 0);
+                    } else {
+                        imp.setAliquotaDebito(rst.getInt("s_cst"), rst.getDouble("s_aliq"), rst.getDouble("s_reduc"));
+                    }
+                    
+                    if (rst.getInt("e_cst") == 60) {
+                        imp.setAliquotaCredito(0, rst.getDouble("e_aliqst"), 0);
+                    } else {
+                        imp.setAliquotaDebito(rst.getInt("e_cst"), rst.getDouble("e_aliq"), rst.getDouble("e_reduc"));
+                    }
+                    
+                    if (rst.getInt("s_cst") == 60) {
+                        imp.setAliquotaDebitoForaEstado(0, rst.getDouble("s_aliqst"), 0);
+                    } else {
+                        imp.setAliquotaDebitoForaEstado(rst.getInt("s_cst"), rst.getDouble("s_aliq"), rst.getDouble("s_reduc"));
+                    }
+                    
+                    if (rst.getInt("e_cst") == 60) {
+                        imp.setAliquotaCreditoForaEstado(0, rst.getDouble("e_aliqst"), 0);
+                    } else {
+                        imp.setAliquotaCreditoForaEstado(rst.getInt("e_cst"), rst.getDouble("e_aliq"), rst.getDouble("e_reduc"));
+                    }
+                    
+
+                    //imp.setAliquotaDebitoId(rst.getString("icmsids"));
+                    //imp.setAliquotaCreditoId(rst.getString("icmside"));
                     
                     result.add(imp);
                 }
@@ -669,8 +711,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    private String formatPautaFiscalId(String uf, String ncm, double p_iva, double v_iva) {
-        return String.format("%s-%s-%.2f-%.2f", uf, ncm, p_iva, v_iva);
+    private String formatPautaFiscalId(String uf, String ncm, double p_iva, double v_iva, int idIcmsSaida, int idIcmsEntrada) {
+        return String.format("%s-%s-%.2f-%.2f-%d-%d", uf, ncm, p_iva, v_iva, idIcmsSaida, idIcmsEntrada);
     }
 
     @Override
@@ -681,6 +723,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
                     "	concat(c.cliloja,'-',c.clicod) id,\n" +
+                    "	c.clitipo tipoempresa,\n" +
                     "	c.clicpfcnpj cnpj,\n" +
                     "	c.clirgie inscricaoestadual,\n" +
                     "	c.cliorgaopublic,\n" +
@@ -729,6 +772,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     ClienteIMP imp = new ClienteIMP();
                     
                     imp.setId(rst.getString("id"));
+                    imp.setTipoInscricao("J".equals(rst.getString("tipoempresa")) ? TipoInscricao.JURIDICA: TipoInscricao.FISICA);
                     imp.setCnpj(rst.getString("cnpj"));
                     imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
                     imp.setRazao(rst.getString("razao"));

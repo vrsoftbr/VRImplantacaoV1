@@ -223,6 +223,9 @@ public class ClienteRepository {
                     if (opt.contains(OpcaoCliente.ENDERECO_COMPLETO)) {
                         atualizarClientePreferencial(vo, opt);
                     }
+                    if (opt.contains(OpcaoCliente.TIPO_INSCRICAO)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
                 }
                 notificar();
             }
@@ -445,6 +448,13 @@ public class ClienteRepository {
         ClientePreferencialVO vo = new ClientePreferencialVO();
         
         vo.setCnpj(Utils.stringToLong(imp.getCnpj()));
+        
+        if (imp.getTipoInscricao() == TipoInscricao.VAZIO) {
+            vo.setTipoInscricao(TipoInscricao.analisarCnpjCpf(vo.getCnpj()));
+        } else {
+            vo.setTipoInscricao(imp.getTipoInscricao());
+        }
+        
         vo.setInscricaoEstadual(imp.getInscricaoestadual());
         vo.setOrgaoEmissor(imp.getOrgaoemissor());
         vo.setNome(imp.getRazao());
@@ -564,8 +574,14 @@ public class ClienteRepository {
         vo.setCep(Utils.stringToInt(imp.getCep()));
        
         vo.setTelefone(imp.getTelefone());
+        
         vo.setCnpj(Utils.stringToLong(imp.getCnpj()));
-        vo.setTipoInscricao(TipoInscricao.analisarCnpjCpf(vo.getCnpj()));
+        if (imp.getTipoInscricao() == TipoInscricao.VAZIO) {
+            vo.setTipoInscricao(TipoInscricao.analisarCnpjCpf(vo.getCnpj()));
+        } else {
+            vo.setTipoInscricao(imp.getTipoInscricao());
+        }
+        
         vo.setInscricaoEstadual(imp.getInscricaoestadual());
         vo.setSituacaoCadastro(imp.isAtivo() ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
         vo.setFax(imp.getFax());
@@ -756,6 +772,7 @@ public class ClienteRepository {
     /**
      * Efetua a unificação do cliente eventual. (NÃO TESTADO)
      * @param clientes Listagem de clientes.
+     * @param opt
      * @throws Exception 
      */
     public void unificarClienteEventual(List<ClienteIMP> clientes, Set<OpcaoCliente> opt) throws Exception {

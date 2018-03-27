@@ -24,6 +24,11 @@ public class AliquotaVO {
         this.aliquota = aliquota;
         this.reduzido = reduzido;
     }
+    
+    public AliquotaVO(int cst, double aliquota, double reduzido) {
+        this(-1, "", cst, aliquota, reduzido);
+    }
+    
 
     public int getId() {
         return id;

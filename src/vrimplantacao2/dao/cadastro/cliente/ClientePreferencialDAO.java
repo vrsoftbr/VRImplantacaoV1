@@ -255,6 +255,9 @@ public class ClientePreferencialDAO {
                 if (opt.contains(OpcaoCliente.CELULAR)) {
                     sql.put("celular", vo.getCelular());
                 }
+                if (opt.contains(OpcaoCliente.TIPO_INSCRICAO)) {
+                    sql.put("id_tipoinscricao", vo.getTipoInscricao());
+                }
                 if (opt.contains(OpcaoCliente.ENDERECO_COMPLETO)) {
                     sql.put("endereco", vo.getEndereco());
                     sql.put("numero", vo.getNumero());
