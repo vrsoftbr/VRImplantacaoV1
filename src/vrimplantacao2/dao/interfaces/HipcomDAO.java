@@ -1108,8 +1108,17 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
             try {
                 if (next == null) {
                     if (rst.next()) {
+                        String ean = rst.getString("ean");
                         
-                        SmProduto prod = produtos.get(rst.getString("ean"));
+                        if (ean == null) ean = "";
+                        
+                        if (ean.length() < 7 && ean.length() > 1) {
+                            String old = ean;
+                            ean = ean.substring(0, ean.length() - 1);
+                            LOG.finest("EAN de balanca anterior: " + old + " atual: " + ean);
+                        }
+                        
+                        SmProduto prod = produtos.get(ean);
                         
                         next = new VendaItemIMP();
                         String id = VendaIterator.makeId(rst.getString("id_loja"), rst.getDate("data"), rst.getString("ecf"), rst.getString("id_caixa"), rst.getString("numerocupom"));
@@ -1125,7 +1134,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                             next.setProduto("");
                             next.setDescricaoReduzida("SEM DESCRICAO");
                             next.setUnidadeMedida("UN");
-                            next.setCodigoBarras(rst.getString("ean"));
+                            next.setCodigoBarras(ean);
                         }
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setTotalBruto(rst.getDouble("total_bruto"));

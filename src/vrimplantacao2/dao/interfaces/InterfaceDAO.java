@@ -13,6 +13,7 @@ import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.venda.VendaHistoricoIMP;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
@@ -20,6 +21,7 @@ import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaReceberIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
@@ -369,6 +371,17 @@ public abstract class InterfaceDAO {
      * @throws Exception
      */
     public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
+        return new ArrayList<>();
+    }
+
+    /**
+     * Listagem com as contas a receber relacionadas a fornecedores. No VR serão
+     * armazenadas como Outras Despesas.
+     * @param opt Opções de importação de contas receber.
+     * @return List com as contas a receber.
+     * @throws Exception 
+     */
+    public List<ContaReceberIMP> getContasReceber(Set<OpcaoContaReceber> opt) throws Exception {
         return new ArrayList<>();
     }
     
