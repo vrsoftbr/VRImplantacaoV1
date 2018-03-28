@@ -2,6 +2,7 @@ package vrimplantacao2.dao.cadastro.cliente;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import vrframework.classe.Conexao;
@@ -155,6 +156,30 @@ public class ClienteEventualAnteriorDAO {
                     vo.setForcarGravacao(rst.getBoolean("forcargravacao"));
 
                     result.put(vo, vo.getSistema(), vo.getLoja(), vo.getId());
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    public Map<String, Integer> getClientesImportador(String sistema, String loja) throws Exception {
+        Map<String, Integer> result = new HashMap<>();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	ant.id,\n" +
+                    "	ant.codigoatual\n" +
+                    "from\n" +
+                    "	implantacao.codant_contareceber ant\n" +
+                    "	join receberoutrasreceitas r on\n" +
+                    "		ant.codigoatual = r.id\n" +
+                    "order by\n" +
+                    "	1,2"
+            )) {
+                while (rst.next()) {
+                    result.put(rst.getString("id"), rst.getInt("codigoatual"));
                 }
             }
         }

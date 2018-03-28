@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.json.JSONObject;
+import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.enums.TipoLocalCobranca;
 import vrimplantacao2.vo.enums.TipoReceita;
 import vrimplantacao2.vo.importacao.ContaReceberIMP;
@@ -36,6 +37,8 @@ public class OutraReceitaRepository {
         LOG.fine("Clientes Eventuais carregados: " + fornecedores.size());
         Map<String, ContaReceberAnteriorVO> anteriores = provider.getAnteriores();
         LOG.fine("Anteriores carregados: " + anteriores.size());
+        MultiMap<String, ContaReceberItemAnteriorVO> itemAnteriores = provider.getItemAnteriores();
+        LOG.fine("Itens anteriores carregados: " + anteriores.size());
         
         provider.setStatus("Contas a Receber...Gravando...", contas.size());
         
@@ -91,18 +94,31 @@ public class OutraReceitaRepository {
                         anterior.setCodigoAtual(vo.getId());
                         provider.gravar(anterior);      
                         log.put("anterior_gravado", true);
+                        anteriores.put(anterior.getId(), anterior);
                     }
 
                     JSONObject pagLog = new JSONObject();
                     log.put("pagamentos", pagLog);
                     if (anterior.getCodigoAtual() > 0) {
                         for (ContaReceberPagamentoIMP impPag: imp.getPagamentos()) {
-                            OutraReceitaItemVO item = converterPagamento(impPag);
-                            item.setIdReceberOutrasReceitas(anterior.getCodigoAtual());
-                            provider.gravar(item);
-                            pagLog.put("tipo", item.getTipoRecebimento().toString());
-                            pagLog.put("pagamento", item.getDataPagamento());
-                            pagLog.put("valor", item.getValor());                            
+                            
+                            ContaReceberItemAnteriorVO antItem = itemAnteriores.get(imp.getId(), impPag.getId());
+                            
+                            if (antItem == null) {                                
+                                OutraReceitaItemVO item = converterPagamento(impPag);
+                                item.setIdReceberOutrasReceitas(anterior.getCodigoAtual());
+                                provider.gravar(item);
+                                pagLog.put("tipo", item.getTipoRecebimento().toString());
+                                pagLog.put("pagamento", item.getDataPagamento());
+                                pagLog.put("valor", item.getValor());
+                                
+                                antItem = converterItemAnterior(impPag);
+                                antItem.setIdContaReceber(imp.getId());
+                                antItem.setCodigoAtual(item.getId());
+                                provider.gravar(antItem);
+                                itemAnteriores.put(antItem, antItem.getIdContaReceber(), antItem.getId());
+                            }
+                            
                         }
                     }
                     log.put("pagamentos_importados", true);
@@ -170,6 +186,10 @@ public class OutraReceitaRepository {
         vo.setTipoRecebimento(imp.getTipoRecebimento());
         
         return vo;
+    }
+
+    private ContaReceberItemAnteriorVO converterItemAnterior(ContaReceberPagamentoIMP impPag) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
     

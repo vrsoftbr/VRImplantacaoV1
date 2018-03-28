@@ -3,7 +3,9 @@ package vrimplantacao2.vo.cadastro.financeiro.contareceber;
 import java.util.Map;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
+import vrimplantacao2.dao.cadastro.cliente.ClienteEventualAnteriorDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
+import vrimplantacao2.utils.multimap.MultiMap;
 
 /**
  * 
@@ -16,6 +18,9 @@ public class OutraReceitaRepositoryProvider {
     private final int lojaVR;
     private final FornecedorAnteriorDAO fornecedorAnteriorDAO;
     private final OutraReceitaAnteriorDAO anteriorDAO;
+    private final OutraReceitaDAO outraReceitaDAO;
+    private final OutraReceitaItemDAO outraReceitaItemDAO;
+    private final ClienteEventualAnteriorDAO clienteEventualAnteriorDAO;
 
     public OutraReceitaRepositoryProvider(String sistema, String loja, int lojaVR) throws Exception {
         this.sistema = sistema;
@@ -23,6 +28,9 @@ public class OutraReceitaRepositoryProvider {
         this.lojaVR = lojaVR;
         this.fornecedorAnteriorDAO = new FornecedorAnteriorDAO();
         this.anteriorDAO = new OutraReceitaAnteriorDAO();
+        this.outraReceitaDAO = new OutraReceitaDAO();
+        this.outraReceitaItemDAO = new OutraReceitaItemDAO();
+        this.clienteEventualAnteriorDAO = new ClienteEventualAnteriorDAO();
     }
 
     public String getSistema() {
@@ -71,18 +79,26 @@ public class OutraReceitaRepositoryProvider {
     }
 
     public void gravar(OutraReceitaVO vo) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        outraReceitaDAO.gravar(vo);
     }
 
     public void gravar(ContaReceberAnteriorVO anterior) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        anteriorDAO.gravar(anterior);
     }
     
     public void gravar(OutraReceitaItemVO item) throws Exception {
+        outraReceitaItemDAO.gravar(item);
+    }
+    
+    public void gravar(ContaReceberItemAnteriorVO ant) throws Exception {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     public Map<String, Integer> getEventuais() throws Exception {
+        return clienteEventualAnteriorDAO.getClientesImportador(sistema, loja);
+    }
+
+    MultiMap<String, ContaReceberItemAnteriorVO> getItemAnteriores() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
