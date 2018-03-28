@@ -710,7 +710,7 @@ public class Importador {
             try (JdbcConnectionSource source = this.getSource()) {
                 ProgressBar.setStatus("Vendas...Gerando listagem de cabeçalho de venda...");
                 new VendaImpDao(source).persistir(getInterfaceDAO().getVendaIterator());
-                        ProgressBar.setStatus("Vendas...Gerando listagem dos itens das vendas...");
+                ProgressBar.setStatus("Vendas...Gerando listagem dos itens das vendas...");
                 new VendaItemImpDao(source).persistir(getInterfaceDAO().getVendaItemIterator());
             }
         }        

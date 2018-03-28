@@ -190,7 +190,7 @@ public class PdvVendaDAO {
                     "		min(vi.contadordoc) contadorinicial,\n" +
                     "		max(vi.contadordoc) contadorfinal,\n" +
                     "		0 gtinicial,\n" +
-                    "		coalesce(nullif(sum(vi.valortotal),0) + sum(vi.valoracrescimo) - sum(vi.valorcancelado), 1) gtfinal,\n" +
+                    "		coalesce(nullif(sum(vi.valortotal),0) + sum(vi.valoracrescimo), 1) gtfinal,\n" +
                     "		sum(vi.valorcancelado) cancelamento,\n" +
                     "		sum(vi.valordescontopromocao + vi.valordesconto) desconto,\n" +
                     "		true as lancamentomanual,\n" +

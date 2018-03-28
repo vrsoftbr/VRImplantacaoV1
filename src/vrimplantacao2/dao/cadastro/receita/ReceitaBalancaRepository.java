@@ -129,25 +129,26 @@ public class ReceitaBalancaRepository {
         return vo;
     }
 
-    private ReceitaBalancaToledoVO converterToledo(ReceitaBalancaIMP imp) {
+    public ReceitaBalancaToledoVO converterToledo(ReceitaBalancaIMP imp) {
         ReceitaBalancaToledoVO vo = new ReceitaBalancaToledoVO();
         
         vo.setDescricao(imp.getDescricao());
         
         String receita = imp.getReceita() != null ? imp.getReceita() : "";        
+        receita = Utils.acertarTexto(receita.replaceAll("\\r?\\n", " "));
         
-        String[] linhas = receita.split("\\r?\\n");
-        
-        String excedente = "";
         int cont = 1;
         
-        for (int i = 0; i < linhas.length - 1; i++) {
-            String linha = excedente + Utils.acertarTexto(linhas[i]);
-            excedente = "";
+        while (!"".equals(receita) && cont <= 15) {
+            String linha;
             
-            if (linha.length() > 56) {
-                excedente = linha.substring(56, linha.length());
-            }            
+            if (receita.length() < 56) {
+                linha = receita.substring(0, receita.length());
+                receita = "";
+            } else {
+                linha = receita.substring(0, 56);
+                receita = receita.substring(56);
+            }
             
             switch (cont) {
                 case 1: vo.setReceitaLinha1(linha); break;
@@ -170,7 +171,7 @@ public class ReceitaBalancaRepository {
             cont++;
         }
         
-        LOG.finest("TOLEDO: " + Arrays.toString(linhas));
+        LOG.finest("TOLEDO: " + imp.getReceita());
         
         return vo;
     }
