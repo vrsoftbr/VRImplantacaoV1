@@ -3,6 +3,7 @@ package vrimplantacao2.vo.cadastro.financeiro.contareceber;
 import java.util.Map;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
+import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
 
 /**
  * 
@@ -13,11 +14,15 @@ public class OutraReceitaRepositoryProvider {
     private final String sistema;
     private final String loja;
     private final int lojaVR;
+    private final FornecedorAnteriorDAO fornecedorAnteriorDAO;
+    private final OutraReceitaAnteriorDAO anteriorDAO;
 
     public OutraReceitaRepositoryProvider(String sistema, String loja, int lojaVR) throws Exception {
         this.sistema = sistema;
         this.loja = loja;
         this.lojaVR = lojaVR;
+        this.fornecedorAnteriorDAO = new FornecedorAnteriorDAO();
+        this.anteriorDAO = new OutraReceitaAnteriorDAO();
     }
 
     public String getSistema() {
@@ -57,19 +62,27 @@ public class OutraReceitaRepositoryProvider {
         Conexao.rollback();
     }
 
-    Map<String, Integer> getFornecedores() {
+    public Map<String, Integer> getFornecedores() throws Exception {
+        return fornecedorAnteriorDAO.getFornecedoresImportados(sistema, loja);
+    }
+
+    public Map<String, ContaReceberAnteriorVO> getAnteriores() throws Exception {
+        return anteriorDAO.getAnteriores(sistema, loja);
+    }
+
+    public void gravar(OutraReceitaVO vo) throws Exception {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    Map<String, ContaReceberAnteriorVO> getAnteriores() {
+    public void gravar(ContaReceberAnteriorVO anterior) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    public void gravar(OutraReceitaItemVO item) throws Exception {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    void gravar(OutraReceitaVO vo) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    void gravar(ContaReceberAnteriorVO anterior) {
+    public Map<String, Integer> getEventuais() throws Exception {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

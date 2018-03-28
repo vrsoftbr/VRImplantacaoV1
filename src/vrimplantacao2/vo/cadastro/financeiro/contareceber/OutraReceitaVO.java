@@ -26,7 +26,7 @@ public class OutraReceitaVO {
     private Timestamp dataHoraAlteracao;// timestamp without time zone NOT NULL DEFAULT now(),
     private boolean exportado = false;// boolean NOT NULL DEFAULT false,
     private int idNotaServico;//id_notaservico integer,
-    private Date dataexportacao;// date
+    private Date dataExportacao;// date
 
     public int getId() {
         return id;
@@ -148,12 +148,12 @@ public class OutraReceitaVO {
         this.idNotaServico = idNotaServico;
     }
 
-    public Date getDataexportacao() {
-        return dataexportacao;
+    public Date getDataExportacao() {
+        return dataExportacao;
     }
 
-    public void setDataexportacao(Date dataexportacao) {
-        this.dataexportacao = dataexportacao;
+    public void setDataExportacao(Date dataExportacao) {
+        this.dataExportacao = dataExportacao;
     }
     
     

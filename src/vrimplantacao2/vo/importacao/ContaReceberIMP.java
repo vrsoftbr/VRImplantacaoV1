@@ -1,8 +1,8 @@
 package vrimplantacao2.vo.importacao;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import vrimplantacao2.vo.enums.TipoLocalCobranca;
 import vrimplantacao2.vo.enums.TipoReceita;
 
@@ -22,7 +22,7 @@ public class ContaReceberIMP {
     private TipoLocalCobranca tipoLocalCobranca = TipoLocalCobranca.CARTEIRA;// id_tipolocalcobranca integer NOT NULL,
     private TipoReceita tipoReceita = TipoReceita.CR_OUTRAS_UNIDADES;// id_tiporeceita integer NOT NULL,
     private String idFornecedor;//id_fornecedor integer,
-    private final List<ContaReceberPagamentoIMP> pagamentos = new ArrayList<>();
+    private final Set<ContaReceberPagamentoIMP> pagamentos = new LinkedHashSet<>();
 
     public String getId() {
         return id;
@@ -104,12 +104,23 @@ public class ContaReceberIMP {
         this.idFornecedor = idFornecedor;
     }
 
-    public List<ContaReceberPagamentoIMP> getPagamentos() {
+    public Set<ContaReceberPagamentoIMP> getPagamentos() {
         return pagamentos;
     }
 
     public void add(ContaReceberPagamentoIMP pagamento) {
         pagamentos.add(pagamento);
+    }
+    
+    public void add(String id, double valor, double valorDesconto, double valorJuros, double valorMulta, Date dataPagamento) {
+        ContaReceberPagamentoIMP imp = new ContaReceberPagamentoIMP();
+        imp.setId(id);
+        imp.setValor(valor);
+        imp.setValorDesconto(valorDesconto);
+        imp.setValorJuros(valorJuros);
+        imp.setValorMulta(valorMulta);
+        imp.setDataPagamento(dataPagamento);
+        pagamentos.add(imp);
     }
     
 }
