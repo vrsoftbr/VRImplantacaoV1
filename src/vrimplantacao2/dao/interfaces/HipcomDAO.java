@@ -909,15 +909,28 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select\n" +
+                    "	pr.prlcodplu id_produto,\n" +
+                    "	pr.prlprpromu precooferta,\n" +
+                    "	pr.prlprvenu preconormal,\n" +
+                    "	pr.prldtinipr datainicio,\n" +
+                    "	pr.prldtfimpr datafim\n" +
+                    "from\n" +
+                    "	hipprl pr\n" +
+                    "where\n" +
+                    "	pr.prlloja = " + getLojaOrigem() + " and\n" +
+                    "	not pr.prldtfimpr is null and\n" +
+                    "	pr.prldtfimpr >= '" + new SimpleDateFormat("yyyy-MM-dd").format(dataTermino) + "'\n" +
+                    "order by\n" +
+                    "	datainicio"
             )) {
                 while (rst.next()) {
                     OfertaIMP imp = new OfertaIMP();
                     
-                    imp.setIdProduto(rst.getString(""));
-                    imp.setDataInicio(rst.getDate(""));
-                    imp.setDataFim(rst.getDate(""));
-                    imp.setPrecoOferta(rst.getDouble(""));
+                    imp.setIdProduto(rst.getString("id_produto"));
+                    imp.setDataInicio(rst.getDate("datainicio"));
+                    imp.setDataFim(rst.getDate("datafim"));
+                    imp.setPrecoOferta(rst.getDouble("precooferta"));
                     imp.setSituacaoOferta(SituacaoOferta.ATIVO);
                     imp.setTipoOferta(TipoOfertaVO.CAPA);
                     

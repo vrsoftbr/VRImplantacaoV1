@@ -1,6 +1,7 @@
 package vrimplantacao2.gui.interfaces;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import org.openide.util.Exceptions;
@@ -284,7 +285,11 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                                 importador.importarReceitaBalanca(opcoes.toArray(new OpcaoReceitaBalanca[] {}));
                             }                            
                         }
-
+                        
+                        if (chkOferta.isSelected()) {
+                            importador.importarOfertas(new Date());
+                        }
+                        
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
@@ -319,7 +324,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                             }
                         }
                         
-                        if (chkOutrasDespesas.isSelected()) {
+                        if (chkOutrasReceitas.isSelected()) {
                             importador.importarOutrasReceitas(OpcaoContaReceber.NOVOS);
                         }
                         
@@ -421,6 +426,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkPProdComprador = new vrframework.bean.checkBox.VRCheckBox();
         chkPReceitaFilizola = new vrframework.bean.checkBox.VRCheckBox();
         chkPReceitaToledo = new vrframework.bean.checkBox.VRCheckBox();
+        chkOferta = new vrframework.bean.checkBox.VRCheckBox();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         jPanel3 = new javax.swing.JPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -432,7 +438,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkFTipoForn = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         pnlOutrasReceitas = new javax.swing.JPanel();
-        chkOutrasDespesas = new vrframework.bean.checkBox.VRCheckBox();
+        chkOutrasReceitas = new vrframework.bean.checkBox.VRCheckBox();
         txtOtRecDtIni = new org.jdesktop.swingx.JXDatePicker();
         txtOtRecDtFim = new org.jdesktop.swingx.JXDatePicker();
         jLabel6 = new javax.swing.JLabel();
@@ -614,6 +620,9 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkPReceitaToledo.setText("Receita (Toledo)");
         tabProdutos.add(chkPReceitaToledo);
 
+        chkOferta.setText("Oferta");
+        tabProdutos.add(chkOferta);
+
         tabImportacao.addTab("Produtos", tabProdutos);
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
@@ -644,7 +653,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
 
         pnlOutrasReceitas.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        chkOutrasDespesas.setText("Outras receitas");
+        chkOutrasReceitas.setText("Outras receitas");
 
         jLabel6.setText("Dt. Inicial");
 
@@ -656,7 +665,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
             pnlOutrasReceitasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlOutrasReceitasLayout.createSequentialGroup()
                 .addGap(5, 5, 5)
-                .addComponent(chkOutrasDespesas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(chkOutrasReceitas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlOutrasReceitasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlOutrasReceitasLayout.createSequentialGroup()
@@ -681,7 +690,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlOutrasReceitasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtOtRecDtIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkOutrasDespesas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkOutrasReceitas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtOtRecDtFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(5, 5, 5))
         );
@@ -960,7 +969,8 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkNatReceita;
     private vrframework.bean.checkBox.VRCheckBox chkNutricionalFilizola;
     private vrframework.bean.checkBox.VRCheckBox chkNutricionalToledo;
-    private vrframework.bean.checkBox.VRCheckBox chkOutrasDespesas;
+    private vrframework.bean.checkBox.VRCheckBox chkOferta;
+    private vrframework.bean.checkBox.VRCheckBox chkOutrasReceitas;
     private vrframework.bean.checkBox.VRCheckBox chkPComprador;
     private vrframework.bean.checkBox.VRCheckBox chkPDescontinuado;
     private vrframework.bean.checkBox.VRCheckBox chkPProdComprador;
