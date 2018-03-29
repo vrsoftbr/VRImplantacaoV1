@@ -1,5 +1,6 @@
 package vrimplantacao2.vo.cadastro.financeiro.contareceber;
 
+import java.sql.ResultSet;
 import java.sql.Statement;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
@@ -31,8 +32,13 @@ public class OutraReceitaItemDAO {
             sql.put("id_recebercheque", item.getIdReceberCheque());
             sql.put("id_usuario", item.getIdUsuario());
             sql.put("id_loja", item.getIdLoja());
+            sql.getReturning().add("id");
             
-            stm.execute(sql.getInsert());
+            try (ResultSet rst = stm.executeQuery(sql.getInsert())) {
+                if (rst.next()) {
+                    item.setId(rst.getInt("id"));
+                }
+            }
         }
     }
     

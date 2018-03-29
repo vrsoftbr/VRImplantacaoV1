@@ -17,20 +17,22 @@ public class OutraReceitaRepositoryProvider {
     private final String loja;
     private final int lojaVR;
     private final FornecedorAnteriorDAO fornecedorAnteriorDAO;
-    private final OutraReceitaAnteriorDAO anteriorDAO;
+    private final ContaReceberAnteriorDAO anteriorDAO;
     private final OutraReceitaDAO outraReceitaDAO;
     private final OutraReceitaItemDAO outraReceitaItemDAO;
     private final ClienteEventualAnteriorDAO clienteEventualAnteriorDAO;
+    private final ContaReceberItemAnteriorDAO contaReceberItemAnteriorDAO;
 
     public OutraReceitaRepositoryProvider(String sistema, String loja, int lojaVR) throws Exception {
         this.sistema = sistema;
         this.loja = loja;
         this.lojaVR = lojaVR;
         this.fornecedorAnteriorDAO = new FornecedorAnteriorDAO();
-        this.anteriorDAO = new OutraReceitaAnteriorDAO();
+        this.anteriorDAO = new ContaReceberAnteriorDAO();
         this.outraReceitaDAO = new OutraReceitaDAO();
         this.outraReceitaItemDAO = new OutraReceitaItemDAO();
         this.clienteEventualAnteriorDAO = new ClienteEventualAnteriorDAO();
+        this.contaReceberItemAnteriorDAO = new ContaReceberItemAnteriorDAO();
     }
 
     public String getSistema() {
@@ -91,15 +93,15 @@ public class OutraReceitaRepositoryProvider {
     }
     
     public void gravar(ContaReceberItemAnteriorVO ant) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        contaReceberItemAnteriorDAO.gravar(ant);
     }
 
     public Map<String, Integer> getEventuais() throws Exception {
         return clienteEventualAnteriorDAO.getClientesImportador(sistema, loja);
     }
 
-    MultiMap<String, ContaReceberItemAnteriorVO> getItemAnteriores() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public MultiMap<String, ContaReceberItemAnteriorVO> getItemAnteriores() throws Exception {
+        return contaReceberItemAnteriorDAO.getAnteriores(sistema, loja);
     }
     
 }

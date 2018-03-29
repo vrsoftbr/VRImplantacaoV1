@@ -11,7 +11,7 @@ import vrimplantacao2.utils.sql.SQLBuilder;
  *
  * @author Leandro
  */
-public class OutraReceitaAnteriorDAO {
+public class ContaReceberAnteriorDAO {
     
     public static void createTable() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
@@ -32,7 +32,7 @@ public class OutraReceitaAnteriorDAO {
         }
     }
 
-    public OutraReceitaAnteriorDAO() throws Exception {
+    public ContaReceberAnteriorDAO() throws Exception {
         createTable();
     }
 

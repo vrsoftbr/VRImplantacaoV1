@@ -1,6 +1,7 @@
 package vrimplantacao2.vo.cadastro.financeiro.contareceber;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -52,12 +53,14 @@ public class OutraReceitaRepository {
                 try {
                     ContaReceberAnteriorVO anterior = anteriores.get(imp.getId());
                     
+                    //<editor-fold defaultstate="collapsed" desc="logging">
                     JSONObject logImp = new JSONObject();
                     logImp.put("id", imp.getId());
                     logImp.put("emissao", imp.getDataEmissao());
                     logImp.put("vencimento", imp.getDataVencimento());
                     logImp.put("valor", imp.getValor());
                     log.put("imp", logImp);
+                    //</editor-fold>
 
                     if (anterior == null) {                        
                         anterior = converterAnterior(imp);
@@ -80,7 +83,8 @@ public class OutraReceitaRepository {
                                 throw new Exception("Fornecedor " + imp.getIdFornecedor()+ " não localizado!");
                             }
                         }
-                        
+                                                
+                        //<editor-fold defaultstate="collapsed" desc="logging">
                         JSONObject logVo = new JSONObject();
                         logVo.put("emissao", vo.getDataEmissao());
                         logVo.put("vencimento", vo.getDataVencimento());
@@ -88,6 +92,7 @@ public class OutraReceitaRepository {
                         logVo.put("fornecedor", vo.getIdFornecedor());
                         logVo.put("cli_eventual", vo.getIdClienteEventual());
                         log.put("convertido", logVo);
+                        //</editor-fold>
                         
                         provider.gravar(vo);
                         log.put("receita_gravada", true);
@@ -97,10 +102,13 @@ public class OutraReceitaRepository {
                         anteriores.put(anterior.getId(), anterior);
                     }
 
-                    JSONObject pagLog = new JSONObject();
-                    log.put("pagamentos", pagLog);
+                    List<JSONObject> pagListLog = new ArrayList<>();
+                    log.put("pagamentos", pagListLog);
                     if (anterior.getCodigoAtual() > 0) {
                         for (ContaReceberPagamentoIMP impPag: imp.getPagamentos()) {
+                            
+                            JSONObject pagLog = new JSONObject();
+                            pagListLog.add(pagLog);
                             
                             ContaReceberItemAnteriorVO antItem = itemAnteriores.get(imp.getId(), impPag.getId());
                             
@@ -108,9 +116,12 @@ public class OutraReceitaRepository {
                                 OutraReceitaItemVO item = converterPagamento(impPag);
                                 item.setIdReceberOutrasReceitas(anterior.getCodigoAtual());
                                 provider.gravar(item);
+                                
+                                //<editor-fold defaultstate="collapsed" desc="logging">
                                 pagLog.put("tipo", item.getTipoRecebimento().toString());
                                 pagLog.put("pagamento", item.getDataPagamento());
                                 pagLog.put("valor", item.getValor());
+                                //</editor-fold>
                                 
                                 antItem = converterItemAnterior(impPag);
                                 antItem.setIdContaReceber(imp.getId());
