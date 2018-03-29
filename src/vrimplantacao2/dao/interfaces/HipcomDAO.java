@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
@@ -38,6 +39,7 @@ import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ContaReceberIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -1384,6 +1386,54 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         public void remove() {
             throw new UnsupportedOperationException("Not supported.");
         }
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	concat(r.ctptipo,'-',r.ctpforn,'-',r.ctpclilj,'-',r.ctpnf,'-',r.ctpserie,'-',r.ctpparc,'-',r.ctploja) id,\n" +
+                    "	r.ctpforn idfornecedor,\n" +
+                    "	r.ctpnf numeroDocumento,\n" +
+                    "	r.ctpdtemiss dataemissao,\n" +
+                    "	r.ctpvalor + coalesce(r.ctpjuros, 0) - coalesce(r.ctpdesc, 0) valor,\n" +
+                    "	r.ctpjuros juros,\n" +
+                    "	r.ctpdesc desconto,\n" +
+                    "	r.ctpvalabt abatimento,\n" +
+                    "	r.ctpobs observacao,\n" +
+                    "	r.ctpdtvenc vencimento,\n" +
+                    "	r.ctpparc parcela\n" +
+                    "from\n" +
+                    "	finctp r\n" +
+                    "where\n" +
+                    "	r.ctpdtemiss >= '" + dateFormat.format(receberDataInicial) + "' and\n" +
+                    "	r.ctpdtemiss <= '" + dateFormat.format(receberDataFinal) + "' and\n" +
+                    "	r.ctploja = " + getLojaOrigem() + " and\n" +
+                    "	r.ctpvalor > 0 and\n" +
+                    "	r.ctptipo = 'F'\n" +
+                    "order by\n" +
+                    "	r.ctpdtemiss"
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setNumeroDocumento(rst.getString("numeroDocumento"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setObservacao("PARCELA " + rst.getString("parcela") + " OBS " + rst.getString("observacao"));
+                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
     }
     
 }
