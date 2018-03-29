@@ -1,9 +1,10 @@
-package vrimplantacao2.vo.cadastro.financeiro.contareceber;
+package vrimplantacao.dao.financeiro.contareceber;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.OutraReceitaVO;
 
 /**
  *
@@ -17,6 +18,7 @@ public class OutraReceitaDAO {
             sql.setTableName("receberoutrasreceitas");
             sql.put("id_loja", vo.getIdLoja());
             sql.put("id_clienteeventual", vo.getIdClienteEventual(), 0);
+            sql.put("id_tiporeceita", vo.getTipoReceita().getId());
             sql.put("dataemissao", vo.getDataEmissao());
             sql.put("datavencimento", vo.getDataVencimento());
             sql.put("valor", vo.getValor());

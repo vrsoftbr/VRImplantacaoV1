@@ -1,4 +1,4 @@
-package vrimplantacao2.vo.cadastro.financeiro.contareceber;
+package vrimplantacao.dao.financeiro.contareceber;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -9,6 +9,12 @@ import java.util.Set;
 import java.util.logging.Logger;
 import org.json.JSONObject;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.ContaReceberAnteriorVO;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.ContaReceberItemAnteriorVO;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.OutraReceitaItemVO;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.OutraReceitaVO;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.SituacaoReceberOutrasReceitas;
 import vrimplantacao2.vo.enums.TipoLocalCobranca;
 import vrimplantacao2.vo.enums.TipoReceita;
 import vrimplantacao2.vo.importacao.ContaReceberIMP;
@@ -190,6 +196,7 @@ public class OutraReceitaRepository {
         vo.setValorJuros(imp.getValorJuros());
         vo.setValorMulta(imp.getValorMulta());
         vo.setDataPagamento(imp.getDataPagamento());
+        vo.setDataBaixa(imp.getDataPagamento());
         vo.setObservacao(imp.getObservacao());
         vo.setIdBanco(imp.getBanco());
         vo.setAgencia(imp.getAgencia());
@@ -199,8 +206,16 @@ public class OutraReceitaRepository {
         return vo;
     }
 
-    private ContaReceberItemAnteriorVO converterItemAnterior(ContaReceberPagamentoIMP impPag) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public ContaReceberItemAnteriorVO converterItemAnterior(ContaReceberPagamentoIMP impPag) {
+        ContaReceberItemAnteriorVO ant = new ContaReceberItemAnteriorVO();
+        
+        ant.setSistema(provider.getSistema());
+        ant.setLoja(provider.getLoja());
+        ant.setId(impPag.getId());
+        ant.setData(impPag.getDataPagamento());
+        ant.setValor(impPag.getValor());
+        
+        return ant;
     }
     
     

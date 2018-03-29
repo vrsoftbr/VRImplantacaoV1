@@ -23,6 +23,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
@@ -37,6 +38,7 @@ import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
+import vrimplantacao2.vo.importacao.ContaReceberIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -63,6 +65,9 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     
     private Date vendaDataInicial;
     private Date vendaDataFinal;
+    
+    private Date receberDataInicial;
+    private Date receberDataFinal;
 
     public void setRotativoDataInicial(Date rotativoDataInicial) {
         this.rotativoDataInicial = rotativoDataInicial;
@@ -78,6 +83,14 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setVendaDataFinal(Date vendaDataFinal) {
         this.vendaDataFinal = vendaDataFinal;
+    }
+
+    public void setReceberDataInicial(Date receberDataInicial) {
+        this.receberDataInicial = receberDataInicial;
+    }
+
+    public void setReceberDataFinal(Date receberDataFinal) {
+        this.receberDataFinal = receberDataFinal;
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -831,7 +844,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyy-MM-dd");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
                     "	concat(r.ctrtipo,'-',r.ctrcod,'-',r.ctrclilj,'-',r.ctrdoc,'-',r.ctrserie,'-',r.ctrparc,'-',r.ctrloja) id,\n" +
@@ -984,6 +997,56 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
        
+    }
+
+    @Override
+    public List<ContaReceberIMP> getContasReceber(Set<OpcaoContaReceber> opt) throws Exception {
+        List<ContaReceberIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	concat(r.ctrtipo,'-',r.ctrcod,'-',r.ctrclilj,'-',r.ctrdoc,'-',r.ctrserie,'-',r.ctrparc,'-',r.ctrloja) id,\n" +
+                    "	r.ctrcod idfornecedor,\n" +
+                    "	r.ctrdtemiss dataemissao,\n" +
+                    "	r.ctrdtvenc vencimento,\n" +
+                    "	r.ctrvalor + coalesce(r.ctrjuros, 0) - coalesce(r.ctrdesc, 0) valor,\n" +
+                    "	r.ctrvalabt abatimento,\n" +
+                    "	r.ctrjuros juros,\n" +
+                    "	r.ctrdesc desconto,\n" +
+                    "	r.ctrsaldo valorfinal,\n" +
+                    "	r.ctrobs observacao\n" +
+                    "from\n" +
+                    "	finctr r\n" +
+                    "where\n" +
+                    "	r.ctrdtemiss >= '" + dateFormat.format(receberDataInicial) + "' and\n" +
+                    "	r.ctrdtemiss <= '" + dateFormat.format(receberDataFinal) + "' and\n" +
+                    "	r.ctrloja = " + getLojaOrigem() + " and\n" +
+                    "	r.ctrvalor > 0 and r.ctrsaldo > 0 and\n" +
+                    "	r.ctrtipo = 'F'\n" +
+                    "order by\n" +
+                    "	r.ctrdtemiss"
+            )) {
+                while (rst.next()) {
+                    ContaReceberIMP imp = new ContaReceberIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("observacao"));                    
+                    if (rst.getDouble("abatimento") > 0) {
+                        imp.add(imp.getId(), rst.getDouble("abatimento"), 0, 0, 0, rst.getDate("vencimento"));
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
     }
 
     @Override

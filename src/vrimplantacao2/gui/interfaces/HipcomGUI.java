@@ -325,6 +325,8 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                         }
                         
                         if (chkOutrasReceitas.isSelected()) {
+                            dao.setReceberDataInicial(txtOtRecDtIni.getDate());
+                            dao.setReceberDataFinal(txtOtRecDtFim.getDate());
                             importador.importarOutrasReceitas(OpcaoContaReceber.NOVOS);
                         }
                         

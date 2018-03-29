@@ -1,10 +1,11 @@
-package vrimplantacao2.vo.cadastro.financeiro.contareceber;
+package vrimplantacao.dao.financeiro.contareceber;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.ContaReceberItemAnteriorVO;
 
 /**
  *

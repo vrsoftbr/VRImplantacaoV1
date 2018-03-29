@@ -1,4 +1,4 @@
-package vrimplantacao2.vo.cadastro.financeiro.contareceber;
+package vrimplantacao.dao.financeiro.contareceber;
 
 import java.util.Map;
 import vrframework.classe.Conexao;
@@ -6,6 +6,10 @@ import vrframework.classe.ProgressBar;
 import vrimplantacao2.dao.cadastro.cliente.ClienteEventualAnteriorDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.ContaReceberAnteriorVO;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.ContaReceberItemAnteriorVO;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.OutraReceitaItemVO;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.OutraReceitaVO;
 
 /**
  * 

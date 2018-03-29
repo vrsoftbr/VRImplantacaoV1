@@ -1,6 +1,8 @@
 package vrimplantacao2.vo.cadastro.financeiro.contareceber;
 
 import java.util.Date;
+import vrimplantacao.utils.Utils;
+import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.TipoRecebimento;
 
 /**
@@ -15,14 +17,14 @@ public class OutraReceitaItemVO {
     private double valorDesconto = 0;// numeric(11,2) NOT NULL,
     private double valorJuros = 0;// numeric(11,2) NOT NULL,
     private double valorMulta = 0;// numeric(11,2) NOT NULL,
-    private double valorTotal = 0;// numeric(11,2) NOT NULL,
-    private Date dataBaixa;// date NOT NULL,
-    private Date dataPagamento;// date NOT NULL,
-    private String observacao = "";// character varying(500) NOT NULL,
+    //private double valorTotal = 0 numeric(11,2) NOT NULL,
+    private Date dataBaixa = new Date();// date NOT NULL,
+    private Date dataPagamento = new Date();// date NOT NULL,
+    private String observacao = "IMPORTADO VR";// character varying(500) NOT NULL,
     private int idBanco;//id_banco integer,
     private String agencia;// character varying(10) NOT NULL,
     private String conta;// character varying(10) NOT NULL,
-    private TipoRecebimento tipoRecebimento = TipoRecebimento.BOLETO;// id_tiporecebimento integer NOT NULL,
+    private TipoRecebimento tipoRecebimento = TipoRecebimento.CARTEIRA;// id_tiporecebimento integer NOT NULL,
     private long idConciliacaoBancariaLancamento;// id_conciliacaobancarialancamento bigint,
     private long idReceberCheque;//id_recebercheque bigint,
     private int idUsuario = 0;//id_usuario integer NOT NULL DEFAULT 0,
@@ -49,7 +51,7 @@ public class OutraReceitaItemVO {
     }
 
     public void setValor(double valor) {
-        this.valor = valor;
+        this.valor = MathUtils.round(valor, 2, 999999.99F);
     }
 
     public double getValorDesconto() {
@@ -57,7 +59,7 @@ public class OutraReceitaItemVO {
     }
 
     public void setValorDesconto(double valorDesconto) {
-        this.valorDesconto = valorDesconto;
+        this.valorDesconto = MathUtils.round(valorDesconto, 2, 999999.99F);
     }
 
     public double getValorJuros() {
@@ -65,7 +67,7 @@ public class OutraReceitaItemVO {
     }
 
     public void setValorJuros(double valorJuros) {
-        this.valorJuros = valorJuros;
+        this.valorJuros = MathUtils.round(valorJuros, 2, 999999.99F);
     }
 
     public double getValorMulta() {
@@ -73,15 +75,11 @@ public class OutraReceitaItemVO {
     }
 
     public void setValorMulta(double valorMulta) {
-        this.valorMulta = valorMulta;
+        this.valorMulta = MathUtils.round(valorMulta, 2, 999999.99F);
     }
 
     public double getValorTotal() {
-        return valorTotal;
-    }
-
-    public void setValorTotal(double valorTotal) {
-        this.valorTotal = valorTotal;
+        return MathUtils.round(getValor() - getValorDesconto() + getValorJuros() + getValorMulta(), 2, 999999.99F);
     }
 
     public Date getDataBaixa() {
@@ -89,7 +87,7 @@ public class OutraReceitaItemVO {
     }
 
     public void setDataBaixa(Date dataBaixa) {
-        this.dataBaixa = dataBaixa;
+        this.dataBaixa = dataBaixa == null ? new Date() : dataBaixa;
     }
 
     public Date getDataPagamento() {
@@ -97,7 +95,7 @@ public class OutraReceitaItemVO {
     }
 
     public void setDataPagamento(Date dataPagamento) {
-        this.dataPagamento = dataPagamento;
+        this.dataPagamento = dataPagamento == null ? new Date() : dataPagamento;
     }
 
     public String getObservacao() {
@@ -105,7 +103,7 @@ public class OutraReceitaItemVO {
     }
 
     public void setObservacao(String observacao) {
-        this.observacao = observacao;
+        this.observacao = Utils.acertarTexto("IMPORTADOR VR " + observacao, 500);
     }
 
     public int getIdBanco() {
@@ -121,7 +119,7 @@ public class OutraReceitaItemVO {
     }
 
     public void setAgencia(String agencia) {
-        this.agencia = agencia;
+        this.agencia = agencia == null ? "" : agencia;
     }
 
     public String getConta() {
@@ -129,7 +127,7 @@ public class OutraReceitaItemVO {
     }
 
     public void setConta(String conta) {
-        this.conta = conta;
+        this.conta = conta == null ? "" : conta;
     }
 
     public TipoRecebimento getTipoRecebimento() {
@@ -137,7 +135,7 @@ public class OutraReceitaItemVO {
     }
 
     public void setTipoRecebimento(TipoRecebimento tipoRecebimento) {
-        this.tipoRecebimento = tipoRecebimento;
+        this.tipoRecebimento = tipoRecebimento == null ? TipoRecebimento.CARTEIRA : tipoRecebimento;
     }
 
     public long getIdConciliacaoBancariaLancamento() {

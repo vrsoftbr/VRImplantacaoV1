@@ -1,9 +1,10 @@
-package vrimplantacao2.vo.cadastro.financeiro.contareceber;
+package vrimplantacao.dao.financeiro.contareceber;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
+import vrimplantacao2.vo.cadastro.financeiro.contareceber.OutraReceitaItemVO;
 
 /**
  *
@@ -28,8 +29,8 @@ public class OutraReceitaItemDAO {
             sql.put("agencia", item.getAgencia());
             sql.put("conta", item.getConta());
             sql.put("id_tiporecebimento", item.getTipoRecebimento().getId());
-            sql.put("id_conciliacaobancarialancamento", item.getIdConciliacaoBancariaLancamento());
-            sql.put("id_recebercheque", item.getIdReceberCheque());
+            sql.put("id_conciliacaobancarialancamento", item.getIdConciliacaoBancariaLancamento(), 0);
+            sql.put("id_recebercheque", item.getIdReceberCheque(), 0);
             sql.put("id_usuario", item.getIdUsuario());
             sql.put("id_loja", item.getIdLoja());
             sql.getReturning().add("id");
