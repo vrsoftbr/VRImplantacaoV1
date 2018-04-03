@@ -15,6 +15,7 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -330,6 +331,12 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                             importador.importarOutrasReceitas(OpcaoContaReceber.NOVOS);
                         }
                         
+                        if (chkContasPagar.isSelected()) {
+                            dao.setCpDataInicial(txtDtCPEntrada.getDate());
+                            dao.setCpDataFinal(txtDtCPFim.getDate());
+                            importador.importarContasPagar(OpcaoContaPagar.NOVOS);
+                        }
+                        
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial();
                         }
@@ -459,6 +466,9 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkVendas = new javax.swing.JCheckBox();
         txtDtVendaIni = new org.jdesktop.swingx.JXDatePicker();
         txtDtVendaFim = new org.jdesktop.swingx.JXDatePicker();
+        chkContasPagar = new javax.swing.JCheckBox();
+        txtDtCPEntrada = new org.jdesktop.swingx.JXDatePicker();
+        txtDtCPFim = new org.jdesktop.swingx.JXDatePicker();
         pnlLoja = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel1 = new javax.swing.JLabel();
@@ -804,18 +814,28 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkVendas.setText("Vendas");
 
+        chkContasPagar.setText("Contas à Pagar");
+
         javax.swing.GroupLayout tabOutrasLayout = new javax.swing.GroupLayout(tabOutras);
         tabOutras.setLayout(tabOutrasLayout);
         tabOutrasLayout.setHorizontalGroup(
             tabOutrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabOutrasLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkVendas)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(199, Short.MAX_VALUE))
+                .addGroup(tabOutrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(tabOutrasLayout.createSequentialGroup()
+                        .addComponent(chkVendas)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(txtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(tabOutrasLayout.createSequentialGroup()
+                        .addComponent(chkContasPagar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtDtCPEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtDtCPFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(161, Short.MAX_VALUE))
         );
         tabOutrasLayout.setVerticalGroup(
             tabOutrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -825,7 +845,12 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(chkVendas)
                     .addComponent(txtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(231, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(tabOutrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkContasPagar)
+                    .addComponent(txtDtCPEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtDtCPFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(211, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Outras", tabOutras);
@@ -945,6 +970,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkClienteTipoInscricao;
+    private javax.swing.JCheckBox chkContasPagar;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkCusto;
     private vrframework.bean.checkBox.VRCheckBox chkCustoComImposto;
@@ -1012,6 +1038,8 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JPanel tabOutras;
     private javax.swing.JPanel tabProdutos;
     private javax.swing.JTabbedPane tabs;
+    private org.jdesktop.swingx.JXDatePicker txtDtCPEntrada;
+    private org.jdesktop.swingx.JXDatePicker txtDtCPFim;
     private org.jdesktop.swingx.JXDatePicker txtDtVendaFim;
     private org.jdesktop.swingx.JXDatePicker txtDtVendaIni;
     private org.jdesktop.swingx.JXDatePicker txtOtRecDtFim;

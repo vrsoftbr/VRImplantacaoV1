@@ -16,7 +16,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
@@ -70,6 +69,9 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     
     private Date receberDataInicial;
     private Date receberDataFinal;
+    
+    private Date cpDataInicial;
+    private Date cpDataFinal;
 
     public void setRotativoDataInicial(Date rotativoDataInicial) {
         this.rotativoDataInicial = rotativoDataInicial;
@@ -93,6 +95,14 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setReceberDataFinal(Date receberDataFinal) {
         this.receberDataFinal = receberDataFinal;
+    }
+
+    public void setCpDataInicial(Date cpDataInicial) {
+        this.cpDataInicial = cpDataInicial;
+    }
+
+    public void setCpDataFinal(Date cpDataFinal) {
+        this.cpDataFinal = cpDataFinal;
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -571,7 +581,6 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdProduto(rst.getString("idproduto"));
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                    //imp.setCustoTabela(MathUtils.round(rst.getDouble("precopacote") / rst.getDouble("qtdembalagem"), 2));                                        
                     
                     result.add(imp);
                 }
@@ -1392,7 +1401,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
         
-        try (Statement stm = Conexao.createStatement()) {
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
@@ -1410,8 +1419,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "from\n" +
                     "	finctp r\n" +
                     "where\n" +
-                    "	r.ctpdtemiss >= '" + dateFormat.format(receberDataInicial) + "' and\n" +
-                    "	r.ctpdtemiss <= '" + dateFormat.format(receberDataFinal) + "' and\n" +
+                    "	r.ctpdtemiss >= '" + dateFormat.format(cpDataInicial) + "' and\n" +
+                    "	r.ctpdtemiss <= '" + dateFormat.format(cpDataFinal) + "' and\n" +
                     "	r.ctploja = " + getLojaOrigem() + " and\n" +
                     "	r.ctpvalor > 0 and\n" +
                     "	r.ctptipo = 'F'\n" +
@@ -1426,7 +1435,10 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroDocumento(rst.getString("numeroDocumento"));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setObservacao("PARCELA " + rst.getString("parcela") + " OBS " + rst.getString("observacao"));
-                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"));
+                    imp.setValor(rst.getDouble("valor"));
+                    if (rst.getDouble("abatimento") > 0) {
+                        imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("abatimento"));
+                    }
                     
                     result.add(imp);
                 }
