@@ -543,7 +543,7 @@ public class AsefeDAO extends InterfaceDAO {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("id") + "-" + rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        String id = rst.getString("id");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
@@ -607,9 +607,9 @@ public class AsefeDAO extends InterfaceDAO {
 
                         String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
                         String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horatermino");
+                        next.setCancelado(rst.getBoolean("cancelado"));
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setCancelado(rst.getBoolean("cancelado"));
                         next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
                         next.setValorDesconto(rst.getDouble("desconto"));
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
@@ -630,12 +630,13 @@ public class AsefeDAO extends InterfaceDAO {
                     + "vc.Codigo as id,\n"
                     + "vc.COO as numerocupom,\n"
                     + "vc.NumeroCaixa as ecf,\n"
-                    + "vc.Data as data,\n"
+                    + "convert(date, vc.Data, 105) as data,\n"
+                    + "vc.NumImpFiscal,\n"
                     + "vc.CodCliente as vc_clientepreferencial,\n"
                     + "cli.CodCliente as cli_clientepreferencial,\n"
                     + "MIN(CONVERT(nvarchar(5), Data, 108)) as horainicio,\n"
                     + "MAX(CONVERT(nvarchar(5), Data, 108)) as horatermino,\n"
-                    + "'N' as cancelado,\n"
+                    + "ISNULL(vc.Estornada, 0) as cancelado,"
                     + "vc.ValorTotal as subtotalimpressora,\n"
                     + "vc.CPFConsumidor as vc_cpf,\n"
                     + "cli.CpfCliente as cli_cpf,\n"
@@ -686,6 +687,8 @@ public class AsefeDAO extends InterfaceDAO {
                     + "		and CONVERT(datetime, '" + FORMAT.format(dataTermino) + "', 103))\n"
                     + "and vc.CodEmpresa = " + idLojaCliente + "\n"
                     + "group by \n"
+                    + "vc.Estornada,"
+                    + "vc.NumImpFiscal,\n"
                     + "vc.Codigo,\n"
                     + "vc.COO, \n"
                     + "vc.NumeroCaixa, \n"
@@ -750,9 +753,9 @@ public class AsefeDAO extends InterfaceDAO {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String idVenda = rst.getString("id_venda") + "-" + rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
-                        String id = rst.getString("id") + "-" + rst.getString("id_venda") + "-" + rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
-                                
+                        String idVenda = rst.getString("id_venda");
+                        String id = rst.getString("id") + "-" + rst.getString("id_venda");
+                        
                         next.setId(id);
                         next.setVenda(idVenda);
                         next.setProduto(rst.getString("produto"));
@@ -838,35 +841,37 @@ public class AsefeDAO extends InterfaceDAO {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "select \n"
+                    = "select distinct\n"
                     + "mov.cod_mov as id,\n"
                     + "vc.Codigo as id_venda,\n"
-                    + "vc.COO as numerocupom,\n"
-                    + "vc.NumeroCaixa as ecf,\n"
-                    + "vc.Data as data,\n"
+                    + "mov.coo as numerocupom,\n"
+                    + "mov.numimpfiscal,\n"
+                    + "mov.caixa_mov as ecf,\n"
+                    + "convert(date, mov.data_mov, 105) as data,\n"
                     + "pro.CODPROD_PRODUTOS as produto,\n"
                     + "pro.DescricaoCompleta as descricao,\n"
                     + "ISNULL(mov.qtd_mov, 0) quantidade,\n"
                     + "ISNULL(mov.venda_mov, 0) as total,\n"
-                    + "mov.Cancelada as cancelado,\n"
-                    + "0 as desconto,\n"
+                    + "ISNULL(mov.Cancelada, 0) as cancelado,\n"
+                    + "ISNULL(mov.VLACRDESC, 0) as desconto,\n"
                     + "0 as acrescimo,\n"
                     + "mov.codbarra_mov as codigobarras,\n"
                     + "pro.UNIDADE_PRODUTOS as unidade,\n"
                     + "mov.S_Trib_Aliquota codaliq_venda,\n"
                     + "'I' as codaliq_produto,\n"
                     + "'' as trib_desc\n"
-                    + "from CE_VendasCaixa vc\n"
-                    + "inner join CE_MOVIMENTACAO mov on mov.caixa_mov = vc.NumeroCaixa "
-                    + "and vc.COO = mov.coo\n"
-                    + "and vc.numimpfiscal = mov.NumImpFiscal\n"
+                    + "from CE_MOVIMENTACAO mov\n"
                     + "inner join CE_PRODUTOS pro on pro.CODBARRA_PRODUTOS = mov.codbarra_mov \n"
+                    + "inner join CE_VendasCaixa vc on vc.NumeroCaixa = mov.caixa_mov and vc.COO = mov.coo and vc.numimpfiscal = mov.NumImpFiscal\n"
+                    + "and vc.NumeroOperador = mov.CodOperador\n"
+                    + "and convert(date, vc.Data, 105) = convert(date, mov.data_mov, 105)\n"
                     + "where vc.CodEmpresa = " + idLojaCliente + "\n"
                     + "and mov.CodEmpresa = " + idLojaCliente + "\n"
                     + "and (vc.Data between CONVERT(datetime, '" + FORMAT.format(dataInicio) + "', 103)\n"
-                    + "		and CONVERT(datetime, '" + FORMAT.format(dataTermino) + "', 103))"
+                    + "		and CONVERT(datetime, '" + FORMAT.format(dataTermino) + "', 103))\n"
                     + "and (mov.data_mov between CONVERT(datetime, '" + FORMAT.format(dataInicio) + "', 103)\n"
-                    + "		and CONVERT(datetime, '" + FORMAT.format(dataTermino) + "', 103))";
+                    + "		and CONVERT(datetime, '" + FORMAT.format(dataTermino) + "', 103))\n"
+                    + "and isnull(mov.VendaUn, 0) > 0";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
