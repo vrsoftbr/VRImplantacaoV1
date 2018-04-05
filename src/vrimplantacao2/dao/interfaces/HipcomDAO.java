@@ -1415,7 +1415,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	r.ctpvalabt abatimento,\n" +
                     "	r.ctpobs observacao,\n" +
                     "	r.ctpdtvenc vencimento,\n" +
-                    "	r.ctpparc parcela\n" +
+                    "	r.ctpparc parcela,\n" +
+                    "	case when r.ctpdtpagto is null then 0 else 1 end pago\n" +
                     "from\n" +
                     "	finctp r\n" +
                     "where\n" +
@@ -1423,6 +1424,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	r.ctpdtemiss <= '" + dateFormat.format(cpDataFinal) + "' and\n" +
                     "	r.ctploja = " + getLojaOrigem() + " and\n" +
                     "	r.ctpvalor > 0 and\n" +
+                    "	r.ctpdtpagto is null and\n" +
                     "	r.ctptipo = 'F'\n" +
                     "order by\n" +
                     "	r.ctpdtemiss"
@@ -1436,9 +1438,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setObservacao("PARCELA " + rst.getString("parcela") + " OBS " + rst.getString("observacao"));
                     imp.setValor(rst.getDouble("valor"));
-                    if (rst.getDouble("abatimento") > 0) {
-                        imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("abatimento"));
-                    }
+                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"));
+                    imp.setFinalizada(rst.getBoolean("pago"));
                     
                     result.add(imp);
                 }
