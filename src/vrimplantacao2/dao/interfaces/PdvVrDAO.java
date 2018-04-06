@@ -14,6 +14,7 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.OperadorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -74,7 +75,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -123,6 +124,37 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstCredito(rst.getString("cstPis"));
                     imp.setIcmsDebitoId(rst.getString("id_aliquota"));
                     imp.setIcmsCreditoId(rst.getString("id_aliquota"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<OperadorIMP> getOperadores() throws Exception {
+        List<OperadorIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "matricula,\n"
+                    + "nome,\n"
+                    + "senha,\n"
+                    + "id_tiponiveloperador,\n"
+                    + "id_situacaocadastro\n"
+                    + "from operador\n"
+                    + "where matricula <> 500001\n"
+                    + "order by matricula"
+            )) {
+                while (rst.next()) {
+                    OperadorIMP imp = new OperadorIMP();
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportarMatricula(rst.getString("matricula"));
+                    imp.setNome(rst.getString("nome"));
+                    imp.setSenha(rst.getString("senha"));
+                    imp.setId_tiponiveloperador(rst.getString("id_tiponiveloperador"));
+                    imp.setId_situacadastro(rst.getString("id_situacaocadastro"));
                     result.add(imp);
                 }
             }

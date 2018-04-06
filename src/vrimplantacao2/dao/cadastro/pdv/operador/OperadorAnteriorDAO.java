@@ -7,13 +7,11 @@ package vrimplantacao2.dao.cadastro.pdv.operador;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import vrframework.classe.Conexao;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.pdv.operador.OperadorAnteriorVO;
-import vrimplantacao2.vo.cadastro.pdv.operador.OperadorVO;
 
 /**
  *
@@ -67,12 +65,14 @@ public class OperadorAnteriorDAO {
         }
     }
 
-    public Map<String, OperadorVO> getAnterior(String sistema, String loja) throws Exception {
-        Map<String, OperadorVO> result = new LinkedHashMap<>();
+    public MultiMap<String, OperadorAnteriorVO> getAnterior(String sistema, String loja) throws Exception {
+        MultiMap<String, OperadorAnteriorVO> result = new MultiMap<>();
 
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
+                    + "ant.sistema,"
+                    + "ant.loja,"
                     + "ant.matricula, "
                     + "ant.matriculaatual, "
                     + "o.nome, "
@@ -88,13 +88,14 @@ public class OperadorAnteriorDAO {
                     + "	ant.id"
             )) {
                 while (rst.next()) {
-                    OperadorVO vo = new OperadorVO();
-                    vo.setMatricula(rst.getInt("matriculaatual"));
+                    OperadorAnteriorVO vo = new OperadorAnteriorVO();
+                    vo.setSistema(rst.getString("sistema"));
+                    vo.setLoja(rst.getString("loja"));
+                    vo.setMatricula(rst.getString("matricula"));
                     vo.setNome(rst.getString("nome"));
-                    vo.setSenha(rst.getInt("senha"));
-                    vo.setCodigo(rst.getInt("codigo"));
-                    vo.setId_tiponiveloperador(rst.getInt("id_tiponiveloperador"));
-                    result.put(rst.getString("matricula"), vo);
+                    vo.setSenha(rst.getString("senha"));
+                    vo.setId_tiponiveloperador(rst.getString("id_tiponiveloperador"));
+                    result.put(vo, vo.getSistema(), vo.getLoja(), vo.getMatricula());
                 }
             }
         }

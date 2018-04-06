@@ -25,6 +25,7 @@ public class OperadorDAO {
             sql.put("codigo", vo.getCodigo());
             sql.put("matricula", vo.getMatricula());
             sql.put("senha", vo.getSenha());
+            sql.put("id_loja", vo.getId_loja());
             sql.put("id_tiponiveloperador", vo.getId_tiponiveloperador());
             sql.put("id_situacaocadastro", vo.getSituacaoCadastro().getId());
             stm.execute(sql.getInsert());

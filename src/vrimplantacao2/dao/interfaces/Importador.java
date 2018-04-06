@@ -63,6 +63,8 @@ import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao.dao.financeiro.contareceber.OutraReceitaRepository;
 import vrimplantacao.dao.financeiro.contareceber.OutraReceitaRepositoryProvider;
+import vrimplantacao2.dao.cadastro.pdv.operador.OperadorRepository;
+import vrimplantacao2.dao.cadastro.pdv.operador.OperadorRepositoryProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
@@ -81,6 +83,7 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
+import vrimplantacao2.vo.importacao.OperadorIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -783,4 +786,19 @@ public class Importador {
         rep.importar(receita, opt);
     }
 
+    /**
+     * Importa o cadastro dos operadores.
+     * 
+     * @throws Exception 
+     */
+    public void importarOperador() throws Exception {
+        ProgressBar.setStatus("Carregando operadores...");
+        List<OperadorIMP> operadores = getInterfaceDAO().getOperadores();
+        OperadorRepositoryProvider provider = new OperadorRepositoryProvider();
+        provider.setSistema(getInterfaceDAO().getSistema());
+        provider.setLojaOrigem(getInterfaceDAO().getLojaOrigem());
+        provider.setLojaVR(getLojaVR());
+        OperadorRepository rep = new OperadorRepository(provider);
+        rep.importarOperador(operadores);
+    }
 }

@@ -32,6 +32,7 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
+import vrimplantacao2.vo.importacao.OperadorIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -385,4 +386,12 @@ public abstract class InterfaceDAO {
         return new ArrayList<>();
     }
     
+    /**
+     * Permite o retorno listas especificadas de operador.
+     * @return
+     * @throws Exception 
+     */    
+    public List<OperadorIMP> getOperadores() throws Exception {
+        return new ArrayList<>();
+    }   
 }
