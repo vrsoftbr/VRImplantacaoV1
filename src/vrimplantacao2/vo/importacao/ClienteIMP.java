@@ -465,7 +465,7 @@ public class ClienteIMP {
     }
 
     public void setTelefone(String telefone) {
-        this.telefone = telefone;
+        this.telefone = Utils.formataNumero(telefone);
     }
 
     public String getCelular() {
@@ -473,7 +473,7 @@ public class ClienteIMP {
     }
 
     public void setCelular(String celular) {
-        this.celular = celular;
+        this.celular = Utils.formataNumero(celular);
     }
 
     public String getEmail() {
@@ -481,7 +481,7 @@ public class ClienteIMP {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = email.toLowerCase();
     }
     
     public void addEmail(String descricao, String email, TipoContato tipo) {
