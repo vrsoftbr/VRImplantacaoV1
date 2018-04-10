@@ -481,7 +481,7 @@ public class ClienteIMP {
     }
 
     public void setEmail(String email) {
-        this.email = email.toLowerCase();
+        this.email = email;
     }
     
     public void addEmail(String descricao, String email, TipoContato tipo) {
