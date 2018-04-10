@@ -130,7 +130,6 @@ import vrimplantacao2.gui.interfaces.ShiGUI;
 import vrimplantacao2.gui.interfaces.SigmaGUI;
 import vrimplantacao2.gui.interfaces.EsSystemGUI;
 import vrimplantacao2.gui.interfaces.Farm2000GUI;
-import vrimplantacao2.gui.interfaces.HipicomGUI;
 import vrimplantacao2.gui.interfaces.MSIInforGUI;
 import vrimplantacao2.gui.interfaces.RCNetGUI;
 import vrimplantacao2.gui.interfaces.SifatGUI;
@@ -159,6 +158,7 @@ import vrimplantacao2.gui.interfaces.Wm_byFileGUI;
 import vrimplantacao2.gui.interfaces.WmsiGUI;
 import vrimplantacao2.gui.interfaces.PdvVrGUI;
 import vrimplantacao2.gui.interfaces.InfoMacGUI;
+import vrimplantacao2.gui.interfaces.SiacGUI;
 
 
 public final class MenuGUI extends VRMdiFrame {
@@ -558,6 +558,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuLinner = new javax.swing.JMenuItem();
         mnuCPGestor = new javax.swing.JMenuItem();
         mnuWmsi = new javax.swing.JMenuItem();
+        mnuWmsi1 = new javax.swing.JMenuItem();
         jMenu8 = new javax.swing.JMenu();
         jMenuItemControlWare = new javax.swing.JMenuItem();
         mnuFlatan = new javax.swing.JMenuItem();
@@ -715,7 +716,7 @@ public final class MenuGUI extends VRMdiFrame {
             vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblRazaoSocial, javax.swing.GroupLayout.DEFAULT_SIZE, 479, Short.MAX_VALUE)
+                .addComponent(lblRazaoSocial, javax.swing.GroupLayout.DEFAULT_SIZE, 747, Short.MAX_VALUE)
                 .addContainerGap())
         );
         vRPanel5Layout.setVerticalGroup(
@@ -742,7 +743,7 @@ public final class MenuGUI extends VRMdiFrame {
             vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblVersao, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
+                .addComponent(lblVersao, javax.swing.GroupLayout.DEFAULT_SIZE, 149, Short.MAX_VALUE)
                 .addContainerGap())
         );
         vRPanel6Layout.setVerticalGroup(
@@ -769,7 +770,7 @@ public final class MenuGUI extends VRMdiFrame {
             vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblLoja, javax.swing.GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE)
+                .addComponent(lblLoja, javax.swing.GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE)
                 .addContainerGap())
         );
         vRPanel3Layout.setVerticalGroup(
@@ -798,7 +799,7 @@ public final class MenuGUI extends VRMdiFrame {
             vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblData, javax.swing.GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)
+                .addComponent(lblData, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
                 .addContainerGap())
         );
         vRPanel2Layout.setVerticalGroup(
@@ -1347,6 +1348,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu7.add(mnuWmsi);
+
+        mnuWmsi1.setText("Siac");
+        mnuWmsi1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuWmsi1ActionPerformed(evt);
+            }
+        });
+        jMenu7.add(mnuWmsi1);
 
         jMenu2.add(jMenu7);
 
@@ -3512,7 +3521,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuFarm2000ActionPerformed
 
     private void mnuHipicomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuHipicomActionPerformed
-        HipicomGUI.exibir(this);
+
     }//GEN-LAST:event_mnuHipicomActionPerformed
 
     private void mnuLinnerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuLinnerActionPerformed
@@ -3629,6 +3638,10 @@ public final class MenuGUI extends VRMdiFrame {
     private void mnuParametros1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuParametros1ActionPerformed
         SQLEditor.exibir(this);
     }//GEN-LAST:event_mnuParametros1ActionPerformed
+
+    private void mnuWmsi1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuWmsi1ActionPerformed
+        SiacGUI.exibir(this);
+    }//GEN-LAST:event_mnuWmsi1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -3802,6 +3815,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuVisualComercio;
     private javax.swing.JMenuItem mnuWmByFile;
     private javax.swing.JMenuItem mnuWmsi;
+    private javax.swing.JMenuItem mnuWmsi1;
     private javax.swing.JMenuItem mnupdvvendaitem;
     private vrframework.bean.toolBar.VRToolBar tlbAtalho;
     private vrframework.bean.toolBar.VRToolBar tlbFixo;
