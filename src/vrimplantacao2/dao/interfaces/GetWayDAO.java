@@ -100,14 +100,14 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select p.codprod, "
-                    + "   cast(p.dataini as date) as dataini, "
-                    + "	  cast(p.datafim as date) as datafim, "
-                    + "	  p.preco_unit precooferta, "
-                    + "   prod.preco_unit as preconormal "
-                    + "from  promocao p "
-                    + "inner join  produtos prod on p.codprod = prod.codprod "
-                    + "where  datafim >= '" + new SimpleDateFormat("yyyy-MM-dd").format(dataTermino) + "' "
-                    + "order  by  p.dataini"
+                    + "     cast(p.dataini as date) as dataini, "
+                    + "     cast(p.datafim as date) as datafim, "
+                    + "     p.preco_unit precooferta, "
+                    + "     prod.preco_unit as preconormal "
+                    + "from promocao p "
+                    + "inner join produtos prod on p.codprod = prod.codprod "
+                    + "where datafim >= '" + new SimpleDateFormat("yyyy-MM-dd").format(dataTermino) + "' "
+                    + "order by p.dataini"
             )) {
                 while (rst.next()) {
                     OfertaIMP imp = new OfertaIMP();
@@ -356,13 +356,13 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    coalesce(case \n"
                     + "    when codtipofornec = 1 then 0 \n"
                     + "    when codtipofornec = 2 then 1 \n"
-                    + "    when codtipofornec = 3 then 4 \n"
+                    + "    when codtipofornec = 3 then 2 \n"
                     + "    when codtipofornec = 4 then 3 \n"
                     + "    when codtipofornec = 5 then 5 \n"
                     + "    when codtipofornec = 6 then 6 \n"
-                    + "    when codtipofornec = 7 then 7\n"
+                    + "    when codtipofornec = 7 then 7 \n"
                     + "    when codtipofornec = 8 then 8 \n"
-                    + "    end, 9) as codtipofornec \n"
+                    + "    end, 2) as codtipofornec \n"
                     + "    from \n"
                     + "    fornecedores f left join condpagto c on (f.codcondpagto = c.codcondpagto) \n"
                     + "    order by codfornec"
@@ -643,7 +643,12 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "WHEN 'A' THEN 4 "
                     + "WHEN 'O' THEN 5 ELSE 0 END AS ESTADOCIVILNOVO, "
                     + "coalesce(CONTATO,'')+' '+coalesce(REF1_NOME,'')+' '+coalesce(REF2_NOME,'')+' '+coalesce(FONE1,'') AS OBS, "
-                    + "BLOQCARTAO "
+                    + "BLOQCARTAO, "
+                    + "cast((case "
+                    +   "when len(senhacartao) <= 6 then "
+                    +    "senhacartao "
+                    +    "else 0 "
+                    + "end) as integer) as senhacartao "        
                     + "FROM "
                     + "CLIENTES "
                     + "where "
@@ -684,6 +689,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCargo(rst.getString("CARGO"));
                     imp.setSalario(rst.getDouble("RENDA"));
                     imp.setObservacao(rst.getString("OBS"));
+                    imp.setSenha(rst.getInt("senhacartao"));
                     imp.setAtivo("1".equals(rst.getString("ATIVO")));
                     if ((rst.getString("BLOQCARTAO") != null)
                             && (!rst.getString("BLOQCARTAO").trim().isEmpty())) {
@@ -1249,11 +1255,11 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    cx.atualizado = 'S' and\n"
                     + "    (cx.flgrupo = 'S' or cx.flgrupo = 'N')\n"
                     + "group by\n"
-                    + "	 cx.coo,\n"
+                    + "	   cx.coo,\n"
                     + "    cx.codcaixa,\n"
                     + "    cx.data,\n"
                     + "    cx.cliente,\n"
-                    + "	 cl.cnpj_cpf,\n"
+                    + "	   cl.cnpj_cpf,\n"
                     + "    pdv.NUM_SERIE,\n"
                     + "    pdv.IMP_MODELO,\n"
                     + "    pdv.IMP_MARCA,\n"

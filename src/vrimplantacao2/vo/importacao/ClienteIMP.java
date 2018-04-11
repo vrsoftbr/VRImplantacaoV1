@@ -61,6 +61,7 @@ public class ClienteIMP {
     private int diaVencimento;
     private boolean permiteCreditoRotativo;
     private boolean permiteCheque;
+    private int senha;
 
     private String telefone;
     private String celular;
@@ -613,6 +614,14 @@ public class ClienteIMP {
 
     public List<ClienteContatoIMP> getContatos() {
         return contatos;
+    }
+
+    public int getSenha() {
+        return senha;
+    }
+
+    public void setSenha(int senha) {
+        this.senha = senha;
     }
     
     /**

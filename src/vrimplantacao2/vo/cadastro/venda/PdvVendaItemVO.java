@@ -61,7 +61,7 @@ public class PdvVendaItemVO {
     }
 
     public void setPrecoVenda(double precoVenda) {
-        this.precoVenda = precoVenda;
+        this.precoVenda = MathUtils.round(precoVenda,2);
     }
 
     public void setId_aliquota(int id_aliquota) {

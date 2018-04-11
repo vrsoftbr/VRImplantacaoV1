@@ -1425,7 +1425,7 @@ public class GetWayGUI extends VRInternalFrame {
     }//GEN-LAST:event_edtDtVendaFimActionPerformed
 
     private void btnMapaTribActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaTribActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_btnMapaTribActionPerformed
 
     private void btnMapDivergenciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapDivergenciasActionPerformed

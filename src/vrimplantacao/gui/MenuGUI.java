@@ -159,6 +159,7 @@ import vrimplantacao2.gui.interfaces.Wm_byFileGUI;
 import vrimplantacao2.gui.interfaces.WmsiGUI;
 import vrimplantacao2.gui.interfaces.PdvVrGUI;
 import vrimplantacao2.gui.interfaces.InfoMacGUI;
+import vrimplantacao2.gui.interfaces.RMSAutomaHelpGUI;
 
 
 public final class MenuGUI extends VRMdiFrame {
@@ -563,6 +564,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuFlatan = new javax.swing.JMenuItem();
         mnuJrf = new javax.swing.JMenuItem();
         mnuAutoSystem = new javax.swing.JMenuItem();
+        mnuAutoSystem1 = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -1383,6 +1385,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuAutoSystem);
+
+        mnuAutoSystem1.setText("RMS Compras");
+        mnuAutoSystem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAutoSystem1ActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuAutoSystem1);
 
         jMenu2.add(jMenu8);
 
@@ -3630,6 +3640,10 @@ public final class MenuGUI extends VRMdiFrame {
         SQLEditor.exibir(this);
     }//GEN-LAST:event_mnuParametros1ActionPerformed
 
+    private void mnuAutoSystem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAutoSystem1ActionPerformed
+        RMSAutomaHelpGUI.exibir(this);
+    }//GEN-LAST:event_mnuAutoSystem1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -3739,6 +3753,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuApollo;
     private javax.swing.JMenuItem mnuAsefe;
     private javax.swing.JMenuItem mnuAutoSystem;
+    private javax.swing.JMenuItem mnuAutoSystem1;
     private javax.swing.JMenu mnuAvancadas;
     private javax.swing.JMenuItem mnuAvance;
     private javax.swing.JMenuItem mnuBase;
