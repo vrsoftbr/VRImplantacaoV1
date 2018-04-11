@@ -5,12 +5,18 @@
  */
 package vrimplantacao2.dao.interfaces;
 
+import java.io.File;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.WorkbookSettings;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -29,6 +35,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    public String v_arquivo = "";
+    
     @Override
     public String getSistema() {
         return "WebSaq";
@@ -108,13 +116,18 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "pce.codcst cstpiscofinsentrada,\n"
                     + "p.natreceita,\n"
                     + "ncm.codigoncm,\n"
-                    + "p.codcfpdv\n"
+                    + "p.codcfpdv,\n"
+                    + "cf.descricao icmsdesc,\n"
+                    + "cf.codcst as icmscst,\n"
+                    + "cf.aliqicms as icmsaliq,\n"
+                    + "cf.aliqredicms as icmsred\n"
                     + "from produto p \n"
                     + "left join embalagem e on e.codembal = p.codembalvda\n"
                     + "inner join unidade u on u.codunidade = e.codunidade\n"
                     + "left join piscofins pcs on pcs.codpiscofins = p.codpiscofinssai\n"
                     + "left join piscofins pce on pce.codpiscofins = p.codpiscofinsent\n"
                     + "left join ncm on ncm.idncm = p.idncm\n"
+                    + "left join classfiscal cf on cf.codcf = p.codcfpdv\n"
                     + "order by p.codproduto"
             )) {
                 while (rst.next()) {
@@ -219,8 +232,6 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
                     + "f.codfornec,\n"
-                    + "f.razaosocial,\n"
-                    + "f.nome,\n"
                     + "f.endereco,\n"
                     + "f.bairro,\n"
                     + "f.cep,\n"
@@ -265,8 +276,6 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("codfornec"));
-                    imp.setRazao(rst.getString("razaosocial"));
-                    imp.setFantasia(rst.getString("nome"));
                     imp.setCnpj_cpf(rst.getString("cpfcnpj"));
                     imp.setIe_rg(rst.getString("rgie"));
                     imp.setInsc_municipal(rst.getString("inscmunicipal"));
@@ -364,11 +373,72 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                                 rst.getString("email3").toLowerCase()
                         );
                     }
-                    return result;
+                    result.add(imp);
                 }
             }
         }
         return result;
+    }
+    
+    
+    @Override
+    public List<FornecedorIMP> getFornecedores(OpcaoFornecedor opcao) throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        WorkbookSettings settings = new WorkbookSettings();
+        Workbook arquivo = Workbook.getWorkbook(new File(v_arquivo), settings);
+        Sheet[] sheets = arquivo.getSheets();
+        int linha;
+        if (opcao == OpcaoFornecedor.RAZAO_SOCIAL) {
+
+            linha = 0;
+            for (int sh = 0; sh < sheets.length; sh++) {
+                Sheet sheet = arquivo.getSheet(sh);
+                for (int i = 0; i < sheet.getRows(); i++) {
+                        
+                    linha++;
+                    if (linha == 1) {
+                        continue;
+                    }
+                    
+                    Cell cellCodigo = sheet.getCell(0, i);
+                    Cell cellRazao = sheet.getCell(2, i);
+                    
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(cellCodigo.getContents());
+                    imp.setRazao(cellRazao.getContents());
+                    result.add(imp);
+                }
+            }
+            return result;
+        }
+        if (opcao == OpcaoFornecedor.NOME_FANTASIA) {
+
+            linha = 0;
+            for (int sh = 0; sh < sheets.length; sh++) {
+                Sheet sheet = arquivo.getSheet(sh);
+                for (int i = 0; i < sheet.getRows(); i++) {
+                        
+                    linha++;
+                    if (linha == 1) {
+                        continue;
+                    }
+                    
+                    Cell cellCodigo = sheet.getCell(0, i);
+                    Cell cellFantasia = sheet.getCell(1, i);
+                    
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(cellCodigo.getContents());
+                    imp.setFantasia(cellFantasia.getContents());
+                    result.add(imp);
+                }
+            }            
+            return result;
+        }
+        return null;
     }
 
     @Override
@@ -587,8 +657,8 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "codcf,\n"
-                    + "descricao, \n"
+                    + "codcf codigo,\n"
+                    + "('NOME: '||descricao||' CST:'||codcst||' ALIQ: '||aliqicms||' REDU: '||aliqredicms) as descricao, \n"
                     + "aliqicms, \n"
                     + "aliqredicms, \n"
                     + "codcst\n"
@@ -596,7 +666,7 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by codcf"
             )) {
                 while (rst.next()) {
-                    result.add(new MapaTributoIMP(rst.getString("codcf"), rst.getString("descricao")));
+                    result.add(new MapaTributoIMP(rst.getString("codigo"), rst.getString("descricao")));
                 }
             }
         }

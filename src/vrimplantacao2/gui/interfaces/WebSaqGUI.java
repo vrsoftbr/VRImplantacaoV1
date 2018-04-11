@@ -26,33 +26,33 @@ import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTrib
 import vrimplantacao2.parametro.Parametros;
 
 public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonProvider {
-    
+
     private static final Logger LOG = Logger.getLogger(WebSaqGUI.class.getName());
-    
+
     public static final String SISTEMA = "WebSaq";
     private static WebSaqGUI instance;
-    
+
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
     private String vDeposito = "-1";
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
-        
+
         conexao.carregarParametros();
-        
+
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
         vDeposito = params.get(SISTEMA, "DEPOSITO");
         txtReiniciarID.setText(params.getWithNull("1", SISTEMA, "N_REINICIO"));
     }
-    
-     private void gravarParametros() throws Exception {
+
+    private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
-        
+
         conexao.atualizarParametros();
-        
+
         if (cliente != null) {
             params.put(cliente.cnpj, SISTEMA, "LOJA_CLIENTE");
             vLojaCliente = cliente.cnpj;
@@ -63,15 +63,14 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
             vLojaVR = vr.id;
         }
         params.put(Utils.stringToInt(txtReiniciarID.getText()), SISTEMA, "N_REINICIO");
-        params.salvar();        
+        params.salvar();
     }
-    
+
     private WebSaqDAO dao = new WebSaqDAO();
-    
+
     private WebSaqGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
-        initComponents();        
-
+        initComponents();
         conexao.setOnConectar(
                 new ConexaoEvent() {
                     @Override
@@ -83,17 +82,17 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
                     }
                 }
         );
-        
+
         this.title = "Importação " + SISTEMA;
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
-        
+
         carregarParametros();
-        
+
         centralizarForm();
         this.setMaximum(false);
     }
-    
+
     public void carregarLojaVR() throws Exception {
         cmbLojaVR.setModel(new DefaultComboBoxModel());
         int cont = 0;
@@ -107,12 +106,12 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
         }
         cmbLojaVR.setSelectedIndex(index);
     }
-    
+
     public void carregarLojaCliente() throws Exception {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja: dao.getLojasCliente()) {
+        for (Estabelecimento loja : dao.getLojasCliente()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -120,11 +119,11 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
             cont++;
         }
         cmbLojaOrigem.setSelectedIndex(index);
-    }    
-    
+    }
+
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
-            i_mdiFrame.setWaitCursor();            
+            i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
                 instance = new WebSaqGUI(i_mdiFrame);
             }
@@ -141,15 +140,16 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
         Thread thread = new Thread() {
             int idLojaVR;
             String idLojaCliente;
+
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
-                    
-                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
-                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;                                        
-                    
+
+                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
+                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;                    
+
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
@@ -159,7 +159,7 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
                         if (chkMercadologico.isSelected()) {
                             importador.importarMercadologico();
                         }
-                        
+
                         if (chkFamiliaProduto.isSelected()) {
                             importador.importarFamiliaProduto();
                         }
@@ -202,7 +202,7 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
                             if (chkT1AtivoInativo.isSelected()) {
                                 opcoes.add(OpcaoProduto.ATIVO);
                                 opcoes.add(OpcaoProduto.DESCONTINUADO);
-                            }    
+                            }
                             if (chkT1DescCompleta.isSelected()) {
                                 opcoes.add(OpcaoProduto.DESC_COMPLETA);
                             }
@@ -214,7 +214,7 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
                             }
                             if (chkT1ProdMercadologico.isSelected()) {
                                 opcoes.add(OpcaoProduto.MERCADOLOGICO);
-                            }                        
+                            }
                             if (chkValidade.isSelected()) {
                                 opcoes.add(OpcaoProduto.VALIDADE);
                             }
@@ -239,51 +239,59 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
                         }
                         if (chkT1EANemBranco.isSelected()) {
                             importador.importarEANemBranco();
-                        }                        
+                        }
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
-                        }  
+                        }
                         {
                             List<OpcaoFornecedor> opcoes = new ArrayList<>();
                             if (chkFContatos.isSelected()) {
-                                opcoes.add(OpcaoFornecedor.CONTATOS);                        
-                            }              
+                                opcoes.add(OpcaoFornecedor.CONTATOS);
+                            }
                             if (chkFCnpj.isSelected()) {
                                 opcoes.add(OpcaoFornecedor.CNPJ_CPF);
                             }
                             if (chkFSitCad.isSelected()) {
                                 opcoes.add(OpcaoFornecedor.SITUACAO_CADASTRO);
                             }
+                            if (chkRazaoSocial.isSelected() && !txtFileRazaoSocial.getArquivo().isEmpty()) {
+                                dao.v_arquivo = txtFileRazaoSocial.getArquivo();
+                                opcoes.add(OpcaoFornecedor.RAZAO_SOCIAL);
+                            }
+                            if (chkNomeFantasia.isSelected() && !txtFileNomeFantasia.getArquivo().isEmpty()) {
+                                dao.v_arquivo = txtFileNomeFantasia.getArquivo();
+                                opcoes.add(OpcaoFornecedor.NOME_FANTASIA);
+                            }
                             if (!opcoes.isEmpty()) {
-                                importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
+                                importador.atualizarFornecedorNovo(opcoes);
                             }
                         }
                         if (chkClientePreferencial.isSelected()) {
                             List<OpcaoCliente> opcoes = new ArrayList<>();
                             if (chkReiniciarIDCliente.isSelected()) {
                                 opcoes.add(
-                                    OpcaoCliente.IMP_REINICIAR_NUMERACAO.addParametro(
-                                        "N_REINICIO",
-                                        Utils.stringToInt(txtReiniciarID.getText())
-                                    )
+                                        OpcaoCliente.IMP_REINICIAR_NUMERACAO.addParametro(
+                                                "N_REINICIO",
+                                                Utils.stringToInt(txtReiniciarID.getText())
+                                        )
                                 );
                             }
-                            importador.importarClientePreferencial(opcoes.toArray(new OpcaoCliente[] {}));
+                            importador.importarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));
                         }
                         if (chkClienteEventual.isSelected()) {
                             List<OpcaoCliente> opcoes = new ArrayList<>();
                             if (chkReiniciarIDCliente.isSelected()) {
                                 opcoes.add(
-                                    OpcaoCliente.IMP_REINICIAR_NUMERACAO.addParametro(
-                                        "N_REINICIO",
-                                        Utils.stringToInt(txtReiniciarID.getText())
-                                    )
+                                        OpcaoCliente.IMP_REINICIAR_NUMERACAO.addParametro(
+                                                "N_REINICIO",
+                                                Utils.stringToInt(txtReiniciarID.getText())
+                                        )
                                 );
                             }
-                            importador.importarClienteEventual(opcoes.toArray(new OpcaoCliente[] {}));
+                            importador.importarClienteEventual(opcoes.toArray(new OpcaoCliente[]{}));
                         }
                         if (chkCvEmpresa.isSelected()) {
                             importador.importarCheque();
@@ -300,15 +308,15 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
                         }
                         if (chkUnifProdutoFornecedor.isSelected()) {
                             importador.unificarProdutoFornecedor();
-                        }                        
+                        }
                         if (chkUnifClientePreferencial.isSelected()) {
                             importador.unificarClientePreferencial();
-                        }                        
+                        }
                         if (chkClienteEventual.isSelected()) {
                             importador.unificarClienteEventual();
                         }
                     }
-                                       
+
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
@@ -366,6 +374,10 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
         chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
         chkFCnpj = new vrframework.bean.checkBox.VRCheckBox();
         chkFSitCad = new vrframework.bean.checkBox.VRCheckBox();
+        chkRazaoSocial = new vrframework.bean.checkBox.VRCheckBox();
+        txtFileRazaoSocial = new vrframework.bean.fileChooser.VRFileChooser();
+        chkNomeFantasia = new vrframework.bean.checkBox.VRCheckBox();
+        txtFileNomeFantasia = new vrframework.bean.fileChooser.VRFileChooser();
         tabClientes = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabClienteDados = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -583,6 +595,20 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
             }
         });
 
+        chkRazaoSocial.setText("Razão Social:");
+        chkRazaoSocial.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkRazaoSocialActionPerformed(evt);
+            }
+        });
+
+        chkNomeFantasia.setText("Nome Fantasia:");
+        chkNomeFantasia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkNomeFantasiaActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout tabImpFornecedorLayout = new javax.swing.GroupLayout(tabImpFornecedor);
         tabImpFornecedor.setLayout(tabImpFornecedorLayout);
         tabImpFornecedorLayout.setHorizontalGroup(
@@ -591,13 +617,24 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
                 .addContainerGap()
                 .addGroup(tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tabImpFornecedorLayout.createSequentialGroup()
-                        .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(chkRazaoSocial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkFCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkFSitCad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(217, Short.MAX_VALUE))
+                        .addComponent(txtFileRazaoSocial, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(tabImpFornecedorLayout.createSequentialGroup()
+                        .addGroup(tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(tabImpFornecedorLayout.createSequentialGroup()
+                                .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkFCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkFSitCad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(tabImpFornecedorLayout.createSequentialGroup()
+                        .addComponent(chkNomeFantasia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtFileNomeFantasia, javax.swing.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         tabImpFornecedorLayout.setVerticalGroup(
             tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -613,7 +650,15 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkFSitCad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(11, 11, 11)
+                .addGroup(tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(chkRazaoSocial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtFileRazaoSocial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(tabImpFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(chkNomeFantasia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtFileNomeFantasia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(40, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Fornecedores", tabImpFornecedor);
@@ -817,7 +862,7 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
                     .addComponent(jLabel2)
                     .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
+                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -902,7 +947,25 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
     private void chkReiniciarIDClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkReiniciarIDClienteActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkReiniciarIDClienteActionPerformed
-    
+
+    private void chkRazaoSocialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkRazaoSocialActionPerformed
+        // TODO add your handling code here:
+        if (chkRazaoSocial.isSelected()) {
+            txtFileRazaoSocial.setEnabled(true);
+        } else {
+            txtFileRazaoSocial.setEnabled(false);
+        }
+    }//GEN-LAST:event_chkRazaoSocialActionPerformed
+
+    private void chkNomeFantasiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkNomeFantasiaActionPerformed
+        // TODO add your handling code here:
+        if (chkNomeFantasia.isSelected()) {
+            txtFileNomeFantasia.setEnabled(true);
+        } else {
+            txtFileNomeFantasia.setEnabled(false);
+        }
+    }//GEN-LAST:event_chkNomeFantasiaActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
@@ -922,9 +985,11 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
+    private vrframework.bean.checkBox.VRCheckBox chkNomeFantasia;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
+    private vrframework.bean.checkBox.VRCheckBox chkRazaoSocial;
     private vrframework.bean.checkBox.VRCheckBox chkReiniciarIDCliente;
     private vrframework.bean.checkBox.VRCheckBox chkT1AtivoInativo;
     private vrframework.bean.checkBox.VRCheckBox chkT1Custo;
@@ -958,6 +1023,8 @@ public class WebSaqGUI extends VRInternalFrame implements MapaTributacaoButtonPr
     private vrframework.bean.panel.VRPanel tabImpFornecedor;
     private vrframework.bean.panel.VRPanel tabImpProduto;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
+    private vrframework.bean.fileChooser.VRFileChooser txtFileNomeFantasia;
+    private vrframework.bean.fileChooser.VRFileChooser txtFileRazaoSocial;
     private vrframework.bean.textField.VRTextField txtReiniciarID;
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;

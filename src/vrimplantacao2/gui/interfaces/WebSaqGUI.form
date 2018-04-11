@@ -51,7 +51,7 @@
                   <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabs" pref="266" max="32767" attributes="0"/>
+              <Component id="tabs" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -357,16 +357,31 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkRazaoSocial" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtFileRazaoSocial" max="32767" attributes="0"/>
                               </Group>
-                              <Component id="chkFContatos" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFCnpj" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFSitCad" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Group type="102" attributes="0">
+                                          <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Component id="chkFContatos" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkFCnpj" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkFSitCad" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkNomeFantasia" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="txtFileNomeFantasia" pref="306" max="32767" attributes="0"/>
+                              </Group>
                           </Group>
-                          <EmptySpace pref="217" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -386,7 +401,17 @@
                               </Group>
                               <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Component id="chkRazaoSocial" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtFileRazaoSocial" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Component id="chkNomeFantasia" alignment="1" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtFileNomeFantasia" alignment="1" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="40" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -446,6 +471,26 @@
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFSitCadActionPerformed"/>
                   </Events>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkRazaoSocial">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Raz&#xe3;o Social:"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkRazaoSocialActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtFileRazaoSocial">
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNomeFantasia">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Nome Fantasia:"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkNomeFantasiaActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtFileNomeFantasia">
                 </Component>
               </SubComponents>
             </Container>
