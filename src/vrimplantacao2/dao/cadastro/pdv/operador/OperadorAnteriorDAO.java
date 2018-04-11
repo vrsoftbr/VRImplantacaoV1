@@ -78,7 +78,7 @@ public class OperadorAnteriorDAO {
                     + "o.nome, "
                     + "o.senha, "
                     + "o.codigo, "
-                    + "o.id_tiponiveloperador, "
+                    + "o.id_tiponiveloperador "
                     + "from implantacao.codant_operador ant "
                     + "inner join pdv.operador o on o.matricula = ant.matriculaatual "
                     + "where "

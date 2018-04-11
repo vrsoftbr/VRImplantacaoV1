@@ -91,24 +91,24 @@ import vrimplantacao2.vo.importacao.RecebimentoCaixaIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 
 public class Importador {
-    
+
     private static final Logger LOG = Logger.getLogger(Importador.class.getName());
-    
+
     private InterfaceDAO interfaceDAO;
     private int lojaVR = 1;
 
     public Importador(InterfaceDAO interfaceDAO) {
         this.interfaceDAO = interfaceDAO;
     }
-    
+
     public void setInterfaceDAO(InterfaceDAO interfaceDAO) {
         this.interfaceDAO = interfaceDAO;
     }
 
     public InterfaceDAO getInterfaceDAO() {
         return interfaceDAO;
-    }   
-    
+    }
+
     public int getLojaVR() {
         return lojaVR;
     }
@@ -118,8 +118,8 @@ public class Importador {
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public String getSistema() {
         return interfaceDAO.getSistema();
@@ -127,6 +127,7 @@ public class Importador {
 
     /**
      * Retorna a loja de origem.
+     *
      * @return Código da loja de origem.
      */
     public String getLojaOrigem() {
@@ -135,15 +136,17 @@ public class Importador {
 
     /**
      * Define qual será a loja de origem.
-     * @param LojaOrigem 
+     *
+     * @param LojaOrigem
      */
     public void setLojaOrigem(String LojaOrigem) {
         interfaceDAO.setLojaOrigem(LojaOrigem);
     }
-    
+
     /**
      * Importa os mercadológicos dos produtos.
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     public void importarMercadologico() throws Exception {
         ProgressBar.setStatus("Carregando dados do mercadológico...");
@@ -151,12 +154,13 @@ public class Importador {
         MercadologicoDAO dao = new MercadologicoDAO();
         dao.salvar(mercadologicos);
     }
-    
+
     /**
      * Importa os mercadológicos dos produtos por níveis.
+     *
      * @param gerarNiveisComoSubNiveis Faz com que um nível seja representado
      * entre os seus subníveis.
-     * @throws Exception 
+     * @throws Exception
      */
     public void importarMercadologicoPorNiveis(boolean gerarNiveisComoSubNiveis) throws Exception {
         ProgressBar.setStatus("Carregando dados do mercadológico em níveis...");
@@ -165,14 +169,15 @@ public class Importador {
                 getSistema(),
                 getLojaOrigem(),
                 getLojaVR()
-        );        
+        );
         repository.setGerarNiveisComoSubniveis(gerarNiveisComoSubNiveis);
         repository.salvar(mercadologicos);
     }
 
     /**
      * Executa a importação das famílias dos produtos.
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     public void importarFamiliaProduto() throws Exception {
         ProgressBar.setStatus("Carregando dados da família do produto...");
@@ -183,13 +188,14 @@ public class Importador {
 
     /**
      * Executa a importação dos produtos no sistema.
-     * @param manterCodigoDeBalanca True para utilizar o código de barras dos 
-     * produtos de balança (PLU) como id dos produtos. OBSERVAÇÃO: para que
-     * esta opções funcione corretamente, é necessário que o código de barras
-     * seja informado no {@link ProdutoIMP}.
-     * @param gerarNiveisComoSubniveis Gerar um subnivel para cada nível de 
+     *
+     * @param manterCodigoDeBalanca True para utilizar o código de barras dos
+     * produtos de balança (PLU) como id dos produtos. OBSERVAÇÃO: para que esta
+     * opções funcione corretamente, é necessário que o código de barras seja
+     * informado no {@link ProdutoIMP}.
+     * @param gerarNiveisComoSubniveis Gerar um subnivel para cada nível de
      * mercadológico.
-     * @throws Exception 
+     * @throws Exception
      */
     @Deprecated
     public void importarProduto(boolean manterCodigoDeBalanca, boolean gerarNiveisComoSubniveis) throws Exception {
@@ -200,7 +206,7 @@ public class Importador {
         if (gerarNiveisComoSubniveis) {
             opcoes.add(OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC);
         }
-        
+
         importarProduto(opcoes.toArray(new OpcaoProduto[]{}));
     }
 
@@ -213,10 +219,10 @@ public class Importador {
         if (gerarNiveisComoSubniveis) {
             opcoes.add(OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC);
         }
-        
+
         importarProduto(opcoes.toArray(new OpcaoProduto[]{}));
     }
-    
+
     @Deprecated
     public void importarProduto(boolean manterCodigoDeBalanca) throws Exception {
         this.importarProduto(manterCodigoDeBalanca, false);
@@ -226,9 +232,9 @@ public class Importador {
     public void importarProdutoBalanca(boolean manterCodigoDeBalanca) throws Exception {
         this.importarProdutoBalanca(manterCodigoDeBalanca, false);
     }
-    
+
     public void importarProduto(OpcaoProduto... opcoes) throws Exception {
-        
+
         ProgressBar.setStatus("Carregando produtos...");
         List<ProdutoIMP> produtos = getInterfaceDAO().getProdutos();
         ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
@@ -236,14 +242,14 @@ public class Importador {
         provider.setSistema(getSistema());
         provider.setLojaVR(getLojaVR());
         provider.setOpcoes(opcoes);
-        
+
         ProdutoRepository repository = new ProdutoRepository(provider);
         repository.salvar(produtos);
-        
+
     }
 
     public void importarProdutoBalanca(OpcaoProduto... opcoes) throws Exception {
-        
+
         ProgressBar.setStatus("Carregando produtos...");
         List<ProdutoIMP> produtos = getInterfaceDAO().getProdutosBalanca();
         ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
@@ -251,16 +257,17 @@ public class Importador {
         provider.setSistema(getSistema());
         provider.setLojaVR(getLojaVR());
         provider.setOpcoes(opcoes);
-        
+
         ProdutoRepository repository = new ProdutoRepository(provider);
         repository.salvar(produtos);
-        
+
     }
-    
+
     /**
      * Executa a importação dos fornecedores.
+     *
      * @param opt
-     * @throws Exception 
+     * @throws Exception
      */
     public void importarFornecedor(OpcaoFornecedor... opt) throws Exception {
         ProgressBar.setStatus("Carregando fornecedores...");
@@ -273,10 +280,11 @@ public class Importador {
         FornecedorRepository rep = new FornecedorRepository(provider);
         rep.salvar(fornecedores);
     }
-    
+
     /**
      * Executa a importação do produto fornecedor.
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     public void importarProdutoFornecedor() throws Exception {
         ProgressBar.setStatus("Carregando produtos dos fornecedores...");
@@ -290,7 +298,8 @@ public class Importador {
 
     /**
      * Importa os códigos de barras dos produtos.
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     public void importarEAN() throws Exception {
         ProgressBar.setStatus("Carregando produtos...");
@@ -303,9 +312,10 @@ public class Importador {
     }
 
     /**
-     * Todo produto que não possuir um EAN, ao executar este método, eles 
+     * Todo produto que não possuir um EAN, ao executar este método, eles
      * recebem um código de barras, baseado em seu ID.
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     public void importarEANemBranco() throws Exception {
         ProgressBar.setStatus("Preenchendo EANs em branco...");
@@ -315,15 +325,16 @@ public class Importador {
         dao.setIdLojaVR(getLojaVR());
         dao.salvarEANemBranco();
     }
-    
+
     /**
      * Importa o histórico de vendas do cliente.
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     public void importarHistoricoVendas() throws Exception {
         ProgressBar.setStatus("Preenchendo as vendas...");
         VendaHistoricoRepository repository = new VendaHistoricoRepository(
-                new VendaHistoricoDAO(), 
+                new VendaHistoricoDAO(),
                 new ProdutoAnteriorDAO(false)
         );
         repository.setImportSistema(getSistema());
@@ -334,13 +345,14 @@ public class Importador {
 
     /**
      * Atualiza as informações dos produtos conforme as opções informadas.
+     *
      * @param opcoes Opções que determinam o que será atualizado no produto.
-     * @throws Exception 
+     * @throws Exception
      */
     public void atualizarProdutos(List<OpcaoProduto> opcoes) throws Exception {
         ProgressBar.setStatus("Carregando produtos...");
         List<ProdutoIMP> produtos = getInterfaceDAO().getProdutos();
-        for (OpcaoProduto opt: opcoes) {
+        for (OpcaoProduto opt : opcoes) {
             opt.setListaEspecial(getInterfaceDAO().getProdutos(opt));
         }
         ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
@@ -354,8 +366,9 @@ public class Importador {
 
     /**
      * Importa o cadastro dos clientes preferênciais.
+     *
      * @param opcoes Opções para importar os dados do cliente.
-     * @throws Exception 
+     * @throws Exception
      */
     public void importarClientePreferencial(OpcaoCliente... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando clientes preferenciais...");
@@ -370,8 +383,9 @@ public class Importador {
 
     /**
      * Importa o cadastro dos clientes eventuais.
+     *
      * @param opcoes Opções para importar os dados do cliente.
-     * @throws Exception 
+     * @throws Exception
      */
     public void importarClienteEventual(OpcaoCliente... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando clientes eventuais...");
@@ -383,38 +397,39 @@ public class Importador {
         ClienteRepository rep = new ClienteRepository(provider);
         rep.importarClienteEventual(clientes, new HashSet<>(Arrays.asList(opcoes)));
     }
-    
+
     public void importarCreditoRotativo() throws Exception {
         ProgressBar.setStatus("Carregando crédito rotativo...");
         List<CreditoRotativoIMP> rotativo = getInterfaceDAO().getCreditoRotativo();
         CreditoRotativoProvider provider = new CreditoRotativoProvider(
-            getInterfaceDAO().getSistema(),
-            getInterfaceDAO().getLojaOrigem(),
-            getLojaVR()
+                getInterfaceDAO().getSistema(),
+                getInterfaceDAO().getLojaOrigem(),
+                getLojaVR()
         );
         CreditoRotativoRepository rep = new CreditoRotativoRepository(provider);
         rep.importarCreditoRotativo(rotativo);
     }
-    
+
     public void unificarCreditoRotativo() throws Exception {
         ProgressBar.setStatus("Carregando crédito rotativo...");
         List<CreditoRotativoIMP> rotativo = getInterfaceDAO().getCreditoRotativo();
         CreditoRotativoProvider provider = new CreditoRotativoProvider(
-            getInterfaceDAO().getSistema(),
-            getInterfaceDAO().getLojaOrigem(),
-            getLojaVR()
+                getInterfaceDAO().getSistema(),
+                getInterfaceDAO().getLojaOrigem(),
+                getLojaVR()
         );
         CreditoRotativoRepository rep = new CreditoRotativoRepository(provider);
         rep.unificarCreditoRotativo(rotativo);
     }
-    
+
     /**
-     * Unifica o cadastro de produtos. Todos os produtos com EAN válido serão 
+     * Unifica o cadastro de produtos. Todos os produtos com EAN válido serão
      * importados e aqueles que não possuirem EAN maior que 999999 são gravados
      * apenas na tabela implantacao.codant_produto.
-     * @throws Exception 
+     *
+     * @throws Exception
      */
-    public void unificarProdutos() throws Exception  {
+    public void unificarProdutos() throws Exception {
         ProgressBar.setStatus("Carregando produtos (Unificação)...");
         List<ProdutoIMP> produtos = getInterfaceDAO().getProdutos();
         ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
@@ -428,7 +443,8 @@ public class Importador {
      * Unifica o cadastro dos fornecedores, apenas aqueles com CPF/CNPJ válidos,
      * e aqueles que não se enquadram nessa categoria são gravados apenas na
      * tabela implantacao.codant_fornecedor.
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     public void unificarFornecedor() throws Exception {
         ProgressBar.setStatus("Carregando fornecedores (Unificação)...");
@@ -445,7 +461,8 @@ public class Importador {
     /**
      * Unifica o cadastro de Produto Fornecedor. Se o fornecedor existir e se o
      * código externo não estiver sendo utilizado grava o registro.
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     public void unificarProdutoFornecedor() throws Exception {
         ProgressBar.setStatus("Carregando produtos dos fornecedores (Unificação)...");
@@ -459,10 +476,11 @@ public class Importador {
 
     /**
      * Unifica o cadastro dos clientes preferenciais. Todo cliente com CNPJ/CPF
-     * válido será importado e os que não se enquadram nessa regra ficam 
+     * válido será importado e os que não se enquadram nessa regra ficam
      * gravados apenas na tabela implantacao.codant_clientepreferencial.
+     *
      * @param opcoes Opções de importação.
-     * @throws Exception 
+     * @throws Exception
      */
     public void unificarClientePreferencial(OpcaoCliente... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando clientes preferenciais(Unificação)...");
@@ -473,13 +491,14 @@ public class Importador {
         provider.setLojaVR(getLojaVR());
         new ClienteRepository(provider).unificarClientePreferencial(clientes, new HashSet<>(Arrays.asList(opcoes)));
     }
-    
+
     /**
      * Unifica o cadastro dos clientes eventuais. Todo cliente com CNPJ/CPF
-     * válido será importado e os que não se enquadram nessa regra ficam 
+     * válido será importado e os que não se enquadram nessa regra ficam
      * gravados apenas na tabela implantacao.codant_clienteeventual.
+     *
      * @param opcoes Opções da importação.
-     * @throws Exception 
+     * @throws Exception
      */
     public void unificarClienteEventual(OpcaoCliente... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando clientes eventuais(Unificação)...");
@@ -489,11 +508,12 @@ public class Importador {
         provider.setLojaOrigem(getLojaOrigem());
         provider.setLojaVR(getLojaVR());
         new ClienteRepository(provider).unificarClienteEventual(clientes, new HashSet<>(Arrays.asList(opcoes)));
-    }    
+    }
 
     /**
      * Executa a importação do Nutricional para a impressora Filizola.
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     public void importarNutricionalFilizola() throws Exception {
         ProgressBar.setStatus("Carregando Nutricional Filizola...");
@@ -504,7 +524,8 @@ public class Importador {
 
     /**
      * Executa a importação do Nutricional para a impressora Toledo.
-     * @throws Exception 
+     *
+     * @throws Exception
      */
     public void importarNutricionalToledo() throws Exception {
         ProgressBar.setStatus("Carregando Nutricional Toledo...");
@@ -515,8 +536,9 @@ public class Importador {
 
     /**
      * Atualiza informações do cadastro de fornecedores.
+     *
      * @param opcoes
-     * @throws Exception 
+     * @throws Exception
      */
     public void atualizarFornecedor(OpcaoFornecedor... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando fornecedores (atualização)...");
@@ -533,11 +555,11 @@ public class Importador {
     public void atualizarFornecedorNovo(List<OpcaoFornecedor> opcoes) throws Exception {
         ProgressBar.setStatus("Carregando fornecedores (atualização)...");
         List<FornecedorIMP> fornecedores = null;
-        for (OpcaoFornecedor opt: opcoes) {
+        for (OpcaoFornecedor opt : opcoes) {
             opt.setListaEspecial(getInterfaceDAO().getFornecedores(opt));
             fornecedores = opt.getListaEspecial();
         }
-        
+
         FornecedorRepositoryProvider provider = new FornecedorRepositoryProvider(
                 getSistema(),
                 getLojaOrigem(),
@@ -546,7 +568,7 @@ public class Importador {
         FornecedorRepository repository = new FornecedorRepository(provider);
         repository.atualizar(fornecedores, opcoes.toArray(new OpcaoFornecedor[]{}));
     }
-    
+
     public void atualizarClientePreferencial(OpcaoCliente... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando clientes (atualização)...");
         List<ClienteIMP> clientes = getInterfaceDAO().getClientes();
@@ -572,7 +594,7 @@ public class Importador {
         ClienteRepository rep = new ClienteRepository(provider);
         rep.atualizarClientePreferencial(clientes, opcoes);
     }
-    
+
     public void importarCheque() throws Exception {
         ProgressBar.setStatus("Carregando cheques...");
         List<ChequeIMP> cheques = getInterfaceDAO().getCheques();
@@ -631,7 +653,7 @@ public class Importador {
         );
         rep.getContasPagar().salvar(pagamentos, opcoes);
     }
- 
+
     public void importarRecebimentoCaixa(OpcaoRecebimentoCaixa... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando recebimento caixa...");
         List<RecebimentoCaixaIMP> recebimentos = getInterfaceDAO().getRecebimentosCaixa();
@@ -644,19 +666,20 @@ public class Importador {
     }
 
     /**
-     * Utilize esta importação quando o sistema a ser importado trabalha com o 
-     * contas à receber semelhante a uma "conta corrente", ou seja, na mesma 
-     * tabela existem operações de crédito e débito, e um pagamento não está 
-     * relacionado diretamente ( 1 para  1) com uma conta.
+     * Utilize esta importação quando o sistema a ser importado trabalha com o
+     * contas à receber semelhante a uma "conta corrente", ou seja, na mesma
+     * tabela existem operações de crédito e débito, e um pagamento não está
+     * relacionado diretamente ( 1 para 1) com uma conta.
+     *
      * @param opcoes Array com as opções de importação do Crédito Rotativo.
-     * @throws Exception 
+     * @throws Exception
      */
     public void importarCreditoRotativoBaixasAgrupadas(OpcaoCreditoRotativo... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando pagamentos agrupados dos rotativos...");
         List<CreditoRotativoPagamentoAgrupadoIMP> pags = getInterfaceDAO().getCreditoRotativoPagamentoAgrupado();
         FinanceiroRepository rep = new FinanceiroRepository(
-                getSistema(), 
-                getLojaOrigem(), 
+                getSistema(),
+                getLojaOrigem(),
                 getLojaVR()
         );
         rep.getCreditoRotativo().salvarPagamentosAgrupados(pags, opcoes);
@@ -664,8 +687,9 @@ public class Importador {
 
     /**
      * Importa ofertas de acordo com a data de termino.
+     *
      * @param dataTermino
-     * @throws Exception 
+     * @throws Exception
      */
     public void importarOfertas(Date dataTermino) throws Exception {
         ProgressBar.setStatus("Ofertas...Gerando listagem...");
@@ -677,11 +701,12 @@ public class Importador {
         ProdutoRepository rep = new ProdutoRepository(provider);
         rep.salvarOfertas(ofertas);
     }
-    
+
     /**
      * Efetua a importação da Pauta Fiscal.
+     *
      * @param opcoes Opções de importação da Pauta Fiscal.
-     * @throws Exception 
+     * @throws Exception
      */
     public void importarPautaFiscal(OpcaoFiscal... opcoes) throws Exception {
         Set<OpcaoFiscal> opt = new HashSet<>(Arrays.asList(opcoes));
@@ -695,20 +720,21 @@ public class Importador {
         FiscalRepository rep = new FiscalRepository(provider);
         rep.pautaFiscal().importar(pautas, opt);
     }
- 
+
     private JdbcConnectionSource getSource() throws SQLException {
         return new JdbcConnectionSource("jdbc:sqlite:" + Parametros.get().getBancoImplantacao());
     }
-    
+
     /**
      * Efetua a importação das Vendas conforme as opções passadas.
+     *
      * @param opcoes Opções das importações de venda.
-     * @throws Exception 
+     * @throws Exception
      */
     public void importarVendas(OpcaoVenda... opcoes) throws Exception {
         Set<OpcaoVenda> opt = new HashSet<>(Arrays.asList(opcoes));
         ProgressBar.setStatus("Vendas...Gerando listagem...");
-        
+
         if (Parametros.get().isGerarBancoImplantacao()) {
             try (JdbcConnectionSource source = this.getSource()) {
                 ProgressBar.setStatus("Vendas...Gerando listagem de cabeçalho de venda...");
@@ -716,8 +742,8 @@ public class Importador {
                 ProgressBar.setStatus("Vendas...Gerando listagem dos itens das vendas...");
                 new VendaItemImpDao(source).persistir(getInterfaceDAO().getVendaItemIterator());
             }
-        }        
-        
+        }
+
         if (Parametros.get().isImportarBancoImplantacao()) {
             VendaRepositoryProvider provider = new VendaRepositoryProvider(
                     getSistema(),
@@ -732,6 +758,7 @@ public class Importador {
 
     /**
      * Executa a importação dos nutricionais para as balanças que o VR trabalha.
+     *
      * @param opcoes Opções de importação dos nutricionais.
      * @throws Exception
      */
@@ -747,7 +774,7 @@ public class Importador {
         NutricionalRepository rep = new NutricionalRepository(provider);
         rep.importar(nutricionais, opt);
     }
-    
+
     public void importarComprador() throws Exception {
         ProgressBar.setStatus("Compradores...Gerando listagem...");
         List<CompradorIMP> compradores = getInterfaceDAO().getCompradores();
@@ -788,16 +815,16 @@ public class Importador {
 
     /**
      * Importa o cadastro dos operadores.
-     * 
-     * @throws Exception 
+     * @throws Exception
      */
     public void importarOperador() throws Exception {
         ProgressBar.setStatus("Carregando operadores...");
         List<OperadorIMP> operadores = getInterfaceDAO().getOperadores();
-        OperadorRepositoryProvider provider = new OperadorRepositoryProvider();
-        provider.setSistema(getInterfaceDAO().getSistema());
-        provider.setLojaOrigem(getInterfaceDAO().getLojaOrigem());
-        provider.setLojaVR(getLojaVR());
+        OperadorRepositoryProvider provider = new OperadorRepositoryProvider(
+                getSistema(),
+                getLojaOrigem(),
+                getLojaVR()
+        );
         OperadorRepository rep = new OperadorRepository(provider);
         rep.importarOperador(operadores);
     }
