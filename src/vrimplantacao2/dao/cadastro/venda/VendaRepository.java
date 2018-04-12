@@ -116,7 +116,7 @@ public class VendaRepository {
                 
                 for (VendaItemIMP impItem: provider.getVendaItemIMP(impVenda.getId())) {
 
-                    PdvVendaItemVO item = converter(impItem);
+                    PdvVendaItemVO item = converter(impItem, venda.isCancelado());
 
                     item.setVenda(venda);
                     item.setSequencia(cont);
@@ -292,7 +292,7 @@ public class VendaRepository {
         return vo;
     }
 
-    public PdvVendaItemVO converter(VendaItemIMP imp) throws Exception {
+    public PdvVendaItemVO converter(VendaItemIMP imp, boolean cupomCancelado) throws Exception {
         
         PdvVendaItemVO item = new PdvVendaItemVO();
         
@@ -318,7 +318,7 @@ public class VendaRepository {
             ));
             item.setId_aliquota(provider.getIsento().getId());
         }
-        item.setCancelado(imp.isCancelado());        
+        item.setCancelado(imp.isCancelado() || cupomCancelado);
         if (item.isCancelado()) {
             item.setValorCancelado(item.getValorTotal());
             item.setMatriculaCancelamento(provider.getMatricula());

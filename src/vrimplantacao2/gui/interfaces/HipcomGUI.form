@@ -57,7 +57,7 @@
                   <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="tabOperacoes" pref="321" max="32767" attributes="0"/>
+              <Component id="tabOperacoes" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="pnlLoja" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -343,6 +343,11 @@
                     <Property name="text" type="java.lang.String" value="Receita (Toledo)"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkOferta">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Oferta"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="tabFornecedor">
@@ -442,7 +447,7 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
-                              <Component id="chkOutrasDespesas" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkOutrasReceitas" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
@@ -474,7 +479,7 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="txtOtRecDtIni" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkOutrasDespesas" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkOutrasReceitas" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="txtOtRecDtFim" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
@@ -483,7 +488,7 @@
                     </DimensionLayout>
                   </Layout>
                   <SubComponents>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkOutrasDespesas">
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkOutrasReceitas">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Outras receitas"/>
                       </Properties>
@@ -526,6 +531,7 @@
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkClienteTipoInscricao" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
@@ -540,10 +546,12 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkClienteTipoInscricao" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="146" max="32767" attributes="0"/>
+                          <EmptySpace pref="127" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -635,6 +643,11 @@
                     </Component>
                   </SubComponents>
                 </Container>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkClienteTipoInscricao">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo Inscri&#xe7;&#xe3;o"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="javax.swing.JPanel" name="tabOutras">
@@ -651,12 +664,23 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkVendas" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txtDtVendaIni" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txtDtVendaFim" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="199" max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <Component id="chkVendas" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
+                                  <Component id="txtDtVendaIni" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="txtDtVendaFim" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" attributes="0">
+                                  <Component id="chkContasPagar" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="txtDtCPEntrada" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="txtDtCPFim" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <EmptySpace pref="161" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -669,7 +693,13 @@
                               <Component id="txtDtVendaIni" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="txtDtVendaFim" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="231" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkContasPagar" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtDtCPEntrada" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtDtCPFim" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="211" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -683,6 +713,15 @@
                 <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDtVendaIni">
                 </Component>
                 <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDtVendaFim">
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkContasPagar">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Contas &#xe0; Pagar"/>
+                  </Properties>
+                </Component>
+                <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDtCPEntrada">
+                </Component>
+                <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDtCPFim">
                 </Component>
               </SubComponents>
             </Container>

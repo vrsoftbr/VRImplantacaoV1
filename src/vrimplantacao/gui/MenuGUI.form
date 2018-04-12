@@ -605,6 +605,12 @@
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuAutoSystem1ActionPerformed"/>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuWebsaq">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="WebSaq"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuWebsaqActionPerformed"/>
                           </Events>
                         </MenuItem>
                       </SubComponents>

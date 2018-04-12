@@ -129,36 +129,49 @@ public class ReceitaBalancaRepository {
         return vo;
     }
 
-    private ReceitaBalancaToledoVO converterToledo(ReceitaBalancaIMP imp) {
+    public ReceitaBalancaToledoVO converterToledo(ReceitaBalancaIMP imp) {
         ReceitaBalancaToledoVO vo = new ReceitaBalancaToledoVO();
         
         vo.setDescricao(imp.getDescricao());
         
-        String receita = imp.getReceita() != null ? imp.getReceita() : "";
+        String receita = imp.getReceita() != null ? imp.getReceita() : "";        
+        receita = Utils.acertarTexto(receita.replaceAll("\\r?\\n", " "));
         
-        String[] linhas = receita.split("\\r?\\n");
+        int cont = 1;
         
-        for (int i = 1; i < linhas.length; i++) {
-            switch (i) {
-                case 1: vo.setReceitaLinha1(linhas[i - 1]); break;
-                case 2: vo.setReceitaLinha2(linhas[i - 1]); break;
-                case 3: vo.setReceitaLinha3(linhas[i - 1]); break;
-                case 4: vo.setReceitaLinha4(linhas[i - 1]); break;
-                case 5: vo.setReceitaLinha5(linhas[i - 1]); break;
-                case 6: vo.setReceitaLinha6(linhas[i - 1]); break;
-                case 7: vo.setReceitaLinha7(linhas[i - 1]); break;
-                case 8: vo.setReceitaLinha8(linhas[i - 1]); break;
-                case 9: vo.setReceitaLinha9(linhas[i - 1]); break;
-                case 10: vo.setReceitaLinha10(linhas[i - 1]); break;
-                case 11: vo.setReceitaLinha11(linhas[i - 1]); break;
-                case 12: vo.setReceitaLinha12(linhas[i - 1]); break;
-                case 13: vo.setReceitaLinha13(linhas[i - 1]); break;
-                case 14: vo.setReceitaLinha14(linhas[i - 1]); break;
-                case 15: vo.setReceitaLinha15(linhas[i - 1]); break;
+        while (!"".equals(receita) && cont <= 15) {
+            String linha;
+            
+            if (receita.length() < 56) {
+                linha = receita.substring(0, receita.length());
+                receita = "";
+            } else {
+                linha = receita.substring(0, 56);
+                receita = receita.substring(56);
             }
+            
+            switch (cont) {
+                case 1: vo.setReceitaLinha1(linha); break;
+                case 2: vo.setReceitaLinha2(linha); break;
+                case 3: vo.setReceitaLinha3(linha); break;
+                case 4: vo.setReceitaLinha4(linha); break;
+                case 5: vo.setReceitaLinha5(linha); break;
+                case 6: vo.setReceitaLinha6(linha); break;
+                case 7: vo.setReceitaLinha7(linha); break;
+                case 8: vo.setReceitaLinha8(linha); break;
+                case 9: vo.setReceitaLinha9(linha); break;
+                case 10: vo.setReceitaLinha10(linha); break;
+                case 11: vo.setReceitaLinha11(linha); break;
+                case 12: vo.setReceitaLinha12(linha); break;
+                case 13: vo.setReceitaLinha13(linha); break;
+                case 14: vo.setReceitaLinha14(linha); break;
+                case 15: vo.setReceitaLinha15(linha); break;
+            }
+            
+            cont++;
         }
         
-        LOG.finest("TOLEDO: " + Arrays.toString(linhas));
+        LOG.finest("TOLEDO: " + imp.getReceita());
         
         return vo;
     }

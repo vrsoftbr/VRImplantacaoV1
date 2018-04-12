@@ -47,7 +47,9 @@ public class ParametroImportacaoDAO {
                     String[] keys = rst.getString("key").split(KEY_DELIMITER);
                     String value = rst.getString("value");
                     
-                    value = value.replace("\\\\", "\\");
+                    if (value != null) {
+                        value = value.replace("\\\\", "\\");
+                    }
                             
                     parametros.add(new Parametro(keys, value));
                 }
@@ -60,10 +62,13 @@ public class ParametroImportacaoDAO {
         Conexao.begin();
         try (Statement stm = Conexao.createStatement()) {
             for (Parametro parametro: parametros) {
+                
                 String key = formatKeys(parametro.getKeys());
                 String value = parametro.getValue();
                 
-                value = value.replace("\\", "\\\\");
+                if (value != null) {
+                    value = value.replace("\\", "\\\\");
+                }
                 
                 try (ResultSet rst = stm.executeQuery(
                         "select * from implantacao.parametro where key = " + Utils.quoteSQL(key)
@@ -79,6 +84,7 @@ public class ParametroImportacaoDAO {
                                 + " where key = " + Utils.quoteSQL(key));
                     }
                 }
+                
             }
             Conexao.commit();
         } catch (Exception e) {

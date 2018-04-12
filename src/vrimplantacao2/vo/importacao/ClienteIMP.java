@@ -5,9 +5,11 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoIndicadorIE;
+import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.enums.TipoOrgaoPublico;
 import vrimplantacao2.vo.enums.TipoSexo;
 
@@ -18,6 +20,7 @@ import vrimplantacao2.vo.enums.TipoSexo;
 public class ClienteIMP {
     private String id;
     private String cnpj;
+    private TipoInscricao tipoInscricao = TipoInscricao.VAZIO;
     private String inscricaoestadual;
     private String orgaoemissor;
     private String razao;
@@ -104,6 +107,14 @@ public class ClienteIMP {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public TipoInscricao getTipoInscricao() {
+        return tipoInscricao;
+    }
+
+    public void setTipoInscricao(TipoInscricao tipoInscricao) {
+        this.tipoInscricao = tipoInscricao != null ? tipoInscricao : TipoInscricao.VAZIO;
     }
 
     public String getCnpj() {
@@ -455,7 +466,7 @@ public class ClienteIMP {
     }
 
     public void setTelefone(String telefone) {
-        this.telefone = telefone;
+        this.telefone = Utils.formataNumero(telefone);
     }
 
     public String getCelular() {
@@ -463,7 +474,7 @@ public class ClienteIMP {
     }
 
     public void setCelular(String celular) {
-        this.celular = celular;
+        this.celular = Utils.formataNumero(celular);
     }
 
     public String getEmail() {

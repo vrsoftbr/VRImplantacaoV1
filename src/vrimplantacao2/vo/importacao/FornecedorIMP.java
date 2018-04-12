@@ -360,7 +360,7 @@ public class FornecedorIMP {
     }
 
     public void setTel_principal(String tel_principal) {
-        this.tel_principal = tel_principal;
+        this.tel_principal = Utils.formataNumero(tel_principal);
     }
 
     public void setQtd_minima_pedido(int qtd_minima_pedido) {

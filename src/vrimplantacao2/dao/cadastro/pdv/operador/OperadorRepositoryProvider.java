@@ -6,6 +6,9 @@
 package vrimplantacao2.dao.cadastro.pdv.operador;
 
 import vrframework.classe.Conexao;
+import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.cadastro.pdv.operador.OperadorAnteriorVO;
+import vrimplantacao2.vo.cadastro.pdv.operador.OperadorVO;
 
 /**
  *
@@ -17,9 +20,14 @@ public class OperadorRepositoryProvider {
     private String lojaOrigem;
     private int lojaVR;
     private OperadorDAO operadorDAO;
+    private OperadorAnteriorDAO anterioresDAO;
 
-    public OperadorRepositoryProvider() throws Exception {
+    public OperadorRepositoryProvider(String sistema, String lojaOrigem, int lojaVR) throws Exception {
+        this.sistema = sistema;
+        this.lojaOrigem = lojaOrigem;
+        this.lojaVR = lojaVR;
         this.operadorDAO = new OperadorDAO();
+        this.anterioresDAO = new OperadorAnteriorDAO();
     }
 
     public String getSistema() {
@@ -62,5 +70,17 @@ public class OperadorRepositoryProvider {
     
     public OperadorIDStack getOperadorIDStack(int iniciarEm) {
         return new OperadorIDStack(iniciarEm);
+    }
+    
+    public MultiMap<String, OperadorAnteriorVO> getAnteriores() throws Exception {
+        return anterioresDAO.getAnterior(this.sistema, this.lojaOrigem);
+    }
+    
+    public void salvar(OperadorAnteriorVO anterior) throws Exception {
+        anterioresDAO.salvar(anterior);
+    }
+    
+    public void salvar(OperadorVO operador) throws Exception {
+        operadorDAO.salvar(operador);
     }
 }

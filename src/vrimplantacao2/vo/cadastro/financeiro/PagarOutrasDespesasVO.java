@@ -19,14 +19,14 @@ public class PagarOutrasDespesasVO {
     private int idFornecedor;
     private int numeroDocumento;
     private TipoEntrada tipoEntrada = TipoEntrada.OUTRAS;
-    private Date dataEmissao;
-    private Date dataEntrada;
+    private Date dataEmissao = new Date();
+    private Date dataEntrada = new Date();
     private double valor = 0;// numeric(11,2) NOT NULL,
     private SituacaoPagarOutrasDespesas situacaoPagarOutrasDespesas = SituacaoPagarOutrasDespesas.NAO_FINALIZADO;// integer NOT NULL,
     private int id_loja;// integer NOT NULL,
     private String observacao = "IMPORTACAO VR";// character varying(280),
     private int id_tipopiscofins = -1;// integer,
-    private Timestamp dataHoraAlteracao;// timestamp without time zone NOT NULL DEFAULT now(),
+    private Timestamp dataHoraAlteracao = new Timestamp(new Date().getTime());// timestamp without time zone NOT NULL DEFAULT now(),
     private List<PagarOutrasDespesasVencimentoVO> vencimentos = new ArrayList<>();
 
     public int getId() {
@@ -128,7 +128,7 @@ public class PagarOutrasDespesasVO {
     }
 
     public void setDataHoraAlteracao(Timestamp dataHoraAlteracao) {
-        this.dataHoraAlteracao = dataHoraAlteracao;
+        this.dataHoraAlteracao = dataHoraAlteracao != null ? dataHoraAlteracao : new Timestamp(new Date().getTime());
     }
 
     public List<PagarOutrasDespesasVencimentoVO> getVencimentos() {

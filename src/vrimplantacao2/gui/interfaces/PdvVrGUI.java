@@ -23,11 +23,11 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoView;
 import vrimplantacao2.parametro.Parametros;
 
 public class PdvVrGUI extends VRInternalFrame {
-    
+
     private static final String SISTEMA = "PdvVr";
     private static final String SERVIDOR_SQL = "Firebird";
     private static PdvVrGUI instance;
-    
+
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
 
@@ -41,7 +41,7 @@ public class PdvVrGUI extends VRInternalFrame {
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
-    
+
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         params.put(txtHost.getText(), SISTEMA, "HOST");
@@ -61,21 +61,21 @@ public class PdvVrGUI extends VRInternalFrame {
         }
         params.salvar();
     }
-    
+
     private PdvVrDAO pdvVrDAO = new PdvVrDAO();
     private ConexaoFirebird connFirebird = new ConexaoFirebird();
-    
+
     private PdvVrGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
         //ConexaoFirebird.encoding = "WIN1252";        
-        
+
         this.title = "Importação " + SISTEMA;
-                
+
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
         carregarParametros();
-        
+
         centralizarForm();
         this.setMaximum(false);
     }
@@ -91,7 +91,7 @@ public class PdvVrGUI extends VRInternalFrame {
             if (txtDatabase.getArquivo().isEmpty()) {
                 throw new VRException("Favor informar nome do banco de dados " + SERVIDOR_SQL + "!");
             }
-        } 
+        }
         if (txtSenha.getText().isEmpty()) {
             throw new VRException("Favor informar a senha do banco de dados " + SERVIDOR_SQL + "!");
         }
@@ -100,18 +100,18 @@ public class PdvVrGUI extends VRInternalFrame {
         }
 
         if (tabsConn.getSelectedIndex() == 0) {
-            connFirebird.abrirConexao(txtHost.getText(), txtPorta.getInt(), 
+            connFirebird.abrirConexao(txtHost.getText(), txtPorta.getInt(),
                     txtDatabase.getArquivo(), txtUsuario.getText(), txtSenha.getText());
         }
-                
+
         btnMapaTribut.setEnabled(true);
-        
+
         gravarParametros();
-        
+
         carregarLojaVR();
         carregarLojaCliente();
     }
-    
+
     public void carregarLojaVR() throws Exception {
         cmbLojaVR.setModel(new DefaultComboBoxModel());
         int cont = 0;
@@ -125,12 +125,12 @@ public class PdvVrGUI extends VRInternalFrame {
         }
         cmbLojaVR.setSelectedIndex(index);
     }
-    
+
     public void carregarLojaCliente() throws Exception {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja: pdvVrDAO.getLojas()) {
+        for (Estabelecimento loja : pdvVrDAO.getLojas()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -139,10 +139,10 @@ public class PdvVrGUI extends VRInternalFrame {
         }
         cmbLojaOrigem.setSelectedIndex(index);
     }
-    
+
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
-            i_mdiFrame.setWaitCursor();            
+            i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
                 instance = new PdvVrGUI(i_mdiFrame);
             }
@@ -159,20 +159,20 @@ public class PdvVrGUI extends VRInternalFrame {
         Thread thread = new Thread() {
             int idLojaVR;
             String idLojaCliente;
+
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
-                    
-                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
-                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;                                        
+
+                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
+                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
                     Importador importador = new Importador(pdvVrDAO);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
 
                     if (tabs.getSelectedIndex() == 0) {
-                    
 
                         if (chkProdutos.isSelected()) {
                             importador.importarProduto();
@@ -191,7 +191,7 @@ public class PdvVrGUI extends VRInternalFrame {
                             }
                             if (chkT1AtivoInativo.isSelected()) {
                                 opcoes.add(OpcaoProduto.ATIVO);
-                            }    
+                            }
                             if (chkT1DescCompleta.isSelected()) {
                                 opcoes.add(OpcaoProduto.DESC_COMPLETA);
                             }
@@ -219,12 +219,19 @@ public class PdvVrGUI extends VRInternalFrame {
                         if (chkT1EANemBranco.isSelected()) {
                             importador.importarEANemBranco();
                         }
+                        
+                        if (chkOperador.isSelected()) {
+                            importador.importarOperador();
+                        }
+                        
+                    } else if (tabs.getSelectedIndex() == 1) {
+
                     }
-                    
+
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
-                    try {                    
+                    try {
                         connFirebird.close();
                     } catch (Exception ex1) {
                         Exceptions.printStackTrace(ex1);
@@ -263,6 +270,8 @@ public class PdvVrGUI extends VRInternalFrame {
         chkTipoEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         btnMapaTribut = new vrframework.bean.button.VRButton();
+        vRPanel1 = new vrframework.bean.panel.VRPanel();
+        chkOperador = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel6 = new vrframework.bean.panel.VRPanel();
         btnConectar = new javax.swing.JToggleButton();
         tabsConn = new javax.swing.JTabbedPane();
@@ -422,6 +431,27 @@ public class PdvVrGUI extends VRInternalFrame {
         );
 
         vRTabbedPane2.addTab("Produtos", vRPanel7);
+
+        chkOperador.setText("Operador");
+
+        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
+        vRPanel1.setLayout(vRPanel1Layout);
+        vRPanel1Layout.setHorizontalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkOperador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(490, Short.MAX_VALUE))
+        );
+        vRPanel1Layout.setVerticalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkOperador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(172, Short.MAX_VALUE))
+        );
+
+        vRTabbedPane2.addTab("Operadores", vRPanel1);
 
         tabs.addTab("Importação", vRTabbedPane2);
 
@@ -639,11 +669,11 @@ public class PdvVrGUI extends VRInternalFrame {
     }//GEN-LAST:event_txtPortaActionPerformed
 
     private void btnMapaTributActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaTributActionPerformed
-        try {        
+        try {
             MapaTributacaoView.exibir(
-                    mdiFrame, 
-                    SISTEMA, 
-                    ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj,                     
+                    mdiFrame,
+                    SISTEMA,
+                    ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj,
                     pdvVrDAO);
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Erro ao abrir");
@@ -655,6 +685,7 @@ public class PdvVrGUI extends VRInternalFrame {
     private javax.swing.JToggleButton btnConectar;
     private vrframework.bean.button.VRButton btnMapaTribut;
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkOperador;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
     private vrframework.bean.checkBox.VRCheckBox chkT1AtivoInativo;
@@ -684,13 +715,12 @@ public class PdvVrGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel23;
     private vrframework.bean.label.VRLabel vRLabel24;
     private vrframework.bean.label.VRLabel vRLabel25;
+    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.panel.VRPanel vRPanel6;
     private vrframework.bean.panel.VRPanel vRPanel7;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
     // End of variables declaration//GEN-END:variables
-
-    
 
 }

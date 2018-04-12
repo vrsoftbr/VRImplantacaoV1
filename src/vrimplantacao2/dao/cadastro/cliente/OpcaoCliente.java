@@ -41,8 +41,8 @@ public enum OpcaoCliente {
     ENDERECO, 
     TELEFONE,
     CELULAR,
-    ENDERECO_COMPLETO;
-    
+    ENDERECO_COMPLETO,
+    TIPO_INSCRICAO;    
     
     private static final Logger LOG = Logger.getLogger(OpcaoCliente.class.getName());
     private List<ClienteIMP> listaEspecial;
