@@ -64,6 +64,7 @@ public class ClienteIMP {
     private int diaVencimento;
     private boolean permiteCreditoRotativo;
     private boolean permiteCheque;
+    private int senha;
 
     private String telefone;
     private String celular;
@@ -465,7 +466,7 @@ public class ClienteIMP {
     }
 
     public void setTelefone(String telefone) {
-        this.telefone = telefone;
+        this.telefone = Utils.formataNumero(telefone);
     }
 
     public String getCelular() {
@@ -473,7 +474,7 @@ public class ClienteIMP {
     }
 
     public void setCelular(String celular) {
-        this.celular = celular;
+        this.celular = Utils.formataNumero(celular);
     }
 
     public String getEmail() {
@@ -624,6 +625,14 @@ public class ClienteIMP {
 
     public List<ClienteContatoIMP> getContatos() {
         return contatos;
+    }
+
+    public int getSenha() {
+        return senha;
+    }
+
+    public void setSenha(int senha) {
+        this.senha = senha;
     }
     
     /**

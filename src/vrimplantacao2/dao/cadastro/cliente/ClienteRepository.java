@@ -525,6 +525,7 @@ public class ClienteRepository {
         vo.setTelefone(imp.getTelefone());
         vo.setCelular(imp.getCelular());
         vo.setEmail(imp.getEmail());
+        vo.setSenha(imp.getSenha());
         
         return vo;
     }

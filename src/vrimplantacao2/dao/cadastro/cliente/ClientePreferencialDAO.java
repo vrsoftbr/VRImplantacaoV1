@@ -67,6 +67,7 @@ public class ClientePreferencialDAO {
 
             sql.put("dataresidencia", "1900-01-01");
             sql.put("id_tiporesidencia", 5);
+            sql.put("senha", cliente.getSenha());
             sql.put("id_tiporestricaocliente", 0);
             sql.put("id_regiaocliente", 1);
             sql.put("agencia", "");

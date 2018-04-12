@@ -1,5 +1,7 @@
 package vrimplantacao2.dao.cadastro.cliente;
 
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;

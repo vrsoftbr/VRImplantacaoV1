@@ -159,7 +159,8 @@ import vrimplantacao2.gui.interfaces.WmsiGUI;
 import vrimplantacao2.gui.interfaces.PdvVrGUI;
 import vrimplantacao2.gui.interfaces.InfoMacGUI;
 import vrimplantacao2.gui.interfaces.SiacGUI;
-
+import vrimplantacao2.gui.interfaces.RMSAutomaHelpGUI;
+import vrimplantacao2.gui.interfaces.WebSaqGUI;
 
 public final class MenuGUI extends VRMdiFrame {
 
@@ -564,6 +565,8 @@ public final class MenuGUI extends VRMdiFrame {
         mnuFlatan = new javax.swing.JMenuItem();
         mnuJrf = new javax.swing.JMenuItem();
         mnuAutoSystem = new javax.swing.JMenuItem();
+        mnuAutoSystem1 = new javax.swing.JMenuItem();
+        mnuWebsaq = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -1392,6 +1395,21 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuAutoSystem);
+
+        mnuAutoSystem1.setText("RMS Compras");
+        mnuAutoSystem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAutoSystem1ActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuAutoSystem1);
+        mnuWebsaq.setText("WebSaq");
+        mnuWebsaq.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuWebsaqActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuWebsaq);
 
         jMenu2.add(jMenu8);
 
@@ -3643,6 +3661,15 @@ public final class MenuGUI extends VRMdiFrame {
         SiacGUI.exibir(this);
     }//GEN-LAST:event_mnuWmsi1ActionPerformed
 
+    private void mnuAutoSystem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAutoSystem1ActionPerformed
+        RMSAutomaHelpGUI.exibir(this);
+    }//GEN-LAST:event_mnuAutoSystem1ActionPerformed
+	
+    private void mnuWebsaqActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuWebsaqActionPerformed
+        // TODO add your handling code here:
+        WebSaqGUI.exibir(this);
+    }//GEN-LAST:event_mnuWebsaqActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -3752,6 +3779,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuApollo;
     private javax.swing.JMenuItem mnuAsefe;
     private javax.swing.JMenuItem mnuAutoSystem;
+    private javax.swing.JMenuItem mnuAutoSystem1;
     private javax.swing.JMenu mnuAvancadas;
     private javax.swing.JMenuItem mnuAvance;
     private javax.swing.JMenuItem mnuBase;
@@ -3813,6 +3841,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSuper;
     private javax.swing.JMenuItem mnuTsti;
     private javax.swing.JMenuItem mnuVisualComercio;
+    private javax.swing.JMenuItem mnuWebsaq;
     private javax.swing.JMenuItem mnuWmByFile;
     private javax.swing.JMenuItem mnuWmsi;
     private javax.swing.JMenuItem mnuWmsi1;

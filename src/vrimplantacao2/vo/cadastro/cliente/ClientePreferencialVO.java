@@ -56,6 +56,7 @@ public class ClientePreferencialVO {
     private String numeroEmpresa = "0";// character varying(6) NOT NULL DEFAULT '0'::character varying,
     private String complemento;// character varying(30) NOT NULL DEFAULT ''::character varying,
     private String complementoEmpresa;// character varying(30) NOT NULL DEFAULT ''::character varying,
+    private int senha;// integer NOT NULL DEFAULT 0,
 
     public int getId() {
         return id;
@@ -413,6 +414,13 @@ public class ClientePreferencialVO {
     public void setComplementoEmpresa(String complementoEmpresa) {
         this.complementoEmpresa = Utils.acertarTexto(complementoEmpresa, 30);
     }
-    
+
+    public int getSenha() {
+        return senha;
+    }
+
+    public void setSenha(int senha) {
+        this.senha = senha;
+    }
     
 }
