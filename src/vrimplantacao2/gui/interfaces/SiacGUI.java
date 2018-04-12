@@ -157,7 +157,7 @@ public class SiacGUI extends VRInternalFrame implements ConexaoEvent {
                         }
 
                         if (chkProdutos.isSelected()) {
-                            importador.importarProduto(chkManterBalanca.isSelected());
+                            importador.importarProduto(chkManterBalanca.isSelected(), true);
                         }
                         if (chkPautaFiscal.isSelected()) {
                             importador.importarPautaFiscal(OpcaoFiscal.NOVOS);
@@ -205,6 +205,7 @@ public class SiacGUI extends VRInternalFrame implements ConexaoEvent {
                                 opcoes.add(OpcaoProduto.DESC_GONDOLA);
                             }
                             if (chkProdMercadologico.isSelected()) {
+                                opcoes.add(OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC);
                                 opcoes.add(OpcaoProduto.MERCADOLOGICO);
                             }
                             if (chkValidade.isSelected()) {
