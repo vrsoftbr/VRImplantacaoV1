@@ -228,6 +228,7 @@ public class ItensNaoExistentesController {
                 vo.setDescricaoGondola(mapa.getDescricao());
                 vo.setPisCofinsNaturezaReceita(new NaturezaReceitaVO(196, 7, 999, "OUTRAS RECEITAS COM ISENCAO"));
                 vo.setVendaPdv(false);
+                vo.setIdFornecedorFabricante(1);
                 provider.salvar(vo);
 
                 ProdutoAliquotaVO aliq = vo.getAliquotas().make(Parametros.get().getUfPadrao().getId(), 1);

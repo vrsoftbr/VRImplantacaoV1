@@ -34,14 +34,25 @@ import vrimplantacao.vo.venda.VendaFinalizadoraVO;
 import vrimplantacao.vo.venda.VendaItemVO;
 import vrimplantacao.vo.venda.VendaVO;
 import vrframework.classe.Conexao;
+import vrframework.classe.ProgressBar;
 //import vrframework.classe.Format;
 //import vrframework.classe.Texto;
 import vrframework.classe.VRException;
 import vrframework.classe.Util;
+import vrimplantacao.dao.ParametroPdvDAO;
 import vrimplantacao.dao.cadastro.ProdutoDAO;
+import vrimplantacao.gui.interfaces.rfd.ItensNaoExistentesController;
+import vrimplantacao.gui.interfaces.rfd.ProdutoMapa;
+import vrimplantacao.gui.interfaces.rfd.ProdutoMapa.TipoMapa;
+import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.interfaces.DivergenciaVO;
+import vrimplantacao.vo.interfaces.TipoDivergencia;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
+import vrimplantacao2.utils.multimap.MultiMap;
 
 public class NotaSaidaNfceDAO {
+
+    private ArrayList<DivergenciaVO> vDivergencia = null;
 
     public static class LojaV2 {
 
@@ -92,14 +103,24 @@ public class NotaSaidaNfceDAO {
     }
     private final ProdutoAnteriorDAO daoV2 = new ProdutoAnteriorDAO(false);
 
-    public VendaVO importar(String i_xml, boolean verificarCodigoAnterior, boolean verificarCodigoBarras) throws Exception {
+    public VendaVO importar(String i_xml, boolean verificarCodigoAnterior, boolean verificarCodigoBarras, boolean exibirDivergencias) throws Exception {
         //abre arquivo
         boolean importacaoV2 = isImportacaoV2();
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = dbf.newDocumentBuilder();
             docBuilder.setErrorHandler(null);
-            Integer codigoProduto = 0;
+            Integer codigoProduto = -1;
+            vDivergencia = new ArrayList();
+
+            ItensNaoExistentesController dao = new ItensNaoExistentesController();
+
+            MultiMap<String, ProdutoMapa> mapa = new MultiMap<>();
+            //TODO: Incluir mais opções            
+            ProdutoMapa.TipoMapa tipo = ProdutoMapa.TipoMapa.EAN;
+            for (ProdutoMapa mp : dao.carregarMapa(true, tipo)) {
+                mapa.put(mp, mp.getTipo().toString(), mp.getCodrfd());
+            }
 
             VendaVO oVenda = new VendaVO();
 
@@ -220,6 +241,7 @@ public class NotaSaidaNfceDAO {
 
                 Element cProd = (Element) prod.getElementsByTagName("cProd").item(0);
                 Element vProd = (Element) prod.getElementsByTagName("vProd").item(0);
+                Element xProd = (Element) prod.getElementsByTagName("xProd").item(0);
                 Element vUnTrib = (Element) prod.getElementsByTagName("vUnTrib").item(0);
                 Element vDescUn = (Element) prod.getElementsByTagName("vDesc").item(0);
                 Element cEAN = (Element) prod.getElementsByTagName("cEAN").item(0);
@@ -229,20 +251,65 @@ public class NotaSaidaNfceDAO {
                 Element qCom = (Element) prod.getElementsByTagName("qCom").item(0);
 
                 if (verificarCodigoAnterior) {
+                    ProdutoMapa mp = mapa.get(tipo.toString(), String.valueOf(Utils.formataNumero(cProd.getTextContent())));
                     if (importacaoV2) {
                         daoV2.setImportSistema(impLoja.impSistema);
                         daoV2.setImportLoja(impLoja.impLoja);
-                        codigoProduto = daoV2.getCodigoAnterior2(daoV2.getImportSistema(), daoV2.getImportLoja(), cProd.getTextContent().replace("'", "").replace("\n", "").trim());
+
+                        if (mp != null && mp.getCodigoAtual() > 0) {
+                            codigoProduto = mp.getCodigoAtual();
+                        } else {
+                            codigoProduto = daoV2.getCodigoAnterior2(daoV2.getImportSistema(), daoV2.getImportLoja(), cProd.getTextContent().replace("'", "").replace("\n", "").trim());
+                        }
                     } else {
-                        codigoProduto = new ProdutoDAO().getIdAnterior(Long.parseLong(cProd.getTextContent()));
+                        if (mp != null && mp.getCodigoAtual() > 0) {
+                            codigoProduto = mp.getCodigoAtual();
+                        } else {
+                            codigoProduto = new ProdutoDAO().getIdAnterior(Long.parseLong(cProd.getTextContent()));
+                        }
+                    }
+
+                    if (codigoProduto <= 0) {
+                        if (exibirDivergencias) {
+                            vDivergencia.add(new DivergenciaVO("Código do Produto :" + cProd.getTextContent().replace("'", "").replace("\n", "").trim()
+                                    + "Descrição :" + xProd.getTextContent() + "não cadastrado", TipoDivergencia.ERRO.getId()));
+                            dao.armazenar(TipoMapa.EAN, Utils.formataNumero(cProd.getTextContent()), xProd.getTextContent());
+                            ProgressBar.next();
+                            continue;
+                        } else {
+                            codigoProduto = new ParametroPdvDAO().get(28).getInt();
+                        }
                     }
                 } else if (verificarCodigoBarras) {
+                    ProdutoMapa mp = mapa.get(tipo.toString(), String.valueOf(Utils.formataNumero(cProd.getTextContent())));
                     if (importacaoV2) {
                         daoV2.setImportSistema(impLoja.impSistema);
                         daoV2.setImportLoja(impLoja.impLoja);
-                        codigoProduto = daoV2.getCodigoAtualEANant(daoV2.getImportSistema(), daoV2.getImportLoja(), cProd.getTextContent().replace("'", "").replace("\n", "").trim());
+
+                        if (mp != null && mp.getCodigoAtual() > 0) {
+                            codigoProduto = mp.getCodigoAtual();
+                        } else {
+                            codigoProduto = daoV2.getCodigoAtualEANant(daoV2.getImportSistema(), daoV2.getImportLoja(), cProd.getTextContent().replace("'", "").replace("\n", "").trim());
+                        }
                     } else {
-                        codigoProduto = new ProdutoDAO().getIdAnterior(Long.parseLong(cProd.getTextContent()));
+
+                        if (mp != null && mp.getCodigoAtual() > 0) {
+                            codigoProduto = mp.getCodigoAtual();
+                        } else {
+                            codigoProduto = new ProdutoDAO().getIdAnterior(Long.parseLong(cProd.getTextContent()));
+                        }
+                    }
+
+                    if (codigoProduto <= 0) {
+                        if (exibirDivergencias) {
+                            vDivergencia.add(new DivergenciaVO("Código de Barras:" + cProd.getTextContent().replace("'", "").replace("\n", "").trim()
+                                    + "Descrição :" + xProd.getTextContent() + "não cadastrado", TipoDivergencia.ERRO.getId()));
+                            dao.armazenar(TipoMapa.EAN, Utils.formataNumero(cProd.getTextContent()), xProd.getTextContent());
+                            ProgressBar.next();
+                            continue;
+                        } else {
+                            codigoProduto = new ParametroPdvDAO().get(28).getInt();
+                        }
                     }
                 } else {
                     codigoProduto = Integer.parseInt(cProd.getTextContent().replace("'", "").replace("\n", "").trim());
@@ -269,7 +336,7 @@ public class NotaSaidaNfceDAO {
 
                 String codigoBarras;
                 codigoBarras = ("".equals(cEAN.getTextContent()) ? String.valueOf(codigoProduto) : cEAN.getTextContent());
-                
+
                 VendaItemVO oVendaItem = new VendaItemVO();
                 oVendaItem.idProduto = codigoProduto;
                 oVendaItem.quantidade = Double.parseDouble(qCom.getTextContent());
@@ -308,6 +375,11 @@ public class NotaSaidaNfceDAO {
 
             oVenda.numeroNFCe = Integer.parseInt(nNF.getTextContent());
             setNumeroCupom(oVenda);
+            dao.gravar();
+
+            if (!vDivergencia.isEmpty()) {
+                throw new VRException("Existe(m) produto(s) do arquivo não cadastrado(s). Verificar clicando no Botão DIVERGÊNCIAS");
+            }
 
             return oVenda;
 

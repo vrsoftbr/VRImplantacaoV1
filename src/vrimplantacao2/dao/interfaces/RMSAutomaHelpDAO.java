@@ -5,23 +5,31 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import vrframework.remote.ItemComboVO;
+import java.util.Map;
 import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  *
  * @author Importacao
  */
 public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvider {
+
+    public boolean v_usar_arquivoBalanca;
 
     @Override
     public String getSistema() {
@@ -30,7 +38,21 @@ public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvide
 
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<MapaTributoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "     codigo,\n"
+                    + "     nome\n"
+                    + "from icms\n"
+                    + "order by 2")) {
+                while (rs.next()) {
+                    result.add(new MapaTributoIMP(rs.getString("codigo"), rs.getString("nome")));
+                }
+            }
+        }
+        return result;
     }
 
     public List<Estabelecimento> getLojas() throws SQLException {
@@ -49,7 +71,6 @@ public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvide
                 }
             }
         }
-
         return lojas;
     }
 
@@ -252,5 +273,167 @@ public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvide
             }
         }
         return result;
+    }
+
+    @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select * from familias order by 1"
+            )) {
+                while (rs.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("codigo"));
+                    imp.setDescricao(rs.getString("nome"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws SQLException {
+        List<MercadologicoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select "
+                    + " g.codigo as codmerc1,\n"
+                    + " g.nome as descmerc1,\n"
+                    + " f.codigo as codmerc2, \n"
+                    + " f.nome as descmerc2,\n"
+                    + " coalesce(s.codigo,1) as codmerc3, \n"
+                    + " coalesce(s.nome, f.nome) as descmerc3 \n"
+                    + "from familias f\n"
+                    + "join sub_familias s on s.familia = f.codigo\n"
+                    + "join grupos g on f.grupo = g.codigo"
+            )) {
+                while (rs.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setMerc1ID(rs.getString("codmerc1"));
+                    imp.setMerc1Descricao(rs.getString("descmerc1"));
+                    imp.setMerc2ID(rs.getString("codmerc2"));
+                    imp.setMerc2Descricao(rs.getString("descmerc2"));
+                    imp.setMerc3ID(rs.getString("codmerc3"));
+                    imp.setMerc3Descricao(rs.getString("descmerc3"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select	\n"
+                    + "	distinct\n"
+                    + "	p.codigo,\n"
+                    + "	f.codigo as codfamilia,\n"
+                    + "	p.descricao,\n"
+                    + "	p.descricao_reduzida,\n"
+                    + "	coalesce(g.codigo, 1) as merc1,\n"
+                    + "	coalesce(f.codigo, 1) as merc2,\n"
+                    + "	coalesce(sf.codigo, 1) as merc3,\n"
+                    + "	p.icms,\n"
+                    + "	p.embalagem1 as qtdembalagem,\n"
+                    + "	p.codigo_barras::bigint,\n"
+                    + "	p.embalagem2,\n"
+                    + "	p.estoque,\n"
+                    + "	p.estoquemin,\n"
+                    + "	coalesce(p.preco_custo_un_nf, p.preco_custo_un_total) as precocusto,\n"
+                    + "	p.precovenda,\n"
+                    + "	p.margem,\n"
+                    + "	p.data_alteracao,\n"
+                    + "	case\n"
+                    + "	  when setorbalanca = 'NÃO' then 0\n"
+                    + "	else 1 end as ebalanca,\n"
+                    + "	p.validade,\n"
+                    + " upper(p.produto_inativo) as ativo,\n"
+                    + "	p.ncm,\n"
+                    + "	p.cest,\n"
+                    + "	p.cst_pis_entrada,\n"
+                    + "	p.cst_pis_saida,\n"
+                    + "	p.cst_cofins_entrada,\n"
+                    + "	p.cst_cofins_saida,\n"
+                    + "	p.icms_entrada icmscredito,\n"
+                    + "	p.cst icmsCstSaida,\n"
+                    + "	p.percentual_pis_cofins_entrada as piscofinsCstCredito\n"
+                    + "from produtos p\n"
+                    + "join familias f on p.familia = f.codigo\n"
+                    + "join grupos g on p.grupo = g.codigo\n"
+                    + "join sub_familias sf on f.codigo = sf.familia\n"
+                    + "and sf.codigo = p.sub_familia\n"
+                    + "and sf.familia = f.codigo\n"
+                    + "order by codigo")) {
+            Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
+                while (rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("codigo"));
+                    imp.setIdFamiliaProduto(rs.getString("codfamilia"));
+                    imp.setDescricaoCompleta(rs.getString("descricao"));
+                    imp.setDescricaoReduzida(rs.getString("descricao_reduzida"));
+                    imp.setCodMercadologico1(rs.getString("merc1"));
+                    imp.setCodMercadologico2(rs.getString("merc2"));
+                    imp.setCodMercadologico3(rs.getString("merc3"));
+                    imp.setIcmsAliq(rs.getDouble("icms"));
+                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem") == 0 ? 1 : rs.getInt("qtdembalagem"));
+                    imp.setEan(rs.getString("codigo_barras"));
+                    imp.setTipoEmbalagem(rs.getString("embalagem2"));
+                    imp.setEstoque(rs.getDouble("estoque"));
+                    imp.setEstoqueMinimo(rs.getDouble("estoquemin"));
+                    imp.setCustoComImposto(rs.getDouble("precocusto"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setPrecovenda(rs.getDouble("precovenda"));
+                    imp.setMargem(rs.getDouble("margem"));
+                    imp.seteBalanca(rs.getBoolean("ebalanca"));
+                    imp.setValidade(rs.getInt("validade"));
+                    imp.setSituacaoCadastro(("S".equals(rs.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
+                    imp.setNcm(rs.getString("ncm"));
+                    imp.setCest(rs.getString("cest"));
+                    imp.setIcmsCreditoId(rs.getString("icmscredito"));
+                    imp.setIcmsDebitoId(rs.getString("icmsCstSaida"));
+                    imp.setPiscofinsCstCredito(rs.getString("piscofinsCstCredito"));
+                    if ((rs.getString("codigo_barras") != null)
+                            && (!rs.getString("codigo_barras").trim().isEmpty())
+                            && (rs.getString("codigo_barras").trim().length() >= 4)
+                            && (rs.getString("codigo_barras").trim().length() <= 6)) {
+
+                        if (v_usar_arquivoBalanca) {
+                            ProdutoBalancaVO produtoBalanca;
+                            long codigoProduto;
+                            codigoProduto = Long.parseLong(imp.getEan().trim());
+                            if (codigoProduto <= Integer.MAX_VALUE) {
+                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                            } else {
+                                produtoBalanca = null;
+                            }
+                            if (produtoBalanca != null) {
+                                imp.seteBalanca(true);
+                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rs.getInt("validade"));
+                            } else {
+                                imp.setValidade(0);
+                                imp.seteBalanca(false);
+                            }
+                        } else {
+                            imp.seteBalanca(rs.getString("embalagem2").contains("KG") ? true : false);
+                            imp.setValidade(rs.getInt("validade"));
+                        }
+                    }
+                    result.add(imp);
+                }
+            }
+            return result;
+        }
     }
 }
