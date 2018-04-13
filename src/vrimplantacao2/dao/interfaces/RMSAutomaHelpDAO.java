@@ -357,7 +357,7 @@ public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvide
                     + "	  when setorbalanca = 'NÃO' then 0\n"
                     + "	else 1 end as ebalanca,\n"
                     + "	p.validade,\n"
-                    + " p.produto_inativo as ativo,\n"
+                    + " upper(p.produto_inativo) as ativo,\n"
                     + "	p.ncm,\n"
                     + "	p.cest,\n"
                     + "	p.cst_pis_entrada,\n"
