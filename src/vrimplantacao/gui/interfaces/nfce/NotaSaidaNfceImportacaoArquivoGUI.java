@@ -9,20 +9,22 @@ import vrimplantacao.vo.venda.VendaVO;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 /*import vrframework.classe.CampoTela;
-import vrframework.classe.Mensagem;*/
+ import vrframework.classe.Mensagem;*/
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrimplantacao.gui.interfaces.rfd.ExportacaoDivergenciaGUI;
 import vrimplantacao.dao.notafiscal.NotaSaidaNfceDAO.LojaV2;
+import vrimplantacao.gui.interfaces.rfd.ItensNaoExistenteGUI;
 
 public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
-    
+
     NotaSaidaNfceDAO dao = new NotaSaidaNfceDAO();
 
     public NotaSaidaNfceImportacaoArquivoGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
+        chkExibirDivergencias.setSelected(true);
         flcArquivo.setMultiplosSelecionados(true);
         carregarLojaV2();
 
@@ -34,12 +36,12 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
         NotaSaidaNfceDAO dao = new NotaSaidaNfceDAO();
         if (dao.isImportacaoV2()) {
             cboLojaV2.removeAllItems();
-            for (LojaV2 oTipo :dao.carregarLojaV2()) {
+            for (LojaV2 oTipo : dao.carregarLojaV2()) {
                 cboLojaV2.addItem(oTipo);
             }
         }
     }
-    
+
     @Override
     public void importar() throws Exception {
         //CampoTela.validar(this.getCampoObrigatorio());
@@ -55,8 +57,6 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                         dao.impLoja = (LojaV2) cboLojaV2.getSelectedItem();
                     }
 
-                    
-                    
                     String[] arquivos = flcArquivo.getArquivo().split(";");
                     ArrayList<DivergenciaVO> vDivergenciaGeral = new ArrayList();
 
@@ -65,7 +65,7 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                         VendaVO oVenda = null;
 
                         try {
-                            oVenda = dao.importar(arq, chkVerificarCodigoAnterior.isSelected(), chkVerificarCodigoBarras.isSelected());
+                            oVenda = dao.importar(arq, chkVerificarCodigoAnterior.isSelected(), chkVerificarCodigoBarras.isSelected(), chkExibirDivergencias.isSelected());
 
                         } catch (Exception ex) {
                             vDivergenciaGeral.add(new DivergenciaVO("Não foi possível importar o arquivo " + arq + "! " + ex, TipoDivergencia.ERRO.getId()));
@@ -96,6 +96,8 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                         } else {
                             Util.exibirMensagem("Arquivo(s) com divergência(s)!", getTitle());
                         }
+
+                        chkMapearProdutoEAN.setEnabled(true);
 
                     } else {
                         Util.exibirMensagem("Arquivo(s) importado(s) com sucesso!", getTitle());
@@ -128,6 +130,9 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
         cboLojaV2 = new javax.swing.JComboBox();
         vRLabel35 = new vrframework.bean.label.VRLabel();
         chkVerificarCodigoBarras = new vrframework.bean.checkBox.VRCheckBox();
+        chkMapearProdutoEAN = new vrframework.bean.checkBox.VRCheckBox();
+        btnMapDivergencias = new vrframework.bean.button.VRButton();
+        chkExibirDivergencias = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         btnSair = new vrframework.bean.button.VRButton();
         btnImportar = new vrframework.bean.button.VRButton();
@@ -172,6 +177,25 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
             }
         });
 
+        chkMapearProdutoEAN.setText("Mapear produto não cadastrado (EAN)");
+        chkMapearProdutoEAN.setEnabled(false);
+        chkMapearProdutoEAN.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkMapearProdutoEANActionPerformed(evt);
+            }
+        });
+
+        btnMapDivergencias.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
+        btnMapDivergencias.setText("Divergências");
+        btnMapDivergencias.setEnabled(false);
+        btnMapDivergencias.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMapDivergenciasActionPerformed(evt);
+            }
+        });
+
+        chkExibirDivergencias.setText("Exibir divergências produtos não cadastrados");
+
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
         vRPanel1Layout.setHorizontalGroup(
@@ -182,13 +206,18 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                     .addComponent(cboLojaV2, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(vRPanel1Layout.createSequentialGroup()
                         .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkVerificarCodigoBarras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkVerificarCodigoAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkBaixaEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(flcArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, 269, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel35, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                            .addComponent(vRLabel35, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(flcArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, 344, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkVerificarCodigoBarras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkVerificarCodigoAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(vRPanel1Layout.createSequentialGroup()
+                                .addComponent(chkMapearProdutoEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnMapDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(chkExibirDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 4, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         vRPanel1Layout.setVerticalGroup(
@@ -198,13 +227,19 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                 .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(flcArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
+                .addComponent(chkExibirDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkBaixaEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkVerificarCodigoAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkVerificarCodigoBarras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkMapearProdutoEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnMapDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(35, 35, 35)
                 .addComponent(vRLabel35, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cboLojaV2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -304,21 +339,37 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
 
     private void chkVerificarCodigoAnteriorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkVerificarCodigoAnteriorActionPerformed
         // TODO add your handling code here:
-            chkVerificarCodigoBarras.setSelected(false);
-            chkVerificarCodigoAnterior.setSelected(true);
+        chkVerificarCodigoBarras.setSelected(false);
+        chkVerificarCodigoAnterior.setSelected(true);
     }//GEN-LAST:event_chkVerificarCodigoAnteriorActionPerformed
 
     private void chkVerificarCodigoBarrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkVerificarCodigoBarrasActionPerformed
         // TODO add your handling code here:
-            chkVerificarCodigoBarras.setSelected(true);
-            chkVerificarCodigoAnterior.setSelected(false);
+        chkVerificarCodigoBarras.setSelected(true);
+        chkVerificarCodigoAnterior.setSelected(false);
     }//GEN-LAST:event_chkVerificarCodigoBarrasActionPerformed
+
+    private void chkMapearProdutoEANActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkMapearProdutoEANActionPerformed
+        // TODO add your handling code here:
+        if (chkMapearProdutoEAN.isSelected()) {
+            btnMapDivergencias.setEnabled(true);
+        } else {
+            btnMapDivergencias.setEnabled(false);
+        }
+    }//GEN-LAST:event_chkMapearProdutoEANActionPerformed
+
+    private void btnMapDivergenciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapDivergenciasActionPerformed
+        ItensNaoExistenteGUI.exibir(this.mdiFrame);
+    }//GEN-LAST:event_btnMapDivergenciasActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnImportar;
+    private vrframework.bean.button.VRButton btnMapDivergencias;
     private vrframework.bean.button.VRButton btnSair;
     private javax.swing.JComboBox cboLojaV2;
     private vrframework.bean.checkBox.VRCheckBox chkBaixaEstoque;
+    private vrframework.bean.checkBox.VRCheckBox chkExibirDivergencias;
+    private vrframework.bean.checkBox.VRCheckBox chkMapearProdutoEAN;
     private vrframework.bean.checkBox.VRCheckBox chkVerificarCodigoAnterior;
     private vrframework.bean.checkBox.VRCheckBox chkVerificarCodigoBarras;
     private vrframework.bean.fileChooser.VRFileChooser flcArquivo;
@@ -328,5 +379,5 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     // End of variables declaration//GEN-END:variables
-    
+
 }
