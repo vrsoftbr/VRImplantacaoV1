@@ -121,8 +121,7 @@ public class NotaSaidaNfceDAO {
             for (ProdutoMapa mp : dao.carregarMapa(true, tipo)) {
                 mapa.put(mp, mp.getTipo().toString(), mp.getCodrfd());
             }
-            
-            
+
             VendaVO oVenda = new VendaVO();
 
             Document doc = docBuilder.parse(new ByteArrayInputStream(getXML(i_xml).getBytes("utf-8")));
@@ -251,22 +250,18 @@ public class NotaSaidaNfceDAO {
 
                 Element qCom = (Element) prod.getElementsByTagName("qCom").item(0);
 
-                if ("0497".equals(cProd.getTextContent().trim())) {
-                    System.out.println("aqui");
-                }
-
                 if (verificarCodigoAnterior) {
                     ProdutoMapa mp = mapa.get(tipo.toString(), String.valueOf(Utils.formataNumero(cProd.getTextContent())));
                     if (importacaoV2) {
                         daoV2.setImportSistema(impLoja.impSistema);
                         daoV2.setImportLoja(impLoja.impLoja);
-                        
+
                         if (mp != null && mp.getCodigoAtual() > 0) {
                             codigoProduto = mp.getCodigoAtual();
                         } else {
                             codigoProduto = daoV2.getCodigoAnterior2(daoV2.getImportSistema(), daoV2.getImportLoja(), cProd.getTextContent().replace("'", "").replace("\n", "").trim());
                         }
-                    } else {                        
+                    } else {
                         if (mp != null && mp.getCodigoAtual() > 0) {
                             codigoProduto = mp.getCodigoAtual();
                         } else {
@@ -290,21 +285,21 @@ public class NotaSaidaNfceDAO {
                     if (importacaoV2) {
                         daoV2.setImportSistema(impLoja.impSistema);
                         daoV2.setImportLoja(impLoja.impLoja);
-                        
+
                         if (mp != null && mp.getCodigoAtual() > 0) {
                             codigoProduto = mp.getCodigoAtual();
                         } else {
                             codigoProduto = daoV2.getCodigoAtualEANant(daoV2.getImportSistema(), daoV2.getImportLoja(), cProd.getTextContent().replace("'", "").replace("\n", "").trim());
                         }
                     } else {
-                        
+
                         if (mp != null && mp.getCodigoAtual() > 0) {
                             codigoProduto = mp.getCodigoAtual();
                         } else {
                             codigoProduto = new ProdutoDAO().getIdAnterior(Long.parseLong(cProd.getTextContent()));
-                        }                        
+                        }
                     }
-                    
+
                     if (codigoProduto <= 0) {
                         if (exibirDivergencias) {
                             vDivergencia.add(new DivergenciaVO("Código de Barras:" + cProd.getTextContent().replace("'", "").replace("\n", "").trim()
@@ -381,10 +376,9 @@ public class NotaSaidaNfceDAO {
             oVenda.numeroNFCe = Integer.parseInt(nNF.getTextContent());
             setNumeroCupom(oVenda);
             dao.gravar();
-            
+
             if (!vDivergencia.isEmpty()) {
-                throw new VRException("Existe(m) produto(s) do arquivo não cadastrado(s)");
-                //new LogTransacaoDAO().gerar(Formulario.INTERFACE_IMPORTACAO_LOGVENDA, TipoTransacao.IMPORTACAO, 0, i_xml.replace("\\", "\\\\"));
+                throw new VRException("Existe(m) produto(s) do arquivo não cadastrado(s). Verificar clicando no Botão DIVERGÊNCIAS");
             }
 
             return oVenda;

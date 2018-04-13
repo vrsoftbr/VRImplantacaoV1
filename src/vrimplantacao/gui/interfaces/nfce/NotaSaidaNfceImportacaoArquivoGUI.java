@@ -97,7 +97,7 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                             Util.exibirMensagem("Arquivo(s) com divergência(s)!", getTitle());
                         }
 
-                        chkMapearProdutoEAN.setEnabled(true);
+                        btnMapDivergencias.setEnabled(true);
 
                     } else {
                         Util.exibirMensagem("Arquivo(s) importado(s) com sucesso!", getTitle());
@@ -130,7 +130,6 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
         cboLojaV2 = new javax.swing.JComboBox();
         vRLabel35 = new vrframework.bean.label.VRLabel();
         chkVerificarCodigoBarras = new vrframework.bean.checkBox.VRCheckBox();
-        chkMapearProdutoEAN = new vrframework.bean.checkBox.VRCheckBox();
         btnMapDivergencias = new vrframework.bean.button.VRButton();
         chkExibirDivergencias = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
@@ -177,14 +176,6 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
             }
         });
 
-        chkMapearProdutoEAN.setText("Mapear produto não cadastrado (EAN)");
-        chkMapearProdutoEAN.setEnabled(false);
-        chkMapearProdutoEAN.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkMapearProdutoEANActionPerformed(evt);
-            }
-        });
-
         btnMapDivergencias.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
         btnMapDivergencias.setText("Divergências");
         btnMapDivergencias.setEnabled(false);
@@ -212,11 +203,8 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                             .addComponent(flcArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, 344, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkVerificarCodigoBarras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkVerificarCodigoAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(vRPanel1Layout.createSequentialGroup()
-                                .addComponent(chkMapearProdutoEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnMapDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(chkExibirDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(chkExibirDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnMapDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, 344, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 4, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -236,9 +224,7 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkVerificarCodigoBarras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkMapearProdutoEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnMapDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(btnMapDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(35, 35, 35)
                 .addComponent(vRLabel35, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -349,15 +335,6 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
         chkVerificarCodigoAnterior.setSelected(false);
     }//GEN-LAST:event_chkVerificarCodigoBarrasActionPerformed
 
-    private void chkMapearProdutoEANActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkMapearProdutoEANActionPerformed
-        // TODO add your handling code here:
-        if (chkMapearProdutoEAN.isSelected()) {
-            btnMapDivergencias.setEnabled(true);
-        } else {
-            btnMapDivergencias.setEnabled(false);
-        }
-    }//GEN-LAST:event_chkMapearProdutoEANActionPerformed
-
     private void btnMapDivergenciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapDivergenciasActionPerformed
         ItensNaoExistenteGUI.exibir(this.mdiFrame);
     }//GEN-LAST:event_btnMapDivergenciasActionPerformed
@@ -369,7 +346,6 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
     private javax.swing.JComboBox cboLojaV2;
     private vrframework.bean.checkBox.VRCheckBox chkBaixaEstoque;
     private vrframework.bean.checkBox.VRCheckBox chkExibirDivergencias;
-    private vrframework.bean.checkBox.VRCheckBox chkMapearProdutoEAN;
     private vrframework.bean.checkBox.VRCheckBox chkVerificarCodigoAnterior;
     private vrframework.bean.checkBox.VRCheckBox chkVerificarCodigoBarras;
     private vrframework.bean.fileChooser.VRFileChooser flcArquivo;

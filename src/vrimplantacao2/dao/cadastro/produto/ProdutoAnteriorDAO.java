@@ -15,7 +15,7 @@ import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
 import vrimplantacao2.vo.cadastro.ProdutoVO;
 
 public class ProdutoAnteriorDAO {
-    
+
     private MultiMap<String, ProdutoAnteriorVO> codigoAnterior;
     private final ProdutoAnteriorEanDAO eanAnteriorDAO = new ProdutoAnteriorEanDAO();
     private String importSistema = "";
@@ -24,9 +24,9 @@ public class ProdutoAnteriorDAO {
 
     public ProdutoAnteriorDAO() {
     }
-    
+
     public ProdutoAnteriorDAO(boolean carregarTodosOsAnteriores) {
-        this.carregarTodosOsAnteriores = carregarTodosOsAnteriores;    
+        this.carregarTodosOsAnteriores = carregarTodosOsAnteriores;
     }
 
     public void setImportSistema(String importSistema) {
@@ -44,56 +44,56 @@ public class ProdutoAnteriorDAO {
     public void setImportLoja(String importLoja) {
         this.importLoja = importLoja;
     }
-    
+
     public void clearAnteriores() {
         codigoAnterior = null;
     }
-    
+
     public MultiMap<String, ProdutoAnteriorVO> getCodigoAnterior() throws Exception {
         if (codigoAnterior == null) {
             atualizarCodigoAnterior();
         }
         return codigoAnterior;
     }
-    
+
     private void createTable() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute(
-                    "do $$\n" +
-                    "declare\n" +
-                    "begin\n" +
-                    "	if not exists(select table_name from information_schema.tables where table_schema = 'implantacao' and table_name = 'codant_produto') then\n" +
-                    "		CREATE TABLE implantacao.codant_produto\n" +
-                    "                    (\n" +
-                    "                      impsistema character varying NOT NULL,\n" +
-                    "                      imploja character varying NOT NULL,\n" +
-                    "                      impid character varying NOT NULL,\n" +
-                    "                      descricao varchar,\n" +
-                    "                      codigoatual integer,\n" +
-                    "                      piscofinscredito integer,\n" +
-                    "                      piscofinsdebito integer,\n" +
-                    "                      piscofinsnaturezareceita integer,\n" +
-                    "                      icmscst integer,\n" +
-                    "                      icmsaliq numeric(14,4),\n" +
-                    "                      icmsreducao numeric(14,4),\n" +
-                    "                      estoque numeric(14,4),\n" +
-                    "                      e_balanca boolean,\n" +
-                    "                      custosemimposto numeric(13,4),\n" +
-                    "                      custocomimposto numeric(13,4),\n" +
-                    "                      margem numeric(11,2),\n" +
-                    "                      precovenda numeric(11,2),\n" +
-                    "                      ncm character varying(15),\n" +
-                    "                      cest varchar(15),\n" +
-                    "                      contadorimportacao integer not null default 0,\n" +
-                    "                      novo boolean default false not null,\n" +
-                    "                      codigosped varchar,\n" +
-                    "                      primary key (impsistema, imploja, impid),\n" +
-                    "                      unique (impsistema, imploja, codigosped)\n" +
-                    "                );\n" +
-                    "		raise notice 'tabela criada';\n" +
-                    "	end if;\n" +
-                    "end;\n" +
-                    "$$;"
+                    "do $$\n"
+                    + "declare\n"
+                    + "begin\n"
+                    + "	if not exists(select table_name from information_schema.tables where table_schema = 'implantacao' and table_name = 'codant_produto') then\n"
+                    + "		CREATE TABLE implantacao.codant_produto\n"
+                    + "                    (\n"
+                    + "                      impsistema character varying NOT NULL,\n"
+                    + "                      imploja character varying NOT NULL,\n"
+                    + "                      impid character varying NOT NULL,\n"
+                    + "                      descricao varchar,\n"
+                    + "                      codigoatual integer,\n"
+                    + "                      piscofinscredito integer,\n"
+                    + "                      piscofinsdebito integer,\n"
+                    + "                      piscofinsnaturezareceita integer,\n"
+                    + "                      icmscst integer,\n"
+                    + "                      icmsaliq numeric(14,4),\n"
+                    + "                      icmsreducao numeric(14,4),\n"
+                    + "                      estoque numeric(14,4),\n"
+                    + "                      e_balanca boolean,\n"
+                    + "                      custosemimposto numeric(13,4),\n"
+                    + "                      custocomimposto numeric(13,4),\n"
+                    + "                      margem numeric(11,2),\n"
+                    + "                      precovenda numeric(11,2),\n"
+                    + "                      ncm character varying(15),\n"
+                    + "                      cest varchar(15),\n"
+                    + "                      contadorimportacao integer not null default 0,\n"
+                    + "                      novo boolean default false not null,\n"
+                    + "                      codigosped varchar,\n"
+                    + "                      primary key (impsistema, imploja, impid),\n"
+                    + "                      unique (impsistema, imploja, codigosped)\n"
+                    + "                );\n"
+                    + "		raise notice 'tabela criada';\n"
+                    + "	end if;\n"
+                    + "end;\n"
+                    + "$$;"
             );
         }
     }
@@ -102,34 +102,34 @@ public class ProdutoAnteriorDAO {
         int retorno = -1;
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                "SELECT \n" +
-                "	ant.impsistema, \n" +
-                "	ant.imploja, \n" +
-                "	ant.impid, \n" +
-                "	ant.descricao, \n" +
-                "	p.descricaocompleta, \n" +
-                "	p.descricaoreduzida, \n" +
-                "	p.descricaogondola, \n" +
-                "	ant.codigoatual, \n" +
-                "	ant.piscofinscredito, \n" +
-                "	ant.piscofinsdebito, \n" +
-                "	ant.piscofinsnaturezareceita, \n" +
-                "	ant.icmscst, \n" +
-                "	ant.icmsaliq, \n" +
-                "	ant.icmsreducao, \n" +
-                "	ant.estoque, \n" +
-                "	ant.e_balanca, \n" +
-                "	ant.custosemimposto, \n" +
-                "	ant.custocomimposto, \n" +
-                "	ant.margem, \n" +
-                "	ant.precovenda, \n" +
-                "	ant.ncm, \n" +
-                "	ant.cest,\n" +
-                "	ant.contadorimportacao,\n" +
-                "	ant.novo\n" +
-                "FROM \n" +
-                "	implantacao.codant_produto ant\n" +
-                "	left join produto p on ant.codigoatual = p.id\n"
+                    "SELECT \n"
+                    + "	ant.impsistema, \n"
+                    + "	ant.imploja, \n"
+                    + "	ant.impid, \n"
+                    + "	ant.descricao, \n"
+                    + "	p.descricaocompleta, \n"
+                    + "	p.descricaoreduzida, \n"
+                    + "	p.descricaogondola, \n"
+                    + "	ant.codigoatual, \n"
+                    + "	ant.piscofinscredito, \n"
+                    + "	ant.piscofinsdebito, \n"
+                    + "	ant.piscofinsnaturezareceita, \n"
+                    + "	ant.icmscst, \n"
+                    + "	ant.icmsaliq, \n"
+                    + "	ant.icmsreducao, \n"
+                    + "	ant.estoque, \n"
+                    + "	ant.e_balanca, \n"
+                    + "	ant.custosemimposto, \n"
+                    + "	ant.custocomimposto, \n"
+                    + "	ant.margem, \n"
+                    + "	ant.precovenda, \n"
+                    + "	ant.ncm, \n"
+                    + "	ant.cest,\n"
+                    + "	ant.contadorimportacao,\n"
+                    + "	ant.novo\n"
+                    + "FROM \n"
+                    + "	implantacao.codant_produto ant\n"
+                    + "	left join produto p on ant.codigoatual = p.id\n"
                     + "where \n"
                     + " ant.impsistema = " + SQLUtils.stringSQL(sistema) + " "
                     + " and ant.imploja = " + SQLUtils.stringSQL(loja) + " "
@@ -149,38 +149,38 @@ public class ProdutoAnteriorDAO {
         int retorno = -1;
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                "SELECT \n" +
-                "	ant.impsistema, \n" +
-                "	ant.imploja, \n" +
-                "	ant.impid, \n" +
-                "	ant.descricao, \n" +
-                "	p.descricaocompleta, \n" +
-                "	p.descricaoreduzida, \n" +
-                "	p.descricaogondola, \n" +
-                "	ant.codigoatual, \n" +
-                "	ant.piscofinscredito, \n" +
-                "	ant.piscofinsdebito, \n" +
-                "	ant.piscofinsnaturezareceita, \n" +
-                "	ant.icmscst, \n" +
-                "	ant.icmsaliq, \n" +
-                "	ant.icmsreducao, \n" +
-                "	ant.estoque, \n" +
-                "	ant.e_balanca, \n" +
-                "	ant.custosemimposto, \n" +
-                "	ant.custocomimposto, \n" +
-                "	ant.margem, \n" +
-                "	ant.precovenda, \n" +
-                "	ant.ncm, \n" +
-                "	ant.cest,\n" +
-                "	ant.contadorimportacao,\n" +
-                "	ant.novo\n" +
-                "FROM \n" +
-                "	implantacao.codant_produto ant\n" +
-                "	left join produto p on ant.codigoatual = p.id\n"
+                    "SELECT \n"
+                    + "	ant.impsistema, \n"
+                    + "	ant.imploja, \n"
+                    + "	ant.impid, \n"
+                    + "	ant.descricao, \n"
+                    + "	p.descricaocompleta, \n"
+                    + "	p.descricaoreduzida, \n"
+                    + "	p.descricaogondola, \n"
+                    + "	ant.codigoatual, \n"
+                    + "	ant.piscofinscredito, \n"
+                    + "	ant.piscofinsdebito, \n"
+                    + "	ant.piscofinsnaturezareceita, \n"
+                    + "	ant.icmscst, \n"
+                    + "	ant.icmsaliq, \n"
+                    + "	ant.icmsreducao, \n"
+                    + "	ant.estoque, \n"
+                    + "	ant.e_balanca, \n"
+                    + "	ant.custosemimposto, \n"
+                    + "	ant.custocomimposto, \n"
+                    + "	ant.margem, \n"
+                    + "	ant.precovenda, \n"
+                    + "	ant.ncm, \n"
+                    + "	ant.cest,\n"
+                    + "	ant.contadorimportacao,\n"
+                    + "	ant.novo\n"
+                    + "FROM \n"
+                    + "	implantacao.codant_produto ant\n"
+                    + "	left join produto p on ant.codigoatual = p.id\n"
                     + "where \n"
                     + " ant.impsistema = " + SQLUtils.stringSQL(sistema) + " "
                     + " and ant.imploja = " + SQLUtils.stringSQL(loja) + " "
-                    + "and ant.impid = lpad(" + SQLUtils.stringSQL(id)+", 14, '0')"
+                    + "and ant.impid = lpad(" + SQLUtils.stringSQL(id) + ", 14, '0')"
             )) {
                 if (rst.next()) {
                     retorno = rst.getInt("codigoatual");
@@ -191,7 +191,7 @@ public class ProdutoAnteriorDAO {
         }
         return retorno;
     }
-    
+
     public String getCodigoAnterior3(String sistema, String loja, String id) throws Exception {
         String retorno = "-1";
         try (Statement stm = Conexao.createStatement()) {
@@ -214,7 +214,7 @@ public class ProdutoAnteriorDAO {
         }
         return retorno;
     }
-    
+
     public String getCodigoAnteriorEAN(String sistema, String loja, String ean) throws Exception {
         String retorno = "-1";
         try (Statement stm = Conexao.createStatement()) {
@@ -242,15 +242,18 @@ public class ProdutoAnteriorDAO {
         int retorno = -1;
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT "
-                    + "ant.codigoatual "
+                    "SELECT\n"
+                    + "ant.codigoatual\n"
                     + "FROM \n"
-                    + "	implantacao.codant_produto ant\n"
-                    + "inner join implantacao.codant_ean ean on ean.importid = ant.impid "
-                    + "where ant.impsistema = " + SQLUtils.stringSQL(sistema) + " "
-                    + " and ant.imploja = " + SQLUtils.stringSQL(loja) + " "
-                    + " and ean.ean = " + SQLUtils.stringSQL(ean)
+                    + "implantacao.codant_produto ant\n"
+                    + "inner join implantacao.codant_ean ean on ean.importid = ant.impid\n"
+                    + "where ant.impsistema = " + SQLUtils.stringSQL(sistema) + "\n"
+                    + "and ean.importsistema = " + SQLUtils.stringSQL(sistema) + "\n"
+                    + "and ant.imploja = " + SQLUtils.stringSQL(loja) + "\n"
+                    + "and ean.importloja = " + SQLUtils.stringSQL(loja) + "\n"
+                    + "and ean.ean = " + SQLUtils.stringSQL(ean)
             )) {
+
                 if (rst.next()) {
                     retorno = rst.getInt("codigoatual");
                 } else {
@@ -260,7 +263,7 @@ public class ProdutoAnteriorDAO {
         }
         return retorno;
     }
-    
+
     public String getCodigoAnteriorCpGestor(String ean) throws Exception {
         String retorno = "-1";
         try (Statement stm = Conexao.createStatement()) {
@@ -278,55 +281,54 @@ public class ProdutoAnteriorDAO {
         }
         return retorno;
     }
-    
+
     public void atualizarCodigoAnterior() throws Exception {
         codigoAnterior = new MultiMap<>(3);
         createTable();
-        try (Statement stm = Conexao.createStatement()){
+        try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                "SELECT \n" +
-                "	ant.impsistema, \n" +
-                "	ant.imploja, \n" +
-                "	ant.impid, \n" +
-                "	ant.descricao, \n" +
-                "	p.descricaocompleta, \n" +
-                "	p.descricaoreduzida, \n" +
-                "	p.descricaogondola, \n" +
-                "	ant.codigoatual, \n" +
-                "	ant.piscofinscredito, \n" +
-                "	ant.piscofinsdebito, \n" +
-                "	ant.piscofinsnaturezareceita, \n" +
-                "	ant.icmscst, \n" +
-                "	ant.icmsaliq, \n" +
-                "	ant.icmsreducao, \n" +
-                "	ant.estoque, \n" +
-                "	ant.e_balanca, \n" +
-                "	ant.custosemimposto, \n" +
-                "	ant.custocomimposto, \n" +
-                "	ant.margem, \n" +
-                "	ant.precovenda, \n" +
-                "	ant.ncm, \n" +
-                "	ant.cest,\n" +
-                "	ant.contadorimportacao,\n" +
-                "	ant.novo\n" +
-                "FROM \n" +
-                "	implantacao.codant_produto ant\n" +
-                "	left join produto p on ant.codigoatual = p.id\n" +
-                (!carregarTodosOsAnteriores ? 
-                    "where \n" +
-                    "       ant.impsistema = " + SQLUtils.stringSQL(getImportSistema()) + " and\n" +
-                    "       ant.imploja = " + SQLUtils.stringSQL(getImportLoja()) + "\n" :
-                    ""
-                ) +
-                "order by\n" +
-                "	ant.impsistema, \n" +
-                "	ant.imploja, \n" +
-                "	ant.impid"
+                    "SELECT \n"
+                    + "	ant.impsistema, \n"
+                    + "	ant.imploja, \n"
+                    + "	ant.impid, \n"
+                    + "	ant.descricao, \n"
+                    + "	p.descricaocompleta, \n"
+                    + "	p.descricaoreduzida, \n"
+                    + "	p.descricaogondola, \n"
+                    + "	ant.codigoatual, \n"
+                    + "	ant.piscofinscredito, \n"
+                    + "	ant.piscofinsdebito, \n"
+                    + "	ant.piscofinsnaturezareceita, \n"
+                    + "	ant.icmscst, \n"
+                    + "	ant.icmsaliq, \n"
+                    + "	ant.icmsreducao, \n"
+                    + "	ant.estoque, \n"
+                    + "	ant.e_balanca, \n"
+                    + "	ant.custosemimposto, \n"
+                    + "	ant.custocomimposto, \n"
+                    + "	ant.margem, \n"
+                    + "	ant.precovenda, \n"
+                    + "	ant.ncm, \n"
+                    + "	ant.cest,\n"
+                    + "	ant.contadorimportacao,\n"
+                    + "	ant.novo\n"
+                    + "FROM \n"
+                    + "	implantacao.codant_produto ant\n"
+                    + "	left join produto p on ant.codigoatual = p.id\n"
+                    + (!carregarTodosOsAnteriores
+                            ? "where \n"
+                            + "       ant.impsistema = " + SQLUtils.stringSQL(getImportSistema()) + " and\n"
+                            + "       ant.imploja = " + SQLUtils.stringSQL(getImportLoja()) + "\n"
+                            : "")
+                    + "order by\n"
+                    + "	ant.impsistema, \n"
+                    + "	ant.imploja, \n"
+                    + "	ant.impid"
             )) {
                 int cont = 1;
                 while (rst.next()) {
                     ProdutoAnteriorVO vo = new ProdutoAnteriorVO();
-                    
+
                     vo.setImportSistema(rst.getString("impsistema"));
                     vo.setImportLoja(rst.getString("imploja"));
                     vo.setImportId(rst.getString("impid"));
@@ -354,16 +356,17 @@ public class ProdutoAnteriorDAO {
                     vo.setNcm(rst.getString("ncm"));
                     vo.setCest(rst.getString("cest"));
                     vo.setNovo(rst.getBoolean("novo"));
-                    vo.setContadorImportacao(rst.getInt("contadorimportacao"));                    
-                    eanAnteriorDAO.addEans(vo);                    
+                    vo.setContadorImportacao(rst.getInt("contadorimportacao"));
+                    eanAnteriorDAO.addEans(vo);
                     codigoAnterior.put(vo, vo.getChave());
                     cont++;
                 }
             }
         }
     }
-    
+
     private int contador = -1;
+
     private void obtemContador() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -377,12 +380,12 @@ public class ProdutoAnteriorDAO {
 
     public void salvar(Collection<ProdutoAnteriorVO> values) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            for (ProdutoAnteriorVO vo: values) {
-                
+            for (ProdutoAnteriorVO vo : values) {
+
                 if (!getCodigoAnterior().containsKey(
-                    vo.getImportSistema(),
-                    vo.getImportLoja(),
-                    vo.getImportId()
+                        vo.getImportSistema(),
+                        vo.getImportLoja(),
+                        vo.getImportId()
                 )) {
                     SQLBuilder sql = new SQLBuilder();
                     sql.setTableName("codant_produto");
@@ -419,10 +422,9 @@ public class ProdutoAnteriorDAO {
                         Util.exibirMensagem(sql.getInsert(), "");
                     }
                     eanAnteriorDAO.salvar(vo.getEans().values());
-                    
 
                     codigoAnterior.put(
-                            vo, 
+                            vo,
                             vo.getImportSistema(),
                             vo.getImportLoja(),
                             vo.getImportId()
@@ -476,54 +478,54 @@ public class ProdutoAnteriorDAO {
                 sql.setFormatarSQL(true);
                 Util.exibirMensagem(sql.getInsert(), "");
                 throw e;
-            }                
+            }
         }
     }
 
     public Map<String, ProdutoAnteriorVO> getCodigoAnterior(String sistema, String loja) throws Exception {
         Map<String, ProdutoAnteriorVO> result = new LinkedHashMap<>();
         createTable();
-        try (Statement stm = Conexao.createStatement()){
+        try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                "SELECT \n" +
-                "	ant.impsistema, \n" +
-                "	ant.imploja, \n" +
-                "	ant.impid, \n" +
-                "	ant.descricao, \n" +
-                "	p.descricaocompleta, \n" +
-                "	p.descricaoreduzida, \n" +
-                "	p.descricaogondola, \n" +
-                "	ant.codigoatual, \n" +
-                "	ant.piscofinscredito, \n" +
-                "	ant.piscofinsdebito, \n" +
-                "	ant.piscofinsnaturezareceita, \n" +
-                "	ant.icmscst, \n" +
-                "	ant.icmsaliq, \n" +
-                "	ant.icmsreducao, \n" +
-                "	ant.estoque, \n" +
-                "	ant.e_balanca, \n" +
-                "	ant.custosemimposto, \n" +
-                "	ant.custocomimposto, \n" +
-                "	ant.margem, \n" +
-                "	ant.precovenda, \n" +
-                "	ant.ncm, \n" +
-                "	ant.cest,\n" +
-                "	ant.contadorimportacao,\n" +
-                "	ant.novo\n" +
-                "FROM \n" +
-                "	implantacao.codant_produto ant\n" +
-                "	left join produto p on ant.codigoatual = p.id\n" +
-                "where \n" +
-                "       ant.impsistema = " + SQLUtils.stringSQL(getImportSistema()) + " and\n" +
-                "       ant.imploja = " + SQLUtils.stringSQL(getImportLoja()) + "\n" +
-                "order by\n" +
-                "	ant.impsistema, \n" +
-                "	ant.imploja, \n" +
-                "	ant.impid"
+                    "SELECT \n"
+                    + "	ant.impsistema, \n"
+                    + "	ant.imploja, \n"
+                    + "	ant.impid, \n"
+                    + "	ant.descricao, \n"
+                    + "	p.descricaocompleta, \n"
+                    + "	p.descricaoreduzida, \n"
+                    + "	p.descricaogondola, \n"
+                    + "	ant.codigoatual, \n"
+                    + "	ant.piscofinscredito, \n"
+                    + "	ant.piscofinsdebito, \n"
+                    + "	ant.piscofinsnaturezareceita, \n"
+                    + "	ant.icmscst, \n"
+                    + "	ant.icmsaliq, \n"
+                    + "	ant.icmsreducao, \n"
+                    + "	ant.estoque, \n"
+                    + "	ant.e_balanca, \n"
+                    + "	ant.custosemimposto, \n"
+                    + "	ant.custocomimposto, \n"
+                    + "	ant.margem, \n"
+                    + "	ant.precovenda, \n"
+                    + "	ant.ncm, \n"
+                    + "	ant.cest,\n"
+                    + "	ant.contadorimportacao,\n"
+                    + "	ant.novo\n"
+                    + "FROM \n"
+                    + "	implantacao.codant_produto ant\n"
+                    + "	left join produto p on ant.codigoatual = p.id\n"
+                    + "where \n"
+                    + "       ant.impsistema = " + SQLUtils.stringSQL(getImportSistema()) + " and\n"
+                    + "       ant.imploja = " + SQLUtils.stringSQL(getImportLoja()) + "\n"
+                    + "order by\n"
+                    + "	ant.impsistema, \n"
+                    + "	ant.imploja, \n"
+                    + "	ant.impid"
             )) {
                 while (rst.next()) {
                     ProdutoAnteriorVO vo = new ProdutoAnteriorVO();
-                    
+
                     vo.setImportSistema(rst.getString("impsistema"));
                     vo.setImportLoja(rst.getString("imploja"));
                     vo.setImportId(rst.getString("impid"));
@@ -552,47 +554,48 @@ public class ProdutoAnteriorDAO {
                     vo.setCest(rst.getString("cest"));
                     vo.setNovo(rst.getBoolean("novo"));
                     vo.setContadorImportacao(rst.getInt("contadorimportacao"));
-                    
+
                     result.put(vo.getImportId(), vo);
                 }
             }
         }
-        
+
         return result;
     }
 
     /**
      * Retorna o código atual dos produtos através do código de importação.
+     *
      * @param sistema Código do sistema importado.
      * @param loja Código da loja importada.
-     * @return {@link Map} com os códigos dos produtos mapeados com os códigos 
+     * @return {@link Map} com os códigos dos produtos mapeados com os códigos
      * anteriores.
-     * @throws Exception 
+     * @throws Exception
      */
     public Map<String, Integer> getAnteriores(String sistema, String loja) throws Exception {
         Map<String, Integer> result = new HashMap<>();
-        
+
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	ant.impid,\n" +
-                    "	ant.codigoatual\n" +
-                    "from\n" +
-                    "	implantacao.codant_produto ant\n" +
-                    "	join produto p on ant.codigoatual = p.id\n" +
-                    "where\n" +
-                    "	ant.impsistema = " + SQLUtils.stringSQL(sistema) + " and\n" +
-                    "	ant.imploja = " + SQLUtils.stringSQL(loja) + " and	\n" +
-                    "	not ant.codigoatual is null\n" +
-                    "order by 1"
+                    "select\n"
+                    + "	ant.impid,\n"
+                    + "	ant.codigoatual\n"
+                    + "from\n"
+                    + "	implantacao.codant_produto ant\n"
+                    + "	join produto p on ant.codigoatual = p.id\n"
+                    + "where\n"
+                    + "	ant.impsistema = " + SQLUtils.stringSQL(sistema) + " and\n"
+                    + "	ant.imploja = " + SQLUtils.stringSQL(loja) + " and	\n"
+                    + "	not ant.codigoatual is null\n"
+                    + "order by 1"
             )) {
                 while (rst.next()) {
                     result.put(rst.getString("impid"), rst.getInt("codigoatual"));
                 }
             }
         }
-        
+
         return result;
     }
-  
+
 }
