@@ -668,6 +668,14 @@ public class ClienteIMP {
             contatos.add(contato);
         }
     }
+    
+    public void addTelefone(String descricao, String numero) {
+        descricao = Utils.acertarTexto(descricao);
+        numero = Utils.stringLong(numero);
+        if (!"".equals(descricao) && !"0".equals(numero)) {
+            addContato(descricao, descricao, numero, "", "");
+        }
+    }
 
     public void copiarEnderecoParaEmpresa() {
         this.empresaEndereco = this.endereco;
