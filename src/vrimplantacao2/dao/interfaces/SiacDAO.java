@@ -7,11 +7,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import vrimplantacao.classe.ConexaoOracle;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -125,7 +128,7 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     "  p.nome_generico descricaocompleta,\n" +
                     "  p.nome_fracionado descricaoreduzida,\n" +
                     "  p.validade,\n" +
-                    "  coalesce(p.grupo_id,'') grupo_id,\n" +
+                    "  coalesce(p.grupo_id, '') grupo_id,\n" +
                     "  p.familia_id,\n" +
                     "  p.peso_unidade pesobruto,\n" +
                     "  p.peso_unidade_liquido pesoliquido,\n" +
@@ -139,10 +142,16 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     "  pe.codigo_cest cest,\n" +
                     "  p.codigo_natureza_prod_pis pis_natureza_rec,\n" +
                     "  pe.grupo_icms_id id_icms,\n" +
-                    "  p.codigo_fabrica id_fabricante\n" +
+                    "  p.grupo_pis_id,\n" +
+                    "  p.codigo_fabrica id_fabricante,\n" +
+                    "  pis_e.cst_pis piscofins_entrada,\n" +
+                    "  pis_s.cst_pis piscofins_saida,\n" +
+                    "  case when p.bloquear_venda = 'N' then 1 else 0 end vendapdv,\n" +
+                    "  case when p.exibir_sugestao_compras = 'S' then 1 else 0 end sugestaocotacao,\n" +
+                    "  case when p.descontinuado = 'S' then 1 else 0 end descontinuado\n" +
                     "from\n" +
                     "  produtos p\n" +
-                    "  join empresas emp on emp.empresa_id = '" + getLojaOrigem() + "'\n" +
+                    "  join empresas emp on emp.empresa_id = '00.096.427/0001-35'\n" +
                     "  join produtos_empresas pe on\n" +
                     "       pe.produto_id = p.produto_id and\n" +
                     "       pe.empresa_id = emp.empresa_id\n" +
@@ -166,6 +175,14 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     "  join estoques est on\n" +
                     "       est.produto_id = p.produto_id and\n" +
                     "       est.empresa_id = emp.empresa_id\n" +
+                    "  left join new_grupo_piscofins pis on\n" +
+                    "       pis.grupo_piscofins_id = pe.new_grupo_pis_cofins_id\n" +
+                    "  left join new_itens_grupo_piscofins pis_e on\n" +
+                    "       pis_e.grupo_pis_id = pis.grupo_piscofins_id and\n" +
+                    "       pis_e.movimento = 'E'\n" +
+                    "  left join new_itens_grupo_piscofins pis_s on\n" +
+                    "       pis_s.grupo_pis_id = pis.grupo_piscofins_id and\n" +
+                    "       pis_s.movimento = 'S'\n" +
                     "order by\n" +
                     "      1"
             )) {
@@ -217,10 +234,16 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
+                    imp.setPiscofinsCstCredito(rst.getString("piscofins_entrada"));
+                    imp.setPiscofinsCstDebito(rst.getString("piscofins_saida"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("pis_natureza_rec"));
                     imp.setIcmsDebitoId(rst.getString("id_icms"));
                     imp.setIcmsCreditoId(rst.getString("id_icms"));
                     imp.setFornecedorFabricante(rst.getString("id_fabricante"));
+                    imp.setVendaPdv(rst.getBoolean("vendapdv"));
+                    imp.setSugestaoCotacao(rst.getBoolean("sugestaocotacao"));
+                    imp.setSugestaoPedido(rst.getBoolean("sugestaocotacao"));
+                    imp.setDescontinuado(rst.getBoolean("descontinuado"));
                     
                     result.add(imp);
                 }
@@ -229,6 +252,118 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "  f.cadastro_id id,\n" +
+                    "  f.razao_social razao,\n" +
+                    "  f.fantasia,\n" +
+                    "  f.cadastro_id cnpj,\n" +
+                    "  f.insc_estadual,\n" +
+                    "  f.codigo_cliente,\n" +
+                    "  case when upper(f.situacao) != 'NORMAL' then 0 else 1 end ativo,\n" +
+                    "  f.endereco_fat,\n" +
+                    "  f.numero_end_fat,\n" +
+                    "  f.complemento_end_fat,\n" +
+                    "  f.bairro_fat,\n" +
+                    "  cid.nome municipio_fat,\n" +
+                    "  cid.estado_id uf_fat,\n" +
+                    "  f.cep_fat,\n" +
+                    "  f.endereco_cob,\n" +
+                    "  f.numero_end_cob,\n" +
+                    "  f.complemento_end_cob,\n" +
+                    "  f.bairro_cob,\n" +
+                    "  cid.nome municipio_cob,\n" +
+                    "  cid.estado_id uf_cob,\n" +
+                    "  f.cep_cob,\n" +
+                    "  f.ddd_fat,\n" +
+                    "  f.fone_voz_fat,\n" +
+                    "  f.fone_dados_fat,\n" +
+                    "  f.fone_fax_fat,\n" +
+                    "  f.fone_outros,\n" +
+                    "  f.dt_cadastro,\n" +
+                    "  f.tipo_cadastro\n" +
+                    "from\n" +
+                    "  cadastros f\n" +
+                    "  left join cidades cid on\n" +
+                    "       f.cidade_fat_id = cid.cidade_id\n" +
+                    "  left join cidades cob on\n" +
+                    "       f.cidade_cob_id = cob.cidade_id\n" +
+                    "where\n" +
+                    "  f.tipo_cadastro in ('F','I','A','T','B','E','D')\n" +
+                    "order by\n" +
+                    "  f.razao_social"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("insc_estadual"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setEndereco(rst.getString("endereco_fat"));
+                    imp.setNumero(rst.getString("numero_end_fat"));
+                    imp.setComplemento(rst.getString("complemento_end_fat"));
+                    imp.setBairro(rst.getString("bairro_fat"));
+                    imp.setMunicipio(rst.getString("municipio_fat"));
+                    imp.setUf(rst.getString("uf_fat"));
+                    imp.setCep(rst.getString("cep_fat"));
+                    imp.setCob_endereco(rst.getString("endereco_cob"));
+                    imp.setCob_numero(rst.getString("numero_end_cob"));
+                    imp.setCob_complemento(rst.getString("complemento_end_cob"));
+                    imp.setCob_bairro(rst.getString("bairro_cob"));
+                    imp.setCob_municipio(rst.getString("municipio_cob"));
+                    imp.setCob_uf(rst.getString("uf_cob"));
+                    imp.setCob_cep(rst.getString("cep_cob"));                  
+                    String ddd = Utils.stringLong(rst.getString("ddd_fat"));                    
+                    imp.setTel_principal(ddd + Utils.stringLong(rst.getString("fone_voz_fat")));
+                    imp.addTelefone("DADOS", ddd + Utils.stringLong(rst.getString("fone_dados_fat")));
+                    imp.addTelefone("FAX", ddd + Utils.stringLong(rst.getString("fone_fax_fat")));
+                    imp.addTelefone("OUTROS", ddd + Utils.stringLong(rst.getString("fone_outros")));
+                    imp.setDatacadastro(rst.getDate("dt_cadastro"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select produto_id, fornecedor_id, codigo_produto_no_fornecedor from siac_produtos_fornecedores order by 1,2"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setIdFornecedor(rst.getString("fornecedor_id"));
+                    imp.setIdProduto(rst.getString("produto_id"));
+                    imp.setCodigoExterno(rst.getString("codigo_produto_no_fornecedor"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
     
     
 }
