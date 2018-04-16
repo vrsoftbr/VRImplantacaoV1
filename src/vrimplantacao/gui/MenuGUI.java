@@ -48,7 +48,7 @@ import vrimplantacao.gui.interfaces.VRSoftwareGUI;
 import vrimplantacao.gui.interfaces.WisaSoftGUI_2;
 import vrimplantacao.gui.interfaces.GuiaSistemasGUI;
 import vrimplantacao.gui.interfaces.GCFGUI;
-import vrimplantacao.gui.interfaces.MultiPdvGUI;
+import vrimplantacao2.gui.interfaces.MultiPdvGUI;
 import vrimplantacao2.gui.interfaces.OrionGUI;
 import vrimplantacao.gui.interfaces.PCSistemasGUI;
 import vrimplantacao.gui.interfaces.PlanilhaChequeGUI;
@@ -2499,19 +2499,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemGCFActionPerformed
 
     private void jMenuItem28ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem28ActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarMultiPdv == null || formImportarMultiPdv.isClosed()) {
-                formImportarMultiPdv = new MultiPdvGUI(this);
-            }
-
-            formImportarMultiPdv.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
+        MultiPdvGUI.exibir(this);
     }//GEN-LAST:event_jMenuItem28ActionPerformed
 
     private void jMenuItem29ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem29ActionPerformed

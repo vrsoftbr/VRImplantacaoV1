@@ -36,7 +36,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public String v_arquivo = "";
-    
+
     @Override
     public String getSistema() {
         return "WebSaq";
@@ -139,7 +139,7 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValidade(rst.getInt("diasvalidade"));
                     imp.setTipoEmbalagem(rst.getString("embalagem"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                    imp.setDescricaoCompleta(rst.getString("descricao"));
+                    imp.setDescricaoCompleta(rst.getString("descricaofiscal"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setCodMercadologico1(rst.getString("coddepto"));
@@ -379,8 +379,7 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
-    
+
     @Override
     public List<FornecedorIMP> getFornecedores(OpcaoFornecedor opcao) throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -394,15 +393,15 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
             for (int sh = 0; sh < sheets.length; sh++) {
                 Sheet sheet = arquivo.getSheet(sh);
                 for (int i = 0; i < sheet.getRows(); i++) {
-                        
+
                     linha++;
                     if (linha == 1) {
                         continue;
                     }
-                    
+
                     Cell cellCodigo = sheet.getCell(0, i);
                     Cell cellRazao = sheet.getCell(2, i);
-                    
+
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
@@ -419,15 +418,15 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
             for (int sh = 0; sh < sheets.length; sh++) {
                 Sheet sheet = arquivo.getSheet(sh);
                 for (int i = 0; i < sheet.getRows(); i++) {
-                        
+
                     linha++;
                     if (linha == 1) {
                         continue;
                     }
-                    
+
                     Cell cellCodigo = sheet.getCell(0, i);
                     Cell cellFantasia = sheet.getCell(1, i);
-                    
+
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
@@ -435,7 +434,7 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFantasia(cellFantasia.getContents());
                     result.add(imp);
                 }
-            }            
+            }
             return result;
         }
         return null;
@@ -526,6 +525,7 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "c.numerores,\n"
                     + "c.complementores,\n"
                     + "(coalesce(c.limite1, 0) + coalesce(c.limite2) - coalesce(c.debito1, 0) - coalesce(debito2, 0)) as valorlimite,\n"
+                    + "c.limite1,\n"
                     + "c.emailnfe,\n"
                     + "c.rgemissor,\n"
                     + "c.codstatus,\n"
@@ -571,11 +571,11 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setDataCadastro(rst.getDate("dtinclusao"));
                     imp.setSalario(rst.getDouble("salario"));
-                    imp.setValorLimite(rst.getDouble("valorlimite"));
+                    imp.setValorLimite(rst.getDouble("limite1"));
                     imp.setBloqueado("S".equals(rst.getString("bloqueado")));
                     imp.setPermiteCreditoRotativo(imp.isBloqueado());
                     imp.setPermiteCheque(imp.isBloqueado());
-                    imp.setAtivo(imp.isBloqueado());
+                    imp.setAtivo("N".equals(rst.getString("bloqueado")));
 
                     if ((rst.getString("site") != null)
                             && (!rst.getString("site").trim().isEmpty())) {
@@ -620,19 +620,22 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "idcupom as id,\n"
-                    + "dtmovto as dataemissao, \n"
-                    + "dtmovto + 30 as datavencimento,\n"
-                    + "totalliquido,\n"
-                    + "totaldesconto,\n"
-                    + "cupom as numerocupom,\n"
-                    + "codcliente,\n"
-                    + "totalacrescimo,\n"
-                    + "totalbruto,\n"
-                    + "numeroecf\n"
-                    + "from cupom \n"
-                    + "where status = 'A'\n"
-                    + "and codestabelec = " + getLojaOrigem()
+                    + "l.codlancto as id,\n"
+                    + "l.parcela,\n"
+                    + "l.codparceiro as codcliente,\n"
+                    + "l.valorparcela as valor,\n"
+                    + "l.valorliquido,\n"
+                    + "l.valorjuros,\n"
+                    + "l.valordescto,\n"
+                    + "l.valoracresc,\n"
+                    + "l.dtemissao as dataemissao,\n"
+                    + "l.dtvencto as datavencimento,\n"
+                    + "l.numnotafis as numerocupom\n"
+                    + "from lancamento l\n"
+                    + "where l.pagrec = 'R' \n"
+                    + "and l.status = 'A' \n"
+                    + "and l.tipoparceiro = 'C'\n"
+                    + "and l.codestabelec = " + getLojaOrigem()
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -640,9 +643,9 @@ public class WebSaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdCliente(rst.getString("codcliente"));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setDataVencimento(rst.getDate("datavencimento"));
-                    imp.setValor(rst.getDouble("totalliquido"));
-                    imp.setEcf(rst.getString("numeroecf"));
+                    imp.setValor(rst.getDouble("valor"));
                     imp.setNumeroCupom(rst.getString("numerocupom"));
+                    imp.setJuros(rst.getDouble("valorjuros"));
                     result.add(imp);
                 }
             }

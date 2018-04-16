@@ -529,14 +529,20 @@
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="chkReiniciarIDCliente" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="txtReiniciarID" min="-2" pref="47" max="-2" attributes="0"/>
                                   </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="chkValorLimite" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="chkSituacaoCadastro" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
-                              <EmptySpace min="-2" pref="359" max="-2" attributes="0"/>
+                              <EmptySpace pref="99" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -544,7 +550,11 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="chkClientePreferencial" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkValorLimite" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkSituacaoCadastro" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -607,6 +617,16 @@
                     <Component class="vrframework.bean.textField.VRTextField" name="txtReiniciarID">
                       <Properties>
                         <Property name="mascara" type="java.lang.String" value="Numero"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkValorLimite">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Valor Limite"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkSituacaoCadastro">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Situa&#xe7;&#xe3;o Cadastro"/>
                       </Properties>
                     </Component>
                   </SubComponents>
