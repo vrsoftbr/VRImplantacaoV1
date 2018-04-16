@@ -17,15 +17,17 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  *
- * @author Importacao
+ * @author Guilherme
  */
 public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvider {
 
@@ -61,8 +63,9 @@ public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvide
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
-                    + "loja::integer as id, \n"
-                    + "loja::integer ||' - '|| cnpj ||' - '|| nome_fantasia as descricao\n"
+                    + "loja::integer as id,\n"
+                    + "cnpj,\n"
+                    + "nome_fantasia as descricao\n"
                     + "from "
                     + "parametros"
             )) {
@@ -80,7 +83,9 @@ public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvide
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select \n"
-                    + "	c.codigo as id,\n"
+                    + "	case\n"
+                    + "	  when codigo_cliente = '' then codigo::character varying\n"
+                    + "	else codigo_cliente end as id,\n"
                     + "	(case when c.inscricao_estadual = '' then null else c.inscricao_estadual end) as ie,\n"
                     + "	c.rg,\n"
                     + "	c.nome as razao,\n"
@@ -117,8 +122,8 @@ public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvide
                     + "	c.telefone,\n"
                     + "	c.celular,\n"
                     + "	c.email\n"
-                    + "from 	clientes c\n"
-                    + "where 	c.codigo >= 1\n"
+                    + "from clientes c\n"
+                   + "where length(c.codigo_cliente) <= 6\n"
                     + "order by 1")) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -171,7 +176,7 @@ public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvide
                     }
                     imp.setDataNascimento(rs.getDate("datanascimento"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
-                    imp.setSexo("1".equals(rs.getString("SEXO")) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                    imp.setSexo("1".equals(rs.getString("sexo")) ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
                     imp.setEmpresa(rs.getString("empresa"));
                     imp.setEmpresaEndereco(rs.getString("empresaendereco"));
                     imp.setEmpresaNumero(rs.getString("empresanumero"));
@@ -288,6 +293,7 @@ public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("codigo"));
                     imp.setDescricao(rs.getString("nome"));
+
                     result.add(imp);
                 }
             }
@@ -303,10 +309,10 @@ public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvide
                     "select "
                     + " g.codigo as codmerc1,\n"
                     + " g.nome as descmerc1,\n"
-                    + " f.codigo as codmerc2, \n"
+                    + " f.codigo as codmerc2,\n"
                     + " f.nome as descmerc2,\n"
-                    + " coalesce(s.codigo,1) as codmerc3, \n"
-                    + " coalesce(s.nome, f.nome) as descmerc3 \n"
+                    + " coalesce(s.codigo,1) as codmerc3,\n"
+                    + " coalesce(s.nome, f.nome) as descmerc3\n"
                     + "from familias f\n"
                     + "join sub_familias s on s.familia = f.codigo\n"
                     + "join grupos g on f.grupo = g.codigo"
@@ -343,13 +349,14 @@ public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvide
                     + "	coalesce(g.codigo, 1) as merc1,\n"
                     + "	coalesce(f.codigo, 1) as merc2,\n"
                     + "	coalesce(sf.codigo, 1) as merc3,\n"
-                    + "	p.icms,\n"
+                    + "	p.icms as icmsdebito,\n"
                     + "	p.embalagem1 as qtdembalagem,\n"
                     + "	p.codigo_barras::bigint,\n"
                     + "	p.embalagem2,\n"
                     + "	p.estoque,\n"
                     + "	p.estoquemin,\n"
                     + "	coalesce(p.preco_custo_un_nf, p.preco_custo_un_total) as precocusto,\n"
+                    + " p.preco_custo_un_total as precocustoimposto,\n"
                     + "	p.precovenda,\n"
                     + "	p.margem,\n"
                     + "	p.data_alteracao,\n"
@@ -365,7 +372,6 @@ public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvide
                     + "	p.cst_cofins_entrada,\n"
                     + "	p.cst_cofins_saida,\n"
                     + "	p.icms_entrada icmscredito,\n"
-                    + "	p.cst icmsCstSaida,\n"
                     + "	p.percentual_pis_cofins_entrada as piscofinsCstCredito\n"
                     + "from produtos p\n"
                     + "join familias f on p.familia = f.codigo\n"
@@ -374,7 +380,7 @@ public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvide
                     + "and sf.codigo = p.sub_familia\n"
                     + "and sf.familia = f.codigo\n"
                     + "order by codigo")) {
-            Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -386,24 +392,25 @@ public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
-                    imp.setIcmsAliq(rs.getDouble("icms"));
+                    imp.setIcmsAliq(rs.getDouble("icmsdebito"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem") == 0 ? 1 : rs.getInt("qtdembalagem"));
                     imp.setEan(rs.getString("codigo_barras"));
                     imp.setTipoEmbalagem(rs.getString("embalagem2"));
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMinimo(rs.getDouble("estoquemin"));
-                    imp.setCustoComImposto(rs.getDouble("precocusto"));
-                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setCustoComImposto(rs.getDouble("precocustoimposto"));
+                    imp.setCustoSemImposto(rs.getDouble("precocusto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setMargem(rs.getDouble("margem"));
                     imp.seteBalanca(rs.getBoolean("ebalanca"));
                     imp.setValidade(rs.getInt("validade"));
-                    imp.setSituacaoCadastro(("S".equals(rs.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
+                    imp.setSituacaoCadastro(("N".equals(rs.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setIcmsCreditoId(rs.getString("icmscredito"));
-                    imp.setIcmsDebitoId(rs.getString("icmsCstSaida"));
-                    imp.setPiscofinsCstCredito(rs.getString("piscofinsCstCredito"));
+                    imp.setIcmsDebitoId(rs.getString("icmsdebito"));
+                    imp.setPiscofinsCstCredito(rs.getString("cst_pis_entrada"));
+                    imp.setPiscofinsCstDebito(rs.getString("cst_pis_saida"));
                     if ((rs.getString("codigo_barras") != null)
                             && (!rs.getString("codigo_barras").trim().isEmpty())
                             && (rs.getString("codigo_barras").trim().length() >= 4)
@@ -435,5 +442,75 @@ public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvide
             }
             return result;
         }
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws SQLException {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + " fornecedor,\n"
+                    + " produto,\n"
+                    + " quantidade_estabelecimento as qtdemb,\n"
+                    + " referencia\n"
+                    + "from referencias")) {
+                while (rs.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdFornecedor(rs.getString("fornecedor"));
+                    imp.setIdProduto(rs.getString("produto"));
+                    imp.setQtdEmbalagem(rs.getDouble("qtdemb"));
+                    imp.setCodigoExterno("referencia");
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws SQLException {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	cp.lancamento as id,\n"
+                    + "	cp.cliente::integer as idcliente,\n"
+                    + "	c.cpf as cpfcnpj,\n"
+                    + "	cp.data::date as dtemissao,\n"
+                    + "	cp.caixa as ecf,\n"
+                    + "	cp.cupom as nrcupom,\n"
+                    + "	cp.tipopagamento,\n"
+                    + "	coalesce(cp.valorcompra,0) as valorcompra,\n"
+                    + "	coalesce(cp.valordebito,0) as valordebito,\n"
+                    + "	cp.datadeposito::date as dtvencimento,\n"
+                    + "	cp.loja as idloja,\n"
+                    + "	cp.horario,\n"
+                    + "	cp.desconto\n"
+                    + "from comprascliente cp\n"
+                    + "left join clientes c on cp.cliente = c.codigo_cliente\n"
+                    + "where statuscompra = 'D'\n"
+                    + "  and loja::integer = " + getLojaOrigem() + "\n"
+                    + "  and length(cp.cliente) <= 6\n"
+                    + "order by data")) {
+                while (rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setCnpjCliente(rs.getString("cpfcnpj"));
+                    imp.setDataEmissao(rs.getDate("dtemissao"));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setNumeroCupom(rs.getString("nrcupom"));
+                    imp.setValor(rs.getDouble("valordebito"));
+                    imp.setDataVencimento(rs.getDate("dtvencimento"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 }

@@ -3392,9 +3392,6 @@ public final class MenuGUI extends VRMdiFrame {
         }
     }//GEN-LAST:event_mnuBrainSoftActionPerformed
 
-
-
-
     private void mnuRMS_3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRMS_3ActionPerformed
         WinthorGUI.exibir(this);
     }//GEN-LAST:event_mnuRMS_3ActionPerformed
