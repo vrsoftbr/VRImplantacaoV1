@@ -21,6 +21,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -549,6 +550,49 @@ public class SysPdvDAO extends InterfaceDAO {
         return result;
     }
 
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n" +
+                    "    CTRID,\n" +
+                    "    ctrnum,\n" +
+                    "    clicod,\n" +
+                    "    cxanum,\n" +
+                    "    ctrdatemi,\n" +
+                    "    ctrdatvnc,\n" +
+                    "    ctrvlrdev,\n" +
+                    "    ctrobs\n" +
+                    "FROM CONTARECEBER\n" +
+                    "WHERE \n" +
+                    "    (COALESCE(CTRVLRPAG,0) < CTRVLRNOM) AND \n" +
+                    "    COALESCE(ctrvlrdev,0) > 0 and\n" +
+                    "    (COALESCE(FZDCOD,'000') IN ('004'))"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rst.getString("CTRID"));
+                    imp.setNumeroCupom(rst.getString("ctrnum"));
+                    imp.setIdCliente(rst.getString("clicod"));
+                    imp.setEcf(rst.getString("cxanum"));
+                    imp.setDataEmissao(rst.getDate("ctrdatemi"));
+                    imp.setDataVencimento(rst.getDate("ctrdatvnc"));
+                    imp.setValor(rst.getDouble("ctrvlrdev"));
+                    imp.setObservacao(rst.getString("ctrobs"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    
+    
     public List<Estabelecimento> getLojasCliente() throws SQLException {
         List<Estabelecimento> result = new ArrayList<>();
         
