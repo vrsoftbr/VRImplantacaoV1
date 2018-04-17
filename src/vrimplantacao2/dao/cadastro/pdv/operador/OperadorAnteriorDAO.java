@@ -60,7 +60,7 @@ public class OperadorAnteriorDAO {
             sql.put("senha", anterior.getSenha());
             sql.put("id_tiponiveloperador", anterior.getId_tiponiveloperador());
             sql.put("id_situacaocadastro", anterior.getId_situacaocadastro());
-            sql.put("forcagravacao", anterior.isForcargravacao());
+            sql.put("forcargravacao", anterior.isForcargravacao());
             stm.executeQuery(sql.getInsert());
         }
     }
@@ -85,7 +85,7 @@ public class OperadorAnteriorDAO {
                     + "	ant.sistema = " + Utils.quoteSQL(sistema) + "\n"
                     + "	and ant.loja = " + Utils.quoteSQL(loja) + "\n"
                     + "order by\n"
-                    + "	ant.id"
+                    + "	ant.matricula"
             )) {
                 while (rst.next()) {
                     OperadorAnteriorVO vo = new OperadorAnteriorVO();
