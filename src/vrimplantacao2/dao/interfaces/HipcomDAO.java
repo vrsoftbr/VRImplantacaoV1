@@ -1113,7 +1113,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
-        private String getVendaSQL(String ano, String idLojaCliente, Date dataInicio, Date dataTermino) {
+        private String getVendaSQL(String idLojaCliente, Date dataInicio, Date dataTermino, String tableName) {  
             
             String strDataInicio = new SimpleDateFormat("yyyy-MM-dd").format(dataInicio);
             String strDataTermino = new SimpleDateFormat("yyyy-MM-dd").format(dataTermino);
@@ -1129,7 +1129,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	min(v.cupom_cancelado) cancelado,\n" +
                     "	sum(v.valor_total) subtotalimpressora\n" +
                     "from\n" +
-                    "	hip_cupom_item_semcript" + (ano == null ? "" : "_" + ano) + " v\n" +
+                    "	" + tableName + " v\n" +
                     "where\n" +
                     "	v.loja = " + idLojaCliente + " and\n" +
                     "	v.data >= '" + strDataInicio + "' and\n" +
@@ -1146,9 +1146,11 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
             
             StringBuilder str = new StringBuilder();
             
-            str.append(getVendaSQL(null, idLojaCliente, dataInicio, dataTermino));
+            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_ultimos_meses"));
             str.append("union\n");
-            str.append(getVendaSQL("2017", idLojaCliente, dataInicio, dataTermino));
+            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript"));
+            str.append("union\n");
+            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2017"));
             /*str.append("union\n");
             str.append(getVendaSQL("2016", idLojaCliente, dataInicio, dataTermino));
             str.append("union\n");
