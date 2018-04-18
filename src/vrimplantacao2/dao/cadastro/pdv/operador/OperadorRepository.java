@@ -49,7 +49,7 @@ public class OperadorRepository {
                 MultiMap<String, OperadorAnteriorVO> anteriores = provider.getAnteriores();
                 //</editor-fold>
 
-                setNotificacao("Gravando cliente preferêncial...", operadores.size());
+                setNotificacao("Gravando operador...", operadores.size());
 
                 for (OperadorIMP imp : operadores) {
                     OperadorAnteriorVO anterior = anteriores.get(
@@ -97,6 +97,7 @@ public class OperadorRepository {
         OperadorVO vo = new OperadorVO();
 
         vo.setMatricula(Utils.stringToInt(imp.getMatricula()));
+        vo.setNome(imp.getNome());
         vo.setSenha(Utils.stringToInt(imp.getSenha()));
         vo.setCodigo(Utils.stringToInt(imp.getCodigo()));
         vo.setId_tiponiveloperador(Utils.stringToInt(imp.getId_tiponiveloperador()));
@@ -109,6 +110,7 @@ public class OperadorRepository {
         vo.setSistema(provider.getSistema());
         vo.setLoja(provider.getLojaOrigem());
         vo.setMatricula(imp.getMatricula());
+        vo.setNome(imp.getNome());
         vo.setSenha(imp.getSenha());
         vo.setId_tiponiveloperador(imp.getId_tiponiveloperador());
         vo.setId_situacaocadastro(imp.getId_situacadastro());

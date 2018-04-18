@@ -45,10 +45,10 @@ public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvide
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select \n"
-                    + "     codigo,\n"
-                    + "     nome\n"
+                    + " codigo,\n"
+                    + " nome\n"
                     + "from icms\n"
-                    + "order by 2")) {
+                + "order by 2")) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(rs.getString("codigo"), rs.getString("nome")));
                 }
@@ -61,16 +61,16 @@ public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvide
         List<Estabelecimento> lojas = new ArrayList<>();
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
+            try (ResultSet rs = stm.executeQuery(
                     "select "
-                    + "loja::integer as id,\n"
-                    + "cnpj,\n"
-                    + "nome_fantasia as descricao\n"
-                    + "from "
-                    + "parametros"
+                     + "loja::integer as id,\n"
+                     + "cnpj,\n"
+                     + "nome_fantasia as descricao\n"
+                   + "from "
+                     + "parametros"
             )) {
-                while (rst.next()) {
-                    lojas.add(new Estabelecimento(rst.getString("id"), rst.getString("descricao")));
+                while (rs.next()) {
+                    lojas.add(new Estabelecimento(rs.getString("id"), rs.getString("descricao")));
                 }
             }
         }
