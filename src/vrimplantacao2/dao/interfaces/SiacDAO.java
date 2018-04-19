@@ -131,8 +131,8 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     "  p.unidade,\n" +
                     "  case when p.permite_venda_fracionada = 'S' then 1 else 0 end e_balanca,\n" +
                     "  case when p.pesavel = 'S' then 1 else 0 end pesavel,\n" +
-                    "  p.nome_generico descricaocompleta,\n" +
-                    "  p.nome_fracionado descricaoreduzida,\n" +
+                    "  p.nome_produto descricaocompleta,\n" +
+                    "  coalesce(nullif(trim(p.breve_descricao),''), p.nome_produto) descricaoreduzida,\n" +
                     "  p.validade,\n" +
                     "  coalesce(p.grupo_id, '') grupo_id,\n" +
                     "  p.familia_id,\n" +
@@ -157,7 +157,7 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     "  case when p.descontinuado = 'S' then 1 else 0 end descontinuado\n" +
                     "from\n" +
                     "  produtos p\n" +
-                    "  join empresas emp on emp.empresa_id = '00.096.427/0001-35'\n" +
+                    "  join empresas emp on emp.empresa_id = '" + getLojaOrigem() + "'\n" +
                     "  join produtos_empresas pe on\n" +
                     "       pe.produto_id = p.produto_id and\n" +
                     "       pe.empresa_id = emp.empresa_id\n" +
@@ -189,8 +189,7 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     "  left join new_itens_grupo_piscofins pis_s on\n" +
                     "       pis_s.grupo_pis_id = pis.grupo_piscofins_id and\n" +
                     "       pis_s.movimento = 'S'\n" +
-                    "order by\n" +
-                    "      1"
+                    "order by e_balanca desc, id"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -521,6 +520,7 @@ public class SiacDAO extends InterfaceDAO implements MapaTributoProvider {
                     "  f.tipo_conta = 'CR' and\n" +
                     "  f.status = 'A' and\n" +
                     "  f.cadastro_id != '111.111.111/11'\n" +
+                    "  and f.dt_emissao > to_date('03/04/2018', 'dd/MM/yyyy')" +
                     "order by\n" +
                     "  f.dt_emissao"
             )) {
