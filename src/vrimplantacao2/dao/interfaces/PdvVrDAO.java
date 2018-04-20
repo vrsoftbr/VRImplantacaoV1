@@ -10,9 +10,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
-import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.importacao.AcumuladorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.OperadorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -155,6 +155,27 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSenha(rst.getString("senha"));
                     imp.setId_tiponiveloperador(rst.getString("id_tiponiveloperador"));
                     imp.setId_situacadastro(rst.getString("id_situacaocadastro"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<AcumuladorIMP> getAcumuladores() throws Exception {
+        List<AcumuladorIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "id,\n"
+                    + "descricao\n"
+                    + "from acumulador\n"
+                    + "order by id"
+            )) {
+                while (rst.next()) {
+                    AcumuladorIMP imp = new AcumuladorIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descricao"));
                     result.add(imp);
                 }
             }
