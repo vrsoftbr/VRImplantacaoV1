@@ -162,6 +162,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    @Override
     public List<AcumuladorIMP> getAcumuladores() throws Exception {
         List<AcumuladorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {

@@ -18,6 +18,7 @@ public class AcumuladorRepositoryProvider {
     
     public AcumuladorRepositoryProvider() throws Exception {
         this.acumuladorDAO = new AcumuladorDAO();
+        this.acumuladorDAO.delete();
     }
     
     public void salvar(AcumuladorVO vo) throws Exception {

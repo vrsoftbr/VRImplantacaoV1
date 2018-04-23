@@ -17,6 +17,7 @@ import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
+import vrimplantacao2.vo.importacao.AcumuladorIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
@@ -392,6 +393,15 @@ public abstract class InterfaceDAO {
      * @throws Exception 
      */    
     public List<OperadorIMP> getOperadores() throws Exception {
+        return new ArrayList<>();
+    }
+    
+    /**
+     * Permite o retorno listas especificadas de acumulador.
+     * @return
+     * @throws Exception 
+     */    
+    public List<AcumuladorIMP> getAcumuladores() throws Exception {
         return new ArrayList<>();
     }   
 }

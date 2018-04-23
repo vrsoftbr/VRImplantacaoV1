@@ -35,7 +35,7 @@ public class AcumuladorRepository {
                 
                 AcumuladorVO acumulador = null;
                 acumulador = converterAcumuador(imp);
-                gravarOperador(acumulador);
+                gravarAcumulador(acumulador);
                 
                 notificar();
             }
@@ -62,7 +62,7 @@ public class AcumuladorRepository {
         return vo;
     }
     
-    public void gravarOperador(AcumuladorVO acumulador) throws Exception {
+    public void gravarAcumulador(AcumuladorVO acumulador) throws Exception {
         provider.salvar(acumulador);
     }
 }
