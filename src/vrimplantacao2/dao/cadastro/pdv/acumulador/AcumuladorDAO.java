@@ -18,6 +18,8 @@ public class AcumuladorDAO {
 
     public void delete() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
+            stm.execute("delete from pdv.acumuladorlayoutretorno");
+            stm.execute("delete from pdv.acumuladorlayout");
             stm.execute("delete from pdv.acumulador");
         }
     }
