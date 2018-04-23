@@ -21,7 +21,7 @@ public class AcumuladorDAO {
             stm.execute("delete from pdv.acumulador");
         }
     }
-    
+
     public void salvar(AcumuladorVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
