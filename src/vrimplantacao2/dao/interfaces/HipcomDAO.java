@@ -6,6 +6,7 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1075,7 +1076,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         private static final SimpleDateFormat TIMESTAMP_DATE = new SimpleDateFormat("yyyy-MM-dd");
         private static final SimpleDateFormat TIMESTAMP = new SimpleDateFormat("yyyy-MM-dd hh:mm");
 
-        private Statement stm = ConexaoMySQL.getConexao().createStatement();
+        private Statement stm = ConexaoMySQL.getConexao().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         private ResultSet rst;
         private String sql;
         private VendaIMP next;
@@ -1149,11 +1150,11 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
             str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_ultimos_meses"));
             str.append("union\n");
             str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2017"));
+            str.append("union\n");
+            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2016"));
+            str.append("union\n");
+            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2015"));
             /*str.append("union\n");
-            str.append(getVendaSQL("2016", idLojaCliente, dataInicio, dataTermino));
-            str.append("union\n");
-            str.append(getVendaSQL("2015", idLojaCliente, dataInicio, dataTermino));
-            str.append("union\n");
             str.append(getVendaSQL("2014", idLojaCliente, dataInicio, dataTermino));
             str.append("union\n");
             str.append(getVendaSQL("2013", idLojaCliente, dataInicio, dataTermino));*/
@@ -1161,6 +1162,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql = str.toString();
                     
             LOG.log(Level.FINE, "SQL da venda: " + sql);
+            stm.setFetchSize(Integer.MIN_VALUE);
             rst = stm.executeQuery(sql);
         }
 
@@ -1229,52 +1231,63 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
-        private Statement stm = ConexaoMySQL.getConexao().createStatement();
+        private Statement stm = ConexaoMySQL.getConexao().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
         private Map<String, SmProduto> produtos;
+        private Set<String> ids = new HashSet<>();
 
         private void obterNext() {
             try {
                 if (next == null) {
                     if (rst.next()) {
-                        String ean = rst.getString("ean");
                         
-                        if (ean == null) ean = "";
+                        String vendaId = VendaIterator.makeId(rst.getString("id_loja"), rst.getDate("data"), rst.getString("ecf"), rst.getString("id_caixa"), rst.getString("numerocupom"));
+                        String idVendaItem = vendaId + "-" + rst.getString("sequencia");
                         
-                        if (ean.length() < 7 && ean.length() > 1) {
-                            String old = ean;
-                            ean = ean.substring(0, ean.length() - 1);
-                            LOG.finest("EAN de balanca anterior: " + old + " atual: " + ean);
-                        }
+                        if (!ids.contains(idVendaItem)) {
                         
-                        SmProduto prod = produtos.get(ean);
+                            ids.add(idVendaItem);
+                            
+                            String ean = rst.getString("ean");
                         
-                        next = new VendaItemIMP();
-                        String id = VendaIterator.makeId(rst.getString("id_loja"), rst.getDate("data"), rst.getString("ecf"), rst.getString("id_caixa"), rst.getString("numerocupom"));
-                        next.setId(id + "-" + rst.getString("sequencia"));
-                        next.setVenda(id);
-                        next.setSequencia(rst.getInt("sequencia"));
-                        if (prod != null) {
-                            next.setProduto(prod.id);
-                            next.setDescricaoReduzida(prod.descricao);
-                            next.setUnidadeMedida(prod.embalagem);
-                            next.setCodigoBarras(prod.ean);
-                        } else {
-                            next.setProduto("");
-                            next.setDescricaoReduzida("SEM DESCRICAO");
-                            next.setUnidadeMedida("UN");
-                            next.setCodigoBarras(ean);
-                        }
-                        next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setTotalBruto(rst.getDouble("total_bruto"));
-                        next.setValorDesconto(0);
-                        next.setValorAcrescimo(0);
-                        next.setCancelado("S".equals(rst.getString("cancelado")));
-                        next.setIcmsCst(Utils.stringToInt(rst.getString("cst")));
-                        next.setIcmsAliq(rst.getDouble("aliquota"));
+                            if (ean == null) ean = "";
 
+                            if (ean.length() < 7 && ean.length() > 1) {
+                                String old = ean;
+                                ean = ean.substring(0, ean.length() - 1);
+                                LOG.finest("EAN de balanca anterior: " + old + " atual: " + ean);
+                            }
+
+                            SmProduto prod = produtos.get(ean);
+
+                            next = new VendaItemIMP();
+
+                            next.setId(idVendaItem);                   
+                        
+                            next.setVenda(vendaId);
+                            next.setSequencia(rst.getInt("sequencia"));
+                            if (prod != null) {
+                                next.setProduto(prod.id);
+                                next.setDescricaoReduzida(prod.descricao);
+                                next.setUnidadeMedida(prod.embalagem);
+                                next.setCodigoBarras(prod.ean);
+                            } else {
+                                next.setProduto("");
+                                next.setDescricaoReduzida("SEM DESCRICAO");
+                                next.setUnidadeMedida("UN");
+                                next.setCodigoBarras(ean);
+                            }
+                            next.setQuantidade(rst.getDouble("quantidade"));
+                            next.setTotalBruto(rst.getDouble("total_bruto"));
+                            next.setValorDesconto(0);
+                            next.setValorAcrescimo(0);
+                            next.setCancelado("S".equals(rst.getString("cancelado")));
+                            next.setIcmsCst(Utils.stringToInt(rst.getString("cst")));
+                            next.setIcmsAliq(rst.getDouble("aliquota"));
+
+                        }
                     }
                 }
             } catch (Exception ex) {
@@ -1326,22 +1339,39 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             StringBuilder str = new StringBuilder();
             
-            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_ultimos_meses"));
-            str.append("union\n");
-            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2017"));
-            /*str.append("union\n");
-            str.append(getVendaSQL("2016", idLojaCliente, dataInicio, dataTermino));
-            str.append("union\n");
-            str.append(getVendaSQL("2015", idLojaCliente, dataInicio, dataTermino));
-            str.append("union\n");
-            str.append(getVendaSQL("2014", idLojaCliente, dataInicio, dataTermino));
-            str.append("union\n");
-            str.append(getVendaSQL("2013", idLojaCliente, dataInicio, dataTermino));*/
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(dataInicio);
+            int anoIni = cal.get(Calendar.YEAR);
+            cal.setTime(dataTermino);
+            int anoFim = cal.get(Calendar.YEAR);
+            
+            if (anoIni <= 2018 && anoFim >= 2018) {
+                str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_ultimos_meses"));
+            }
+            if (anoIni <= 2017 && anoFim >= 2017) {
+                if (!str.toString().isEmpty()) {
+                    str.append("union\n");
+                }
+                str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2017"));
+            }
+            if (anoIni <= 2016 && anoFim >= 2016) {
+                if (!str.toString().isEmpty()) {
+                    str.append("union\n");
+                }
+                str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2016"));
+            }
+            if (anoIni <= 2015 && anoFim >= 2015) {
+                if (!str.toString().isEmpty()) {
+                    str.append("union\n");
+                }
+                str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2015"));
+            }
             str.append("order by id_loja, data, ecf, numerocupom");
             
             this.sql = str.toString();
                     
             LOG.log(Level.FINE, "SQL da venda item: " + sql);
+            stm.setFetchSize(Integer.MIN_VALUE);
             rst = stm.executeQuery(sql);
             
             this.produtos = new HashMap<>();
