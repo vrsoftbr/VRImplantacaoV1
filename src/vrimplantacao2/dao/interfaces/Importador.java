@@ -63,11 +63,14 @@ import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao.dao.financeiro.contareceber.OutraReceitaRepository;
 import vrimplantacao.dao.financeiro.contareceber.OutraReceitaRepositoryProvider;
+import vrimplantacao2.dao.cadastro.pdv.acumulador.AcumuladorRepository;
+import vrimplantacao2.dao.cadastro.pdv.acumulador.AcumuladorRepositoryProvider;
 import vrimplantacao2.dao.cadastro.pdv.operador.OperadorRepository;
 import vrimplantacao2.dao.cadastro.pdv.operador.OperadorRepositoryProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
+import vrimplantacao2.vo.importacao.AcumuladorIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
@@ -827,5 +830,17 @@ public class Importador {
         );
         OperadorRepository rep = new OperadorRepository(provider);
         rep.importarOperador(operadores);
+    }
+    
+    /**
+     * Importa o cadastro dos operadores.
+     * @throws Exception
+     */
+    public void importarAcumulador() throws Exception {
+        ProgressBar.setStatus("Carregando acumuladores...");
+        List<AcumuladorIMP> acumuladores = getInterfaceDAO().getAcumuladores();
+        AcumuladorRepositoryProvider provider = new AcumuladorRepositoryProvider();
+        AcumuladorRepository rep = new AcumuladorRepository(provider);
+        rep.importarAcumulador(acumuladores);
     }
 }

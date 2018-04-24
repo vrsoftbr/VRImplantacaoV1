@@ -5,10 +5,7 @@
  */
 package vrimplantacao2.dao.cadastro.pdv.operador;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -37,7 +34,6 @@ public class OperadorRepository {
 
         if (parametrosValidos) {
 
-            operadores = organizarListagem(operadores);
             System.gc();
 
             this.provider.begin();
@@ -72,7 +68,7 @@ public class OperadorRepository {
 
                         // Grava os dados
                         gravarOperador(operador);
-                        gravarOperadorAnterior(anterior);
+                        //gravarOperadorAnterior(anterior);
 
                         anteriores.put(
                                 anterior,
@@ -115,41 +111,6 @@ public class OperadorRepository {
         vo.setId_tiponiveloperador(imp.getId_tiponiveloperador());
         vo.setId_situacaocadastro(imp.getId_situacadastro());
         return vo;
-    }
-
-    public List<OperadorIMP> organizarListagem(List<OperadorIMP> operadores) {
-        List<OperadorIMP> result = new ArrayList<>();
-        Map<String, OperadorIMP> validos = new LinkedHashMap<>();
-        Map<String, OperadorIMP> invalidos = new LinkedHashMap<>();
-
-        for (OperadorIMP imp : operadores) {
-            //Verifica se o ID é válido para organizar a listagem;
-            try {
-                long id = Long.parseLong(imp.getId());
-
-                if (id <= 999999) {
-                    validos.put(imp.getId(), imp);
-                } else {
-                    invalidos.put(imp.getId(), imp);
-                }
-            } catch (NumberFormatException e) {
-                invalidos.put(imp.getId(), imp);
-            }
-        }
-
-        /**
-         * Unifica os resultados, colocando primeiro os operadores com IDs
-         * válidos e depois os inválidos que receberão um novo id
-         * posteriormente.
-         */
-        result.addAll(validos.values());
-        result.addAll(invalidos.values());
-
-        //Liberar memória
-        validos.clear();
-        invalidos.clear();
-
-        return result;
     }
 
     public void gravarOperador(OperadorVO operador) throws Exception {

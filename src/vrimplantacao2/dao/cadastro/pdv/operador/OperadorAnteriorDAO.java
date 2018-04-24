@@ -53,9 +53,13 @@ public class OperadorAnteriorDAO {
             sql.put("sistema", anterior.getSistema());
             sql.put("loja", anterior.getLoja());
             sql.put("matricula", anterior.getMatricula());
+            
             if (anterior.getMatriculaatual() != null) {
-                sql.put("matriculaatual", anterior.getMatriculaatual().getId());
+                sql.put("matriculaatual", anterior.getMatricula());
+            } else {
+                sql.putNull("matriculaatual");
             }
+            
             sql.put("nome", anterior.getNome());
             sql.put("senha", anterior.getSenha());
             sql.put("id_tiponiveloperador", anterior.getId_tiponiveloperador());

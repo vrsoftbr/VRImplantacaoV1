@@ -10,9 +10,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
-import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.importacao.AcumuladorIMP;
+import vrimplantacao2.vo.importacao.AcumuladorLayoutIMP;
+import vrimplantacao2.vo.importacao.AcumuladorLayoutRetornoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.OperadorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -155,6 +157,72 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSenha(rst.getString("senha"));
                     imp.setId_tiponiveloperador(rst.getString("id_tiponiveloperador"));
                     imp.setId_situacadastro(rst.getString("id_situacaocadastro"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<AcumuladorIMP> getAcumuladores() throws Exception {
+        List<AcumuladorIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "id,\n"
+                    + "descricao\n"
+                    + "from acumulador\n"
+                    + "order by id"
+            )) {
+                while (rst.next()) {
+                    AcumuladorIMP imp = new AcumuladorIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<AcumuladorLayoutIMP> getAcumuladorLayout() throws Exception {
+        List<AcumuladorLayoutIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "distinct\n"
+                    + "id_acumuladorlayout as id, ('IMPORTADO VR ACUMULADOR '||id_acumuladorlayout) as descricao\n"
+                    + "from acumuladorlayout"
+            )) {
+                while (rst.next()) {
+                    AcumuladorLayoutIMP imp = new AcumuladorLayoutIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<AcumuladorLayoutRetornoIMP> getAcumuladorLayoutReorno() throws Exception {
+        List<AcumuladorLayoutRetornoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "id_acumuladorlayout,\n"
+                    + "id_acumulador,\n"
+                    + "retorno,\n"
+                    + "titulo\n"
+                    + "from acumuladorlayout"
+            )) {
+                while (rst.next()) {
+                    AcumuladorLayoutRetornoIMP imp = new AcumuladorLayoutRetornoIMP();
+                    imp.setIdAcumuladorLayout(rst.getString("id_acumuladorlayout"));
+                    imp.setIdAcumulador(rst.getString("id_acumulador"));
+                    imp.setRetorno(rst.getString("retorno"));
+                    imp.setTitulo(rst.getString("titulo"));
                     result.add(imp);
                 }
             }
