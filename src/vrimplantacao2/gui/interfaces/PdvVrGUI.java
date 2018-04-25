@@ -224,9 +224,9 @@ public class PdvVrGUI extends VRInternalFrame {
                             importador.importarOperador();
                         }
                         
-                        if (chkAcumuladores.isSelected()) {
-                            importador.importarAcumulador();
-                        }
+                        //if (chkAcumuladores.isSelected()) {
+                        //    importador.importarAcumulador();
+                        //}
                         
                     } else if (tabs.getSelectedIndex() == 1) {
 
@@ -276,8 +276,6 @@ public class PdvVrGUI extends VRInternalFrame {
         btnMapaTribut = new vrframework.bean.button.VRButton();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         chkOperador = new vrframework.bean.checkBox.VRCheckBox();
-        vRPanel2 = new vrframework.bean.panel.VRPanel();
-        chkAcumuladores = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel6 = new vrframework.bean.panel.VRPanel();
         btnConectar = new javax.swing.JToggleButton();
         tabsConn = new javax.swing.JTabbedPane();
@@ -459,27 +457,6 @@ public class PdvVrGUI extends VRInternalFrame {
 
         vRTabbedPane2.addTab("Operadores", vRPanel1);
 
-        chkAcumuladores.setText("Acumuladores");
-
-        javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
-        vRPanel2.setLayout(vRPanel2Layout);
-        vRPanel2Layout.setHorizontalGroup(
-            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkAcumuladores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(468, Short.MAX_VALUE))
-        );
-        vRPanel2Layout.setVerticalGroup(
-            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkAcumuladores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(172, Short.MAX_VALUE))
-        );
-
-        vRTabbedPane2.addTab("Acumulares", vRPanel2);
-
         tabs.addTab("Importação", vRTabbedPane2);
 
         vRPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Origem - Firebird"));
@@ -640,7 +617,7 @@ public class PdvVrGUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vRPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
+                .addComponent(vRPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -712,7 +689,6 @@ public class PdvVrGUI extends VRInternalFrame {
     private javax.swing.JToggleButton btnConectar;
     private vrframework.bean.button.VRButton btnMapaTribut;
     private vrframework.bean.button.VRButton btnMigrar;
-    private vrframework.bean.checkBox.VRCheckBox chkAcumuladores;
     private vrframework.bean.checkBox.VRCheckBox chkOperador;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
@@ -744,7 +720,6 @@ public class PdvVrGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel24;
     private vrframework.bean.label.VRLabel vRLabel25;
     private vrframework.bean.panel.VRPanel vRPanel1;
-    private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.panel.VRPanel vRPanel6;
     private vrframework.bean.panel.VRPanel vRPanel7;
