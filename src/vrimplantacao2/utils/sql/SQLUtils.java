@@ -93,16 +93,22 @@ public final class SQLUtils {
         DateTime termino = new DateTime(vendaDataTermino.getTime());        
         
         List<String> result = new ArrayList<>();
-        while (inicio.isBefore(termino)) {
-            DateTime prox = inicio.plusMonths(1);
-            if (prox.isAfter(termino)) {
-                prox = termino;
-            }
+        
+        if (inicio.equals(termino) || inicio.getMonthOfYear() == termino.getMonthOfYear()) {
             String copy = sql.replace("{DATA_INICIO}", format.format(new Date(inicio.getMillis())));
-            copy = copy.replace("{DATA_TERMINO}", format.format(new Date(prox.getMillis())));
+            copy = copy.replace("{DATA_TERMINO}", format.format(new Date(termino.getMillis())));
             result.add(copy);
-            inicio = prox.plusDays(1);
-            
+        } else {
+            while (inicio.isBefore(termino)) {
+                DateTime prox = inicio.plusMonths(1);
+                if (prox.isAfter(termino)) {
+                    prox = termino;
+                }
+                String copy = sql.replace("{DATA_INICIO}", format.format(new Date(inicio.getMillis())));
+                copy = copy.replace("{DATA_TERMINO}", format.format(new Date(prox.getMillis())));
+                result.add(copy);
+                inicio = prox.plusDays(1);
+            }
         }
         
         return result;

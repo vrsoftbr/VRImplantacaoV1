@@ -22,6 +22,9 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
+import vrimplantacao2.dao.cadastro.venda.MultiStatementIterator;
+import vrimplantacao2.dao.interfaces.hipcom.HipcomVendaItemIterator;
+import vrimplantacao2.dao.interfaces.hipcom.HipcomVendaIterator;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
@@ -1063,12 +1066,13 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new VendaIterator(getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
+        //return new VendaIterator(getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
+        return new HipcomVendaIterator(getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
     }
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new VendaItemIterator(getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
+        return new HipcomVendaItemIterator(getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
     }
     
     private static class VendaIterator implements Iterator<VendaIMP> {
@@ -1147,7 +1151,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
             
             StringBuilder str = new StringBuilder();
             
-            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_ultimos_meses"));
+            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_ultimos_meses2"));
             str.append("union\n");
             str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2017"));
             str.append("union\n");
@@ -1162,7 +1166,6 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql = str.toString();
                     
             LOG.log(Level.FINE, "SQL da venda: " + sql);
-            stm.setFetchSize(Integer.MIN_VALUE);
             rst = stm.executeQuery(sql);
         }
 
@@ -1337,42 +1340,6 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
-            StringBuilder str = new StringBuilder();
-            
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(dataInicio);
-            int anoIni = cal.get(Calendar.YEAR);
-            cal.setTime(dataTermino);
-            int anoFim = cal.get(Calendar.YEAR);
-            
-            if (anoIni <= 2018 && anoFim >= 2018) {
-                str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_ultimos_meses"));
-            }
-            if (anoIni <= 2017 && anoFim >= 2017) {
-                if (!str.toString().isEmpty()) {
-                    str.append("union\n");
-                }
-                str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2017"));
-            }
-            if (anoIni <= 2016 && anoFim >= 2016) {
-                if (!str.toString().isEmpty()) {
-                    str.append("union\n");
-                }
-                str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2016"));
-            }
-            if (anoIni <= 2015 && anoFim >= 2015) {
-                if (!str.toString().isEmpty()) {
-                    str.append("union\n");
-                }
-                str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2015"));
-            }
-            str.append("order by id_loja, data, ecf, numerocupom");
-            
-            this.sql = str.toString();
-                    
-            LOG.log(Level.FINE, "SQL da venda item: " + sql);
-            stm.setFetchSize(Integer.MIN_VALUE);
-            rst = stm.executeQuery(sql);
             
             this.produtos = new HashMap<>();
             
@@ -1401,6 +1368,22 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                 }
             }
+            
+            StringBuilder str = new StringBuilder();
+            
+            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_ultimos_meses2"));
+            str.append("union\n");
+            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2017"));
+            str.append("union\n");
+            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2016"));
+            str.append("union\n");
+            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2015"));
+            str.append("order by id_loja, data, ecf, numerocupom");
+            
+            this.sql = str.toString();
+                    
+            LOG.log(Level.FINE, "SQL da venda item: " + sql);
+            rst = stm.executeQuery(sql);
             
             LOG.fine("Quantidade de produtos SM: " + produtos.size());
             
