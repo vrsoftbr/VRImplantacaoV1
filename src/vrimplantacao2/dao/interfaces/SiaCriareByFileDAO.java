@@ -19,6 +19,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -655,6 +656,75 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                 }
             }
             return result;
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        java.sql.Date dataEmissao, dataDeposito;
+        DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
+        WorkbookSettings settings = new WorkbookSettings();
+        Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls + "//cheque.xls"), settings);
+        Sheet[] sheets = arquivo.getSheets();
+        int linha;
+
+        try {
+
+            for (int sh = 0; sh < sheets.length; sh++) {
+                Sheet sheet = arquivo.getSheet(sh);
+                linha = 0;
+
+                for (int i = 0; i < sheet.getRows(); i++) {
+                    linha++;
+                    if (linha == 1) {
+                        continue;
+                    }
+                    
+                    Cell cellIdCheque = sheet.getCell(0, i);
+                    Cell cellNCheque = sheet.getCell(1, i);
+                    Cell cellBanco = sheet.getCell(4, i);
+                    Cell cellValor = sheet.getCell(5, i);
+                    Cell cellVencto = sheet.getCell(6, i);
+                    Cell cellDevolvido = sheet.getCell(7, i);
+                    Cell cellCaixa = sheet.getCell(8, i);
+                    Cell cellCupom = sheet.getCell(9, i);
+                    Cell cellEmissao = sheet.getCell(10, i);
+                    Cell cellObservacao = sheet.getCell(12, i);
+                    Cell cellCmc7 = sheet.getCell(17, i);
+                    Cell cellIdCliente = sheet.getCell(21, i);
+
+                    if ((cellEmissao.getContents() != null)
+                            && (!cellEmissao.getContents().trim().isEmpty())) {
+                        dataEmissao = new java.sql.Date(fmt.parse(cellEmissao.getContents()).getTime());
+                    } else {
+                        dataEmissao = new Date(new java.util.Date().getTime());
+                    }
+
+                    if ((cellVencto.getContents() != null)
+                            && (!cellVencto.getContents().trim().isEmpty())) {
+                        dataDeposito = new java.sql.Date(fmt.parse(cellVencto.getContents()).getTime());
+                    } else {
+                        dataDeposito = new Date(new java.util.Date().getTime());
+                    }
+                    
+                    ChequeIMP imp = new ChequeIMP();
+                    imp.setId(cellIdCheque.getContents());
+                    imp.setDate(dataEmissao);
+                    imp.setDataDeposito(dataDeposito);
+                    imp.setNumeroCheque(cellNCheque.getContents());
+                    imp.setValor(Double.parseDouble(cellValor.getContents()));
+                    imp.setEcf(cellCaixa.getContents());
+                    imp.setNumeroCupom(cellCupom.getContents());
+                    imp.setObservacao(cellObservacao.getContents());
+                    imp.setCmc7(cellCmc7.getContents());
+                    imp.setAlinea("S".equals(cellDevolvido.getContents()) ? 0 : 11);
+                    imp.setBanco(Utils.stringToInt(cellBanco.getContents()));
+                }
+            }
+            return null;
         } catch (Exception ex) {
             throw ex;
         }
