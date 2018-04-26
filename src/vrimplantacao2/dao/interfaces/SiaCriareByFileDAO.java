@@ -18,8 +18,10 @@ import jxl.WorkbookSettings;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -207,7 +209,190 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                     result.add(imp);
                 }
             }
-            return null;
+            return result;
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        java.sql.Date dataCadastro;
+        DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
+        WorkbookSettings settings = new WorkbookSettings();
+        Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls + "//cliente.xls"), settings);
+        Sheet[] sheets = arquivo.getSheets();
+        int linha;
+
+        try {
+
+            for (int sh = 0; sh < sheets.length; sh++) {
+                Sheet sheet = arquivo.getSheet(sh);
+                linha = 0;
+
+                for (int i = 0; i < sheet.getRows(); i++) {
+                    linha++;
+                    if (linha == 1) {
+                        continue;
+                    }
+
+                    Cell cellCodigo = sheet.getCell(0, i);
+                    Cell cellFantasia = sheet.getCell(1, i);
+                    Cell cellEndereco = sheet.getCell(2, i);
+                    Cell cellBairro = sheet.getCell(3, i);
+                    Cell cellMunicipio = sheet.getCell(4, i);
+                    Cell cellUf = sheet.getCell(5, i);
+                    Cell cellCep = sheet.getCell(6, i);
+                    Cell cellTelefone = sheet.getCell(7, i);
+                    Cell cellFax = sheet.getCell(8, i);
+                    Cell cellinscMunicipal = sheet.getCell(11, i);
+                    Cell cellObservacao = sheet.getCell(14, i);
+                    Cell cellCnpjCpf = sheet.getCell(15, i);
+                    Cell cellIeRg = sheet.getCell(16, i);
+                    Cell cellEmail = sheet.getCell(19, i);
+                    Cell cellReferencia = sheet.getCell(22, i);
+                    Cell cellAtivo = sheet.getCell(40, i);
+                    Cell cellMotivoDesativo = sheet.getCell(41, i);
+                    Cell cellTipo = sheet.getCell(42, i);
+                    Cell cellRazao = sheet.getCell(43, i);
+                    Cell cellDataCadastro = sheet.getCell(48, i);
+                    Cell cellMunicipioIBGE = sheet.getCell(57, i);
+                    Cell cellComplemento = sheet.getCell(59, i);
+                    Cell cellNumero = sheet.getCell(60, i);
+                    Cell cellBairroCob = sheet.getCell(64, i);
+                    Cell cellMunicipioCob = sheet.getCell(65, i);
+                    Cell cellUfCob = sheet.getCell(66, i);
+                    Cell cellCepCob = sheet.getCell(67, i);
+                    Cell cellFoneCob = sheet.getCell(68, i);
+                    Cell cellFaxCob = sheet.getCell(69, i);
+                    Cell cellEndCod = sheet.getCell(70, i);
+                    Cell cellCompCob = sheet.getCell(71, i);
+                    Cell cellNumCob = sheet.getCell(72, i);
+                    Cell cellBairroEnt = sheet.getCell(73, i);
+                    Cell cellMunicipioEnt = sheet.getCell(74, i);
+                    Cell cellUfEnt = sheet.getCell(75, i);
+                    Cell cellCepEnt = sheet.getCell(76, i);
+                    Cell cellFoneEnt = sheet.getCell(77, i);
+                    Cell cellFaxEnt = sheet.getCell(78, i);
+                    Cell cellEndEnt = sheet.getCell(79, i);
+                    Cell cellCompEnt = sheet.getCell(80, i);
+                    Cell cellNumEnt = sheet.getCell(81, i);
+                    Cell cellPontoRef = sheet.getCell(82, i);
+                    Cell cellIdEmpresa = sheet.getCell(90, i);
+                    Cell cellSite = sheet.getCell(110, i);
+
+                    if ("F".equals(cellTipo.getContents().trim())) {
+
+                        FornecedorIMP imp = new FornecedorIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(cellCodigo.getContents());
+                        imp.setAtivo("S".equals(cellAtivo.getContents()));
+                        imp.setRazao(cellRazao.getContents());
+                        imp.setFantasia(cellFantasia.getContents());
+                        imp.setCnpj_cpf(cellCnpjCpf.getContents());
+                        imp.setInsc_municipal(cellinscMunicipal.getContents());
+                        imp.setIe_rg(cellIeRg.getContents());
+                        imp.setEndereco(cellEndereco.getContents());
+                        imp.setNumero(cellNumero.getContents());
+                        imp.setComplemento(cellComplemento.getContents());
+                        imp.setBairro(cellBairro.getContents());
+                        imp.setMunicipio(cellMunicipio.getContents());
+                        imp.setCob_ibge_municipio(Utils.stringToInt(cellMunicipioIBGE.getContents()));
+                        imp.setUf(cellUf.getContents());
+                        imp.setCep(cellCep.getContents());
+                        imp.setTel_principal(cellTelefone.getContents());
+                        imp.setObservacao(cellObservacao.getContents());
+                        imp.setCob_endereco(cellEndCod.getContents());
+                        imp.setCob_numero(cellNumCob.getContents());
+                        imp.setCob_complemento(cellCompCob.getContents());
+                        imp.setCob_bairro(cellBairroCob.getContents());
+                        imp.setCob_municipio(cellMunicipioCob.getContents());
+                        imp.setCob_uf(cellUfCob.getContents());
+                        imp.setCob_cep(cellCepCob.getContents());
+
+                        if (!imp.isAtivo()) {
+                            if ((cellMotivoDesativo.getContents() != null)
+                                    && (!cellMotivoDesativo.getContents().trim().isEmpty())) {
+                                imp.setObservacao(imp.getObservacao() + "; MOTIVO DESATIVACAO - " + cellMotivoDesativo.getContents());
+                            }
+                        }
+
+                        if ((cellReferencia.getContents() != null)
+                                && (!cellReferencia.getContents().trim().isEmpty())) {
+                            imp.setObservacao(imp.getObservacao() + "; REFERENCIA - " + cellReferencia.getContents());
+                        }
+
+                        if ((cellPontoRef.getContents() != null)
+                                && (!cellPontoRef.getContents().trim().isEmpty())) {
+                            imp.setObservacao(imp.getObservacao() + "; PONTO REFERENCIA - " + cellPontoRef.getContents());
+                        }
+
+                        if ((cellFax.getContents() != null)
+                                && (!cellFax.getContents().trim().isEmpty())) {
+                            imp.addContato(
+                                    "1",
+                                    "FAX",
+                                    Utils.formataNumero(cellFax.getContents()),
+                                    null,
+                                    TipoContato.COMERCIAL,
+                                    null
+                            );
+                        }
+
+                        if ((cellEmail.getContents() != null)
+                                && (!cellEmail.getContents().trim().isEmpty())) {
+                            imp.addContato(
+                                    "2",
+                                    "EMAIL",
+                                    null,
+                                    null,
+                                    TipoContato.COMERCIAL,
+                                    cellEmail.getContents().toLowerCase()
+                            );
+                        }
+
+                        if ((cellSite.getContents() != null)
+                                && (!cellSite.getContents().trim().isEmpty())) {
+                            imp.addContato(
+                                    "3",
+                                    "SITE",
+                                    null,
+                                    null,
+                                    TipoContato.COMERCIAL,
+                                    cellSite.getContents().toLowerCase()
+                            );
+                        }
+
+                        if ((cellFoneCob.getContents() != null)
+                                && (!cellFoneCob.getContents().trim().isEmpty())) {
+                            imp.addContato(
+                                    "4",
+                                    "FONE COBRANCA",
+                                    Utils.formataNumero(cellFoneCob.getContents()),
+                                    null,
+                                    TipoContato.COMERCIAL,
+                                    null
+                            );
+                        }
+
+                        if ((cellFaxCob.getContents() != null)
+                                && (!cellFaxCob.getContents().trim().isEmpty())) {
+                            imp.addContato(
+                                    "5",
+                                    "FAX COBRANCA",
+                                    Utils.formataNumero(cellFaxCob.getContents()),
+                                    null,
+                                    TipoContato.COMERCIAL,
+                                    null
+                            );
+                        }
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
         } catch (Exception ex) {
             throw ex;
         }
@@ -318,6 +503,7 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                         imp.setNumero(cellNumero.getContents());
                         imp.setComplemento(cellComplemento.getContents());
                         imp.setBairro(cellBairro.getContents());
+                        imp.setMunicipio(cellMunicipio.getContents());
                         imp.setMunicipioIBGE(Utils.stringToInt(cellMunicipioIBGE.getContents()));
                         imp.setUf(cellUf.getContents());
                         imp.setCep(cellCep.getContents());
@@ -343,14 +529,65 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                         imp.setCobrancaCep(cellCepCob.getContents());
                         imp.setCobrancaTelefone(cellFoneCob.getContents());
 
+                        if (!imp.isAtivo()) {
+                            if ((cellMotivoDesativo.getContents() != null)
+                                    && (!cellMotivoDesativo.getContents().trim().isEmpty())) {
+                                imp.setObservacao2("MOTIVO DESATIVACAO - " + cellMotivoDesativo.getContents());
+                            }
+                        }
+
+                        if ((cellCliEspecial.getContents() != null)
+                                && (!cellCliEspecial.getContents().trim().isEmpty())) {
+
+                            if ("S".equals(cellCliEspecial.getContents().trim())) {
+                                imp.setObservacao2(imp.getObservacao2() + "; CLIENTE ESPECIAL");
+                            }
+                        }
+
+                        if ((cellCrediario.getContents() != null)
+                                && (!cellCrediario.getContents().trim().isEmpty())) {
+
+                            if ("S".equals(cellCrediario.getContents().trim())) {
+                                imp.setObservacao2(imp.getObservacao2() + "; CLIENTE CREDIARIO");
+                            }
+                        }
+
                         if ((cellPontoRef.getContents() != null)
                                 && (!cellPontoRef.getContents().trim().isEmpty())) {
-                            imp.setObservacao2("PONTO REFERENCIA - " + cellPontoRef.getContents());
+                            imp.setObservacao2(imp.getObservacao2() + "; PONTO REFERENCIA - " + cellPontoRef.getContents());
                         }
+
+                        if ((cellReferencia.getContents() != null)
+                                && (!cellReferencia.getContents().trim().isEmpty())) {
+                            imp.setObservacao2(imp.getObservacao2() + "; REFERENCIA - " + cellReferencia.getContents());
+                        }
+
+                        if ((cellFaxCob.getContents() != null)
+                                && (!cellFaxCob.getContents().trim().isEmpty())) {
+                            imp.addContato(
+                                    "1",
+                                    "FAX COBRANCA",
+                                    Utils.formataNumero(cellFaxCob.getContents().trim()),
+                                    null,
+                                    null
+                            );
+                        }
+
+                        if ((cellSite.getContents() != null)
+                                && (!cellSite.getContents().trim().isEmpty())) {
+                            imp.addContato(
+                                    "2",
+                                    "SITE",
+                                    null,
+                                    null,
+                                    cellSite.getContents().toLowerCase()
+                            );
+                        }
+                        result.add(imp);
                     }
                 }
             }
-            return null;
+            return result;
         } catch (Exception ex) {
             throw ex;
         }
