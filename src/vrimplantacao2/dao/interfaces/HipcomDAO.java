@@ -6,7 +6,6 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,7 +21,6 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
-import vrimplantacao2.dao.cadastro.venda.MultiStatementIterator;
 import vrimplantacao2.dao.interfaces.hipcom.HipcomVendaItemIterator;
 import vrimplantacao2.dao.interfaces.hipcom.HipcomVendaIterator;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -76,6 +74,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     
     private Date cpDataInicial;
     private Date cpDataFinal;
+    
+    private boolean vendaUtilizaDigito = false;
 
     public void setRotativoDataInicial(Date rotativoDataInicial) {
         this.rotativoDataInicial = rotativoDataInicial;
@@ -107,6 +107,10 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setCpDataFinal(Date cpDataFinal) {
         this.cpDataFinal = cpDataFinal;
+    }
+
+    public void setVendaUtilizaDigito(boolean vendaUtilizaDigito) {
+        this.vendaUtilizaDigito = vendaUtilizaDigito;
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -1072,7 +1076,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new HipcomVendaItemIterator(getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
+        return new HipcomVendaItemIterator(this.vendaUtilizaDigito, getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
     }
     
     private static class VendaIterator implements Iterator<VendaIMP> {

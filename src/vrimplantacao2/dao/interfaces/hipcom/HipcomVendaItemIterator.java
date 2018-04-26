@@ -22,9 +22,9 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
     
     private static final Logger LOG = Logger.getLogger(HipcomVendaItemIterator.class.getName());
     
-    public HipcomVendaItemIterator(String idLoja, Date dataInicial, Date dataTermino) throws Exception {
+    public HipcomVendaItemIterator(boolean vendaUtilizaDigito, String idLoja, Date dataInicial, Date dataTermino) throws Exception {
         super(
-            new CustomNextBuilder(),
+            new CustomNextBuilder(vendaUtilizaDigito),
             new StatementBuilder() {
                 @Override
                 public Statement makeStatement() throws Exception {
@@ -102,9 +102,11 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
     
     private static class CustomNextBuilder implements NextBuilder<VendaItemIMP> {
 
-        private final Map<String, SmProduto> produtos = new HashMap<>();     
+        private final Map<String, SmProduto> produtos = new HashMap<>(); 
+        private boolean vendaUtilizaDigito;
 
-        public CustomNextBuilder() throws Exception {
+        public CustomNextBuilder(boolean vendaUtilizaDigito) throws Exception {
+            this.vendaUtilizaDigito = vendaUtilizaDigito;
             try (Statement st = ConexaoMySQL.getConexao().createStatement()) {
                 try (ResultSet rs = st.executeQuery(
                         "select distinct\n" +
@@ -144,7 +146,11 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
 
             if (ean.length() < 7 && ean.length() > 1) {
                 String old = ean;
-                ean = ean.substring(0, ean.length() - 1);
+                if (vendaUtilizaDigito) {
+                    ean = ean.substring(0, ean.length() - 1);
+                } else {
+                    ean = ean.substring(0, ean.length());
+                }
                 LOG.finest("EAN de balanca anterior: " + old + " atual: " + ean);
             }
 
