@@ -20,6 +20,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -585,6 +586,72 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                         }
                         result.add(imp);
                     }
+                }
+            }
+            return result;
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        java.sql.Date dataEmissao, dataVencimento;
+        DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
+        WorkbookSettings settings = new WorkbookSettings();
+        Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls + "//cReceber.xls"), settings);
+        Sheet[] sheets = arquivo.getSheets();
+        int linha;
+
+        try {
+
+            for (int sh = 0; sh < sheets.length; sh++) {
+                Sheet sheet = arquivo.getSheet(sh);
+                linha = 0;
+
+                for (int i = 0; i < sheet.getRows(); i++) {
+                    linha++;
+                    if (linha == 1) {
+                        continue;
+                    }
+
+                    Cell cellIdVenda = sheet.getCell(17, i);
+                    Cell cellCodCliente = sheet.getCell(2, i);
+                    Cell cellEmissao = sheet.getCell(5, i);
+                    Cell cellVencimento = sheet.getCell(6, i);
+                    Cell cellValor = sheet.getCell(7, i);
+                    Cell cellHistorico = sheet.getCell(8, i);
+                    Cell cellJuros = sheet.getCell(15, i);
+                    Cell cellDesconto = sheet.getCell(16, i);
+                    Cell cellCaixa = sheet.getCell(23, i);
+                    Cell cellCupom = sheet.getCell(24, i);
+
+                    if ((cellEmissao.getContents() != null)
+                            && (!cellEmissao.getContents().trim().isEmpty())) {
+                        dataEmissao = new java.sql.Date(fmt.parse(cellEmissao.getContents()).getTime());
+                    } else {
+                        dataEmissao = new Date(new java.util.Date().getTime());
+                    }
+
+                    if ((cellVencimento.getContents() != null)
+                            && (!cellVencimento.getContents().trim().isEmpty())) {
+                        dataVencimento = new java.sql.Date(fmt.parse(cellVencimento.getContents()).getTime());
+                    } else {
+                        dataVencimento = new Date(new java.util.Date().getTime());
+                    }
+
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(cellIdVenda.getContents());
+                    imp.setIdCliente(cellCodCliente.getContents());
+                    imp.setDataEmissao(dataEmissao);
+                    imp.setDataVencimento(dataVencimento);
+                    imp.setValor(Double.parseDouble(cellValor.getContents()));
+                    imp.setJuros(Double.parseDouble(cellJuros.getContents()));
+                    imp.setNumeroCupom(cellCupom.getContents());
+                    imp.setEcf(cellCaixa.getContents());
+                    imp.setObservacao(cellHistorico.getContents());
+                    result.add(imp);
                 }
             }
             return result;
