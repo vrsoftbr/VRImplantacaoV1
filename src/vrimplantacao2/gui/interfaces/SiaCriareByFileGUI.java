@@ -193,6 +193,10 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
                         if (chkT1EANemBranco.isSelected()) {
                             importador.importarEANemBranco();
                         }
+                        
+                        if (chkOfertas.isSelected()) {
+                            importador.importarOfertas(null);
+                        }
 
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();

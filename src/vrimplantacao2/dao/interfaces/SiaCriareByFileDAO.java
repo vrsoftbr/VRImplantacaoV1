@@ -12,14 +12,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
-import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -827,7 +824,8 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
         }
     }
 
-    public List<OfertaIMP> getOfertas() throws Exception {
+    @Override
+    public List<OfertaIMP> getOfertas(java.util.Date dataTermino) throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
         java.sql.Date dataFimOferta, dataInicioOferta;
         DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
@@ -856,7 +854,10 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
 
                     if ((cellInicioOferta.getContents() != null)
                             && (!cellInicioOferta.getContents().trim().isEmpty())
-                            && (!"1899-12-30".equals(cellInicioOferta.getContents().trim()))) {
+                            && (!cellInicioOferta.getContents().contains("-"))
+                            && (cellFimOferta.getContents() != null)
+                            && (!cellFimOferta.getContents().trim().isEmpty())
+                            && (!cellFimOferta.getContents().contains("-"))) {
 
                         if ((cellFimOferta.getContents() != null)
                                 && (!cellFimOferta.getContents().trim().isEmpty())) {
