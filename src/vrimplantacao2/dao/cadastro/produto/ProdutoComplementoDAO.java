@@ -409,4 +409,75 @@ public class ProdutoComplementoDAO {
             );
         }
     }
+
+    public void criarEstoqueAnteriorTemporario(int lojaVR) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(
+                    "create temp table tmp_estoque \n" +
+                    "on commit drop \n" +
+                    "as \n" +
+                    "select \n" +
+                    "	id, \n" +
+                    "	id_produto, \n" +
+                    "	estoque \n" +
+                    "from\n" +
+                    "	produtocomplemento\n" +
+                    "where\n" +
+                    "	id_loja = " + lojaVR + "\n" +
+                    "order by\n" +
+                    "	id"
+            );
+        }
+    }
+
+    public void gerarLogDeEstoqueViaTMP_ESTOQUE(int lojaVR) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(
+                    "insert into logestoque (\n" +
+                    "	id_loja, \n" +
+                    "	id_produto, \n" +
+                    "	quantidade, \n" +
+                    "	id_tipomovimentacao, \n" +
+                    "	datahora, \n" +
+                    "	id_usuario, \n" +
+                    "	observacao, \n" +
+                    "	estoqueanterior,\n" +
+                    "	estoqueatual, \n" +
+                    "	id_tipoentradasaida, \n" +
+                    "	custosemimposto, \n" +
+                    "	custocomimposto, \n" +
+                    "	datamovimento, \n" +
+                    "	customediocomimposto, \n" +
+                    "	customediosemimposto\n" +
+                    ")\n" +                    
+                    "select\n" +
+                    "	pc.id_loja,\n" +
+                    "	pc.id_produto,\n" +
+                    "	(pc.estoque - coalesce(l.estoque, pc.estoque)) * (case when coalesce(l.estoque,pc.estoque) > pc.estoque then -1 else 1 end) quantidade,\n" +
+                    "	1 id_tipomovimentacao,\n" +
+                    "	current_timestamp datahora, \n" +
+                    "	0 id_usuario, \n" +
+                    "	'IMPORTACAO (VRIMPLANTACAO)' observacao,\n" +
+                    "	coalesce(l.estoque, pc.estoque) estoqueanterior,\n" +
+                    "	pc.estoque estoqueatual, \n" +
+                    "	case \n" +
+                    "	when coalesce(l.estoque, pc.estoque) < pc.estoque then 0 \n" +
+                    "	when coalesce(l.estoque, pc.estoque) = pc.estoque then 2\n" +
+                    "	else 1 end id_tipoentradasaida, \n" +
+                    "	pc.custosemimposto, \n" +
+                    "	pc.custocomimposto, \n" +
+                    "	current_timestamp datamovimento, \n" +
+                    "	pc.customediocomimposto, \n" +
+                    "	pc.customediosemimposto \n" +
+                    "from\n" +
+                    "	produtocomplemento pc\n" +
+                    "	left join tmp_estoque l on\n" +
+                    "		pc.id_produto = l.id_produto\n" +
+                    "where\n" +
+                    "	pc.id_loja = " + lojaVR + "\n" +
+                    "order by\n" +
+                    "	id_produto"
+            );
+        }
+    }
 }

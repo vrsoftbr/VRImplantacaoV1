@@ -368,6 +368,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkVendas.isSelected()) {
                             dao.setVendaDataInicial(txtDtVendaIni.getDate());
                             dao.setVendaDataFinal(txtDtVendaFim.getDate());
+                            dao.setVendaUtilizaDigito(chkVendaUtilizaDigito.isSelected());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                     }

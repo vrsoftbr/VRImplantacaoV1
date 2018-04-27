@@ -219,6 +219,10 @@ public class ProdutoRepository {
 
                 ProgressBar.setStatus("Produtos - Gravando alterações - " + strOpt);
                 ProgressBar.setMaximum(organizados.size());
+                
+                if (optSimples.contains(OpcaoProduto.ESTOQUE)) {
+                    provider.complemento().criarEstoqueAnteriorTemporario();
+                }
 
                 for (KeyList<String> keys: organizados.keySet()) {
                     String[] chave;
@@ -300,6 +304,10 @@ public class ProdutoRepository {
                         }
                     }
                     ProgressBar.next();
+                }
+                
+                if (optSimples.contains(OpcaoProduto.ESTOQUE)) {
+                    provider.complemento().gerarLogDeImportacaoDeEstoque();
                 }
 
                 Conexao.commit();

@@ -166,11 +166,11 @@ public class ProdutoRepositoryProvider {
     /**
      * Retorna um {@link Map} com os IDs de compradores importados.
      * @return {@link Map} com os IDs importados.
+     * @throws java.lang.Exception
      */
     public Map<String, Integer> getCompradores() throws Exception {
         return new CompradorAnteriorDAO().getCompradoresImportador(sistema, loja);
     }
-
     
     public class Anterior {
         
@@ -204,12 +204,20 @@ public class ProdutoRepositoryProvider {
             produtoComplementoDAO.salvar(complemento, unificacao);
         }
 
+        public void criarEstoqueAnteriorTemporario() throws Exception {
+            produtoComplementoDAO.criarEstoqueAnteriorTemporario(getLojaVR());
+        }
+
         public void atualizar(ProdutoComplementoVO complemento, Set<OpcaoProduto> opt) throws Exception {
             produtoComplementoDAO.atualizar(complemento, opt);
         }
 
         public void copiarProdutoComplemento(int lojaModelo, int lojaNova) throws Exception {
             produtoComplementoDAO.copiarProdutoComplemento(lojaModelo, lojaNova);
+        }
+
+        public void gerarLogDeImportacaoDeEstoque() throws Exception {
+            produtoComplementoDAO.gerarLogDeEstoqueViaTMP_ESTOQUE(getLojaVR());
         }
         
     }
