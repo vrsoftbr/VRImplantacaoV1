@@ -160,6 +160,7 @@ import vrimplantacao2.gui.interfaces.PdvVrGUI;
 import vrimplantacao2.gui.interfaces.InfoMacGUI;
 import vrimplantacao2.gui.interfaces.SiacGUI;
 import vrimplantacao2.gui.interfaces.RMSAutomaHelpGUI;
+import vrimplantacao2.gui.interfaces.SiaCriareByFileGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 
 public final class MenuGUI extends VRMdiFrame {
@@ -632,6 +633,7 @@ public final class MenuGUI extends VRMdiFrame {
         jMenuItem32 = new javax.swing.JMenuItem();
         mnuHostMundo = new javax.swing.JMenuItem();
         mnuWmByFile = new javax.swing.JMenuItem();
+        mnuSiaCriareByFile = new javax.swing.JMenuItem();
         jMenu11 = new javax.swing.JMenu();
         jMenuItem29 = new javax.swing.JMenuItem();
         jMenuItem15 = new javax.swing.JMenuItem();
@@ -1886,6 +1888,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu4.add(mnuWmByFile);
+
+        mnuSiaCriareByFile.setText("Sia - Criare");
+        mnuSiaCriareByFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSiaCriareByFileActionPerformed(evt);
+            }
+        });
+        jMenu4.add(mnuSiaCriareByFile);
 
         jMenu1.add(jMenu4);
 
@@ -3657,6 +3667,11 @@ public final class MenuGUI extends VRMdiFrame {
         WebSaqGUI.exibir(this);
     }//GEN-LAST:event_mnuWebsaqActionPerformed
 
+    private void mnuSiaCriareByFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSiaCriareByFileActionPerformed
+        // TODO add your handling code here:
+        SiaCriareByFileGUI.exibir(this);
+    }//GEN-LAST:event_mnuSiaCriareByFileActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -3819,6 +3834,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSatecfe;
     private javax.swing.JMenuItem mnuScef;
     private javax.swing.JMenuItem mnuScripts;
+    private javax.swing.JMenuItem mnuSiaCriareByFile;
     private javax.swing.JMenuItem mnuSicom;
     private javax.swing.JMenuItem mnuSifat;
     private javax.swing.JMenuItem mnuSigma;
