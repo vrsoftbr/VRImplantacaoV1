@@ -12,10 +12,10 @@ import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
 
 public class ProdutoAliquotaDAO {
-    
+
     public void salvar(int idLojaVR, Collection<ProdutoAliquotaVO> values) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            for (ProdutoAliquotaVO vo: values) {
+            for (ProdutoAliquotaVO vo : values) {
                 SQLBuilder sql = new SQLBuilder();
                 sql.setTableName("produtoaliquota");
                 sql.put("id_produto", vo.getProduto().getId());
@@ -28,7 +28,7 @@ public class ProdutoAliquotaDAO {
                 sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
 
                 sql.getReturning().add("id");
-                
+
                 try (ResultSet rst = stm.executeQuery(
                         sql.getInsert()
                 )) {
@@ -39,7 +39,7 @@ public class ProdutoAliquotaDAO {
             }
         }
     }
-    
+
     public void salvar(ProdutoAliquotaVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
@@ -72,7 +72,7 @@ public class ProdutoAliquotaDAO {
     public void atualizar(Collection<ProdutoAliquotaVO> aliquotas, OpcaoProduto... opcoes) throws Exception {
         Set<OpcaoProduto> opt = new LinkedHashSet<>(Arrays.asList(opcoes));
         try (Statement stm = Conexao.createStatement()) {
-            for (ProdutoAliquotaVO vo: aliquotas) {
+            for (ProdutoAliquotaVO vo : aliquotas) {
                 SQLBuilder sql = new SQLBuilder();
                 sql.setTableName("produtoaliquota");
                 if (opt.contains(OpcaoProduto.ICMS)) {
@@ -82,20 +82,23 @@ public class ProdutoAliquotaDAO {
                     sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
                     sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
                     sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
-                    sql.setWhere(
-                        "id_produto = " + vo.getProduto().getId() + " and " +
-                        "id_estado = " + vo.getEstado().getId()
-                    );
-                    stm.execute(sql.getUpdate());
+                } else if (opt.contains(OpcaoProduto.ICMS_FORNECEDOR)) {
+                    sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
                 }
+                sql.setWhere(
+                        "id_produto = " + vo.getProduto().getId() + " and "
+                        + "id_estado = " + vo.getEstado().getId()
+                );
+                stm.execute(sql.getUpdate());
             }
         }
     }
-    
+
     public void atualizar(ProdutoAliquotaVO vo, Set<OpcaoProduto> opt) throws Exception {
-        try (Statement stm = Conexao.createStatement()) {            
+        try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
             sql.setTableName("produtoaliquota");
+
             if (opt.contains(OpcaoProduto.ICMS)) {
                 sql.put("id_aliquotadebito", vo.getAliquotaDebito().getId());
                 sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
@@ -103,18 +106,19 @@ public class ProdutoAliquotaDAO {
                 sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
                 sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
                 sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
-                sql.setWhere(
-                    "id_produto = " + vo.getProduto().getId() + " and " +
-                    "id_estado = " + vo.getEstado().getId()
-                );
-                stm.execute(sql.getUpdate());
-            }            
+            } else if (opt.contains(OpcaoProduto.ICMS_FORNECEDOR)) {
+                sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
+            }
+            sql.setWhere(
+                    "id_produto = " + vo.getProduto().getId() + " and "
+                    + "id_estado = " + vo.getEstado().getId());
+            stm.execute(sql.getUpdate());
         }
     }
 
     public MultiMap<Integer, Void> getAliquotas() throws Exception {
         MultiMap<Integer, Void> result = new MultiMap<>();
-        
+
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select id_produto, id_estado from produtoaliquota order by id_produto, id_estado"
@@ -124,8 +128,8 @@ public class ProdutoAliquotaDAO {
                 }
             }
         }
-        
+
         return result;
     }
-    
+
 }

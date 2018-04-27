@@ -613,7 +613,7 @@
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuAutoSystem1ActionPerformed"/>
-						  </Events>
+                          </Events>
                         </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuWebsaq">
                           <Properties>
@@ -1125,6 +1125,14 @@
                       </Properties>
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuWmByFileActionPerformed"/>
+                      </Events>
+                    </MenuItem>
+                    <MenuItem class="javax.swing.JMenuItem" name="mnuSiaCriareByFile">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Sia - Criare"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuSiaCriareByFileActionPerformed"/>
                       </Events>
                     </MenuItem>
                   </SubComponents>

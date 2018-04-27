@@ -16,6 +16,7 @@ import vrframework.classe.ProgressBar;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.venda.MultiStatementIterator;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.utils.sql.SQLUtils;
@@ -449,7 +450,8 @@ public class AriusDAO extends InterfaceDAO {
                     + "    f.dias_vencto,\n"
                     + "    f.frequencia prazovisita,\n"
                     + "    f.entrega prazoentrega,\n"
-                    + "    f.email\n"
+                    + "    f.email,\n"
+                    + "    f.condpagto\n"
                     + "from\n"
                     + "    fornecedores f\n"
                     + "order by\n"
@@ -481,13 +483,35 @@ public class AriusDAO extends InterfaceDAO {
                     imp.setTel_principal(rst.getString("telefone1"));
                     imp.setValor_minimo_pedido(rst.getDouble("pedminimo"));
                     imp.setDatacadastro(rst.getDate("datahora_cadastro"));
-                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setObservacao(rst.getString("observacao") + " Cond. pag: " + rst.getString("condpagto"));
                     imp.setCondicaoPagamento(Utils.stringToInt(rst.getString("dias_vencto")));
                     imp.setPrazoVisita(rst.getInt("prazovisita"));
                     imp.setPrazoEntrega(rst.getInt("prazoentrega"));
                     String email = Utils.acertarTexto(rst.getString("email")).toLowerCase();
                     if (!"".equals(email)) {
-                        imp.addContato("EMAIL", "EMAIL", "", "", TipoContato.COMERCIAL, email);
+                        imp.addContato("1", "Email", "", "", TipoContato.COMERCIAL, email);
+                    }
+                    if ((rst.getString("telefone2") != null)
+                            && (!rst.getString("telefone2").trim().isEmpty())) {
+                        imp.addContato(
+                                "2",
+                                "Telefone 2",
+                                null,
+                                rst.getString("telefone2"),
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("fax") != null)
+                            && (!rst.getString("fax").trim().isEmpty())) {
+                        imp.addContato(
+                                "3",
+                                "Fax",
+                                null,
+                                rst.getString("fax"),
+                                TipoContato.COMERCIAL,
+                                null
+                        );
                     }
 
                     result.add(imp);
@@ -496,6 +520,93 @@ public class AriusDAO extends InterfaceDAO {
         }
 
         return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opc) throws Exception {
+        if (opc == OpcaoProduto.ICMS_FORNECEDOR) {
+            List<ProdutoIMP> result = new ArrayList<>();
+            try (Statement stm = ConexaoOracle.createStatement()) {
+                
+                ProgressBar.setStatus("Executando a query...");
+                
+                int cont = 1;
+                try (ResultSet rs = stm.executeQuery(
+                        "SELECT\n" +
+                        "    distinct\n" +
+                        "    tf.produto, \n" +
+                        "    tf.fornecedor, \n" +
+                        "    tf.estado, \n" +
+                        "    case \n" +
+                        "     when tf.tributacao_compra = 'T' and tf.icms_compra = 18 and tf.reducao_compra = 0 then 2\n" +
+                        "     when tf.tributacao_compra = 'R' and tf.icms_compra = 18 and tf.reducao_compra = 33.33 then 9\n" +
+                        "     when tf.tributacao_compra = 'I' and tf.icms_compra = 0 and tf.reducao_compra = 0 then 6\n" +
+                        "     when tf.tributacao_compra = 'T' and tf.icms_compra = 2.58 and tf.reducao_compra = 0 then 20\n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 0 and tf.reducao_compra = 0 then 7\n" +
+                        "     when tf.tributacao_compra = 'N' and tf.icms_compra = 0 and tf.reducao_compra = 0 then  17\n" +
+                        "     when tf.tributacao_compra = 'T' and tf.icms_compra = 2.58 and tf.reducao_compra = 0 then 20 \n" +
+                        "     when tf.tributacao_compra = 'O' and tf.icms_compra = 2.58 and tf.reducao_compra = 0 then 8\n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 12 and tf.reducao_compra = 0 then 1\n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 12 and tf.reducao_compra = 33.33 then 21\n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 12 and tf.reducao_compra = 41.66 then 22\n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 12 and tf.reducao_compra = 61.11 then 23\n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 12 and tf.reducao_compra = 43.23 then 24\n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 4 and tf.reducao_compra = 0 then 25\n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 4 and tf.reducao_compra = 0 then 26\n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 18 and tf.reducao_compra = 43.23 then 27\n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 18 and tf.reducao_compra = 54.81 then 28\n" +
+                        "     when tf.tributacao_compra = 'R' and tf.icms_compra = 18 and tf.reducao_compra = 61.11 then 4\n" +
+                        "     when tf.tributacao_compra = 'T' and tf.icms_compra = 25 and tf.reducao_compra = 0 then 3\n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 18 and tf.reducao_compra = 85.98 then 29\n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 18 and tf.reducao_compra = 57 then 30\n" +
+                        "    else \n" +
+                        "        8\n" +
+                        "    end as icms_credito, \n" +
+                        "    tf.icms_compra, \n" +
+                        "    tf.reducao_compra,\n" +
+                        "    tf.st_compra,\n" +
+                        "    tf.pauta\n" +
+                        "FROM\n" +
+                        "    produtos a\n" +
+                        "    join empresas emp on emp.id = " + getLojaOrigem() + "\n" +
+                        "    join produtos_estado pe on a.id = pe.id and pe.estado = emp.estado \n" +
+                        "    join politicas_empresa poli on poli.empresa = emp.id\n" +
+                        "    join produtos_precos preco on a.id = preco.produto and poli.politica = preco.politica and preco.id = " + tipoVenda + "\n" +
+                        "    join produtos_loja loja on a.id = loja.id and poli.politica = loja.politica\n" +
+                        "    join estoques e on e.empresa = emp.id and e.troca != 'T'\n" +
+                        "    join produtos_estoques estoq on estoq.produto = a.id and estoq.estoque = e.id\n" +
+                        "    left join produtos_ean ean on ean.produto = a.id\n" +
+                        "    left join (select distinct id from vw_produtos_balancas order by id) bal on bal.id = a.id\n" +
+                        "    left join familias fam on a.familia = fam.id\n" +
+                        "    join tabela_fornecedor_uf tf on a.id = tf.produto and\n" +
+                        "    tf.datahora_alteracao in (select \n" +
+                        "                                max(t.datahora_alteracao) \n" +
+                        "                              from \n" +
+                        "                                tabela_fornecedor_uf t \n" +
+                        "                              where \n" +
+                        "                                t.produto = tf.produto)\n" +
+                        "order by\n" +
+                        "    tf.produto")) {
+                    while (rs.next()) {
+                        
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportId(rs.getString("produto"));
+                        imp.setIcmsAliqEntrada(rs.getDouble("icms_compra"));
+                        imp.setIcmsCstEntrada(rs.getInt("st_compra"));
+                        imp.setIcmsReducaoEntrada(rs.getDouble("reducao_compra"));
+                        //imp.setIcmsCreditoId(rs.getString("icms_credito"));
+                        ProgressBar.setStatus("Convertendo ICMS Fornecedor em IMP....");
+                        cont++;
+                        
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -571,7 +682,7 @@ public class AriusDAO extends InterfaceDAO {
                         + "    c.datahora_cadastro datacadastro,\n"
                         + "    c.descritivo razao,\n"
                         + "    c.fantasia,\n"
-                        + "    case c.situacao when 0 then 1 else 0 end bloqueado,\n"
+                        + "    c.situacao as bloqueado,\n"
                         + "    c.endereco,\n"
                         + "    c.numero,\n"
                         + "    c.complemento,\n"
@@ -606,7 +717,8 @@ public class AriusDAO extends InterfaceDAO {
                         + "    c.cidade_c,\n"
                         + "    c.estado_c,\n"
                         + "    c.cep_c,\n"
-                        + "    c.inscricao_municipal\n"
+                        + "    c.inscricao_municipal,\n"
+                        + "    decode(c.empresa_convenio, '', 3, c.empresa_convenio) as empresa_convenio\n"
                         + "from\n"
                         + "    clientes c\n"
                         + "where\n"
@@ -618,7 +730,7 @@ public class AriusDAO extends InterfaceDAO {
 
                         ClienteIMP imp = new ClienteIMP();
 
-                        imp.setId("0-" + rst.getString("id"));
+                        imp.setId(rst.getString("id"));
                         imp.setCnpj(rst.getString("cnpj_cpf"));
                         imp.setInscricaoestadual(rst.getString("inscricao_rg"));
                         imp.setDataCadastro(rst.getTimestamp("datacadastro"));
@@ -660,6 +772,7 @@ public class AriusDAO extends InterfaceDAO {
                         imp.setCobrancaUf(rst.getString("estado_c"));
                         imp.setCobrancaCep(rst.getString("cep_c"));
                         imp.setInscricaoMunicipal(rst.getString("inscricao_municipal"));
+                        imp.setGrupo(rst.getInt("empresa_convenio"));
 
                         result.add(imp);
 
@@ -1110,7 +1223,7 @@ public class AriusDAO extends InterfaceDAO {
                     if (rst.getString("observacao") != null && !"".equals(rst.getString("observacao").trim())) {
                         obs.append("observacao: ").append(rst.getString("observacao")).append(" ");
                     }
-                    imp.setIdCliente(rst.getString("tipo_cadastro") + "-" + rst.getString("id_cadastro"));
+                    imp.setIdCliente(rst.getString("id_cadastro"));
                     imp.setDataVencimento(formater.parse(rst.getString("vencimento")));
                     imp.setParcela(rst.getInt("parcela"));
                     imp.setJuros(rst.getDouble("juros"));
@@ -1131,49 +1244,49 @@ public class AriusDAO extends InterfaceDAO {
         List<ChequeIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoOracle.createStatement()) {
-            String sql = "select  \n" +
-                        "        c.id,  \n" +
-                        "        c.id_cadastro,  \n" +
-                        "        c.descritivo,  \n" +
-                        "        trunc(c.emissao) emissao,  \n" +
-                        "        c.nf,  \n" +
-                        "        c.pdv,  \n" +
-                        "        c.valor,  \n" +
-                        "        c.desconto,  \n" +
-                        "        c.liquido,  \n" +
-                        "        c.descritivo, \n" +
-                        "        c.id_cadastro, \n" +
-                        "        trim(translate(c.observacao, '->', ' ')) observacao,\n" +
-                        "        c.desc_plano_conta,  \n" +
-                        "        c.desc_forma_pagto,  \n" +
-                        "        c.tipo_cadastro,  \n" +
-                        "        c.id_cadastro,  \n" +
-                        "        to_char(c.vencimento,'dd/MM/yyyy') vencimento,  \n" +
-                        "        c.parcela,  \n" +
-                        "        c.juros,  \n" +
-                        "        c.cpf_cnpj, \n" +
-                        "        c.cheque, \n" +
-                        "        c.banco_cheque, \n" +
-                        "        c.agencia,  \n" +
-                        "        c.conta, \n" +
-                        "        cl.inscricao_rg, \n" +
-                        "        cl.telefone1 \n" +
-                        "        from  \n" +
-                        "        vw_contas c \n" +
-                        "        join clientes cl on (c.id_cadastro = cl.id) \n" +
-                        "        and empresa = 1 \n" +
-                        "        and parcela <> 0  \n" +
-                        "        and tipo_conta = " + getLojaOrigem() + "\n" +
-                        "        and pagamento is null  \n" +
-                        "        and not tipo_cadastro is null  \n" +
-                        "        and plano_conta in (" + getPlanosContaStr() + ") \n" +
-                        "        order by emissao desc";
-            
+            String sql = "select  \n"
+                    + "        c.id,  \n"
+                    + "        c.id_cadastro,  \n"
+                    + "        c.descritivo,  \n"
+                    + "        trunc(c.emissao) emissao,  \n"
+                    + "        c.nf,  \n"
+                    + "        c.pdv,  \n"
+                    + "        c.valor,  \n"
+                    + "        c.desconto,  \n"
+                    + "        c.liquido,  \n"
+                    + "        c.descritivo, \n"
+                    + "        c.id_cadastro, \n"
+                    + "        trim(translate(c.observacao, '->', ' ')) observacao,\n"
+                    + "        c.desc_plano_conta,  \n"
+                    + "        c.desc_forma_pagto,  \n"
+                    + "        c.tipo_cadastro,  \n"
+                    + "        c.id_cadastro,  \n"
+                    + "        to_char(c.vencimento, 'yyyy-MM-dd') vencimento,  \n"
+                    + "        c.parcela,  \n"
+                    + "        c.juros,  \n"
+                    + "        c.cpf_cnpj, \n"
+                    + "        c.cheque, \n"
+                    + "        c.banco_cheque, \n"
+                    + "        c.agencia,  \n"
+                    + "        c.conta, \n"
+                    + "        cl.inscricao_rg, \n"
+                    + "        cl.telefone1 \n"
+                    + "        from  \n"
+                    + "        vw_contas c \n"
+                    + "        join clientes cl on (c.id_cadastro = cl.id) \n"
+                    + "        and empresa = 1 \n"
+                    + "        and parcela <> 0  \n"
+                    + "        and tipo_conta = " + getLojaOrigem() + "\n"
+                    + "        and pagamento is null  \n"
+                    + "        and not tipo_cadastro is null  \n"
+                    + "        and plano_conta in (" + getPlanosContaStr() + ") \n"
+                    + "        order by emissao desc";
+
             LOG.fine("SQL a ser executado:\n" + sql);
-            
+
             try (ResultSet rst = stm.executeQuery(sql)) {
                 SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy");
-                
+
                 while (rst.next()) {
 
                     ChequeIMP imp = new ChequeIMP();
@@ -1205,9 +1318,9 @@ public class AriusDAO extends InterfaceDAO {
                     imp.setNome(rst.getString("descritivo"));
                     imp.setCpf(rst.getString("cpf_cnpj"));
                     imp.setValorJuros(rst.getFloat("juros"));
+                    imp.setDataDeposito(rst.getDate("vencimento"));
 
                     result.add(imp);
-
                 }
             }
         }

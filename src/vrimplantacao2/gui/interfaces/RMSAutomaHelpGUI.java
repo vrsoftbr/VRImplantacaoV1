@@ -101,11 +101,7 @@ public class RMSAutomaHelpGUI extends VRInternalFrame {
         });
         
         centralizarForm();
-        this.setMaximum(false);
-    
-        
-        centralizarForm();
-        this.setMaximum(false);   
+        this.setMaximum(false);  
     }
 
     public void validarDadosAcessoPostgres() throws Exception {
@@ -946,15 +942,15 @@ public class RMSAutomaHelpGUI extends VRInternalFrame {
     }//GEN-LAST:event_btnMigrarActionPerformed
 
     private void txtUsuarioPostgresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsuarioPostgresActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_txtUsuarioPostgresActionPerformed
 
     private void txtSenhaPostgresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSenhaPostgresActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_txtSenhaPostgresActionPerformed
 
     private void txtPortaPostgresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPortaPostgresActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_txtPortaPostgresActionPerformed
 
     private void btnConectarPostgresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectarPostgresActionPerformed
@@ -981,11 +977,11 @@ public class RMSAutomaHelpGUI extends VRInternalFrame {
     }//GEN-LAST:event_onClose
 
     private void chkClienteEventualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkClienteEventualActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_chkClienteEventualActionPerformed
 
     private void chkClientePreferencialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkClientePreferencialActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_chkClientePreferencialActionPerformed
 
     private void chkProdutoFornecedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkProdutoFornecedorActionPerformed
