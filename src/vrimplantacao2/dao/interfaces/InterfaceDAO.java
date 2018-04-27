@@ -393,5 +393,5 @@ public abstract class InterfaceDAO {
      */    
     public List<OperadorIMP> getOperadores() throws Exception {
         return new ArrayList<>();
-    }   
+    }
 }

@@ -169,6 +169,11 @@ public enum OpcaoProduto {
         public String toString() {
             return "Comprador";
         }
+    }, ICMS_FORNECEDOR {
+        @Override
+        public String toString() {
+            return "Icms Entrada Fornecedor";
+        }
     },
     IMPORTAR_RESETAR_BALANCA, IMPORTAR_GERAR_SUBNIVEL_MERC, IMPORTAR_MANTER_BALANCA, ;
     
@@ -187,7 +192,4 @@ public enum OpcaoProduto {
     public void setListaEspecial(List<ProdutoIMP> listaEspecial) {
         this.listaEspecial = listaEspecial;
     }
-    
-    
-    
 }

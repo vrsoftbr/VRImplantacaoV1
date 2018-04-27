@@ -205,6 +205,7 @@ public class CreditoRotativoRepository {
 
     public CreditoRotativoVO converterRotativo(CreditoRotativoIMP imp) {
         CreditoRotativoVO vo = new CreditoRotativoVO();
+        vo.setId_clientePreferencial(Integer.parseInt(imp.getIdCliente()));
         vo.setDataEmissao(imp.getDataEmissao());
         vo.setDataVencimento(imp.getDataVencimento());
         vo.setEcf(Utils.stringToInt(imp.getEcf()));

@@ -57,6 +57,7 @@ public class ClientePreferencialVO {
     private String complemento;// character varying(30) NOT NULL DEFAULT ''::character varying,
     private String complementoEmpresa;// character varying(30) NOT NULL DEFAULT ''::character varying,
     private int senha;// integer NOT NULL DEFAULT 0,
+    private int grupo;// integer
 
     public int getId() {
         return id;
@@ -422,5 +423,12 @@ public class ClientePreferencialVO {
     public void setSenha(int senha) {
         this.senha = senha;
     }
-    
+
+    public int getGrupo() {
+        return grupo;
+    }
+
+    public void setGrupo(int grupo) {
+        this.grupo = grupo;
+    }
 }

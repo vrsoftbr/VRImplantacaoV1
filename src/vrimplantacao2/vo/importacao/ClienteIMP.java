@@ -86,6 +86,7 @@ public class ClienteIMP {
     private double limiteCompra = 0;
     private String inscricaoMunicipal;
     private TipoIndicadorIE tipoIndicadorIe = TipoIndicadorIE.NAO_CONTRIBUINTE;
+    private int grupo;
     
     private List<ClienteContatoIMP> contatos = new ArrayList<>();
     
@@ -707,5 +708,13 @@ public class ClienteIMP {
 
     public void setObservacao2(String observacao2) {
         this.observacao2 = observacao2;
+    }
+
+    public int getGrupo() {
+        return grupo;
+    }
+
+    public void setGrupo(int grupo) {
+        this.grupo = grupo;
     }
 }

@@ -217,5 +217,4 @@ public class ChequeIMP {
     public void setIdLocalCobranca(int idLocalCobranca) {
         this.idLocalCobranca = idLocalCobranca;
     }
-    
 }

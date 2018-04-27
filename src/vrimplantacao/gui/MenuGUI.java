@@ -292,6 +292,7 @@ public final class MenuGUI extends VRMdiFrame {
 
     @Override
     public void atualizarRodape() throws Exception {
+        
         lblRazaoSocial.setText(Global.fornecedor);
         lblLoja.setText(Global.loja);
         lblData.setText(new DataProcessamentoDAO().get());
@@ -1403,6 +1404,7 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuAutoSystem1);
+
         mnuWebsaq.setText("WebSaq");
         mnuWebsaq.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
