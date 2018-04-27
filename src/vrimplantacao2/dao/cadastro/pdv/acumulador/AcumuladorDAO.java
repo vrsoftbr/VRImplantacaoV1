@@ -18,15 +18,14 @@ public class AcumuladorDAO {
 
     public void delete() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            stm.execute("delete from pdv.acumuador");
+            stm.execute("delete from pdv.acumuladorlayoutretorno");
+            stm.execute("delete from pdv.acumuladorlayout");
+            stm.execute("delete from pdv.acumulador");
         }
     }
-    
+
     public void salvar(AcumuladorVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            
-            this.delete();
-            
             SQLBuilder sql = new SQLBuilder();
             sql.setSchema("pdv");
             sql.setTableName("acumulador");

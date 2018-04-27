@@ -27,7 +27,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="vRPanel3" max="32767" attributes="0"/>
-                  <Component id="tabs" max="32767" attributes="0"/>
+                  <Component id="tabs" pref="0" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Component id="vRToolBarPadrao3" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -43,7 +43,7 @@
           <Group type="102" attributes="0">
               <Component id="vRToolBarPadrao3" min="-2" pref="23" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="vRPanel6" pref="186" max="32767" attributes="0"/>
+              <Component id="vRPanel6" pref="190" max="32767" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="tabs" min="-2" pref="263" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
@@ -319,7 +319,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkOperador" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="490" max="32767" attributes="0"/>
+                          <EmptySpace pref="478" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -336,7 +336,7 @@
               <SubComponents>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkOperador">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Operador"/>
+                    <Property name="text" type="java.lang.String" value="Operadores"/>
                   </Properties>
                 </Component>
               </SubComponents>

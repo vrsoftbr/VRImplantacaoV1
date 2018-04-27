@@ -46,6 +46,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         conexaoMySQL.carregarParametros();
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
+        chkVendaUtilizaDigito.setSelected(params.getBool(true, SISTEMA, "UTILIZA_DIGITO"));
     }
 
     private void gravarParametros() throws Exception {
@@ -61,6 +62,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
             params.put(vr.id, SISTEMA, "LOJA_VR");
             vLojaVR = vr.id;
         }
+        params.put(chkVendaUtilizaDigito.isSelected(), SISTEMA, "UTILIZA_DIGITO");
         params.salvar();
     }
 
@@ -469,6 +471,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkContasPagar = new javax.swing.JCheckBox();
         txtDtCPEntrada = new org.jdesktop.swingx.JXDatePicker();
         txtDtCPFim = new org.jdesktop.swingx.JXDatePicker();
+        chkVendaUtilizaDigito = new javax.swing.JCheckBox();
         pnlLoja = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel1 = new javax.swing.JLabel();
@@ -816,6 +819,9 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkContasPagar.setText("Contas à Pagar");
 
+        chkVendaUtilizaDigito.setText("Venda utiliza digito nos prod.");
+        chkVendaUtilizaDigito.setToolTipText("<html>\nExiste no Hipcom a opção de armazenar os produtos das vendas com digíto verificador.<br>\n<b>Marque esta opção se a loja a ser importada utilizar o digíto verificador.</b>\n</html>");
+
         javax.swing.GroupLayout tabOutrasLayout = new javax.swing.GroupLayout(tabOutras);
         tabOutras.setLayout(tabOutrasLayout);
         tabOutrasLayout.setHorizontalGroup(
@@ -835,7 +841,9 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                         .addComponent(txtDtCPEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtDtCPFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(161, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkVendaUtilizaDigito)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         tabOutrasLayout.setVerticalGroup(
             tabOutrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -844,13 +852,14 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                 .addGroup(tabOutrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkVendas)
                     .addComponent(txtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkVendaUtilizaDigito))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabOutrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkContasPagar)
                     .addComponent(txtDtCPEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtDtCPFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(211, Short.MAX_VALUE))
+                .addContainerGap(215, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Outras", tabOutras);
@@ -1017,6 +1026,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
     private vrframework.bean.checkBox.VRCheckBox chkValidade;
+    private javax.swing.JCheckBox chkVendaUtilizaDigito;
     private javax.swing.JCheckBox chkVendas;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;

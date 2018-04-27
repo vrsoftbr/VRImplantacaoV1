@@ -680,7 +680,9 @@
                                   <Component id="txtDtCPFim" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace pref="161" max="32767" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="chkVendaUtilizaDigito" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -692,6 +694,7 @@
                               <Component id="chkVendas" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="txtDtVendaIni" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="txtDtVendaFim" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkVendaUtilizaDigito" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
@@ -699,7 +702,7 @@
                               <Component id="txtDtCPEntrada" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="txtDtCPFim" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="211" max="32767" attributes="0"/>
+                          <EmptySpace pref="215" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -722,6 +725,12 @@
                 <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDtCPEntrada">
                 </Component>
                 <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDtCPFim">
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkVendaUtilizaDigito">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Venda utiliza digito nos prod."/>
+                    <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;Existe no Hipcom a op&#xe7;&#xe3;o de armazenar os produtos das vendas com dig&#xed;to verificador.&lt;br&gt;&#xa;&lt;b&gt;Marque esta op&#xe7;&#xe3;o se a loja a ser importada utilizar o dig&#xed;to verificador.&lt;/b&gt;&#xa;&lt;/html&gt;"/>
+                  </Properties>
                 </Component>
               </SubComponents>
             </Container>

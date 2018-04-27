@@ -21,6 +21,8 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
+import vrimplantacao2.dao.interfaces.hipcom.HipcomVendaItemIterator;
+import vrimplantacao2.dao.interfaces.hipcom.HipcomVendaIterator;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
@@ -72,6 +74,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     
     private Date cpDataInicial;
     private Date cpDataFinal;
+    
+    private boolean vendaUtilizaDigito = false;
 
     public void setRotativoDataInicial(Date rotativoDataInicial) {
         this.rotativoDataInicial = rotativoDataInicial;
@@ -103,6 +107,10 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setCpDataFinal(Date cpDataFinal) {
         this.cpDataFinal = cpDataFinal;
+    }
+
+    public void setVendaUtilizaDigito(boolean vendaUtilizaDigito) {
+        this.vendaUtilizaDigito = vendaUtilizaDigito;
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -1062,12 +1070,13 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new VendaIterator(getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
+        //return new VendaIterator(getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
+        return new HipcomVendaIterator(getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
     }
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new VendaItemIterator(getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
+        return new HipcomVendaItemIterator(this.vendaUtilizaDigito, getLojaOrigem(), this.vendaDataInicial, this.vendaDataFinal);
     }
     
     private static class VendaIterator implements Iterator<VendaIMP> {
@@ -1075,7 +1084,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         private static final SimpleDateFormat TIMESTAMP_DATE = new SimpleDateFormat("yyyy-MM-dd");
         private static final SimpleDateFormat TIMESTAMP = new SimpleDateFormat("yyyy-MM-dd hh:mm");
 
-        private Statement stm = ConexaoMySQL.getConexao().createStatement();
+        private Statement stm = ConexaoMySQL.getConexao().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         private ResultSet rst;
         private String sql;
         private VendaIMP next;
@@ -1146,14 +1155,14 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
             
             StringBuilder str = new StringBuilder();
             
-            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_ultimos_meses"));
+            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_ultimos_meses2"));
             str.append("union\n");
             str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2017"));
+            str.append("union\n");
+            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2016"));
+            str.append("union\n");
+            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2015"));
             /*str.append("union\n");
-            str.append(getVendaSQL("2016", idLojaCliente, dataInicio, dataTermino));
-            str.append("union\n");
-            str.append(getVendaSQL("2015", idLojaCliente, dataInicio, dataTermino));
-            str.append("union\n");
             str.append(getVendaSQL("2014", idLojaCliente, dataInicio, dataTermino));
             str.append("union\n");
             str.append(getVendaSQL("2013", idLojaCliente, dataInicio, dataTermino));*/
@@ -1229,52 +1238,63 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
     
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
-        private Statement stm = ConexaoMySQL.getConexao().createStatement();
+        private Statement stm = ConexaoMySQL.getConexao().createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
         private Map<String, SmProduto> produtos;
+        private Set<String> ids = new HashSet<>();
 
         private void obterNext() {
             try {
                 if (next == null) {
                     if (rst.next()) {
-                        String ean = rst.getString("ean");
                         
-                        if (ean == null) ean = "";
+                        String vendaId = VendaIterator.makeId(rst.getString("id_loja"), rst.getDate("data"), rst.getString("ecf"), rst.getString("id_caixa"), rst.getString("numerocupom"));
+                        String idVendaItem = vendaId + "-" + rst.getString("sequencia");
                         
-                        if (ean.length() < 7 && ean.length() > 1) {
-                            String old = ean;
-                            ean = ean.substring(0, ean.length() - 1);
-                            LOG.finest("EAN de balanca anterior: " + old + " atual: " + ean);
-                        }
+                        if (!ids.contains(idVendaItem)) {
                         
-                        SmProduto prod = produtos.get(ean);
+                            ids.add(idVendaItem);
+                            
+                            String ean = rst.getString("ean");
                         
-                        next = new VendaItemIMP();
-                        String id = VendaIterator.makeId(rst.getString("id_loja"), rst.getDate("data"), rst.getString("ecf"), rst.getString("id_caixa"), rst.getString("numerocupom"));
-                        next.setId(id + "-" + rst.getString("sequencia"));
-                        next.setVenda(id);
-                        next.setSequencia(rst.getInt("sequencia"));
-                        if (prod != null) {
-                            next.setProduto(prod.id);
-                            next.setDescricaoReduzida(prod.descricao);
-                            next.setUnidadeMedida(prod.embalagem);
-                            next.setCodigoBarras(prod.ean);
-                        } else {
-                            next.setProduto("");
-                            next.setDescricaoReduzida("SEM DESCRICAO");
-                            next.setUnidadeMedida("UN");
-                            next.setCodigoBarras(ean);
-                        }
-                        next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setTotalBruto(rst.getDouble("total_bruto"));
-                        next.setValorDesconto(0);
-                        next.setValorAcrescimo(0);
-                        next.setCancelado("S".equals(rst.getString("cancelado")));
-                        next.setIcmsCst(Utils.stringToInt(rst.getString("cst")));
-                        next.setIcmsAliq(rst.getDouble("aliquota"));
+                            if (ean == null) ean = "";
 
+                            if (ean.length() < 7 && ean.length() > 1) {
+                                String old = ean;
+                                ean = ean.substring(0, ean.length() - 1);
+                                LOG.finest("EAN de balanca anterior: " + old + " atual: " + ean);
+                            }
+
+                            SmProduto prod = produtos.get(ean);
+
+                            next = new VendaItemIMP();
+
+                            next.setId(idVendaItem);                   
+                        
+                            next.setVenda(vendaId);
+                            next.setSequencia(rst.getInt("sequencia"));
+                            if (prod != null) {
+                                next.setProduto(prod.id);
+                                next.setDescricaoReduzida(prod.descricao);
+                                next.setUnidadeMedida(prod.embalagem);
+                                next.setCodigoBarras(prod.ean);
+                            } else {
+                                next.setProduto("");
+                                next.setDescricaoReduzida("SEM DESCRICAO");
+                                next.setUnidadeMedida("UN");
+                                next.setCodigoBarras(ean);
+                            }
+                            next.setQuantidade(rst.getDouble("quantidade"));
+                            next.setTotalBruto(rst.getDouble("total_bruto"));
+                            next.setValorDesconto(0);
+                            next.setValorAcrescimo(0);
+                            next.setCancelado("S".equals(rst.getString("cancelado")));
+                            next.setIcmsCst(Utils.stringToInt(rst.getString("cst")));
+                            next.setIcmsAliq(rst.getDouble("aliquota"));
+
+                        }
                     }
                 }
             } catch (Exception ex) {
@@ -1324,25 +1344,6 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
-            StringBuilder str = new StringBuilder();
-            
-            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_ultimos_meses"));
-            str.append("union\n");
-            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2017"));
-            /*str.append("union\n");
-            str.append(getVendaSQL("2016", idLojaCliente, dataInicio, dataTermino));
-            str.append("union\n");
-            str.append(getVendaSQL("2015", idLojaCliente, dataInicio, dataTermino));
-            str.append("union\n");
-            str.append(getVendaSQL("2014", idLojaCliente, dataInicio, dataTermino));
-            str.append("union\n");
-            str.append(getVendaSQL("2013", idLojaCliente, dataInicio, dataTermino));*/
-            str.append("order by id_loja, data, ecf, numerocupom");
-            
-            this.sql = str.toString();
-                    
-            LOG.log(Level.FINE, "SQL da venda item: " + sql);
-            rst = stm.executeQuery(sql);
             
             this.produtos = new HashMap<>();
             
@@ -1371,6 +1372,22 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                 }
             }
+            
+            StringBuilder str = new StringBuilder();
+            
+            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_ultimos_meses2"));
+            str.append("union\n");
+            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2017"));
+            str.append("union\n");
+            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2016"));
+            str.append("union\n");
+            str.append(getVendaSQL(idLojaCliente, dataInicio, dataTermino, "hip_cupom_item_semcript_2015"));
+            str.append("order by id_loja, data, ecf, numerocupom");
+            
+            this.sql = str.toString();
+                    
+            LOG.log(Level.FINE, "SQL da venda item: " + sql);
+            rst = stm.executeQuery(sql);
             
             LOG.fine("Quantidade de produtos SM: " + produtos.size());
             
