@@ -10,13 +10,18 @@ import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ChequeIMP;
@@ -26,6 +31,7 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -47,14 +53,22 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
         WorkbookSettings settings = new WorkbookSettings();
         Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls + "//aliquota.xls"), settings);
         Sheet[] sheets = arquivo.getSheets();
+        int linha;
 
         for (int sh = 0; sh < sheets.length; sh++) {
             Sheet sheet = arquivo.getSheet(sh);
+            linha = 0;
 
             for (int i = 0; i < sheet.getRows(); i++) {
+                linha++;
+                if (linha == 1) {
+                    continue;
+                }
 
-                Cell cellIcms = sheet.getCell(0, i);
-                result.add(new MapaTributoIMP(cellIcms.getContents(), cellIcms.getContents()));
+                Cell cellId = sheet.getCell(0, i);
+                Cell cellDescricao = sheet.getCell(1, i);
+                Cell cellCst = sheet.getCell(4, i);
+                result.add(new MapaTributoIMP(cellId.getContents(), cellCst.getContents() + " - " + cellDescricao.getContents()));
             }
         }
         return result;
@@ -96,7 +110,7 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
         WorkbookSettings settings = new WorkbookSettings();
-        Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls + "//grupo"), settings);
+        Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls + "//grupo.xls"), settings);
         Sheet[] sheets = arquivo.getSheets();
         int linha;
 
@@ -140,11 +154,13 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
         Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls + "//produto.xls"), settings);
         Sheet[] sheets = arquivo.getSheets();
         int linha;
+        String strPreco, strCusto;
         java.sql.Date dataCadastro;
         DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
 
         try {
 
+            //Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
             for (int sh = 0; sh < sheets.length; sh++) {
                 Sheet sheet = arquivo.getSheet(sh);
                 linha = 0;
@@ -179,6 +195,65 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
 
                     dataCadastro = new java.sql.Date(fmt.parse(cellData.getContents()).getTime());
 
+                    strPreco = "";
+                    strCusto = "";
+
+                    if (cellPreco.getContents().length() == 9) {
+                        for (int j = 0; j < cellPreco.getContents().length(); j++) {
+                            if (j == 1) {
+                                strPreco = strPreco + "";
+                            } else {
+                                strPreco = strPreco + cellPreco.getContents().charAt(j);
+                            }
+                        }
+                    } else if (cellPreco.getContents().length() == 10) {
+                        for (int j = 0; j < cellPreco.getContents().length(); j++) {
+                            if (j == 2) {
+                                strPreco = strPreco + "";
+                            } else {
+                                strPreco = strPreco + cellPreco.getContents().charAt(j);
+                            }
+                        }
+                    } else if (cellPreco.getContents().length() == 11) {
+                        for (int j = 0; j < cellPreco.getContents().length(); j++) {
+                            if (j == 3) {
+                                strPreco = strPreco + "";
+                            } else {
+                                strPreco = strPreco + cellPreco.getContents().charAt(j);
+                            }
+                        }
+                    } else {
+                        strPreco = cellPreco.getContents();
+                    }
+
+                    if (cellCusto.getContents().length() == 9) {
+                        for (int j = 0; j < cellCusto.getContents().length(); j++) {
+                            if (j == 1) {
+                                strCusto = strCusto + "";
+                            } else {
+                                strCusto = strCusto + cellCusto.getContents().charAt(j);
+                            }
+                        }
+                    } else if (cellCusto.getContents().length() == 10) {
+                        for (int j = 0; j < cellCusto.getContents().length(); j++) {
+                            if (j == 2) {
+                                strCusto = strCusto + "";
+                            } else {
+                                strCusto = strCusto + cellCusto.getContents().charAt(j);
+                            }
+                        }
+                    } else if (cellCusto.getContents().length() == 11) {
+                        for (int j = 0; j < cellCusto.getContents().length(); j++) {
+                            if (j == 3) {
+                                strCusto = strCusto + "";
+                            } else {
+                                strCusto = strCusto + cellCusto.getContents().charAt(j);
+                            }
+                        }
+                    } else {
+                        strCusto = cellCusto.getContents();
+                    }
+
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
@@ -196,8 +271,8 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                     imp.setCodMercadologico1(cellIdGrupo.getContents());
                     imp.setCodMercadologico2("1");
                     imp.setCodMercadologico3("1");
-                    imp.setPrecovenda(Double.parseDouble(cellPreco.getContents()));
-                    imp.setCustoComImposto(Double.parseDouble(cellCusto.getContents()));
+                    imp.setPrecovenda(Double.parseDouble(strPreco));
+                    imp.setCustoComImposto(Double.parseDouble(strCusto));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setMargem(Double.parseDouble(cellMargem.getContents()));
                     imp.setPesoBruto(Double.parseDouble(cellPesoBruto.getContents()));
@@ -208,6 +283,27 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                     imp.setPiscofinsCstCredito(cellCstPisCredito.getContents());
                     imp.setIcmsDebitoId(cellIcms.getContents());
                     imp.setIcmsCreditoId(cellIcms.getContents());
+
+                    /*if (imp.getEan().trim().length() < 7) {
+                     ProdutoBalancaVO produtoBalanca;
+                     long codigoProduto;
+                     codigoProduto = Long.parseLong(imp.getEan().trim());
+                     if (codigoProduto <= Integer.MAX_VALUE) {
+                     produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                     } else {
+                     produtoBalanca = null;
+                     }
+                     if (produtoBalanca != null) {
+                     imp.seteBalanca(true);
+                     imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : Utils.stringToInt(cellValidade.getContents()));
+                     } else {
+                     imp.setValidade(0);
+                     imp.seteBalanca(false);
+                     }
+                     } else {
+                     imp.setValidade(Utils.stringToInt(cellValidade.getContents()));
+                     imp.seteBalanca(false);
+                     }*/
                     result.add(imp);
                 }
             }
@@ -682,7 +778,7 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                     if (linha == 1) {
                         continue;
                     }
-                    
+
                     Cell cellIdCheque = sheet.getCell(0, i);
                     Cell cellNCheque = sheet.getCell(1, i);
                     Cell cellBanco = sheet.getCell(4, i);
@@ -709,7 +805,7 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                     } else {
                         dataDeposito = new Date(new java.util.Date().getTime());
                     }
-                    
+
                     ChequeIMP imp = new ChequeIMP();
                     imp.setId(cellIdCheque.getContents());
                     imp.setDate(dataEmissao);
@@ -722,9 +818,68 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                     imp.setCmc7(cellCmc7.getContents());
                     imp.setAlinea("S".equals(cellDevolvido.getContents()) ? 0 : 11);
                     imp.setBanco(Utils.stringToInt(cellBanco.getContents()));
+                    result.add(imp);
                 }
             }
-            return null;
+            return result;
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+
+    public List<OfertaIMP> getOfertas() throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        java.sql.Date dataFimOferta, dataInicioOferta;
+        DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
+        WorkbookSettings settings = new WorkbookSettings();
+        Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls + "//produto.xls"), settings);
+        Sheet[] sheets = arquivo.getSheets();
+        int linha;
+        Calendar c = Calendar.getInstance();
+
+        try {
+
+            for (int sh = 0; sh < sheets.length; sh++) {
+                Sheet sheet = arquivo.getSheet(sh);
+                linha = 0;
+
+                for (int i = 0; i < sheet.getRows(); i++) {
+                    linha++;
+                    if (linha == 1) {
+                        continue;
+                    }
+
+                    Cell cellIdProduto = sheet.getCell(0, i);
+                    Cell cellPrecoOferta = sheet.getCell(13, i);
+                    Cell cellFimOferta = sheet.getCell(57, i);
+                    Cell cellInicioOferta = sheet.getCell(71, i);
+
+                    if ((cellInicioOferta.getContents() != null)
+                            && (!cellInicioOferta.getContents().trim().isEmpty())
+                            && (!"1899-12-30".equals(cellInicioOferta.getContents().trim()))) {
+
+                        if ((cellFimOferta.getContents() != null)
+                                && (!cellFimOferta.getContents().trim().isEmpty())) {
+                            dataFimOferta = new java.sql.Date(fmt.parse(cellFimOferta.getContents()).getTime());
+                        } else {
+                            dataFimOferta = new Date(new java.util.Date().getTime());
+                        }
+
+                        dataInicioOferta = new Date(new java.util.Date().getTime());
+
+                        if (dataFimOferta.after(dataInicioOferta)) {
+                            OfertaIMP imp = new OfertaIMP();
+                            imp.setTipoOferta(TipoOfertaVO.CAPA);
+                            imp.setIdProduto(cellIdProduto.getContents());
+                            imp.setPrecoOferta(Double.parseDouble(cellPrecoOferta.getContents()));
+                            imp.setDataInicio(dataInicioOferta);
+                            imp.setDataFim(dataFimOferta);
+                            result.add(imp);
+                        }
+                    }
+                }
+            }
+            return result;
         } catch (Exception ex) {
             throw ex;
         }
