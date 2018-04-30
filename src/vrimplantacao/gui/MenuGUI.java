@@ -158,6 +158,7 @@ import vrimplantacao2.gui.interfaces.Wm_byFileGUI;
 import vrimplantacao2.gui.interfaces.WmsiGUI;
 import vrimplantacao2.gui.interfaces.PdvVrGUI;
 import vrimplantacao2.gui.interfaces.InfoMacGUI;
+import vrimplantacao2.gui.interfaces.PwsGUI;
 import vrimplantacao2.gui.interfaces.SiacGUI;
 import vrimplantacao2.gui.interfaces.RMSAutomaHelpGUI;
 import vrimplantacao2.gui.interfaces.SiaCriareByFileGUI;
@@ -520,6 +521,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSolidus = new javax.swing.JMenuItem();
         mnuSuper = new javax.swing.JMenuItem();
         mnuScef = new javax.swing.JMenuItem();
+        mnuPws = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1034,6 +1036,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu5.add(mnuScef);
+
+        mnuPws.setText("PWS");
+        mnuPws.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuPwsActionPerformed(evt);
+            }
+        });
+        jMenu5.add(mnuPws);
 
         jMenu2.add(jMenu5);
 
@@ -3663,14 +3673,16 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuAutoSystem1ActionPerformed
 	
     private void mnuWebsaqActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuWebsaqActionPerformed
-        // TODO add your handling code here:
         WebSaqGUI.exibir(this);
     }//GEN-LAST:event_mnuWebsaqActionPerformed
 
     private void mnuSiaCriareByFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSiaCriareByFileActionPerformed
-        // TODO add your handling code here:
         SiaCriareByFileGUI.exibir(this);
     }//GEN-LAST:event_mnuSiaCriareByFileActionPerformed
+
+    private void mnuPwsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPwsActionPerformed
+        PwsGUI.exibir(this);
+    }//GEN-LAST:event_mnuPwsActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -3825,6 +3837,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuPlanilhaForn;
     private javax.swing.JMenuItem mnuPlanilhaPadrao;
     private javax.swing.JMenuItem mnuPlanilhaV2;
+    private javax.swing.JMenuItem mnuPws;
     private javax.swing.JMenuItem mnuRCNet;
     private javax.swing.JMenuItem mnuRMS_2;
     private javax.swing.JMenuItem mnuRMS_3;
