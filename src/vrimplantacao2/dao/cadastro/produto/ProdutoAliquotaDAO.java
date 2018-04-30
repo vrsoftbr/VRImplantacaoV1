@@ -89,7 +89,9 @@ public class ProdutoAliquotaDAO {
                         "id_produto = " + vo.getProduto().getId() + " and "
                         + "id_estado = " + vo.getEstado().getId()
                 );
-                stm.execute(sql.getUpdate());
+                if (!sql.isEmpty()) {
+                    stm.execute(sql.getUpdate());
+                }
             }
         }
     }
@@ -112,7 +114,9 @@ public class ProdutoAliquotaDAO {
             sql.setWhere(
                     "id_produto = " + vo.getProduto().getId() + " and "
                     + "id_estado = " + vo.getEstado().getId());
-            stm.execute(sql.getUpdate());
+            if (!sql.isEmpty()) {
+                stm.execute(sql.getUpdate());
+            }
         }
     }
 
