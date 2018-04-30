@@ -339,6 +339,8 @@ public class ProdutoRepository {
             System.gc();
 
             ProdutoIDStack idStack = provider.getIDStack();
+            
+            boolean unificarProdutoBalanca = provider.getOpcoes().contains(OpcaoProduto.UNIFICAR_PRODUTO_BALANCA);
 
             setNotify("Gravando os produtos...", organizados.size());
             for (KeyList<String> keys: organizados.keySet()) {
@@ -362,7 +364,7 @@ public class ProdutoRepository {
                 /**
                  * Variaveis foram criadas para facilitar a leitura do código.
                  */
-                boolean eanValido = ean > 999999;
+                boolean eanValido = unificarProdutoBalanca || (ean > 999999);
                 int idProdutoExistente = provider.automacao().getIdProdutoPorEAN(ean);
                 boolean eanExistente = idProdutoExistente > 0;
                 ProdutoVO codigoAtual = null;

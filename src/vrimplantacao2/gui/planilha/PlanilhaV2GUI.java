@@ -68,34 +68,14 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        checksProdutoPanelGUI1 = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabModel = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabProdutos = new vrframework.bean.panel.VRPanel();
         txtDelimitadorProd = new javax.swing.JTextField();
         txtProdutoFile = new vrframework.bean.fileChooser.VRFileChooser();
         vRLabel1 = new vrframework.bean.label.VRLabel();
         tabsProduto = new vrframework.bean.tabbedPane.VRTabbedPane();
-        tabProdImportacao = new vrframework.bean.panel.VRPanel();
-        chkMercadologico = new vrframework.bean.checkBox.VRCheckBox();
-        chkFamiliaProduto = new vrframework.bean.checkBox.VRCheckBox();
-        chkDadosProduto = new vrframework.bean.checkBox.VRCheckBox();
-        chkPreco = new vrframework.bean.checkBox.VRCheckBox();
-        chkCusto = new vrframework.bean.checkBox.VRCheckBox();
-        chkEstoque = new vrframework.bean.checkBox.VRCheckBox();
-        chkEAN = new vrframework.bean.checkBox.VRCheckBox();
-        chkEANemBranco = new vrframework.bean.checkBox.VRCheckBox();
-        chkPisCofins = new vrframework.bean.checkBox.VRCheckBox();
-        chkNatReceita = new vrframework.bean.checkBox.VRCheckBox();
-        chkICMS = new vrframework.bean.checkBox.VRCheckBox();
-        chkAtivoInativo = new vrframework.bean.checkBox.VRCheckBox();
-        chkProdutoMercadologico = new vrframework.bean.checkBox.VRCheckBox();
-        chkDescCompleta = new vrframework.bean.checkBox.VRCheckBox();
-        chkDescReduzida = new vrframework.bean.checkBox.VRCheckBox();
-        chkDescGondola = new vrframework.bean.checkBox.VRCheckBox();
-        chkNCM = new vrframework.bean.checkBox.VRCheckBox();
-        chkMargem = new vrframework.bean.checkBox.VRCheckBox();
-        chkCest = new vrframework.bean.checkBox.VRCheckBox();
-        chkEmbalagemProd = new vrframework.bean.checkBox.VRCheckBox();
-        chkEmbalagemEan = new vrframework.bean.checkBox.VRCheckBox();
+        tabProdImportacao = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabProdEspeciais = new vrframework.bean.panel.VRPanel();
         btnDelMercadologico = new vrframework.bean.button.VRButton();
         btnDelFamiliaProduto = new vrframework.bean.button.VRButton();
@@ -172,8 +152,12 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         txtSistema = new javax.swing.JTextField();
         txtCodLojaOrigem = new javax.swing.JTextField();
 
+        checksProdutoPanelGUI1.setMaximumSize(new java.awt.Dimension(3728, 38));
+        checksProdutoPanelGUI1.setPreferredSize(new java.awt.Dimension(900, 38));
+
         setResizable(true);
         setTitle("Importação de Planilha");
+        setMaximumSize(new java.awt.Dimension(700, 1024));
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
@@ -198,151 +182,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel1, "Informe o arquivo dos produtos");
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkMercadologico, "Mercadológico");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkFamiliaProduto, "Família de produtos");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkDadosProduto, "Dados do produto");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkPreco, "Preço");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkCusto, "Custo");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkEstoque, "Estoque");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkEAN, "EAN");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkEANemBranco, "EAN em branco");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkPisCofins, "PIS/COFINS");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkNatReceita, "Nat. Receita");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkICMS, "ICMS");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkAtivoInativo, "Ativo/Inativo");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkProdutoMercadologico, "Prod. Mercadológico");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkDescCompleta, "Descrição Completa");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkDescReduzida, "Descrição Reduzida");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkDescGondola, "Descrição Gondola");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkNCM, "NCM");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkMargem, "Margem");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkCest, "CEST");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkEmbalagemProd, "Embalagem (Prod)");
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkEmbalagemEan, "Embalagem (EAN)");
-
-        javax.swing.GroupLayout tabProdImportacaoLayout = new javax.swing.GroupLayout(tabProdImportacao);
-        tabProdImportacao.setLayout(tabProdImportacaoLayout);
-        tabProdImportacaoLayout.setHorizontalGroup(
-            tabProdImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabProdImportacaoLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(tabProdImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(tabProdImportacaoLayout.createSequentialGroup()
-                        .addGroup(tabProdImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkFamiliaProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkDadosProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(tabProdImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkPreco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkCusto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(tabProdImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkEANemBranco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkPisCofins, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(tabProdImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(tabProdImportacaoLayout.createSequentialGroup()
-                                .addComponent(chkAtivoInativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(tabProdImportacaoLayout.createSequentialGroup()
-                                .addGroup(tabProdImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(chkNatReceita, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkICMS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18)
-                                .addGroup(tabProdImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(chkMargem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkProdutoMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(0, 45, Short.MAX_VALUE))))
-                    .addGroup(tabProdImportacaoLayout.createSequentialGroup()
-                        .addComponent(chkDescCompleta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(chkDescReduzida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkDescGondola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkNCM, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkCest, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkEmbalagemProd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(tabProdImportacaoLayout.createSequentialGroup()
-                        .addComponent(chkEmbalagemEan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))))
-        );
-        tabProdImportacaoLayout.setVerticalGroup(
-            tabProdImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabProdImportacaoLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(tabProdImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, tabProdImportacaoLayout.createSequentialGroup()
-                        .addGroup(tabProdImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(chkMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkPreco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(tabProdImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(tabProdImportacaoLayout.createSequentialGroup()
-                                .addComponent(chkFamiliaProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(chkDadosProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(tabProdImportacaoLayout.createSequentialGroup()
-                                .addComponent(chkCusto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(tabProdImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(chkEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkPisCofins, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, tabProdImportacaoLayout.createSequentialGroup()
-                        .addGroup(tabProdImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(tabProdImportacaoLayout.createSequentialGroup()
-                                .addGroup(tabProdImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(chkNatReceita, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkProdutoMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(tabProdImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(chkICMS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkMargem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(tabProdImportacaoLayout.createSequentialGroup()
-                                .addComponent(chkEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(chkEANemBranco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkAtivoInativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
-                .addGroup(tabProdImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkDescCompleta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkDescReduzida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkDescGondola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkNCM, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCest, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkEmbalagemProd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkEmbalagemEan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(29, Short.MAX_VALUE))
-        );
-
+        tabsProduto.setPreferredSize(new java.awt.Dimension(900, 202));
         tabsProduto.addTab("Importação", tabProdImportacao);
 
         org.openide.awt.Mnemonics.setLocalizedText(btnDelMercadologico, "Eliminar mercadológico");
@@ -465,7 +305,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                         .addComponent(txtDelimitadorTribut, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMapaTribut, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(55, Short.MAX_VALUE))
+                .addContainerGap(133, Short.MAX_VALUE))
         );
 
         tabsProduto.addTab("Mapa de tributações", tabMapaTributacao);
@@ -509,12 +349,12 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                 .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(tabProdutosLayout.createSequentialGroup()
-                                .addComponent(txtProdutoFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(txtProdutoFile, javax.swing.GroupLayout.DEFAULT_SIZE, 604, Short.MAX_VALUE)
                                 .addContainerGap())))
                     .addGroup(tabProdutosLayout.createSequentialGroup()
                         .addGroup(tabProdutosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(vRPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(tabsProduto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(vRPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(tabsProduto, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                         .addContainerGap())))
         );
         tabProdutosLayout.setVerticalGroup(
@@ -558,7 +398,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                     .addComponent(chkFornDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFornContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFornProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(471, Short.MAX_VALUE))
+                .addContainerGap(473, Short.MAX_VALUE))
         );
         tabFornImportacaoLayout.setVerticalGroup(
             tabFornImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -587,7 +427,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 .addGroup(tabFornUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkFornUnificar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFornUnificarProd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(293, Short.MAX_VALUE))
+                .addContainerGap(295, Short.MAX_VALUE))
         );
         tabFornUnificacaoLayout.setVerticalGroup(
             tabFornUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -624,7 +464,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 .addGroup(tabFornEspecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnFornContatos, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnFornDados, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(483, Short.MAX_VALUE))
+                .addContainerGap(485, Short.MAX_VALUE))
         );
         tabFornEspecialLayout.setVerticalGroup(
             tabFornEspecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -706,7 +546,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                             .addComponent(vRLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(vRLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(txtVendaItemFile, javax.swing.GroupLayout.DEFAULT_SIZE, 623, Short.MAX_VALUE)
+                    .addComponent(txtVendaItemFile, javax.swing.GroupLayout.DEFAULT_SIZE, 625, Short.MAX_VALUE)
                     .addComponent(txtVendaHistFile, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -731,7 +571,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 .addComponent(chkHistVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(138, Short.MAX_VALUE))
+                .addContainerGap(196, Short.MAX_VALUE))
         );
 
         tabModel.addTab("Vendas", tabVenda);
@@ -769,7 +609,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 .addComponent(chkCliPrefRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCliPrefRotativoBaixas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(200, Short.MAX_VALUE))
+                .addContainerGap(202, Short.MAX_VALUE))
         );
         vRPanel2Layout.setVerticalGroup(
             vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -850,7 +690,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 .addComponent(btnDelPrefContatos, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnDelPrefDados, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(316, Short.MAX_VALUE))
+                .addContainerGap(318, Short.MAX_VALUE))
         );
         vRPanel4Layout.setVerticalGroup(
             vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -886,7 +726,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 .addComponent(btnDelEvtContatos, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnDelEvtDados, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(316, Short.MAX_VALUE))
+                .addContainerGap(318, Short.MAX_VALUE))
         );
         vRPanel5Layout.setVerticalGroup(
             vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -933,7 +773,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 .addGroup(pnlUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkClientePrefUnificar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkClienteEvtUnificar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(285, Short.MAX_VALUE))
+                .addContainerGap(287, Short.MAX_VALUE))
         );
         pnlUnificacaoLayout.setVerticalGroup(
             pnlUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1209,8 +1049,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.button.VRButton btnFornDados;
     private vrframework.bean.button.VRButton btnMapaTribut;
     private vrframework.bean.button.VRButton btnMigrar;
-    private vrframework.bean.checkBox.VRCheckBox chkAtivoInativo;
-    private vrframework.bean.checkBox.VRCheckBox chkCest;
+    private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI checksProdutoPanelGUI1;
     private vrframework.bean.checkBox.VRCheckBox chkCliEvenContatos;
     private vrframework.bean.checkBox.VRCheckBox chkCliEvenDados;
     private vrframework.bean.checkBox.VRCheckBox chkCliPrefContatos;
@@ -1219,34 +1058,15 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCliPrefRotativoBaixas;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEvtUnificar;
     private vrframework.bean.checkBox.VRCheckBox chkClientePrefUnificar;
-    private vrframework.bean.checkBox.VRCheckBox chkCusto;
-    private vrframework.bean.checkBox.VRCheckBox chkDadosProduto;
-    private vrframework.bean.checkBox.VRCheckBox chkDescCompleta;
-    private vrframework.bean.checkBox.VRCheckBox chkDescGondola;
-    private vrframework.bean.checkBox.VRCheckBox chkDescReduzida;
-    private vrframework.bean.checkBox.VRCheckBox chkEAN;
-    private vrframework.bean.checkBox.VRCheckBox chkEANemBranco;
-    private vrframework.bean.checkBox.VRCheckBox chkEmbalagemEan;
-    private vrframework.bean.checkBox.VRCheckBox chkEmbalagemProd;
-    private vrframework.bean.checkBox.VRCheckBox chkEstoque;
-    private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkFornContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFornDados;
     private vrframework.bean.checkBox.VRCheckBox chkFornProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkFornUnificar;
     private vrframework.bean.checkBox.VRCheckBox chkFornUnificarProd;
     private vrframework.bean.checkBox.VRCheckBox chkHistVenda;
-    private vrframework.bean.checkBox.VRCheckBox chkICMS;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
-    private vrframework.bean.checkBox.VRCheckBox chkMargem;
-    private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
-    private vrframework.bean.checkBox.VRCheckBox chkNCM;
-    private vrframework.bean.checkBox.VRCheckBox chkNatReceita;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
-    private vrframework.bean.checkBox.VRCheckBox chkPisCofins;
-    private vrframework.bean.checkBox.VRCheckBox chkPreco;
     private vrframework.bean.checkBox.VRCheckBox chkProdUnifProdutos;
-    private vrframework.bean.checkBox.VRCheckBox chkProdutoMercadologico;
     private javax.swing.JComboBox cmbLojaDestino;
     private javax.swing.JLabel jLabel2;
     private vrframework.bean.panel.VRPanel pnlClienteEspeciais;
@@ -1261,7 +1081,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel tabMapaTributacao;
     private vrframework.bean.tabbedPane.VRTabbedPane tabModel;
     private vrframework.bean.panel.VRPanel tabProdEspeciais;
-    private vrframework.bean.panel.VRPanel tabProdImportacao;
+    private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdImportacao;
     private vrframework.bean.panel.VRPanel tabProdUnifacao;
     private vrframework.bean.panel.VRPanel tabProdutos;
     private vrframework.bean.panel.VRPanel tabVenda;
@@ -1322,78 +1142,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                 dao.getOpcoes().put("delimiter", txtDelimitadorProd.getText());                                
                                 dao.setArquivo(txtProdutoFile.getArquivo());
                                 if (tabsProduto.getSelectedIndex() == 0) {
-                                    if (chkMercadologico.isSelected()) {
-                                        importador.importarMercadologico();
-                                    }
-
-                                    if (chkFamiliaProduto.isSelected()) {
-                                        importador.importarFamiliaProduto();
-                                    }
-
-                                    if (chkDadosProduto.isSelected()) {
-                                        importador.importarProduto(chkManterBalanca.isSelected());
-                                    }
-
-                                    List<OpcaoProduto> opcoes = new ArrayList<>();
-                                    if (chkPreco.isSelected()) {
-                                        opcoes.add(OpcaoProduto.PRECO);
-                                    }
-                                    if (chkCusto.isSelected()) {
-                                        opcoes.add(OpcaoProduto.CUSTO);
-                                    }
-                                    if (chkEstoque.isSelected()) {
-                                        opcoes.add(OpcaoProduto.ESTOQUE);
-                                    }
-                                    if (chkEAN.isSelected()) {
-                                        importador.importarEAN();
-                                    }
-                                    if (chkEANemBranco.isSelected()) {
-                                        importador.importarEANemBranco();
-                                    }                                
-                                    if (chkPisCofins.isSelected()) {
-                                        opcoes.add(OpcaoProduto.PIS_COFINS);
-                                    }
-                                    if (chkNatReceita.isSelected()) {
-                                        opcoes.add(OpcaoProduto.NATUREZA_RECEITA);
-                                    }
-                                    if (chkICMS.isSelected()) {
-                                        opcoes.add(OpcaoProduto.ICMS);
-                                    }
-                                    if (chkAtivoInativo.isSelected()) {
-                                        opcoes.add(OpcaoProduto.ATIVO);
-                                    }
-                                    if (chkProdutoMercadologico.isSelected()) {
-                                        opcoes.add(OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC);
-                                        opcoes.add(OpcaoProduto.MERCADOLOGICO);
-                                    }
-                                    if (chkDescCompleta.isSelected()) {
-                                        opcoes.add(OpcaoProduto.DESC_COMPLETA);
-                                    }
-                                    if (chkDescReduzida.isSelected()) {
-                                        opcoes.add(OpcaoProduto.DESC_REDUZIDA);
-                                    }
-                                    if (chkDescGondola.isSelected()) {
-                                        opcoes.add(OpcaoProduto.DESC_GONDOLA);
-                                    }
-                                    if (chkNCM.isSelected()) {
-                                        opcoes.add(OpcaoProduto.NCM);
-                                    }
-                                    if (chkCest.isSelected()) {
-                                        opcoes.add(OpcaoProduto.CEST);
-                                    }
-                                    if (chkMargem.isSelected()) {
-                                        opcoes.add(OpcaoProduto.MARGEM);
-                                    }
-                                    if (chkEmbalagemProd.isSelected()) {
-                                        opcoes.add(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO);
-                                    }
-                                    if (chkEmbalagemEan.isSelected()) {
-                                        opcoes.add(OpcaoProduto.TIPO_EMBALAGEM_EAN);
-                                    }
-
-                                    if (!opcoes.isEmpty()) {
-                                        importador.atualizarProdutos(opcoes);
-                                    }
+                                    tabProdImportacao.executarImportacao();
                                 } else if (tabsProduto.getSelectedIndex() == 2) {
                                     if (chkProdUnifProdutos.isSelected()) {
                                         importador.unificarProdutos();

@@ -175,7 +175,7 @@ public enum OpcaoProduto {
             return "Icms Entrada Fornecedor";
         }
     },
-    IMPORTAR_RESETAR_BALANCA, IMPORTAR_GERAR_SUBNIVEL_MERC, IMPORTAR_MANTER_BALANCA, ;
+    IMPORTAR_RESETAR_BALANCA, IMPORTAR_GERAR_SUBNIVEL_MERC, IMPORTAR_MANTER_BALANCA, UNIFICAR_PRODUTO_BALANCA;
     
     private List<ProdutoIMP> listaEspecial;
     
