@@ -18,6 +18,7 @@ import jxl.Workbook;
 import jxl.WorkbookSettings;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialVO;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -30,6 +31,7 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.dao.cadastro.cliente.ClientePreferencialDAO;
 
 /**
  *
@@ -717,7 +719,6 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                     Cell cellValor = sheet.getCell(7, i);
                     Cell cellHistorico = sheet.getCell(8, i);
                     Cell cellJuros = sheet.getCell(15, i);
-                    Cell cellDesconto = sheet.getCell(16, i);
                     Cell cellCaixa = sheet.getCell(23, i);
                     Cell cellCupom = sheet.getCell(24, i);
 
@@ -757,6 +758,8 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> result = new ArrayList<>();
+        ClientePreferencialDAO cliente = new ClientePreferencialDAO();
+        List<ClientePreferencialVO> vo = new ArrayList<>();
         java.sql.Date dataEmissao, dataDeposito;
         DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
         WorkbookSettings settings = new WorkbookSettings();
@@ -778,6 +781,8 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
 
                     Cell cellIdCheque = sheet.getCell(0, i);
                     Cell cellNCheque = sheet.getCell(1, i);
+                    Cell cellCpf = sheet.getCell(2, i);
+                    Cell cellNome = sheet.getCell(3, i);
                     Cell cellBanco = sheet.getCell(4, i);
                     Cell cellValor = sheet.getCell(5, i);
                     Cell cellVencto = sheet.getCell(6, i);
@@ -785,37 +790,64 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                     Cell cellCaixa = sheet.getCell(8, i);
                     Cell cellCupom = sheet.getCell(9, i);
                     Cell cellEmissao = sheet.getCell(10, i);
+                    Cell cellBaixado = sheet.getCell(11, i);
                     Cell cellObservacao = sheet.getCell(12, i);
                     Cell cellCmc7 = sheet.getCell(17, i);
                     Cell cellIdCliente = sheet.getCell(21, i);
 
-                    if ((cellEmissao.getContents() != null)
-                            && (!cellEmissao.getContents().trim().isEmpty())) {
-                        dataEmissao = new java.sql.Date(fmt.parse(cellEmissao.getContents()).getTime());
-                    } else {
-                        dataEmissao = new Date(new java.util.Date().getTime());
-                    }
+                    if (("N".equals(cellBaixado.getContents().trim()))
+                            && (!cellEmissao.getContents().contains("-"))
+                            && (!cellVencto.getContents().contains("-"))) {
 
-                    if ((cellVencto.getContents() != null)
-                            && (!cellVencto.getContents().trim().isEmpty())) {
-                        dataDeposito = new java.sql.Date(fmt.parse(cellVencto.getContents()).getTime());
-                    } else {
-                        dataDeposito = new Date(new java.util.Date().getTime());
-                    }
+                        if ((cellIdCliente.getContents() != null)
+                                && (!cellIdCliente.getContents().trim().isEmpty())) {
 
-                    ChequeIMP imp = new ChequeIMP();
-                    imp.setId(cellIdCheque.getContents());
-                    imp.setDate(dataEmissao);
-                    imp.setDataDeposito(dataDeposito);
-                    imp.setNumeroCheque(cellNCheque.getContents());
-                    imp.setValor(Double.parseDouble(cellValor.getContents()));
-                    imp.setEcf(cellCaixa.getContents());
-                    imp.setNumeroCupom(cellCupom.getContents());
-                    imp.setObservacao(cellObservacao.getContents());
-                    imp.setCmc7(cellCmc7.getContents());
-                    imp.setAlinea("S".equals(cellDevolvido.getContents()) ? 0 : 11);
-                    imp.setBanco(Utils.stringToInt(cellBanco.getContents()));
-                    result.add(imp);
+                            vo = cliente.getClienteChequeByCodAnt(cellIdCliente.getContents().trim(),
+                                    getSistema(), getLojaOrigem());
+                        }
+
+                        if ((cellEmissao.getContents() != null)
+                                && (!cellEmissao.getContents().trim().isEmpty())) {
+                            dataEmissao = new java.sql.Date(fmt.parse(cellEmissao.getContents()).getTime());
+                        } else {
+                            dataEmissao = new Date(new java.util.Date().getTime());
+                        }
+
+                        if ((cellVencto.getContents() != null)
+                                && (!cellVencto.getContents().trim().isEmpty())) {
+                            dataDeposito = new java.sql.Date(fmt.parse(cellVencto.getContents()).getTime());
+                        } else {
+                            dataDeposito = new Date(new java.util.Date().getTime());
+                        }
+
+                        ChequeIMP imp = new ChequeIMP();
+                        imp.setId(cellIdCheque.getContents());
+                        imp.setDate(dataEmissao);
+                        imp.setDataDeposito(dataDeposito);
+                        imp.setNumeroCheque(cellNCheque.getContents());
+                        imp.setValor(Double.parseDouble(cellValor.getContents()));
+                        imp.setEcf(cellCaixa.getContents());
+                        imp.setNumeroCupom(cellCupom.getContents());
+                        imp.setObservacao(cellObservacao.getContents());
+                        imp.setCmc7(cellCmc7.getContents());
+                        imp.setAlinea("S".equals(cellDevolvido.getContents()) ? 0 : 11);
+                        imp.setBanco(Utils.stringToInt(cellBanco.getContents()));
+
+                        if (vo.isEmpty()) {
+                            imp.setCpf(Utils.formataNumero(cellCpf.getContents()));
+                            imp.setNome(cellNome.getContents());
+                        } else {
+                            for (ClientePreferencialVO i_cliente : vo) {
+                                imp.setNome(i_cliente.getNome());
+                                imp.setCpf(String.valueOf(i_cliente.getCnpj()));
+                                imp.setRg(i_cliente.getInscricaoEstadual());
+                                imp.setTelefone(i_cliente.getTelefone());
+                            }
+                        }
+
+                        result.add(imp);
+
+                    }
                 }
             }
             return result;

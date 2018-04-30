@@ -597,7 +597,7 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="vRCheckBox1" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="419" max="32767" attributes="0"/>
                       </Group>
@@ -611,7 +611,7 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="vRCheckBox1" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
                           <EmptySpace pref="116" max="32767" attributes="0"/>
                       </Group>
                   </Group>
@@ -640,7 +640,7 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkRotativoActionPerformed"/>
                   </Events>
                 </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="vRCheckBox1">
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCheque">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cheque"/>
                   </Properties>
