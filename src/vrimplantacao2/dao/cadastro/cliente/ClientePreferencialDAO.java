@@ -2,7 +2,9 @@ package vrimplantacao2.dao.cadastro.cliente;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import vrframework.classe.Conexao;
@@ -226,6 +228,35 @@ public class ClientePreferencialDAO {
                 }
             }
         }
+    }
+
+    public List<ClientePreferencialVO> getClienteChequeByCodAnt(String i_codigo, String i_sistema, String i_loja) throws Exception {
+        List<ClientePreferencialVO> result = new ArrayList<>();
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "c.nome,\n"
+                    + "c.cnpj,\n"
+                    + "c.inscricaoestadual,"
+                    + "c.telefone\n"
+                    + "from clientepreferencial c\n"
+                    + "inner join implantacao.codant_clientepreferencial ant\n"
+                    + "on ant.codigoatual = c.id\n"
+                    + "where ant.id = '" + i_codigo + "'\n"
+                    + "and ant.sistema = '" + i_sistema + "'\n"
+                    + "and ant.loja = '" + i_loja + "'"
+            )) {
+                if (rst.next()) {
+                    ClientePreferencialVO vo = new ClientePreferencialVO();
+                    vo.setNome(rst.getString("nome"));
+                    vo.setCnpj(rst.getLong("cnpj"));
+                    vo.setInscricaoEstadual(rst.getString("inscricaoestadual"));
+                    vo.setTelefone(rst.getString("telefone"));
+                    result.add(vo);
+                }
+            }
+        }
+        return result;
     }
 
     public void atualizarClientePreferencial(ClientePreferencialVO vo, Set<OpcaoCliente> opt) throws Exception {
