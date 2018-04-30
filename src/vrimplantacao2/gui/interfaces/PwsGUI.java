@@ -1,7 +1,8 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import org.openide.util.Exceptions;
@@ -10,6 +11,7 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
+import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
@@ -17,8 +19,6 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
-import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.PwsDAO;
@@ -26,8 +26,6 @@ import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoView;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
-import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
-import vrimplantacao2.vo.enums.OpcaoFiscal;
 
 public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
 
@@ -73,6 +71,8 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
         initComponents();
 
         this.title = "Importação " + SISTEMA;
+        
+        ConexaoFirebird.encoding = "WIN1252";
 
         conexaoFirebird.host = "localhost";
         conexaoFirebird.database = "pws.fdb";
@@ -81,6 +81,22 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
         conexaoFirebird.pass = "masterkey";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
+        
+        tabProdutos.pnlMercNivel.setVisible(false);
+        tabProdutos.btnMapaTribut.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    MapaTributacaoView.exibir(
+                            mdiFrame,
+                            SISTEMA,
+                            ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj,
+                            dao);
+                } catch (Exception ex) {
+                    Util.exibirMensagemErro(ex, "Erro ao abrir");
+                }
+            }            
+        });
 
         conexaoFirebird.setOnConectar(this);
 
@@ -157,141 +173,11 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
+                    tabProdutos.setImportador(importador);
 
                     if (tabOperacoes.getSelectedIndex() == 0) {
 
-                        if (chkFamiliaProduto.isSelected()) {
-                            importador.importarFamiliaProduto();
-                        }
-
-                        if (chkMercadologico.isSelected()) {
-                            importador.importarMercadologicoPorNiveis(false);
-                        }
-
-                        if (chkProdutos.isSelected()) {
-                            importador.importarProduto(chkManterBalanca.isSelected());
-                        }
-                        if (chkPautaFiscal.isSelected()) {
-                            importador.importarPautaFiscal(OpcaoFiscal.NOVOS);
-                        }
-                        if (chkPComprador.isSelected()) {
-                            importador.importarComprador();
-                        }             
-
-                        {
-                            List<OpcaoProduto> opcoes = new ArrayList<>();
-                            if (chkCusto.isSelected()) {
-                                opcoes.add(OpcaoProduto.CUSTO);
-                            }
-                            if (chkCustoComImposto.isSelected()) {
-                                opcoes.add(OpcaoProduto.CUSTO_COM_IMPOSTO);
-                            }
-                            if (chkCustoSemImposto.isSelected()) {
-                                opcoes.add(OpcaoProduto.CUSTO_SEM_IMPOSTO);
-                            }
-                            if (chkPreco.isSelected()) {
-                                opcoes.add(OpcaoProduto.PRECO);
-                            }
-                            if (chkEstoque.isSelected()) {
-                                opcoes.add(OpcaoProduto.ESTOQUE);
-                            }
-                            if (chkPisCofins.isSelected()) {
-                                opcoes.add(OpcaoProduto.PIS_COFINS);
-                            }
-                            if (chkNatReceita.isSelected()) {
-                                opcoes.add(OpcaoProduto.NATUREZA_RECEITA);
-                            }
-                            if (chkICMS.isSelected()) {
-                                opcoes.add(OpcaoProduto.ICMS);
-                            }
-                            if (chkAtivoInativo.isSelected()) {
-                                opcoes.add(OpcaoProduto.ATIVO);
-                            }
-                            if (chkDescCompleta.isSelected()) {
-                                opcoes.add(OpcaoProduto.DESC_COMPLETA);
-                            }
-                            if (chkDescReduzida.isSelected()) {
-                                opcoes.add(OpcaoProduto.DESC_REDUZIDA);
-                            }
-                            if (chkDescGondola.isSelected()) {
-                                opcoes.add(OpcaoProduto.DESC_GONDOLA);
-                            }
-                            if (chkProdMercadologico.isSelected()) {
-                                opcoes.add(OpcaoProduto.MERCADOLOGICO);
-                            }
-                            if (chkValidade.isSelected()) {
-                                opcoes.add(OpcaoProduto.VALIDADE);
-                            }
-                            if (chkMargem.isSelected()) {
-                                opcoes.add(OpcaoProduto.MARGEM);
-                            }
-                            if (chkFamilia.isSelected()) {
-                                opcoes.add(OpcaoProduto.FAMILIA);
-                            }
-                            if (chkTipoEmbalagemEAN.isSelected()) {
-                                opcoes.add(OpcaoProduto.TIPO_EMBALAGEM_EAN);
-                            }
-                            if (chkQtdEmbalagemEAN.isSelected()) {
-                                opcoes.add(OpcaoProduto.QTD_EMBALAGEM_EAN);
-                            }
-                            if (chkPautaFiscalProduto.isSelected()) {
-                                opcoes.add(OpcaoProduto.EXCECAO);
-                            }
-                            if (chkPSitCadastro.isSelected()) {
-                                opcoes.add(OpcaoProduto.ATIVO);
-                            }
-                            if (chkPDescontinuado.isSelected()) {
-                                opcoes.add(OpcaoProduto.DESCONTINUADO);
-                            }
-                            if (chkPVendaPdv.isSelected()) {
-                                opcoes.add(OpcaoProduto.VENDA_PDV);
-                            }
-                            if (chkPSugestaoCotacao.isSelected()) {
-                                opcoes.add(OpcaoProduto.SUGESTAO_COTACAO);
-                            }
-                            if (chkPProdComprador.isSelected()) {
-                                opcoes.add(OpcaoProduto.COMPRADOR);
-                            }
-                            if (!opcoes.isEmpty()) {
-                                importador.atualizarProdutos(opcoes);
-                            }
-                        }
-                        if (chkEAN.isSelected()) {
-                            importador.importarEAN();
-                        }
-                        if (chkEANemBranco.isSelected()) {
-                            importador.importarEANemBranco();
-                        }                        
-                        
-                        {
-                            List<OpcaoNutricional> opcoes = new ArrayList<>();
-                            if (chkNutricionalFilizola.isSelected()) {
-                                opcoes.add(OpcaoNutricional.FILIZOLA);
-                            }
-                            if (chkNutricionalToledo.isSelected()) {
-                                opcoes.add(OpcaoNutricional.TOLEDO);
-                            }
-                            if (!opcoes.isEmpty()) {
-                                importador.importarNutricional(opcoes.toArray(new OpcaoNutricional[] {}));
-                            }                            
-                        }
-                        
-                        {
-                            List<OpcaoReceitaBalanca> opcoes = new ArrayList<>();
-                            if (chkPReceitaFilizola.isSelected()) {
-                                opcoes.add(OpcaoReceitaBalanca.FILIZOLA);
-                            }
-                            if (chkPReceitaToledo.isSelected()) {
-                                opcoes.add(OpcaoReceitaBalanca.TOLEDO);
-                            }
-                            if (!opcoes.isEmpty()) {
-                                importador.importarReceitaBalanca(opcoes.toArray(new OpcaoReceitaBalanca[] {}));
-                            }                            
-                        }
-                        
-                        if (chkOferta.isSelected()) {
-                            importador.importarOfertas(new Date());
-                        }
+                        tabProdutos.executarImportacao();
                         
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
@@ -374,6 +260,8 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
                     }
                     ProgressBar.dispose();
                     Util.exibirMensagemErro(ex, getTitle());
+                } finally {
+                    tabProdutos.setImportador(null);
                 }
             }
         };
@@ -390,46 +278,7 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
         cmbLojaOrigem = new javax.swing.JComboBox();
         tabOperacoes = new javax.swing.JTabbedPane();
         tabImportacao = new javax.swing.JTabbedPane();
-        tabProdutos = new javax.swing.JPanel();
-        chkMercadologico = new vrframework.bean.checkBox.VRCheckBox();
-        chkFamiliaProduto = new vrframework.bean.checkBox.VRCheckBox();
-        vRPanel1 = new vrframework.bean.panel.VRPanel();
-        chkProdutos = new vrframework.bean.checkBox.VRCheckBox();
-        chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
-        chkCusto = new vrframework.bean.checkBox.VRCheckBox();
-        chkCustoSemImposto = new vrframework.bean.checkBox.VRCheckBox();
-        chkCustoComImposto = new vrframework.bean.checkBox.VRCheckBox();
-        chkPreco = new vrframework.bean.checkBox.VRCheckBox();
-        chkEstoque = new vrframework.bean.checkBox.VRCheckBox();
-        chkEAN = new vrframework.bean.checkBox.VRCheckBox();
-        chkEANemBranco = new vrframework.bean.checkBox.VRCheckBox();
-        chkPisCofins = new vrframework.bean.checkBox.VRCheckBox();
-        chkNatReceita = new vrframework.bean.checkBox.VRCheckBox();
-        chkICMS = new vrframework.bean.checkBox.VRCheckBox();
-        chkAtivoInativo = new vrframework.bean.checkBox.VRCheckBox();
-        chkDescCompleta = new vrframework.bean.checkBox.VRCheckBox();
-        chkDescReduzida = new vrframework.bean.checkBox.VRCheckBox();
-        chkDescGondola = new vrframework.bean.checkBox.VRCheckBox();
-        chkProdMercadologico = new vrframework.bean.checkBox.VRCheckBox();
-        chkValidade = new vrframework.bean.checkBox.VRCheckBox();
-        chkFamilia = new vrframework.bean.checkBox.VRCheckBox();
-        chkTipoEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
-        chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
-        chkMargem = new vrframework.bean.checkBox.VRCheckBox();
-        chkNutricionalFilizola = new vrframework.bean.checkBox.VRCheckBox();
-        chkNutricionalToledo = new vrframework.bean.checkBox.VRCheckBox();
-        btnMapaTribut = new vrframework.bean.button.VRButton();
-        chkPautaFiscal = new vrframework.bean.checkBox.VRCheckBox();
-        chkPautaFiscalProduto = new vrframework.bean.checkBox.VRCheckBox();
-        chkPSitCadastro = new vrframework.bean.checkBox.VRCheckBox();
-        chkPDescontinuado = new vrframework.bean.checkBox.VRCheckBox();
-        chkPVendaPdv = new vrframework.bean.checkBox.VRCheckBox();
-        chkPSugestaoCotacao = new vrframework.bean.checkBox.VRCheckBox();
-        chkPComprador = new vrframework.bean.checkBox.VRCheckBox();
-        chkPProdComprador = new vrframework.bean.checkBox.VRCheckBox();
-        chkPReceitaFilizola = new vrframework.bean.checkBox.VRCheckBox();
-        chkPReceitaToledo = new vrframework.bean.checkBox.VRCheckBox();
-        chkOferta = new vrframework.bean.checkBox.VRCheckBox();
+        tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         jPanel3 = new javax.swing.JPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -477,158 +326,6 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
         vRLabel1.setText("Loja (Cliente):");
 
         cmbLojaOrigem.setModel(new javax.swing.DefaultComboBoxModel());
-
-        tabProdutos.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-
-        chkMercadologico.setText("Mercadologico");
-        chkMercadologico.setEnabled(true);
-        tabProdutos.add(chkMercadologico);
-
-        chkFamiliaProduto.setText("Familia Produto");
-        chkFamiliaProduto.setEnabled(true);
-        chkFamiliaProduto.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkFamiliaProdutoActionPerformed(evt);
-            }
-        });
-        tabProdutos.add(chkFamiliaProduto);
-
-        chkProdutos.setText("Produtos");
-        chkProdutos.setEnabled(true);
-
-        chkManterBalanca.setText("Manter Balança");
-        chkManterBalanca.setEnabled(true);
-
-        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
-        vRPanel1.setLayout(vRPanel1Layout);
-        vRPanel1Layout.setHorizontalGroup(
-            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel1Layout.createSequentialGroup()
-                .addGap(2, 2, 2)
-                .addComponent(chkProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2))
-        );
-        vRPanel1Layout.setVerticalGroup(
-            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel1Layout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-        );
-
-        tabProdutos.add(vRPanel1);
-
-        chkCusto.setText("Custo");
-        tabProdutos.add(chkCusto);
-
-        chkCustoSemImposto.setText("Custo Sem Imposto");
-        tabProdutos.add(chkCustoSemImposto);
-
-        chkCustoComImposto.setText("Custo Com Imposto");
-        tabProdutos.add(chkCustoComImposto);
-
-        chkPreco.setText("Preço");
-        tabProdutos.add(chkPreco);
-
-        chkEstoque.setText("Estoque");
-        tabProdutos.add(chkEstoque);
-
-        chkEAN.setText("EAN");
-        tabProdutos.add(chkEAN);
-
-        chkEANemBranco.setText("EAN em branco");
-        tabProdutos.add(chkEANemBranco);
-
-        chkPisCofins.setText("PIS/COFINS");
-        tabProdutos.add(chkPisCofins);
-
-        chkNatReceita.setText("Nat. Receita");
-        tabProdutos.add(chkNatReceita);
-
-        chkICMS.setText("ICMS");
-        tabProdutos.add(chkICMS);
-
-        chkAtivoInativo.setText("Ativo/Inativo");
-        tabProdutos.add(chkAtivoInativo);
-
-        chkDescCompleta.setText("Descrição Completa");
-        tabProdutos.add(chkDescCompleta);
-
-        chkDescReduzida.setText("Descrição Reduzida");
-        tabProdutos.add(chkDescReduzida);
-
-        chkDescGondola.setText("Descrição Gondola");
-        tabProdutos.add(chkDescGondola);
-
-        chkProdMercadologico.setText("Prod. Mercadológico");
-        tabProdutos.add(chkProdMercadologico);
-
-        chkValidade.setText("Validade");
-        tabProdutos.add(chkValidade);
-
-        chkFamilia.setText("Família X Produto");
-        chkFamilia.setToolTipText("Corrige o relacionamento entre o produto e a família.");
-        tabProdutos.add(chkFamilia);
-
-        chkTipoEmbalagemEAN.setText("Tipo Emb. EAN");
-        tabProdutos.add(chkTipoEmbalagemEAN);
-
-        chkQtdEmbalagemEAN.setText("Qtd. Emb. EAN");
-        tabProdutos.add(chkQtdEmbalagemEAN);
-
-        chkMargem.setText("Margem");
-        tabProdutos.add(chkMargem);
-
-        chkNutricionalFilizola.setText("Nutricional (Filizola)");
-        tabProdutos.add(chkNutricionalFilizola);
-
-        chkNutricionalToledo.setText("Nutricional (Toledo)");
-        tabProdutos.add(chkNutricionalToledo);
-
-        btnMapaTribut.setText("Mapa de Tribut.");
-        btnMapaTribut.setEnabled(false);
-        btnMapaTribut.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnMapaTributActionPerformed(evt);
-            }
-        });
-        tabProdutos.add(btnMapaTribut);
-
-        chkPautaFiscal.setText("Pauta Fiscal");
-        tabProdutos.add(chkPautaFiscal);
-
-        chkPautaFiscalProduto.setText("Pauta Fiscal X Produto");
-        tabProdutos.add(chkPautaFiscalProduto);
-
-        chkPSitCadastro.setText("Sit. Cadastro");
-        tabProdutos.add(chkPSitCadastro);
-
-        chkPDescontinuado.setText("Descontinuado");
-        tabProdutos.add(chkPDescontinuado);
-
-        chkPVendaPdv.setText("Venda (PDV)");
-        tabProdutos.add(chkPVendaPdv);
-
-        chkPSugestaoCotacao.setText("Sugestão Cotação");
-        tabProdutos.add(chkPSugestaoCotacao);
-
-        chkPComprador.setText("Comprador");
-        tabProdutos.add(chkPComprador);
-
-        chkPProdComprador.setText("Produto Comprador");
-        tabProdutos.add(chkPProdComprador);
-
-        chkPReceitaFilizola.setText("Receita (Filizola)");
-        tabProdutos.add(chkPReceitaFilizola);
-
-        chkPReceitaToledo.setText("Receita (Toledo)");
-        tabProdutos.add(chkPReceitaToledo);
-
-        chkOferta.setText("Oferta");
-        tabProdutos.add(chkOferta);
 
         tabImportacao.addTab("Produtos", tabProdutos);
 
@@ -948,76 +645,22 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
         }
     }//GEN-LAST:event_btnMigrarActionPerformed
 
-    private void chkFamiliaProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFamiliaProdutoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkFamiliaProdutoActionPerformed
-
-    private void btnMapaTributActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaTributActionPerformed
-        try {
-            MapaTributacaoView.exibir(
-                    mdiFrame,
-                    SISTEMA,
-                    ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj,
-                    dao);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, "Erro ao abrir");
-        }
-    }//GEN-LAST:event_btnMapaTributActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private vrframework.bean.button.VRButton btnMapaTribut;
     private vrframework.bean.button.VRButton btnMigrar;
-    private vrframework.bean.checkBox.VRCheckBox chkAtivoInativo;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkClienteTipoInscricao;
     private javax.swing.JCheckBox chkContasPagar;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
-    private vrframework.bean.checkBox.VRCheckBox chkCusto;
-    private vrframework.bean.checkBox.VRCheckBox chkCustoComImposto;
-    private vrframework.bean.checkBox.VRCheckBox chkCustoSemImposto;
-    private vrframework.bean.checkBox.VRCheckBox chkDescCompleta;
-    private vrframework.bean.checkBox.VRCheckBox chkDescGondola;
-    private vrframework.bean.checkBox.VRCheckBox chkDescReduzida;
-    private vrframework.bean.checkBox.VRCheckBox chkEAN;
-    private vrframework.bean.checkBox.VRCheckBox chkEANemBranco;
-    private vrframework.bean.checkBox.VRCheckBox chkEstoque;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFEndereco;
     private vrframework.bean.checkBox.VRCheckBox chkFNumero;
     private vrframework.bean.checkBox.VRCheckBox chkFTipoEmp;
     private vrframework.bean.checkBox.VRCheckBox chkFTipoForn;
     private vrframework.bean.checkBox.VRCheckBox chkFTipoPagamento;
-    private vrframework.bean.checkBox.VRCheckBox chkFamilia;
-    private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
-    private vrframework.bean.checkBox.VRCheckBox chkICMS;
-    private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
-    private vrframework.bean.checkBox.VRCheckBox chkMargem;
-    private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
-    private vrframework.bean.checkBox.VRCheckBox chkNatReceita;
-    private vrframework.bean.checkBox.VRCheckBox chkNutricionalFilizola;
-    private vrframework.bean.checkBox.VRCheckBox chkNutricionalToledo;
-    private vrframework.bean.checkBox.VRCheckBox chkOferta;
     private vrframework.bean.checkBox.VRCheckBox chkOutrasReceitas;
-    private vrframework.bean.checkBox.VRCheckBox chkPComprador;
-    private vrframework.bean.checkBox.VRCheckBox chkPDescontinuado;
-    private vrframework.bean.checkBox.VRCheckBox chkPProdComprador;
-    private vrframework.bean.checkBox.VRCheckBox chkPReceitaFilizola;
-    private vrframework.bean.checkBox.VRCheckBox chkPReceitaToledo;
-    private vrframework.bean.checkBox.VRCheckBox chkPSitCadastro;
-    private vrframework.bean.checkBox.VRCheckBox chkPSugestaoCotacao;
-    private vrframework.bean.checkBox.VRCheckBox chkPVendaPdv;
-    private vrframework.bean.checkBox.VRCheckBox chkPautaFiscal;
-    private vrframework.bean.checkBox.VRCheckBox chkPautaFiscalProduto;
-    private vrframework.bean.checkBox.VRCheckBox chkPisCofins;
-    private vrframework.bean.checkBox.VRCheckBox chkPreco;
-    private vrframework.bean.checkBox.VRCheckBox chkProdMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
-    private vrframework.bean.checkBox.VRCheckBox chkProdutos;
-    private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
-    private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
-    private vrframework.bean.checkBox.VRCheckBox chkValidade;
     private javax.swing.JCheckBox chkVendaUtilizaDigito;
     private javax.swing.JCheckBox chkVendas;
     private javax.swing.JComboBox cmbLojaOrigem;
@@ -1038,7 +681,7 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JTabbedPane tabImportacao;
     private javax.swing.JTabbedPane tabOperacoes;
     private javax.swing.JPanel tabOutras;
-    private javax.swing.JPanel tabProdutos;
+    private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private javax.swing.JTabbedPane tabs;
     private org.jdesktop.swingx.JXDatePicker txtDtCPEntrada;
     private org.jdesktop.swingx.JXDatePicker txtDtCPFim;
@@ -1049,12 +692,11 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
     private org.jdesktop.swingx.JXDatePicker txtRotDtFim;
     private org.jdesktop.swingx.JXDatePicker txtRotDtIni;
     private vrframework.bean.label.VRLabel vRLabel1;
-    private vrframework.bean.panel.VRPanel vRPanel1;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void executar() throws Exception {
-        btnMapaTribut.setEnabled(true);
+        tabProdutos.btnMapaTribut.setEnabled(true);
 
         gravarParametros();
         carregarLojaVR();
