@@ -3,6 +3,7 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
@@ -15,6 +16,7 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -348,5 +350,43 @@ public class PwsDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    p.cd_pro,\n" +
+                    "    p.dt_ini_promocao_pro,\n" +
+                    "    p.dt_fim_promocao_pro,\n" +
+                    "    p.vl_promocao_pro\n" +
+                    "from\n" +
+                    "    produto p\n" +
+                    "where\n" +
+                    "    not p.dt_ini_promocao_pro is null and\n" +
+                    "    p.dt_ini_promocao_pro <= current_date and\n" +
+                    "    p.dt_fim_promocao_pro >= current_date\n" +
+                    "order by\n" +
+                    "    1"
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    
+                    imp.setIdProduto(rst.getString("cd_pro"));
+                    imp.setDataInicio(rst.getDate("dt_ini_promocao_pro"));
+                    imp.setDataFim(rst.getDate("dt_fim_promocao_pro"));
+                    imp.setPrecoOferta(rst.getDouble("vl_promocao_pro"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    
     
 }
