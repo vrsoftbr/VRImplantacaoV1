@@ -9,8 +9,10 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -221,5 +223,123 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	e.tipoEntidade,\n" +
+                    "	e.codigo,\n" +
+                    "	e.razaoSocial,\n" +
+                    "	e.fantasia,\n" +
+                    "	e.cnpjCPF,\n" +
+                    "	e.ieRG,\n" +
+                    "	e.codigoSuframa,\n" +
+                    "	e.status,\n" +
+                    "	e.endereco,\n" +
+                    "	e.numero,\n" +
+                    "	e.complemento,\n" +
+                    "	e.bairro,\n" +
+                    "	e.cidade,\n" +
+                    "	e.estado,\n" +
+                    "	e.cep,\n" +
+                    "	e.cobEndereco,\n" +
+                    "	e.cobNumero,\n" +
+                    "	e.cobComplemento,\n" +
+                    "	e.cobBairro,\n" +
+                    "	e.cobCidade,\n" +
+                    "	e.cobEstado,\n" +
+                    "	e.cobCep,\n" +
+                    "	e.telefone,\n" +
+                    "	e.dataInicio,\n" +
+                    "	e.obsFixa,\n" +
+                    "	e.prazoLimite,\n" +
+                    "	e.prazoLimiteF\n" +
+                    "from\n" +
+                    "	Entidades e\n" +
+                    "where\n" +
+                    "	e.tipoEntidade like '%F%' and\n" +
+                    "	e.dataFinal is null\n" +
+                    "order by\n" +
+                    "	e.codigo;"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("codigo"));
+                    imp.setRazao(rst.getString("razaoSocial"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpjCPF"));
+                    imp.setIe_rg(rst.getString("ieRG"));
+                    imp.setSuframa(rst.getString("codigoSuframa"));
+                    imp.setAtivo(!"I".equals(rst.getString("status")));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setCob_endereco(rst.getString("cobEndereco"));
+                    imp.setCob_numero(rst.getString("cobNumero"));
+                    imp.setCob_complemento(rst.getString("cobComplemento"));
+                    imp.setCob_bairro(rst.getString("cobBairro"));
+                    imp.setCob_municipio(rst.getString("cobCidade"));
+                    imp.setCob_uf(rst.getString("cobEstado"));
+                    imp.setCob_cep(rst.getString("cobCep"));
+                    imp.setTel_principal(rst.getString("telefone"));
+                    imp.setDatacadastro(rst.getDate("dataInicio"));
+                    imp.setObservacao(rst.getString("obsFixa"));
+                    imp.setPrazoEntrega(rst.getInt("prazoLimite"));
+                    imp.setPrazoSeguranca(rst.getInt("prazoLimiteF"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n" +
+                    "	codigoFornecedor,\n" +
+                    "	codigoProduto,\n" +
+                    "	codigoProdutoNoFornecedor,\n" +
+                    "	quantidadeEmbalagem\n" +
+                    "FROM\n" +
+                    "	ProdutosCodigosNoFornecedor\n" +
+                    "where\n" +
+                    "	codigoFornecedor != -1\n" +
+                    "order by\n" +
+                    "	1,2"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setIdFornecedor(rst.getString("codigoFornecedor"));
+                    imp.setIdProduto(rst.getString("codigoProduto"));
+                    imp.setCodigoExterno(rst.getString("codigoProdutoNoFornecedor"));
+                    imp.setQtdEmbalagem(rst.getInt("quantidadeEmbalagem"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }    
     
 }
