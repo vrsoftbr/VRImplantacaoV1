@@ -191,6 +191,8 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="413" max="32767" attributes="0"/>
                       </Group>
@@ -203,7 +205,11 @@
                           <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="213" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="167" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -217,6 +223,16 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkClienteEventual">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cliente Eventual"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCreditoRotativo">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cr&#xe9;dito Rotativo"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCheque">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cheque"/>
                   </Properties>
                 </Component>
               </SubComponents>

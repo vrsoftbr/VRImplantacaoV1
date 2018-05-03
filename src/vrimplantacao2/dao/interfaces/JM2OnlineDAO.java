@@ -8,7 +8,9 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -144,10 +146,11 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.aliquotaICMS icms_aliquota,\n" +
                     "	p.reducaoBaseICMS icms_reduzido,\n" +
                     "	pis.tipoPisCofins piscofinsSaida,\n" +
-                    "	p.idFornecedor codigofabricante\n" +
+                    "	ent.Codigo codigofabricante\n" +
                     "from\n" +
                     "	Produtos p\n" +
                     "	join Empresas emp on emp.id = " + getLojaOrigem() + "\n" +
+                    "	left join Entidades ent on p.idFornecedor = ent.id\n" +
                     "	left join ProdutosEmpresas pe on pe.idProduto = p.id and pe.idEmpresa = emp.id\n" +
                     "	join (select * from ProdutosPrecos where (ativoTabela = 'A' or ativoNormal = 'A' or ativoTabela = 'A')) pr on pr.codigoProduto = p.codigo and pr.idEmpresa = emp.id\n" +
                     "	left join (\n" +
@@ -428,7 +431,87 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
-    
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	c.id,\n" +
+                    "	c.dataEmissao,\n" +
+                    "	c.dataVencimento,\n" +
+                    "	pdv.coo,\n" +
+                    "	PDVs.idECF ecf,\n" +
+                    "	c.valorDaDuplicata,\n" +
+                    "	c.obs,\n" +
+                    "	ent.codigo idCliente,\n" +
+                    "	c.dataVencimento,\n" +
+                    "	c.parcela,\n" +
+                    "	c.contaJuros,\n" +
+                    "	cp.valorPago\n" +
+                    "from\n" +
+                    "	Contas c\n" +
+                    "	left join (select idConta, sum(valorTotal) valorPago from ContasBaixas group by idConta) cp on\n" +
+                    "		c.id = cp.idConta\n" +
+                    "	left join ContasPDV pdv on\n" +
+                    "		pdv.id = c.idGerador\n" +
+                    "	left join PDVs on\n" +
+                    "		pdv.idPdv = PDVs.id\n" +
+                    "	left join Entidades ent on\n" +
+                    "		ent.id = c.idEntidade\n" +
+                    "where\n" +
+                    "	c.tipoDaConta = 'R' and\n" +
+                    "	c.valorDaDuplicata > cp.valorPago and\n" +
+                    "	c.idEmpresa = " + getLojaOrigem() + "\n" +
+                    "order by c.id"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setDataEmissao(rst.getDate("dataEmissao"));
+                    imp.setDataVencimento(rst.getDate("dataVencimento"));
+                    imp.setNumeroCupom(rst.getString("coo"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setValor(rst.getDouble("valorDaDuplicata"));
+                    imp.setObservacao(rst.getString("obs"));
+                    imp.setIdCliente(rst.getString("idCliente"));
+                    imp.setDataVencimento(rst.getDate("dataVencimento"));
+                    imp.setParcela(rst.getInt("parcela"));
+                    imp.setJuros(rst.getDouble("contaJuros"));
+                    if (rst.getDouble("valorPago") > 0) {
+                        imp.addPagamento(rst.getString("id"), rst.getDouble("valorPago"),0,0,rst.getDate("dataVencimento"),"");
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    ""
+            )) {
+                while (rst.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+ 
     
     
 }
