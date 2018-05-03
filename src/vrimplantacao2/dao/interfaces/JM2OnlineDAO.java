@@ -8,6 +8,7 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -341,5 +342,93 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }    
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	e.codigo id,\n" +
+                    "	e.cnpjCPF cnpj,\n" +
+                    "	e.ieRG,\n" +
+                    "	e.razaoSocial,\n" +
+                    "	e.fantasia,\n" +
+                    "	e.status,\n" +
+                    "	e.vendaBloqueada,\n" +
+                    "	e.endereco,\n" +
+                    "	e.numero,\n" +
+                    "	e.complemento,\n" +
+                    "	e.bairro,\n" +
+                    "	e.cidade,\n" +
+                    "	e.estado,\n" +
+                    "	e.cep,\n" +
+                    "	e.dataNascimento,\n" +
+                    "	e.dataInicio,\n" +
+                    "	e.cargoU,\n" +
+                    "	e.limiteDeCredito,\n" +
+                    "	e.obsFixa,\n" +
+                    "	coalesce(e.acVen1, 0) diavencimento,\n" +
+                    "	e.telefone,\n" +
+                    "	e.emailEntidade email,\n" +
+                    "	e.fax,\n" +
+                    "	e.cobendereco,\n" +
+                    "	e.cobnumero,\n" +
+                    "	e.cobcomplemento,\n" +
+                    "	e.cobbairro,\n" +
+                    "	e.cobcidade,\n" +
+                    "	e.cobestado,\n" +
+                    "	e.cobcep\n" +
+                    "from\n" +
+                    "	Entidades e\n" +
+                    "where\n" +
+                    "	e.tipoEntidade like '%C%' and\n" +
+                    "	e.dataFinal is null\n" +
+                    "order by\n" +
+                    "	e.codigo;"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("ieRG"));
+                    imp.setRazao(rst.getString("razaoSocial"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setAtivo(!"I".equals(rst.getString("status")));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setDataNascimento(rst.getDate("dataNascimento"));
+                    imp.setDataCadastro(rst.getDate("dataInicio"));
+                    imp.setCargo(rst.getString("cargoU"));
+                    imp.setValorLimite(rst.getDouble("limiteDeCredito"));
+                    imp.setObservacao2(rst.getString("obsFixa"));
+                    imp.setDiaVencimento(rst.getInt("diavencimento"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setFax(rst.getString("fax"));
+                    imp.setCobrancaEndereco(rst.getString("cobendereco"));
+                    imp.setCobrancaNumero(rst.getString("cobnumero"));
+                    imp.setCobrancaComplemento(rst.getString("cobcomplemento"));
+                    imp.setCobrancaBairro(rst.getString("cobbairro"));
+                    imp.setCobrancaMunicipio(rst.getString("cobcidade"));
+                    imp.setCobrancaUf(rst.getString("cobestado"));
+                    imp.setCobrancaCep(rst.getString("cobcep"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    
     
 }
