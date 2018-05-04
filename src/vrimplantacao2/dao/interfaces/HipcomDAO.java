@@ -716,7 +716,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (rst.getInt("e_cst") == 60) {
                         imp.setAliquotaCredito(0, rst.getDouble("e_aliqst"), 0);
                     } else {
-                        imp.setAliquotaDebito(rst.getInt("e_cst"), rst.getDouble("e_aliq"), rst.getDouble("e_reduc"));
+                        imp.setAliquotaCredito(rst.getInt("e_cst"), rst.getDouble("e_aliq"), rst.getDouble("e_reduc"));
                     }
                     
                     if (rst.getInt("s_cst") == 60) {

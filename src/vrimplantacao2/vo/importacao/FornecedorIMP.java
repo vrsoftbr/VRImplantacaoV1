@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import vrimplantacao.utils.Utils;
-import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.Factory;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.enums.TipoContato;

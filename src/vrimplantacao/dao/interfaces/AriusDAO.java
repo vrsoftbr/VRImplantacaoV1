@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrframework.classe.ProgressBar;
@@ -19,10 +20,13 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.venda.MultiStatementIterator;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -30,13 +34,15 @@ import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
-public class AriusDAO extends InterfaceDAO {
+public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(AriusDAO.class.getName());
 
@@ -104,6 +110,29 @@ public class AriusDAO extends InterfaceDAO {
         return "ARIUS";
     }
 
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoOracle.createStatement()){
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "        id,\n" +
+                    "        descritivo,\n" +
+                    "        icms_venda,\n" +
+                    "        reducao_venda,\n" +
+                    "        tributacao_venda \n" +
+                    "from \n" +
+                    "        tributacao_pdv \n" +
+                    "order by descritivo")){
+                while (rs.next()){
+                    result.add(new MapaTributoIMP(rs.getString("id"), 
+                                                  rs.getString("descritivo")));
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
 
@@ -293,12 +322,17 @@ public class AriusDAO extends InterfaceDAO {
                 + "        when 'I' then 40\n"
                 + "        when 'N' then 41\n"
                 + "    else 90 end as icms_cst,\n"
-                + "    pe.icms_venda icms_aliquota, \n"
-                + "    pe.reducao_venda icms_reduzido  \n"
+                + "    pe.icms_venda icms_aliquota,\n"
+                + "    pe.reducao_venda icms_reduzido,\n"
+                + "    pe.iva,\n"
+                + "    pe.estado,\n"
+                + "    pe.tipo_iva,\n"
+                + "    pe.st_venda,\n"
+                + "    01 as p_iva\n"
                 + "FROM\n"
                 + "    produtos a\n"
                 + "    join empresas emp on emp.id = " + getLojaOrigem() + "\n"
-                + "    join produtos_estado pe on a.id = pe.id and pe.estado = emp.estado    \n"
+                + "    join produtos_estado pe on a.id = pe.id and pe.estado = emp.estado\n"
                 + "    join politicas_empresa poli on poli.empresa = emp.id\n"
                 + "    join produtos_precos preco on a.id = preco.produto and poli.politica = preco.politica and preco.id = " + tipoVenda + "\n"
                 + "    join produtos_loja loja on a.id = loja.id and poli.politica = loja.politica\n"
@@ -378,6 +412,14 @@ public class AriusDAO extends InterfaceDAO {
                     imp.setIcmsCst(rst.getInt("icms_cst"));
                     imp.setIcmsAliq(rst.getDouble("icms_aliquota"));
                     imp.setIcmsReducao(rst.getDouble("icms_reduzido"));
+                    imp.setPautaFiscalId(formatPautaFiscalId(
+                                rst.getString("estado"),
+                                rst.getString("ncm"),
+                                rst.getDouble("p_iva"),
+                                rst.getDouble("iva"),
+                                rst.getInt("st_venda"),
+                                rst.getInt("st_venda")
+                                ));
 
                     //imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem_compra"));
                     ProgressBar.setStatus("Convertendo em IMP.... " + cont);
@@ -1648,7 +1690,87 @@ public class AriusDAO extends InterfaceDAO {
         public void remove() {
             throw new UnsupportedOperationException("Não suportado.");
         }
-
+    }
+    
+    @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoOracle.getConexao().createStatement()){
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "        distinct\n" +
+                    "        p.classificacao_fiscal,\n" +
+                    "        pe.estado,\n" +
+                    "        pe.tributacao_venda,\n" +
+                    "        pe.icms_venda,\n" +
+                    "        pe.reducao_venda,\n" +
+                    "        pe.st_venda,\n" +
+                    "        pe.iva,\n" +
+                    "        pe.tipo_iva,\n" +
+                    "        01 as p_iva\n" +
+                    "from \n" +
+                    "        produtos_estado pe\n" +
+                    "join    produtos p on pe.id = p.id\n" +
+                    "join    empresas em on pe.estado = em.estado\n" +
+                    "join    politicas_empresa po on em.id = po.empresa\n" +
+                    "left join tabela_fornecedor_uf tf on tf.produto = pe.id\n" +
+                    "join    produtos_loja loja on p.id = loja.id and\n" +
+                    "        po.politica = loja.politica and\n" +
+                    "        loja.id = pe.id and\n" +
+                    "        po.politica = 1 and\n" +
+                    "        pe.iva != 0 and\n" +
+                    "        em.id = " + getLojaOrigem() + " and\n" +
+                    "        p.status = 0\n" +
+                    "order by classificacao_fiscal")){
+                while(rs.next()){
+                    PautaFiscalIMP imp = new PautaFiscalIMP();
+                    imp.setId(formatPautaFiscalId(
+                                rs.getString("estado"),
+                                rs.getString("classificacao_fiscal"),
+                                rs.getDouble("p_iva"),
+                                rs.getDouble("iva"),
+                                rs.getInt("st_venda"),
+                                rs.getInt("st_venda")
+                                ));
+                    imp.setNcm(rs.getString("classificacao_fiscal"));
+                    imp.setUf(rs.getString("estado"));
+                    if ("P".equals(rs.getString("tipo_iva"))) {
+                        imp.setTipoIva(TipoIva.PERCENTUAL);
+                        imp.setIva(rs.getDouble("iva"));
+                    } else {
+                        imp.setTipoIva(TipoIva.VALOR);
+                        imp.setIva(rs.getDouble("iva"));
+                    }
+                    if (rs.getInt("st_venda") == 60) {
+                        imp.setAliquotaCredito(0, rs.getDouble("icms_venda"), 0);
+                    } else {
+                        imp.setAliquotaCredito(rs.getInt("st_venda"), rs.getDouble("icms_venda"), rs.getDouble("reducao_venda"));
+                    }
+                    if (rs.getInt("st_venda") == 60) {
+                        imp.setAliquotaDebito(0, rs.getDouble("icms_venda"), 0);
+                    } else {
+                        imp.setAliquotaDebito(rs.getInt("st_venda"), rs.getDouble("icms_venda"), rs.getDouble("reducao_venda"));
+                    }
+                    if (rs.getInt("st_venda") == 60) {
+                        imp.setAliquotaCreditoForaEstado(0, rs.getDouble("icms_venda"), 0);
+                    } else {
+                        imp.setAliquotaCreditoForaEstado(rs.getInt("st_venda"), rs.getDouble("icms_venda"), rs.getDouble("reducao_venda"));
+                    }
+                    if (rs.getInt("st_venda") == 60) {
+                        imp.setAliquotaDebitoForaEstado(0, rs.getDouble("icms_venda"), 0);
+                    } else {
+                        imp.setAliquotaDebitoForaEstado(rs.getInt("st_venda"), rs.getDouble("icms_venda"), rs.getDouble("reducao_venda"));
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    private String formatPautaFiscalId(String uf, String ncm, double p_iva, double v_iva, int idIcmsSaida, int idIcmsEntrada) {
+        return String.format("%s-%s-%.2f-%.2f-%d-%d", uf, ncm, p_iva, v_iva, idIcmsSaida, idIcmsEntrada);
     }
 
 }

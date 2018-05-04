@@ -16,17 +16,18 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.PwsDAO;
+import vrimplantacao2.dao.interfaces.JM2OnlineDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoView;
 import vrimplantacao2.parametro.Parametros;
 
-public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
+public class JM2OnlineGUI extends VRInternalFrame implements ConexaoEvent {
 
-    private static final String SISTEMA = "PWS";
-    private static PwsGUI instance;
+    private static final String SISTEMA = "JM2Online";
+    private static JM2OnlineGUI instance;
 
     public static String getSISTEMA() {
         return SISTEMA;
@@ -37,14 +38,14 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
-        conexaoFirebird.carregarParametros();
+        conexao.carregarParametros();
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
 
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
-        conexaoFirebird.atualizarParametros();
+        conexao.atualizarParametros();
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
             params.put(cliente.cnpj, SISTEMA, "LOJA_CLIENTE");
@@ -58,9 +59,9 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
         params.salvar();
     }
 
-    private PwsDAO dao = new PwsDAO();
+    private JM2OnlineDAO dao = new JM2OnlineDAO();
 
-    private PwsGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private JM2OnlineGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
@@ -68,11 +69,11 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
         
         ConexaoFirebird.encoding = "WIN1252";
 
-        conexaoFirebird.host = "localhost";
-        conexaoFirebird.database = "pws.fdb";
-        conexaoFirebird.port = "3051";
-        conexaoFirebird.user = "sysdba";
-        conexaoFirebird.pass = "masterkey";
+        conexao.host = "localhost";
+        conexao.database = "JM2Online";
+        conexao.port = "1433";
+        conexao.user = "sa";
+        conexao.pass = "vrsoftw@re";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         
@@ -94,7 +95,7 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
             }            
         });
 
-        conexaoFirebird.setOnConectar(this);
+        conexao.setOnConectar(this);
 
         carregarParametros();
 
@@ -134,7 +135,7 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new PwsGUI(i_mdiFrame);
+                instance = new JM2OnlineGUI(i_mdiFrame);
             }
             instance.setVisible(true);
         } catch (Exception ex) {
@@ -202,6 +203,18 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
                             }
                         }
                         
+                        if (chkClientePreferencial.isSelected()) {
+                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
+                        }
+                        if (chkClienteEventual.isSelected()) {
+                            importador.importarClienteEventual(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
+                        }
+                        if (chkCreditoRotativo.isSelected()) {
+                            importador.importarCreditoRotativo();
+                        }
+                        if (chkCheque.isSelected()) {
+                            importador.importarCheque();
+                        }
                     }
 
                     ProgressBar.dispose();
@@ -243,12 +256,16 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
         chkFTipoEmp = new vrframework.bean.checkBox.VRCheckBox();
         chkFTipoForn = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        tabClientes = new vrframework.bean.panel.VRPanel();
+        chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
+        chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
+        chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        chkCheque = new vrframework.bean.checkBox.VRCheckBox();
         pnlLoja = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel1 = new javax.swing.JLabel();
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
-        tabs = new javax.swing.JTabbedPane();
-        conexaoFirebird = new vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel();
+        conexao = new vrimplantacao2.gui.component.conexao.sqlserver.ConexaoSqlServerPanel();
 
         setTitle("Importação Emporio");
         setToolTipText("");
@@ -289,14 +306,51 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
         tabFornecedor.setLayout(tabFornecedorLayout);
         tabFornecedorLayout.setHorizontalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 490, Short.MAX_VALUE)
+            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 538, Short.MAX_VALUE)
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 262, Short.MAX_VALUE)
         );
 
         tabImportacao.addTab("Fornecedores", tabFornecedor);
+
+        chkClientePreferencial.setText("Cliente Preferencial");
+
+        chkClienteEventual.setText("Cliente Eventual");
+
+        chkCreditoRotativo.setText("Crédito Rotativo");
+
+        chkCheque.setText("Cheque");
+
+        javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
+        tabClientes.setLayout(tabClientesLayout);
+        tabClientesLayout.setHorizontalGroup(
+            tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabClientesLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(413, Short.MAX_VALUE))
+        );
+        tabClientesLayout.setVerticalGroup(
+            tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabClientesLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(167, Short.MAX_VALUE))
+        );
+
+        tabImportacao.addTab("Clientes", tabClientes);
 
         tabOperacoes.addTab("Importação", tabImportacao);
 
@@ -321,7 +375,7 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(cmbLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, 357, Short.MAX_VALUE)
+                .addComponent(cmbLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, 405, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -337,8 +391,7 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        conexaoFirebird.setSistema("PWS");
-        tabs.addTab("Conexão", conexaoFirebird);
+        conexao.setSistema("JM2Online");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -347,7 +400,7 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tabs)
+                    .addComponent(conexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -360,7 +413,7 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(conexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -392,6 +445,10 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkCheque;
+    private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
+    private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
+    private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFEndereco;
     private vrframework.bean.checkBox.VRCheckBox chkFNumero;
@@ -402,16 +459,16 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
-    private vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel conexaoFirebird;
+    private vrimplantacao2.gui.component.conexao.sqlserver.ConexaoSqlServerPanel conexao;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel3;
     private org.jdesktop.swingx.JXDatePicker jXDatePicker1;
     private vrframework.bean.panel.VRPanel pnlLoja;
+    private vrframework.bean.panel.VRPanel tabClientes;
     private vrframework.bean.panel.VRPanel tabFornecedor;
     private javax.swing.JTabbedPane tabImportacao;
     private javax.swing.JTabbedPane tabOperacoes;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
-    private javax.swing.JTabbedPane tabs;
     private vrframework.bean.label.VRLabel vRLabel1;
     // End of variables declaration//GEN-END:variables
 
