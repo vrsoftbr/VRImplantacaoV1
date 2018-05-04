@@ -89,11 +89,7 @@ public class ClientePreferencialDAO {
             sql.put("cargoconjuge", "");
             sql.put("salarioconjuge", 0);
             sql.put("outrarendaconjuge", 0);
-<<<<<<< HEAD
             sql.putNull("id_grupo");
-=======
-            sql.put("id_grupo", cliente.getGrupo(), 0);
->>>>>>> 43b8097737f068e904fe2922ef4bf49aa5fe7278
 
             try {
                 stm.execute(sql.getInsert());

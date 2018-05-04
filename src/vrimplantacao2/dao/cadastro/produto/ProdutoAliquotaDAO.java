@@ -111,23 +111,17 @@ public class ProdutoAliquotaDAO {
                 sql.setWhere(
                         "id_produto = " + vo.getProduto().getId() + " and "
                         + "id_estado = " + vo.getEstado().getId());
-                stm.execute(sql.getUpdate());                
+                stm.execute(sql.getUpdate());
             } else if (opt.contains(OpcaoProduto.ICMS_FORNECEDOR)) {
                 sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
                 sql.setWhere(
                         "id_produto = " + vo.getProduto().getId() + " and "
                         + "id_estado = " + vo.getEstado().getId());
-                stm.execute(sql.getUpdate());                
+                stm.execute(sql.getUpdate());
             }
-<<<<<<< HEAD
-=======
-            sql.setWhere(
-                    "id_produto = " + vo.getProduto().getId() + " and "
-                    + "id_estado = " + vo.getEstado().getId());
             if (!sql.isEmpty()) {
                 stm.execute(sql.getUpdate());
             }
->>>>>>> 43b8097737f068e904fe2922ef4bf49aa5fe7278
         }
     }
 
