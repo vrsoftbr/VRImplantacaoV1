@@ -42,7 +42,9 @@ public enum OpcaoCliente {
     TELEFONE,
     CELULAR,
     ENDERECO_COMPLETO,
-    TIPO_INSCRICAO;    
+    TIPO_INSCRICAO,
+    PERMITE_CHEQUE,
+    PERMITE_CREDITOROTATIVO;    
     
     private static final Logger LOG = Logger.getLogger(OpcaoCliente.class.getName());
     private List<ClienteIMP> listaEspecial;

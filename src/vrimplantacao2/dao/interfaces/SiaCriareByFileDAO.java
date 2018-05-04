@@ -25,13 +25,13 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
-import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.dao.cadastro.cliente.ClientePreferencialDAO;
+import vrimplantacao2.dao.cadastro.mercadologico.OpcaoMercadologico;
 
 /**
  *
@@ -74,42 +74,10 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
     }
 
     @Override
-    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
-        List<FamiliaProdutoIMP> result = new ArrayList<>();
-        WorkbookSettings settings = new WorkbookSettings();
-        Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls + "//familia.xls"), settings);
-        Sheet[] sheets = arquivo.getSheets();
-        int linha;
-
-        for (int sh = 0; sh < sheets.length; sh++) {
-            Sheet sheet = arquivo.getSheet(sh);
-            linha = 0;
-
-            for (int i = 0; i < sheet.getRows(); i++) {
-                linha++;
-                if (linha == 1) {
-                    continue;
-                }
-
-                Cell cellCodigo = sheet.getCell(0, i);
-                Cell cellDescricao = sheet.getCell(2, i);
-
-                FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-                imp.setImportLoja(getLojaOrigem());
-                imp.setImportSistema(getSistema());
-                imp.setImportId(cellCodigo.getContents());
-                imp.setDescricao(cellDescricao.getContents());
-                result.add(imp);
-            }
-        }
-        return result;
-    }
-
-    @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
         WorkbookSettings settings = new WorkbookSettings();
-        Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls + "//grupo.xls"), settings);
+        Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls + "//produto.xls"), settings);
         Sheet[] sheets = arquivo.getSheets();
         int linha;
 
@@ -125,19 +93,30 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                         continue;
                     }
 
-                    Cell cellId = sheet.getCell(0, i);
-                    Cell cellDescricao = sheet.getCell(1, i);
+                    Cell cellIdDivisao = sheet.getCell(145, i);
+                    Cell cellIdGrupo = sheet.getCell(1, i);
+                    Cell cellIdCategoria = sheet.getCell(45, i);
+                    Cell cellIdFamilia = sheet.getCell(24, i);
 
-                    MercadologicoIMP imp = new MercadologicoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setMerc1ID(cellId.getContents());
-                    imp.setMerc1Descricao(cellDescricao.getContents());
-                    imp.setMerc2ID("1");
-                    imp.setMerc2Descricao(cellDescricao.getContents());
-                    imp.setMerc3ID("1");
-                    imp.setMerc3Descricao(cellDescricao.getContents());
-                    result.add(imp);
+                    if ((cellIdDivisao.getContents() != null)
+                            && (!cellIdDivisao.getContents().trim().isEmpty())
+                            && (cellIdGrupo.getContents() != null)
+                            && (!cellIdGrupo.getContents().trim().isEmpty())
+                            && (cellIdCategoria.getContents() != null)
+                            && (!cellIdCategoria.getContents().trim().isEmpty())
+                            && (cellIdFamilia.getContents() != null)
+                            && (!cellIdFamilia.getContents().trim().isEmpty())) {
+
+                        MercadologicoIMP imp = new MercadologicoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setMerc1ID(cellIdDivisao.getContents());
+                        imp.setMerc2ID(cellIdGrupo.getContents());
+                        imp.setMerc3ID(cellIdCategoria.getContents());
+                        imp.setMerc4ID(cellIdFamilia.getContents());
+                        result.add(imp);
+
+                    }
                 }
             }
             return result;
@@ -159,7 +138,6 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
 
         try {
 
-            //Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
             for (int sh = 0; sh < sheets.length; sh++) {
                 Sheet sheet = arquivo.getSheet(sh);
                 linha = 0;
@@ -270,39 +248,18 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                     imp.setCodMercadologico1(cellIdGrupo.getContents());
                     imp.setCodMercadologico2("1");
                     imp.setCodMercadologico3("1");
-                    imp.setPrecovenda(Double.parseDouble(strPreco));
-                    imp.setCustoComImposto(Double.parseDouble(strCusto));
+                    imp.setPrecovenda(Double.parseDouble(strPreco.replace(",", ".")));
+                    imp.setCustoComImposto(Double.parseDouble(strCusto.replace(",", ".")));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
-                    imp.setMargem(Double.parseDouble(cellMargem.getContents()));
-                    imp.setPesoBruto(Double.parseDouble(cellPesoBruto.getContents()));
-                    imp.setPesoLiquido(Double.parseDouble(cellPesoLiquido.getContents()));
+                    imp.setMargem(Double.parseDouble(cellMargem.getContents().replace(",", ".")));
+                    imp.setPesoBruto(Double.parseDouble(cellPesoBruto.getContents().replace(",", ".")));
+                    imp.setPesoLiquido(Double.parseDouble(cellPesoLiquido.getContents().replace(",", ".")));
                     imp.setNcm(cellNcm.getContents());
                     imp.setCest(cellCest.getContents());
                     imp.setPiscofinsCstDebito(cellCstPisDebito.getContents());
                     imp.setPiscofinsCstCredito(cellCstPisCredito.getContents());
                     imp.setIcmsDebitoId(cellIcms.getContents());
                     imp.setIcmsCreditoId(cellIcms.getContents());
-
-                    /*if (imp.getEan().trim().length() < 7) {
-                     ProdutoBalancaVO produtoBalanca;
-                     long codigoProduto;
-                     codigoProduto = Long.parseLong(imp.getEan().trim());
-                     if (codigoProduto <= Integer.MAX_VALUE) {
-                     produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                     } else {
-                     produtoBalanca = null;
-                     }
-                     if (produtoBalanca != null) {
-                     imp.seteBalanca(true);
-                     imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : Utils.stringToInt(cellValidade.getContents()));
-                     } else {
-                     imp.setValidade(0);
-                     imp.seteBalanca(false);
-                     }
-                     } else {
-                     imp.setValidade(Utils.stringToInt(cellValidade.getContents()));
-                     imp.seteBalanca(false);
-                     }*/
                     result.add(imp);
                 }
             }
@@ -568,6 +525,7 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                     Cell cellNumEnt = sheet.getCell(81, i);
                     Cell cellPontoRef = sheet.getCell(82, i);
                     Cell cellCliEspecial = sheet.getCell(83, i);
+                    Cell cellCheque = sheet.getCell(84, i);
                     Cell cellCrediario = sheet.getCell(85, i);
                     Cell cellIdEmpresa = sheet.getCell(90, i);
                     Cell cellSite = sheet.getCell(110, i);
@@ -637,7 +595,7 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                                 && (!cellCliEspecial.getContents().trim().isEmpty())) {
 
                             if ("S".equals(cellCliEspecial.getContents().trim())) {
-                                imp.setObservacao2(imp.getObservacao2() + "; CLIENTE ESPECIAL");
+                                imp.setObservacao2(imp.getObservacao2() + "; CLIENTE ESPECIAL");                                
                             }
                         }
 
@@ -646,6 +604,14 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
 
                             if ("S".equals(cellCrediario.getContents().trim())) {
                                 imp.setObservacao2(imp.getObservacao2() + "; CLIENTE CREDIARIO");
+                                imp.setPermiteCreditoRotativo(true);
+                            }
+                        }
+                        
+                        if ((cellCheque.getContents() != null) &&
+                                (!cellCheque.getContents().trim().isEmpty())) {
+                            if ("S".equals(cellCheque.getContents().trim())) {
+                                imp.setPermiteCheque(true);
                             }
                         }
 
@@ -721,6 +687,8 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                     Cell cellJuros = sheet.getCell(15, i);
                     Cell cellCaixa = sheet.getCell(23, i);
                     Cell cellCupom = sheet.getCell(24, i);
+
+                    System.out.println(linha + " - " + cellEmissao.getContents());
 
                     if ((cellEmissao.getContents() != null)
                             && (!cellEmissao.getContents().trim().isEmpty())) {

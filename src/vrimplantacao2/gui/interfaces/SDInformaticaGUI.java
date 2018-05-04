@@ -168,6 +168,7 @@ public class SDInformaticaGUI extends VRInternalFrame {
                     
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;                                        
+                    dao.i_arquivoOferta = txtOferta.getArquivo();
                     
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
@@ -190,6 +191,12 @@ public class SDInformaticaGUI extends VRInternalFrame {
                             }
                             opcoes.add(OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC);
                             importador.importarProduto(opcoes.toArray(new OpcaoProduto[]{}));
+                        }
+                        
+                        if (chkProdutosComplemento.isSelected()) {
+                            List<OpcaoProduto> opcoes = new ArrayList<>();
+                            opcoes.add(OpcaoProduto.IMPORTAR_MANTER_BALANCA);
+                            importador.importarProdutoComplemento(opcoes.toArray(new OpcaoProduto[]{}));
                         }
 
                         {
@@ -256,6 +263,11 @@ public class SDInformaticaGUI extends VRInternalFrame {
                         if (chkT1EANemBranco.isSelected()) {
                             importador.importarEANemBranco();
                         }
+                        
+                        if (!txtOferta.getArquivo().isEmpty()) {
+                            importador.importarOfertas(null);
+                        }
+                        
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
@@ -361,6 +373,8 @@ public class SDInformaticaGUI extends VRInternalFrame {
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkCustoComImposto = new vrframework.bean.checkBox.VRCheckBox();
         chkCustoSemImposto = new vrframework.bean.checkBox.VRCheckBox();
+        chkProdutosComplemento = new vrframework.bean.checkBox.VRCheckBox();
+        txtOferta = new vrframework.bean.fileChooser.VRFileChooser();
         tabImpCliente = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -542,6 +556,10 @@ public class SDInformaticaGUI extends VRInternalFrame {
         chkCustoSemImposto.setText("Custo Sem Imposto");
         tabImpProduto.add(chkCustoSemImposto);
 
+        chkProdutosComplemento.setText("Produtos Balança (Complemento)");
+        tabImpProduto.add(chkProdutosComplemento);
+        tabImpProduto.add(txtOferta);
+
         vRTabbedPane2.addTab("Produtos", tabImpProduto);
 
         tabImpCliente.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
@@ -593,7 +611,7 @@ public class SDInformaticaGUI extends VRInternalFrame {
                     .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(108, Short.MAX_VALUE))
+                .addContainerGap(159, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Clientes", tabImpCliente);
@@ -659,7 +677,7 @@ public class SDInformaticaGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkFCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(81, Short.MAX_VALUE))
+                .addContainerGap(136, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Fornecedores", tabImpFornecedor);
@@ -709,7 +727,7 @@ public class SDInformaticaGUI extends VRInternalFrame {
                 .addComponent(chkConvConveniados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkConvTransacoes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(77, Short.MAX_VALUE))
+                .addContainerGap(136, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Convênio", tabImpConvenio);
@@ -753,7 +771,7 @@ public class SDInformaticaGUI extends VRInternalFrame {
                 .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(55, Short.MAX_VALUE))
+                .addContainerGap(118, Short.MAX_VALUE))
         );
 
         tabs.addTab("Unificação", vRPanel2);
@@ -1067,6 +1085,7 @@ public class SDInformaticaGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
+    private vrframework.bean.checkBox.VRCheckBox chkProdutosComplemento;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
     private vrframework.bean.checkBox.VRCheckBox chkT1AtivoInativo;
     private vrframework.bean.checkBox.VRCheckBox chkT1Custo;
@@ -1101,6 +1120,7 @@ public class SDInformaticaGUI extends VRInternalFrame {
     private javax.swing.JTabbedPane tabsConn;
     private vrframework.bean.fileChooser.VRFileChooser txtDatabase;
     private vrframework.bean.textField.VRTextField txtHost;
+    private vrframework.bean.fileChooser.VRFileChooser txtOferta;
     private vrframework.bean.textField.VRTextField txtPorta;
     private vrframework.bean.passwordField.VRPasswordField txtSenha;
     private vrframework.bean.textField.VRTextField txtUsuario;

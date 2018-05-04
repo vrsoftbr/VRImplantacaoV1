@@ -21,10 +21,10 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoView;
 import vrimplantacao2.parametro.Parametros;
 
 public class SiaCriareByFileGUI extends VRInternalFrame {
-    
+
     private static final String SISTEMA = "SiaCriareByFile";
     private static SiaCriareByFileGUI instance;
-    
+
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
 
@@ -35,7 +35,7 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
-    
+
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         params.put(txtDatabase.getText(), SISTEMA, "DATABASE");
@@ -47,9 +47,9 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
         }
         params.salvar();
     }
-    
+
     private SiaCriareByFileDAO siaDAO = new SiaCriareByFileDAO();
-    
+
     private SiaCriareByFileGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
@@ -63,7 +63,7 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
         gravarParametros();
         carregarLojaVR();
     }
-    
+
     public void carregarLojaVR() throws Exception {
         cmbLojaVR.setModel(new DefaultComboBoxModel());
         int cont = 0;
@@ -77,10 +77,10 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
         }
         cmbLojaVR.setSelectedIndex(index);
     }
-    
+
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
-            i_mdiFrame.setWaitCursor();            
+            i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
                 instance = new SiaCriareByFileGUI(i_mdiFrame);
             }
@@ -97,23 +97,24 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
         Thread thread = new Thread() {
             int idLojaVR;
             String idLojaCliente;
+
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
-                    
-                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
+
+                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = txtLojaCliente.getText();
                     siaDAO.v_pahtFileXls = txtDatabase.getText();
-                    
+
                     Importador importador = new Importador(siaDAO);
                     importador.setLojaOrigem(idLojaCliente);
-                    importador.setLojaVR(idLojaVR);                    
+                    importador.setLojaVR(idLojaVR);
 
                     if (tabs.getSelectedIndex() == 0) {
 
-                        if (chkFamiliaProduto.isSelected()) {                        
+                        if (chkFamiliaProduto.isSelected()) {
                             importador.importarFamiliaProduto();
                         }
 
@@ -153,7 +154,7 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
                             }
                             if (chkT1AtivoInativo.isSelected()) {
                                 opcoes.add(OpcaoProduto.ATIVO);
-                            }    
+                            }
                             if (chkT1DescCompleta.isSelected()) {
                                 opcoes.add(OpcaoProduto.DESC_COMPLETA);
                             }
@@ -165,7 +166,7 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
                             }
                             if (chkT1ProdMercadologico.isSelected()) {
                                 opcoes.add(OpcaoProduto.MERCADOLOGICO);
-                            }                        
+                            }
                             if (chkValidade.isSelected()) {
                                 opcoes.add(OpcaoProduto.VALIDADE);
                             }
@@ -185,7 +186,7 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
                                 importador.atualizarProdutos(opcoes);
                             }
                         }
-                        
+
                         if (chkT1EAN.isSelected()) {
                             importador.importarEAN();
                         }
@@ -193,7 +194,7 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
                         if (chkT1EANemBranco.isSelected()) {
                             importador.importarEANemBranco();
                         }
-                        
+
                         if (chkOfertas.isSelected()) {
                             importador.importarOfertas(null);
                         }
@@ -205,28 +206,32 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
-                        
+
                         List<OpcaoFornecedor> opcoes = new ArrayList<>();
                         if (chkFContatos.isSelected()) {
-                            opcoes.add(OpcaoFornecedor.CONTATOS);                        
+                            opcoes.add(OpcaoFornecedor.CONTATOS);
                         }
-                        
+
                         if (!opcoes.isEmpty()) {
                             importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
                         }
 
                         if (chkClientePreferencial.isSelected()) {
-                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.VALOR_LIMITE, OpcaoCliente.SITUACAO_CADASTRO);
+                            importador.importarClientePreferencial(OpcaoCliente.DADOS,
+                                    OpcaoCliente.VALOR_LIMITE,
+                                    OpcaoCliente.SITUACAO_CADASTRO,
+                                    OpcaoCliente.PERMITE_CHEQUE,
+                                    OpcaoCliente.PERMITE_CREDITOROTATIVO);
                         }
 
                         if (chkRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }
-                        
+
                         if (chkCheque.isSelected()) {
                             importador.importarCheque();
                         }
-                        
+
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -236,12 +241,12 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
                         }
                         if (chkUnifProdutoFornecedor.isSelected()) {
                             importador.unificarProdutoFornecedor();
-                        }                        
+                        }
                         if (chkUnifClientePreferencial.isSelected()) {
                             importador.unificarClientePreferencial();
-                        }                        
+                        }
                     }
-                                       
+
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
@@ -873,10 +878,10 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
         try {
             siaDAO.v_pahtFileXls = txtDatabase.getText();
             MapaTributacaoView.exibir(
-                mdiFrame,
-                SISTEMA,
-                null,
-                siaDAO);
+                    mdiFrame,
+                    SISTEMA,
+                    null,
+                    siaDAO);
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Erro ao abrir");
         }
@@ -944,7 +949,5 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
     private vrframework.bean.textField.VRTextField vRTextField1;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
     // End of variables declaration//GEN-END:variables
-
-    
 
 }

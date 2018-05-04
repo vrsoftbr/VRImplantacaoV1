@@ -9,6 +9,7 @@ import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaVO;
 import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.mercadologico.OpcaoMercadologico;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -80,7 +81,7 @@ public abstract class InterfaceDAO {
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         return new ArrayList<>();        
     }
-    
+
     /**
      * Retorna um mercadológico organizado por nível.
      * @return
@@ -105,6 +106,15 @@ public abstract class InterfaceDAO {
      * @throws Exception 
      */
     public List<ProdutoIMP> getProdutos() throws Exception {
+        return new ArrayList<>();
+    }
+
+    /**
+     * Retorna uma listagem com os produtos complemento sistema SD Informatica.
+     * @return Retorna uma listagem com os produtos cadastrados.
+     * @throws Exception 
+     */
+    public List<ProdutoIMP> getProdutosComplemento() throws Exception {
         return new ArrayList<>();
     }
     

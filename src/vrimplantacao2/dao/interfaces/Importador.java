@@ -251,6 +251,18 @@ public class Importador {
 
     }
 
+    public void importarProdutoComplemento(OpcaoProduto... opcoes) throws Exception {
+        ProgressBar.setStatus("Carregando produtos...");
+        List<ProdutoIMP> produtos = getInterfaceDAO().getProdutosComplemento();
+        ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
+        provider.setLoja(getLojaOrigem());
+        provider.setSistema(getSistema());
+        provider.setLojaVR(getLojaVR());
+        provider.setOpcoes(opcoes);
+        ProdutoRepository repository = new ProdutoRepository(provider);
+        repository.salvar(produtos);
+    }
+    
     public void importarProdutoBalanca(OpcaoProduto... opcoes) throws Exception {
 
         ProgressBar.setStatus("Carregando produtos...");

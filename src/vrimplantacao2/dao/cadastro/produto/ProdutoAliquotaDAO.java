@@ -106,13 +106,17 @@ public class ProdutoAliquotaDAO {
                 sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
                 sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
                 sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
+                sql.setWhere(
+                        "id_produto = " + vo.getProduto().getId() + " and "
+                        + "id_estado = " + vo.getEstado().getId());
+                stm.execute(sql.getUpdate());                
             } else if (opt.contains(OpcaoProduto.ICMS_FORNECEDOR)) {
                 sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
+                sql.setWhere(
+                        "id_produto = " + vo.getProduto().getId() + " and "
+                        + "id_estado = " + vo.getEstado().getId());
+                stm.execute(sql.getUpdate());                
             }
-            sql.setWhere(
-                    "id_produto = " + vo.getProduto().getId() + " and "
-                    + "id_estado = " + vo.getEstado().getId());
-            stm.execute(sql.getUpdate());
         }
     }
 
