@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.cadastro.fornecedor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -8,21 +9,25 @@ import java.util.Map;
 import java.util.Set;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.cadastro.ProdutoVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorContatoVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorPagamentoVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorVO;
+import vrimplantacao2.vo.cadastro.fornecedor.ProdutoFornecedorVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.FornecedorPagamentoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 
 /**
  *
  * @author Leandro
  */
 public class FornecedorRepository {
+
     private FornecedorRepositoryProvider provider;
 
     public FornecedorRepository(FornecedorRepositoryProvider provider) {
@@ -34,36 +39,36 @@ public class FornecedorRepository {
         fornecedores = null;
         System.gc();
         organizar(filtrados);
-        
+
         try {
             provider.begin();
-            
+
             MultiMap<String, FornecedorAnteriorVO> anteriores = provider.getAnteriores();
             Map<Long, FornecedorVO> cnpjExistentes = provider.getCnpjExistentes();
             FornecedorIDStack ids = provider.getIdsExistentes();
             MultiMap<String, Void> contatos = provider.getContatos();
             MultiMap<String, Void> pagamentos = provider.getPagamentos();
-            
+
             provider.setStatus("Fornecedores - Gravando...");
             provider.setMaximum(filtrados.size());
-            for (FornecedorIMP imp: filtrados.values()) {                
+            for (FornecedorIMP imp : filtrados.values()) {
                 FornecedorAnteriorVO anterior = anteriores.get(
                         provider.getSistema(),
                         provider.getLojaOrigem(),
                         imp.getImportId()
                 );
-                
+
                 FornecedorVO vo;
-                
+
                 if (anterior == null) {
-                    
+
                     vo = converter(imp);
-                    
+
                     //Se o CNPJ/CPF existir, gera um novo.
                     if (cnpjExistentes.containsKey(Utils.stringToLong(imp.getCnpj_cpf()))) {
                         vo.setCnpj(-2);
                     }
-                        
+
                     int id = ids.obterID(imp.getImportId());
 
                     //Obtem um ID válido.
@@ -79,19 +84,19 @@ public class FornecedorRepository {
                     anterior.setCodigoAtual(vo);
                     gravarFornecedorAnterior(anterior);
                     anteriores.put(
-                            anterior, 
+                            anterior,
                             provider.getSistema(),
                             provider.getLojaOrigem(),
                             imp.getImportId()
-                    );     
+                    );
                 } else {
                     vo = anterior.getCodigoAtual();
                 }
-                
+
                 if (vo != null) {
                     processarContatos(imp, vo, contatos);
-                    
-                    for (Integer condicao: imp.getCondicoesPagamentos()) {
+
+                    for (Integer condicao : imp.getCondicoesPagamentos()) {
                         provider.gravarCondicaoPagamento(vo.getId(), condicao);
                     }
 
@@ -99,10 +104,10 @@ public class FornecedorRepository {
                         provider.gravarPrazoFornecedor(vo.getId(), imp.getPrazoEntrega(), imp.getPrazoVisita(), imp.getPrazoSeguranca());
                     }
                 }
-                
+
                 provider.next();
             }
-            
+
             provider.commit();
         } catch (Exception e) {
             provider.rollback();
@@ -116,45 +121,45 @@ public class FornecedorRepository {
         fornecedores = null;
         System.gc();
         organizar(filtrados);
-        
+
         try {
             provider.begin();
-            
-            MultiMap<String, FornecedorAnteriorVO> anteriores = provider.getAnteriores();            
+
+            MultiMap<String, FornecedorAnteriorVO> anteriores = provider.getAnteriores();
             MultiMap<String, Void> contatos = provider.getContatos();
             MultiMap<String, Void> pagamentos = provider.getPagamentos();
-            
+
             provider.setStatus("Fornecedores - Gravando...");
             provider.setMaximum(filtrados.size());
-            
-            if (opt.contains(OpcaoFornecedor.CNPJ_CPF)) {            
+
+            if (opt.contains(OpcaoFornecedor.CNPJ_CPF)) {
                 provider.resetCnpjCpf();
             }
-             
+
             Map<Long, FornecedorVO> cnpjExistentes = provider.getCnpjExistentes();
-            
-            for (FornecedorIMP imp: filtrados.values()) {                
+
+            for (FornecedorIMP imp : filtrados.values()) {
                 FornecedorAnteriorVO anterior = anteriores.get(
                         provider.getSistema(),
                         provider.getLojaOrigem(),
                         imp.getImportId()
                 );
-                
+
                 if (anterior != null && anterior.getCodigoAtual() != null) {
-                    
+
                     FornecedorVO vo = converter(imp);
                     vo.setId(anterior.getCodigoAtual().getId());
                     long cnpj = Utils.stringToLong(imp.getCnpj_cpf());
-                    
+
                     if (cnpj <= 9999999) {
                         cnpj = anterior.getCodigoAtual().getId();
                     }
-                    
+
                     //Se o CNPJ/CPF existir, gera um novo.
                     if (cnpjExistentes.containsKey(cnpj)) {
                         vo.setCnpj(anterior.getCodigoAtual().getId());
                     }
-                    
+
                     if (opt.contains(OpcaoFornecedor.TELEFONE)
                             || (opt.contains(OpcaoFornecedor.TIPO_INSCRICAO))
                             || (opt.contains(OpcaoFornecedor.RAZAO_SOCIAL))
@@ -172,17 +177,17 @@ public class FornecedorRepository {
                             || (opt.contains(OpcaoFornecedor.TIPO_PAGAMENTO))) {
                         atualizarFornecedor(vo, opt);
                     }
-                    
+
                     if (opt.contains(OpcaoFornecedor.CONTATOS)) {
                         processarContatos(imp, vo, contatos);
                     }
-                    
+
                     if (opt.contains(OpcaoFornecedor.CONDICAO_PAGAMENTO2)) {
                         processarPagamentos(imp, vo, pagamentos);
                     }
-                    
+
                     if (opt.contains(OpcaoFornecedor.CONDICAO_PAGAMENTO)) {
-                        for (Integer condicao: imp.getCondicoesPagamentos()) {
+                        for (Integer condicao : imp.getCondicoesPagamentos()) {
                             provider.gravarCondicaoPagamento(vo.getId(), condicao);
                         }
                     }
@@ -191,15 +196,48 @@ public class FornecedorRepository {
                         if (imp.getPrazoEntrega() > 0 || imp.getPrazoSeguranca() > 0 || imp.getPrazoVisita() > 0) {
                             provider.gravarPrazoFornecedor(vo.getId(), imp.getPrazoEntrega(), imp.getPrazoVisita(), imp.getPrazoSeguranca());
                         }
-                    }                    
+                    }
                 }
                 provider.next();
             }
-            
+
             provider.commit();
         } catch (Exception e) {
             provider.rollback();
             throw e;
+        }
+    }
+
+    public void atualizarProdFornecedor(List<ProdutoFornecedorIMP> produtoFornecedores, OpcaoProdutoFornecedor... opc) throws Exception {
+        Set<OpcaoProdutoFornecedor> opt = new HashSet<>(Arrays.asList(opc));
+        MultiMap<String, ProdutoFornecedorIMP> filtrados = filtrarProdFornecedor(produtoFornecedores);
+        produtoFornecedores = null;
+        System.gc();
+        organizarProdutoFornecedor(filtrados);
+
+        try {
+            provider.begin();
+            provider.setStatus("Produtos Fornecedores - Gravando...");
+            provider.setMaximum(filtrados.size());
+
+            for (ProdutoFornecedorIMP imp : filtrados.values()) {
+
+                ProdutoFornecedorVO vo = converterProdutoFornecedor(imp);
+                
+                if(opt.contains(OpcaoProdutoFornecedor.IPI)){
+                    atualizarProdutoFornecedor(vo, opt);
+                }
+                if(opt.contains(OpcaoProdutoFornecedor.QTDEMBALAGEM)){
+                    atualizarProdutoFornecedor(vo, opt);
+                }
+                
+                provider.next();
+            }
+
+            provider.commit();
+        } catch (Exception ex) {
+            provider.rollback();
+            throw ex;
         }
     }
 
@@ -208,18 +246,18 @@ public class FornecedorRepository {
         fornecedores = null;
         System.gc();
         organizar(filtrados);
-        
+
         try {
             provider.begin();
-            
+
             MultiMap<String, FornecedorAnteriorVO> anteriores = provider.getAnteriores();
             Map<Long, FornecedorVO> cnpjExistentes = provider.getCnpjExistentes();
             FornecedorIDStack ids = provider.getIdsExistentes();
             MultiMap<String, Void> contatos = provider.getContatos();
-            
+
             provider.setStatus("Fornecedores - Gravando...");
             provider.setMaximum(filtrados.size());
-            for (FornecedorIMP imp: filtrados.values()) {
+            for (FornecedorIMP imp : filtrados.values()) {
                 //Localiza as referencias dos fornecedores (anteriores e por cnpj/cpf)
                 FornecedorAnteriorVO anterior = anteriores.get(
                         provider.getSistema(),
@@ -227,11 +265,11 @@ public class FornecedorRepository {
                         imp.getImportId()
                 );
                 FornecedorVO fornecedorPorCnpj = cnpjExistentes.get(Utils.stringToLong(imp.getCnpj_cpf()));
-                
-                FornecedorVO vo = null;                
-                if (anterior == null) {                    
-                    vo = converter(imp); 
-                    
+
+                FornecedorVO vo = null;
+                if (anterior == null) {
+                    vo = converter(imp);
+
                     if (fornecedorPorCnpj == null) {
                         int id = ids.obterID(imp.getImportId());
 
@@ -251,22 +289,22 @@ public class FornecedorRepository {
                     anterior.setCodigoAtual(vo);
                     gravarFornecedorAnterior(anterior);
                     anteriores.put(
-                            anterior, 
+                            anterior,
                             provider.getSistema(),
                             provider.getLojaOrigem(),
                             imp.getImportId()
-                    );     
+                    );
                 } else {
                     vo = anterior.getCodigoAtual();
                     if (vo == null) {
                         vo = fornecedorPorCnpj;
                     }
                 }
-                
+
                 if (vo != null) {
                     processarContatos(imp, vo, contatos);
-                    
-                    for (Integer condicao: imp.getCondicoesPagamentos()) {
+
+                    for (Integer condicao : imp.getCondicoesPagamentos()) {
                         provider.gravarCondicaoPagamento(vo.getId(), condicao);
                     }
 
@@ -274,19 +312,19 @@ public class FornecedorRepository {
                         provider.gravarPrazoFornecedor(vo.getId(), imp.getPrazoEntrega(), imp.getPrazoVisita(), imp.getPrazoSeguranca());
                     }
                 }
-                
+
                 provider.next();
             }
-            
+
             provider.commit();
         } catch (Exception e) {
             provider.rollback();
             throw e;
         }
     }
-    
+
     public void processarContatos(FornecedorIMP imp, FornecedorVO vo, MultiMap<String, Void> contatos) throws Exception {
-        for (FornecedorContatoIMP impCont: imp.getContatos().values()) {
+        for (FornecedorContatoIMP impCont : imp.getContatos().values()) {
             //Converte o IMP em VO
             FornecedorContatoVO contato = converterContatoFornecedor(impCont);
             contato.setFornecedor(vo);
@@ -311,9 +349,9 @@ public class FornecedorRepository {
             }
         }
     }
-    
+
     public void processarPagamentos(FornecedorIMP imp, FornecedorVO vo, MultiMap<String, Void> pagamentos) throws Exception {
-        for (FornecedorPagamentoIMP impPag: imp.getPagamentos().values()) {
+        for (FornecedorPagamentoIMP impPag : imp.getPagamentos().values()) {
             FornecedorPagamentoVO pagamento = converterPagamentoFornecedor(impPag);
             pagamento.setFornecedor(vo);
             //Se houver algum contato cadastrado com essa assinatura,
@@ -324,35 +362,50 @@ public class FornecedorRepository {
             )) {
                 gravarFornecedorPagamento(pagamento);
                 pagamentos.put(
-                        null, 
+                        null,
                         String.valueOf(pagamento.getFornecedor().getId()),
                         String.valueOf(pagamento.getVencimento())
                 );
             }
         }
     }
-    
+
     public MultiMap<String, FornecedorIMP> filtrar(List<FornecedorIMP> fornecedores) throws Exception {
         MultiMap<String, FornecedorIMP> result = new MultiMap<>();
-        
-        for (FornecedorIMP imp: fornecedores) {
+
+        for (FornecedorIMP imp : fornecedores) {
             result.put(
-                imp, 
-                imp.getImportSistema(), 
-                imp.getImportLoja(), 
-                imp.getImportId()
+                    imp,
+                    imp.getImportSistema(),
+                    imp.getImportLoja(),
+                    imp.getImportId()
             );
         }
-        
+
         return result;
     }
-    
+
+    public MultiMap<String, ProdutoFornecedorIMP> filtrarProdFornecedor(List<ProdutoFornecedorIMP> produtoFornecedores) throws Exception {
+        MultiMap<String, ProdutoFornecedorIMP> result = new MultiMap<>();
+
+        for (ProdutoFornecedorIMP imp : produtoFornecedores) {
+            result.put(
+                    imp,
+                    imp.getImportSistema(),
+                    imp.getImportLoja(),
+                    imp.getIdProduto()
+            );
+        }
+
+        return result;
+    }
+
     public void organizar(MultiMap<String, FornecedorIMP> filtrados) {
         MultiMap<String, FornecedorIMP> idsValidos = new MultiMap<>(3);
         MultiMap<String, FornecedorIMP> idsInvalidos = new MultiMap<>(3);
-        
-        for (FornecedorIMP imp: filtrados.values()) {
-            String[] chave = new String[] {
+
+        for (FornecedorIMP imp : filtrados.values()) {
+            String[] chave = new String[]{
                 imp.getImportSistema(),
                 imp.getImportLoja(),
                 imp.getImportId()
@@ -368,9 +421,9 @@ public class FornecedorRepository {
                 idsInvalidos.put(imp, chave);
             }
         }
-        
+
         filtrados.clear();
-        for (FornecedorIMP imp: idsValidos.getSortedMap().values()) {
+        for (FornecedorIMP imp : idsValidos.getSortedMap().values()) {
             filtrados.put(
                     imp,
                     imp.getImportSistema(),
@@ -378,20 +431,61 @@ public class FornecedorRepository {
                     imp.getImportId()
             );
         }
-        for (FornecedorIMP imp: idsInvalidos.getSortedMap().values()) {
+        for (FornecedorIMP imp : idsInvalidos.getSortedMap().values()) {
             filtrados.put(
                     imp,
                     imp.getImportSistema(),
                     imp.getImportLoja(),
                     imp.getImportId()
             );
-        } 
+        }
     }
-    
+
+    public void organizarProdutoFornecedor(MultiMap<String, ProdutoFornecedorIMP> filtrados) {
+        MultiMap<String, ProdutoFornecedorIMP> idsValidos = new MultiMap<>(3);
+        MultiMap<String, ProdutoFornecedorIMP> idsInvalidos = new MultiMap<>(3);
+
+        for (ProdutoFornecedorIMP imp : filtrados.values()) {
+            String[] chave = new String[]{
+                imp.getImportSistema(),
+                imp.getImportLoja(),
+                imp.getIdProduto()
+            };
+            try {
+                int id = Integer.parseInt(imp.getIdProduto());
+                if (id > 1 && id <= 999999) {
+                    idsValidos.put(imp, chave);
+                } else {
+                    idsInvalidos.put(imp, chave);
+                }
+            } catch (NumberFormatException ex) {
+                idsInvalidos.put(imp, chave);
+            }
+        }
+
+        filtrados.clear();
+        for (ProdutoFornecedorIMP imp : idsValidos.getSortedMap().values()) {
+            filtrados.put(
+                    imp,
+                    imp.getImportSistema(),
+                    imp.getImportLoja(),
+                    imp.getIdProduto()
+            );
+        }
+        for (ProdutoFornecedorIMP imp : idsInvalidos.getSortedMap().values()) {
+            filtrados.put(
+                    imp,
+                    imp.getImportSistema(),
+                    imp.getImportLoja(),
+                    imp.getIdProduto()
+            );
+        }
+    }
+
     public FornecedorVO converter(FornecedorIMP imp) throws Exception {
         FornecedorVO vo = new FornecedorVO();
 
-        vo.setRazaoSocial(imp.getRazao());        
+        vo.setRazaoSocial(imp.getRazao());
         vo.setNomeFantasia(imp.getFantasia());
         vo.setCnpj(Utils.stringToLong(imp.getCnpj_cpf(), -1));
         vo.setInscricaoEstadual(imp.getIe_rg());
@@ -403,16 +497,16 @@ public class FornecedorRepository {
         vo.setPedidoMinimoQtd(imp.getQtd_minima_pedido());
         vo.setPedidoMinimoValor(imp.getValor_minimo_pedido());
         vo.setDataCadastro(imp.getDatacadastro() != null ? imp.getDatacadastro() : new Date());
-        vo.setObservacao(imp.getObservacao());        
+        vo.setObservacao(imp.getObservacao());
         if (imp.getTipo_inscricao() == TipoInscricao.VAZIO) {
             vo.setTipoInscricao(TipoInscricao.analisarCnpjCpf(vo.getCnpj()));
         } else {
             vo.setTipoInscricao(imp.getTipo_inscricao());
-        }        
+        }
         vo.setTipoFornecedor(imp.getTipoFornecedor());
         vo.setTipoEmpresa(imp.getTipoEmpresa());
         vo.setTipoPagamento(imp.getTipoPagamento());
-        
+
         //<editor-fold defaultstate="collapsed" desc="ENDEREÇO">
         vo.setEndereco(imp.getEndereco());
         vo.setNumero(imp.getNumero());
@@ -428,7 +522,7 @@ public class FornecedorRepository {
         vo.setEstado(vo.getMunicipio().getEstado());
         vo.setCep(Utils.stringToInt(imp.getCep()));
         //</editor-fold>
-        
+
         //<editor-fold defaultstate="collapsed" desc="ENDEREÇO COBRANÇA">
         vo.setEnderecoCobranca(imp.getCob_endereco());
         vo.setNumeroCobranca(imp.getCob_numero());
@@ -440,10 +534,26 @@ public class FornecedorRepository {
             if (vo.getMunicipioCobranca() == null) {
                 vo.setMunicipioCobranca(provider.getMunicipioPadrao());
             }
-        }        
+        }
         vo.setEstadoCobranca(vo.getMunicipioCobranca().getEstado());
         vo.setCepCobranca(Utils.stringToInt(imp.getCob_cep()));
         //</editor-fold>
+
+        return vo;
+    }
+
+    public ProdutoFornecedorVO converterProdutoFornecedor(ProdutoFornecedorIMP imp) {
+        ProdutoFornecedorVO vo = new ProdutoFornecedorVO();
+
+        ProdutoVO prodVO = new ProdutoVO();
+        prodVO.setId(Integer.parseInt(imp.getIdProduto()));
+        vo.setProduto(prodVO);
+        FornecedorVO forVO = new FornecedorVO();
+        forVO.setId(Integer.parseInt(imp.getIdFornecedor()));
+        vo.setFornecedor(forVO);
+        vo.setIpi(imp.getIpi());
+        vo.setTipoIpi(imp.getTipoIpi());
+        vo.setQtdEmbalagem(imp.getQtdEmbalagem());
 
         return vo;
     }
@@ -476,7 +586,7 @@ public class FornecedorRepository {
         contato.setTipoContato(imp.getTipoContato());
         return contato;
     }
-    
+
     public FornecedorPagamentoVO converterPagamentoFornecedor(FornecedorPagamentoIMP imp) throws Exception {
         FornecedorPagamentoVO pagamento = new FornecedorPagamentoVO();
         pagamento.setVencimento(imp.getVencimento());
@@ -486,13 +596,17 @@ public class FornecedorRepository {
     public void gravarFornecedorContato(FornecedorContatoVO contato) throws Exception {
         provider.gravarFornecedorContato(contato);
     }
-    
-    public void gravarFornecedorPagamento(FornecedorPagamentoVO pagamento)throws Exception {
+
+    public void gravarFornecedorPagamento(FornecedorPagamentoVO pagamento) throws Exception {
         provider.gravarCondicaoPagamento(pagamento);
     }
 
     private void atualizarFornecedor(FornecedorVO vo, Set<OpcaoFornecedor> opt) throws Exception {
         provider.atualizarFornecedor(vo, opt);
     }
-    
+
+    public void atualizarProdutoFornecedor(ProdutoFornecedorVO vo, Set<OpcaoProdutoFornecedor> opt) throws Exception {
+        provider.atualizarProdutoFornecedor(vo, opt);
+    }
+
 }

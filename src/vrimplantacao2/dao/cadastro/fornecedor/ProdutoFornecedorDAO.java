@@ -2,9 +2,12 @@ package vrimplantacao2.dao.cadastro.fornecedor;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
@@ -370,4 +373,24 @@ public class ProdutoFornecedorDAO {
             throw e;
         }        
     }   
+    
+    public void atualizarProdutoFornecedor(ProdutoFornecedorVO vo, Set<OpcaoProdutoFornecedor> opcao) throws Exception {
+        
+        if(opcao != null){
+            try (Statement stm = Conexao.createStatement()){
+                SQLBuilder sql = new SQLBuilder();
+                sql.setTableName("produtofornecedor");
+                if (opcao.contains(OpcaoProdutoFornecedor.IPI)) {
+                    sql.put("ipi", vo.getIpi());
+                    sql.put("tipoipi", vo.getTipoIpi());
+                }
+                if (opcao.contains(OpcaoProdutoFornecedor.QTDEMBALAGEM)) {
+                    sql.put("qtdembalagem", vo.getQtdEmbalagem());
+                }
+                sql.setWhere("id_produto = " + vo.getProduto().getId() + 
+                             " and id_fornecedor = " + vo.getFornecedor().getId());
+                stm.execute(sql.getUpdate());
+            }
+        }
+    }
 }

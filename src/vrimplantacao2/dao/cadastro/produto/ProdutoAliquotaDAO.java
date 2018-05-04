@@ -83,7 +83,7 @@ public class ProdutoAliquotaDAO {
                     sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
                     sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
                 } else if (opt.contains(OpcaoProduto.ICMS_FORNECEDOR)) {
-                    sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
+                    sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCredito().getId());
                 }
                 sql.setWhere(
                         "id_produto = " + vo.getProduto().getId() + " and "
@@ -109,7 +109,8 @@ public class ProdutoAliquotaDAO {
                 sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
                 sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
             } else if (opt.contains(OpcaoProduto.ICMS_FORNECEDOR)) {
-                sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
+                    sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCredito().getId());
+                    //sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
             }
             sql.setWhere(
                     "id_produto = " + vo.getProduto().getId() + " and "

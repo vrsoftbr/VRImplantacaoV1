@@ -624,7 +624,6 @@ public class FornecedorDAO {
             } else {
                 sql.put("id_tipoindicadorie", TipoIndicadorIE.NAO_CONTRIBUINTE.getId());
             }
-
             stm.execute(sql.getInsert());
         }
     }

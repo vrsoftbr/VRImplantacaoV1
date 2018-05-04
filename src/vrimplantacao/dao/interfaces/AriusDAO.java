@@ -17,6 +17,7 @@ import vrframework.classe.ProgressBar;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.venda.MultiStatementIterator;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
@@ -113,26 +114,26 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-        try(Statement stm = ConexaoOracle.createStatement()){
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "        id,\n" +
-                    "        descritivo,\n" +
-                    "        icms_venda,\n" +
-                    "        reducao_venda,\n" +
-                    "        tributacao_venda \n" +
-                    "from \n" +
-                    "        tributacao_pdv \n" +
-                    "order by descritivo")){
-                while (rs.next()){
-                    result.add(new MapaTributoIMP(rs.getString("id"), 
-                                                  rs.getString("descritivo")));
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "        id,\n"
+                    + "        descritivo,\n"
+                    + "        icms_venda,\n"
+                    + "        reducao_venda,\n"
+                    + "        tributacao_venda \n"
+                    + "from \n"
+                    + "        tributacao_pdv \n"
+                    + "order by descritivo")) {
+                while (rs.next()) {
+                    result.add(new MapaTributoIMP(rs.getString("id"),
+                            rs.getString("descritivo")));
                 }
             }
         }
         return result;
     }
-    
+
     @Override
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
 
@@ -413,13 +414,13 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsAliq(rst.getDouble("icms_aliquota"));
                     imp.setIcmsReducao(rst.getDouble("icms_reduzido"));
                     imp.setPautaFiscalId(formatPautaFiscalId(
-                                rst.getString("estado"),
-                                rst.getString("ncm"),
-                                rst.getDouble("p_iva"),
-                                rst.getDouble("iva"),
-                                rst.getInt("st_venda"),
-                                rst.getInt("st_venda")
-                                ));
+                            rst.getString("estado"),
+                            rst.getString("ncm"),
+                            rst.getDouble("p_iva"),
+                            rst.getDouble("iva"),
+                            rst.getInt("st_venda"),
+                            rst.getInt("st_venda")
+                    ));
 
                     //imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem_compra"));
                     ProgressBar.setStatus("Convertendo em IMP.... " + cont);
@@ -569,16 +570,16 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
         if (opc == OpcaoProduto.ICMS_FORNECEDOR) {
             List<ProdutoIMP> result = new ArrayList<>();
             try (Statement stm = ConexaoOracle.createStatement()) {
-                
-                ProgressBar.setStatus("Executando a query...");
-                
+
+                ProgressBar.setStatus("Executando a query (Icms Fornecedor)...");
+
                 int cont = 1;
                 try (ResultSet rs = stm.executeQuery(
                         "SELECT\n" +
                         "    distinct\n" +
                         "    tf.produto, \n" +
                         "    tf.fornecedor, \n" +
-                        "    tf.estado, \n" +
+                        "    forn.estado, \n" +
                         "    case \n" +
                         "     when tf.tributacao_compra = 'T' and tf.icms_compra = 18 and tf.reducao_compra = 0 then 2\n" +
                         "     when tf.tributacao_compra = 'R' and tf.icms_compra = 18 and tf.reducao_compra = 33.33 then 9\n" +
@@ -620,31 +621,73 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                         "    left join produtos_ean ean on ean.produto = a.id\n" +
                         "    left join (select distinct id from vw_produtos_balancas order by id) bal on bal.id = a.id\n" +
                         "    left join familias fam on a.familia = fam.id\n" +
-                        "    join tabela_fornecedor_uf tf on a.id = tf.produto and\n" +
+                        "    join tabela_fornecedor_uf tf on a.id = tf.produto\n" +
+                        "    join fornecedores forn on tf.fornecedor = forn.id and\n" +
                         "    tf.datahora_alteracao in (select \n" +
                         "                                max(t.datahora_alteracao) \n" +
                         "                              from \n" +
                         "                                tabela_fornecedor_uf t \n" +
                         "                              where \n" +
-                        "                                t.produto = tf.produto)\n" +
+                        "                                t.produto = tf.produto) and \n" +
+                        "    forn.estado != 'SP'\n" +        
                         "order by\n" +
-                        "    tf.produto")) {
+                        "    tf.produto\n")) {
                     while (rs.next()) {
-                        
+
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportSistema(getSistema());
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportId(rs.getString("produto"));
-                        imp.setIcmsAliqEntrada(rs.getDouble("icms_compra"));
+                        imp.setIcmsCreditoId(rs.getString("icms_credito"));
                         imp.setIcmsCstEntrada(rs.getInt("st_compra"));
                         imp.setIcmsReducaoEntrada(rs.getDouble("reducao_compra"));
-                        //imp.setIcmsCreditoId(rs.getString("icms_credito"));
+                        imp.setIcmsAliqEntrada(rs.getDouble("icms_compra"));
+                        imp.setUf(rs.getString("estado"));
+                        
                         ProgressBar.setStatus("Convertendo ICMS Fornecedor em IMP....");
                         cont++;
+
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        } else if (opc == OpcaoProduto.TIPO_EMBALAGEM_PRODUTO) {
+            List<ProdutoIMP> result = new ArrayList<>();
+            try(Statement stm = ConexaoOracle.createStatement()){
+                try(ResultSet rs = stm.executeQuery(
+                        "SELECT\n" +
+                        "    a.id,\n" +
+                        "    coalesce(ean.ean, cast(a.id as varchar(13))) codigobarras,\n" +
+                        "    coalesce(ean.qtdee, 1) qtdembalagem,\n" +
+                        "    a.unidade_venda unidade,\n" +
+                        "    a.qtde_embalageme qtdembalagem_compra,\n" +
+                        "    a.unidade_compra\n" +
+                        "FROM\n" +
+                        "    produtos a\n" +
+                        "    join empresas emp on emp.id = " + getLojaOrigem() + "\n" +
+                        "    join produtos_estado pe on a.id = pe.id and pe.estado = emp.estado\n" +
+                        "    join politicas_empresa poli on poli.empresa = emp.id\n" +
+                        "    join produtos_precos preco on a.id = preco.produto and poli.politica = preco.politica and preco.id = " + tipoVenda + "\n" +
+                        "    join produtos_loja loja on a.id = loja.id and poli.politica = loja.politica\n" +
+                        "    join estoques e on e.empresa = emp.id and e.troca != 'T'\n" +
+                        "    join produtos_estoques estoq on estoq.produto = a.id and estoq.estoque = e.id\n" +
+                        "    left join produtos_ean ean on ean.produto = a.id\n" +
+                        "    left join (select distinct id from vw_produtos_balancas order by id) bal on bal.id = a.id\n" +
+                        "    left join familias fam on a.familia = fam.id\n"+
+                        "order by\n" +
+                        "    a.id")){
+                    while(rs.next()){
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportId(rs.getString("id"));
+                        imp.setTipoEmbalagem(rs.getString("unidade"));
                         
                         result.add(imp);
                     }
                 }
+                
                 return result;
             }
         }
@@ -698,6 +741,93 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores(OpcaoProdutoFornecedor opc) throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        if (opc == OpcaoProdutoFornecedor.IPI) {
+            try (Statement stm = ConexaoOracle.createStatement()) {
+                ProgressBar.setStatus("Convertendo Produto Fornecedor em IMP...(IPI Fornecedor)");
+                try (ResultSet rs = stm.executeQuery(
+                        "SELECT \n"
+                        + "    distinct \n"
+                        + "    tf.produto,  \n"
+                        + "    tf.fornecedor,  \n"
+                        + "    tf.ipi,\n"
+                        + "    case \n"
+                        + "     when tf.ipi_tipo = 'P' then 0\n"
+                        + "    else 1\n"
+                        + "    end as ipi_tipo,\n"
+                        + "    tf.qtde_embalageme,\n"
+                        + "    tf.unidade_compra\n"
+                        + "FROM \n"
+                        + "    produtos a \n"
+                        + "    join empresas emp on emp.id = " + getLojaOrigem() + "\n"
+                        + "    join produtos_estado pe on a.id = pe.id and pe.estado = emp.estado  \n"
+                        + "    join politicas_empresa poli on poli.empresa = emp.id \n"
+                        + "    join produtos_precos preco on a.id = preco.produto and poli.politica = preco.politica and preco.id = 1\n"
+                        + "    join produtos_loja loja on a.id = loja.id and poli.politica = loja.politica \n"
+                        + "    join tabela_fornecedor tf on a.id = tf.produto and \n"
+                        + "    tf.datahora_alteracao in (select  \n"
+                        + "                                max(t.datahora_alteracao)  \n"
+                        + "                              from  \n"
+                        + "                                tabela_fornecedor t  \n"
+                        + "                              where  \n"
+                        + "                                t.produto = tf.produto) and\n"
+                        + "    tf.ipi != 0\n"
+                        + "order by \n"
+                        + "    tf.produto")) {
+                    while (rs.next()) {
+                        ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setIdProduto(rs.getString("produto"));
+                        imp.setIdFornecedor(rs.getString("fornecedor"));
+                        imp.setIpi(rs.getDouble("ipi"));
+                        imp.setTipoIpi(rs.getInt("ipi_tipo"));
+
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        } else if (opc == OpcaoProdutoFornecedor.QTDEMBALAGEM) {
+            try (Statement stm = ConexaoOracle.createStatement()) {
+                ProgressBar.setStatus("Convertendo Produto Fornecedor em IMP...(Qtd. Embalagem)");
+                try (ResultSet rs = stm.executeQuery(
+                        "SELECT \n"
+                        + "    distinct \n"
+                        + "    tf.produto,  \n"
+                        + "    tf.fornecedor, \n"
+                        + "    tf.qtde_embalageme,\n"
+                        + "    tf.unidade_compra\n"
+                        + "FROM \n"
+                        + "    produtos a \n"
+                        + "    join tabela_fornecedor tf on a.id = tf.produto and \n"
+                        + "    tf.datahora_alteracao in (select  \n"
+                        + "                                max(t.datahora_alteracao)  \n"
+                        + "                              from  \n"
+                        + "                                tabela_fornecedor t  \n"
+                        + "                              where  \n"
+                        + "                                t.produto = tf.produto)\n"
+                        + "order by \n"
+                        + "    tf.produto")) {
+                    while (rs.next()) {
+                        ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setIdProduto(rs.getString("produto"));
+                        imp.setQtdEmbalagem(rs.getDouble("qtde_embalageme"));
+                        imp.setIdFornecedor(rs.getString("fornecedor"));
+
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+        return null;
     }
 
     @Override
@@ -1691,47 +1821,47 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
             throw new UnsupportedOperationException("Não suportado.");
         }
     }
-    
+
     @Override
     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
         List<PautaFiscalIMP> result = new ArrayList<>();
-        try(Statement stm = ConexaoOracle.getConexao().createStatement()){
-            try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "        distinct\n" +
-                    "        p.classificacao_fiscal,\n" +
-                    "        pe.estado,\n" +
-                    "        pe.tributacao_venda,\n" +
-                    "        pe.icms_venda,\n" +
-                    "        pe.reducao_venda,\n" +
-                    "        pe.st_venda,\n" +
-                    "        pe.iva,\n" +
-                    "        pe.tipo_iva,\n" +
-                    "        01 as p_iva\n" +
-                    "from \n" +
-                    "        produtos_estado pe\n" +
-                    "join    produtos p on pe.id = p.id\n" +
-                    "join    empresas em on pe.estado = em.estado\n" +
-                    "join    politicas_empresa po on em.id = po.empresa\n" +
-                    "left join tabela_fornecedor_uf tf on tf.produto = pe.id\n" +
-                    "join    produtos_loja loja on p.id = loja.id and\n" +
-                    "        po.politica = loja.politica and\n" +
-                    "        loja.id = pe.id and\n" +
-                    "        po.politica = 1 and\n" +
-                    "        pe.iva != 0 and\n" +
-                    "        em.id = " + getLojaOrigem() + " and\n" +
-                    "        p.status = 0\n" +
-                    "order by classificacao_fiscal")){
-                while(rs.next()){
+        try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "        distinct\n"
+                    + "        p.classificacao_fiscal,\n"
+                    + "        pe.estado,\n"
+                    + "        pe.tributacao_venda,\n"
+                    + "        pe.icms_venda,\n"
+                    + "        pe.reducao_venda,\n"
+                    + "        pe.st_venda,\n"
+                    + "        pe.iva,\n"
+                    + "        pe.tipo_iva,\n"
+                    + "        01 as p_iva\n"
+                    + "from \n"
+                    + "        produtos_estado pe\n"
+                    + "join    produtos p on pe.id = p.id\n"
+                    + "join    empresas em on pe.estado = em.estado\n"
+                    + "join    politicas_empresa po on em.id = po.empresa\n"
+                    + "left join tabela_fornecedor_uf tf on tf.produto = pe.id\n"
+                    + "join    produtos_loja loja on p.id = loja.id and\n"
+                    + "        po.politica = loja.politica and\n"
+                    + "        loja.id = pe.id and\n"
+                    + "        po.politica = 1 and\n"
+                    + "        pe.iva != 0 and\n"
+                    + "        em.id = " + getLojaOrigem() + " and\n"
+                    + "        p.status = 0\n"
+                    + "order by classificacao_fiscal")) {
+                while (rs.next()) {
                     PautaFiscalIMP imp = new PautaFiscalIMP();
                     imp.setId(formatPautaFiscalId(
-                                rs.getString("estado"),
-                                rs.getString("classificacao_fiscal"),
-                                rs.getDouble("p_iva"),
-                                rs.getDouble("iva"),
-                                rs.getInt("st_venda"),
-                                rs.getInt("st_venda")
-                                ));
+                            rs.getString("estado"),
+                            rs.getString("classificacao_fiscal"),
+                            rs.getDouble("p_iva"),
+                            rs.getDouble("iva"),
+                            rs.getInt("st_venda"),
+                            rs.getInt("st_venda")
+                    ));
                     imp.setNcm(rs.getString("classificacao_fiscal"));
                     imp.setUf(rs.getString("estado"));
                     if ("P".equals(rs.getString("tipo_iva"))) {
@@ -1761,14 +1891,14 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setAliquotaDebitoForaEstado(rs.getInt("st_venda"), rs.getDouble("icms_venda"), rs.getDouble("reducao_venda"));
                     }
-                    
+
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-    
+
     private String formatPautaFiscalId(String uf, String ncm, double p_iva, double v_iva, int idIcmsSaida, int idIcmsEntrada) {
         return String.format("%s-%s-%.2f-%.2f-%d-%d", uf, ncm, p_iva, v_iva, idIcmsSaida, idIcmsEntrada);
     }
