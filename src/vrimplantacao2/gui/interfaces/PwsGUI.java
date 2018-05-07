@@ -69,10 +69,10 @@ public class PwsGUI extends VRInternalFrame implements ConexaoEvent {
         ConexaoFirebird.encoding = "WIN1252";
 
         conexaoFirebird.host = "localhost";
-        conexaoFirebird.database = "pws.fdb";
-        conexaoFirebird.port = "3051";
-        conexaoFirebird.user = "sysdba";
-        conexaoFirebird.pass = "masterkey";
+        conexaoFirebird.database = "C:/PWS/FDB/pws.fdb";
+        conexaoFirebird.port = "3050";
+        conexaoFirebird.user = "pointer";
+        conexaoFirebird.pass = "sysadmin";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         
