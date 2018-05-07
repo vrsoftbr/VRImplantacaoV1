@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
+import vrimplantacao2.vo.cadastro.fornecedor.ProdutoFornecedorVO;
 import vrimplantacao2.dao.cadastro.local.MunicipioDAO;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -22,6 +23,7 @@ public class FornecedorRepositoryProvider {
     private String lojaOrigem;
     private int lojaVR;
     private FornecedorDAO fornecedorDAO;
+    private ProdutoFornecedorDAO produtoFornecedorDAO;
     private FornecedorAnteriorDAO anterioresDAO;
     private MunicipioDAO municipioDAO;
     private FornecedorContatoDAO fornecedorContatoDAO;
@@ -34,6 +36,7 @@ public class FornecedorRepositoryProvider {
         this.lojaOrigem = lojaOrigem;
         this.lojaVR = lojaVR;
         this.fornecedorDAO = new FornecedorDAO();
+        this.produtoFornecedorDAO = new ProdutoFornecedorDAO();
         this.fornecedorContatoDAO = new FornecedorContatoDAO();
         this.anterioresDAO = new FornecedorAnteriorDAO();
         this.municipioDAO = new MunicipioDAO();
@@ -137,6 +140,10 @@ public class FornecedorRepositoryProvider {
     public void atualizarFornecedor(FornecedorVO vo, Set<OpcaoFornecedor> opt) throws Exception {
         fornecedorDAO.atualizarFornecedor(vo, opt);
     }    
+    
+    public void atualizarProdutoFornecedor(ProdutoFornecedorVO vo, Set<OpcaoProdutoFornecedor> opt) throws Exception {
+        produtoFornecedorDAO.atualizarProdutoFornecedor(vo, opt);
+    }
 
     public void resetCnpjCpf() throws Exception {
         fornecedorDAO.resetCnpjCpf(getSistema(), getLojaOrigem());

@@ -60,6 +60,7 @@ public class ProdutoIMP {
     
     private String icmsDebitoId;
     private String icmsCreditoId;
+    private String icmsCreditoForaEstadoId;
     
     private double atacadoPreco = 0;
     private double atacadoPorcentagem = 0;
@@ -73,6 +74,8 @@ public class ProdutoIMP {
     private String pautaFiscalId;
     private boolean vendaPdv = true;
     private String idComprador;
+    
+    private String uf;
     
     public String getImportSistema() {
         return importSistema;
@@ -264,6 +267,10 @@ public class ProdutoIMP {
 
     public String getIcmsCreditoId() {
         return icmsCreditoId;
+    }
+    
+    public String getIcmsCreditoForaEstadoId() {
+        return icmsCreditoForaEstadoId;
     }
 
     public void setImportSistema(String importSistema) {
@@ -477,6 +484,10 @@ public class ProdutoIMP {
         this.icmsCreditoId = icmsCreditoId;
     }
     
+    public void setIcmsCreditoForaEstadoId(String icmsCreditoForaEstadoId) {
+        this.icmsCreditoForaEstadoId = icmsCreditoForaEstadoId;
+    }
+    
     public String[] getChave() {
         return new String[]{
             getImportSistema(),
@@ -542,4 +553,11 @@ public class ProdutoIMP {
         this.idComprador = idComprador;
     }
 
+    public String getUf() {
+        return uf;
+    }
+
+    public void setUf(String uf) {
+        this.uf = uf;
+    }
 }

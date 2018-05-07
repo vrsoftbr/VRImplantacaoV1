@@ -63,6 +63,7 @@ import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao.dao.financeiro.contareceber.OutraReceitaRepository;
 import vrimplantacao.dao.financeiro.contareceber.OutraReceitaRepositoryProvider;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
 import vrimplantacao2.dao.cadastro.pdv.acumulador.AcumuladorRepository;
 import vrimplantacao2.dao.cadastro.pdv.acumulador.AcumuladorRepositoryProvider;
 import vrimplantacao2.dao.cadastro.pdv.operador.OperadorRepository;
@@ -553,6 +554,31 @@ public class Importador {
         );
         FornecedorRepository rep = new FornecedorRepository(provider);
         rep.atualizar(fornecedores, opcoes);
+    }
+    
+    /**
+     * Atualiza as informações dos produtos fornecedores conforme as opções informadas.
+     *
+     * @param opcoes Opções que determinam o que será atualizado no produto.
+     * @throws Exception
+     */
+    public void atualizarProdutoFornecedor(List<OpcaoProdutoFornecedor> opcoes) throws Exception {
+        ProgressBar.setStatus("Carregando Produtos Fornecedores (atualização)...");
+        //List<ProdutoFornecedorIMP> produtoFornecedores = getInterfaceDAO().getProdutosFornecedores();
+        List<ProdutoFornecedorIMP> produtoFornecedores = null;
+        for (OpcaoProdutoFornecedor opt : opcoes) {
+            opt.setListaEspecial(getInterfaceDAO().getProdutosFornecedores(opt));
+            produtoFornecedores = opt.getListaEspecial();
+        }
+        
+        FornecedorRepositoryProvider provider = new FornecedorRepositoryProvider(
+                getSistema(),
+                getLojaOrigem(),
+                getLojaVR()
+        );
+        
+        FornecedorRepository rep = new FornecedorRepository(provider);
+        rep.atualizarProdFornecedor(produtoFornecedores, opcoes.toArray(new OpcaoProdutoFornecedor[]{}));
     }
 
     public void atualizarFornecedorNovo(List<OpcaoFornecedor> opcoes) throws Exception {

@@ -527,17 +527,18 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" attributes="0">
+                          <Component id="vRPanel4" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
                               <Component id="chkFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkContatos" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Component id="chkProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="386" max="32767" attributes="0"/>
+                      <EmptySpace pref="382" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -553,7 +554,9 @@
                           </Group>
                           <Component id="chkContatos" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="204" max="32767" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="vRPanel4" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="132" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -592,6 +595,53 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkContatosActionPerformed"/>
               </Events>
             </Component>
+            <Container class="vrframework.bean.panel.VRPanel" name="vRPanel4">
+              <Properties>
+                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                  <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
+                    <EtchetBorder/>
+                  </Border>
+                </Property>
+              </Properties>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkQtdeEmb" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkIPI" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkQtdeEmb" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="chkIPI" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkQtdeEmb">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Qtde. Emb. Forn."/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIPI">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="IPI Fornecedor"/>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
           </SubComponents>
         </Container>
         <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="tabCliente">

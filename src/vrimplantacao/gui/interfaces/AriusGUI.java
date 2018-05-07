@@ -19,6 +19,7 @@ import vrimplantacao.dao.interfaces.AriusDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
@@ -349,10 +350,25 @@ public class AriusGUI extends VRInternalFrame {
                                 opcoes.add(OpcaoFornecedor.CONTATOS);
                             }
                         }
+                        
                         if (!opcoes.isEmpty()) {
                             importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
                         }
-
+                        
+                        List<OpcaoProdutoFornecedor> opcoesFor = new ArrayList<>();
+                        {
+                            if(chkIPI.isSelected()) {
+                                opcoesFor.add(OpcaoProdutoFornecedor.IPI);
+                            }
+                            if(chkQtdeEmb.isSelected()) {
+                                opcoesFor.add(OpcaoProdutoFornecedor.QTDEMBALAGEM);
+                            }
+                        }
+                        
+                        if(!opcoesFor.isEmpty()) {
+                            importador.atualizarProdutoFornecedor(opcoesFor);
+                        }
+                        
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
@@ -475,6 +491,9 @@ public class AriusGUI extends VRInternalFrame {
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkContatos = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel4 = new vrframework.bean.panel.VRPanel();
+        chkQtdeEmb = new vrframework.bean.checkBox.VRCheckBox();
+        chkIPI = new vrframework.bean.checkBox.VRCheckBox();
         tabCliente = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabClienteDados = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -826,6 +845,33 @@ public class AriusGUI extends VRInternalFrame {
             }
         });
 
+        vRPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        chkQtdeEmb.setText("Qtde. Emb. Forn.");
+
+        chkIPI.setText("IPI Fornecedor");
+
+        javax.swing.GroupLayout vRPanel4Layout = new javax.swing.GroupLayout(vRPanel4);
+        vRPanel4.setLayout(vRPanel4Layout);
+        vRPanel4Layout.setHorizontalGroup(
+            vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkQtdeEmb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkIPI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        vRPanel4Layout.setVerticalGroup(
+            vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkQtdeEmb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkIPI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
         tabFornecedor.setLayout(tabFornecedorLayout);
         tabFornecedorLayout.setHorizontalGroup(
@@ -833,12 +879,13 @@ public class AriusGUI extends VRInternalFrame {
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(tabFornecedorLayout.createSequentialGroup()
                         .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(386, Short.MAX_VALUE))
+                .addContainerGap(382, Short.MAX_VALUE))
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -850,7 +897,9 @@ public class AriusGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(204, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(132, Short.MAX_VALUE))
         );
 
         tab.addTab("Fornecedores", tabFornecedor);
@@ -1275,6 +1324,7 @@ public class AriusGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
     private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkIPI;
     private vrframework.bean.checkBox.VRCheckBox chkIcmsFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
@@ -1286,6 +1336,7 @@ public class AriusGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbCotacao;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
+    private vrframework.bean.checkBox.VRCheckBox chkQtdeEmb;
     private vrframework.bean.checkBox.VRCheckBox chkT1AtivoInativo;
     private vrframework.bean.checkBox.VRCheckBox chkT1Custo;
     private vrframework.bean.checkBox.VRCheckBox chkT1DescCompleta;
@@ -1335,6 +1386,7 @@ public class AriusGUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
+    private vrframework.bean.panel.VRPanel vRPanel4;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane1;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
     // End of variables declaration//GEN-END:variables

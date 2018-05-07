@@ -30,6 +30,7 @@ import vrimplantacao2.dao.cadastro.devolucao.receber.ReceberDevolucaoDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.verba.receber.ReceberVerbaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -314,24 +315,68 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opc) throws SQLException {
+        List<ProdutoIMP> result = new ArrayList<>();
+        if (opc == OpcaoProduto.ATACADO) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select CODPROD,\n"
+                        + "	QTD,\n"
+                        + "     barra_emb,\n"
+                        + "	PRECO_UNIT\n"
+                        + "from EMBALAGENS\n"
+                        + "order by 1")) {
+                    while (rs.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rs.getString("codprod"));
+                        imp.setAtacadoPreco(rs.getDouble("preco_unit"));
+                        imp.setQtdEmbalagem(rs.getInt("qtd"));
+                        imp.setEan(rs.getString("barra_emb"));
+
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+        return null;
+    }
+
+    @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select codprod,\n"
-                         + "barra_emb,\n"
-                         + "qtd\n"
-                    + "from embalagens\n"
-                   + "where BARRA_EMB is not null\n"
-                + "order by 1"
-            )) {
+                    "select  \n" +
+                    "	codprod, \n" +
+                    "	rtrim(barra_emb) as barra_emb, \n" +
+                    "	qtd,  \n" +
+                    "	preco_unit \n" +
+                    "from  \n" +
+                    "	embalagens \n" +
+                    "where  \n" +
+                    "	barra_emb is not null \n" +
+                    "union all\n" +
+                    "select\n" +
+                    "	codprod,\n" +
+                    "    barra as barra_emb,\n" +
+                    "    0 as qtd,\n" +
+                    "    0 as preco_unit \n" +
+                    "from\n" +
+                    "	ALTERNATIVO\n" +
+                    "where\n" +
+                    "	BARRA is not null\n" +
+                    "order by 1")) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("codprod"));
-                    imp.setEan(rst.getString("barra_emb").trim());
+                    imp.setEan(rst.getString("barra_emb"));
                     imp.setQtdEmbalagem(rst.getInt("qtd"));
+                    imp.setPrecovenda(rst.getDouble("preco_unit"));
                     result.add(imp);
                 }
             }
@@ -645,10 +690,10 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "coalesce(CONTATO,'')+' '+coalesce(REF1_NOME,'')+' '+coalesce(REF2_NOME,'')+' '+coalesce(FONE1,'') AS OBS, "
                     + "BLOQCARTAO, "
                     + "cast((case "
-                    +   "when len(senhacartao) <= 6 then "
-                    +    "senhacartao "
-                    +    "else 0 "
-                    + "end) as integer) as senhacartao "        
+                    + "when len(senhacartao) <= 6 then "
+                    + "senhacartao "
+                    + "else 0 "
+                    + "end) as integer) as senhacartao "
                     + "FROM "
                     + "CLIENTES "
                     + "where "

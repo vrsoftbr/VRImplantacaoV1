@@ -301,7 +301,7 @@ public class ClientePreferencialDAO {
 
                 sql.setWhere("id = " + vo.getId());
                 stm.execute(sql.getUpdate());
-
+                
             }
         }
     }

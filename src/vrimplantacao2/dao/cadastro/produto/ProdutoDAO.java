@@ -10,6 +10,8 @@ import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoRepository;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoRepositoryProvider;
 import vrimplantacao2.utils.multimap.KeyList;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
@@ -20,6 +22,7 @@ import vrimplantacao2.vo.cadastro.ProdutoComplementoVO;
 import vrimplantacao2.vo.cadastro.ProdutoVO;
 import vrimplantacao2.vo.enums.NaturezaReceitaVO;
 import vrimplantacao2.vo.enums.NcmVO;
+import vrimplantacao2.vo.enums.TipoEmbalagem;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -32,6 +35,7 @@ public class ProdutoDAO {
     private int idLojaVR = 1;
     private String importSistema = null;
     private String importLoja = null;
+    private ProdutoRepositoryProvider Produtoprovider = new ProdutoRepositoryProvider();
 
     public void setIdLojaVR(int idLojaVR) {
         this.idLojaVR = idLojaVR;
@@ -261,12 +265,19 @@ public class ProdutoDAO {
                         imp.getImportLoja(),
                         imp.getImportId()
                 );
+                
                 //Se o produto foi localizado executa
                 if (anterior != null) {
-                    long ean = Utils.stringToLong(imp.getEan());  
-                    if (ean > 999999) {
+                    long ean13 = Utils.stringToLong(imp.getEan());
+                    if ((ean13 > 999999) && (!Produtoprovider.automacao().cadastrado(ean13))) {
+                        //ProdutoAutomacaoVO automacao = prodRepository.converterEAN(imp, ean13, unidade);
+                        //automacao.setProduto(anterior.getCodigoAtual());
+                        //Produtoprovider.automacao().salvar(automacao);
                         automacaoDAO.salvar(imp, anterior);
                     }
+                    //if (ean13 > 999999) {
+                    //  automacaoDAO.salvar(imp, anterior);  
+                    //}
                 }
                 ProgressBar.next();
             }
