@@ -58,7 +58,7 @@ import vrimplantacao.gui.interfaces.ControlWareGUI;
 import vrimplantacao.gui.interfaces.IntelliCashGUI;
 import vrimplantacao.gui.interfaces.SoftaExGUI;
 import vrimplantacao.gui.interfaces.UltraSistGUI;
-import vrimplantacao.gui.interfaces.KairosGUI;
+import vrimplantacao2.gui.interfaces.KairosGUI;
 import vrimplantacao.gui.interfaces.RootacGUI;
 import vrimplantacao.gui.interfaces.DirectorGUI;
 import vrimplantacao.gui.interfaces.EccusInformaticaGUI;
@@ -2675,19 +2675,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemConcretizeActionPerformed
 
     private void jMenuItemKairosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemKairosActionPerformed
-
-        try {
-            this.setWaitCursor();
-            if (formImportarKairos == null || formImportarKairos.isClosed()) {
-                formImportarKairos = new KairosGUI(this);
-            }
-            formImportarKairos.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
+        KairosGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemKairosActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
