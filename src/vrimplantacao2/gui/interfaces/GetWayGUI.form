@@ -1106,15 +1106,20 @@
                       <Component id="tabsConn" max="32767" attributes="0"/>
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="vRLabel20" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtUsuario" alignment="0" min="-2" pref="102" max="-2" attributes="0"/>
+                              <Component id="vRLabel20" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtUsuario" min="-2" pref="65" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtSenha" alignment="0" min="-2" pref="96" max="-2" attributes="0"/>
+                              <Component id="txtSenha" alignment="0" min="-2" pref="71" max="-2" attributes="0"/>
                               <Component id="vRLabel21" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="lblLoja" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtLoja" min="-2" pref="49" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
                                   <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
@@ -1142,6 +1147,7 @@
                       <Component id="vRLabel20" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="vRLabel21" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="lblLoja" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
@@ -1149,6 +1155,7 @@
                       <Component id="txtUsuario" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="btnConectar" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtLoja" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -1302,6 +1309,13 @@
               <Connection code="new DefaultComboBoxModel()" type="code"/>
             </Property>
           </Properties>
+        </Component>
+        <Component class="vrframework.bean.label.VRLabel" name="lblLoja">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Loja"/>
+          </Properties>
+        </Component>
+        <Component class="vrframework.bean.textField.VRTextField" name="txtLoja">
         </Component>
       </SubComponents>
     </Container>

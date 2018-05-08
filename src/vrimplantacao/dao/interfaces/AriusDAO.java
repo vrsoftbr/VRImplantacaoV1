@@ -356,7 +356,11 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
-                    imp.setEan(rst.getString("codigobarras"));
+                    if("S".equals(rst.getString("balanca"))){
+                        imp.setEan(rst.getString("id"));
+                    } else {
+                        imp.setEan(rst.getString("codigobarras"));
+                    }
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem_compra"));
 
@@ -575,63 +579,65 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
 
                 int cont = 1;
                 try (ResultSet rs = stm.executeQuery(
-                        "SELECT\n" +
-                        "    distinct\n" +
-                        "    tf.produto, \n" +
-                        "    tf.fornecedor, \n" +
-                        "    forn.estado, \n" +
-                        "    case \n" +
-                        "     when tf.tributacao_compra = 'T' and tf.icms_compra = 18 and tf.reducao_compra = 0 then 2\n" +
-                        "     when tf.tributacao_compra = 'R' and tf.icms_compra = 18 and tf.reducao_compra = 33.33 then 9\n" +
-                        "     when tf.tributacao_compra = 'I' and tf.icms_compra = 0 and tf.reducao_compra = 0 then 6\n" +
-                        "     when tf.tributacao_compra = 'T' and tf.icms_compra = 2.58 and tf.reducao_compra = 0 then 20\n" +
-                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 0 and tf.reducao_compra = 0 then 7\n" +
-                        "     when tf.tributacao_compra = 'N' and tf.icms_compra = 0 and tf.reducao_compra = 0 then  17\n" +
+                        "SELECT \n" +
+                        "    distinct \n" +
+                        "    tf.produto,  \n" +
+                        "    tf.fornecedor,  \n" +
+                        "    forn.estado,  \n" +
+                        "    case  \n" +
+                        "     when tf.tributacao_compra = 'T' and tf.icms_compra = 18 and tf.reducao_compra = 0 then 2 \n" +
+                        "     when tf.tributacao_compra = 'R' and tf.icms_compra = 18 and tf.reducao_compra = 33.33 then 9 \n" +
+                        "     when tf.tributacao_compra = 'I' and tf.icms_compra = 0 and tf.reducao_compra = 0 then 6 \n" +
                         "     when tf.tributacao_compra = 'T' and tf.icms_compra = 2.58 and tf.reducao_compra = 0 then 20 \n" +
-                        "     when tf.tributacao_compra = 'O' and tf.icms_compra = 2.58 and tf.reducao_compra = 0 then 8\n" +
-                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 12 and tf.reducao_compra = 0 then 1\n" +
-                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 12 and tf.reducao_compra = 33.33 then 21\n" +
-                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 12 and tf.reducao_compra = 41.66 then 22\n" +
-                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 12 and tf.reducao_compra = 61.11 then 23\n" +
-                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 12 and tf.reducao_compra = 43.23 then 24\n" +
-                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 4 and tf.reducao_compra = 0 then 25\n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 0 and tf.reducao_compra = 0 then 7 \n" +
+                        "     when tf.tributacao_compra = 'N' and tf.icms_compra = 0 and tf.reducao_compra = 0 then  17 \n" +
+                        "     when tf.tributacao_compra = 'T' and tf.icms_compra = 2.58 and tf.reducao_compra = 0 then 20  \n" +
+                        "     when tf.tributacao_compra = 'O' and tf.icms_compra = 2.58 and tf.reducao_compra = 0 then 8 \n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 12 and tf.reducao_compra = 0 then 1 \n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 12 and tf.reducao_compra = 33.33 then 21 \n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 12 and tf.reducao_compra = 41.66 then 22 \n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 12 and tf.reducao_compra = 61.11 then 23 \n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 12 and tf.reducao_compra = 43.23 then 24 \n" +
+                        "     when tf.tributacao_compra = 'T' and tf.icms_compra = 12 and tf.reducao_compra = 0 then 1\n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 4 and tf.reducao_compra = 0 then 25 \n" +
                         "     when tf.tributacao_compra = 'F' and tf.icms_compra = 4 and tf.reducao_compra = 0 then 26\n" +
-                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 18 and tf.reducao_compra = 43.23 then 27\n" +
-                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 18 and tf.reducao_compra = 54.81 then 28\n" +
-                        "     when tf.tributacao_compra = 'R' and tf.icms_compra = 18 and tf.reducao_compra = 61.11 then 4\n" +
-                        "     when tf.tributacao_compra = 'T' and tf.icms_compra = 25 and tf.reducao_compra = 0 then 3\n" +
-                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 18 and tf.reducao_compra = 85.98 then 29\n" +
-                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 18 and tf.reducao_compra = 57 then 30\n" +
-                        "    else \n" +
-                        "        8\n" +
-                        "    end as icms_credito, \n" +
-                        "    tf.icms_compra, \n" +
-                        "    tf.reducao_compra,\n" +
-                        "    tf.st_compra,\n" +
-                        "    tf.pauta\n" +
-                        "FROM\n" +
-                        "    produtos a\n" +
-                        "    join empresas emp on emp.id = " + getLojaOrigem() + "\n" +
-                        "    join produtos_estado pe on a.id = pe.id and pe.estado = emp.estado \n" +
-                        "    join politicas_empresa poli on poli.empresa = emp.id\n" +
-                        "    join produtos_precos preco on a.id = preco.produto and poli.politica = preco.politica and preco.id = " + tipoVenda + "\n" +
-                        "    join produtos_loja loja on a.id = loja.id and poli.politica = loja.politica\n" +
-                        "    join estoques e on e.empresa = emp.id and e.troca != 'T'\n" +
-                        "    join produtos_estoques estoq on estoq.produto = a.id and estoq.estoque = e.id\n" +
-                        "    left join produtos_ean ean on ean.produto = a.id\n" +
-                        "    left join (select distinct id from vw_produtos_balancas order by id) bal on bal.id = a.id\n" +
-                        "    left join familias fam on a.familia = fam.id\n" +
-                        "    join tabela_fornecedor_uf tf on a.id = tf.produto\n" +
-                        "    join fornecedores forn on tf.fornecedor = forn.id and\n" +
-                        "    tf.datahora_alteracao in (select \n" +
-                        "                                max(t.datahora_alteracao) \n" +
-                        "                              from \n" +
-                        "                                tabela_fornecedor_uf t \n" +
-                        "                              where \n" +
-                        "                                t.produto = tf.produto) and \n" +
-                        "    forn.estado != 'SP'\n" +        
-                        "order by\n" +
-                        "    tf.produto\n")) {
+                        "     when tf.tributacao_compra = 'T' and tf.icms_compra = 4 and tf.reducao_compra = 0 then 25 \n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 18 and tf.reducao_compra = 43.23 then 27 \n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 18 and tf.reducao_compra = 54.81 then 28 \n" +
+                        "     when tf.tributacao_compra = 'R' and tf.icms_compra = 18 and tf.reducao_compra = 61.11 then 4 \n" +
+                        "     when tf.tributacao_compra = 'T' and tf.icms_compra = 25 and tf.reducao_compra = 0 then 3 \n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 18 and tf.reducao_compra = 85.98 then 29 \n" +
+                        "     when tf.tributacao_compra = 'F' and tf.icms_compra = 18 and tf.reducao_compra = 57 then 30 \n" +
+                        "    else  \n" +
+                        "        8 \n" +
+                        "    end as icms_credito,  \n" +
+                        "    tf.icms_compra,  \n" +
+                        "    tf.reducao_compra, \n" +
+                        "    tf.st_compra, \n" +
+                        "    tf.pauta \n" +
+                        "FROM \n" +
+                        "    produtos a \n" +
+                        "    join empresas emp on emp.id = 1 \n" +
+                        "    join produtos_estado pe on a.id = pe.id and pe.estado = emp.estado  \n" +
+                        "    join politicas_empresa poli on poli.empresa = emp.id \n" +
+                        "    join produtos_precos preco on a.id = preco.produto and poli.politica = preco.politica and preco.id = 1  \n" +
+                        "    join produtos_loja loja on a.id = loja.id and poli.politica = loja.politica \n" +
+                        "    join estoques e on e.empresa = emp.id and e.troca != 'T' \n" +
+                        "    join produtos_estoques estoq on estoq.produto = a.id and estoq.estoque = e.id \n" +
+                        "    left join produtos_ean ean on ean.produto = a.id \n" +
+                        "    left join (select distinct id from vw_produtos_balancas order by id) bal on bal.id = a.id \n" +
+                        "    left join familias fam on a.familia = fam.id \n" +
+                        "    join tabela_fornecedor_uf tf on a.id = tf.produto \n" +
+                        "    join fornecedores forn on tf.fornecedor = forn.id and \n" +
+                        "    tf.datahora_alteracao in (select  \n" +
+                        "                                max(t.datahora_alteracao)  \n" +
+                        "                              from  \n" +
+                        "                                tabela_fornecedor_uf t  \n" +
+                        "                              where  \n" +
+                        "                                t.produto = tf.produto) and\n" +
+                        "forn.estado != 'SP'\n" +
+                        "order by \n" +
+                        "    tf.produto")) {
                     while (rs.next()) {
 
                         ProdutoIMP imp = new ProdutoIMP();

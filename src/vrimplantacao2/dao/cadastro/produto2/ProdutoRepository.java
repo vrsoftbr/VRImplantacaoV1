@@ -15,7 +15,6 @@ import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
-import vrimplantacao.vo.vrimplantacao.EstadoVO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -483,6 +482,7 @@ public class ProdutoRepository {
 
         String idIcmsDebito = imp.getIcmsDebitoId();
         String idIcmsCredito = imp.getIcmsCreditoId();
+        String idIcmsCreditoFornecedor = imp.getIcmsCreditoId();
 
         if (idIcmsDebito != null || idIcmsCredito != null) {
 
@@ -545,6 +545,10 @@ public class ProdutoRepository {
         aliquota.setAliquotaCreditoForaEstado(creditoForaEstado);
         aliquota.setAliquotaDebitoForaEstadoNf(debitoForaEstadoNfe);
         aliquota.setAliquotaConsumidor(consumidor);
+        
+        if(idIcmsCreditoFornecedor != null) {
+            aliquota.setAliquotaCreditoFornecedor(idIcmsCreditoFornecedor);
+        }
         
         return aliquota;
     }
