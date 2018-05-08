@@ -17,7 +17,9 @@ public class ProdutoFornecedorIMP {
     private double qtdEmbalagem = 1;
     private double pesoEmbalagem = 0;
     private double custoTabela = 0;
-
+    private double ipi = 0;
+    private int tipoIpi = 0;
+    
     public String getImportSistema() {
         return importSistema;
     }
@@ -25,7 +27,7 @@ public class ProdutoFornecedorIMP {
     public String getImportLoja() {
         return importLoja;
     }
-
+    
     public String getIdFornecedor() {
         return idFornecedor;
     }
@@ -90,4 +92,19 @@ public class ProdutoFornecedorIMP {
         this.custoTabela = custoTabela;
     }
 
+    public double getIpi() {
+        return ipi;
+    }
+
+    public void setIpi(double ipi) {
+        this.ipi = ipi;
+    }
+
+    public int getTipoIpi() {
+        return tipoIpi;
+    }
+
+    public void setTipoIpi(int tipoIpi) {
+        this.tipoIpi = tipoIpi;
+    }
 }

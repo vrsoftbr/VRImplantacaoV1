@@ -9,7 +9,7 @@ import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaVO;
 import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.cadastro.mercadologico.OpcaoMercadologico;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -171,6 +171,16 @@ public abstract class InterfaceDAO {
      * @throws java.lang.Exception 
      */
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        return new ArrayList<>();
+    }
+    
+    /**
+     * Permite o retorno listas especificadas dependendo da {@link OpcaoProduto}.
+     * @param opc Opção de importação.
+     * @return
+     * @throws Exception 
+     */
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores(OpcaoProdutoFornecedor opc) throws Exception {
         return new ArrayList<>();
     }
     

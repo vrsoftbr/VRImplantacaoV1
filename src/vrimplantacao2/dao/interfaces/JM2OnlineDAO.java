@@ -120,7 +120,7 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.codigo id,\n" +
                     "	p.id codigosped,\n" +
                     "	p.dataInicio datacadastro,\n" +
-                    "	coalesce(ean.ean, p.codigo) ean,\n" +
+                    "	coalesce(ean.ean, cast(p.codigo as varchar)) ean,\n" +
                     "	coalesce(ean.qtdembalagem, 1) qtdembalagem,\n" +
                     "	case p.balanca\n" +
                     "	when 'P' then 'KG'\n" +
@@ -174,7 +174,7 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     "where\n" +
                     "	p.dataFinal is null\n" +
                     "order by\n" +
-                    "	p.codigo;"
+                    "	p.codigo"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -499,7 +499,21 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select\n" +
+                    "	c.id,\n" +
+                    "	c.cpfCliente,\n" +
+                    "	c.numeroCheque,\n" +
+                    "	c.numeroBanco,\n" +
+                    "	c.dataEmissao,\n" +
+                    "	c.coo,\n" +
+                    "	p.idECF ecf,\n" +
+                    "	c.valor\n" +
+                    "from\n" +
+                    "	ChequesPDV c\n" +
+                    "	left join PDVs p on\n" +
+                    "		c.idPDV = p.id\n" +
+                    "order by\n" +
+                    "	c.dataEmissao"
             )) {
                 while (rst.next()) {
                     ChequeIMP imp = new ChequeIMP();

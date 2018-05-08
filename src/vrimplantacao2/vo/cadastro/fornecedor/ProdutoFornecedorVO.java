@@ -21,6 +21,8 @@ public class ProdutoFornecedorVO {
     private Date dataAlteracao = new Date();
     private double qtdEmbalagem = 1;
     private double pesoEmbalagem = 0;
+    private double ipi = 0;
+    private int tipoIpi = 0;
 
     public int getId() {
         return id;
@@ -94,4 +96,19 @@ public class ProdutoFornecedorVO {
         this.pesoEmbalagem = MathUtils.trunc(pesoEmbalagem, 3, 999999999D);
     }
     
+    public double getIpi() {
+        return ipi;
+    }
+
+    public void setIpi(double ipi) {
+        this.ipi = ipi;
+    }
+
+    public int getTipoIpi() {
+        return tipoIpi;
+    }
+
+    public void setTipoIpi(int tipoIpi) {
+        this.tipoIpi = tipoIpi;
+    }
 }
