@@ -264,7 +264,7 @@ public class RMSAutomaHelpGUI extends VRInternalFrame {
                         }
                     } else if (tab.getSelectedIndex() == 2) {
                         if (chkClientePreferencial.isSelected()) {                            
-                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
+                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS, OpcaoCliente.VALOR_LIMITE);
                         }
                         if (chkClienteEventual.isSelected()) {                            
                             importador.importarClienteEventual(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);

@@ -122,7 +122,8 @@ public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvide
                     " c.cargo_empresa as cargo,\n" +
                     " c.telefone,\n" +
                     " c.celular,\n" +
-                    " c.email\n" +
+                    " c.email,\n" +
+                    " c.limite\n" +
                 " from clientes c\n" +
               " order by 1")) {
                 while (rs.next()) {
@@ -130,6 +131,7 @@ public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setId(rs.getString("id"));
                     imp.setCnpj(rs.getString("cpf"));
                     imp.setRazao(rs.getString("razao"));
+                    imp.setValorLimite(rs.getDouble("limite"));
                     if ((rs.getString("rg") != null)
                             && (!rs.getString("rg").trim().isEmpty())) {
                         imp.setInscricaoestadual(rs.getString("rg"));
