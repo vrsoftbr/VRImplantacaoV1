@@ -64,7 +64,7 @@ import vrimplantacao.gui.interfaces.DirectorGUI;
 import vrimplantacao.gui.interfaces.EccusInformaticaGUI;
 import vrimplantacao.gui.interfaces.MRSGUI;
 import vrimplantacao.gui.interfaces.VRSoftwarePDVGUI;
-import vrimplantacao.gui.interfaces.SuperServerGUI;
+import vrimplantacao2.gui.interfaces.SuperServerGUI;
 import vrimplantacao2.gui.interfaces.DestroGUI;
 import vrimplantacao.gui.interfaces.GZSistemasGUI;
 import vrimplantacao.gui.interfaces.ImportarNotaSaidaImportacaoArquivoGUI;
@@ -2747,18 +2747,8 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemEcosInformaticaActionPerformed
 
     private void jMenuItemSuperServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSuperServerActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarSuperServer == null || formImportarSuperServer.isClosed()) {
-                formImportarSuperServer = new SuperServerGUI(this);
-            }
-
-            formImportarSuperServer.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
+        
+        SuperServerGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemSuperServerActionPerformed
 
     private void jMenuItemCISSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemCISSActionPerformed

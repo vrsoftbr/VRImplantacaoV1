@@ -9,15 +9,19 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -26,7 +30,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author lucasrafael
  */
-public class SuperServerDAO extends InterfaceDAO {
+public class SuperServerDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
@@ -42,7 +46,7 @@ public class SuperServerDAO extends InterfaceDAO {
                     "select "
                     + "id, "
                     + "nomeFamilia "
-                    + "from CadProduto.Familia;"
+                    + "from CadProduto.Familia"
             )) {
                 while (rst.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
@@ -76,7 +80,7 @@ public class SuperServerDAO extends InterfaceDAO {
                     + "		m2.fkCategoria = m1.id \n"
                     + "order by \n"
                     + "	codM1, \n"
-                    + "	codM2 "
+                    + "	codM2"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -180,10 +184,8 @@ public class SuperServerDAO extends InterfaceDAO {
                     + "		icms.id = p.aliqICMS and\n"
                     + "		icms.fkCliente = @fkCliente"
             )) {
-                int cont = 1;
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
@@ -219,51 +221,25 @@ public class SuperServerDAO extends InterfaceDAO {
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setValidade(rst.getInt("validade"));
                     imp.setMargem(rst.getDouble("margem"));
-                    //imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
+
                     if (rst.getInt("ativo") == 0) {
                         imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
                     } else {
                         imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
                     }
-                    imp.setNcm(rst.getString("ncm"));
-                        //imp.setCest(rst.getString("cest"));                     
 
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(Utils.stringToInt(rst.getString("piscofins_cst_debito")));
                     imp.setPiscofinsCstCredito(Utils.stringToInt(rst.getString("piscofins_cst_credito")));
                     imp.setPiscofinsNaturezaReceita(Utils.stringToInt(rst.getString("piscofins_natureza_receita")));
-
-                    switch (rst.getInt("aliqICMS")) {
-                        case 1: {
-                            imp.setIcmsCst(60);
-                            imp.setIcmsAliq(0);
-                            imp.setIcmsReducao(0);
-                        }
-                        ;
-                        break;
-                        case 2: {
-                            imp.setIcmsCst(40);
-                            imp.setIcmsAliq(0);
-                            imp.setIcmsReducao(0);
-                        }
-                        ;
-                        break;
-                        default: {
-                            imp.setIcmsCst(Utils.stringToInt(rst.getString("icms_cst")));
-                            imp.setIcmsAliq(Utils.stringToDouble(rst.getString("icms_aliq")));
-                            imp.setIcmsReducao(Utils.stringToDouble(rst.getString("icms_reducao")));
-                        }
-                        ;
-                        break;
-                    }
-
-                    ProgressBar.setStatus("Convertendo em IMP.... " + cont);
-                    cont++;
-
+                    imp.setIcmsDebitoId(rst.getString("aliqICMS"));
+                    imp.setIcmsCreditoId(rst.getString("aliqICMS"));
                     result.add(imp);
                 }
             }
@@ -310,7 +286,6 @@ public class SuperServerDAO extends InterfaceDAO {
                         + "order by\n"
                         + "	id"
                 )) {
-                    int cont = 1;
                     while (rst.next()) {
                         FornecedorIMP imp = new FornecedorIMP();
 
@@ -403,11 +378,7 @@ public class SuperServerDAO extends InterfaceDAO {
                                 contato.setEmail(rst2.getString("email"));
                             }
                         }
-
                         result.add(imp);
-
-                        ProgressBar.setStatus("Carregando fornecedores..." + cont);
-                        cont++;
                     }
                 }
             }
@@ -452,6 +423,199 @@ public class SuperServerDAO extends InterfaceDAO {
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "c.id,\n"
+                    + "c.cnpj,\n"
+                    + "c.inscricaoMunicipal,\n"
+                    + "c.inscricaoEstadual,\n"
+                    + "c.razaoSocial,\n"
+                    + "c.nomeFantasia,\n"
+                    + "c.dtNascimento,\n"
+                    + "c.dtCadastro,\n"
+                    + "c.ativo,\n"
+                    + "c.obs,\n"
+                    + "ender.logradouro,\n"
+                    + "ender.numero,\n"
+                    + "ender.complemento,\n"
+                    + "ender.bairro,\n"
+                    + "ender.cep,\n"
+                    + "ender.fkMunicipio,\n"
+                    + "ender.fkUF,\n"
+                    + "ender.fkPais,\n"
+                    + "email.endereco as email,\n"
+                    + "crm.vlRotativoTotal as valorlimite,\n"
+                    + "crm.liberadoRotativo as permitecreditorotativo,\n"
+                    + "crm.liberadoCheque as permitecheque,\n"
+                    + "crm.vlSalario,\n"
+                    + "crm.dtAdmissao,\n"
+                    + "crm.empresa,\n"
+                    + "crm.cargo,\n"
+                    + "crm.pai,\n"
+                    + "crm.mae,\n"
+                    + "crm.observacao obs2,\n"
+                    + "crm.cdInternoCli,\n"
+                    + "crm.senha,\n"
+                    + "crm.clienteespecial\n"
+                    + "from Cadastro.Entidade c\n"
+                    + "left join Cadastro.Endereco ender on ender.fkEntidade = c.id \n"
+                    + "and ender.id in (select max(id) id from Cadastro.Endereco group by fkEntidade)\n"
+                    + "left join Cadastro.Email email on email.fkEntidade = c.id\n"
+                    + "and email.id in (select max(id) id from Cadastro.Email group by fkEntidade)\n"
+                    + "left join CRM.Cadastro crm on crm.fkEntidade = c.id\n"
+                    + "where c.isCliente = 1\n"
+                    + "and crm.fkCliente = 1\n"
+                    + "order by c.id"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoMunicipal(rst.getString("inscricaoMunicipal"));
+                    imp.setInscricaoestadual(rst.getString("inscricaoEstadual"));
+                    imp.setRazao(rst.getString("razaoSocial"));
+                    imp.setFantasia(rst.getString("nomeFantasia"));
+                    imp.setDataNascimento(rst.getDate("dtNascimento"));
+                    imp.setDataCadastro(rst.getDate("dtCadastro"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setObservacao(rst.getString("obs"));
+                    imp.setEndereco(rst.getString("logradouro"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setMunicipioIBGE(rst.getInt("fkMunicipio"));
+                    imp.setUfIBGE(rst.getInt("fkUF"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setValorLimite(rst.getDouble("valorlimite"));
+                    imp.setPermiteCreditoRotativo(rst.getBoolean("permitecreditorotativo"));
+                    imp.setPermiteCheque(rst.getBoolean("permitecheque"));
+                    imp.setSalario(rst.getDouble("vlSalario"));
+                    imp.setDataAdmissao(rst.getDate("dtAdmissao"));
+                    imp.setEmpresa(rst.getString("empresa"));
+                    imp.setCargo(rst.getString("cargo"));
+                    imp.setNomePai(rst.getString("pai"));
+                    imp.setNomeMae(rst.getString("mae"));
+                    imp.setObservacao2(rst.getString("obs2"));
+                    //imp.setSenha(rst.getInt("senha"));
+
+                    try (Statement stm2 = ConexaoSqlServer.getConexao().createStatement()) {
+                        try (ResultSet rst2 = stm2.executeQuery(
+                                "select\n"
+                                + "	id,\n"
+                                + "	'(FONE) ' + case coalesce(ltrim(rtrim(tipo)), '') \n"
+                                + "		when '' then 'COMERCIAL' \n"
+                                + "		else upper(ltrim(rtrim(tipo))) \n"
+                                + "	end tipo,\n"
+                                + "	numero\n"
+                                + "from \n"
+                                + "	Cadastro.Fone\n"
+                                + "where\n"
+                                + "	fkEntidade = " + imp.getId()
+                        )) {
+                            boolean first = true;
+                            while (rst2.next()) {
+                                if (first) {
+                                    imp.setTelefone(rst2.getString("numero"));
+                                    first = false;
+                                }
+
+                                imp.addContato(
+                                        rst.getString("id"),
+                                        "TELEFONE",
+                                        rst.getString("numero"),
+                                        null,
+                                        null
+                                );
+                            }
+                        }
+                    }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "id, \n"
+                    + "referencia, \n"
+                    + "valorAtual as valor, \n"
+                    + "dtEntrada as emissao,\n"
+                    + "dtVencAtual as vencimento,\n"
+                    + "fkEntidade as cliente,\n"
+                    + "numParcela as parcela\n"
+                    + "from Financeiro.ContasReceber\n"
+                    + "where fkLoja = " + getLojaOrigem() + "\n"
+                    + "and pago = 0"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setIdCliente(rst.getString("cliente"));
+                    imp.setObservacao(rst.getString("referencia"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "id, \n"
+                    + "descricaoAliquota, \n"
+                    + "taxa, \n"
+                    + "reducaoBaseCalculo \n"
+                    + "from CadProduto.AliquotaICMS \n"
+                    + "where fkCliente = 1\n"
+                    + "order by id"
+            )) {
+                while (rst.next()) {
+                    result.add(new MapaTributoIMP(rst.getString("id"), rst.getString("descricaoAliquota")));
+                }
+            }
+            return result;
+        }
+    }
+
+    public List<Estabelecimento> getLojasCliente() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "id, \n"
+                    + "(descricaoLoja + ' - ' + cnpjLoja) as descricao\n"
+                    + "from MultiLoja.Loja\n"
+                    + "where fkCliente = 1\n"
+                    + "order by id"
+            )) {
+                while (rst.next()) {
+                    result.add(
+                            new Estabelecimento(rst.getString("id"), rst.getString("descricao"))
+                    );
+                }
+            }
+        }
         return result;
     }
 }
