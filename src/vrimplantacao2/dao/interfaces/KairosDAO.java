@@ -459,66 +459,66 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                                     break;
                             }
                         }
-
-                        imp.setObservacao(rst.getString("Observacoes"));
-                        imp.setObservacao2(rst.getString("Contato"));
-                        imp.setDataCadastro(rst.getDate("DataCadastro"));
-                        imp.setEndereco(rst.getString("Endereco"));
-                        imp.setNumero(rst.getString("Numero"));
-                        imp.setBairro(rst.getString("Bairro"));
-                        imp.setComplemento(rst.getString("Complemento"));
-                        imp.setMunicipioIBGE(rst.getInt("CodigoIBGEMunicipio"));
-                        imp.setMunicipio(rst.getString("municipio"));
-                        imp.setUf(rst.getString("SiglaUF"));
-                        imp.setCep(rst.getString("CEP"));
-                        imp.setTelefone(rst.getString("Telefone"));
-                        imp.setCnpj(rst.getString("Cnpj"));
-                        imp.setInscricaoestadual(rst.getString("InscricaoEstadual"));
-                        imp.setOrgaoemissor(rst.getString("OrgaoExp"));
-                        imp.setValorLimite(rst.getDouble("LimiteCredito"));
-                        imp.setPermiteCheque(true);
-                        imp.setPermiteCreditoRotativo(true);
-
-                        try (Statement stm1 = ConexaoSqlServer.getConexao().createStatement()) {
-                            try (ResultSet rst1 = stm1.executeQuery(
-                                    "select \n"
-                                    + "CodigoPessoa, NumeroTelefone \n"
-                                    + "from TelefonePessoa\n"
-                                    + "where CodigoPessoa = " + imp.getId()
-                            )) {
-                                while (rst1.next()) {
-                                    imp.addContato(
-                                            "TELEFONE",
-                                            rst1.getString("NumeroTelefone"),
-                                            null,
-                                            null,
-                                            null
-                                    );
-                                }
-                            }
-                        }
-
-                        try (Statement stm2 = ConexaoSqlServer.getConexao().createStatement()) {
-                            try (ResultSet rst2 = stm2.executeQuery(
-                                    "select \n"
-                                    + "CodigoPessoa, EnderecoEletronicoPessoa \n"
-                                    + "from EnderecoEletronicoPessoa\n"
-                                    + "where EnderecoEletronicoPessoa <> ''"
-                                    + "and CodigoPessoa = " + imp.getId()
-                            )) {
-                                while (rst2.next()) {
-                                    imp.addContato(
-                                            "EMAIL",
-                                            null,
-                                            null,
-                                            null,
-                                            rst2.getString("EnderecoEletronicoPessoa").toLowerCase()
-                                    );
-                                }
-                            }
-                        }
-                        result.add(imp);
                     }
+
+                    imp.setObservacao(rst.getString("Observacoes"));
+                    imp.setObservacao2(rst.getString("Contato"));
+                    imp.setDataCadastro(rst.getDate("DataCadastro"));
+                    imp.setEndereco(rst.getString("Endereco"));
+                    imp.setNumero(rst.getString("Numero"));
+                    imp.setBairro(rst.getString("Bairro"));
+                    imp.setComplemento(rst.getString("Complemento"));
+                    imp.setMunicipioIBGE(rst.getInt("CodigoIBGEMunicipio"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("SiglaUF"));
+                    imp.setCep(rst.getString("CEP"));
+                    imp.setTelefone(rst.getString("Telefone"));
+                    imp.setCnpj(rst.getString("Cnpj"));
+                    imp.setInscricaoestadual(rst.getString("InscricaoEstadual"));
+                    imp.setOrgaoemissor(rst.getString("OrgaoExp"));
+                    imp.setValorLimite(rst.getDouble("LimiteCredito"));
+                    imp.setPermiteCheque(true);
+                    imp.setPermiteCreditoRotativo(true);
+
+                    try (Statement stm1 = ConexaoSqlServer.getConexao().createStatement()) {
+                        try (ResultSet rst1 = stm1.executeQuery(
+                                "select \n"
+                                + "CodigoPessoa, NumeroTelefone \n"
+                                + "from TelefonePessoa\n"
+                                + "where CodigoPessoa = " + imp.getId()
+                        )) {
+                            while (rst1.next()) {
+                                imp.addContato(
+                                        "TELEFONE",
+                                        rst1.getString("NumeroTelefone"),
+                                        null,
+                                        null,
+                                        null
+                                );
+                            }
+                        }
+                    }
+
+                    try (Statement stm2 = ConexaoSqlServer.getConexao().createStatement()) {
+                        try (ResultSet rst2 = stm2.executeQuery(
+                                "select \n"
+                                + "CodigoPessoa, EnderecoEletronicoPessoa \n"
+                                + "from EnderecoEletronicoPessoa\n"
+                                + "where EnderecoEletronicoPessoa <> ''"
+                                + "and CodigoPessoa = " + imp.getId()
+                        )) {
+                            while (rst2.next()) {
+                                imp.addContato(
+                                        "EMAIL",
+                                        null,
+                                        null,
+                                        null,
+                                        rst2.getString("EnderecoEletronicoPessoa").toLowerCase()
+                                );
+                            }
+                        }
+                    }
+                    result.add(imp);
                 }
             }
         }
