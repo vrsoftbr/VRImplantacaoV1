@@ -81,7 +81,7 @@ public abstract class InterfaceDAO {
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         return new ArrayList<>();        
     }
-    
+
     /**
      * Retorna um mercadológico organizado por nível.
      * @return
@@ -106,6 +106,15 @@ public abstract class InterfaceDAO {
      * @throws Exception 
      */
     public List<ProdutoIMP> getProdutos() throws Exception {
+        return new ArrayList<>();
+    }
+
+    /**
+     * Retorna uma listagem com os produtos complemento sistema SD Informatica.
+     * @return Retorna uma listagem com os produtos cadastrados.
+     * @throws Exception 
+     */
+    public List<ProdutoIMP> getProdutosComplemento() throws Exception {
         return new ArrayList<>();
     }
     

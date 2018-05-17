@@ -313,6 +313,13 @@
                     <Property name="text" type="java.lang.String" value="Custo Sem Imposto"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutosComplemento">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Produtos Balan&#xe7;a (Complemento)"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtOferta">
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="tabImpCliente">
@@ -358,7 +365,7 @@
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="108" max="32767" attributes="0"/>
+                          <EmptySpace pref="159" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -447,7 +454,7 @@
                               </Group>
                               <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="81" max="32767" attributes="0"/>
+                          <EmptySpace pref="136" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -531,7 +538,7 @@
                           <Component id="chkConvConveniados" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkConvTransacoes" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="77" max="32767" attributes="0"/>
+                          <EmptySpace pref="136" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -612,7 +619,7 @@
                       <Component id="chkUnifClientePreferencial" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkUnifClienteEventual" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="55" max="32767" attributes="0"/>
+                      <EmptySpace pref="118" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>

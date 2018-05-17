@@ -381,7 +381,7 @@ public class MercadologicoDAO {
     private int gravarCodigosAnteriores(MultiMap<String, MercadologicoAuxiliar> organizados) throws Exception {
         int result = 1;
         try (Statement stm = Conexao.createStatement()) {
-            stm.execute("delete from mercadologico where id > 0; delete from implantacao.codant_mercadologico;");
+            //stm.execute("delete from mercadologico where id > 0; delete from implantacao.codant_mercadologico;");
             for (KeyList<String> key : organizados.keySet()) {
                 String[] chave = key.toArray();
                 MercadologicoAuxiliar descricao = organizados.get(chave);

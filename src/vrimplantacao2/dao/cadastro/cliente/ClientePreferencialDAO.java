@@ -89,7 +89,7 @@ public class ClientePreferencialDAO {
             sql.put("cargoconjuge", "");
             sql.put("salarioconjuge", 0);
             sql.put("outrarendaconjuge", 0);
-            sql.put("id_grupo", cliente.getGrupo(), 0);
+            sql.putNull("id_grupo");
 
             try {
                 stm.execute(sql.getInsert());
@@ -297,6 +297,12 @@ public class ClientePreferencialDAO {
                     sql.put("bairro", vo.getBairro());
                     sql.put("id_municipio", vo.getId_municipio());
                     sql.put("id_estado", vo.getId_estado());
+                }
+                if (opt.contains(OpcaoCliente.PERMITE_CHEQUE)) {
+                    sql.put("permitecheque", vo.isPermiteCheque());
+                }
+                if (opt.contains(OpcaoCliente.PERMITE_CREDITOROTATIVO)) {
+                    sql.put("permitecreditorotativo", vo.isPermiteCreditoRotativo());
                 }
 
                 sql.setWhere("id = " + vo.getId());

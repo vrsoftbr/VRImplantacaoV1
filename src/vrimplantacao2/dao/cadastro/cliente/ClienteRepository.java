@@ -61,6 +61,8 @@ public class ClienteRepository {
                 opt.add(OpcaoCliente.INSCRICAO_ESTADUAL);
                 opt.add(OpcaoCliente.DATA_NASCIMENTO);
                 opt.add(OpcaoCliente.CELULAR);
+                opt.add(OpcaoCliente.PERMITE_CHEQUE);
+                opt.add(OpcaoCliente.PERMITE_CREDITOROTATIVO);
             }
 
             this.provider.begin();
@@ -126,32 +128,18 @@ public class ClienteRepository {
                                     imp.getId()
                             );
                         }
-                    } else {                    
-                        if (opt.contains(OpcaoCliente.OBSERVACOES2)) {
-                            cliente = converterClientePreferencial(imp);
-                            cliente.setId(anterior.getCodigoAtual().getId());
-                            atualizarClientePreferencial(cliente, opt);
-                        } else if (opt.contains(OpcaoCliente.SITUACAO_CADASTRO)) {
-                            cliente = converterClientePreferencial(imp);
-                            cliente.setId(anterior.getCodigoAtual().getId());
-                            atualizarClientePreferencial(cliente, opt);
-                        } else if (opt.contains(OpcaoCliente.VALOR_LIMITE)) {
-                            cliente = converterClientePreferencial(imp);
-                            cliente.setId(anterior.getCodigoAtual().getId());
-                            atualizarClientePreferencial(cliente, opt);
-                        } else if (opt.contains(OpcaoCliente.INSCRICAO_ESTADUAL)) {
-                            cliente = converterClientePreferencial(imp);
-                            cliente.setId(anterior.getCodigoAtual().getId());
-                            atualizarClientePreferencial(cliente, opt);
-                        } else if (opt.contains(OpcaoCliente.DATA_NASCIMENTO)) {
-                            cliente = converterClientePreferencial(imp);
-                            cliente.setId(anterior.getCodigoAtual().getId());
-                            atualizarClientePreferencial(cliente, opt);
-                        } else if (opt.contains(OpcaoCliente.TELEFONE)) {
-                            cliente = converterClientePreferencial(imp);
-                            cliente.setId(anterior.getCodigoAtual().getId());
-                            atualizarClientePreferencial(cliente, opt);
-                        } else if (opt.contains(OpcaoCliente.CELULAR)) {
+                    } else {
+                        if ((opt.contains(OpcaoCliente.OBSERVACOES2))
+                                || (opt.contains(OpcaoCliente.SITUACAO_CADASTRO))
+                                || (opt.contains(OpcaoCliente.SITUACAO_CADASTRO))
+                                || (opt.contains(OpcaoCliente.VALOR_LIMITE))
+                                || (opt.contains(OpcaoCliente.INSCRICAO_ESTADUAL))
+                                || (opt.contains(OpcaoCliente.DATA_NASCIMENTO))
+                                || (opt.contains(OpcaoCliente.TELEFONE))
+                                || (opt.contains(OpcaoCliente.CELULAR))
+                                || (opt.contains(OpcaoCliente.PERMITE_CHEQUE))
+                                || (opt.contains(OpcaoCliente.PERMITE_CREDITOROTATIVO))) {
+
                             cliente = converterClientePreferencial(imp);
                             cliente.setId(anterior.getCodigoAtual().getId());
                             atualizarClientePreferencial(cliente, opt);
@@ -163,7 +151,6 @@ public class ClienteRepository {
                     if (opt.contains(OpcaoCliente.CONTATOS)) {
                         importarContatoPreferencial(cliente, imp, contatos);
                     }
-
                     notificar();
                 }
                 this.provider.commit();

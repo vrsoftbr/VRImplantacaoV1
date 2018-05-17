@@ -21,10 +21,10 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoView;
 import vrimplantacao2.parametro.Parametros;
 
 public class SiaCriareByFileGUI extends VRInternalFrame {
-    
+
     private static final String SISTEMA = "SiaCriareByFile";
     private static SiaCriareByFileGUI instance;
-    
+
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
 
@@ -35,7 +35,7 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
-    
+
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         params.put(txtDatabase.getText(), SISTEMA, "DATABASE");
@@ -47,9 +47,9 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
         }
         params.salvar();
     }
-    
+
     private SiaCriareByFileDAO siaDAO = new SiaCriareByFileDAO();
-    
+
     private SiaCriareByFileGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
@@ -63,7 +63,7 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
         gravarParametros();
         carregarLojaVR();
     }
-    
+
     public void carregarLojaVR() throws Exception {
         cmbLojaVR.setModel(new DefaultComboBoxModel());
         int cont = 0;
@@ -77,10 +77,10 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
         }
         cmbLojaVR.setSelectedIndex(index);
     }
-    
+
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
-            i_mdiFrame.setWaitCursor();            
+            i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
                 instance = new SiaCriareByFileGUI(i_mdiFrame);
             }
@@ -97,29 +97,22 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
         Thread thread = new Thread() {
             int idLojaVR;
             String idLojaCliente;
+
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
-                    
-                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
+
+                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = txtLojaCliente.getText();
                     siaDAO.v_pahtFileXls = txtDatabase.getText();
-                    
+
                     Importador importador = new Importador(siaDAO);
                     importador.setLojaOrigem(idLojaCliente);
-                    importador.setLojaVR(idLojaVR);                    
+                    importador.setLojaVR(idLojaVR);
 
                     if (tabs.getSelectedIndex() == 0) {
-
-                        if (chkFamiliaProduto.isSelected()) {                        
-                            importador.importarFamiliaProduto();
-                        }
-
-                        if (chkMercadologico.isSelected()) {
-                            importador.importarMercadologico();
-                        }
 
                         if (chkProdutos.isSelected()) {
                             importador.importarProduto(chkManterBalanca.isSelected());
@@ -153,7 +146,7 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
                             }
                             if (chkT1AtivoInativo.isSelected()) {
                                 opcoes.add(OpcaoProduto.ATIVO);
-                            }    
+                            }
                             if (chkT1DescCompleta.isSelected()) {
                                 opcoes.add(OpcaoProduto.DESC_COMPLETA);
                             }
@@ -165,7 +158,7 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
                             }
                             if (chkT1ProdMercadologico.isSelected()) {
                                 opcoes.add(OpcaoProduto.MERCADOLOGICO);
-                            }                        
+                            }
                             if (chkValidade.isSelected()) {
                                 opcoes.add(OpcaoProduto.VALIDADE);
                             }
@@ -185,7 +178,7 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
                                 importador.atualizarProdutos(opcoes);
                             }
                         }
-                        
+
                         if (chkT1EAN.isSelected()) {
                             importador.importarEAN();
                         }
@@ -193,7 +186,7 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
                         if (chkT1EANemBranco.isSelected()) {
                             importador.importarEANemBranco();
                         }
-                        
+
                         if (chkOfertas.isSelected()) {
                             importador.importarOfertas(null);
                         }
@@ -205,28 +198,32 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
-                        
+
                         List<OpcaoFornecedor> opcoes = new ArrayList<>();
                         if (chkFContatos.isSelected()) {
-                            opcoes.add(OpcaoFornecedor.CONTATOS);                        
+                            opcoes.add(OpcaoFornecedor.CONTATOS);
                         }
-                        
+
                         if (!opcoes.isEmpty()) {
                             importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
                         }
 
                         if (chkClientePreferencial.isSelected()) {
-                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.VALOR_LIMITE, OpcaoCliente.SITUACAO_CADASTRO);
+                            importador.importarClientePreferencial(OpcaoCliente.DADOS,
+                                    OpcaoCliente.VALOR_LIMITE,
+                                    OpcaoCliente.SITUACAO_CADASTRO,
+                                    OpcaoCliente.PERMITE_CHEQUE,
+                                    OpcaoCliente.PERMITE_CREDITOROTATIVO);
                         }
 
                         if (chkRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }
-                        
+
                         if (chkCheque.isSelected()) {
                             importador.importarCheque();
                         }
-                        
+
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -236,12 +233,12 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
                         }
                         if (chkUnifProdutoFornecedor.isSelected()) {
                             importador.unificarProdutoFornecedor();
-                        }                        
+                        }
                         if (chkUnifClientePreferencial.isSelected()) {
                             importador.unificarClientePreferencial();
-                        }                        
+                        }
                     }
-                                       
+
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
@@ -269,8 +266,6 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
         vRTabbedPane2 = new vrframework.bean.tabbedPane.VRTabbedPane();
         vRPanel7 = new vrframework.bean.panel.VRPanel();
-        chkFamiliaProduto = new vrframework.bean.checkBox.VRCheckBox();
-        chkMercadologico = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Custo = new vrframework.bean.checkBox.VRCheckBox();
@@ -370,17 +365,6 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
 
         vRPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
-        chkFamiliaProduto.setText("Familia Produto");
-        chkFamiliaProduto.setEnabled(true);
-        chkFamiliaProduto.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkFamiliaProdutoActionPerformed(evt);
-            }
-        });
-
-        chkMercadologico.setText("Mercadologico");
-        chkMercadologico.setEnabled(true);
-
         chkProdutos.setText("Produtos");
         chkProdutos.setEnabled(true);
 
@@ -458,8 +442,6 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
                                 .addComponent(chkProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(chkFamiliaProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkT1Estoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkT1Custo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkT1Preco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -506,28 +488,12 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(vRPanel7Layout.createSequentialGroup()
-                        .addComponent(chkFamiliaProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(69, 69, 69)
+                        .addComponent(chkT1NatReceita, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(chkT1ICMS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(vRPanel7Layout.createSequentialGroup()
-                                .addGap(46, 46, 46)
-                                .addComponent(chkT1Estoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(vRPanel7Layout.createSequentialGroup()
-                                .addGap(23, 23, 23)
-                                .addComponent(chkT1Preco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(chkT1Custo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(vRPanel7Layout.createSequentialGroup()
-                                .addComponent(chkT1NatReceita, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(chkT1ICMS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(chkT1AtivoInativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(chkT1AtivoInativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addGroup(vRPanel7Layout.createSequentialGroup()
                             .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -560,7 +526,20 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(chkT1ProdMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkQtdEmbalagemEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                                    .addComponent(chkQtdEmbalagemEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                    .addGroup(vRPanel7Layout.createSequentialGroup()
+                        .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(vRPanel7Layout.createSequentialGroup()
+                                .addGap(46, 46, 46)
+                                .addComponent(chkT1Estoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(vRPanel7Layout.createSequentialGroup()
+                                .addGap(23, 23, 23)
+                                .addComponent(chkT1Preco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(chkT1Custo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMapaTribut, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -826,10 +805,6 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
         }
     }//GEN-LAST:event_btnMigrarActionPerformed
 
-    private void chkFamiliaProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFamiliaProdutoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkFamiliaProdutoActionPerformed
-
     private void chkFornecedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFornecedorActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFornecedorActionPerformed
@@ -873,10 +848,10 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
         try {
             siaDAO.v_pahtFileXls = txtDatabase.getText();
             MapaTributacaoView.exibir(
-                mdiFrame,
-                SISTEMA,
-                null,
-                siaDAO);
+                    mdiFrame,
+                    SISTEMA,
+                    null,
+                    siaDAO);
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Erro ao abrir");
         }
@@ -893,10 +868,8 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCustoSemImposto;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
-    private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
-    private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkOfertas;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
@@ -944,7 +917,5 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
     private vrframework.bean.textField.VRTextField vRTextField1;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
     // End of variables declaration//GEN-END:variables
-
-    
 
 }

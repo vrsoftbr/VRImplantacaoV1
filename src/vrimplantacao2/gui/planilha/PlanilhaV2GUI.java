@@ -1133,6 +1133,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                         dao.setSistema(txtSistema.getText());
                         dao.setLojaOrigem(txtCodLojaOrigem.getText());
                         importador.setLojaVR(((ItemComboVO) cmbLojaDestino.getSelectedItem()).id);
+                        tabProdImportacao.setImportador(importador);
 
                         ProgressBar.show();
                         ProgressBar.setCancel(true);
@@ -1232,7 +1233,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                     } catch (Exception ex) {
                         ProgressBar.dispose();
                         Util.exibirMensagemErro(ex, getTitle());
-                    }                    
+                    } finally {
+                        tabProdImportacao.setImportador(null);
+                    }                 
                 }
             };
             
