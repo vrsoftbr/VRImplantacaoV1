@@ -159,6 +159,7 @@ import vrimplantacao2.gui.interfaces.Wm_byFileGUI;
 import vrimplantacao2.gui.interfaces.WmsiGUI;
 import vrimplantacao2.gui.interfaces.PdvVrGUI;
 import vrimplantacao2.gui.interfaces.InfoMacGUI;
+import vrimplantacao2.gui.interfaces.InventerGUI;
 import vrimplantacao2.gui.interfaces.JM2OnlineGUI;
 import vrimplantacao2.gui.interfaces.PwsGUI;
 import vrimplantacao2.gui.interfaces.SiacGUI;
@@ -553,6 +554,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuVisualComercio = new javax.swing.JMenuItem();
         mnuAsefe = new javax.swing.JMenuItem();
         mnuJM2Online = new javax.swing.JMenuItem();
+        mnuInventer = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1276,6 +1278,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu6.add(mnuJM2Online);
+
+        mnuInventer.setText("Inventer");
+        mnuInventer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuInventerActionPerformed(evt);
+            }
+        });
+        jMenu6.add(mnuInventer);
 
         jMenu2.add(jMenu6);
 
@@ -3690,6 +3700,10 @@ public final class MenuGUI extends VRMdiFrame {
         FenixGUI.exibir(this);
     }//GEN-LAST:event_mnuPws1ActionPerformed
 
+    private void mnuInventerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuInventerActionPerformed
+        InventerGUI.exibir(this);
+    }//GEN-LAST:event_mnuInventerActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -3829,6 +3843,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuInfoMacStore;
     private javax.swing.JMenuItem mnuInteragem;
     private javax.swing.JMenu mnuInterface;
+    private javax.swing.JMenuItem mnuInventer;
     private javax.swing.JMenuItem mnuJM2Online;
     private javax.swing.JMenuItem mnuJacsys;
     private javax.swing.JMenu mnuJanela;
