@@ -147,6 +147,7 @@ import vrimplantacao2.gui.interfaces.AvanceGUI;
 import vrimplantacao2.gui.interfaces.TstiGUI;
 import vrimplantacao2.gui.interfaces.CPlusGUI;
 import vrimplantacao2.gui.interfaces.CissGUI;
+import vrimplantacao2.gui.interfaces.FenixGUI;
 import vrimplantacao2.gui.interfaces.HipcomGUI;
 import vrimplantacao2.gui.interfaces.ScefGUI;
 import vrimplantacao2.gui.interfaces.SisMouraGUI;
@@ -523,6 +524,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSuper = new javax.swing.JMenuItem();
         mnuScef = new javax.swing.JMenuItem();
         mnuPws = new javax.swing.JMenuItem();
+        mnuPws1 = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1039,13 +1041,21 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu5.add(mnuScef);
 
-        mnuPws.setText("PWS");
+        mnuPws.setText("PWS (POINTER)");
         mnuPws.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 mnuPwsActionPerformed(evt);
             }
         });
         jMenu5.add(mnuPws);
+
+        mnuPws1.setText("Fenix (POINTER)");
+        mnuPws1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuPws1ActionPerformed(evt);
+            }
+        });
+        jMenu5.add(mnuPws1);
 
         jMenu2.add(jMenu5);
 
@@ -3698,6 +3708,10 @@ public final class MenuGUI extends VRMdiFrame {
         JM2OnlineGUI.exibir(this);
     }//GEN-LAST:event_mnuJM2OnlineActionPerformed
 
+    private void mnuPws1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPws1ActionPerformed
+        FenixGUI.exibir(this);
+    }//GEN-LAST:event_mnuPws1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -3853,6 +3867,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuPlanilhaPadrao;
     private javax.swing.JMenuItem mnuPlanilhaV2;
     private javax.swing.JMenuItem mnuPws;
+    private javax.swing.JMenuItem mnuPws1;
     private javax.swing.JMenuItem mnuRCNet;
     private javax.swing.JMenuItem mnuRMS_2;
     private javax.swing.JMenuItem mnuRMS_3;

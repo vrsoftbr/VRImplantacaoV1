@@ -8,6 +8,16 @@ import java.sql.Statement;
 
 public class ConexaoSqlServer {
 
+    public static Connection getNewConnection(String host, int port, String database, String user, String pass, String encoding) throws Exception {
+        Class.forName("net.sourceforge.jtds.jdbc.Driver");
+
+        try {
+            return DriverManager.getConnection("jdbc:jtds:sqlserver://" + host + ":" + port + "/" + database, user, pass);
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+
     private int contBegin = 0;
     private static Connection con;
     private String ip = "";

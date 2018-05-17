@@ -236,10 +236,18 @@
                         </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuPws">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="PWS"/>
+                            <Property name="text" type="java.lang.String" value="PWS (POINTER)"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuPwsActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuPws1">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Fenix (POINTER)"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuPws1ActionPerformed"/>
                           </Events>
                         </MenuItem>
                       </SubComponents>

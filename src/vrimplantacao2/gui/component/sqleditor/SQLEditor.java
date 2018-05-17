@@ -16,6 +16,7 @@ import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrimplantacao.classe.ConexaoDB2;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.classe.Global;
 import vrimplantacao.vo.vrimplantacao.SqlVO;
 import vrimplantacao2.parametro.Parametros;
@@ -167,6 +168,34 @@ public class SQLEditor extends VRInternalFrame {
                     conn.close();
                 }
                 conn = ConexaoFirebird.getNewConnection(
+                        editor.txtHost.getText(), 
+                        editor.txtPorta.getInt(),
+                        editor.txtDatabase.getArquivo(),
+                        editor.txtUsuario.getText(),
+                        editor.txtSenha.getText(),
+                        editor.txtEncoding.getText()
+                );
+            }
+        },
+        SQLSERVER {
+            private Connection conn;
+
+            @Override
+            public String toString() {
+                return "SQL Server";
+            }
+            
+            @Override
+            public Connection getConexao() throws Exception {
+                return conn;
+            }
+
+            @Override
+            public void conectar(final SQLEditor editor) throws Exception {
+                if (conn != null) {
+                    conn.close();
+                }
+                conn = ConexaoSqlServer.getNewConnection(
                         editor.txtHost.getText(), 
                         editor.txtPorta.getInt(),
                         editor.txtDatabase.getArquivo(),
