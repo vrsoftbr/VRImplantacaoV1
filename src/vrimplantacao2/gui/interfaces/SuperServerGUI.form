@@ -331,6 +331,11 @@
                     <Property name="text" type="java.lang.String" value="Prod. Familia Produto"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMargem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Margem"/>
+                  </Properties>
+                </Component>
                 <Component class="vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton" name="btnMapaTrib">
                   <Properties>
                     <Property name="enabled" type="boolean" value="false"/>

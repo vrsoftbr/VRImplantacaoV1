@@ -112,7 +112,12 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                     Cell cellCstPisDebito = sheet.getCell(121, i);
                     Cell cellCest = sheet.getCell(196, i);
 
-                    dataCadastro = new java.sql.Date(fmt.parse(cellData.getContents()).getTime());
+                    if ((cellData.getContents() != null) &&
+                            (!cellData.getContents().trim().isEmpty())) {
+                        dataCadastro = new java.sql.Date(fmt.parse(cellData.getContents()).getTime());
+                    } else {
+                        dataCadastro = new Date(new java.util.Date().getTime());
+                    }
 
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -639,14 +644,10 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                     Cell cellIdEmpresa = sheet.getCell(90, i);
                     Cell cellSite = sheet.getCell(110, i);
 
-                    if ("C".equals(cellTipo.getContents())) {
+                    if (("C".equals(cellTipo.getContents())) ||
+                            "A".equals(cellTipo.getContents())) {
 
-                        if ((cellDataCadastro.getContents() != null)
-                                && (!cellDataCadastro.getContents().trim().isEmpty())) {
-                            dataCadastro = new java.sql.Date(fmt.parse(cellDataCadastro.getContents()).getTime());
-                        } else {
-                            dataCadastro = new Date(new java.util.Date().getTime());
-                        }
+                        dataCadastro = new Date(new java.util.Date().getTime());
 
                         if ((cellNascimento.getContents() != null)
                                 && (!cellNascimento.getContents().trim().isEmpty())) {
@@ -787,17 +788,15 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                         continue;
                     }
 
-                    Cell cellIdVenda = sheet.getCell(17, i);
+                    Cell cellIdVenda = sheet.getCell(0, i);
                     Cell cellCodCliente = sheet.getCell(2, i);
-                    Cell cellEmissao = sheet.getCell(5, i);
-                    Cell cellVencimento = sheet.getCell(6, i);
-                    Cell cellValor = sheet.getCell(7, i);
-                    Cell cellHistorico = sheet.getCell(8, i);
-                    Cell cellJuros = sheet.getCell(15, i);
-                    Cell cellCaixa = sheet.getCell(23, i);
-                    Cell cellCupom = sheet.getCell(24, i);
-
-                    System.out.println(linha + " - " + cellEmissao.getContents());
+                    Cell cellEmissao = sheet.getCell(4, i);
+                    Cell cellVencimento = sheet.getCell(5, i);
+                    Cell cellValor = sheet.getCell(6, i);
+                    Cell cellHistorico = sheet.getCell(7, i);
+                    Cell cellJuros = sheet.getCell(14, i);
+                    Cell cellCaixa = sheet.getCell(22, i);
+                    Cell cellCupom = sheet.getCell(23, i);
 
                     if ((cellEmissao.getContents() != null)
                             && (!cellEmissao.getContents().trim().isEmpty())) {

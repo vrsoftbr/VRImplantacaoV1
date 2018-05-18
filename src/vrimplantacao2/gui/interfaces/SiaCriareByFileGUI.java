@@ -209,11 +209,7 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
                         }
 
                         if (chkClientePreferencial.isSelected()) {
-                            importador.importarClientePreferencial(OpcaoCliente.DADOS,
-                                    OpcaoCliente.VALOR_LIMITE,
-                                    OpcaoCliente.SITUACAO_CADASTRO,
-                                    OpcaoCliente.PERMITE_CHEQUE,
-                                    OpcaoCliente.PERMITE_CREDITOROTATIVO);
+                            importador.importarClientePreferencial(OpcaoCliente.DADOS);
                         }
 
                         if (chkRotativo.isSelected()) {

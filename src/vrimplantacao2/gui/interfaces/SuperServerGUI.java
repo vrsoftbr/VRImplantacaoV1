@@ -259,6 +259,9 @@ public class SuperServerGUI extends VRInternalFrame {
                             if (chkProdFamilia.isSelected()) {
                                 opcoes.add(OpcaoProduto.FAMILIA);
                             }
+                            if (chkMargem.isSelected()) {
+                                opcoes.add(OpcaoProduto.MARGEM);
+                            }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
                             }
@@ -367,6 +370,7 @@ public class SuperServerGUI extends VRInternalFrame {
         chkT1NCM = new vrframework.bean.checkBox.VRCheckBox();
         chkT1CEST = new vrframework.bean.checkBox.VRCheckBox();
         chkProdFamilia = new vrframework.bean.checkBox.VRCheckBox();
+        chkMargem = new vrframework.bean.checkBox.VRCheckBox();
         btnMapaTrib = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
         vRPanel9 = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -540,6 +544,9 @@ public class SuperServerGUI extends VRInternalFrame {
 
         chkProdFamilia.setText("Prod. Familia Produto");
         vRPanel7.add(chkProdFamilia);
+
+        chkMargem.setText("Margem");
+        vRPanel7.add(chkMargem);
 
         btnMapaTrib.setEnabled(false);
         btnMapaTrib.addActionListener(new java.awt.event.ActionListener() {
@@ -945,6 +952,7 @@ public class SuperServerGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
+    private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkProdFamilia;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;

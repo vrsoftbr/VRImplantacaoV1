@@ -129,7 +129,7 @@ public class SuperServerDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	p.peso pesoliquido,\n"
                     + "	p.dtUltimaEntrada datacadastro,\n"
                     + "	p.balancaValidade validade,\n"
-                    + "	p.margemMinima margem,\n"
+                    + "	p.margemDesejada margem,\n"
                     + "	e.estoqueAtual estoque,\n"
                     + "	e.estoqueMin estoqueminimo,\n"
                     + "	cast(p.custoCaixa / (case when p.tamCaixa < 1 then 1 else p.tamCaixa end) as numeric(10,2)) custocomimposto,\n"
@@ -215,6 +215,7 @@ public class SuperServerDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setDescricaoGondola(rst.getString("descricaogondola"));
                     imp.setCodMercadologico1(rst.getString("cod_mercadologico1"));
                     imp.setCodMercadologico2(rst.getString("cod_mercadologico2"));
+                    imp.setCodMercadologico3("1");
                     imp.setIdFamiliaProduto(rst.getString("id_familiaproduto"));
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
@@ -550,25 +551,31 @@ public class SuperServerDAO extends InterfaceDAO implements MapaTributoProvider 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "id, \n"
-                    + "referencia, \n"
-                    + "valorAtual as valor, \n"
-                    + "dtEntrada as emissao,\n"
-                    + "dtVencAtual as vencimento,\n"
-                    + "fkEntidade as cliente,\n"
-                    + "numParcela as parcela\n"
-                    + "from Financeiro.ContasReceber\n"
-                    + "where fkLoja = " + getLojaOrigem() + "\n"
-                    + "and pago = 0"
+                    + "r.fkVenda as id,\n"
+                    + "r.fkEntidade as cliente,\n"
+                    + "dtVenda as emissao,\n"
+                    + "dateadd(DAY, 30, r.dtVenda) as vencimento,\n"
+                    + "(r.valorVenda - r.valorPago) as valor,\n"
+                    + "r.valorJuros as juros,\n"
+                    + "r.fkPDV as ecf,\n"
+                    + "v.coo numerocupom\n"
+                    + "from Comercial.VendaPrazo r\n"
+                    + "inner join Comercial.Venda v on v.id = r.fkVenda\n"
+                    + "where coalesce(r.valorPago, 0) < coalesce(r.valorVenda,0)\n"
+                    + "and r.fkLoja = " + getLojaOrigem() + "\n"
+                    + "and r.fkCliente = " + getLojaOrigem() + "\n"
+                    + "ORDER BY r.dtVenda desc"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rst.getString("id"));
                     imp.setValor(rst.getDouble("valor"));
+                    imp.setJuros(rst.getDouble("juros"));
+                    imp.setEcf(rst.getString("ecf"));
                     imp.setDataEmissao(rst.getDate("emissao"));
                     imp.setDataVencimento(rst.getDate("vencimento"));
                     imp.setIdCliente(rst.getString("cliente"));
-                    imp.setObservacao(rst.getString("referencia"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
                     result.add(imp);
                 }
             }
