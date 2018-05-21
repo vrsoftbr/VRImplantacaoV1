@@ -284,13 +284,6 @@ public class KairosGUI extends VRInternalFrame {
                         if (chkClienteEventual.isSelected()) {
                             importador.importarClienteEventual();
                         }                        
-                        if (chkNutricionalFilizola.isSelected()) {
-                            importador.importarNutricionalFilizola();
-                        }
-                        if (chkNutricionalToledo.isSelected()) {
-                            //importador.importarNutricionalToledo();
-                            //shiDAO.importarNutricionalToledo();
-                        }                        
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -357,8 +350,6 @@ public class KairosGUI extends VRInternalFrame {
         chkT1DescReduzida = new vrframework.bean.checkBox.VRCheckBox();
         chkT1DescGondola = new vrframework.bean.checkBox.VRCheckBox();
         chkT1ProdMercadologico = new vrframework.bean.checkBox.VRCheckBox();
-        chkNutricionalFilizola = new vrframework.bean.checkBox.VRCheckBox();
-        chkNutricionalToledo = new vrframework.bean.checkBox.VRCheckBox();
         chkValidade = new vrframework.bean.checkBox.VRCheckBox();
         chkTipoEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
@@ -503,12 +494,6 @@ public class KairosGUI extends VRInternalFrame {
 
         chkT1ProdMercadologico.setText("Prod. Mercadológico");
         vRPanel7.add(chkT1ProdMercadologico);
-
-        chkNutricionalFilizola.setText("Nutricional Filizola");
-        vRPanel7.add(chkNutricionalFilizola);
-
-        chkNutricionalToledo.setText("Nutricional Toledo");
-        vRPanel7.add(chkNutricionalToledo);
 
         chkValidade.setText("Validade");
         chkValidade.addActionListener(new java.awt.event.ActionListener() {
@@ -922,8 +907,6 @@ public class KairosGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
-    private vrframework.bean.checkBox.VRCheckBox chkNutricionalFilizola;
-    private vrframework.bean.checkBox.VRCheckBox chkNutricionalToledo;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
