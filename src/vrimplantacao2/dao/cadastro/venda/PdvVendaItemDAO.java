@@ -30,6 +30,7 @@ public class PdvVendaItemDAO {
         try (Statement stm = Conexao.createStatement()) {         
             
             SQLBuilder sql = new SQLBuilder();
+            
             sql.setSchema("pdv");
             sql.setTableName("vendaitem");
             sql.put("id_venda", item.getVenda().getId());

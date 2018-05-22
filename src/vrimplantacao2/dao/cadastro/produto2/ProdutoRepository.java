@@ -114,6 +114,7 @@ public class ProdutoRepository {
 
                 ProdutoAnteriorVO anterior = provider.anterior().get(keys.get(0), keys.get(1), keys.get(2));
                 if (anterior == null) {
+                    
                     if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_RESETAR_BALANCA)) {
                         try {
                             int idValido = Integer.parseInt(strID);

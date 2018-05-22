@@ -477,28 +477,6 @@ public class RMSAutomaHelpDAO extends InterfaceDAO implements MapaTributoProvide
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws SQLException {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-        
-        String sql = "select \n"
-                    + "	cp.lancamento as id,\n"
-                    + "	cp.cliente::integer as idcliente,\n"
-                    + "	c.cpf as cpfcnpj,\n"
-                    + "	cp.data::date as dtemissao,\n"
-                    + "	cp.caixa as ecf,\n"
-                    + "	cp.cupom as nrcupom,\n"
-                    + "	cp.tipopagamento,\n"
-                    + "	coalesce(cp.valorcompra,0) as valorcompra,\n"
-                    + "	coalesce(cp.valordebito,0) as valordebito,\n"
-                    + "	cp.datadeposito::date as dtvencimento,\n"
-                    + "	cp.loja as idloja,\n"
-                    + "	cp.horario,\n"
-                    + "	cp.desconto\n"
-                    + "from comprascliente cp\n"
-                    + "left join clientes c on cp.cliente = c.codigo_cliente\n"
-                    + "where statuscompra = 'D'\n"
-                    + "  and loja::integer = " + getLojaOrigem() + "\n"
-                    + "  and length(cp.cliente) <= 6\n"
-                    + "order by data";
-        
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select \n"
