@@ -123,7 +123,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
 
-            //this.insertCodAnt_Produto();
+            this.insertCodAnt_Produto();
 
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
