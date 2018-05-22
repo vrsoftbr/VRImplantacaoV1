@@ -275,16 +275,6 @@
                     <Property name="text" type="java.lang.String" value="Prod. Mercadol&#xf3;gico"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNutricionalFilizola">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Nutricional Filizola"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNutricionalToledo">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Nutricional Toledo"/>
-                  </Properties>
-                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkValidade">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Validade"/>

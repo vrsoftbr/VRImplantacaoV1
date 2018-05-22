@@ -62,6 +62,7 @@ public class GetWayGUI extends VRInternalFrame {
     }
     
     private void gravarParametros() throws Exception {
+        String lojaMesmoId;
         Parametros params = Parametros.get();
         params.put(txtHost.getText(), SISTEMA, "HOST");
         params.put(txtDatabase.getText(), SISTEMA, "DATABASE");
@@ -70,8 +71,13 @@ public class GetWayGUI extends VRInternalFrame {
         params.put(txtSenha.getText(), SISTEMA, "SENHA");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
+            if(!"".equals(txtLoja.getText())){
+                        lojaMesmoId = " - " + txtLoja.getText();
+                    } else {
+                        lojaMesmoId = "";
+                    }
             params.put(cliente.cnpj, SISTEMA, "LOJA_CLIENTE");
-            vLojaCliente = cliente.cnpj + " - " + txtLoja.getText();
+            vLojaCliente = cliente.cnpj + lojaMesmoId;
         }
         ItemComboVO vr = (ItemComboVO) cmbLojaVR.getSelectedItem();
         if (vr != null) {

@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import vrframework.classe.Conexao;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -78,10 +79,52 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    private void insertCodAnt_Produto() throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(
+                    "insert into implantacao.codant_produto "
+                    + "(impsistema, "
+                    + "imploja, "
+                    + "impid, "
+                    + "descricao, "
+                    + "codigoatual)\n"
+                    + "(select "
+                    + "'" + getSistema() + "', "
+                    + "'" + getLojaOrigem() + "', "
+                    + "id::varchar, "
+                    + "descricaocompleta, "
+                    + "id "
+                    + "from produto \n"
+                    + "where id not in (select impid::integer "
+                    + "from implantacao.codant_produto\n"
+                    + "where impsistema = '" + getSistema() + "'\n"
+                    + "and imploja = '" + getLojaOrigem() + "'));\n"
+                    + "insert into implantacao.codant_ean "
+                    + "(importsistema,"
+                    + "importloja,"
+                    + "importid,"
+                    + "ean) \n"
+                    + "(select "
+                    + "'" + getSistema() + "', "
+                    + "'" + getLojaOrigem() + "', "
+                    + "id_produto::varchar, "
+                    + "codigobarras::varchar "
+                    + "from produtoautomacao \n"
+                    + "where codigobarras not in (select ean::numeric(14,0) "
+                    + "from implantacao.codant_ean "
+                    + "where importsistema = '" + getSistema() + "' "
+                    + "and importloja = '" + getLojaOrigem() + "'))"
+            );
+        }
+    }
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+
+            this.insertCodAnt_Produto();
+
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "p.id,\n"
