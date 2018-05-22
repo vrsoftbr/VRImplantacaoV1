@@ -261,6 +261,14 @@ public class ClienteIMP {
     public void setEstadoCivil(TipoEstadoCivil estadoCivil) {
         this.estadoCivil = estadoCivil;
     }
+    
+    public void setEstadoCivil(int estadoCivil) {
+        setEstadoCivil(TipoEstadoCivil.getById(estadoCivil));
+    }
+    
+    public void setEstadoCivil(String estadoCivil) {        
+        setEstadoCivil(TipoEstadoCivil.getByString(estadoCivil));
+    }
 
     public Date getDataNascimento() {
         return dataNascimento;
@@ -675,6 +683,14 @@ public class ClienteIMP {
         numero = Utils.stringLong(numero);
         if (!"".equals(descricao) && !"0".equals(numero)) {
             addContato(descricao, descricao, numero, "", "");
+        }
+    }
+    
+    public void addCelular(String descricao, String numero) {
+        descricao = Utils.acertarTexto(descricao);
+        numero = Utils.stringLong(numero);
+        if (!"".equals(descricao) && !"0".equals(numero)) {
+            addContato(descricao, descricao, "", numero, "");
         }
     }
 

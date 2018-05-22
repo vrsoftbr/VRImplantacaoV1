@@ -509,7 +509,8 @@ public class FornecedorIMP {
      * @return Contato incluso.
      */
     public FornecedorContatoIMP addCelular(String descricao, String celular) {
-        if (celular != null && !"".equals(celular.trim())) {
+        celular = Utils.stringLong(celular);
+        if (celular != null && !"0".equals(celular.trim())) {
             return addContato(descricao, "", celular, TipoContato.COMERCIAL, "");
         } else {
             return null;
@@ -524,7 +525,8 @@ public class FornecedorIMP {
      * @return Contato incluso.
      */
     public FornecedorContatoIMP addTelefone(String descricao, String telefone) {
-        if (telefone != null && !"".equals(telefone.trim())) {
+        telefone = Utils.stringLong(telefone);
+        if (telefone != null && !"0".equals(telefone.trim())) {
             return addContato(descricao, telefone, "", TipoContato.COMERCIAL, "");
         } else {
             return null;
@@ -539,6 +541,7 @@ public class FornecedorIMP {
      * @return Contato incluso.
      */
     public FornecedorContatoIMP addEmail(String descricao, String email, TipoContato tipo) {
+        email = Utils.formataEmail(email, 60);
         if (email != null && !"".equals(email.trim())) {
             return addContato(descricao, "", "", tipo, email);
         } else {

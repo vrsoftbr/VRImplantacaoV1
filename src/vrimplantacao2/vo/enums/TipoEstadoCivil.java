@@ -21,6 +21,19 @@ public enum TipoEstadoCivil {
         }
         return NAO_INFORMADO;
     }
+
+    public static TipoEstadoCivil getByString(String estadoCivil) {
+        estadoCivil = estadoCivil == null ? "" : estadoCivil.toUpperCase();
+        
+        if (estadoCivil.matches("^\\s*S.*")) return SOLTEIRO;
+        if (estadoCivil.matches("^\\s*C.*")) return CASADO;
+        if (estadoCivil.matches("^\\s*V.*")) return VIUVO;
+        if (estadoCivil.matches("(^\\s*A.*)|(.*MORA.*)|(.*NAM.*)")) return AMAZIADO;
+        if (estadoCivil.matches("^\\s*O.*")) return OUTROS;
+        if (estadoCivil.matches("^\\s*D.*")) return DIVORCIADO;
+        
+        return NAO_INFORMADO;
+    }
     
     private final int ID;
     private final String descricao;

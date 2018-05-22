@@ -67,14 +67,14 @@ public class InventerGUI extends VRInternalFrame implements ConexaoEvent {
         this.title = "Importação " + SISTEMA;
 
         conexao.host = "localhost";
-        conexao.database = "JM2Online";
+        conexao.database = "BDInventer";
         conexao.port = "1433";
         conexao.user = "sa";
         conexao.pass = "vrsoftw@re";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         
-        tabProdutos.pnlMercNivel.setVisible(false);
+        tabProdutos.chkMercadologico.setVisible(false);
         tabProdutos.chkPReceitaFilizola.setVisible(false);
         tabProdutos.chkPReceitaToledo.setVisible(false);
         tabProdutos.btnMapaTribut.addActionListener(new ActionListener(){

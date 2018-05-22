@@ -59,7 +59,7 @@ public class Utils {
             long val = Utils.stringToLong(celular);
             return String.valueOf(val);
         }
-        return "";
+        return "0";
     }
 
     public double calcularSemImposto(double i_custoComImposto, double i_icmsCredito, double i_pisCofins, double i_valorIva, double i_valorIpi) throws Exception {
