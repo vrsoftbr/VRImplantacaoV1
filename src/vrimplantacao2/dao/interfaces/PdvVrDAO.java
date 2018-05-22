@@ -78,10 +78,10 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     private void insertCodAnt_Produto() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            stm.executeQuery(
+            stm.execute(
                     "insert into implantacao.codant_produto "
                     + "(impsistema, "
                     + "imploja, "
@@ -94,7 +94,11 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "id::varchar, "
                     + "descricaocompleta, "
                     + "id "
-                    + "from produto);\n"
+                    + "from produto \n"
+                    + "where id not in (select impid::integer "
+                    + "from implantacao.codant_produto\n"
+                    + "where impsistema = '" + getSistema() + "'\n"
+                    + "and imploja = '" + getLojaOrigem() + "'));\n"
                     + "insert into implantacao.codant_ean "
                     + "(importsistema,"
                     + "importloja,"
@@ -105,7 +109,11 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "'" + getLojaOrigem() + "', "
                     + "id_produto::varchar, "
                     + "codigobarras::varchar "
-                    + "from produtoautomacao)"
+                    + "from produtoautomacao \n"
+                    + "where codigobarras not in (select ean::numeric(14,0) "
+                    + "from implantacao.codant_ean "
+                    + "where importsistema = '" + getSistema() + "' "
+                    + "and importloja = '" + getLojaOrigem() + "'))"
             );
         }
     }
@@ -114,9 +122,9 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            
-            this.insertCodAnt_Produto();
-                        
+
+            //this.insertCodAnt_Produto();
+
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "p.id,\n"
@@ -142,7 +150,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "inner join aliquota a on a.id_aliquota = p.id_aliquota\n"
                     + "inner join tipopiscofins pis on pis.id = p.id_tipopiscofins\n"
                     + "order by p.id"
-            )) {                
+            )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
