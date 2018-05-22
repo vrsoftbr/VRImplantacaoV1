@@ -26,10 +26,10 @@ import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTrib
 import vrimplantacao2.parametro.Parametros;
 
 public class KairosGUI extends VRInternalFrame {
-    
+
     private static final String SISTEMA = "Kairos";
     private static final String SERVIDOR_SQL = "Sql Server";
-    private static KairosGUI instance;    
+    private static KairosGUI instance;
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
     private KairosDAO dao = new KairosDAO();
@@ -45,7 +45,7 @@ public class KairosGUI extends VRInternalFrame {
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
-    
+
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         params.put(txtHost.getText(), SISTEMA, "HOST");
@@ -65,13 +65,13 @@ public class KairosGUI extends VRInternalFrame {
         }
         params.salvar();
     }
-    
+
     private KairosGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
-        
+
         this.title = "Importação " + SISTEMA;
-        
+
         carregarParametros();
         btnMapaTrib.setProvider(new MapaTributacaoButtonProvider() {
             @Override
@@ -96,7 +96,7 @@ public class KairosGUI extends VRInternalFrame {
                 return mdiFrame;
             }
         });
-        
+
         centralizarForm();
         this.setMaximum(false);
     }
@@ -112,7 +112,7 @@ public class KairosGUI extends VRInternalFrame {
             if (txtDatabase.getText().isEmpty()) {
                 throw new VRException("Favor informar nome do banco de dados " + SERVIDOR_SQL + "!");
             }
-        } 
+        }
         if (txtSenha.getText().isEmpty()) {
             throw new VRException("Favor informar a senha do banco de dados " + SERVIDOR_SQL + "!");
         }
@@ -121,21 +121,21 @@ public class KairosGUI extends VRInternalFrame {
         }
 
         if (tabsConn.getSelectedIndex() == 0) {
-            connSqlServer.abrirConexao(txtHost.getText(), txtPorta.getInt(), 
+            connSqlServer.abrirConexao(txtHost.getText(), txtPorta.getInt(),
                     txtDatabase.getText(), txtUsuario.getText(), txtSenha.getText());
         }
-        
+
         btnMapaTrib.setEnabled(true);
         gravarParametros();
         carregarLojaCliente();
         carregarLojaVR();
     }
-    
+
     public void carregarLojaCliente() throws Exception {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja: dao.getLojasCliente()) {
+        for (Estabelecimento loja : dao.getLojasCliente()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -144,7 +144,7 @@ public class KairosGUI extends VRInternalFrame {
         }
         cmbLojaOrigem.setSelectedIndex(index);
     }
-    
+
     public void carregarLojaVR() throws Exception {
         cmbLojaVR.setModel(new DefaultComboBoxModel());
         int cont = 0;
@@ -158,10 +158,10 @@ public class KairosGUI extends VRInternalFrame {
         }
         cmbLojaVR.setSelectedIndex(index);
     }
-    
+
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
-            i_mdiFrame.setWaitCursor();            
+            i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
                 instance = new KairosGUI(i_mdiFrame);
             }
@@ -178,18 +178,19 @@ public class KairosGUI extends VRInternalFrame {
         Thread thread = new Thread() {
             int idLojaVR;
             String idLojaCliente;
+
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
-                    
-                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
-                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;                    
-                    
+
+                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
+                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
-                    importador.setLojaVR(idLojaVR);                    
+                    importador.setLojaVR(idLojaVR);
 
                     if (tabs.getSelectedIndex() == 0) {
                         if (chkMercadologico.isSelected()) {
@@ -233,7 +234,7 @@ public class KairosGUI extends VRInternalFrame {
                             }
                             if (chkT1AtivoInativo.isSelected()) {
                                 opcoes.add(OpcaoProduto.ATIVO);
-                            }    
+                            }
                             if (chkT1DescCompleta.isSelected()) {
                                 opcoes.add(OpcaoProduto.DESC_COMPLETA);
                             }
@@ -245,7 +246,7 @@ public class KairosGUI extends VRInternalFrame {
                             }
                             if (chkT1ProdMercadologico.isSelected()) {
                                 opcoes.add(OpcaoProduto.MERCADOLOGICO);
-                            }                        
+                            }
                             if (chkValidade.isSelected()) {
                                 opcoes.add(OpcaoProduto.VALIDADE);
                             }
@@ -259,7 +260,7 @@ public class KairosGUI extends VRInternalFrame {
                                 importador.atualizarProdutos(opcoes);
                             }
                         }
-                        
+
                         if (chkT1EAN.isSelected()) {
                             importador.importarEAN();
                         }
@@ -272,18 +273,18 @@ public class KairosGUI extends VRInternalFrame {
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
-                        
+
                         List<OpcaoFornecedor> opcoes = new ArrayList<>();
                         if (!opcoes.isEmpty()) {
                             importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
                         }
                         if (chkClientePreferencial.isSelected()) {
-                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.VALOR_LIMITE, 
+                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.VALOR_LIMITE,
                                     OpcaoCliente.SITUACAO_CADASTRO, OpcaoCliente.INSCRICAO_ESTADUAL);
                         }
                         if (chkClienteEventual.isSelected()) {
                             importador.importarClienteEventual();
-                        }                        
+                        }
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -293,19 +294,19 @@ public class KairosGUI extends VRInternalFrame {
                         }
                         if (chkUnifProdutoFornecedor.isSelected()) {
                             importador.unificarProdutoFornecedor();
-                        }                        
+                        }
                         if (chkUnifClientePreferencial.isSelected()) {
                             importador.unificarClientePreferencial();
-                        }                        
+                        }
                         if (chkClienteEventual.isSelected()) {
                             importador.unificarClienteEventual();
                         }
                     }
-                                       
+
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
-                    try {                    
+                    try {
                         connSqlServer.close();
                     } catch (Exception ex1) {
                         Exceptions.printStackTrace(ex1);
@@ -889,7 +890,7 @@ public class KairosGUI extends VRInternalFrame {
     }//GEN-LAST:event_chkValidadeActionPerformed
 
     private void btnMapaTribActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaTribActionPerformed
-        
+
     }//GEN-LAST:event_btnMapaTribActionPerformed
 
     private void chkClienteEventualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkClienteEventualActionPerformed
@@ -963,7 +964,5 @@ public class KairosGUI extends VRInternalFrame {
     private vrframework.bean.textField.VRTextField vRTextField1;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
     // End of variables declaration//GEN-END:variables
-
-    
 
 }

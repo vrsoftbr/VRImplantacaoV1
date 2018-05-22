@@ -560,15 +560,14 @@ public class SuperServerDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "r.fkPDV as ecf,\n"
                     + "v.coo numerocupom\n"
                     + "from Comercial.VendaPrazo r\n"
-                    + "inner join Comercial.Venda v on v.id = r.fkVenda\n"
+                    + "left join Comercial.Venda v on v.id = r.fkVenda\n"
                     + "where coalesce(r.valorPago, 0) < coalesce(r.valorVenda,0)\n"
-                    + "and r.fkLoja = " + getLojaOrigem() + "\n"
                     + "and r.fkCliente = " + getLojaOrigem() + "\n"
                     + "ORDER BY r.dtVenda desc"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    imp.setId(rst.getString("id"));
+                    imp.setId(rst.getString("id") + rst.getString("cliente"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setJuros(rst.getDouble("juros"));
                     imp.setEcf(rst.getString("ecf"));
