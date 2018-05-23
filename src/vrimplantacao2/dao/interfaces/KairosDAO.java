@@ -33,9 +33,9 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
 
-    public String pais = "BRA";
-    public String uf = "PE";
-    public String loja = "";
+    public String pais;
+    public String uf;
+    public String loja;
 
     @Override
     public String getSistema() {
@@ -86,7 +86,7 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "p.DataCadastro, p.MargemLucroTeorica, p.Situacao, p.ClassificacaoFiscal, \n"
                     + "p.SituacaoTributariaPISEnt, p.SituacaoTributariaPIS, p.SituacaoTributariaCOFINSEnt, \n"
                     + "p.SituacaoTributariaCOFINS, p.NaturezaReceitaPisCofins, codB.SiglaUnidade TipoEmbalagem, \n"
-                    + "codB.QuantidadeProduto, gfp.CodigoGrupoFiscal, gf.Descricao\n"
+                    + "codB.QuantidadeProduto, gfp.CodigoGrupoFiscal, gf.Descricao, p.CodigoEspecificadorST as cest\n"
                     + "from Produto p\n"
                     + "left join CodigoBarraProduto codB on codB.CodigoProduto = p.CodigoProduto\n"
                     + "left join GrupoFiscalProduto gfp on gfp.CodigoProduto = p.CodigoProduto\n"
@@ -115,6 +115,7 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(rst.getString("CodigoSubGrupoProduto"));
                     imp.setCodMercadologico3("1");
                     imp.setNcm(rst.getString("CodigoNcm"));
+                    imp.setCest(rst.getString("cest"));
                     imp.setSituacaoCadastro("A".equals(rst.getString("Situacao")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setDataCadastro(rst.getDate("DataCadastro"));
                     imp.setValidade(rst.getInt("PrazoValidade"));
