@@ -46,7 +46,6 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
                 "	v.loja id_loja,\n" +
                 "	v.data,\n" +
                 "	v.codigo_terminal ecf,\n" +
-                "	v.codigo_caixa id_caixa,\n" +
                 "	v.numero_cupom_fiscal numerocupom,\n" +
                 "	v.sequencia,\n" +
                 "	v.codigo_plu_bar ean,\n" +
@@ -78,7 +77,6 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
                 "	v.loja,\n" +
                 "	v.data,\n" +
                 "	v.codigo_terminal,\n" +
-                "	v.codigo_caixa,\n" +
                 "	v.numero_cupom_fiscal,\n" +
                 "	v.sequencia,\n" +
                 "	v.codigo_plu_bar\n";        
@@ -137,7 +135,7 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
         @Override
         public VendaItemIMP makeNext(ResultSet rst) throws Exception {
             
-            String vendaId = HipcomVendaIterator.makeId(rst.getString("id_loja"), rst.getDate("data"), rst.getString("ecf"), rst.getString("id_caixa"), rst.getString("numerocupom"));
+            String vendaId = HipcomVendaIterator.makeId(rst.getString("id_loja"), rst.getDate("data"), rst.getString("id_caixa"), rst.getString("numerocupom"));
             String idVendaItem = vendaId + "-" + rst.getString("sequencia") + "-" + rst.getString("ean");
 
             String ean = rst.getString("ean");

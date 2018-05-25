@@ -165,6 +165,7 @@ import vrimplantacao2.gui.interfaces.PwsGUI;
 import vrimplantacao2.gui.interfaces.SiacGUI;
 import vrimplantacao2.gui.interfaces.RMSAutomaHelpGUI;
 import vrimplantacao2.gui.interfaces.SiaCriareByFileGUI;
+import vrimplantacao2.gui.interfaces.SoftcomGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 
 public final class MenuGUI extends VRMdiFrame {
@@ -555,6 +556,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAsefe = new javax.swing.JMenuItem();
         mnuJM2Online = new javax.swing.JMenuItem();
         mnuInventer = new javax.swing.JMenuItem();
+        mnuSoftcom = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1286,6 +1288,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu6.add(mnuInventer);
+
+        mnuSoftcom.setText("Softcom");
+        mnuSoftcom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSoftcomActionPerformed(evt);
+            }
+        });
+        jMenu6.add(mnuSoftcom);
 
         jMenu2.add(jMenu6);
 
@@ -3704,6 +3714,10 @@ public final class MenuGUI extends VRMdiFrame {
         InventerGUI.exibir(this);
     }//GEN-LAST:event_mnuInventerActionPerformed
 
+    private void mnuSoftcomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSoftcomActionPerformed
+        SoftcomGUI.exibir(this);
+    }//GEN-LAST:event_mnuSoftcomActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -3876,6 +3890,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSigma;
     private javax.swing.JMenu mnuSistema;
     private javax.swing.JMenuItem mnuSistemaLogin;
+    private javax.swing.JMenuItem mnuSoftcom;
     private javax.swing.JMenuItem mnuSolidus;
     private javax.swing.JMenuItem mnuSuper;
     private javax.swing.JMenuItem mnuTsti;

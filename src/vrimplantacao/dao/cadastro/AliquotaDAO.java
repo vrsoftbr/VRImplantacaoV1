@@ -169,4 +169,59 @@ public class AliquotaDAO {
             return false;
         }
     }
+
+    public int aliquota(int cst, double aliquota, double reduzido, String descricao, boolean gerarAliquotaPdv) throws Exception {        
+        int result = -1;
+        
+        Conexao.begin();
+        try {
+            try (Statement stm = Conexao.createStatement()) {
+                stm.execute(
+                        "do $$\n" +
+                        "declare\n" +
+                        "	r record;\n" +
+                        "	vid integer = -1;\n" +
+                        "	vidpdv integer;\n" +
+                        "	v_aliquotafinal numeric(11,2);\n" +
+                        "\n" +
+                        "	rcst integer = " + cst + ";\n" +
+                        "	raliquota numeric(11,2) = " + String.format("%.2f", aliquota).replace(",", ".") + ";\n" +
+                        "	rreduzido numeric(13,3) = " + String.format("%.2f", reduzido).replace(",", ".") + ";\n" +
+                        "	rdescricao varchar(15) = '" + descricao + "';\n" +
+                        "	rgeraaliquotapdv boolean = " + gerarAliquotaPdv + ";\n" +
+                        "begin\n" +
+                        "		v_aliquotafinal = round(raliquota * ((100 - rreduzido) / 100), 2);\n" +
+                        "		\n" +
+                        "		select coalesce(max(id) + 1, 1) from aliquota into vid;\n" +
+                        "		insert into aliquota (id, descricao, reduzido, porcentagem, id_situacaocadastro, situacaotributaria, id_aliquotapdv, mensagemnf, csosn, porcentagemfinal) \n" +
+                        "		values (vid, rdescricao, rreduzido, raliquota, 1, rcst, null, '' , 101, v_aliquotafinal);\n" +
+                        "\n" +
+                        "		if (rgeraaliquotapdv) then\n" +
+                        "			select coalesce(max(id) + 1, 1) from pdv.aliquota into vidpdv;\n" +
+                        "			insert into pdv.aliquota (id, descricao, porcentagem, id_aliquota)\n" +
+                        "			values (vidpdv, rdescricao, v_aliquotafinal, vid);\n" +
+                        "\n" +
+                        "			update aliquota set id_aliquotapdv = vidpdv where id = vid;\n" +
+                        "		end if;\n" +
+                        "\n" +
+                        "	create temp table tp_aliq on commit drop as select vid id;\n" +
+                        "end;\n" +
+                        "$$;"
+                );
+                try (ResultSet rst = stm.executeQuery(
+                        "select id from tp_aliq"                    
+                )) {
+                    while (rst.next()) {
+                        result = rst.getInt("id");
+                    }
+                }
+            }
+            Conexao.commit();
+        } catch (Exception ex) {
+            Conexao.rollback();
+            throw ex;
+        }
+        
+        return result;
+    }
 }

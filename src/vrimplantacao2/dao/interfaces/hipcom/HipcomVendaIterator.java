@@ -4,8 +4,6 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
@@ -24,8 +22,8 @@ public class HipcomVendaIterator extends MultiStatementIterator<VendaIMP> {
     private static final SimpleDateFormat TIMESTAMP_DATE = new SimpleDateFormat("yyyy-MM-dd");
     private static final SimpleDateFormat TIMESTAMP = new SimpleDateFormat("yyyy-MM-dd hh:mm");
     
-    public static String makeId(String idLoja, Date data, String ecf, String idCaixa, String numeroCupom) {
-        return idLoja + "-" + TIMESTAMP_DATE.format(data) + "-" + ecf + "-" + idCaixa + "-" + numeroCupom;
+    public static String makeId(String idLoja, Date data, String ecf, String numeroCupom) {
+        return idLoja + "-" + TIMESTAMP_DATE.format(data) + "-" + ecf + "-" + numeroCupom;
     }
 
     public HipcomVendaIterator(String idLojas, Date dataInicial, Date dataTermino) throws Exception {
@@ -49,7 +47,6 @@ public class HipcomVendaIterator extends MultiStatementIterator<VendaIMP> {
         return 
             "select\n" +
             "	v.loja id_loja,\n" +
-            "	v.codigo_caixa id_caixa,\n" +
             "	v.numero_cupom_fiscal numerocupom,\n" +
             "	v.codigo_terminal ecf,\n" +
             "	v.data,\n" +
@@ -65,7 +62,6 @@ public class HipcomVendaIterator extends MultiStatementIterator<VendaIMP> {
             "	v.data <= '{DATA_TERMINO}'\n" +
             "group by\n" +
             "	id_loja,\n" +
-            "	id_caixa,\n" +
             "	numerocupom,\n" +
             "	ecf,\n" +
             "	data\n";
@@ -91,7 +87,7 @@ public class HipcomVendaIterator extends MultiStatementIterator<VendaIMP> {
         @Override
         public VendaIMP makeNext(ResultSet rst) throws Exception {
             VendaIMP next = new VendaIMP();
-            String id = makeId(rst.getString("id_loja"), rst.getDate("data"), rst.getString("ecf"), rst.getString("id_caixa"), rst.getString("numerocupom"));
+            String id = makeId(rst.getString("id_loja"), rst.getDate("data"), rst.getString("ecf"), rst.getString("numerocupom"));
             next.setId(id);
             next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
             next.setEcf(Utils.stringToInt(rst.getString("ecf")));

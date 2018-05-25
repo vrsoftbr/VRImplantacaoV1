@@ -83,6 +83,7 @@ public class VendaImpDao {
         
         @Override
         public Void call() throws Exception {
+            VendaIMP imp = null;
             try {        
                 
                 ProgressBar.setStatus("Vendas...gravando vendas no banco temporário...");
@@ -103,6 +104,7 @@ public class VendaImpDao {
                 } else {                    
                     ProgressBar.setMaximum(vendas.size());
                     for (VendaIMP venda: vendas) {
+                        imp = venda;
                         dao.create(venda);
                         ProgressBar.next();
                     }
@@ -113,7 +115,7 @@ public class VendaImpDao {
                 LOG.fine("Vendas gravadas no banco temporário");
 
             } catch (Exception e) {
-                LOG.log(Level.SEVERE, "Erro ao gerar o banco", e);
+                LOG.log(Level.SEVERE, "Erro ao gerar o banco " + (imp != null ? imp.toString() : ""), e);                
                 throw e;
             }
 

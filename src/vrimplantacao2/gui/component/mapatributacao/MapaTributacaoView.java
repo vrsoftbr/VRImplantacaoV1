@@ -3,6 +3,8 @@ package vrimplantacao2.gui.component.mapatributacao;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JDialog;
@@ -58,6 +60,43 @@ public class MapaTributacaoView extends JPanel {
      */
     public MapaTributacaoView() {
         initComponents();
+        tblVR.tblTabela.addMouseListener(
+                new MouseListener() {
+
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        if (e.getClickCount() == 2) {
+                            e.consume();
+                            try {
+                                controller.gravarTributo();
+                            } catch (Exception ex) {
+                                Exceptions.printStackTrace(ex);
+                                throw new RuntimeException(ex);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        
+                    }
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        
+                    }
+
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        
+                    }
+                }
+        );
     }    
 
     /**
@@ -79,6 +118,7 @@ public class MapaTributacaoView extends JPanel {
         txtSistema = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         txtAgrupador = new javax.swing.JTextField();
+        btnIncluir = new javax.swing.JButton();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel3, "Buscar");
 
@@ -105,6 +145,13 @@ public class MapaTributacaoView extends JPanel {
 
         txtAgrupador.setEditable(false);
 
+        org.openide.awt.Mnemonics.setLocalizedText(btnIncluir, "Incluir - F2");
+        btnIncluir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnIncluirOnClick(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -115,7 +162,9 @@ public class MapaTributacaoView extends JPanel {
                     .addComponent(tblVR, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(txtBusca, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 113, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnIncluir)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnAtualizar))
                     .addComponent(tblMapa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
@@ -143,7 +192,8 @@ public class MapaTributacaoView extends JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtBusca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnAtualizar))
+                    .addComponent(btnAtualizar)
+                    .addComponent(btnIncluir))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tblVR, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -223,6 +273,8 @@ public class MapaTributacaoView extends JPanel {
                 if (MapaTributacaoView.frame != null) {
                     MapaTributacaoView.frame.setVisible(false);
                 }
+            } else if (keyCode == KeyEvent.VK_F2) {
+                controller.incluirTributo();
             } else {
                 controller.buscar(txtBusca.getText());
             }
@@ -232,9 +284,19 @@ public class MapaTributacaoView extends JPanel {
         } 
     }//GEN-LAST:event_txtBuscaKeyRelesed
 
+    private void btnIncluirOnClick(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIncluirOnClick
+        try {
+            controller.incluirTributo();
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+            throw new RuntimeException(ex);
+        }
+    }//GEN-LAST:event_btnIncluirOnClick
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     javax.swing.JButton btnAtualizar;
+    javax.swing.JButton btnIncluir;
     javax.swing.JCheckBox jCheckBox1;
     javax.swing.JLabel jLabel1;
     javax.swing.JLabel jLabel2;

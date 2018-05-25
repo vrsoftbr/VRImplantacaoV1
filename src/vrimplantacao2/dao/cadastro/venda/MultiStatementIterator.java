@@ -71,19 +71,24 @@ public class MultiStatementIterator<T> implements Iterator<T> {
     }
 
     private void callNext() throws Exception {
-        if (!nextExecutado) {
-            if (activeStatement == null) {
-                nextStatement();
-            }
-            hasNext = activeRst.next();            
-            if (!hasNext) {
-                nextStatement();
-                if (!rstFechado) {
-                    hasNext = activeRst.next();
+        try {
+            if (!nextExecutado) {
+                if (activeStatement == null) {
+                    nextStatement();
                 }
+                hasNext = activeRst.next();            
+                if (!hasNext) {
+                    nextStatement();
+                    if (!rstFechado) {
+                        hasNext = activeRst.next();
+                    }
+                }
+
+                nextExecutado = true;
             }
-            
-            nextExecutado = true;
+        } catch (Exception e) {
+            System.out.println(sql);
+            throw e;
         }
     }
 

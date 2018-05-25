@@ -57,7 +57,7 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select\n" +
                     "	p.[Código da Mercadoria] id,\n" +
                     "	p.DataCadastro,\n" +
-                    "	p.PAF_Codigo ean,\n" +
+                    "	ean.ean ean,\n" +
                     "	1 qtdEmbalagem,\n" +
                     "	p.Medida unidade,\n" +
                     "	p.Balanca as e_balanca,--p.Balanca,\n" +
@@ -82,90 +82,7 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	cast(p.CST as varchar(10)) + '-' + cast(p.NFCe_Aliquota as varchar(10)) icms_id\n" +
                     "from\n" +
                     "	[Cadastro de Mercadorias] p\n" +
-                    "	left join NFe_PIS pisdebito on\n" +
-                    "		pisdebito.ID = p.TipoPIS\n" +
-                    "	left join NFe_PIS piscredito on\n" +
-                    "		piscredito.ID = p.TipoPISEntrada\n" +
-                    "where\n" +
-                    "	not p.Mercadoria is null"
-            )) {
-                while (rst.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rst.getString("id"));
-                    imp.setDataCadastro(rst.getDate("DataCadastro"));
-                    imp.setEan(rst.getString("ean"));
-                    imp.setQtdEmbalagem(rst.getInt("qtdEmbalagem"));
-                    imp.setTipoEmbalagem(rst.getString("unidade"));
-                    imp.seteBalanca(rst.getBoolean("e_balanca"));
-                    imp.setValidade(rst.getInt("validade"));
-                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                    imp.setDescricaoGondola(rst.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rst.getString("descricaocompleta"));
-                    imp.setCodMercadologico1(rst.getString("cod_mercadologico1"));
-                    imp.setCodMercadologico2(rst.getString("cod_mercadologico2"));
-                    imp.setPesoBruto(rst.getDouble("Peso"));
-                    imp.setPesoLiquido(rst.getDouble("Peso"));
-                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
-                    imp.setEstoque(rst.getDouble("estoque"));
-                    imp.setMargem(rst.getDouble("margem"));
-                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
-                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                    imp.setPrecovenda(rst.getDouble("precovenda"));
-                    imp.setSituacaoCadastro(rst.getInt("situacaocadastro") == 0 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
-                    imp.setNcm(rst.getString("ncm"));
-                    imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstDebito(rst.getInt("piscofins_debito"));
-                    imp.setPiscofinsCstCredito(rst.getInt("piscofins_credito"));
-                    imp.setPiscofinsNaturezaReceita(rst.getInt("piscofins_naturezareceita"));
-                    imp.setIcmsCreditoId(rst.getString("icms_id"));
-                    imp.setIcmsDebitoId(rst.getString("icms_id"));
-                    
-                    result.add(imp);
-                }
-            }
-        }
-        
-        return result;
-    }
-
-    @Override
-    public List<ProdutoIMP> getEANs() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-        
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	p.[Código da Mercadoria] id,\n" +
-                    "	p.DataCadastro,\n" +
-                    "	ean.ean,\n" +
-                    "	1 qtdEmbalagem,\n" +
-                    "	p.Medida unidade,\n" +
-                    "	p.Balanca as e_balanca,--p.Balanca,\n" +
-                    "	p.validadedias validade,\n" +
-                    "	p.Mercadoria descricaocompleta,\n" +
-                    "	p.Grupo cod_mercadologico1,\n" +
-                    "	p.SubGrupo cod_mercadologico2,\n" +
-                    "	p.Peso,\n" +
-                    "	p.[Estoque Mínimo] estoqueminimo,\n" +
-                    "	p.[Unidades em Estoque] estoque,\n" +
-                    "	p.[Margem Lucro] margem,\n" +
-                    "	round(p.[Preço C], 2, 1) custocomimposto,\n" +
-                    "	p.[Preço Compra] custosemimposto,\n" +
-                    "	p.[Preço de Venda] precovenda,\n" +
-                    "	case p.Desativado when 1 then 0 else 1 end situacaocadastro,\n" +
-                    "	p.NCM ncm,\n" +
-                    "	nullif(rtrim(ltrim(coalesce(p.cCEST,''))),'') cest,\n" +
-                    "	pisdebito.CSTPIS piscofins_debito,\n" +
-                    "	piscredito.CSTPIS piscofins_credito,\n" +
-                    "	p.NaturezaReceita piscofins_naturezareceita,\n" +
-                    "	p.Situação,\n" +
-                    "	cast(p.CST as varchar(10)) + '-' + cast(p.NFCe_Aliquota as varchar(10)) icms_id\n" +
-                    "from\n" +
-                    "	[Cadastro de Mercadorias] p\n" +
-                    "	join (\n" +
+                    "join (\n" +
                     "		select\n" +
                     "			[Código da Mercadoria] id,\n" +
                     "			PAF_Codigo ean\n" +
@@ -217,9 +134,9 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSituacaoCadastro(rst.getInt("situacaocadastro") == 0 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstDebito(rst.getInt("piscofins_debito"));
-                    imp.setPiscofinsCstCredito(rst.getInt("piscofins_credito"));
-                    imp.setPiscofinsNaturezaReceita(rst.getInt("piscofins_naturezareceita"));
+                    imp.setPiscofinsCstDebito(rst.getString("piscofins_debito"));
+                    imp.setPiscofinsCstCredito(rst.getString("piscofins_credito"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_naturezareceita"));
                     imp.setIcmsCreditoId(rst.getString("icms_id"));
                     imp.setIcmsDebitoId(rst.getString("icms_id"));
                     
@@ -230,8 +147,6 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
-    
-    
 
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {

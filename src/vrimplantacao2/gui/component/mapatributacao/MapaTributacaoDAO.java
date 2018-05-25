@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.utils.sql.SQLUtils;
@@ -30,6 +29,9 @@ public class MapaTributacaoDAO {
                     + "	orig_id varchar not null,\n"
                     + "	orig_descricao varchar not null,\n"
                     + "	id_aliquota int,\n"
+                    + "	orig_cst integer,\n"
+                    + "	orig_aliquota numeric(11,2),\n"
+                    + "	orig_reduzido numeric(13,3),\n"
                     + "	primary key (sistema, agrupador, orig_id)\n"
                     + ");"
             );
@@ -46,6 +48,9 @@ public class MapaTributacaoDAO {
                     + "	mp.agrupador,\n"
                     + "	mp.orig_id,\n"
                     + "	mp.orig_descricao,\n"
+                    + "	mp.orig_cst,\n"
+                    + "	mp.orig_aliquota,\n"
+                    + "	mp.orig_reduzido,\n"
                     + "	mp.id_aliquota,\n"
                     + "	a.descricao,\n"
                     + "	a.situacaotributaria,\n"
@@ -65,6 +70,9 @@ public class MapaTributacaoDAO {
                     vo.setAgrupador(rst.getString("agrupador"));
                     vo.setOrigId(rst.getString("orig_id"));
                     vo.setOrigDescricao(rst.getString("orig_descricao"));
+                    vo.setOrigCst(rst.getInt("orig_cst"));
+                    vo.setOrigAliquota(rst.getDouble("orig_aliquota"));
+                    vo.setOrigReduzido(rst.getDouble("orig_reduzido"));
                     if (rst.getString("id_aliquota") != null) {
                         vo.setAliquota(
                             new Icms(
@@ -97,6 +105,9 @@ public class MapaTributacaoDAO {
                     sql.put("agrupador", vo.getAgrupador());
                     sql.put("orig_id", vo.getOrigId());
                     sql.put("orig_descricao", vo.getOrigDescricao());
+                    sql.put("orig_cst", vo.getOrigCst());
+                    sql.put("orig_aliquota", vo.getOrigAliquota());
+                    sql.put("orig_reduzido", vo.getOrigReduzido());
                     if (vo.getAliquota() != null) {
                         sql.put("id_aliquota", vo.getAliquota().getId());
                     }

@@ -2,6 +2,7 @@ package vrimplantacao2.gui.component.mapatributacao;
 
 import java.util.ArrayList;
 import java.util.List;
+import vrimplantacao2.gui.component.mapatributacao.incluiraliquota.IncluirAliquotaGUI;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.enums.Icms;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -105,6 +106,9 @@ public class MapaTributacaoController {
             vo.setAgrupador(getAgrupador());
             vo.setOrigId(imp.getId());
             vo.setOrigDescricao(imp.getDescricao());
+            vo.setOrigCst(imp.getCst());
+            vo.setOrigAliquota(imp.getAliquota());
+            vo.setOrigReduzido(imp.getReduzido());
                         
             vo.setAliquota(tributacaoVR.get(imp.getCst(), imp.getAliquota(), imp.getReduzido()));
             
@@ -129,6 +133,16 @@ public class MapaTributacaoController {
             } else {
                 view.tblMapa.setLinhaSelecionada(view.tblMapa.getRowCount() - 1);
             }           
+        }
+    }
+
+    public void incluirTributo() throws Exception {        
+        int mapaIndex = view.tblMapa.getLinhaSelecionada();
+        MapaTributoVO map = this.mapa.get(mapaIndex);
+        
+        int id = IncluirAliquotaGUI.exibir(0, 0, 0, map.getOrigDescricao());
+        if (id > 0) {
+            buscar(String.valueOf(id));
         }
     }
 

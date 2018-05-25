@@ -11,6 +11,9 @@ public class MapaTributoVO {
     private String agrupador;
     private String origId;
     private String origDescricao;
+    private int origCst;
+    private double origAliquota;
+    private double origReduzido;
     private Icms aliquota;
 
     public String getSistema() {
@@ -51,6 +54,30 @@ public class MapaTributoVO {
 
     public void setAliquota(Icms aliquota) {
         this.aliquota = aliquota;
-    }    
+    }
+
+    public int getOrigCst() {
+        return origCst;
+    }
+
+    public void setOrigCst(int origCst) {
+        this.origCst = origCst;
+    }
+
+    public double getOrigAliquota() {
+        return origAliquota;
+    }
+
+    public void setOrigAliquota(double origAliquota) {
+        this.origAliquota = origAliquota;
+    }
+
+    public double getOrigReduzido() {
+        return origReduzido;
+    }
+
+    public void setOrigReduzido(double origReduzido) {
+        this.origReduzido = origReduzido;
+    }
     
 }

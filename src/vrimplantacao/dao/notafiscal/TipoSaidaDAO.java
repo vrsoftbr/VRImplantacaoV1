@@ -6,6 +6,7 @@ import vrimplantacao.vo.notafiscal.CfopVO;
 import vrimplantacao.vo.notafiscal.TipoSaidaVO;
 import vrframework.classe.Conexao;
 import vrframework.classe.VRException;
+import vrimplantacao2.parametro.Versao;
 
 public class TipoSaidaDAO {
 
@@ -29,7 +30,9 @@ public class TipoSaidaDAO {
         oTipoSaida.id = rst.getInt("id");
         oTipoSaida.descricao = rst.getString("descricao");
         oTipoSaida.serie = rst.getString("serie");
-        oTipoSaida.especie = rst.getString("especie");
+        if (Versao.maiorQue(3,17,10)) {
+            oTipoSaida.especie = rst.getString("especie");
+        }
         oTipoSaida.idHistoricoPadrao = rst.getObject("id_historicopadrao") == null ? -1 : rst.getInt("id_historicopadrao");
         oTipoSaida.tipo = rst.getString("tipo");
         oTipoSaida.idContaContabilFiscalCredito = rst.getObject("id_contacontabilfiscalcredito") == null ? -1 : rst.getInt("id_contacontabilfiscalcredito");
