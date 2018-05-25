@@ -219,6 +219,9 @@ public class KairosGUI extends VRInternalFrame {
                             if (chkT1Preco.isSelected()) {
                                 opcoes.add(OpcaoProduto.PRECO);
                             }
+                            if (chkMargem.isSelected()) {
+                                opcoes.add(OpcaoProduto.MARGEM);
+                            }
                             if (chkT1Estoque.isSelected()) {
                                 opcoes.add(OpcaoProduto.ESTOQUE);
                             }
@@ -345,6 +348,7 @@ public class KairosGUI extends VRInternalFrame {
         chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Custo = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Preco = new vrframework.bean.checkBox.VRCheckBox();
+        chkMargem = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Estoque = new vrframework.bean.checkBox.VRCheckBox();
         chkT1EAN = new vrframework.bean.checkBox.VRCheckBox();
         chkT1EANemBranco = new vrframework.bean.checkBox.VRCheckBox();
@@ -471,6 +475,9 @@ public class KairosGUI extends VRInternalFrame {
 
         chkT1Preco.setText("Preço");
         vRPanel7.add(chkT1Preco);
+
+        chkMargem.setText("Margem");
+        vRPanel7.add(chkMargem);
 
         chkT1Estoque.setText("Estoque");
         vRPanel7.add(chkT1Estoque);
@@ -947,6 +954,7 @@ public class KairosGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCustoSemImposto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
+    private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;

@@ -220,6 +220,11 @@
                     <Property name="text" type="java.lang.String" value="Pre&#xe7;o"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMargem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Margem"/>
+                  </Properties>
+                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1Estoque">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Estoque"/>
