@@ -71,9 +71,12 @@ public class KairosGUI extends VRInternalFrame {
         initComponents();
 
         this.title = "Importação " + SISTEMA;
+        txtPais.setText("BRA");
+        txtUf.setText("PE");
 
         carregarParametros();
         btnMapaTrib.setProvider(new MapaTributacaoButtonProvider() {
+            
             @Override
             public MapaTributoProvider getProvider() {
                 return dao;
@@ -87,6 +90,8 @@ public class KairosGUI extends VRInternalFrame {
             @Override
             public String getLoja() {
                 dao.loja = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                dao.pais = txtPais.getText();
+                dao.uf = txtUf.getText();
                 vLojaCliente = dao.loja;
                 return vLojaCliente;
             }
@@ -214,6 +219,9 @@ public class KairosGUI extends VRInternalFrame {
                             if (chkT1Preco.isSelected()) {
                                 opcoes.add(OpcaoProduto.PRECO);
                             }
+                            if (chkMargem.isSelected()) {
+                                opcoes.add(OpcaoProduto.MARGEM);
+                            }
                             if (chkT1Estoque.isSelected()) {
                                 opcoes.add(OpcaoProduto.ESTOQUE);
                             }
@@ -340,6 +348,7 @@ public class KairosGUI extends VRInternalFrame {
         chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Custo = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Preco = new vrframework.bean.checkBox.VRCheckBox();
+        chkMargem = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Estoque = new vrframework.bean.checkBox.VRCheckBox();
         chkT1EAN = new vrframework.bean.checkBox.VRCheckBox();
         chkT1EANemBranco = new vrframework.bean.checkBox.VRCheckBox();
@@ -389,6 +398,10 @@ public class KairosGUI extends VRInternalFrame {
         txtDatabase = new vrframework.bean.textField.VRTextField();
         jLabel2 = new javax.swing.JLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
+        vRLabel1 = new vrframework.bean.label.VRLabel();
+        txtPais = new vrframework.bean.textField.VRTextField();
+        txtUf = new vrframework.bean.textField.VRTextField();
+        vRLabel2 = new vrframework.bean.label.VRLabel();
 
         vRTextArea1.setColumns(20);
         vRTextArea1.setRows(5);
@@ -462,6 +475,9 @@ public class KairosGUI extends VRInternalFrame {
 
         chkT1Preco.setText("Preço");
         vRPanel7.add(chkT1Preco);
+
+        chkMargem.setText("Margem");
+        vRPanel7.add(chkMargem);
 
         chkT1Estoque.setText("Estoque");
         vRPanel7.add(chkT1Estoque);
@@ -568,7 +584,7 @@ public class KairosGUI extends VRInternalFrame {
                 .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(188, Short.MAX_VALUE))
+                .addContainerGap(174, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Clientes", vRPanel9);
@@ -609,7 +625,7 @@ public class KairosGUI extends VRInternalFrame {
                 .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(188, Short.MAX_VALUE))
+                .addContainerGap(174, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Fornecedores", vRPanel8);
@@ -653,7 +669,7 @@ public class KairosGUI extends VRInternalFrame {
                 .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(139, Short.MAX_VALUE))
+                .addContainerGap(133, Short.MAX_VALUE))
         );
 
         tabs.addTab("Unificação", vRPanel2);
@@ -752,6 +768,16 @@ public class KairosGUI extends VRInternalFrame {
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
+        vRLabel1.setText("Pais:");
+
+        txtUf.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtUfActionPerformed(evt);
+            }
+        });
+
+        vRLabel2.setText("Uf:");
+
         javax.swing.GroupLayout vRPanel6Layout = new javax.swing.GroupLayout(vRPanel6);
         vRPanel6.setLayout(vRPanel6Layout);
         vRPanel6Layout.setHorizontalGroup(
@@ -777,14 +803,23 @@ public class KairosGUI extends VRInternalFrame {
                                 .addGap(1, 1, 1)
                                 .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnConectar, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnConectar, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(vRPanel6Layout.createSequentialGroup()
+                        .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtPais, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtUf, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         vRPanel6Layout.setVerticalGroup(
             vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel6Layout.createSequentialGroup()
                 .addComponent(tabsConn, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(vRLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -795,7 +830,15 @@ public class KairosGUI extends VRInternalFrame {
                     .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnConectar)
                     .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtPais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtUf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -818,7 +861,7 @@ public class KairosGUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vRPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(vRPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -897,6 +940,10 @@ public class KairosGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkClienteEventualActionPerformed
 
+    private void txtUfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUfActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtUfActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
     private vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTrib;
@@ -907,6 +954,7 @@ public class KairosGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCustoSemImposto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
+    private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
@@ -944,10 +992,14 @@ public class KairosGUI extends VRInternalFrame {
     private javax.swing.JTabbedPane tabsConn;
     private vrframework.bean.textField.VRTextField txtDatabase;
     private vrframework.bean.textField.VRTextField txtHost;
+    private vrframework.bean.textField.VRTextField txtPais;
     private vrframework.bean.textField.VRTextField txtPorta;
     private vrframework.bean.passwordField.VRPasswordField txtSenha;
+    private vrframework.bean.textField.VRTextField txtUf;
     private vrframework.bean.textField.VRTextField txtUsuario;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
+    private vrframework.bean.label.VRLabel vRLabel1;
+    private vrframework.bean.label.VRLabel vRLabel2;
     private vrframework.bean.label.VRLabel vRLabel20;
     private vrframework.bean.label.VRLabel vRLabel21;
     private vrframework.bean.label.VRLabel vRLabel23;
