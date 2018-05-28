@@ -135,7 +135,7 @@ public class HipcomVendaItemIterator extends MultiStatementIterator<VendaItemIMP
         @Override
         public VendaItemIMP makeNext(ResultSet rst) throws Exception {
             
-            String vendaId = HipcomVendaIterator.makeId(rst.getString("id_loja"), rst.getDate("data"), rst.getString("id_caixa"), rst.getString("numerocupom"));
+            String vendaId = HipcomVendaIterator.makeId(rst.getString("id_loja"), rst.getDate("data"), rst.getString("ecf"), rst.getString("numerocupom"));
             String idVendaItem = vendaId + "-" + rst.getString("sequencia") + "-" + rst.getString("ean");
 
             String ean = rst.getString("ean");
