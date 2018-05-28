@@ -148,6 +148,7 @@ import vrimplantacao2.gui.interfaces.TstiGUI;
 import vrimplantacao2.gui.interfaces.CPlusGUI;
 import vrimplantacao2.gui.interfaces.CissGUI;
 import vrimplantacao2.gui.interfaces.FenixGUI;
+import vrimplantacao2.gui.interfaces.FortiGUI;
 import vrimplantacao2.gui.interfaces.HipcomGUI;
 import vrimplantacao2.gui.interfaces.ScefGUI;
 import vrimplantacao2.gui.interfaces.SisMouraGUI;
@@ -616,6 +617,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuLogus = new javax.swing.JMenuItem();
         mnuBrainSoft = new javax.swing.JMenuItem();
         mnuFarm2000 = new javax.swing.JMenuItem();
+        mnuForti = new javax.swing.JMenuItem();
         mnuADT = new javax.swing.JMenu();
         mnuInfoMacStore = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
@@ -1736,6 +1738,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu13.add(mnuFarm2000);
+
+        mnuForti.setText("Forti");
+        mnuForti.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuFortiActionPerformed(evt);
+            }
+        });
+        jMenu13.add(mnuForti);
 
         jMenu2.add(jMenu13);
 
@@ -3718,6 +3728,11 @@ public final class MenuGUI extends VRMdiFrame {
         SoftcomGUI.exibir(this);
     }//GEN-LAST:event_mnuSoftcomActionPerformed
 
+    private void mnuFortiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuFortiActionPerformed
+        // TODO add your handling code here:
+        FortiGUI.exibir(this);
+    }//GEN-LAST:event_mnuFortiActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -3848,6 +3863,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuFarm2000;
     private javax.swing.JMenu mnuFerramentas;
     private javax.swing.JMenuItem mnuFlatan;
+    private javax.swing.JMenuItem mnuForti;
     private javax.swing.JMenuItem mnuHipcom;
     private javax.swing.JMenuItem mnuHipicom;
     private javax.swing.JMenuItem mnuHostMundo;
