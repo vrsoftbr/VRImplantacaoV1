@@ -147,6 +147,7 @@ import vrimplantacao2.gui.interfaces.AvanceGUI;
 import vrimplantacao2.gui.interfaces.TstiGUI;
 import vrimplantacao2.gui.interfaces.CPlusGUI;
 import vrimplantacao2.gui.interfaces.CissGUI;
+import vrimplantacao2.gui.interfaces.FaciliteGUI;
 import vrimplantacao2.gui.interfaces.FenixGUI;
 import vrimplantacao2.gui.interfaces.FortiGUI;
 import vrimplantacao2.gui.interfaces.HipcomGUI;
@@ -527,7 +528,8 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSuper = new javax.swing.JMenuItem();
         mnuScef = new javax.swing.JMenuItem();
         mnuPws = new javax.swing.JMenuItem();
-        mnuPws1 = new javax.swing.JMenuItem();
+        mnuFenix = new javax.swing.JMenuItem();
+        mnuFacilite = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1055,13 +1057,21 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu5.add(mnuPws);
 
-        mnuPws1.setText("Fenix (POINTER)");
-        mnuPws1.addActionListener(new java.awt.event.ActionListener() {
+        mnuFenix.setText("Fenix (POINTER)");
+        mnuFenix.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuPws1ActionPerformed(evt);
+                mnuFenixActionPerformed(evt);
             }
         });
-        jMenu5.add(mnuPws1);
+        jMenu5.add(mnuFenix);
+
+        mnuFacilite.setText("FACILITE");
+        mnuFacilite.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuFaciliteActionPerformed(evt);
+            }
+        });
+        jMenu5.add(mnuFacilite);
 
         jMenu2.add(jMenu5);
 
@@ -3716,9 +3726,9 @@ public final class MenuGUI extends VRMdiFrame {
         JM2OnlineGUI.exibir(this);
     }//GEN-LAST:event_mnuJM2OnlineActionPerformed
 
-    private void mnuPws1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPws1ActionPerformed
+    private void mnuFenixActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuFenixActionPerformed
         FenixGUI.exibir(this);
-    }//GEN-LAST:event_mnuPws1ActionPerformed
+    }//GEN-LAST:event_mnuFenixActionPerformed
 
     private void mnuInventerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuInventerActionPerformed
         InventerGUI.exibir(this);
@@ -3729,9 +3739,12 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuSoftcomActionPerformed
 
     private void mnuFortiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuFortiActionPerformed
-        // TODO add your handling code here:
         FortiGUI.exibir(this);
     }//GEN-LAST:event_mnuFortiActionPerformed
+
+    private void mnuFaciliteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuFaciliteActionPerformed
+        FaciliteGUI.exibir(this);
+    }//GEN-LAST:event_mnuFaciliteActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -3860,7 +3873,9 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuFG;
     private javax.swing.JMenuItem mnuFabTech;
     private javax.swing.JMenuItem mnuFabTech1;
+    private javax.swing.JMenuItem mnuFacilite;
     private javax.swing.JMenuItem mnuFarm2000;
+    private javax.swing.JMenuItem mnuFenix;
     private javax.swing.JMenu mnuFerramentas;
     private javax.swing.JMenuItem mnuFlatan;
     private javax.swing.JMenuItem mnuForti;
@@ -3890,7 +3905,6 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuPlanilhaPadrao;
     private javax.swing.JMenuItem mnuPlanilhaV2;
     private javax.swing.JMenuItem mnuPws;
-    private javax.swing.JMenuItem mnuPws1;
     private javax.swing.JMenuItem mnuRCNet;
     private javax.swing.JMenuItem mnuRMS_2;
     private javax.swing.JMenuItem mnuRMS_3;
