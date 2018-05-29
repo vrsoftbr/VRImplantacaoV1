@@ -403,7 +403,9 @@
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="vRLabel24" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="vRTextField1" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Component id="txtDatabase" pref="501" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -413,9 +415,10 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="2" attributes="0">
-                              <Component id="vRLabel24" alignment="2" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtDatabase" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="vRLabel24" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="vRTextField1" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtDatabase" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="32767" attributes="0"/>
                       </Group>
@@ -428,10 +431,12 @@
                     <Property name="text" type="java.lang.String" value="Host"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtDatabase">
+                <Component class="vrframework.bean.textField.VRTextField" name="vRTextField1">
                   <Properties>
-                    <Property name="fileSelectionMode" type="java.lang.String" value="Directories"/>
+                    <Property name="text" type="java.lang.String" value="vRTextField1"/>
                   </Properties>
+                </Component>
+                <Component class="vrframework.bean.textField.VRTextField" name="txtDatabase">
                 </Component>
               </SubComponents>
             </Container>

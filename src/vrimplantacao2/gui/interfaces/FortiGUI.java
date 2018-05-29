@@ -30,8 +30,9 @@ public class FortiGUI extends VRInternalFrame {
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
-        txtDatabase.setArquivo(params.getWithNull("localhost", SISTEMA, "DATABASE"));
-        vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
+        txtDatabase.setText(params.getWithNull("localhost", SISTEMA, "DATABASE"));
+        txtLojaCliente.setText(params.get(SISTEMA, "LOJA_CLIENTE"));
+        vLojaCliente =  params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
         if (params.getBool(SISTEMA, "USAR_STRING_CONN")) {
             tabsConn.setSelectedIndex(1);
@@ -42,7 +43,7 @@ public class FortiGUI extends VRInternalFrame {
     
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
-        params.put(txtDatabase.getArquivo(), SISTEMA, "DATABASE");
+        params.put(txtDatabase.getText(), SISTEMA, "DATABASE");
         params.put(tabsConn.getSelectedIndex() == 1, SISTEMA, "USAR_STRING_CONN");
         params.put(txtLojaCliente.getText(), SISTEMA, "LOJA_CLIENTE");
         ItemComboVO vr = (ItemComboVO) cmbLojaVR.getSelectedItem();
@@ -72,7 +73,7 @@ public class FortiGUI extends VRInternalFrame {
 
     public void validarDadosAcesso() throws Exception {
                 
-        ConexaoParadox.abrirConexao(txtDatabase.getArquivo());
+        ConexaoParadox.abrirConexao(txtDatabase.getText());
         
         gravarParametros();
         
@@ -276,7 +277,8 @@ public class FortiGUI extends VRInternalFrame {
         tabsConn = new javax.swing.JTabbedPane();
         jPanel4 = new javax.swing.JPanel();
         vRLabel24 = new vrframework.bean.label.VRLabel();
-        txtDatabase = new vrframework.bean.fileChooser.VRFileChooser();
+        vRTextField1 = new vrframework.bean.textField.VRTextField();
+        txtDatabase = new vrframework.bean.textField.VRTextField();
         jLabel2 = new javax.swing.JLabel();
         txtLojaCliente = new vrframework.bean.textField.VRTextField();
 
@@ -439,7 +441,7 @@ public class FortiGUI extends VRInternalFrame {
 
         vRLabel24.setText("Host");
 
-        txtDatabase.setFileSelectionMode("Directories");
+        vRTextField1.setText("vRTextField1");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -448,7 +450,9 @@ public class FortiGUI extends VRInternalFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(vRLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(vRTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtDatabase, javax.swing.GroupLayout.DEFAULT_SIZE, 501, Short.MAX_VALUE)
                 .addContainerGap())
         );
@@ -456,8 +460,9 @@ public class FortiGUI extends VRInternalFrame {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(vRLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -602,7 +607,7 @@ public class FortiGUI extends VRInternalFrame {
     private javax.swing.JPanel jPanel4;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private javax.swing.JTabbedPane tabsConn;
-    private vrframework.bean.fileChooser.VRFileChooser txtDatabase;
+    private vrframework.bean.textField.VRTextField txtDatabase;
     private vrframework.bean.textField.VRTextField txtLojaCliente;
     private vrframework.bean.label.VRLabel vRLabel24;
     private vrframework.bean.panel.VRPanel vRPanel2;
@@ -610,6 +615,7 @@ public class FortiGUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel vRPanel6;
     private vrframework.bean.panel.VRPanel vRPanel7;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;
+    private vrframework.bean.textField.VRTextField vRTextField1;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
     // End of variables declaration//GEN-END:variables
 
