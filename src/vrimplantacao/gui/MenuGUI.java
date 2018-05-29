@@ -167,6 +167,7 @@ import vrimplantacao2.gui.interfaces.SiacGUI;
 import vrimplantacao2.gui.interfaces.RMSAutomaHelpGUI;
 import vrimplantacao2.gui.interfaces.SiaCriareByFileGUI;
 import vrimplantacao2.gui.interfaces.SoftcomGUI;
+import vrimplantacao2.gui.interfaces.SysmoGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 
 public final class MenuGUI extends VRMdiFrame {
@@ -528,6 +529,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuScef = new javax.swing.JMenuItem();
         mnuPws = new javax.swing.JMenuItem();
         mnuPws1 = new javax.swing.JMenuItem();
+        mnuSysmo = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1062,6 +1064,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu5.add(mnuPws1);
+
+        mnuSysmo.setText("Sysmo");
+        mnuSysmo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSysmoActionPerformed(evt);
+            }
+        });
+        jMenu5.add(mnuSysmo);
 
         jMenu2.add(jMenu5);
 
@@ -3613,25 +3623,6 @@ public final class MenuGUI extends VRMdiFrame {
         }
     }//GEN-LAST:event_mnuImportarNfceActionPerformed
 
-    private void mnupdvvendaitemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnupdvvendaitemActionPerformed
-        // TODO add your handling code here:
-        try {
-            this.setWaitCursor();
-            if (formAlterarProdutoPdvVendaItem == null || formAlterarProdutoPdvVendaItem.isClosed()) {
-                formAlterarProdutoPdvVendaItem = new AlterarProdutoPdvVendaItemGUI(this);
-            }
-
-            formAlterarProdutoPdvVendaItem.setConsultaCampo(null);
-            formAlterarProdutoPdvVendaItem.setVisible(true);
-
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
-    }//GEN-LAST:event_mnupdvvendaitemActionPerformed
-
     private void mnuTstiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuTstiActionPerformed
         // TODO add your handling code here:
         TstiGUI.exibir(this);
@@ -3732,6 +3723,29 @@ public final class MenuGUI extends VRMdiFrame {
         // TODO add your handling code here:
         FortiGUI.exibir(this);
     }//GEN-LAST:event_mnuFortiActionPerformed
+
+    private void mnupdvvendaitemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnupdvvendaitemActionPerformed
+        // TODO add your handling code here:
+        try {
+            this.setWaitCursor();
+            if (formAlterarProdutoPdvVendaItem == null || formAlterarProdutoPdvVendaItem.isClosed()) {
+                formAlterarProdutoPdvVendaItem = new AlterarProdutoPdvVendaItemGUI(this);
+            }
+
+            formAlterarProdutoPdvVendaItem.setConsultaCampo(null);
+            formAlterarProdutoPdvVendaItem.setVisible(true);
+
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, getTitle());
+
+        } finally {
+            this.setDefaultCursor();
+        }
+    }//GEN-LAST:event_mnupdvvendaitemActionPerformed
+
+    private void mnuSysmoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSysmoActionPerformed
+        SysmoGUI.exibir(this);
+    }//GEN-LAST:event_mnuSysmoActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -3909,6 +3923,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSoftcom;
     private javax.swing.JMenuItem mnuSolidus;
     private javax.swing.JMenuItem mnuSuper;
+    private javax.swing.JMenuItem mnuSysmo;
     private javax.swing.JMenuItem mnuTsti;
     private javax.swing.JMenuItem mnuVisualComercio;
     private javax.swing.JMenuItem mnuWebsaq;
