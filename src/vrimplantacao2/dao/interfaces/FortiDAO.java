@@ -39,28 +39,34 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
         Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
         try (Statement stm = ConexaoParadox.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select "
-                    + "G1 merc1, "
-                    + "Nome merc1_desc \n"
+                    "select \n"
+                    + "Mostrag as merc1, \n"
+                    + "Nome as merc1_desc\n"
                     + "from setor\n"
-                    + "order by G1"
+                    + "where Mostrag = G1\n"
+                    + "and G2 = '000'\n"
+                    + "order by Mostrag"
             )) {
                 while (rst.next()) {
                     MercadologicoNivelIMP imp = new MercadologicoNivelIMP();
 
+                    byte[] bytes = rst.getBytes("merc1_desc");
+                    String descricao = new String(bytes, "UTF-8");
+                    
                     imp.setId(rst.getString("merc1"));
-                    imp.setDescricao(rst.getString("merc1_desc"));
+                    imp.setDescricao(descricao);
 
                     merc.put(imp.getId(), imp);
                 }
             }
 
             try (ResultSet rst = stm.executeQuery(
-                    "select "
-                    + "G1 merc1, "
-                    + "G2 merc2, "
-                    + "Nome merc2_desc \n"
+                    "select\n"
+                    + "G1 as merc1,\n"
+                    + "G2 as merc2,\n"
+                    + "Nome as merc2_desc\n"
                     + "from setor\n"
+                    + "where G2 <> '000'\n"
                     + "order by G1, G2"
             )) {
                 while (rst.next()) {
@@ -73,15 +79,15 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                 }
             }
-
+            
             try (ResultSet rst = stm.executeQuery(
-                    "select "
-                    + "G1 merc1, "
-                    + "G2 merc2, "
-                    + "'1' merc3, "
-                    + "Nome merc2_desc, "
-                    + "Nome merc3_desc \n"
+                    "select\n"
+                    + "G1 as merc1,\n"
+                    + "G2 as merc2,\n"
+                    + "'1' as merc3, \n"
+                    + "Nome as merc3_desc\n"
                     + "from setor\n"
+                    + "where G2 <> '000'\n"
                     + "order by G1, G2"
             )) {
                 while (rst.next()) {
@@ -90,13 +96,13 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
                         MercadologicoNivelIMP merc2 = merc1.getNiveis().get(rst.getString("merc2"));
                         if (merc2 != null) {
                             merc2.addFilho(
-                                    rst.getString("merc3"),
-                                    rst.getString("merc3_desc")
+                                rst.getString("merc3"),
+                                rst.getString("merc3_desc")
                             );
                         }
                     }
                 }
-            }
+            }            
         }
         return new ArrayList<>(merc.values());
     }
@@ -107,19 +113,21 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoParadox.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "Codigo, \n"
+                    + "Codigo as id, \n"
+                    + "Codigo as ean, \n"
                     + "Setor, \n"
                     + "G1, \n"
                     + "G2, \n"
-                    + "'1' as G3, \n"
                     + "Nome, \n"
                     + "Un, \n"
                     + "Estoque, \n"
                     + "Minimo, \n"
                     + "Maximo,\n"
-                    + "Custo, \n"
+                    + "Custo as custocomimposto, \n"
+                    + "Custo as custosemimposto, \n"
                     + "Venda, \n"
-                    + "Icms, \n"
+                    + "Icms as icmsdebito, \n"
+                    + "Icms as icmscredito, \n"
                     + "Data, \n"
                     + "Balanca, \n"
                     + "Validade, \n"
@@ -130,31 +138,32 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by Codigo"
             )) {
                 while (rst.next()) {
+                    
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(Utils.formataNumero(Utils.formataNumero(rst.getString("Codigo"))));
-                    imp.setEan(Utils.formataNumero(Utils.formataNumero(rst.getString("Codigo"))));
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("ean"));
                     imp.seteBalanca("S".equals(rst.getString("Balanca")));
-                    imp.setDescricaoCompleta(rst.getString("Descricao"));
+                    imp.setDescricaoCompleta(rst.getString("Nome"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setCodMercadologico1(rst.getString("G1"));
                     imp.setCodMercadologico2(rst.getString("G2"));
-                    imp.setCodMercadologico3(rst.getString("G3"));
+                    imp.setCodMercadologico3("1");
                     imp.setTipoEmbalagem(rst.getString("Un"));
                     imp.setQtdEmbalagem(1);
                     imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
                     imp.setValidade(rst.getInt("Validade"));
                     imp.setMargem(rst.getDouble("MargUltRJ"));
                     imp.setPrecovenda(rst.getDouble("Venda"));
-                    imp.setCustoComImposto(rst.getDouble("Custo"));
-                    imp.setCustoSemImposto(rst.getDouble("Custo"));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setEstoque(rst.getDouble("Estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("Minimo"));
                     imp.setEstoqueMaximo(rst.getDouble("Maximo"));
-                    imp.setIcmsDebitoId(rst.getString("Icms"));
-                    imp.setIcmsCreditoId(rst.getString("Icms"));
+                    imp.setIcmsDebitoId(rst.getString("icmsdebito"));
+                    imp.setIcmsCreditoId(rst.getString("icmscredito"));
                     vResult.add(imp);
                 }
             }
@@ -191,7 +200,7 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("Codigo"));
                     imp.setRazao(rst.getString("Nome"));
-                    imp.setFantasia(rst.getString("Nome"));
+                    imp.setFantasia(imp.getRazao());
                     imp.setEndereco(rst.getString("Endereco"));
                     imp.setBairro(rst.getString("Bairro"));
                     imp.setMunicipio(rst.getString("Cidade"));
@@ -202,26 +211,30 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIe_rg(rst.getString("Insc"));
                     imp.setObservacao(rst.getString("Obs"));
 
-                    if ((rst.getString("Fone2") != null)
-                            && (!rst.getString("Fone2").trim().isEmpty())) {
+                    
+                    String fone2 = rst.getString("Fone2");
+                    String email = rst.getString("Email");
+                    
+                    if ((fone2 != null)
+                            && (!fone2.trim().isEmpty())) {
                         imp.addContato(
                                 "1",
                                 "TELEFONE 2",
-                                rst.getString("Fone2"),
+                                fone2,
                                 null,
                                 TipoContato.COMERCIAL,
                                 null
                         );
                     }
-                    if ((rst.getString("Email") != null)
-                            && (!rst.getString("Email").trim().isEmpty())) {
+                    if ((email != null)
+                            && (!email.trim().isEmpty())) {
                         imp.addContato(
                                 "2",
                                 "EMAIL",
                                 null,
                                 null,
                                 TipoContato.COMERCIAL,
-                                rst.getString("Email")
+                                email
                         );
                     }
                     result.add(imp);
@@ -293,10 +306,12 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataNascimento(rst.getDate("Datanasc"));
                     imp.setObservacao(rst.getString("Obs"));
 
-                    if ((rst.getString("Sexo") != null)
-                            && (!rst.getString("Sexo").trim().isEmpty())) {
+                    String sexo = rst.getString("Sexo");
+                    
+                    if ((sexo != null)
+                            && (!sexo.trim().isEmpty())) {
 
-                        if ("M".equals(rst.getString("Sexo"))) {
+                        if ("M".equals(sexo)) {
                             imp.setSexo(TipoSexo.MASCULINO);
                         } else {
                             imp.setSexo(TipoSexo.FEMININO);
@@ -318,7 +333,7 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "Codigo, \n"
                     + "Porc, \n"
                     + "Descricao \n"
-                    + "from ALIQUOTA \n"
+                    + "from ALIQUOTA.DB \n"
                     + "order by Codigo"
             )) {
                 while (rst.next()) {
