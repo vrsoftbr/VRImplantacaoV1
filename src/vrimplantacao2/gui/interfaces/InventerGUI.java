@@ -212,6 +212,9 @@ public class InventerGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkCheque.isSelected()) {
                             importador.importarCheque();
                         }
+                        if (chkAtacadoEAN.isSelected()) {
+                            dao.importarAtacadoPorEAN(idLojaVR);
+                        }
                     }
 
                     ProgressBar.dispose();
@@ -258,6 +261,8 @@ public class InventerGUI extends VRInternalFrame implements ConexaoEvent {
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
+        tabOutros = new vrframework.bean.panel.VRPanel();
+        chkAtacadoEAN = new vrframework.bean.checkBox.VRCheckBox();
         pnlLoja = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel1 = new javax.swing.JLabel();
@@ -348,6 +353,27 @@ public class InventerGUI extends VRInternalFrame implements ConexaoEvent {
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
+
+        chkAtacadoEAN.setText("Atacado (gerar EAN pelo ID)");
+
+        javax.swing.GroupLayout tabOutrosLayout = new javax.swing.GroupLayout(tabOutros);
+        tabOutros.setLayout(tabOutrosLayout);
+        tabOutrosLayout.setHorizontalGroup(
+            tabOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabOutrosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkAtacadoEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(369, Short.MAX_VALUE))
+        );
+        tabOutrosLayout.setVerticalGroup(
+            tabOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabOutrosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkAtacadoEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(240, Short.MAX_VALUE))
+        );
+
+        tabImportacao.addTab("Outros", tabOutros);
 
         tabOperacoes.addTab("Importação", tabImportacao);
 
@@ -442,6 +468,7 @@ public class InventerGUI extends VRInternalFrame implements ConexaoEvent {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkAtacadoEAN;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
@@ -465,6 +492,7 @@ public class InventerGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.panel.VRPanel tabFornecedor;
     private javax.swing.JTabbedPane tabImportacao;
     private javax.swing.JTabbedPane tabOperacoes;
+    private vrframework.bean.panel.VRPanel tabOutros;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.label.VRLabel vRLabel1;
     // End of variables declaration//GEN-END:variables

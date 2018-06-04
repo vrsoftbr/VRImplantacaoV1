@@ -78,8 +78,8 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pisdebito.CSTPIS piscofins_debito,\n" +
                     "	piscredito.CSTPIS piscofins_credito,\n" +
                     "	p.NaturezaReceita piscofins_naturezareceita,\n" +
-                    "	p.Situação,\n" +
-                    "	cast(p.CST as varchar(10)) + '-' + cast(p.NFCe_Aliquota as varchar(10)) icms_id\n" +
+                    "	p.Situação icms_id\n" +
+                    //"	cast(p.CST as varchar(10)) + '-' + cast(p.NFCe_Aliquota as varchar(10)) icms_id\n" +                    
                     "from\n" +
                     "	[Cadastro de Mercadorias] p\n" +
                     "join (\n" +
@@ -154,17 +154,11 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct\n" +
-                    "	cast(p.CST as varchar(10)) + '-' + cast(p.NFCe_Aliquota as varchar(10)) id,\n" +
-                    "	'CST: ' + icms.CST + ' - ALIQ: ' + cast(p.NFCe_Aliquota as varchar(10)) + ' - ALIQ. CONS: ' + coalesce(p.\"Situação\", '??') + ' - ' + icms.\"Descrição\" descricao\n" +
-                    "from\n" +
-                    "	\"Cadastro de Mercadorias\" p\n" +
-                    "	join NFe_CST icms on\n" +
-                    "		p.cst = icms.id"
+                    "select distinct Situação id from [Cadastro de Mercadorias] order by 1"
             )) {
                 while (rst.next()) {
                     result.add(
-                            new MapaTributoIMP(rst.getString("id"), rst.getString("descricao"))
+                            new MapaTributoIMP(rst.getString("id"), rst.getString("id"))
                     );
                 }
             }

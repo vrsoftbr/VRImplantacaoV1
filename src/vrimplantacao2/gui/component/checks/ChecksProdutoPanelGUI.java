@@ -82,6 +82,7 @@ public class ChecksProdutoPanelGUI extends JPanel {
         chkPReceitaFilizola = new vrframework.bean.checkBox.VRCheckBox();
         chkPReceitaToledo = new vrframework.bean.checkBox.VRCheckBox();
         chkOferta = new vrframework.bean.checkBox.VRCheckBox();
+        chkAtacado = new vrframework.bean.checkBox.VRCheckBox();
 
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
@@ -251,11 +252,15 @@ public class ChecksProdutoPanelGUI extends JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkOferta, "Oferta");
         add(chkOferta);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkAtacado, "Atacado");
+        add(chkAtacado);
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public vrframework.bean.button.VRButton btnMapaTribut;
+    public vrframework.bean.checkBox.VRCheckBox chkAtacado;
     public vrframework.bean.checkBox.VRCheckBox chkAtivoInativo;
     public vrframework.bean.checkBox.VRCheckBox chkCusto;
     public vrframework.bean.checkBox.VRCheckBox chkCustoComImposto;
@@ -405,6 +410,9 @@ public class ChecksProdutoPanelGUI extends JPanel {
                 }
                 if (chkPProdComprador.isSelected()) {
                     opcoes.add(OpcaoProduto.COMPRADOR);
+                }
+                if (chkAtacado.isSelected()) {
+                    opcoes.add(OpcaoProduto.ATACADO);
                 }
                 if (!opcoes.isEmpty()) {
                     importador.atualizarProdutos(opcoes);

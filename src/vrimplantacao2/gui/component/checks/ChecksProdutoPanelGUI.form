@@ -299,5 +299,10 @@
         <Property name="text" type="java.lang.String" value="Oferta"/>
       </Properties>
     </Component>
+    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAtacado">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Atacado"/>
+      </Properties>
+    </Component>
   </SubComponents>
 </Form>
