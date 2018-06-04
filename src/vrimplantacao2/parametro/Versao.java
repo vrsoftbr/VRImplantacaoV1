@@ -61,9 +61,9 @@ public final class Versao {
     public static boolean menorQue(int... versao) {
         for (int i = 0; i < versao.length; i++) {
             if (versao[i] > versaoArray[i]) {
-                return false;
-            } else if (versao[i] < versaoArray[i]) {
                 return true;
+            } else if (versao[i] < versaoArray[i]) {
+                return false;
             }
         }
         return false;
@@ -77,9 +77,9 @@ public final class Versao {
     public static boolean maiorQue(int... versao) {
         for (int i = 0; i < versao.length; i++) {
             if (versao[i] < versaoArray[i]) {
-                return false;
-            } else if (versao[i] > versaoArray[i]) {
                 return true;
+            } else if (versao[i] > versaoArray[i]) {
+                return false;
             }
         }
         return false;

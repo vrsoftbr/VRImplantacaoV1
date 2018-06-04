@@ -183,7 +183,7 @@ public class ProdutoDAO {
             sql.putNull("margemmaxima");            
             sql.put("permitedescontopdv", true);
             sql.put("verificapesopdv", false);
-            if (Versao.maiorQue(3,17,10)) {
+            if (Versao.menorQue(3,17,10)) {
                 sql.put("id_tipoproduto", 0);
                 sql.put("fabricacaopropria", false);
             }

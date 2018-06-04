@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import vrframework.classe.Conexao;
+import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.vo.cadastro.oferta.OfertaVO;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
@@ -91,6 +92,10 @@ public class ProdutoComplementoDAO {
                     sql.put("customediosemimpostoanterior", 0);
                     sql.put("id_tipopiscofinscredito", vo.getProduto().getPisCofinsCredito().getId());
                     sql.put("valoroutrassubstituicao", 0);
+                    if (Versao.maiorQue(3,17,9)) {
+                        sql.put("id_tipoproduto", 0);
+                        sql.put("fabricacaopropria", false);
+                    }
                     sql.getReturning().add("id");
 
                     try (ResultSet rst = stm.executeQuery(

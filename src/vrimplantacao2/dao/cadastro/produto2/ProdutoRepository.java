@@ -295,10 +295,10 @@ public class ProdutoRepository {
                             provider.aliquota().salvar(aliquota);
                             aliquotas.put(null, prod.getId(), aliquota.getEstado().getId());
                         }
-                        if (precoAtacadoLoja.getPrecoVenda() != 0 && precoAtacadoLoja.getPrecoVenda() != complemento.getPrecoVenda()) {
+                        if (precoAtacadoLoja.getPrecoVenda() > 0 && precoAtacadoLoja.getPrecoVenda() != complemento.getPrecoVenda()) {
                             provider.atacado().atualizarLoja(precoAtacadoLoja, optSimples);
                         }
-                        if (precoAtacadoDesconto.getDesconto() != 0) {
+                        if (precoAtacadoDesconto.getDesconto() > 0) {
                             provider.atacado().atualizarDesconto(precoAtacadoDesconto, optSimples);
                         }
                     }
