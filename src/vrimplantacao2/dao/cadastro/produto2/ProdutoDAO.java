@@ -279,6 +279,9 @@ public class ProdutoDAO {
         if (opt.contains(OpcaoProduto.EXCECAO)) {
             sql.put("excecao", vo.getExcecao());
         }
+        if(opt.contains(OpcaoProduto.DATA_ALTERACAO)) {
+            sql.put("dataalteracao", vo.getDataalteracao());
+        }
         
         sql.setWhere("id = " + vo.getId());
         

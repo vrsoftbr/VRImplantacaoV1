@@ -174,6 +174,11 @@ public enum OpcaoProduto {
         public String toString() {
             return "Icms Entrada Fornecedor";
         }
+    }, DATA_ALTERACAO {
+        @Override
+        public String toString() {
+            return "Data de Alteração";
+        }
     },
     IMPORTAR_RESETAR_BALANCA, IMPORTAR_GERAR_SUBNIVEL_MERC, IMPORTAR_MANTER_BALANCA, UNIFICAR_PRODUTO_BALANCA;
     

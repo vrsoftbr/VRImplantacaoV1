@@ -649,7 +649,10 @@ public class ProdutoRepository {
         if (vo.getDatacadastro() == null) {
             vo.setDatacadastro(new Date());
         }
-
+        vo.setDataalteracao(imp.getDataAlteracao());
+        if(vo.getDataalteracao() == null) {
+            vo.setDataalteracao(new Date());
+        }
         Integer fornecedorFabricante = fabricantes.get(imp.getFornecedorFabricante());
         if (fornecedorFabricante != null) {
             vo.setIdFornecedorFabricante(fornecedorFabricante);

@@ -15,7 +15,6 @@ import vrframework.classe.VRException;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.LojaDAO;
-import vrimplantacao.gui.interfaces.MapeamentoVendasGetWay.ItensNaoExistenteGetWayGUI;
 import vrimplantacao2.dao.interfaces.GetWayDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -30,10 +29,10 @@ import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTrib
 import vrimplantacao2.parametro.Parametros;
 
 public class GetWayGUI extends VRInternalFrame {
-    
+
     private static final String SISTEMA = "GetWay";
     private static final String SERVIDOR_SQL = "Sql Server";
-    private static GetWayGUI instance;    
+    private static GetWayGUI instance;
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
     private GetWayDAO getWayDAO = new GetWayDAO();
@@ -44,12 +43,12 @@ public class GetWayGUI extends VRInternalFrame {
         cmbTipoDocRotativo.setModel(new DefaultComboBoxModel());
         cmbTipoDocCheque.removeAllItems();
         cmbTipoDocCheque.setModel(new DefaultComboBoxModel());
-        for (ItemComboVO item: getWayDAO.getTipoDocumento()) {
+        for (ItemComboVO item : getWayDAO.getTipoDocumento()) {
             cmbTipoDocRotativo.addItem(item);
             cmbTipoDocCheque.addItem(item);
         }
     }
-    
+
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         txtHost.setText(params.get(SISTEMA, "HOST"));
@@ -60,7 +59,7 @@ public class GetWayGUI extends VRInternalFrame {
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
-    
+
     private void gravarParametros() throws Exception {
         String lojaMesmoId;
         Parametros params = Parametros.get();
@@ -71,11 +70,11 @@ public class GetWayGUI extends VRInternalFrame {
         params.put(txtSenha.getText(), SISTEMA, "SENHA");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
-            if(!"".equals(txtLoja.getText())){
-                        lojaMesmoId = " - " + txtLoja.getText();
-                    } else {
-                        lojaMesmoId = "";
-                    }
+            if (!"".equals(txtLoja.getText())) {
+                lojaMesmoId = " - " + txtLoja.getText();
+            } else {
+                lojaMesmoId = "";
+            }
             params.put(cliente.cnpj, SISTEMA, "LOJA_CLIENTE");
             vLojaCliente = cliente.cnpj + lojaMesmoId;
         }
@@ -86,16 +85,15 @@ public class GetWayGUI extends VRInternalFrame {
         }
         params.salvar();
     }
-    
+
     private GetWayGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
         //ConexaoFirebird.encoding = "WIN1252";        
-        
-        this.title = "Importação " + SISTEMA;
-                
-        //cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
+        this.title = "Importação " + SISTEMA;
+
+        //cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         carregarParametros();
         btnMapaTrib.setProvider(new MapaTributacaoButtonProvider() {
             @Override
@@ -118,7 +116,7 @@ public class GetWayGUI extends VRInternalFrame {
                 return mdiFrame;
             }
         });
-        
+
         centralizarForm();
         this.setMaximum(false);
     }
@@ -134,7 +132,7 @@ public class GetWayGUI extends VRInternalFrame {
             if (txtDatabase.getText().isEmpty()) {
                 throw new VRException("Favor informar nome do banco de dados " + SERVIDOR_SQL + "!");
             }
-        } 
+        }
         if (txtSenha.getText().isEmpty()) {
             throw new VRException("Favor informar a senha do banco de dados " + SERVIDOR_SQL + "!");
         }
@@ -143,22 +141,22 @@ public class GetWayGUI extends VRInternalFrame {
         }
 
         if (tabsConn.getSelectedIndex() == 0) {
-            connSqlServer.abrirConexao(txtHost.getText(), txtPorta.getInt(), 
+            connSqlServer.abrirConexao(txtHost.getText(), txtPorta.getInt(),
                     txtDatabase.getText(), txtUsuario.getText(), txtSenha.getText());
         }
-        
+
         btnMapaTrib.setEnabled(true);
         gravarParametros();
         carregarLojaCliente();
         carregarLojaVR();
         carregarTipoDocumento();
     }
-    
+
     public void carregarLojaCliente() throws Exception {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja: getWayDAO.getLojas()) {
+        for (Estabelecimento loja : getWayDAO.getLojas()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -167,7 +165,7 @@ public class GetWayGUI extends VRInternalFrame {
         }
         cmbLojaOrigem.setSelectedIndex(index);
     }
-    
+
     public void carregarLojaVR() throws Exception {
         cmbLojaVR.setModel(new DefaultComboBoxModel());
         int cont = 0;
@@ -181,10 +179,10 @@ public class GetWayGUI extends VRInternalFrame {
         }
         cmbLojaVR.setSelectedIndex(index);
     }
-    
+
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
-            i_mdiFrame.setWaitCursor();            
+            i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
                 instance = new GetWayGUI(i_mdiFrame);
             }
@@ -202,32 +200,32 @@ public class GetWayGUI extends VRInternalFrame {
             int idLojaVR;
             String idLojaCliente;
             String lojaMesmoId;
-            
+
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
-                    
-                    if(!"".equals(txtLoja.getText())){
+
+                    if (!"".equals(txtLoja.getText())) {
                         lojaMesmoId = " - " + txtLoja.getText();
                     } else {
                         lojaMesmoId = "";
                     }
-                    
+
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj + lojaMesmoId;
-                    getWayDAO.v_tipoDocumento = ((ItemComboVO)cmbTipoDocRotativo.getSelectedItem()).id;
-                    getWayDAO.v_tipoDocumentoCheque = ((ItemComboVO)cmbTipoDocCheque.getSelectedItem()).id;
+                    getWayDAO.v_tipoDocumento = ((ItemComboVO) cmbTipoDocRotativo.getSelectedItem()).id;
+                    getWayDAO.v_tipoDocumentoCheque = ((ItemComboVO) cmbTipoDocCheque.getSelectedItem()).id;
                     getWayDAO.v_usar_arquivoBalanca = chkTemArquivoBalanca.isSelected();
                     getWayDAO.usarMargemBruta = chkUsarMargemBruta.isSelected();
-                    
+
                     Importador importador = new Importador(getWayDAO);
                     importador.setLojaOrigem(idLojaCliente);
-                    importador.setLojaVR(idLojaVR);                    
+                    importador.setLojaVR(idLojaVR);
 
                     if (tabs.getSelectedIndex() == 0) {
-                        if (chkFamiliaProduto.isSelected()) {                        
+                        if (chkFamiliaProduto.isSelected()) {
                             importador.importarFamiliaProduto();
                         }
                         if (chkMercadologico.isSelected()) {
@@ -271,7 +269,7 @@ public class GetWayGUI extends VRInternalFrame {
                             }
                             if (chkT1AtivoInativo.isSelected()) {
                                 opcoes.add(OpcaoProduto.ATIVO);
-                            }    
+                            }
                             if (chkT1DescCompleta.isSelected()) {
                                 opcoes.add(OpcaoProduto.DESC_COMPLETA);
                             }
@@ -283,7 +281,7 @@ public class GetWayGUI extends VRInternalFrame {
                             }
                             if (chkT1ProdMercadologico.isSelected()) {
                                 opcoes.add(OpcaoProduto.MERCADOLOGICO);
-                            }                        
+                            }
                             if (chkValidade.isSelected()) {
                                 opcoes.add(OpcaoProduto.VALIDADE);
                             }
@@ -302,11 +300,16 @@ public class GetWayGUI extends VRInternalFrame {
                             if (chkMargem.isSelected()) {
                                 opcoes.add(OpcaoProduto.MARGEM);
                             }
+
+                            if (chkDtAlteracao.isSelected()) {
+                                opcoes.add(OpcaoProduto.DATA_ALTERACAO);
+                            }
+
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
                             }
                         }
-                        
+
                         if (chkOfertas.isSelected()) {
                             importador.importarOfertas(txtDataFimOferta.getDate());
                         }
@@ -322,14 +325,14 @@ public class GetWayGUI extends VRInternalFrame {
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
-                        
+
                         List<OpcaoFornecedor> opcoes = new ArrayList<>();
                         if (chkFContatos.isSelected()) {
-                            opcoes.add(OpcaoFornecedor.CONTATOS);                        
-                        }                        
+                            opcoes.add(OpcaoFornecedor.CONTATOS);
+                        }
                         if (chkFCondicaoPagamento.isSelected()) {
                             opcoes.add(OpcaoFornecedor.CONDICAO_PAGAMENTO2);
-                        }                        
+                        }
                         if (chkFPrazoFornecedor.isSelected()) {
                             opcoes.add(OpcaoFornecedor.PRAZO_FORNECEDOR);
                         }
@@ -341,14 +344,14 @@ public class GetWayGUI extends VRInternalFrame {
                         }
                         if (chkContasPagar.isSelected()) {
                             importador.importarContasPagar(OpcaoContaPagar.NOVOS);
-                        }                        
+                        }
                         if (chkClientePreferencial.isSelected()) {
-                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.VALOR_LIMITE, 
-                                    OpcaoCliente.SITUACAO_CADASTRO, OpcaoCliente.INSCRICAO_ESTADUAL);
+                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.VALOR_LIMITE,
+                                    OpcaoCliente.SITUACAO_CADASTRO, OpcaoCliente.INSCRICAO_ESTADUAL, OpcaoCliente.OBSERVACOES2);
                         }
                         if (chkClienteEventual.isSelected()) {
                             importador.importarClienteEventual();
-                        }                        
+                        }
                         if (chkRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }
@@ -367,13 +370,13 @@ public class GetWayGUI extends VRInternalFrame {
                         if (chkNutricionalToledo.isSelected()) {
                             //importador.importarNutricionalToledo();
                             //shiDAO.importarNutricionalToledo();
-                        }                        
+                        }
                         if (chkConvEmpresa.isSelected()) {
                             importador.importarConvenioEmpresa();
-                        }                        
+                        }
                         if (chkConvConveniado.isSelected()) {
                             importador.importarConvenioConveniado();
-                        }                        
+                        }
                         if (chkConvRecebimento.isSelected()) {
                             importador.importarConvenioTransacao();
                         }
@@ -391,19 +394,19 @@ public class GetWayGUI extends VRInternalFrame {
                         }
                         if (chkUnifProdutoFornecedor.isSelected()) {
                             importador.unificarProdutoFornecedor();
-                        }                        
+                        }
                         if (chkUnifClientePreferencial.isSelected()) {
                             importador.unificarClientePreferencial();
-                        }                        
+                        }
                         if (chkClienteEventual.isSelected()) {
                             importador.unificarClienteEventual();
                         }
                     }
-                                       
+
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
-                    try {                    
+                    try {
                         connSqlServer.close();
                     } catch (Exception ex1) {
                         Exceptions.printStackTrace(ex1);
@@ -464,6 +467,7 @@ public class GetWayGUI extends VRInternalFrame {
         chkT1NCM = new vrframework.bean.checkBox.VRCheckBox();
         chkT1CEST = new vrframework.bean.checkBox.VRCheckBox();
         chkTemArquivoBalanca = new vrframework.bean.checkBox.VRCheckBox();
+        chkDtAlteracao = new vrframework.bean.checkBox.VRCheckBox();
         jPanel2 = new javax.swing.JPanel();
         chkMargem = new vrframework.bean.checkBox.VRCheckBox();
         chkUsarMargemBruta = new vrframework.bean.checkBox.VRCheckBox();
@@ -501,11 +505,6 @@ public class GetWayGUI extends VRInternalFrame {
         edtDtVendaIni = new org.jdesktop.swingx.JXDatePicker();
         edtDtVendaFim = new org.jdesktop.swingx.JXDatePicker();
         chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
-        vRPanel4 = new vrframework.bean.panel.VRPanel();
-        btnMapDivergencias = new vrframework.bean.button.VRButton();
-        chkMapearProdutoEAN = new vrframework.bean.checkBox.VRCheckBox();
-        chkVerificarCodigoBarras = new vrframework.bean.checkBox.VRCheckBox();
-        chkVerificarCodAnterior = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -696,6 +695,9 @@ public class GetWayGUI extends VRInternalFrame {
 
         chkTemArquivoBalanca.setText("Tem Arquivo Balança");
         vRPanel7.add(chkTemArquivoBalanca);
+
+        chkDtAlteracao.setText("Data Alteração");
+        vRPanel7.add(chkDtAlteracao);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -1031,80 +1033,21 @@ public class GetWayGUI extends VRInternalFrame {
                     .addComponent(pnlPdvVendaDatas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
-        vRPanel4.setPreferredSize(new java.awt.Dimension(390, 137));
-
-        btnMapDivergencias.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
-        btnMapDivergencias.setText("Divergências");
-        btnMapDivergencias.setEnabled(false);
-        btnMapDivergencias.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnMapDivergenciasActionPerformed(evt);
-            }
-        });
-
-        chkMapearProdutoEAN.setText("Mapear produto não cadastrado (EAN)");
-        chkMapearProdutoEAN.setEnabled(false);
-
-        chkVerificarCodigoBarras.setText("Verificar Código Barras");
-        chkVerificarCodigoBarras.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkVerificarCodigoBarrasActionPerformed(evt);
-            }
-        });
-
-        chkVerificarCodAnterior.setText("Verificar Código Anterior");
-
-        javax.swing.GroupLayout vRPanel4Layout = new javax.swing.GroupLayout(vRPanel4);
-        vRPanel4.setLayout(vRPanel4Layout);
-        vRPanel4Layout.setHorizontalGroup(
-            vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel4Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(vRPanel4Layout.createSequentialGroup()
-                        .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkVerificarCodAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkVerificarCodigoBarras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(119, 119, 119))
-                    .addGroup(vRPanel4Layout.createSequentialGroup()
-                        .addComponent(chkMapearProdutoEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnMapDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())))
-        );
-        vRPanel4Layout.setVerticalGroup(
-            vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkVerificarCodAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkVerificarCodigoBarras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkMapearProdutoEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnMapDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
-        );
-
         javax.swing.GroupLayout tabVendasLayout = new javax.swing.GroupLayout(tabVendas);
         tabVendas.setLayout(tabVendasLayout);
         tabVendasLayout.setHorizontalGroup(
             tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabVendasLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(198, Short.MAX_VALUE))
+                .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(247, Short.MAX_VALUE))
         );
         tabVendasLayout.setVerticalGroup(
             tabVendasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabVendasLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(86, Short.MAX_VALUE))
+                .addContainerGap(189, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Vendas", tabVendas);
@@ -1449,22 +1392,11 @@ public class GetWayGUI extends VRInternalFrame {
     }//GEN-LAST:event_edtDtVendaFimActionPerformed
 
     private void btnMapaTribActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaTribActionPerformed
-        
+
     }//GEN-LAST:event_btnMapaTribActionPerformed
-
-    private void btnMapDivergenciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapDivergenciasActionPerformed
-        ItensNaoExistenteGetWayGUI.exibir(this.mdiFrame);
-    }//GEN-LAST:event_btnMapDivergenciasActionPerformed
-
-    private void chkVerificarCodigoBarrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkVerificarCodigoBarrasActionPerformed
-        chkMapearProdutoEAN.setEnabled(chkVerificarCodigoBarras.isSelected());
-        chkMapearProdutoEAN.setSelected(chkVerificarCodigoBarras.isSelected());
-        btnMapDivergencias.setEnabled(chkVerificarCodigoBarras.isSelected());
-    }//GEN-LAST:event_chkVerificarCodigoBarrasActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
-    private vrframework.bean.button.VRButton btnMapDivergencias;
     private vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTrib;
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkAtacado;
@@ -1477,6 +1409,7 @@ public class GetWayGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkConvRecebimento;
     private vrframework.bean.checkBox.VRCheckBox chkCustoComImposto;
     private vrframework.bean.checkBox.VRCheckBox chkCustoSemImposto;
+    private vrframework.bean.checkBox.VRCheckBox chkDtAlteracao;
     private vrframework.bean.checkBox.VRCheckBox chkFCondicaoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFPrazoFornecedor;
@@ -1484,7 +1417,6 @@ public class GetWayGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
-    private vrframework.bean.checkBox.VRCheckBox chkMapearProdutoEAN;
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkNutricionalFilizola;
@@ -1525,8 +1457,6 @@ public class GetWayGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUsarMargemBruta;
     private vrframework.bean.checkBox.VRCheckBox chkValidade;
     private vrframework.bean.checkBox.VRCheckBox chkValorLimite;
-    private vrframework.bean.checkBox.VRCheckBox chkVerificarCodAnterior;
-    private vrframework.bean.checkBox.VRCheckBox chkVerificarCodigoBarras;
     private vrframework.bean.checkBox.VRCheckBox chkreceberDevolucao;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
@@ -1565,7 +1495,6 @@ public class GetWayGUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
-    private vrframework.bean.panel.VRPanel vRPanel4;
     private vrframework.bean.panel.VRPanel vRPanel6;
     private vrframework.bean.panel.VRPanel vRPanel7;
     private vrframework.bean.panel.VRPanel vRPanel8;
@@ -1575,7 +1504,5 @@ public class GetWayGUI extends VRInternalFrame {
     private vrframework.bean.textField.VRTextField vRTextField1;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
     // End of variables declaration//GEN-END:variables
-
-    
 
 }

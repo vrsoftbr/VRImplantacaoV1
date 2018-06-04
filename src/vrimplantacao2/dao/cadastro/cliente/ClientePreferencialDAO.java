@@ -266,6 +266,7 @@ public class ClientePreferencialDAO {
                 sql.setTableName("clientepreferencial");
                 if (opt.contains(OpcaoCliente.OBSERVACOES2)) {
                     sql.put("observacao2", vo.getObservacao2());
+                    sql.put("observacao", vo.getObservacao());
                 }
                 if (opt.contains(OpcaoCliente.SITUACAO_CADASTRO)) {
                     sql.put("permitecreditorotativo", vo.isPermiteCreditoRotativo());

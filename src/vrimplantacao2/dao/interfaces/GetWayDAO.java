@@ -25,14 +25,18 @@ import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.BancoDAO;
 import vrimplantacao.dao.cadastro.FornecedorDAO;
+import vrimplantacao.dao.cadastro.NutricionalFilizolaDAO;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao2.dao.cadastro.devolucao.receber.ReceberDevolucaoDAO;
 import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaVO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.verba.receber.ReceberVerbaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.utils.arquivo.LinhaArquivo;
+import vrimplantacao2.utils.arquivo.delimited.ArquivoTXT;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
@@ -334,6 +338,29 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setAtacadoPreco(rs.getDouble("preco_unit"));
                         imp.setQtdEmbalagem(rs.getInt("qtd"));
                         imp.setEan(rs.getString("barra_emb"));
+
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        } else if (opc == OpcaoProduto.DATA_ALTERACAO) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select\n" +
+                        "	CODPROD,\n" +
+                        "	BARRA,\n" +
+                        "	convert(date, DTALTERA, 103) as dtalteracao,\n" +
+                        "	convert(date, DTinclui, 103) as dtinclui\n" +
+                        "from\n" +
+                        "	PRODUTOS")) {
+                    while (rs.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rs.getString("codprod"));
+                        imp.setEan(rs.getString("barra"));
+                        imp.setDataAlteracao(rs.getDate("dtalteracao"));
 
                         result.add(imp);
                     }
@@ -645,59 +672,68 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ClienteIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT "
-                    + "CASE COALESCE(PESSOA,'F') WHEN 'F' THEN 1 ELSE 0 END AS PESSOA, "
-                    + "CODCLIE, "
-                    + "RAZAO, "
-                    + "ENDERECO, "
-                    + "COMPLEMENTO, "
-                    + "BAIRRO, "
-                    + "CIDADE, "
-                    + "ESTADO, "
-                    + "CEP, "
-                    + "NUMERO, "
-                    + "CNPJ_CPF, "
-                    + "TELEFONE, "
-                    + "RG,"
-                    + "IE, "
-                    + "FONE1, "
-                    + "FONE2, "
-                    + "EMAIL, "
-                    + "DTANIVER, "
-                    + "coalesce(LIMITECRED,0) LIMITECRED, "
-                    + "coalesce(RENDA,0) RENDA, "
-                    + "CARGO, "
-                    + "EMPRESA, "
-                    + "FONE_EMP, "
-                    + "CASE ATIVO WHEN 'S' THEN 1 ELSE 0 END AS ATIVO, "
-                    + "ESTADOCIVIL, "
-                    + "CASE SEXO WHEN 'F' THEN 1 ELSE 2 END AS SEXO, "
-                    + "NOMEPAI, "
-                    + "NOMEMAE, "
-                    + "DTALTERA, "
-                    + "CELULAR, "
-                    + "NOMECONJUGE, "
-                    + "CARGOCONJUGE, "
-                    + "CPF_CONJUGE, "
-                    + "RG_CONJUGE, "
-                    + "coalesce(RENDACONJUGE,0) as RENDACONJUGE, "
-                    + "DTCAD, "
-                    + "CASE ESTADOCIVIL WHEN 'S' THEN 1 "
-                    + "WHEN 'C' THEN 2 "
-                    + "WHEN 'V' THEN 3 "
-                    + "WHEN 'A' THEN 4 "
-                    + "WHEN 'O' THEN 5 ELSE 0 END AS ESTADOCIVILNOVO, "
-                    + "coalesce(CONTATO,'')+' '+coalesce(REF1_NOME,'')+' '+coalesce(REF2_NOME,'')+' '+coalesce(FONE1,'') AS OBS, "
-                    + "BLOQCARTAO, "
-                    + "cast((case "
-                    + "when len(senhacartao) <= 6 then "
-                    + "senhacartao "
-                    + "else 0 "
-                    + "end) as integer) as senhacartao "
-                    + "FROM "
-                    + "CLIENTES "
-                    + "where "
-                    + "CODCLIE >= 1 "
+                    "SELECT \n" +
+                    "    CASE COALESCE(PESSOA,'F') WHEN 'F' THEN 1 ELSE 0 END AS PESSOA, \n" +
+                    "    CODCLIE, \n" +
+                    "    RAZAO, \n" +
+                    "    ENDERECO, \n" +
+                    "    COMPLEMENTO, \n" +
+                    "    BAIRRO, \n" +
+                    "    CIDADE, \n" +
+                    "    ESTADO, \n" +
+                    "    CEP, \n" +
+                    "    NUMERO, \n" +
+                    "    CNPJ_CPF, \n" +
+                    "    TELEFONE, \n" +
+                    "    RG,\n" +
+                    "    IE, \n" +
+                    "    FONE1, \n" +
+                    "    FONE2, \n" +
+                    "    EMAIL, \n" +
+                    "    DTANIVER, \n" +
+                    "    coalesce(LIMITECRED,0) LIMITECRED, \n" +
+                    "    coalesce(RENDA,0) RENDA, \n" +
+                    "    CARGO, \n" +
+                    "    EMPRESA, \n" +
+                    "    FONE_EMP, \n" +
+                    "    CASE ATIVO WHEN 'S' THEN 1 ELSE 0 END AS ATIVO, \n" +
+                    "    ESTADOCIVIL, \n" +
+                    "    CASE SEXO WHEN 'F' THEN 1 ELSE 2 END AS SEXO, \n" +
+                    "    NOMEPAI, \n" +
+                    "    NOMEMAE, \n" +
+                    "    DTALTERA, \n" +
+                    "    CELULAR, \n" +
+                    "    NOMECONJUGE, \n" +
+                    "    CARGOCONJUGE, \n" +
+                    "    CPF_CONJUGE, \n" +
+                    "    RG_CONJUGE, \n" +
+                    "    coalesce(RENDACONJUGE,0) as RENDACONJUGE, \n" +
+                    "    DTCAD, \n" +
+                    "    CASE ESTADOCIVIL WHEN 'S' THEN 1 \n" +
+                    "    WHEN 'C' THEN 2 \n" +
+                    "    WHEN 'V' THEN 3 \n" +
+                    "    WHEN 'A' THEN 4 \n" +
+                    "    WHEN 'O' THEN 5 ELSE 0 END AS ESTADOCIVILNOVO, \n" +
+                    "    coalesce(OBS1, '') + ' ' +\n" +
+                    "    coalesce(CONTATO, '') + ' ' +\n" +
+                    "    coalesce(REF1_NOME, '') + ' ' +\n" +
+                    "    coalesce(REF2_NOME, '') + ' ' +\n" +
+                    "    coalesce(FONE1, '') AS OBS,\n" +
+                    "    coalesce(obs2, '') + ' Agencia ' +\n" +
+                    "    coalesce(agencia, '') + ' Banco ' +\n" +
+                    "    coalesce(banco, '') + ' CC ' +\n" +
+                    "    coalesce(cc, '') as obs2, \n" +
+                    "    BLOQCARTAO, \n" +
+                    "    cast((case \n" +
+                    "	when len(senhacartao) <= 6 then \n" +
+                    "		senhacartao \n" +
+                    "    else \n" +
+                    "		0 \n" +
+                    "    end) as integer) as senhacartao \n" +
+                    "    FROM \n" +
+                    "    CLIENTES \n" +
+                    "    where \n" +
+                    "    CODCLIE >= 1"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -734,6 +770,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCargo(rst.getString("CARGO"));
                     imp.setSalario(rst.getDouble("RENDA"));
                     imp.setObservacao(rst.getString("OBS"));
+                    imp.setObservacao2(rst.getString("OBS2"));
                     imp.setSenha(rst.getInt("senhacartao"));
                     imp.setAtivo("1".equals(rst.getString("ATIVO")));
                     if ((rst.getString("BLOQCARTAO") != null)
@@ -1499,5 +1536,4 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
             throw new UnsupportedOperationException("Not supported.");
         }
     }
-
 }
