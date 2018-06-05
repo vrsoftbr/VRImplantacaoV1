@@ -304,5 +304,15 @@
         <Property name="text" type="java.lang.String" value="Atacado"/>
       </Properties>
     </Component>
+    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNcm">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="NCM"/>
+      </Properties>
+    </Component>
+    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCest">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="CEST"/>
+      </Properties>
+    </Component>
   </SubComponents>
 </Form>

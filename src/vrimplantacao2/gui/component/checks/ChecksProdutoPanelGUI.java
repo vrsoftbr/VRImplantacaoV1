@@ -83,6 +83,8 @@ public class ChecksProdutoPanelGUI extends JPanel {
         chkPReceitaToledo = new vrframework.bean.checkBox.VRCheckBox();
         chkOferta = new vrframework.bean.checkBox.VRCheckBox();
         chkAtacado = new vrframework.bean.checkBox.VRCheckBox();
+        chkNcm = new vrframework.bean.checkBox.VRCheckBox();
+        chkCest = new vrframework.bean.checkBox.VRCheckBox();
 
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
@@ -255,6 +257,12 @@ public class ChecksProdutoPanelGUI extends JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkAtacado, "Atacado");
         add(chkAtacado);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkNcm, "NCM");
+        add(chkNcm);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkCest, "CEST");
+        add(chkCest);
     }// </editor-fold>//GEN-END:initComponents
 
 
@@ -262,6 +270,7 @@ public class ChecksProdutoPanelGUI extends JPanel {
     public vrframework.bean.button.VRButton btnMapaTribut;
     public vrframework.bean.checkBox.VRCheckBox chkAtacado;
     public vrframework.bean.checkBox.VRCheckBox chkAtivoInativo;
+    public vrframework.bean.checkBox.VRCheckBox chkCest;
     public vrframework.bean.checkBox.VRCheckBox chkCusto;
     public vrframework.bean.checkBox.VRCheckBox chkCustoComImposto;
     public vrframework.bean.checkBox.VRCheckBox chkCustoSemImposto;
@@ -280,6 +289,7 @@ public class ChecksProdutoPanelGUI extends JPanel {
     public vrframework.bean.checkBox.VRCheckBox chkMercadologicoPorNivel;
     public vrframework.bean.checkBox.VRCheckBox chkMercadologicoPorNivelReplicar;
     public vrframework.bean.checkBox.VRCheckBox chkNatReceita;
+    public vrframework.bean.checkBox.VRCheckBox chkNcm;
     public vrframework.bean.checkBox.VRCheckBox chkNutricionalFilizola;
     public vrframework.bean.checkBox.VRCheckBox chkNutricionalToledo;
     public vrframework.bean.checkBox.VRCheckBox chkOferta;
@@ -413,6 +423,12 @@ public class ChecksProdutoPanelGUI extends JPanel {
                 }
                 if (chkAtacado.isSelected()) {
                     opcoes.add(OpcaoProduto.ATACADO);
+                }
+                if (chkNcm.isSelected()) {
+                    opcoes.add(OpcaoProduto.NCM);
+                }
+                if (chkCest.isSelected()) {
+                    opcoes.add(OpcaoProduto.CEST);
                 }
                 if (!opcoes.isEmpty()) {
                     importador.atualizarProdutos(opcoes);
