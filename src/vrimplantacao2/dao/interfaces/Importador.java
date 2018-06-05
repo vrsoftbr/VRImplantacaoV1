@@ -84,6 +84,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.InventarioIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
@@ -882,5 +883,15 @@ public class Importador {
         AcumuladorRepositoryProvider provider = new AcumuladorRepositoryProvider();
         AcumuladorRepository rep = new AcumuladorRepository(provider);
         rep.importarAcumulador(acumuladores);
+    }
+    
+    /**
+     * Importa o cadastro dos operadores.
+     * @param dataInventario
+     * @throws Exception
+     */
+    public void importarInventario(Date dataInventario) throws Exception {
+        ProgressBar.setStatus("Carregando inventário...");
+        List<InventarioIMP> inventario = getInterfaceDAO().getInventario(dataInventario);
     }
 }
