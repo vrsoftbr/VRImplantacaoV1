@@ -33,6 +33,8 @@ public class InventarioRepository {
             //</editor-fold>
             
             setNotificacao("Gravando operador...", inventario.size());
+            
+            //if ()
 
         } catch (Exception ex) {
             throw ex;
