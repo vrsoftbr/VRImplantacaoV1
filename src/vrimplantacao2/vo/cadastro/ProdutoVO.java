@@ -23,6 +23,7 @@ public class ProdutoVO {
     private TipoEmbalagem tipoEmbalagem = TipoEmbalagem.UN;
     private FamiliaProdutoVO familiaProduto = null;
     private Date datacadastro = new Date();
+    private Date dataalteracao = new Date();
     private int qtdEmbalagem = 1;
     private int validade = 0;
     private double pesoBruto = 0;
@@ -125,6 +126,10 @@ public class ProdutoVO {
     public void setDatacadastro(Date datacadastro) {
         this.datacadastro = datacadastro;
     }
+    
+    public void setDataalteracao (Date dataalteracao) {
+        this.dataalteracao = dataalteracao;
+    }
 
     public void setValidade(int validade) {
         this.validade = validade > 0 ? validade : 0;
@@ -208,6 +213,10 @@ public class ProdutoVO {
 
     public Date getDatacadastro() {
         return datacadastro;
+    }
+    
+    public Date getDataalteracao() {
+        return dataalteracao;
     }
 
     public int getValidade() {

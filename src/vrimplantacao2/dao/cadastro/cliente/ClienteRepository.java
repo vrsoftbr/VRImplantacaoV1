@@ -131,7 +131,6 @@ public class ClienteRepository {
                     } else {
                         if ((opt.contains(OpcaoCliente.OBSERVACOES2))
                                 || (opt.contains(OpcaoCliente.SITUACAO_CADASTRO))
-                                || (opt.contains(OpcaoCliente.SITUACAO_CADASTRO))
                                 || (opt.contains(OpcaoCliente.VALOR_LIMITE))
                                 || (opt.contains(OpcaoCliente.INSCRICAO_ESTADUAL))
                                 || (opt.contains(OpcaoCliente.DATA_NASCIMENTO))
@@ -504,7 +503,7 @@ public class ClienteRepository {
         vo.setNomeConjuge(imp.getNomeConjuge());
         vo.setNomePai(imp.getNomePai());
         vo.setNomeMae(imp.getNomeMae());
-        vo.setObservacao("IMPORTACAO VR");
+        vo.setObservacao("IMPORTACAO VR - " + imp.getObservacao());
         vo.setObservacao2(imp.getObservacao2());
         vo.setVencimentoCreditoRotativo(imp.getDiaVencimento());
         vo.setPermiteCreditoRotativo(imp.isPermiteCreditoRotativo());

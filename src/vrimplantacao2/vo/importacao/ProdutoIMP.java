@@ -12,6 +12,7 @@ public class ProdutoIMP {
     private String importId;
     
     private Date dataCadastro = new Date();
+    private Date dataAlteracao = new Date();
     private String ean = "-2";
     private int qtdEmbalagemCotacao = 1;
     private int qtdEmbalagem = 1;
@@ -93,6 +94,10 @@ public class ProdutoIMP {
         return dataCadastro;
     }
 
+    public Date getDataAlteracao() {
+        return dataAlteracao;
+    }
+    
     public String getEan() {
         return ean;
     }
@@ -287,6 +292,10 @@ public class ProdutoIMP {
 
     public void setDataCadastro(Date dataCadastro) {
         this.dataCadastro = dataCadastro;
+    }
+    
+    public void setDataAlteracao(Date dataAlteracao) {
+        this.dataAlteracao = dataAlteracao;
     }
 
     public void setEan(String ean) {
