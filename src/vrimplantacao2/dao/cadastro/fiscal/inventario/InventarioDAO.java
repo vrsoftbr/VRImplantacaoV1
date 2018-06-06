@@ -12,6 +12,7 @@ import vrframework.classe.Conexao;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.fiscal.inventario.InventarioVO;
+import vrimplantacao2.vo.cadastro.fiscal.inventario.InventarioVOIMP;
 
 /**
  *
@@ -56,8 +57,8 @@ public class InventarioDAO {
         }
     }
 
-    public MultiMap<String, InventarioVO> getInventario(int idLojaVR, int idProduto, Date data) throws Exception {
-        MultiMap<String, InventarioVO> result = new MultiMap<>();
+    public MultiMap<String, InventarioVOIMP> getInventario(int idLojaVR, int idProduto, Date data) throws Exception {
+        MultiMap<String, InventarioVOIMP> result = new MultiMap<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT "
@@ -82,7 +83,7 @@ public class InventarioDAO {
                     + "AND data = '" + data + "'"
             )) {
                 while (rst.next()) {
-                    InventarioVO vo = new InventarioVO();
+                    InventarioVOIMP vo = new InventarioVOIMP();
                     vo.setIdLoja(rst.getInt("id_loja"));
                     vo.setIdProduto(rst.getInt("id_produto"));
                     vo.setData(rst.getDate("data"));

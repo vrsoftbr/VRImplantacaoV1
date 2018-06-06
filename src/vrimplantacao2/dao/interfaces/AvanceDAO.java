@@ -5,6 +5,7 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
@@ -627,7 +628,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    public List<InventarioIMP> getInventatio(String dataInventario) throws Exception {
+    @Override
+    public List<InventarioIMP> getInventario(Date dataInventario) throws Exception {
         List<InventarioIMP> result = new ArrayList<>();
         java.sql.Date dataInv;
         DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
@@ -635,7 +637,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT nome_inventario as nomeTabela "
+                    "SELECT nome_inventario as nomeTabela"
                     + "FROM inventarios_cab "
                     + "WHERE data_inventario = '" + dataInventario + "' \n"
                     + "AND id_loja = " + getLojaOrigem()
@@ -644,8 +646,6 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     nomeTable = rst.getString("nomeTabela");
                 }
             }
-
-            dataInv = new java.sql.Date(fmt.parse(dataInventario).getTime());
 
             if (!nomeTable.trim().isEmpty()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -666,8 +666,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                         InventarioIMP imp = new InventarioIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        imp.setData(dataInv);
-                        imp.setDataGeracao(dataInv);
+                        imp.setData(dataInventario);
+                        imp.setDataGeracao(dataInventario);
                         imp.setIdProduto(rst.getString("Codigo"));
                         imp.setDescricao(rst.getString("DESCRICAO"));
                         imp.setCustoComImposto(rst.getDouble("CUSTO"));
