@@ -114,7 +114,7 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jPanel3" alignment="0" pref="490" max="32767" attributes="0"/>
+                      <Component id="jPanel3" alignment="0" pref="494" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -174,6 +174,58 @@
                 </Container>
               </SubComponents>
             </Container>
+            <Container class="vrframework.bean.panel.VRPanel" name="tabClientes">
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                  <JTabbedPaneConstraints tabName="Clientes">
+                    <Property name="tabTitle" type="java.lang.String" value="Clientes"/>
+                  </JTabbedPaneConstraints>
+                </Constraint>
+              </Constraints>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="jPanel4" alignment="0" pref="490" max="32767" attributes="0"/>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="jPanel4" alignment="0" pref="284" max="32767" attributes="0"/>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Container class="javax.swing.JPanel" name="jPanel4">
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                    <Property name="alignment" type="int" value="0"/>
+                  </Layout>
+                  <SubComponents>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkClientePreferencial">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Cliente Preferencial"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkClienteEventual">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Cliente Eventual"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCreditoRotativo">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Cr&#xe9;dito Rotativo"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCheque">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Cheque"/>
+                      </Properties>
+                    </Component>
+                  </SubComponents>
+                </Container>
+              </SubComponents>
+            </Container>
           </SubComponents>
         </Container>
         <Container class="javax.swing.JPanel" name="tabUnificacao">
@@ -188,10 +240,16 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
+                  <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="chkUnifProdutos" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="256" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="chkUnifProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkUnifFornecedores" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkUnifProdutosFornecedores" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkUnifClientesPreferenciais" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkUnifClientesEventuais" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="108" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -200,7 +258,15 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkUnifProdutos" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="283" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="chkUnifFornecedores" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="chkUnifProdutosFornecedores" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="chkUnifClientesPreferenciais" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="chkUnifClientesEventuais" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="199" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -209,6 +275,26 @@
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUnifProdutos">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Unificar produtos (Somente com EAN v&#xe1;lido)"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUnifFornecedores">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Unificar fornecedores (Somente com CNPJ/CPF v&#xe1;lido)"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUnifProdutosFornecedores">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Unificar produtos fornecedores (Somente com EAN e com CNPJ/CPF v&#xe1;lido)"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUnifClientesPreferenciais">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Unificar clientes preferenciais (com CNPJ/CPF v&#xe1;lido)"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUnifClientesEventuais">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Unificar clientes eventuais (com CNPJ/CPF v&#xe1;lido)"/>
               </Properties>
             </Component>
           </SubComponents>

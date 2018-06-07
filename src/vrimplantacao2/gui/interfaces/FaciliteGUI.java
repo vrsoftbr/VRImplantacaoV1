@@ -18,7 +18,6 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.FaciliteDAO;
-import vrimplantacao2.dao.interfaces.FenixDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoView;
@@ -80,8 +79,6 @@ public class FaciliteGUI extends VRInternalFrame implements ConexaoEvent {
         tabProdutos.pnlMercNivel.setVisible(false);
         tabProdutos.chkPReceitaFilizola.setVisible(false);
         tabProdutos.chkPReceitaToledo.setVisible(false);
-        tabProdutos.chkFamilia.setVisible(false);
-        tabProdutos.chkFamiliaProduto.setVisible(false);
         tabProdutos.btnMapaTribut.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -205,6 +202,19 @@ public class FaciliteGUI extends VRInternalFrame implements ConexaoEvent {
                             }
                         }
                         
+                        if (chkClientePreferencial.isSelected()) {
+                            importador.importarClientePreferencial();
+                        }
+                        if (chkClienteEventual.isSelected()) {
+                            importador.importarClienteEventual();
+                        }
+                        if (chkCreditoRotativo.isSelected()) {
+                            importador.importarCreditoRotativo();
+                        }
+                        if (chkCheque.isSelected()) {
+                            importador.importarCheque();
+                        }
+                        
                     } else if (tabOperacoes.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -250,8 +260,18 @@ public class FaciliteGUI extends VRInternalFrame implements ConexaoEvent {
         chkFTipoEmp = new vrframework.bean.checkBox.VRCheckBox();
         chkFTipoForn = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        tabClientes = new vrframework.bean.panel.VRPanel();
+        jPanel4 = new javax.swing.JPanel();
+        chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
+        chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
+        chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        chkCheque = new vrframework.bean.checkBox.VRCheckBox();
         tabUnificacao = new javax.swing.JPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
+        chkUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
+        chkUnifProdutosFornecedores = new vrframework.bean.checkBox.VRCheckBox();
+        chkUnifClientesPreferenciais = new vrframework.bean.checkBox.VRCheckBox();
+        chkUnifClientesEventuais = new vrframework.bean.checkBox.VRCheckBox();
         pnlLoja = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel1 = new javax.swing.JLabel();
@@ -298,7 +318,7 @@ public class FaciliteGUI extends VRInternalFrame implements ConexaoEvent {
         tabFornecedor.setLayout(tabFornecedorLayout);
         tabFornecedorLayout.setHorizontalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 490, Short.MAX_VALUE)
+            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 494, Short.MAX_VALUE)
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -307,9 +327,44 @@ public class FaciliteGUI extends VRInternalFrame implements ConexaoEvent {
 
         tabImportacao.addTab("Fornecedores", tabFornecedor);
 
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        chkClientePreferencial.setText("Cliente Preferencial");
+        jPanel4.add(chkClientePreferencial);
+
+        chkClienteEventual.setText("Cliente Eventual");
+        jPanel4.add(chkClienteEventual);
+
+        chkCreditoRotativo.setText("Crédito Rotativo");
+        jPanel4.add(chkCreditoRotativo);
+
+        chkCheque.setText("Cheque");
+        jPanel4.add(chkCheque);
+
+        javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
+        tabClientes.setLayout(tabClientesLayout);
+        tabClientesLayout.setHorizontalGroup(
+            tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
+        );
+        tabClientesLayout.setVerticalGroup(
+            tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
+        );
+
+        tabImportacao.addTab("Clientes", tabClientes);
+
         tabOperacoes.addTab("Importação", tabImportacao);
 
         chkUnifProdutos.setText("Unificar produtos (Somente com EAN válido)");
+
+        chkUnifFornecedores.setText("Unificar fornecedores (Somente com CNPJ/CPF válido)");
+
+        chkUnifProdutosFornecedores.setText("Unificar produtos fornecedores (Somente com EAN e com CNPJ/CPF válido)");
+
+        chkUnifClientesPreferenciais.setText("Unificar clientes preferenciais (com CNPJ/CPF válido)");
+
+        chkUnifClientesEventuais.setText("Unificar clientes eventuais (com CNPJ/CPF válido)");
 
         javax.swing.GroupLayout tabUnificacaoLayout = new javax.swing.GroupLayout(tabUnificacao);
         tabUnificacao.setLayout(tabUnificacaoLayout);
@@ -317,15 +372,28 @@ public class FaciliteGUI extends VRInternalFrame implements ConexaoEvent {
             tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabUnificacaoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(256, Short.MAX_VALUE))
+                .addGroup(tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUnifFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUnifProdutosFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUnifClientesPreferenciais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUnifClientesEventuais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(108, Short.MAX_VALUE))
         );
         tabUnificacaoLayout.setVerticalGroup(
             tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabUnificacaoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(283, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkUnifFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkUnifProdutosFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkUnifClientesPreferenciais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkUnifClientesEventuais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(199, Short.MAX_VALUE))
         );
 
         tabOperacoes.addTab("Unificação", tabUnificacao);
@@ -422,6 +490,10 @@ public class FaciliteGUI extends VRInternalFrame implements ConexaoEvent {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkCheque;
+    private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
+    private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
+    private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFEndereco;
     private vrframework.bean.checkBox.VRCheckBox chkFNumero;
@@ -430,14 +502,20 @@ public class FaciliteGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkFTipoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkUnifClientesEventuais;
+    private vrframework.bean.checkBox.VRCheckBox chkUnifClientesPreferenciais;
+    private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedores;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
+    private vrframework.bean.checkBox.VRCheckBox chkUnifProdutosFornecedores;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel conexaoFirebird;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private org.jdesktop.swingx.JXDatePicker jXDatePicker1;
     private vrframework.bean.panel.VRPanel pnlLoja;
+    private vrframework.bean.panel.VRPanel tabClientes;
     private vrframework.bean.panel.VRPanel tabFornecedor;
     private javax.swing.JTabbedPane tabImportacao;
     private javax.swing.JTabbedPane tabOperacoes;
