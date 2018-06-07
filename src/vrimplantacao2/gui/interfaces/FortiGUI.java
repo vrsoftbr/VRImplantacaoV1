@@ -125,7 +125,9 @@ public class FortiGUI extends VRInternalFrame {
                     
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
-                    importador.setLojaVR(idLojaVR);     
+                    importador.setLojaVR(idLojaVR);
+                    
+                    dao.i_arquivo = txtArquivo.getArquivo();
 
                     if (tabs.getSelectedIndex() == 0) {
                         if (chkMercadologico.isSelected()) {
@@ -261,6 +263,9 @@ public class FortiGUI extends VRInternalFrame {
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkQtdEmbCotacao = new vrframework.bean.checkBox.VRCheckBox();
         btnMapaTribut = new vrframework.bean.button.VRButton();
+        jPanel3 = new javax.swing.JPanel();
+        vRLabel1 = new vrframework.bean.label.VRLabel();
+        txtArquivo = new vrframework.bean.fileChooser.VRFileChooser();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel4 = new vrframework.bean.panel.VRPanel();
@@ -398,6 +403,14 @@ public class FortiGUI extends VRInternalFrame {
         });
         vRPanel7.add(btnMapaTribut);
 
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Acedtar Descrição"));
+
+        vRLabel1.setText("Diretório arquivo ");
+        jPanel3.add(vRLabel1);
+        jPanel3.add(txtArquivo);
+
+        vRPanel7.add(jPanel3);
+
         vRTabbedPane2.addTab("Produtos", vRPanel7);
 
         chkFornecedor.setText("Fornecedor");
@@ -416,7 +429,7 @@ public class FortiGUI extends VRInternalFrame {
             .addGroup(vRPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(75, Short.MAX_VALUE))
+                .addContainerGap(133, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Fornecedores", vRPanel1);
@@ -437,7 +450,7 @@ public class FortiGUI extends VRInternalFrame {
             .addGroup(vRPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(75, Short.MAX_VALUE))
+                .addContainerGap(133, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Clientes", vRPanel4);
@@ -460,7 +473,7 @@ public class FortiGUI extends VRInternalFrame {
             .addGroup(vRPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(99, Short.MAX_VALUE))
+                .addContainerGap(161, Short.MAX_VALUE))
         );
 
         tabs.addTab("Unificação", vRPanel2);
@@ -643,11 +656,14 @@ public class FortiGUI extends VRInternalFrame {
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private javax.swing.JTabbedPane tabsConn;
+    private vrframework.bean.fileChooser.VRFileChooser txtArquivo;
     private vrframework.bean.textField.VRTextField txtDatabase;
     private vrframework.bean.textField.VRTextField txtLojaCliente;
+    private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.label.VRLabel vRLabel24;
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;

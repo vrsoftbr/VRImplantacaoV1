@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.Properties;
 
 public class ConexaoParadox {
 
@@ -31,7 +30,7 @@ public class ConexaoParadox {
             if (!usarOdbc) {
                 con = DriverManager.getConnection("jdbc:Paradox:/" + i_database, "", "");
             } else {
-                con = DriverManager.getConnection("jdbc:odbc:" + i_database+";CollatingSequence=ASCII", "", "");
+                con = DriverManager.getConnection("jdbc:odbc:" + i_database, "", "");
             }
         } catch (Exception ex) {
             throw ex;

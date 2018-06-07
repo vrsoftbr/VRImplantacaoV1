@@ -11,8 +11,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import vrframework.remote.Arquivo;
 import vrimplantacao.classe.ConexaoParadox;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -28,6 +30,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  * @author lucasrafael
  */
 public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
+
+    public String i_arquivo;
 
     @Override
     public String getSistema() {
@@ -52,7 +56,7 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     byte[] bytes = rst.getBytes("merc1_desc");
                     String descricao = new String(bytes, "UTF-8");
-                    
+
                     imp.setId(rst.getString("merc1"));
                     imp.setDescricao(descricao);
 
@@ -79,7 +83,7 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                 }
             }
-            
+
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "G1 as merc1,\n"
@@ -96,13 +100,13 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
                         MercadologicoNivelIMP merc2 = merc1.getNiveis().get(rst.getString("merc2"));
                         if (merc2 != null) {
                             merc2.addFilho(
-                                rst.getString("merc3"),
-                                rst.getString("merc3_desc")
+                                    rst.getString("merc3"),
+                                    rst.getString("merc3_desc")
                             );
                         }
                     }
                 }
-            }            
+            }
         }
         return new ArrayList<>(merc.values());
     }
@@ -138,17 +142,14 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by Codigo"
             )) {
                 while (rst.next()) {
-                    
-                    byte[] bytes = rst.getBytes("Nome");
-                    String descricao = new String(bytes, "latin1");
-                    
+
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
                     imp.seteBalanca("S".equals(rst.getString("Balanca")));
-                    imp.setDescricaoCompleta(descricao);
+                    imp.setDescricaoCompleta(rst.getString("Nome"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setCodMercadologico1(rst.getString("G1"));
@@ -172,6 +173,60 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return vResult;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opcao) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        Arquivo arquivo = new Arquivo(i_arquivo, "r", "utf-8");
+        String linha;
+
+        if (opcao == OpcaoProduto.DESC_COMPLETA) {
+
+            while (arquivo.ready()) {
+                linha = arquivo.readLine();
+
+                System.out.println(Utils.acertarTexto(linha.substring(26, 66)));
+                
+                ProdutoIMP imp = new ProdutoIMP();
+                imp.setImportLoja(getLojaOrigem());
+                imp.setImportSistema(getSistema());
+                imp.setImportId(linha.substring(0, 15).trim());
+                imp.setDescricaoCompleta(linha.substring(26, 66));
+                result.add(imp);
+            }
+            return result;
+        }
+        if (opcao == OpcaoProduto.DESC_REDUZIDA) {
+
+            while (arquivo.ready()) {
+                linha = arquivo.readLine();
+
+                ProdutoIMP imp = new ProdutoIMP();
+                imp.setImportLoja(getLojaOrigem());
+                imp.setImportSistema(getSistema());
+                imp.setImportId(linha.substring(0, 15).trim());
+                imp.setDescricaoReduzida(linha.substring(26, 66));
+                result.add(imp);
+            }
+            return result;
+
+        }
+        if (opcao == OpcaoProduto.DESC_GONDOLA) {
+
+            while (arquivo.ready()) {
+                linha = arquivo.readLine();
+
+                ProdutoIMP imp = new ProdutoIMP();
+                imp.setImportLoja(getLojaOrigem());
+                imp.setImportSistema(getSistema());
+                imp.setImportId(linha.substring(0, 15).trim());
+                imp.setDescricaoGondola(linha.substring(26, 66));
+                result.add(imp);
+            }
+            return result;
+        }
+        return null;
     }
 
     @Override
@@ -214,10 +269,9 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIe_rg(rst.getString("Insc"));
                     imp.setObservacao(rst.getString("Obs"));
 
-                    
                     String fone2 = rst.getString("Fone2");
                     String email = rst.getString("Email");
-                    
+
                     if ((fone2 != null)
                             && (!fone2.trim().isEmpty())) {
                         imp.addContato(
@@ -310,7 +364,7 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao(rst.getString("Obs"));
 
                     String sexo = rst.getString("Sexo");
-                    
+
                     if ((sexo != null)
                             && (!sexo.trim().isEmpty())) {
 
