@@ -21,12 +21,21 @@ public final class Versao {
      * @throws Exception 
      */
     public static void carregar() throws Exception {
+        String versao = "";
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select versao from versao where id_programa = 0"
             )) {
                 if (rst.next()) {
-                    String[] array = rst.getString("versao").split("\\.");
+                    
+                    if (rst.getString("versao").contains("-")) {
+                        versao = rst.getString("versao").substring(0, rst.getString("versao").indexOf("-"));
+                    }  else {
+                        versao = rst.getString("versao");
+                    }
+                    
+                    //String[] array = rst.getString("versao").split("\\.");
+                    String[] array = versao.split("\\.");
                     versaoArray = new Integer[array.length];
                     for (int i = 0; i < array.length; i++) {
                         versaoArray[i] = Integer.parseInt(array[i]);

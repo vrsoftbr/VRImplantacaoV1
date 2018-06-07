@@ -63,6 +63,8 @@ import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao.dao.financeiro.contareceber.OutraReceitaRepository;
 import vrimplantacao.dao.financeiro.contareceber.OutraReceitaRepositoryProvider;
+import vrimplantacao2.dao.cadastro.fiscal.inventario.InventarioRepository;
+import vrimplantacao2.dao.cadastro.fiscal.inventario.InventarioRepositoryProvider;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
 import vrimplantacao2.dao.cadastro.pdv.acumulador.AcumuladorRepository;
 import vrimplantacao2.dao.cadastro.pdv.acumulador.AcumuladorRepositoryProvider;
@@ -84,6 +86,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.InventarioIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
@@ -263,7 +266,7 @@ public class Importador {
         ProdutoRepository repository = new ProdutoRepository(provider);
         repository.salvar(produtos);
     }
-    
+
     public void importarProdutoBalanca(OpcaoProduto... opcoes) throws Exception {
 
         ProgressBar.setStatus("Carregando produtos...");
@@ -567,9 +570,10 @@ public class Importador {
         FornecedorRepository rep = new FornecedorRepository(provider);
         rep.atualizar(fornecedores, opcoes);
     }
-    
+
     /**
-     * Atualiza as informações dos produtos fornecedores conforme as opções informadas.
+     * Atualiza as informações dos produtos fornecedores conforme as opções
+     * informadas.
      *
      * @param opcoes Opções que determinam o que será atualizado no produto.
      * @throws Exception
@@ -582,13 +586,13 @@ public class Importador {
             opt.setListaEspecial(getInterfaceDAO().getProdutosFornecedores(opt));
             produtoFornecedores = opt.getListaEspecial();
         }
-        
+
         FornecedorRepositoryProvider provider = new FornecedorRepositoryProvider(
                 getSistema(),
                 getLojaOrigem(),
                 getLojaVR()
         );
-        
+
         FornecedorRepository rep = new FornecedorRepository(provider);
         rep.atualizarProdFornecedor(produtoFornecedores, opcoes.toArray(new OpcaoProdutoFornecedor[]{}));
     }
@@ -858,6 +862,7 @@ public class Importador {
 
     /**
      * Importa o cadastro dos operadores.
+     *
      * @throws Exception
      */
     public void importarOperador() throws Exception {
@@ -871,9 +876,10 @@ public class Importador {
         OperadorRepository rep = new OperadorRepository(provider);
         rep.importarOperador(operadores);
     }
-    
+
     /**
      * Importa o cadastro dos operadores.
+     *
      * @throws Exception
      */
     public void importarAcumulador() throws Exception {
@@ -882,5 +888,20 @@ public class Importador {
         AcumuladorRepositoryProvider provider = new AcumuladorRepositoryProvider();
         AcumuladorRepository rep = new AcumuladorRepository(provider);
         rep.importarAcumulador(acumuladores);
+    }
+
+    /**
+     * Importa o cadastro dos operadores.
+     *
+     * @param dataInventario
+     * @throws Exception
+     */
+    public void importarInventario(Date dataInventario) throws Exception {
+        ProgressBar.setStatus("Carregando inventário...");
+        List<InventarioIMP> inventario = getInterfaceDAO().getInventario(dataInventario);
+        InventarioRepositoryProvider provider = new InventarioRepositoryProvider();
+        provider.setLojaVR(getLojaVR());
+        InventarioRepository rep = new InventarioRepository(provider);
+        rep.importarInventario(inventario);
     }
 }

@@ -139,13 +139,16 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     
+                    byte[] bytes = rst.getBytes("Nome");
+                    String descricao = new String(bytes, "latin1");
+                    
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
                     imp.seteBalanca("S".equals(rst.getString("Balanca")));
-                    imp.setDescricaoCompleta(rst.getString("Nome"));
+                    imp.setDescricaoCompleta(descricao);
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setCodMercadologico1(rst.getString("G1"));

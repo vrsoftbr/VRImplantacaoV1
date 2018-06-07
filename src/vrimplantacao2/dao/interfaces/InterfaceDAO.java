@@ -31,6 +31,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.InventarioIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
@@ -422,6 +423,16 @@ public abstract class InterfaceDAO {
      * @throws Exception 
      */    
     public List<AcumuladorIMP> getAcumuladores() throws Exception {
+        return new ArrayList<>();
+    }
+    
+    /**
+     * Permite o retorno listas especificadas de inventario.
+     * @param dataInventario
+     * @return
+     * @throws Exception 
+     */    
+    public List<InventarioIMP> getInventario(Date dataInventario) throws Exception {
         return new ArrayList<>();
     }   
 }

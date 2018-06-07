@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -363,7 +364,8 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "CodigoPessoa, "
                     + "CodigoProduto, "
                     + "Referencia, "
-                    + "AlteracaoDataHora "
+                    + "AlteracaoDataHora,"
+                    + "SiglaUnidade "
                     + "from ProdutoFornecedor "
             )) {
                 while (rst.next()) {
@@ -374,6 +376,17 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdProduto(rst.getString("CodigoProduto"));
                     imp.setCodigoExterno(rst.getString("Referencia"));
                     imp.setDataAlteracao(rst.getDate("AlteracaoDataHora"));
+                    
+                    if ((rst.getString("SiglaUnidade") != null) &&
+                            (!rst.getString("SiglaUnidade").trim().isEmpty())) {
+                        
+                        int qtdEmbalagem = Integer.parseInt(Utils.formataNumero(rst.getString("SiglaUnidade")));
+                        
+                        if (qtdEmbalagem > 0) {
+                            imp.setQtdEmbalagem(qtdEmbalagem);
+                        }
+                    }
+                            
                     result.add(imp);
                 }
             }

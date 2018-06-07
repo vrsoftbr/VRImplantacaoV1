@@ -2,12 +2,14 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -16,6 +18,7 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.InventarioIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -619,6 +622,66 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataHoraAlteracao(rst.getTimestamp("datahora_alteracao"));
                     imp.setAlinea(0);
                     result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<InventarioIMP> getInventario(Date dataInventario) throws Exception {
+        List<InventarioIMP> result = new ArrayList<>();
+        java.sql.Date dataInv;
+        DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
+        String nomeTable = "";
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT nome_inventario as nomeTabela"
+                    + "FROM inventarios_cab "
+                    + "WHERE data_inventario = '" + dataInventario + "' \n"
+                    + "AND id_loja = " + getLojaOrigem()
+            )) {
+                if (rst.next()) {
+                    nomeTable = rst.getString("nomeTabela");
+                }
+            }
+
+            if (!nomeTable.trim().isEmpty()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "SELECT \n"
+                        + "i.Codigo, "
+                        + "i.DESCRICAO, "
+                        + "i.ALIQUOTA,\n"
+                        + "i.CUSTO, "
+                        + "i.VENDA, "
+                        + "i.LOJAEST, "
+                        + "i.CUSMEDIO,\n"
+                        + "i.dt_inv, "
+                        + "i.aliq_pis_sai, "
+                        + "i.aliq_cofins_ent,\n"
+                        + "FROM " + nomeTable + " i"
+                )) {
+                    while (rst.next()) {
+                        InventarioIMP imp = new InventarioIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setData(dataInventario);
+                        imp.setDataGeracao(dataInventario);
+                        imp.setIdProduto(rst.getString("Codigo"));
+                        imp.setDescricao(rst.getString("DESCRICAO"));
+                        imp.setCustoComImposto(rst.getDouble("CUSTO"));
+                        imp.setCustoSemImposto(imp.getCustoComImposto());
+                        imp.setCustoMedioComImposto(rst.getDouble("CUSMEDIO"));
+                        imp.setCustoMedioSemImposto(imp.getCustoMedioComImposto());
+                        imp.setPrecoVenda(rst.getDouble("VENDA"));
+                        imp.setQuantidade(rst.getDouble("LOJAEST"));
+                        imp.setPis(rst.getDouble("aliq_pis_sai"));
+                        imp.setCofins(rst.getDouble("aliq_cofins_ent"));
+                        imp.setIdAliquotaDebito(rst.getString("ALIQUOTA"));
+                        imp.setIdAliquotaCredito(rst.getString("ALIQUOTA"));
+                        result.add(imp);
+                    }
                 }
             }
         }
