@@ -558,6 +558,7 @@ public class InventerDAO extends InterfaceDAO implements MapaTributoProvider {
         ProgressBar.setStatus("Preparando para gravar atacado...");
         Map<String, Integer> anteriores = new ProdutoAnteriorDAO().getAnteriores(getSistema(), getLojaOrigem());        
         Map<Long, Integer> eans = new ProdutoAutomacaoDAO().getEansCadastrados();
+        Set<Long> atac = new ProdutoAutomacaoDAO().getEansCadastradosAtacado(lojaVR);
         
         Conexao.begin();
         try {            
@@ -568,7 +569,7 @@ public class InventerDAO extends InterfaceDAO implements MapaTributoProvider {
                 Integer id = anteriores.get(imp.getImportId());
 
                 if (id != null) {                
-                    if (!eans.containsKey(id.longValue())) {
+                    if (!atac.contains(id.longValue())) {
                         double precoAtacado = imp.getAtacadoPreco();
                         double precoVenda;
                         int qtd = 10;//imp.getQtdEmbalagem();
@@ -583,8 +584,10 @@ public class InventerDAO extends InterfaceDAO implements MapaTributoProvider {
                                 precoVenda = rst.getDouble("precovenda");
                             }
 
-                            stm.execute("insert into produtoautomacao (id_produto, codigobarras, qtdembalagem, id_tipoembalagem, pesobruto, dun14) values (" + id + ", " + ean + ", " + qtd + ", 0, 0, false)");
-                            eans.put(ean, id);
+                            if (!eans.containsKey(ean)) {
+                                stm.execute("insert into produtoautomacao (id_produto, codigobarras, qtdembalagem, id_tipoembalagem, pesobruto, dun14) values (" + id + ", " + ean + ", " + qtd + ", 0, 0, false)");
+                                eans.put(ean, id);
+                            }
                             if (precoVenda != precoAtacado) {
                                 double desconto = MathUtils.round(100 - ((imp.getAtacadoPreco() / (imp.getPrecovenda() == 0 ? 1 : imp.getPrecovenda())) * 100), 2);
                                 if (Versao.menorQue(3, 18)) {
@@ -593,41 +596,9 @@ public class InventerDAO extends InterfaceDAO implements MapaTributoProvider {
                                 } else {
                                     stm.execute("insert into produtoautomacaodesconto (codigobarras, id_loja, desconto, descontodiaanterior, descontodiaseguinte, dataultimodesconto) values (" + ean + ", " + lojaVR + ", " + String.format("%.2f", desconto) + ", 0, " + String.format("%.2f", desconto) + ", now())");
                                 }
+                                atac.add(ean);
                             }
-
-
-
-                           /* 
-                            String sql = 
-                                    "do $$\n" +
-                                    "declare\n" +
-                                    "	v_ean numeric(14,0) = " + ean + ";\n" +
-                                    "	v_loja integer = " + lojaVR + ";\n" +
-                                    "	v_desconto numeric(11,2) = 0.00;\n" +
-                                    "	v_precoatacado numeric(11,2) = " + MathUtils.round(precoAtacado, 2) + ";\n" +
-                                    "	v_precovenda numeric(11,2);\n" +
-                                    "begin\n" +
-                                    "	select precovenda from produtocomplemento where id_loja = v_loja and id_produto = (select id_produto from produtoautomacao where codigobarras = v_ean) into v_precovenda;\n" +
-                                    "\n" +
-                                    "	raise notice 'ean % preco % atacado %', v_ean, v_precovenda, v_precoatacado;\n" +
-                                    "	\n" +
-                                    "	if (v_desconto = 0 and v_precoatacado > 0 and v_precoatacado != v_precovenda) then\n" +
-                                    "		v_desconto = round(100 - ((v_precoatacado / (case when v_precovenda = 0 then 1 else v_precovenda end)) * 100), 2);\n" +
-                                    "	end if;	\n" +
-                                    "	\n" +
-                                            (
-                                                Versao.menorQue(3,18) ?
-                                                "	insert into produtoautomacaodesconto (codigobarras, id_loja, desconto) values (v_ean, v_loja, v_desconto);\n" :
-                                                "	insert into produtoautomacaodesconto (codigobarras, id_loja, desconto, descontodiaanterior, descontodiaseguinte, dataultimodesconto) values (v_ean, v_loja, v_desconto, 0, v_desconto, now());\n"
-                                            ) +                        
-                                    "end\n" +
-                                    "$$;";
-
-                            stm.execute(sql);*/
-
                         }
-
-
                     }
                 }
                 
@@ -638,7 +609,7 @@ public class InventerDAO extends InterfaceDAO implements MapaTributoProvider {
         } catch (Exception e) {
             Conexao.rollback();
             throw e;
-        }        
+        }
     }
     
 }
