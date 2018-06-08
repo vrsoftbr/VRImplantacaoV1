@@ -146,6 +146,9 @@ public class FortiGUI extends VRInternalFrame {
                             if (chkT1Preco.isSelected()) {
                                 opcoes.add(OpcaoProduto.PRECO);
                             }
+                            if (chkT1Margem.isSelected()) {
+                                opcoes.add(OpcaoProduto.MARGEM);
+                            }
                             if (chkT1Estoque.isSelected()) {
                                 opcoes.add(OpcaoProduto.ESTOQUE);
                             }
@@ -246,6 +249,7 @@ public class FortiGUI extends VRInternalFrame {
         chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Custo = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Preco = new vrframework.bean.checkBox.VRCheckBox();
+        chkT1Margem = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Estoque = new vrframework.bean.checkBox.VRCheckBox();
         chkT1EAN = new vrframework.bean.checkBox.VRCheckBox();
         chkT1EANemBranco = new vrframework.bean.checkBox.VRCheckBox();
@@ -345,6 +349,9 @@ public class FortiGUI extends VRInternalFrame {
 
         chkT1Preco.setText("Preço");
         vRPanel7.add(chkT1Preco);
+
+        chkT1Margem.setText("Margem");
+        vRPanel7.add(chkT1Margem);
 
         chkT1Estoque.setText("Estoque");
         vRPanel7.add(chkT1Estoque);
@@ -646,6 +653,7 @@ public class FortiGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkT1EANemBranco;
     private vrframework.bean.checkBox.VRCheckBox chkT1Estoque;
     private vrframework.bean.checkBox.VRCheckBox chkT1ICMS;
+    private vrframework.bean.checkBox.VRCheckBox chkT1Margem;
     private vrframework.bean.checkBox.VRCheckBox chkT1NatReceita;
     private vrframework.bean.checkBox.VRCheckBox chkT1PisCofins;
     private vrframework.bean.checkBox.VRCheckBox chkT1Preco;

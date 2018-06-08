@@ -127,8 +127,8 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "Estoque, \n"
                     + "Minimo, \n"
                     + "Maximo,\n"
-                    + "Custo as custocomimposto, \n"
-                    + "Custo as custosemimposto, \n"
+                    + "Compra as custocomimposto, \n"
+                    + "Compra as custosemimposto, \n"
                     + "Venda, \n"
                     + "Icms as icmsdebito, \n"
                     + "Icms as icmscredito, \n"
@@ -136,8 +136,7 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "Balanca, \n"
                     + "Validade, \n"
                     + "Descricao,\n"
-                    + "MLucro1, \n"
-                    + "MargUltRJ\n"
+                    + "Porc as margem \n"
                     + "from PRODUTO\n"
                     + "order by Codigo"
             )) {
@@ -159,7 +158,7 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdEmbalagem(1);
                     imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
                     imp.setValidade(rst.getInt("Validade"));
-                    imp.setMargem(rst.getDouble("MargUltRJ"));
+                    imp.setMargem(rst.getDouble("margem"));
                     imp.setPrecovenda(rst.getDouble("Venda"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
@@ -185,8 +184,6 @@ public class FortiDAO extends InterfaceDAO implements MapaTributoProvider {
 
             while (arquivo.ready()) {
                 linha = arquivo.readLine();
-
-                System.out.println(Utils.acertarTexto(linha.substring(26, 66)));
                 
                 ProdutoIMP imp = new ProdutoIMP();
                 imp.setImportLoja(getLojaOrigem());
