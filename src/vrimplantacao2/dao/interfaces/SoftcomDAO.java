@@ -4,10 +4,18 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import vrframework.classe.Conexao;
+import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAutomacaoDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.parametro.Versao;
+import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -78,7 +86,8 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	pisdebito.CSTPIS piscofins_debito,\n" +
                     "	piscredito.CSTPIS piscofins_credito,\n" +
                     "	p.NaturezaReceita piscofins_naturezareceita,\n" +
-                    "	p.Situação icms_id\n" +
+                    "	p.Situação icms_id,\n" +
+                    "	p.VendaA preco_atacado\n" +
                     //"	cast(p.CST as varchar(10)) + '-' + cast(p.NFCe_Aliquota as varchar(10)) icms_id\n" +                    
                     "from\n" +
                     "	[Cadastro de Mercadorias] p\n" +
@@ -139,6 +148,7 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_naturezareceita"));
                     imp.setIcmsCreditoId(rst.getString("icms_id"));
                     imp.setIcmsDebitoId(rst.getString("icms_id"));
+                    imp.setAtacadoPreco(rst.getDouble("preco_atacado"));
                     
                     result.add(imp);
                 }
@@ -328,6 +338,64 @@ public class SoftcomDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         
         return result;
+    }
+    
+    public void importarAtacadoPorEAN(int lojaVR) throws Exception {
+        ProgressBar.setStatus("Preparando para gravar atacado...");
+        Map<String, Integer> anteriores = new ProdutoAnteriorDAO().getAnteriores(getSistema(), getLojaOrigem());        
+        Map<Long, Integer> eans = new ProdutoAutomacaoDAO().getEansCadastrados();
+        Set<Long> atac = new ProdutoAutomacaoDAO().getEansCadastradosAtacado(lojaVR);
+        
+        Conexao.begin();
+        try {            
+            List<ProdutoIMP> prods = getProdutos();
+            ProgressBar.setStatus("Gravando atacado...");
+            ProgressBar.setMaximum(prods.size());
+            for (ProdutoIMP imp: prods) {            
+                Integer id = anteriores.get(imp.getImportId());
+
+                if (id != null) {                
+                    if (!atac.contains(id.longValue())) {
+                        double precoAtacado = imp.getAtacadoPreco();
+                        double precoVenda;
+                        int qtd = 10;//imp.getQtdEmbalagem();
+                        long ean = id.longValue();
+
+                        try (Statement stm = Conexao.createStatement()) {
+
+                            try (ResultSet rst = stm.executeQuery(
+                                    "select precovenda from produtocomplemento where id_loja = " + lojaVR + " and id_produto = " + id
+                            )) {
+                                rst.next();
+                                precoVenda = rst.getDouble("precovenda");
+                            }
+
+                            if (!eans.containsKey(ean)) {
+                                stm.execute("insert into produtoautomacao (id_produto, codigobarras, qtdembalagem, id_tipoembalagem, pesobruto, dun14) values (" + id + ", " + ean + ", " + qtd + ", 0, 0, false)");
+                                eans.put(ean, id);
+                            }
+                            if (precoVenda != precoAtacado) {
+                                double desconto = MathUtils.round(100 - ((imp.getAtacadoPreco() / (imp.getPrecovenda() == 0 ? 1 : imp.getPrecovenda())) * 100), 2);
+                                if (Versao.menorQue(3, 18)) {
+                                    stm.execute("insert into produtoautomacaoloja (codigobarras, precovenda, id_loja) values (" + ean + ", " + precoAtacado + ", " + lojaVR + ")");
+                                    stm.execute("insert into produtoautomacaodesconto (codigobarras, id_loja, desconto) values (" + ean + ", " + lojaVR + ", " + desconto + ")");
+                                } else {
+                                    stm.execute("insert into produtoautomacaodesconto (codigobarras, id_loja, desconto, descontodiaanterior, descontodiaseguinte, dataultimodesconto) values (" + ean + ", " + lojaVR + ", " + String.format("%.2f", desconto) + ", 0, " + String.format("%.2f", desconto) + ", now())");
+                                }
+                                atac.add(ean);
+                            }
+                        }
+                    }
+                }
+                
+                ProgressBar.next();
+            }
+            
+            Conexao.commit();
+        } catch (Exception e) {
+            Conexao.rollback();
+            throw e;
+        }
     }
     
 }

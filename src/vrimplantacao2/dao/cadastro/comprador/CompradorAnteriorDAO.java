@@ -20,9 +20,16 @@ import vrimplantacao2.vo.cadastro.comprador.CompradorAnteriorVO;
 public class CompradorAnteriorDAO {
     
     public static void createTable() throws Exception {
-        try (Statement stm = Conexao.createStatement()) {                        
+        try (Statement stm = Conexao.createStatement()) {      
+            try (ResultSet rst = stm.executeQuery(
+                    "select table_schema||'.'||table_name tabela from information_schema.tables where table_schema = 'implantacao' and table_name = 'codant_comprador'"
+            )) {
+                if (rst.next()) {
+                    return;
+                }
+            }
             stm.execute(
-                    "create table if not exists implantacao.codant_comprador (\n" +
+                    "create table implantacao.codant_comprador (\n" +
                     "	sistema varchar not null,\n" +
                     "	loja varchar not null,\n" +
                     "	id varchar not null,\n" +

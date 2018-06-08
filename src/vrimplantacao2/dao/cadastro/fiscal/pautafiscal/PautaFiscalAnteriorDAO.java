@@ -18,8 +18,15 @@ public final class PautaFiscalAnteriorDAO {
     
     public static void createTable() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select table_schema||'.'||table_name tabela from information_schema.tables where table_schema = 'implantacao' and table_name = 'codant_pautafiscal'"
+            )) {
+                if (rst.next()) {
+                    return;
+                }
+            }
             stm.execute(
-                    "create table if not exists implantacao.codant_pautafiscal(\n" +
+                    "create table implantacao.codant_pautafiscal(\n" +
                     "	sistema varchar not null,\n" +
                     "	loja varchar not null,\n" +
                     "	id varchar not null,\n" +
