@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +27,25 @@ public class ProdutoAutomacaoDAO {
             atualizaEansCadastrados();
         }
         return eansCadastrados;
+    }
+    
+    public Set<Long> getEansCadastradosAtacado(int idLoja) throws Exception {        
+        Set<Long> result = new HashSet<>();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select codigobarras from produtoautomacaoloja where id_loja = 2\n" +
+                    "union\n" +
+                    "select codigobarras from produtoautomacaodesconto where id_loja = 2\n" +
+                    "order by codigobarras"
+            )) {
+                while (rst.next()) {
+                    result.add(rst.getLong("codigobarras"));
+                }
+            }
+        }
+        
+        return result;
     }
 
     public void atualizaEansCadastrados() throws Exception {
