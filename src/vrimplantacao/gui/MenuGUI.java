@@ -1321,7 +1321,7 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu6.add(mnuSoftcom);
 
-        mnuIdeia.setText("Softcom");
+        mnuIdeia.setText("Ideia");
         mnuIdeia.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 mnuIdeiaActionPerformed(evt);

@@ -507,7 +507,7 @@
                         </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuIdeia">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Softcom"/>
+                            <Property name="text" type="java.lang.String" value="Ideia"/>
                           </Properties>
                           <AccessibilityProperties>
                             <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Ideia"/>
