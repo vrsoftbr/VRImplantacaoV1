@@ -11,6 +11,8 @@ import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -22,14 +24,35 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  * @author Guilherme
  */
 public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
-
+    
     public boolean v_usar_arquivoBalanca;
-
+    
     @Override
     public String getSistema() {
         return "Sysmo";
     }
-
+    
+    public List<Estabelecimento> getLojas() throws Exception {
+        List<Estabelecimento> lojas = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "      emp.cod::integer as id,\n"
+                    + "      emp.ccg::bigint as cnpj,\n"
+                    + "      emp.cnm as nome\n"
+                    + "from\n"
+                    + "    spsemp00 emp\n"
+                    + "order by\n"
+                    + "      emp.cod::integer"
+            )) {
+                while (rs.next()) {
+                    lojas.add(new Estabelecimento(rs.getString("id"), rs.getString("nome")));
+                }
+            }
+        }
+        return lojas;
+    }
+    
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -58,28 +81,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
-    public List<Estabelecimento> getLojas() throws Exception {
-        List<Estabelecimento> lojas = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "      emp.cod::integer as id,\n"
-                    + "      emp.ccg::bigint as cnpj,\n"
-                    + "      emp.cnm as nome\n"
-                    + "from\n"
-                    + "    spsemp00 emp\n"
-                    + "order by\n"
-                    + "      emp.cod::integer"
-            )) {
-                while (rs.next()) {
-                    lojas.add(new Estabelecimento(rs.getString("id"), rs.getString("nome")));
-                }
-            }
-        }
-        return lojas;
-    }
-
+    
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -126,14 +128,14 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc4Descricao(rs.getString("descmercadologico4"));
                     imp.setMerc5ID(rs.getString("mercadologico5"));
                     imp.setMerc5Descricao(rs.getString("descmercadologico5"));
-
+                    
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-
+    
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
@@ -143,7 +145,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	forn.pro as idproduto,\n"
                     + "	forn.ccf as idfornecedor,\n"
                     + " forn.qnt as qtdembalagem,\n"
-                    + " forn.dtr as dataalteracao\n"    
+                    + " forn.dtr as dataalteracao\n"
                     + "from \n"
                     + "	gcefor01 forn \n"
                     + "where \n"
@@ -151,22 +153,22 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by\n"
                     + "	forn.pro, forn.ccf")) {
                 while (rs.next()) {
-                       ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
-                       imp.setImportLoja(getLojaOrigem());
-                       imp.setImportSistema(getSistema());
-                       imp.setIdProduto(rs.getString("idproduto"));
-                       imp.setIdFornecedor(rs.getString("idfornecedor"));
-                       imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
-                       imp.setDataAlteracao(rs.getDate("dataalteracao"));
-                       
-                       result.add(imp);
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rs.getString("idproduto"));
+                    imp.setIdFornecedor(rs.getString("idfornecedor"));
+                    imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
+                    imp.setDataAlteracao(rs.getDate("dataalteracao"));
+                    
+                    result.add(imp);
                 }
-
+                
             }
         }
         return result;
     }
-
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -287,7 +289,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCstSaida(rs.getInt("cstdebito"));
                     imp.setIcmsAliqSaida(rs.getDouble("icmsdebito"));
                     imp.setIcmsReducao(rs.getDouble("icmsreducao"));
-
+                    
                     result.add(imp);
                 }
             }
@@ -298,7 +300,142 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + " t.cod as id,\n"
+                    + " t.nom as nome,\n"
+                    + " t.cgc::bigint as cpfcnpj,\n"
+                    + " t.pss as tipopessoa,\n"
+                    + " t.fan as fantasia,\n"
+                    + " t.log as endereco,\n"
+                    + " t.num as numero,\n"
+                    + " t.bai as bairro,\n"
+                    + " t.cmp as complemento,\n"
+                    + " t.mun as municipio,\n"
+                    + " t.cep,\n"
+                    + " t.cxp as caixapostal,\n"
+                    + " t.tel,\n"
+                    + " t.fax,\n"
+                    + " t.cel,\n"
+                    + " t.ins as ie,\n"
+                    + " t.oex as orgaoexp,\n"
+                    + " t.dtn as datanascimento,\n"
+                    + " t.eml as email,\n"
+                    + " t.emn as emailnf,\n"
+                    + " t.obs,\n"
+                    + " t.dtc as datacadastro,\n"
+                    + " t.dtm as datamovimentacao,\n"
+                    + " t.lcr as limitecredito\n"
+                    + "from\n"
+                    + "    trstra01 t\n"
+                    + "where\n"
+                    + "     t.tip not in ('D', 'C')")) {
+                while (rs.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setRazao(rs.getString("nome"));
+                    imp.setCnpj_cpf(rs.getString("cpfcnpj"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setMunicipio(rs.getString("municipio"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setTel_principal(rs.getString("tel"));
+                    if (!"".equals(rs.getString("fax"))) {
+                        imp.addContato("1", "Fax", rs.getString("fax"), null, TipoContato.COMERCIAL, null);
+                    }
+                    if (!"".equals(rs.getString("cel"))) {
+                        imp.addContato("2", "Celular", rs.getString("cel"), null, TipoContato.COMERCIAL, null);
+                    }
+                    imp.setIe_rg(rs.getString("ie"));
+                    if (!"".equals(rs.getString("email"))) {
+                        imp.addContato("3", "Email", null, null, TipoContato.FISCAL, rs.getString("email").toLowerCase());
+                    }
+                    if (!"".equals(rs.getString("emailnf"))) {
+                        imp.addContato("4", "Email NF", null, null, TipoContato.NFE, rs.getString("emailnf").toLowerCase());
+                    }
+                    imp.setObservacao(rs.getString("obs"));
+                    imp.setDatacadastro(rs.getDate("datacadastro"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "      t.cod as id,\n"
+                    + "      t.nom as nome,\n"
+                    + "      t.cgc::bigint as cpfcnpj,\n"
+                    + "      t.pss as tipopessoa,\n"
+                    + "      t.fan as fantasia,\n"
+                    + "      t.log as endereco,\n"
+                    + "      t.num as numero,\n"
+                    + "      t.bai as bairro,\n"
+                    + "      t.cmp as complemento,\n"
+                    + "      t.mun as municipio,\n"
+                    + "      t.cep,\n"
+                    + "      t.cxp as caixapostal,\n"
+                    + "      t.tel,\n"
+                    + "      t.fax,\n"
+                    + "      t.cel,\n"
+                    + "      t.ins as ie,\n"
+                    + "      t.oex as orgaoexp,\n"
+                    + "      t.dtn as datanascimento,\n"
+                    + "      t.eml as email,\n"
+                    + "      t.emn as emailnf,\n"
+                    + "      t.obs,\n"
+                    + "      t.dtc as datacadastro,\n"
+                    + "      t.dtm as datamovimentacao,\n"
+                    + "      (select vlc from trsccv01 tr where tr.cod = t.cod) as limitecredito,\n"
+                    + "      case when conv.dbl is null\n"
+                    + "      then 0 else 1 end bloqueado \n"
+                    + "from\n"
+                    + "    trstra01 t\n"
+                    + "left join trstra01 conv on t.cod = conv.cod\n"
+                    + "where\n"
+                    + "     t.tip in ('D', 'C')\n"
+                    + "order by\n"
+                    + "     t.cod")) {
+                while (rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setRazao(rs.getString("nome"));
+                    imp.setCnpj(rs.getString("cpfcnpj"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setTelefone(rs.getString("tel"));
+                    imp.setFax(rs.getString("fax"));
+                    imp.setCelular(rs.getString("celular"));
+                    imp.setInscricaoestadual(rs.getString("ie"));
+                    imp.setDataNascimento(rs.getDate("datanascimento"));
+                    imp.setEmail(rs.getString("email").toLowerCase());
+                    imp.addEmail(rs.getString("emailnf").toLowerCase(), TipoContato.NFE);
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+                    imp.setLimiteCompra(rs.getDouble("limitecredito"));
+                    imp.setBloqueado(rs.getBoolean("bloqueado"));
+                    imp.setObservacao(rs.getString("obs"));
+                    
+                    result.add(imp);
+                }
+                
+            }
+        }
         return result;
     }
 }
