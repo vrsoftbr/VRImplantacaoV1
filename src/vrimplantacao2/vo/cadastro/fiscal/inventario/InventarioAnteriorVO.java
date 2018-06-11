@@ -11,11 +11,13 @@ import java.util.Date;
  *
  * @author lucasrafael
  */
-public class InventarioVOIMP {
+public class InventarioAnteriorVO {
 
-    private int id;
-    private int idLoja;
-    private int idProduto;
+    private String sistema;
+    private String idLoja;
+    private String id;
+    private String codigoAnteior;
+    private String codigoAtual;
     private Date data;
     private Date datageracao;
     private String descricao;
@@ -23,35 +25,44 @@ public class InventarioVOIMP {
     private double quantidade;
     private double custoComImposto;
     private double custoSemImposto;
-    private int idAliquotaCredito;
-    private int idAliquotadebito;
+    private String idAliquotaCredito;
+    private String idAliquotadebito;
     private double pis;
     private double cofins;
     private double custoMedioComImposto;
     private double custoMedioSemImposto;
+    private InventarioVO idAtual;
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public int getIdLoja() {
+    public String getIdLoja() {
         return idLoja;
     }
 
-    public void setIdLoja(int idLoja) {
+    public void setIdLoja(String idLoja) {
         this.idLoja = idLoja;
     }
 
-    public int getIdProduto() {
-        return idProduto;
+    public String getCodigoAnteior() {
+        return codigoAnteior;
+    }
+    
+    public void setCodigoAnteior(String codigoAnteior) {
+        this.codigoAnteior = codigoAnteior;
     }
 
-    public void setIdProduto(int idProduto) {
-        this.idProduto = idProduto;
+    public String getCodigoAtual() {
+        return codigoAtual;
+    }
+    
+    public void setCodigoAtual(String codigoAtual) {
+        this.codigoAtual = codigoAtual;
     }
 
     public Date getData() {
@@ -110,19 +121,19 @@ public class InventarioVOIMP {
         this.custoSemImposto = custoSemImposto;
     }
 
-    public int getIdAliquotaCredito() {
+    public String getIdAliquotaCredito() {
         return idAliquotaCredito;
     }
 
-    public void setIdAliquotaCredito(int idAliquotaCredito) {
+    public void setIdAliquotaCredito(String idAliquotaCredito) {
         this.idAliquotaCredito = idAliquotaCredito;
     }
 
-    public int getIdAliquotadebito() {
+    public String getIdAliquotadebito() {
         return idAliquotadebito;
     }
 
-    public void setIdAliquotadebito(int idAliquotadebito) {
+    public void setIdAliquotadebito(String idAliquotadebito) {
         this.idAliquotadebito = idAliquotadebito;
     }
 
@@ -156,5 +167,21 @@ public class InventarioVOIMP {
 
     public void setCustoMedioSemImposto(double custoMedioSemImposto) {
         this.custoMedioSemImposto = custoMedioSemImposto;
+    }
+
+    public String getSistema() {
+        return sistema;
+    }
+
+    public void setSistema(String sistema) {
+        this.sistema = sistema;
+    }
+
+    public InventarioVO getIdAtual() {
+        return idAtual;
+    }
+
+    public void setIdAtual(InventarioVO idAtual) {
+        this.idAtual = idAtual;
     }
 }

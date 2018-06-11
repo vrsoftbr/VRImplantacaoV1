@@ -17,6 +17,7 @@ public class InventarioIMP {
     private String importLoja;
     private String importId;
 
+    private String id;
     private String idLoja;
     private String idProduto;
     private Date data = new Date();
@@ -175,5 +176,13 @@ public class InventarioIMP {
 
     public void setImportId(String importId) {
         this.importId = importId;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

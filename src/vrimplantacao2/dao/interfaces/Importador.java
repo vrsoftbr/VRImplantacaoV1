@@ -899,8 +899,11 @@ public class Importador {
     public void importarInventario(Date dataInventario) throws Exception {
         ProgressBar.setStatus("Carregando inventário...");
         List<InventarioIMP> inventario = getInterfaceDAO().getInventario(dataInventario);
-        InventarioRepositoryProvider provider = new InventarioRepositoryProvider();
-        provider.setLojaVR(getLojaVR());
+        InventarioRepositoryProvider provider = new InventarioRepositoryProvider(
+                getSistema(),
+                getLojaOrigem(),
+                getLojaVR()
+        );
         InventarioRepository rep = new InventarioRepository(provider);
         rep.importarInventario(inventario);
     }

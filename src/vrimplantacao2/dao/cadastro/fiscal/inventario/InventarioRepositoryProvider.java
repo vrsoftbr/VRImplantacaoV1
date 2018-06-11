@@ -16,7 +16,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoVO;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.fiscal.inventario.InventarioVO;
-import vrimplantacao2.vo.cadastro.fiscal.inventario.InventarioVOIMP;
+import vrimplantacao2.vo.cadastro.fiscal.inventario.InventarioAnteriorVO;
 import vrimplantacao2.vo.enums.Icms;
 
 /**
@@ -31,7 +31,17 @@ public class InventarioRepositoryProvider {
     private int idProduto;
     private Date data;
     private InventarioDAO inventarioDAO;
+    private InventarioAnteriorDAO inventarioAnteriorDAO; 
     private Tributo tributo = new Tributo();
+    
+    public InventarioRepositoryProvider(String sistema, String loja, int idLovaVR) throws Exception {
+        this.sistema = sistema;
+        this.lojaOrigem = loja;
+        this.lojaVR = idLovaVR;
+        this.inventarioDAO = new InventarioDAO();
+        this.inventarioAnteriorDAO = new InventarioAnteriorDAO();
+    }
+    
     
     public class Tributo {
         
@@ -131,8 +141,8 @@ public class InventarioRepositoryProvider {
     }
     //</editor-fold>
 
-    public MultiMap<String, InventarioVOIMP> getInventarios() throws Exception {
-        return inventarioDAO.getInventario(this.lojaVR, this.getIdProduto(), this.data);
+    public Map<String, InventarioAnteriorVO> getAnteriores() throws Exception {
+        return inventarioAnteriorDAO.getAnteriores(getSistema(), getLojaOrigem());
     }
     
     public void salvar(InventarioVO vo) throws Exception {
@@ -141,6 +151,10 @@ public class InventarioRepositoryProvider {
 
     public void atualizar(InventarioVO vo) throws Exception {
         inventarioDAO.atualizar(vo);
+    }
+    
+    public void salvarAnterior(InventarioAnteriorVO vo) throws Exception {
+        inventarioAnteriorDAO.gravar(vo);
     }
     
     public int getIdProduto() {
