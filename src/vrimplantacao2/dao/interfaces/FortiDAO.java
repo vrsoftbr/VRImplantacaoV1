@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import vrframework.remote.Arquivo;
 import vrimplantacao.classe.ConexaoParadox;
-import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
