@@ -171,9 +171,9 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    left join icmsprod icm on icm.codpro = p.codigo and icm.estado = f.estado\n"
                     + "order by\n"
                     + "    p.codigo"
-            )) {
+            )) { 
                 while (rst.next()) {
-                    if (rst.getInt("ativo") == 1) {
+                    {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportSistema(getSistema());
                         imp.setImportLoja(getLojaOrigem());

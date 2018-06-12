@@ -29,7 +29,7 @@ public final class Versao {
                 if (rst.next()) {
                     
                     if (rst.getString("versao").contains("-")) {
-                        versao = rst.getString("versao").substring(0, rst.getString("versao").indexOf("-"));
+                        versao = rst.getString("versao").replace("-", ".");
                     }  else {
                         versao = rst.getString("versao");
                     }
