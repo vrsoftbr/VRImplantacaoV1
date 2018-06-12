@@ -29,35 +29,40 @@ public class InventarioRepository {
     public void importarInventario(List<InventarioIMP> inventario) throws Exception {
         ProdutoAnteriorDAO produtoAnteriorDAO = new ProdutoAnteriorDAO();
         System.gc();
-        inventario.clear();
 
         this.provider.begin();
         try {
 
             //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
-            setNotificacao("Preparando para gravar operadores...", inventario.size());
+            setNotificacao("Preparando para gravar inventario...", inventario.size());
             Map<String, InventarioAnteriorVO> anteriores = provider.getAnteriores();
             //</editor-fold>
 
-            setNotificacao("Gravando operador...", inventario.size());
+            setNotificacao("Gravando inventario...", inventario.size());
 
             for (InventarioIMP imp : inventario) {
                 int idProduto = produtoAnteriorDAO.getCodigoAnterior2(provider.getSistema(), provider.getLojaOrigem(), imp.getIdProduto());
 
-                InventarioAnteriorVO anterior = anteriores.get(imp.getId());
+                if (idProduto > 0) {
 
-                if (anterior == null) {                    
-                    converterAnterior(imp, String.valueOf(idProduto));
-                    InventarioVO vo = converterInventario(imp, idProduto);
-                    provider.salvar(vo);
-                    anterior.setIdAtual(vo);
-                    
-                    provider.salvarAnterior(anterior);
-                    //Inclui na listagem de anteriores.
-                    anteriores.put(anterior.getId(), anterior);
-                } else {
-                    InventarioVO vo = converterInventario(imp, idProduto);
-                    provider.atualizar(vo);
+                    InventarioAnteriorVO anterior = anteriores.get(imp.getId());
+                    if (anterior == null) {
+                        anterior = converterAnterior(imp, String.valueOf(idProduto));
+                        InventarioVO vo = converterInventario(imp, idProduto);
+                        provider.salvar(vo);
+                        anterior.setIdAtual(vo);
+
+                        provider.salvarAnterior(anterior);
+                        //Inclui na listagem de anteriores.
+                        anteriores.put(anterior.getId(), anterior);
+                    } else {
+                        anterior = converterAnterior(imp, String.valueOf(idProduto));
+                        InventarioVO vo = converterInventario(imp, idProduto);
+                        provider.atualizar(vo);
+                        anterior.setIdAtual(vo);
+                        provider.salvarAnterior(anterior);
+                        anteriores.put(anterior.getId(), anterior);
+                    }
                 }
                 notificar();
             }
@@ -87,7 +92,11 @@ public class InventarioRepository {
         aliqDebito = provider.tributo().getAliquotaByMapaId(idIcmsDebito);
 
         InventarioVO vo = new InventarioVO();
+        
+        vo.setData(imp.getData());
+        vo.setDatageracao(imp.getDataGeracao());
         vo.setIdProduto(idProduto);
+        vo.setIdLoja(provider.getLojaVR());
         vo.setDescricao(imp.getDescricao());
         vo.setCustoComImposto(imp.getCustoComImposto());
         vo.setCustoSemImposto(imp.getCustoSemImposto());
@@ -106,6 +115,8 @@ public class InventarioRepository {
         InventarioAnteriorVO vo = new InventarioAnteriorVO();
         vo.setSistema(provider.getSistema());
         vo.setIdLoja(provider.getLojaOrigem());
+        vo.setData(imp.getData());
+        vo.setDatageracao(imp.getDataGeracao());
         vo.setId(imp.getId());
         vo.setCodigoAnteior(imp.getIdProduto());
         vo.setCodigoAtual(idProduto);

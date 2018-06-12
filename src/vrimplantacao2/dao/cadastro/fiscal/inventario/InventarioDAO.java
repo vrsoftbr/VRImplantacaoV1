@@ -7,12 +7,9 @@ package vrimplantacao2.dao.cadastro.fiscal.inventario;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.Date;
 import vrframework.classe.Conexao;
-import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.fiscal.inventario.InventarioVO;
-import vrimplantacao2.vo.cadastro.fiscal.inventario.InventarioAnteriorVO;
 
 /**
  *
@@ -25,7 +22,7 @@ public class InventarioDAO {
             SQLBuilder sql = new SQLBuilder();
             sql.setSchema("public");
             sql.setTableName("inventario");
-            sql.put("id", vo.getId());
+            sql.put("id_loja", vo.getIdLoja());
             sql.put("id_produto", vo.getIdProduto());
             sql.put("data", vo.getData());
             sql.put("datageracao", vo.getData());
@@ -40,7 +37,13 @@ public class InventarioDAO {
             sql.put("cofins", vo.getCofins());
             sql.put("customediocomimposto", vo.getCustoMedioComImposto());
             sql.put("customediosemimposto", vo.getCustoMedioSemImposto());
-            stm.execute(sql.getInsert());
+            sql.getReturning().add("id");
+            try (ResultSet rst = stm.executeQuery(
+                    sql.getInsert()
+            )) {
+                rst.next();
+                vo.setId(rst.getInt("id"));
+            }
         }
     }
 
@@ -53,7 +56,13 @@ public class InventarioDAO {
             sql.setWhere("id_loja = " + vo.getIdLoja() + " "
                     + "and id_produto = " + vo.getIdProduto() + " "
                     + "and data = '" + vo.getData() + "'");
-            stm.execute(sql.getUpdate());
+            sql.getReturning().add("id");
+            try (ResultSet rst = stm.executeQuery(
+                    sql.getUpdate()
+            )) {
+                rst.next();
+                vo.setId(rst.getInt("id"));
+            }
         }
     }
 

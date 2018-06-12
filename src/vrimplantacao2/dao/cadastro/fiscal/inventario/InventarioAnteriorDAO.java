@@ -39,7 +39,7 @@ public class InventarioAnteriorDAO {
                     + "idloja varchar, \n"
                     + "id varchar, \n"
                     + "idatual integer, \n"
-                    + "codigoanteior varchar, \n"
+                    + "codigoanterior varchar, \n"
                     + "codigoatual varchar, \n"
                     + "data date, \n"
                     + "datageracao date, \n"
@@ -47,9 +47,9 @@ public class InventarioAnteriorDAO {
                     + "precovenda numeric, \n"
                     + "quantidade numeric, \n"
                     + "custocomimposto numeric, \n"
-                    + "custosemimposto nuemric, \n"
-                    + "idaliquotacredito integer, \n"
-                    + "idaliquotadebito integer, \n"
+                    + "custosemimposto numeric, \n"
+                    + "idaliquotacredito varchar, \n"
+                    + "idaliquotadebito varchar, \n"
                     + "pis numeric, \n"
                     + "cofins numeric, \n"
                     + "customediocomImposto numeric, \n"
@@ -73,7 +73,7 @@ public class InventarioAnteriorDAO {
                     + "idloja, \n"
                     + "id, \n"
                     + "idatual, \n"
-                    + "codigoanteior, \n"
+                    + "codigoanterior, \n"
                     + "codigoatual, \n"
                     + "data, \n"
                     + "datageracao, \n"
@@ -88,7 +88,7 @@ public class InventarioAnteriorDAO {
                     + "cofins, \n"
                     + "customediocomimposto, \n"
                     + "customediosemimposto \n"
-                    + "from codant_inventario "
+                    + "from implantacao.codant_inventario "
                     + "where sistema = " + SQLUtils.stringSQL(sistema) + "\n"
                     + "and idloja = " + SQLUtils.stringSQL(loja)
             )) {
@@ -104,7 +104,7 @@ public class InventarioAnteriorDAO {
                         ant.setIdAtual(vo);
                     }
 
-                    ant.setCodigoAnteior(rst.getString("codigoanteior"));
+                    ant.setCodigoAnteior(rst.getString("codigoanterior"));
                     ant.setCodigoAtual(rst.getString("codigoatual"));
                     ant.setData(rst.getDate("data"));
                     ant.setDatageracao(rst.getDate("datageracao"));

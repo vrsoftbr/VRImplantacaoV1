@@ -2,7 +2,6 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,6 +29,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    
     @Override
     public String getSistema() {
         return "Avance";
@@ -631,23 +632,23 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<InventarioIMP> getInventario(Date dataInventario) throws Exception {
         List<InventarioIMP> result = new ArrayList<>();
-        java.sql.Date dataInv;
-        DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
         String nomeTable = "";
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT nome_inventario as nomeTabela"
+                    "SELECT nome_inventario as nomeTabela "
                     + "FROM inventarios_cab "
-                    + "WHERE data_inventario = '" + dataInventario + "' \n"
+                    + "WHERE data_inventario = '" + FORMAT.format(dataInventario) + "' \n"
+                    + "AND nome_inventario NOT LIKE '%_1'\n"
                     + "AND id_loja = " + getLojaOrigem()
             )) {
                 if (rst.next()) {
                     nomeTable = rst.getString("nomeTabela");
+                    System.out.println("Tabela: " + rst.getString("nomeTabela"));
                 }
             }
 
-            if (!nomeTable.trim().isEmpty()) {
+            if ((nomeTable != null) && (!nomeTable.trim().isEmpty())) {
                 try (ResultSet rst = stm.executeQuery(
                         "SELECT \n"
                         + "i.Codigo, "
@@ -659,13 +660,14 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "i.CUSMEDIO,\n"
                         + "i.dt_inv, "
                         + "i.aliq_pis_sai, "
-                        + "i.aliq_cofins_ent,\n"
+                        + "i.aliq_cofins_ent\n"
                         + "FROM " + nomeTable + " i"
                 )) {
                     while (rst.next()) {
                         InventarioIMP imp = new InventarioIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
+                        imp.setId(getLojaOrigem() + "-" + rst.getString("dt_inv") + "-" + rst.getString("Codigo"));
                         imp.setData(dataInventario);
                         imp.setDataGeracao(dataInventario);
                         imp.setIdProduto(rst.getString("Codigo"));
