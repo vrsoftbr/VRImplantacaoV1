@@ -505,15 +505,15 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuSoftcomActionPerformed"/>
                           </Events>
                         </MenuItem>
-                        <MenuItem class="javax.swing.JMenuItem" name="mnuIdeia">
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuIcommerce">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="Ideia"/>
+                            <Property name="label" type="java.lang.String" value="ICommerce"/>
                           </Properties>
                           <AccessibilityProperties>
-                            <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Ideia"/>
+                            <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="ICommerce"/>
                           </AccessibilityProperties>
                           <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuIdeiaActionPerformed"/>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuIcommerceActionPerformed"/>
                           </Events>
                         </MenuItem>
                       </SubComponents>

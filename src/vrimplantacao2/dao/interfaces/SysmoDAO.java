@@ -24,14 +24,14 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  * @author Guilherme
  */
 public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
-    
+
     public boolean v_usar_arquivoBalanca;
-    
+
     @Override
     public String getSistema() {
         return "Sysmo";
     }
-    
+
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> lojas = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -52,7 +52,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return lojas;
     }
-    
+
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -81,7 +81,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -128,14 +128,14 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc4Descricao(rs.getString("descmercadologico4"));
                     imp.setMerc5ID(rs.getString("mercadologico5"));
                     imp.setMerc5Descricao(rs.getString("descmercadologico5"));
-                    
+
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-    
+
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
@@ -144,10 +144,22 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select\n"
                     + "	forn.pro as idproduto,\n"
                     + "	forn.ccf as idfornecedor,\n"
-                    + " forn.qnt as qtdembalagem,\n"
-                    + " forn.dtr as dataalteracao\n"
+                    + "	forn.qnt as qtdembalagem,\n"
+                    + "	forn.dtr as dataalteracao,\n"
+                    + "	ref.ref as referencia\n"
                     + "from \n"
                     + "	gcefor01 forn \n"
+                    + "left join\n"
+                    + "	(select\n"
+                    + "		ref,\n"
+                    + "		cfr,\n"
+                    + "		pro,\n"
+                    + "		uni\n"
+                    + "	from \n"
+                    + "		gceref01 ref\n"
+                    + "	where\n"
+                    + "		dtm in (select max(dtm) from gceref01)) ref on forn.ccf = ref.cfr and\n"
+                    + "		ref.pro = forn.pro\n"
                     + "where \n"
                     + "	emp = " + getLojaOrigem() + "\n"
                     + "order by\n"
@@ -160,15 +172,16 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
                     imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
-                    
+                    imp.setCodigoExterno(rs.getString("referencia"));
+
                     result.add(imp);
                 }
-                
+
             }
         }
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -289,14 +302,14 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCstSaida(rs.getInt("cstdebito"));
                     imp.setIcmsAliqSaida(rs.getDouble("icmsdebito"));
                     imp.setIcmsReducao(rs.getDouble("icmsreducao"));
-                    
+
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-    
+
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -361,14 +374,14 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     imp.setObservacao(rs.getString("obs"));
                     imp.setDatacadastro(rs.getDate("datacadastro"));
-                    
+
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-    
+
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
@@ -421,7 +434,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCep(rs.getString("cep"));
                     imp.setTelefone(rs.getString("tel"));
                     imp.setFax(rs.getString("fax"));
-                    imp.setCelular(rs.getString("celular"));
+                    imp.setCelular(rs.getString("cel"));
                     imp.setInscricaoestadual(rs.getString("ie"));
                     imp.setDataNascimento(rs.getDate("datanascimento"));
                     imp.setEmail(rs.getString("email").toLowerCase());
@@ -430,10 +443,11 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setLimiteCompra(rs.getDouble("limitecredito"));
                     imp.setBloqueado(rs.getBoolean("bloqueado"));
                     imp.setObservacao(rs.getString("obs"));
-                    
+                    imp.setOrgaoemissor(rs.getString("orgaoexp"));
+
                     result.add(imp);
                 }
-                
+
             }
         }
         return result;

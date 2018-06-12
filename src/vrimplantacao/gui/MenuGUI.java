@@ -151,7 +151,7 @@ import vrimplantacao2.gui.interfaces.FaciliteGUI;
 import vrimplantacao2.gui.interfaces.FenixGUI;
 import vrimplantacao2.gui.interfaces.FortiGUI;
 import vrimplantacao2.gui.interfaces.HipcomGUI;
-import vrimplantacao2.gui.interfaces.IdeiaGUI;
+import vrimplantacao2.gui.interfaces.ICommerceGUI;
 import vrimplantacao2.gui.interfaces.ScefGUI;
 import vrimplantacao2.gui.interfaces.SisMouraGUI;
 import vrimplantacao2.gui.interfaces.SolidusGUI;
@@ -563,7 +563,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuJM2Online = new javax.swing.JMenuItem();
         mnuInventer = new javax.swing.JMenuItem();
         mnuSoftcom = new javax.swing.JMenuItem();
-        mnuIdeia = new javax.swing.JMenuItem();
+        mnuIcommerce = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1321,14 +1321,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu6.add(mnuSoftcom);
 
-        mnuIdeia.setText("Ideia");
-        mnuIdeia.addActionListener(new java.awt.event.ActionListener() {
+        mnuIcommerce.setLabel("ICommerce");
+        mnuIcommerce.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuIdeiaActionPerformed(evt);
+                mnuIcommerceActionPerformed(evt);
             }
         });
-        jMenu6.add(mnuIdeia);
-        mnuIdeia.getAccessibleContext().setAccessibleName("Ideia");
+        jMenu6.add(mnuIcommerce);
+        mnuIcommerce.getAccessibleContext().setAccessibleName("ICommerce");
 
         jMenu2.add(jMenu6);
 
@@ -3771,9 +3771,9 @@ public final class MenuGUI extends VRMdiFrame {
         SysmoGUI.exibir(this);
     }//GEN-LAST:event_mnuSysmoActionPerformed
 
-    private void mnuIdeiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuIdeiaActionPerformed
-        IdeiaGUI.exibir(this);
-    }//GEN-LAST:event_mnuIdeiaActionPerformed
+    private void mnuIcommerceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuIcommerceActionPerformed
+        ICommerceGUI.exibir(this);
+    }//GEN-LAST:event_mnuIcommerceActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -3911,8 +3911,8 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuHipcom;
     private javax.swing.JMenuItem mnuHipicom;
     private javax.swing.JMenuItem mnuHostMundo;
+    private javax.swing.JMenuItem mnuIcommerce;
     private javax.swing.JMenuItem mnuIdealSoft;
-    private javax.swing.JMenuItem mnuIdeia;
     private javax.swing.JMenuItem mnuImportarNCM;
     private javax.swing.JMenuItem mnuImportarNfce;
     private javax.swing.JMenuItem mnuInfoMacStore;

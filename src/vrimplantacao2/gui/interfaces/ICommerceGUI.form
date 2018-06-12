@@ -8,10 +8,10 @@
     </Component>
   </NonVisualComponents>
   <Properties>
-    <Property name="title" type="java.lang.String" value="Sysmo"/>
+    <Property name="title" type="java.lang.String" value="Icommerce"/>
   </Properties>
   <AccessibilityProperties>
-    <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Ideia"/>
+    <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="ICommerce"/>
   </AccessibilityProperties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
@@ -593,7 +593,7 @@
                               <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="320" max="32767" attributes="0"/>
+                          <EmptySpace pref="399" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -727,48 +727,48 @@
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="txtPortaSQLServer" min="-2" pref="65" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="cmbLojaOrigem" max="32767" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="btnConectarSQLServer" min="-2" pref="114" max="-2" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="1" attributes="0">
-                              <Group type="103" groupAlignment="1" attributes="0">
-                                  <Group type="102" alignment="1" attributes="0">
-                                      <Component id="vRLabel7" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="-2" pref="45" max="-2" attributes="0"/>
-                                      <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="0" pref="75" max="32767" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" alignment="1" attributes="0">
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Group type="102" attributes="0">
-                                              <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
-                                              <EmptySpace min="0" pref="54" max="32767" attributes="0"/>
-                                          </Group>
-                                          <Component id="txtHostSQLServer" max="32767" attributes="0"/>
-                                      </Group>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
-                                          <Component id="txtBancoDadosSQLServer" min="-2" pref="122" max="-2" attributes="0"/>
-                                      </Group>
-                                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="txtUsuarioSQLServer" min="-2" pref="100" max="-2" attributes="0"/>
+                                  <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtHostSQLServer" min="-2" pref="141" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtBancoDadosSQLServer" min="-2" pref="122" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="vRLabel4" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtUsuarioSQLServer" min="-2" pref="96" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="vRLabel5" min="-2" max="-2" attributes="0"/>
-                                  <Component id="txtSenhaSQLServer" min="-2" pref="84" max="-2" attributes="0"/>
+                                  <Component id="txtSenhaSQLServer" min="-2" pref="103" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="txtPortaSQLServer" alignment="0" min="-2" pref="65" max="-2" attributes="0"/>
+                                  <Component id="vRLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                  <Component id="vRLabel8" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtLojaID" pref="90" max="32767" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" attributes="0">
+                                      <Component id="cmbLojaOrigem" min="-2" pref="197" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="btnConectarSQLServer" min="-2" pref="113" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
                           </Group>
                       </Group>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -792,12 +792,14 @@
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="vRLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="vRLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="vRLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="2" attributes="0">
                           <Component id="txtPortaSQLServer" alignment="2" min="-2" max="-2" attributes="0"/>
                           <Component id="btnConectarSQLServer" alignment="2" min="-2" max="-2" attributes="0"/>
                           <Component id="cmbLojaOrigem" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtLojaID" alignment="2" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -886,6 +888,13 @@
                 <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
                   <StringArray count="0"/>
                 </Property>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.textField.VRTextField" name="txtLojaID">
+            </Component>
+            <Component class="vrframework.bean.label.VRLabel" name="vRLabel8">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Loja ID (Cliente)"/>
               </Properties>
             </Component>
           </SubComponents>

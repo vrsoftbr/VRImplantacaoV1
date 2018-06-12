@@ -25,13 +25,13 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Guilherme
  */
-public class IdeiaDAO extends InterfaceDAO implements MapaTributoProvider {
+public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean v_usar_arquivoBalanca;
 
     @Override
     public String getSistema() {
-        return "Ideia";
+        return "ICommerce";
     }
 
     @Override
