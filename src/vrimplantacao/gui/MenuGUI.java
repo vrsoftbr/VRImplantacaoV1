@@ -170,6 +170,7 @@ import vrimplantacao2.gui.interfaces.RMSAutomaHelpGUI;
 import vrimplantacao2.gui.interfaces.SiaCriareByFileGUI;
 import vrimplantacao2.gui.interfaces.SoftcomGUI;
 import vrimplantacao2.gui.interfaces.SysmoGUI;
+import vrimplantacao2.gui.interfaces.TopSystemGUI2;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 
 public final class MenuGUI extends VRMdiFrame {
@@ -2884,18 +2885,8 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItem9ActionPerformed
 
     private void jMenuItemTopSystemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemTopSystemActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formTopSystemGUI == null || formTopSystemGUI.isClosed()) {
-                formTopSystemGUI = new TopSystemGUI(this);
-            }
-
-            formTopSystemGUI.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
+     
+        TopSystemGUI2.exibir(this);
     }//GEN-LAST:event_jMenuItemTopSystemActionPerformed
 
     private void jMenuItemSciActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSciActionPerformed
