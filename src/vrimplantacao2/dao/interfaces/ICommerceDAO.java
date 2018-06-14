@@ -218,7 +218,8 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.pro_st_pis_ent piscredito, \n"
                     + "	p.pro_st_cofins_ent cofinscredito, \n"
                     + "	p.pro_aliq_pis_ent aliqpiscredito, \n"
-                    + "	p.pro_aliq_cofins_ent aliqcofinscredito \n"
+                    + "	p.pro_aliq_cofins_ent aliqcofinscredito, \n"
+                    + " p.pro_ntr as naturezareceita \n"
                     + "from \n"
                     + "	produtos as p \n"
                     + "	join produtos_estoque as pe on p.pro_codigo = pe.pro_codigo \n"
@@ -253,41 +254,28 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValidade(rs.getInt("validade"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setSituacaoCadastro("A".equals(rs.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-                    if ((rs.getString("ean") == null) && "S".equals(rs.getString("ebalanca"))) {
-                        imp.setEan(rs.getString("id"));
-                        imp.seteBalanca(true);
-                    }
-                    if ((rs.getString("ean") != null)
-                            && (!rs.getString("ean").trim().isEmpty())
-                            && (rs.getString("ean").trim().length() >= 4)
-                            && (rs.getString("ean").trim().length() <= 6)) {
 
-                        if (v_usar_arquivoBalanca) {
-                            ProdutoBalancaVO produtoBalanca;
-                            long codigoProduto;
-                            codigoProduto = Long.parseLong(imp.getEan().trim());
-                            if (codigoProduto <= Integer.MAX_VALUE) {
-                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                            } else {
-                                produtoBalanca = null;
-                            }
-                            if (produtoBalanca != null) {
-                                imp.seteBalanca(true);
-                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rs.getInt("validade"));
-                            } else {
-                                imp.setValidade(0);
-                                imp.seteBalanca(false);
-                            }
-                        } else {
-                            imp.seteBalanca(rs.getString("unidade").contains("KG") ? true : false);
-                            imp.setValidade(rs.getInt("validade"));
-                        }
+                    ProdutoBalancaVO produtoBalanca;
+                    long codigoProduto;
+                    codigoProduto = Long.parseLong(imp.getImportId().trim());
+                    if (codigoProduto <= Integer.MAX_VALUE) {
+                        produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                    } else {
+                        produtoBalanca = null;
                     }
-                    imp.setIcmsAliq(rs.getDouble("icmsdebito"));
-                    imp.setIcmsCst(rs.getInt("cstdebito"));
+                    if (produtoBalanca != null) {
+                        imp.seteBalanca(true);
+                        imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rs.getInt("validade"));
+                    } else {
+                        imp.setValidade(0);
+                        imp.seteBalanca(false);
+                    }
+                    
                     imp.setIcmsDebitoId(rs.getString("cstdebito"));
+                    imp.setIcmsCreditoId(rs.getString("cstdebito"));
                     imp.setPiscofinsCstCredito(rs.getString("piscredito"));
                     imp.setPiscofinsCstDebito(rs.getString("pisdebito"));
+                    imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
 
                     result.add(imp);
                 }
