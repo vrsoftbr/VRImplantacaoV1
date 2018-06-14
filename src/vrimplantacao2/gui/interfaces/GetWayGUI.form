@@ -1036,9 +1036,9 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="lblLoja" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtLoja" min="-2" pref="49" max="-2" attributes="0"/>
+                              <Component id="txtLojaMesmoID" min="-2" pref="54" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
                                   <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
@@ -1074,7 +1074,7 @@
                       <Component id="txtUsuario" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="btnConectar" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtLoja" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtLojaMesmoID" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -1234,7 +1234,7 @@
             <Property name="text" type="java.lang.String" value="Loja"/>
           </Properties>
         </Component>
-        <Component class="vrframework.bean.textField.VRTextField" name="txtLoja">
+        <Component class="vrframework.bean.textField.VRTextField" name="txtLojaMesmoID">
         </Component>
       </SubComponents>
     </Container>

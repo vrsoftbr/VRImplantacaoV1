@@ -61,7 +61,6 @@ public class GetWayGUI extends VRInternalFrame {
     }
 
     private void gravarParametros() throws Exception {
-        String lojaMesmoId;
         Parametros params = Parametros.get();
         params.put(txtHost.getText(), SISTEMA, "HOST");
         params.put(txtDatabase.getText(), SISTEMA, "DATABASE");
@@ -70,13 +69,8 @@ public class GetWayGUI extends VRInternalFrame {
         params.put(txtSenha.getText(), SISTEMA, "SENHA");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
-            if (!"".equals(txtLoja.getText())) {
-                lojaMesmoId = " - " + txtLoja.getText();
-            } else {
-                lojaMesmoId = "";
-            }
             params.put(cliente.cnpj, SISTEMA, "LOJA_CLIENTE");
-            vLojaCliente = cliente.cnpj + lojaMesmoId;
+            vLojaCliente = cliente.cnpj;
         }
         ItemComboVO vr = (ItemComboVO) cmbLojaVR.getSelectedItem();
         if (vr != null) {
@@ -207,18 +201,21 @@ public class GetWayGUI extends VRInternalFrame {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
 
-                    if (!"".equals(txtLoja.getText())) {
-                        lojaMesmoId = " - " + txtLoja.getText();
-                    } else {
-                        lojaMesmoId = "";
-                    }
-
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
-                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj + lojaMesmoId;
+                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                    
                     getWayDAO.v_tipoDocumento = ((ItemComboVO) cmbTipoDocRotativo.getSelectedItem()).id;
                     getWayDAO.v_tipoDocumentoCheque = ((ItemComboVO) cmbTipoDocCheque.getSelectedItem()).id;
                     getWayDAO.v_usar_arquivoBalanca = chkTemArquivoBalanca.isSelected();
                     getWayDAO.usarMargemBruta = chkUsarMargemBruta.isSelected();
+                    
+                     if (!"".equals(txtLojaMesmoID.getText()) && !txtLojaMesmoID.getText().isEmpty()) {
+                        lojaMesmoId = " - " + txtLojaMesmoID.getText();
+                    } else {
+                        lojaMesmoId = "";
+                    }
+                     
+                    getWayDAO.v_lojaMesmoId = lojaMesmoId;
 
                     Importador importador = new Importador(getWayDAO);
                     importador.setLojaOrigem(idLojaCliente);
@@ -530,7 +527,7 @@ public class GetWayGUI extends VRInternalFrame {
         jLabel2 = new javax.swing.JLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
         lblLoja = new vrframework.bean.label.VRLabel();
-        txtLoja = new vrframework.bean.textField.VRTextField();
+        txtLojaMesmoID = new vrframework.bean.textField.VRTextField();
 
         vRTextArea1.setColumns(20);
         vRTextArea1.setRows(5);
@@ -1211,8 +1208,8 @@ public class GetWayGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtLoja, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(txtLojaMesmoID, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(5, 5, 5)
                         .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(vRPanel6Layout.createSequentialGroup()
                                 .addComponent(jLabel2)
@@ -1240,7 +1237,7 @@ public class GetWayGUI extends VRInternalFrame {
                     .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnConectar)
                     .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtLojaMesmoID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -1480,7 +1477,7 @@ public class GetWayGUI extends VRInternalFrame {
     private org.jdesktop.swingx.JXDatePicker txtDataFimOferta;
     private vrframework.bean.textField.VRTextField txtDatabase;
     private vrframework.bean.textField.VRTextField txtHost;
-    private vrframework.bean.textField.VRTextField txtLoja;
+    private vrframework.bean.textField.VRTextField txtLojaMesmoID;
     private vrframework.bean.textField.VRTextField txtPorta;
     private vrframework.bean.passwordField.VRPasswordField txtSenha;
     private vrframework.bean.textField.VRTextField txtUsuario;
