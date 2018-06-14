@@ -251,7 +251,6 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoqueMaximo(rs.getDouble("estoquemax"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
-                    imp.setValidade(rs.getInt("validade"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setSituacaoCadastro("A".equals(rs.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
 
@@ -265,7 +264,7 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     if (produtoBalanca != null) {
                         imp.seteBalanca(true);
-                        imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rs.getInt("validade"));
+                        imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 1);
                     } else {
                         imp.setValidade(0);
                         imp.seteBalanca(false);

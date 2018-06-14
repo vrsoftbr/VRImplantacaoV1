@@ -28,11 +28,12 @@ public class ConexaoSqlServer {
     private String senha = "";
     private String strCon;
     private boolean usandoString = false;
+    public String instance = "";
 
     public void abrirConexao(String i_ip, int i_porta, String i_database, String i_usuario, String i_senha) throws Exception {
         abrirConexao(i_ip, "", i_porta, i_database, i_usuario, i_senha);
     }
-    
+
     public void abrirConexao(String conString, String i_usuario, String i_senha) throws Exception {
         Class.forName("net.sourceforge.jtds.jdbc.Driver");
 
@@ -59,7 +60,11 @@ public class ConexaoSqlServer {
         senha = i_senha;
 
         try {
-            con = DriverManager.getConnection("jdbc:jtds:sqlserver://" + i_ip + ":" + i_porta + "/" + i_database, i_usuario, i_senha);
+            if (!instance.trim().isEmpty()) {
+                con = DriverManager.getConnection("jdbc:jtds:sqlserver://" + i_ip + ":" + i_porta + "/" + i_database + ";instance=" + instance, i_usuario, i_senha);
+            } else {
+                con = DriverManager.getConnection("jdbc:jtds:sqlserver://" + i_ip + ":" + i_porta + "/" + i_database, i_usuario, i_senha);
+            }
 
         } catch (Exception ex) {
             if (!ipSec.isEmpty()) {
