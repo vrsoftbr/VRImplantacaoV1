@@ -9,7 +9,6 @@ import java.util.List;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.multimap.MultiMap;
-import vrimplantacao2.vo.cadastro.pdv.operador.OperadorAnteriorVO;
 import vrimplantacao2.vo.cadastro.pdv.operador.OperadorVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.OperadorIMP;
@@ -42,16 +41,16 @@ public class OperadorRepository {
                 //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
                 setNotificacao("Preparando para gravar operadores...", operadores.size());
                 OperadorIDStack ids = provider.getOperadorIDStack(iniciarEm);
-                MultiMap<String, OperadorAnteriorVO> anteriores = provider.getAnteriores();
+                MultiMap<String, OperadorVO> anteriores = provider.getOperadores();
                 //</editor-fold>
 
                 setNotificacao("Gravando operador...", operadores.size());
 
                 for (OperadorIMP imp : operadores) {
-                    OperadorAnteriorVO anterior = anteriores.get(
-                            provider.getSistema(),
-                            provider.getLojaOrigem(),
-                            imp.getMatricula()
+                    OperadorVO anterior = anteriores.get(
+                            String.valueOf(provider.getLojaVR()),
+                            imp.getMatricula(),
+                            imp.getNome()
                     );
 
                     OperadorVO operador = null;
@@ -63,19 +62,10 @@ public class OperadorRepository {
                         // Converte os dados
                         operador = converterOperador(imp);
                         operador.setId(id);
-                        anterior = converterOperadorAnterior(imp);
-                        anterior.setMatriculaatual(operador);
 
                         // Grava os dados
                         gravarOperador(operador);
                         //gravarOperadorAnterior(anterior);
-
-                        anteriores.put(
-                                anterior,
-                                provider.getSistema(),
-                                provider.getLojaOrigem(),
-                                imp.getMatricula()
-                        );
                     }
                     notificar();
                 }
@@ -101,24 +91,8 @@ public class OperadorRepository {
         return vo;
     }
 
-    public OperadorAnteriorVO converterOperadorAnterior(OperadorIMP imp) throws Exception {
-        OperadorAnteriorVO vo = new OperadorAnteriorVO();
-        vo.setSistema(provider.getSistema());
-        vo.setLoja(provider.getLojaOrigem());
-        vo.setMatricula(imp.getMatricula());
-        vo.setNome(imp.getNome());
-        vo.setSenha(imp.getSenha());
-        vo.setId_tiponiveloperador(imp.getId_tiponiveloperador());
-        vo.setId_situacaocadastro(imp.getId_situacadastro());
-        return vo;
-    }
-
     public void gravarOperador(OperadorVO operador) throws Exception {
         provider.salvar(operador);
-    }
-
-    public void gravarOperadorAnterior(OperadorAnteriorVO anterior) throws Exception {
-        provider.salvar(anterior);
     }
 
     public void setNotificacao(String mensagem, int qtd) throws Exception {

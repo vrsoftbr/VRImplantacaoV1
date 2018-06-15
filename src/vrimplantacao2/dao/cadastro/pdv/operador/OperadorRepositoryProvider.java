@@ -7,7 +7,6 @@ package vrimplantacao2.dao.cadastro.pdv.operador;
 
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.multimap.MultiMap;
-import vrimplantacao2.vo.cadastro.pdv.operador.OperadorAnteriorVO;
 import vrimplantacao2.vo.cadastro.pdv.operador.OperadorVO;
 
 /**
@@ -16,34 +15,12 @@ import vrimplantacao2.vo.cadastro.pdv.operador.OperadorVO;
  */
 public class OperadorRepositoryProvider {
 
-    private String sistema;
-    private String lojaOrigem;
     private int lojaVR;
     private OperadorDAO operadorDAO;
-    private OperadorAnteriorDAO anterioresDAO;
 
-    public OperadorRepositoryProvider(String sistema, String lojaOrigem, int lojaVR) throws Exception {
-        this.sistema = sistema;
-        this.lojaOrigem = lojaOrigem;
+    public OperadorRepositoryProvider(int lojaVR) throws Exception {
         this.lojaVR = lojaVR;
         this.operadorDAO = new OperadorDAO();
-        this.anterioresDAO = new OperadorAnteriorDAO();
-    }
-
-    public String getSistema() {
-        return sistema;
-    }
-
-    public void setSistema(String sistema) {
-        this.sistema = sistema;
-    }
-
-    public String getLojaOrigem() {
-        return lojaOrigem;
-    }
-
-    public void setLojaOrigem(String lojaOrigem) {
-        this.lojaOrigem = lojaOrigem;
     }
 
     public int getLojaVR() {
@@ -72,12 +49,8 @@ public class OperadorRepositoryProvider {
         return new OperadorIDStack(iniciarEm);
     }
     
-    public MultiMap<String, OperadorAnteriorVO> getAnteriores() throws Exception {
-        return anterioresDAO.getAnterior(this.sistema, this.lojaOrigem);
-    }
-    
-    public void salvar(OperadorAnteriorVO anterior) throws Exception {
-        anterioresDAO.salvar(anterior);
+    public MultiMap<String, OperadorVO> getOperadores() throws Exception {
+        return operadorDAO.getOperadores(this.lojaVR);
     }
     
     public void salvar(OperadorVO operador) throws Exception {

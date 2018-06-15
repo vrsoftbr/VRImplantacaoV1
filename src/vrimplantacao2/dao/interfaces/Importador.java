@@ -869,8 +869,6 @@ public class Importador {
         ProgressBar.setStatus("Carregando operadores...");
         List<OperadorIMP> operadores = getInterfaceDAO().getOperadores();
         OperadorRepositoryProvider provider = new OperadorRepositoryProvider(
-                getSistema(),
-                getLojaOrigem(),
                 getLojaVR()
         );
         OperadorRepository rep = new OperadorRepository(provider);

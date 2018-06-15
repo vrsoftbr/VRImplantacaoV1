@@ -157,6 +157,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("codigobarras"));
+                    imp.setSituacaoCadastro(rst.getInt("id_situacaocadastro"));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
