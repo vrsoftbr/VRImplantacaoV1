@@ -250,7 +250,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    public List<AcumuladorLayoutRetornoIMP> getAcumuladorLayoutReorno() throws Exception {
+    public List<AcumuladorLayoutRetornoIMP> getAcumuladorLayoutRetorno() throws Exception {
         List<AcumuladorLayoutRetornoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
