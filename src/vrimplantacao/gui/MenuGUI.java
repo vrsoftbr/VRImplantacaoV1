@@ -149,6 +149,7 @@ import vrimplantacao2.gui.interfaces.CPlusGUI;
 import vrimplantacao2.gui.interfaces.CissGUI;
 import vrimplantacao2.gui.interfaces.FaciliteGUI;
 import vrimplantacao2.gui.interfaces.FenixGUI;
+import vrimplantacao2.gui.interfaces.FortGUI;
 import vrimplantacao2.gui.interfaces.FortiGUI;
 import vrimplantacao2.gui.interfaces.HipcomGUI;
 import vrimplantacao2.gui.interfaces.ICommerceGUI;
@@ -534,6 +535,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuFenix = new javax.swing.JMenuItem();
         mnuFacilite = new javax.swing.JMenuItem();
         mnuSysmo = new javax.swing.JMenuItem();
+        mnuFort = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1086,6 +1088,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu5.add(mnuSysmo);
 
+        mnuFort.setText("Fort (Firebird)");
+        mnuFort.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuFortActionPerformed(evt);
+            }
+        });
+        jMenu5.add(mnuFort);
+
         jMenu2.add(jMenu5);
 
         jMenu6.setText("SQL Server");
@@ -1329,7 +1339,6 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu6.add(mnuIcommerce);
-        mnuIcommerce.getAccessibleContext().setAccessibleName("ICommerce");
 
         jMenu2.add(jMenu6);
 
@@ -3766,6 +3775,10 @@ public final class MenuGUI extends VRMdiFrame {
         ICommerceGUI.exibir(this);
     }//GEN-LAST:event_mnuIcommerceActionPerformed
 
+    private void mnuFortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuFortActionPerformed
+        FortGUI.exibir(this);
+    }//GEN-LAST:event_mnuFortActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -3898,6 +3911,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuFenix;
     private javax.swing.JMenu mnuFerramentas;
     private javax.swing.JMenuItem mnuFlatan;
+    private javax.swing.JMenuItem mnuFort;
     private javax.swing.JMenuItem mnuForti;
     private javax.swing.JMenuItem mnuHipcom;
     private javax.swing.JMenuItem mnuHipicom;
