@@ -141,29 +141,27 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "	forn.pro as idproduto,\n"
-                    + "	forn.ccf as idfornecedor,\n"
-                    + "	forn.qnt as qtdembalagem,\n"
-                    + "	forn.dtr as dataalteracao,\n"
-                    + "	ref.ref as referencia\n"
-                    + "from \n"
-                    + "	gcefor01 forn \n"
-                    + "left join\n"
-                    + "	(select\n"
-                    + "		ref,\n"
-                    + "		cfr,\n"
-                    + "		pro,\n"
-                    + "		uni\n"
-                    + "	from \n"
-                    + "		gceref01 ref\n"
-                    + "	where\n"
-                    + "		dtm in (select max(dtm) from gceref01)) ref on forn.ccf = ref.cfr and\n"
-                    + "		ref.pro = forn.pro\n"
-                    + "where \n"
-                    + "	emp = " + getLojaOrigem() + "\n"
-                    + "order by\n"
-                    + "	forn.pro, forn.ccf")) {
+                    "select\n" +
+                    "	pro,\n" +
+                    "	ccf,\n" +
+                    "	qnt,\n" +
+                    "	uni,\n" +
+                    "	(select \n" +
+                    "		ref \n" +
+                    "	from \n" +
+                    "		gceref01 ref \n" +
+                    "	where \n" +
+                    "		ref.cfr = forn.ccf and \n" +
+                    "		ref.pro = forn.pro\n" +
+                    "		limit 1) as refe,\n" +
+                    "	dtr\n" +
+                    "from\n" +
+                    "	gcefor01 forn \n" +
+                    "where \n" +
+                    "   emp = " + getLojaOrigem() + " \n" + 
+                    "order by \n" +
+                    "	pro, \n" +
+                    "	ccf")) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
