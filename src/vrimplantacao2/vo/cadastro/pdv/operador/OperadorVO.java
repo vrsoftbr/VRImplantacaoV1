@@ -21,6 +21,7 @@ public class OperadorVO {
     private int senha = 0;
     private int codigo = 0;
     private int id_tiponiveloperador = 5;
+    private int id_situacaocadastro = 1;
     private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
 
     public int getId() {
