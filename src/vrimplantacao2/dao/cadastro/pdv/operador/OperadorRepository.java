@@ -49,8 +49,7 @@ public class OperadorRepository {
                 for (OperadorIMP imp : operadores) {
                     OperadorVO anterior = anteriores.get(
                             String.valueOf(provider.getLojaVR()),
-                            imp.getMatricula(),
-                            imp.getNome()
+                            imp.getMatricula()
                     );
 
                     OperadorVO operador = null;
@@ -65,7 +64,8 @@ public class OperadorRepository {
 
                         // Grava os dados
                         gravarOperador(operador);
-                        //gravarOperadorAnterior(anterior);
+                        
+                        anteriores.put(operador, String.valueOf(provider.getLojaVR()), imp.getMatricula(), imp.getNome());
                     }
                     notificar();
                 }
@@ -82,6 +82,7 @@ public class OperadorRepository {
     public OperadorVO converterOperador(OperadorIMP imp) throws Exception {
         OperadorVO vo = new OperadorVO();
 
+        vo.setId_loja(provider.getLojaVR());
         vo.setMatricula(Utils.stringToInt(imp.getMatricula()));
         vo.setNome(imp.getNome());
         vo.setSenha(Utils.stringToInt(imp.getSenha()));
