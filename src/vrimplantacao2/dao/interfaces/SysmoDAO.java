@@ -9,6 +9,7 @@ import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -141,27 +142,27 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	pro,\n" +
-                    "	ccf,\n" +
-                    "	qnt,\n" +
-                    "	uni,\n" +
-                    "	(select \n" +
-                    "		ref \n" +
-                    "	from \n" +
-                    "		gceref01 ref \n" +
-                    "	where \n" +
-                    "		ref.cfr = forn.ccf and \n" +
-                    "		ref.pro = forn.pro\n" +
-                    "		limit 1) as refe,\n" +
-                    "	dtr\n" +
-                    "from\n" +
-                    "	gcefor01 forn \n" +
-                    "where \n" +
-                    "   emp = " + getLojaOrigem() + " \n" + 
-                    "order by \n" +
-                    "	pro, \n" +
-                    "	ccf")) {
+                    "select\n"
+                    + "	pro idproduto,\n"
+                    + "	ccf idfornecedor,\n"
+                    + "	qnt qtdembalagem,\n"
+                    + "	uni,\n"
+                    + "	(select \n"
+                    + "		ref \n"
+                    + "	from \n"
+                    + "		gceref01 ref \n"
+                    + "	where \n"
+                    + "		ref.cfr = forn.ccf and \n"
+                    + "		ref.pro = forn.pro\n"
+                    + "		limit 1) as referencia,\n"
+                    + "	dtr dataalteracao\n"
+                    + "from\n"
+                    + "	gcefor01 forn \n"
+                    + "where \n"
+                    + "   emp = " + getLojaOrigem() + " \n"
+                    + "order by \n"
+                    + "	pro, \n"
+                    + "	ccf")) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -197,7 +198,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "      coalesce(prod.seg, 1) as mercadologico4,\n"
                     + "      coalesce(prod.ssg, 1) as mercadologico5,\n"
                     + "      prod.dtc as datacadastro,\n"
-                    + "      ean.bar as ean,\n"
+                    + "      ean.bar::bigint as ean,\n"
                     + "      prod.emb as qtdembalagem,\n"
                     + "      prod.uni as tipoembalagem,\n"
                     + "      prod.tip as balanca,\n"
@@ -217,7 +218,8 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "      custo.icm as icmscredito,\n"
                     + "      fis.ctr as cstdebito,\n"
                     + "      fis.icf as icmsdebito,\n"
-                    + "      fis.icr as icmsreducao\n"
+                    + "      fis.icr as icmsreducao,\n"
+                    + "      prod.fpc::integer as piscofins\n"
                     + "from\n"
                     + "      gcepro02 as prod\n"
                     + "left join gcebar01 as ean on ean.pro = prod.cod\n"
@@ -264,24 +266,29 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem") == 0 ? 1 : rs.getInt("qtdembalagem"));
                     imp.setEan(rs.getString("ean"));
                     imp.setValidade(rs.getInt("validade"));
-                    if ((rs.getString("ean") == null) && ("B".equals(rs.getString("balanca").trim()))) {
-                        imp.setEan(rs.getString("id").trim());
-                        imp.seteBalanca(true);
-                    }
-                    if (v_usar_arquivoBalanca) {
-                        ProdutoBalancaVO produtoBalanca;
-                        long codigoProduto;
-                        codigoProduto = Long.parseLong(imp.getImportId().trim());
-                        if (codigoProduto <= Integer.MAX_VALUE) {
-                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                        } else {
-                            produtoBalanca = null;
+                    if (("".equals(rs.getString("ean"))) && 
+                        ("B".equals(rs.getString("balanca").trim())) && 
+                        (rs.getString("ean").isEmpty())) {
+                        if (v_usar_arquivoBalanca) {
+                            ProdutoBalancaVO produtoBalanca;
+                            long codigoProduto;
+                            codigoProduto = Long.parseLong(imp.getImportId().trim());
+                            if (codigoProduto <= Integer.MAX_VALUE) {
+                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                            } else {
+                                produtoBalanca = null;
+                            }
+                            if (produtoBalanca != null) {
+                                imp.seteBalanca(true);
+                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rs.getInt("validade"));
+                            } else {
+                                imp.setValidade(0);
+                                imp.seteBalanca(false);
+                            }
                         }
-                        if (produtoBalanca != null) {
-                            imp.setValidade(produtoBalanca.getValidade());
-                        } else {
-                            imp.setValidade(0);
-                        }
+                    } else {
+                        imp.seteBalanca(rs.getString("tipoembalagem").contains("KG") ? true : false);
+                        imp.setValidade(rs.getInt("validade"));
                     }
                     imp.setSituacaoCadastro("A".equals(rs.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setPesoBruto(rs.getInt("pesobruto"));
@@ -301,6 +308,13 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsAliqSaida(rs.getDouble("icmsdebito"));
                     imp.setIcmsReducao(rs.getDouble("icmsreducao"));
 
+                    if (rs.getInt("piscofins") == 1) {
+                        imp.setPiscofinsCstCredito(50);
+                        imp.setPiscofinsCstDebito(1);
+                    } else {
+                        imp.setPiscofinsCstCredito(71);
+                        imp.setPiscofinsCstDebito(7);
+                    }
                     result.add(imp);
                 }
             }

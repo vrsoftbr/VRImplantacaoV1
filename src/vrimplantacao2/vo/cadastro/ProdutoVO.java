@@ -127,7 +127,7 @@ public class ProdutoVO {
         this.datacadastro = datacadastro;
     }
     
-    public void setDataalteracao (Date dataalteracao) {
+    public void setDataAlteracao (Date dataalteracao) {
         this.dataalteracao = dataalteracao;
     }
 
@@ -215,7 +215,7 @@ public class ProdutoVO {
         return datacadastro;
     }
     
-    public Date getDataalteracao() {
+    public Date getDataAlteracao() {
         return dataalteracao;
     }
 
