@@ -87,7 +87,7 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	for_endereco endereco,\n"
                     + "	for_bairro bairro,\n"
                     + "	for_cidade cidade,\n"
-                    + "	for_numero,\n"
+                    + "	for_numero as numero,\n"
                     + "	for_uf uf,\n"
                     + "	for_cep cep,\n"
                     + "	for_fone telefone,\n"
@@ -119,21 +119,22 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
                     imp.setTel_principal(rs.getString("telefone"));
-                    if (!rs.getString("fax").isEmpty() && rs.getString("fax") != null) {
+
+                    if ((rs.getString("fax") != null) && (!rs.getString("fax").trim().isEmpty())) {
                         imp.addContato("FAX",
                                 rs.getString("fax"),
                                 null,
                                 TipoContato.COMERCIAL,
                                 null);
                     }
-                    if (!rs.getString("celular").isEmpty() && rs.getString("celular") != null) {
+                    if ((rs.getString("celular") != null) && (!rs.getString("celular").trim().isEmpty())) {
                         imp.addContato("Celular",
                                 null,
                                 rs.getString("celular"),
                                 TipoContato.COMERCIAL,
                                 null);
                     }
-                    if (!rs.getString("email").isEmpty() && rs.getString("email") != null) {
+                    if ((rs.getString("email") != null) && (!rs.getString("email").isEmpty())) {
                         String email = rs.getString("email").toLowerCase();
                         imp.addContato("Email",
                                 null,
@@ -269,7 +270,7 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setValidade(0);
                         imp.seteBalanca(false);
                     }
-                    
+
                     imp.setIcmsDebitoId(rs.getString("cstdebito"));
                     imp.setIcmsCreditoId(rs.getString("cstdebito"));
                     imp.setPiscofinsCstCredito(rs.getString("piscredito"));
@@ -326,78 +327,81 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	clientes \n"
                     + "order by\n"
                     + "	cli_codigo")) {
-                ClienteIMP imp = new ClienteIMP();
-                imp.setId(rs.getString("id"));
-                imp.setCnpj(rs.getString("cpfcnpj"));
-                if ((rs.getString("rg") != null)
-                        && (!rs.getString("rg").trim().isEmpty()) && (rs.getString("rg").length() == 9)) {
-                    imp.setInscricaoestadual(rs.getString("rg"));
-                } else if ((!rs.getString("rg").isEmpty()) && (rs.getString("rg").length() < 9)) {
-                    imp.setInscricaoestadual(rs.getString("rg"));
-                } else {
-                    imp.setInscricaoMunicipal("ISENTO");
-                }
-                boolean ativo = "A".equals(rs.getString("ativo")) ? true : false;
-                imp.setAtivo(ativo);
-                imp.setRazao(rs.getString("nome"));
-                imp.setRazao(rs.getString("fantasia"));
-                if (rs.getString("sexo") != null) {
-                    imp.setSexo("1".equals(rs.getString("sexo")) ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
-                }
-                imp.setDataNascimento(rs.getDate("datanascimento"));
-                imp.setEndereco(rs.getString("endereco"));
-                imp.setBairro(rs.getString("bairro"));
-                imp.setNumero(rs.getString("numero"));
-                imp.setMunicipio(rs.getString("cidade"));
-                imp.setUf(rs.getString("uf"));
-                imp.setCep(rs.getString("cep"));
-                if (!rs.getString("celular").isEmpty() && rs.getString("celular") != null) {
-                    imp.addContato("1",
-                            "Celular",
-                            null,
-                            rs.getString("celular"),
-                            null);
-                }
-                if (!rs.getString("email").isEmpty() && rs.getString("email") != null) {
-                    String email = rs.getString("email").toLowerCase();
-                    imp.addContato("2",
-                            "Email",
-                            null,
-                            null,
-                            email);
-                }
-                imp.setNomePai(rs.getString("nomepai"));
-                imp.setNomeMae(rs.getString("nomemae"));
-                if ((rs.getString("estadocivil") != null)
-                        && (!rs.getString("estadocivil").trim().isEmpty())) {
-                    if (null != rs.getString("estadocivil")) {
-                        switch (rs.getString("estadocivil")) {
-                            case "1":
-                                imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
-                                break;
-                            case "2":
-                                imp.setEstadoCivil(TipoEstadoCivil.CASADO);
-                                break;
-                            case "3":
-                                imp.setEstadoCivil(TipoEstadoCivil.VIUVO);
-                                break;
-                            case "4":
-                                imp.setEstadoCivil(TipoEstadoCivil.AMAZIADO);
-                                break;
-                            case "5":
-                                imp.setEstadoCivil(TipoEstadoCivil.OUTROS);
-                                break;
-                            default:
-                                imp.setEstadoCivil(TipoEstadoCivil.OUTROS);
-                                break;
-                        }
+                while (rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setCnpj(rs.getString("cpfcnpj"));
+                    if ((rs.getString("rg") != null)
+                            && (!rs.getString("rg").trim().isEmpty()) && (rs.getString("rg").length() == 9)) {
+                        imp.setInscricaoestadual(rs.getString("rg"));
+                    } else if ((rs.getString("rg") != null) && (!rs.getString("rg").isEmpty()) && (rs.getString("rg").length() < 9)) {
+                        imp.setInscricaoestadual(rs.getString("rg"));
+                    } else {
+                        imp.setInscricaoMunicipal("ISENTO");
                     }
-                } else {
-                    imp.setEstadoCivil(TipoEstadoCivil.OUTROS);
+                    boolean ativo = "A".equals(rs.getString("ativo")) ? true : false;
+                    imp.setAtivo(ativo);
+                    imp.setRazao(rs.getString("nome"));
+                    imp.setRazao(rs.getString("fantasia"));
+                    if (rs.getString("sexo") != null) {
+                        imp.setSexo("1".equals(rs.getString("sexo")) ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
+                    }
+                    imp.setDataNascimento(rs.getDate("dtnascimento"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setCep(rs.getString("cep"));
+                    if ((rs.getString("celular") != null) && (!rs.getString("celular").isEmpty())) {
+                        imp.addContato("1",
+                                "Celular",
+                                null,
+                                rs.getString("celular"),
+                                null);
+                    }
+                    if ((rs.getString("email") != null) && (!rs.getString("email").isEmpty())) {
+                        String email = rs.getString("email").toLowerCase();
+                        imp.addContato("2",
+                                "Email",
+                                null,
+                                null,
+                                email);
+                    }
+                    imp.setNomePai(rs.getString("nomepai"));
+                    imp.setNomeMae(rs.getString("nomemae"));
+                    if ((rs.getString("estadocivil") != null)
+                            && (!rs.getString("estadocivil").trim().isEmpty())) {
+                        if (null != rs.getString("estadocivil")) {
+                            switch (rs.getString("estadocivil")) {
+                                case "1":
+                                    imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
+                                    break;
+                                case "2":
+                                    imp.setEstadoCivil(TipoEstadoCivil.CASADO);
+                                    break;
+                                case "3":
+                                    imp.setEstadoCivil(TipoEstadoCivil.VIUVO);
+                                    break;
+                                case "4":
+                                    imp.setEstadoCivil(TipoEstadoCivil.AMAZIADO);
+                                    break;
+                                case "5":
+                                    imp.setEstadoCivil(TipoEstadoCivil.OUTROS);
+                                    break;
+                                default:
+                                    imp.setEstadoCivil(TipoEstadoCivil.OUTROS);
+                                    break;
+                            }
+                        }
+                    } else {
+                        imp.setEstadoCivil(TipoEstadoCivil.OUTROS);
+                    }
+                    imp.setLimiteCompra(rs.getDouble("limite"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+                    result.add(imp);
                 }
-                imp.setLimiteCompra(rs.getDouble("limite"));
-                imp.setObservacao(rs.getString("observacao"));
-                imp.setDataCadastro(rs.getDate("datacadastro"));
             }
         }
 
