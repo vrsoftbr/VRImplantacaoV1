@@ -34,7 +34,7 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="tab" alignment="1" pref="441" max="32767" attributes="0"/>
+                  <Component id="tab" alignment="1" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Component id="vRToolBarPadrao3" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -191,6 +191,7 @@
                                   <Component id="chkMercadologico" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkT1NatReceita" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkT1DescGondola" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkTemBalanca" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -263,7 +264,10 @@
                                           <Component id="chkT1DescGondola" alignment="3" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                      <Component id="chkT1DescReduzida" min="-2" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="3" attributes="0">
+                                          <Component id="chkT1DescReduzida" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkTemBalanca" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      </Group>
                                   </Group>
                               </Group>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
@@ -427,6 +431,11 @@
                 </Component>
               </SubComponents>
             </Container>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTemBalanca">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Tem Balanca"/>
+              </Properties>
+            </Component>
           </SubComponents>
         </Container>
         <Container class="vrframework.bean.panel.VRPanel" name="tabFornecedor">

@@ -188,7 +188,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "      distinct\n"
-                    + "      prod.cod as id,\n"
+                    + "      prod.cod::integer as id,\n"
                     + "      prod.dsc as descricaocompleta,\n"
                     + "      prod.dsr as descricaoresumida,\n"
                     + "      prod.dsr as descricaogondola,\n"
@@ -247,7 +247,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "     emp.cod = preco.emp and\n"
                     + "     emp.cod = " + getLojaOrigem() + "\n"
                     + "order by\n"
-                    + "      prod.cod")) {
+                    + "      prod.cod::integer")) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -266,9 +266,8 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem") == 0 ? 1 : rs.getInt("qtdembalagem"));
                     imp.setEan(rs.getString("ean"));
                     imp.setValidade(rs.getInt("validade"));
-                    if (("".equals(rs.getString("ean"))) && 
-                        ("B".equals(rs.getString("balanca").trim())) && 
-                        (rs.getString("ean").isEmpty())) {
+                   
+                        if(("B".equals(rs.getString("balanca").trim()))) {
                         if (v_usar_arquivoBalanca) {
                             ProdutoBalancaVO produtoBalanca;
                             long codigoProduto;
