@@ -34,7 +34,7 @@ public class AcumuladorRepository {
             for (AcumuladorIMP imp : acumuladores) {
                 
                 AcumuladorVO acumulador = null;
-                acumulador = converterAcumuador(imp);
+                acumulador = converterAcumulador(imp);
                 gravarAcumulador(acumulador);
                 
                 notificar();
@@ -55,7 +55,7 @@ public class AcumuladorRepository {
         ProgressBar.next();
     }
     
-    public AcumuladorVO converterAcumuador(AcumuladorIMP imp) throws Exception {
+    public AcumuladorVO converterAcumulador(AcumuladorIMP imp) throws Exception {
         AcumuladorVO vo = new AcumuladorVO();
         vo.setId(Utils.stringToInt(imp.getId()));
         vo.setDescricao(imp.getDescricao());

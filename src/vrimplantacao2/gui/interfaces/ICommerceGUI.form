@@ -484,11 +484,8 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="398" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -497,9 +494,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace pref="135" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -514,17 +509,6 @@
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkClientePreferencialActionPerformed"/>
-                  </Events>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkClienteEventual">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Cliente Eventual"/>
-                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                      <Connection code="true" type="code"/>
-                    </Property>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkClienteEventualActionPerformed"/>
                   </Events>
                 </Component>
               </SubComponents>

@@ -9,6 +9,7 @@ import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -142,28 +143,26 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "	forn.pro as idproduto,\n"
-                    + "	forn.ccf as idfornecedor,\n"
-                    + "	forn.qnt as qtdembalagem,\n"
-                    + "	forn.dtr as dataalteracao,\n"
-                    + "	ref.ref as referencia\n"
-                    + "from \n"
-                    + "	gcefor01 forn \n"
-                    + "left join\n"
-                    + "	(select\n"
-                    + "		ref,\n"
-                    + "		cfr,\n"
-                    + "		pro,\n"
-                    + "		uni\n"
+                    + "	pro idproduto,\n"
+                    + "	ccf idfornecedor,\n"
+                    + "	qnt qtdembalagem,\n"
+                    + "	uni,\n"
+                    + "	(select \n"
+                    + "		ref \n"
                     + "	from \n"
-                    + "		gceref01 ref\n"
-                    + "	where\n"
-                    + "		dtm in (select max(dtm) from gceref01)) ref on forn.ccf = ref.cfr and\n"
+                    + "		gceref01 ref \n"
+                    + "	where \n"
+                    + "		ref.cfr = forn.ccf and \n"
                     + "		ref.pro = forn.pro\n"
+                    + "		limit 1) as referencia,\n"
+                    + "	dtr dataalteracao\n"
+                    + "from\n"
+                    + "	gcefor01 forn \n"
                     + "where \n"
-                    + "	emp = " + getLojaOrigem() + "\n"
-                    + "order by\n"
-                    + "	forn.pro, forn.ccf")) {
+                    + "   emp = " + getLojaOrigem() + " \n"
+                    + "order by \n"
+                    + "	pro, \n"
+                    + "	ccf")) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -189,7 +188,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "      distinct\n"
-                    + "      prod.cod as id,\n"
+                    + "      prod.cod::integer as id,\n"
                     + "      prod.dsc as descricaocompleta,\n"
                     + "      prod.dsr as descricaoresumida,\n"
                     + "      prod.dsr as descricaogondola,\n"
@@ -199,7 +198,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "      coalesce(prod.seg, 1) as mercadologico4,\n"
                     + "      coalesce(prod.ssg, 1) as mercadologico5,\n"
                     + "      prod.dtc as datacadastro,\n"
-                    + "      ean.bar as ean,\n"
+                    + "      ean.bar::bigint as ean,\n"
                     + "      prod.emb as qtdembalagem,\n"
                     + "      prod.uni as tipoembalagem,\n"
                     + "      prod.tip as balanca,\n"
@@ -219,7 +218,8 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "      custo.icm as icmscredito,\n"
                     + "      fis.ctr as cstdebito,\n"
                     + "      fis.icf as icmsdebito,\n"
-                    + "      fis.icr as icmsreducao\n"
+                    + "      fis.icr as icmsreducao,\n"
+                    + "      prod.fpc::integer as piscofins\n"
                     + "from\n"
                     + "      gcepro02 as prod\n"
                     + "left join gcebar01 as ean on ean.pro = prod.cod\n"
@@ -247,7 +247,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "     emp.cod = preco.emp and\n"
                     + "     emp.cod = " + getLojaOrigem() + "\n"
                     + "order by\n"
-                    + "      prod.cod")) {
+                    + "      prod.cod::integer")) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -266,24 +266,28 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem") == 0 ? 1 : rs.getInt("qtdembalagem"));
                     imp.setEan(rs.getString("ean"));
                     imp.setValidade(rs.getInt("validade"));
-                    if ((rs.getString("ean") == null) && ("B".equals(rs.getString("balanca").trim()))) {
-                        imp.setEan(rs.getString("id").trim());
-                        imp.seteBalanca(true);
-                    }
-                    if (v_usar_arquivoBalanca) {
-                        ProdutoBalancaVO produtoBalanca;
-                        long codigoProduto;
-                        codigoProduto = Long.parseLong(imp.getImportId().trim());
-                        if (codigoProduto <= Integer.MAX_VALUE) {
-                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                        } else {
-                            produtoBalanca = null;
+                   
+                        if(("B".equals(rs.getString("balanca").trim()))) {
+                        if (v_usar_arquivoBalanca) {
+                            ProdutoBalancaVO produtoBalanca;
+                            long codigoProduto;
+                            codigoProduto = Long.parseLong(imp.getImportId().trim());
+                            if (codigoProduto <= Integer.MAX_VALUE) {
+                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                            } else {
+                                produtoBalanca = null;
+                            }
+                            if (produtoBalanca != null) {
+                                imp.seteBalanca(true);
+                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rs.getInt("validade"));
+                            } else {
+                                imp.setValidade(0);
+                                imp.seteBalanca(false);
+                            }
                         }
-                        if (produtoBalanca != null) {
-                            imp.setValidade(produtoBalanca.getValidade());
-                        } else {
-                            imp.setValidade(0);
-                        }
+                    } else {
+                        imp.seteBalanca(rs.getString("tipoembalagem").contains("KG") ? true : false);
+                        imp.setValidade(rs.getInt("validade"));
                     }
                     imp.setSituacaoCadastro("A".equals(rs.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setPesoBruto(rs.getInt("pesobruto"));
@@ -303,6 +307,13 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsAliqSaida(rs.getDouble("icmsdebito"));
                     imp.setIcmsReducao(rs.getDouble("icmsreducao"));
 
+                    if (rs.getInt("piscofins") == 1) {
+                        imp.setPiscofinsCstCredito(50);
+                        imp.setPiscofinsCstDebito(1);
+                    } else {
+                        imp.setPiscofinsCstCredito(71);
+                        imp.setPiscofinsCstDebito(7);
+                    }
                     result.add(imp);
                 }
             }

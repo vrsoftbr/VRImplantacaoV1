@@ -649,9 +649,9 @@ public class ProdutoRepository {
         if (vo.getDatacadastro() == null) {
             vo.setDatacadastro(new Date());
         }
-        vo.setDataalteracao(imp.getDataAlteracao());
-        if(vo.getDataalteracao() == null) {
-            vo.setDataalteracao(new Date());
+        vo.setDataAlteracao(imp.getDataAlteracao());
+        if(vo.getDataAlteracao() == null) {
+            vo.setDataAlteracao(new Date());
         }
         Integer fornecedorFabricante = fabricantes.get(imp.getFornecedorFabricante());
         if (fornecedorFabricante != null) {
