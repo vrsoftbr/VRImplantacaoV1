@@ -221,7 +221,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     AcumuladorIMP imp = new AcumuladorIMP();
-                    imp.setId(rst.getString("id"));
+                    imp.setId(rst.getInt("id"));
                     imp.setDescricao(rst.getString("descricao"));
                     result.add(imp);
                 }
@@ -230,13 +230,14 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    public List<AcumuladorLayoutIMP> getAcumuladorLayout() throws Exception {
+    @Override
+    public List<AcumuladorLayoutIMP> getAcumuladoresLayout() throws Exception {
         List<AcumuladorLayoutIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "distinct\n"
-                    + "id_acumuladorlayout as id, ('IMPORTADO VR ACUMULADOR '||id_acumuladorlayout) as descricao\n"
+                    + "id_acumuladorlayout as id, ('BANCO PDV VR - '||id_acumuladorlayout) as descricao\n"
                     + "from acumuladorlayout"
             )) {
                 while (rst.next()) {
@@ -250,7 +251,8 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    public List<AcumuladorLayoutRetornoIMP> getAcumuladorLayoutRetorno() throws Exception {
+    @Override
+    public List<AcumuladorLayoutRetornoIMP> getAcumuladoresLayoutRetorno() throws Exception {
         List<AcumuladorLayoutRetornoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(

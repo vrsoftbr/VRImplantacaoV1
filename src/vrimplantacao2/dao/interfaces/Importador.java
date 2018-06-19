@@ -74,6 +74,8 @@ import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.importacao.AcumuladorIMP;
+import vrimplantacao2.vo.importacao.AcumuladorLayoutIMP;
+import vrimplantacao2.vo.importacao.AcumuladorLayoutRetornoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
@@ -883,9 +885,12 @@ public class Importador {
     public void importarAcumulador() throws Exception {
         ProgressBar.setStatus("Carregando acumuladores...");
         List<AcumuladorIMP> acumuladores = getInterfaceDAO().getAcumuladores();
+        List<AcumuladorLayoutIMP> acumuladoresLayout = getInterfaceDAO().getAcumuladoresLayout();
+        List<AcumuladorLayoutRetornoIMP> acumuladoresLayoutRetorno = getInterfaceDAO().getAcumuladoresLayoutRetorno();
         AcumuladorRepositoryProvider provider = new AcumuladorRepositoryProvider();
+        provider.setLojaVR(getLojaVR());
         AcumuladorRepository rep = new AcumuladorRepository(provider);
-        rep.importarAcumulador(acumuladores);
+        rep.importarAcumulador(acumuladores, acumuladoresLayout, acumuladoresLayoutRetorno);
     }
 
     /**
