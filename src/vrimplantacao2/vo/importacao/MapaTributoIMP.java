@@ -10,6 +10,13 @@ public class MapaTributoIMP {
     private int cst;
     private double aliquota;
     private double reduzido;
+    
+    public static MapaTributoIMP make(String id, String descricao) {
+        return new MapaTributoIMP(id, descricao);
+    }
+    public static MapaTributoIMP make(String id, String descricao, int cst, double aliquota, double reduzido) {
+        return new MapaTributoIMP(id, descricao, cst, aliquota, reduzido);
+    }
 
     public MapaTributoIMP(String id, String descricao) {
         this.id = id;

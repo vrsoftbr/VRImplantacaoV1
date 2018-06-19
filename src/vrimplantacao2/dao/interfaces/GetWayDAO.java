@@ -25,18 +25,14 @@ import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.BancoDAO;
 import vrimplantacao.dao.cadastro.FornecedorDAO;
-import vrimplantacao.dao.cadastro.NutricionalFilizolaDAO;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao2.dao.cadastro.devolucao.receber.ReceberDevolucaoDAO;
 import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.vrimplantacao.NutricionalFilizolaVO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.verba.receber.ReceberVerbaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.utils.arquivo.LinhaArquivo;
-import vrimplantacao2.utils.arquivo.delimited.ArquivoTXT;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
@@ -725,12 +721,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    coalesce(banco, '') + ' CC ' +\n"
                     + "    coalesce(cc, '') as obs2, \n"
                     + "    BLOQCARTAO, \n"
-                    + "    cast((case \n"
-                    + "	when len(senhacartao) <= 6 then \n"
-                    + "		senhacartao \n"
-                    + "    else \n"
-                    + "		0 \n"
-                    + "    end) as integer) as senhacartao \n"
+                    + "    senhacartao \n"
                     + "    FROM \n"
                     + "    CLIENTES \n"
                     + "    where \n"
@@ -772,7 +763,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSalario(rst.getDouble("RENDA"));
                     imp.setObservacao(rst.getString("OBS"));
                     imp.setObservacao2(rst.getString("OBS2"));
-                    imp.setSenha(rst.getInt("senhacartao"));
+                    imp.setSenha(Utils.stringToInt(rst.getString("senhacartao")));
                     imp.setAtivo("1".equals(rst.getString("ATIVO")));
                     if ((rst.getString("BLOQCARTAO") != null)
                             && (!rst.getString("BLOQCARTAO").trim().isEmpty())) {

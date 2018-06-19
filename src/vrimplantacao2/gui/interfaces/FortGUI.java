@@ -67,7 +67,7 @@ public class FortGUI extends VRInternalFrame implements ConexaoEvent {
 
         this.title = "Importação " + SISTEMA;
         
-        //ConexaoFirebird.encoding = "WIN1252";
+        ConexaoFirebird.encoding = "WIN1252";
 
         conexaoFirebird.host = "localhost";
         conexaoFirebird.database = "C:/Fenix/DB/FENIX.fdb";
