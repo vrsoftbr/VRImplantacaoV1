@@ -10,6 +10,7 @@ import vrframework.classe.Util;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.collection.IDStack;
+import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.ProdutoVO;
@@ -295,6 +296,24 @@ public class ProdutoDAO {
             Util.exibirMensagem(sql.getUpdate(), "Erro");
             throw e;
         }
+    }
+    
+    public MultiMap<Integer, ProdutoVO> getProdutos() throws Exception {
+        MultiMap<Integer, ProdutoVO> result = new MultiMap<>();
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "id "
+                    + "from produto "
+            )) {
+                while (rst.next()) {
+                    ProdutoVO vo = new ProdutoVO();
+                    vo.setId(rst.getInt("id"));
+                    result.put(vo, rst.getInt("id"));
+                }
+            }
+        }
+        return result;
     }
 
 }

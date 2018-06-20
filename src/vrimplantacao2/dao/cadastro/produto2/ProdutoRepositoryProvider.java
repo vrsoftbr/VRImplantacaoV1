@@ -91,7 +91,11 @@ public class ProdutoRepositoryProvider {
     public Set<OpcaoProduto> getOpcoes() {
         return opcoes;
     }
-
+    
+    public MultiMap<Integer, ProdutoVO> getProdutos() throws Exception {
+        return produtoDAO.getProdutos();
+    }
+    
     public void setOpcoes(Set<OpcaoProduto> opcoes) {
         this.opcoes = opcoes;
     }

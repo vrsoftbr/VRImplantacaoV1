@@ -183,6 +183,94 @@ public class ProdutoRepository {
         }
     }
 
+    public void salvarPdvVr(List<ProdutoIMP> produtos) throws Exception {
+        LOG.finest("Abrindo a transação");
+        begin();
+        try {
+            /**
+             * Organizando a listagem de dados antes de efetuar a gravação.
+             */
+            System.gc();
+            MultiMap<String, ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
+            produtos.clear();
+            System.gc();
+
+            MultiMap<Integer, ProdutoVO> produtosGravados = provider.getProdutos();
+
+            setNotify("Gravando os produtos Pdv VR...", organizados.size());
+            for (KeyList<String> keys : organizados.keySet()) {
+                ProdutoIMP imp = organizados.get(keys);
+
+                //<editor-fold defaultstate="collapsed" desc="Preparando variáveis">
+                int id;
+                long ean;
+                String strID;
+                boolean eBalanca;
+                TipoEmbalagem unidade;
+                {
+                    SetUpVariaveisTO to = setUpVariaveis(imp);
+                    ean = to.ean;
+                    strID = to.strID;
+                    eBalanca = to.eBalanca;
+                    unidade = to.unidade;
+                }
+                //</editor-fold>
+
+                
+                ProdutoVO produtoGravado = produtosGravados.get(Integer.parseInt(keys.get(2)));
+                
+                //ProdutoAnteriorVO anterior = provider.anterior().get(keys.get(0), keys.get(1), keys.get(2));
+                
+                ProdutoAnteriorVO anterior = null;
+
+                
+                if (produtoGravado == null) {
+                    
+                    id = Integer.parseInt(imp.getImportId());
+
+                    ProdutoVO prod = converterIMP(imp, id, ean, unidade, eBalanca);
+
+                    anterior = converterImpEmAnterior(imp);
+                    anterior.setCodigoAtual(prod);
+                    ProdutoComplementoVO complemento = converterComplemento(imp);
+                    complemento.setProduto(prod);
+                    ProdutoAliquotaVO aliquota = converterAliquota(imp);
+                    aliquota.setProduto(prod);
+
+                    provider.salvar(prod);
+                    provider.anterior().salvar(anterior);
+                    provider.complemento().salvar(complemento, false);
+                    provider.aliquota().salvar(aliquota);
+                    
+                    if (Integer.parseInt(imp.getImportId()) > 0 && Long.parseLong(imp.getEan()) > 0) { //ID e EAN válidos
+                        if (!provider.automacao().cadastrado(ean)) {
+                            ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
+                            automacao.setProduto(prod);
+                            provider.automacao().salvar(automacao);
+                        }
+                    }
+
+                    if (!provider.eanAnterior().cadastrado(imp.getImportId(), imp.getEan())) {
+                        ProdutoAnteriorEanVO eanAnterior = converterAnteriorEAN(imp);
+                        provider.eanAnterior().salvar(eanAnterior);
+                    }
+                } 
+                notificar();
+            }
+
+            for (LojaVO loja : provider.getLojas()) {
+                if (loja.getId() != getLojaVR()) {
+                    provider.complemento().copiarProdutoComplemento(getLojaVR(), loja.getId());
+                }
+            }
+            commit();
+        } catch (Exception e) {
+            rollback();
+            LOG.log(Level.SEVERE, "Erro ao importar os produtos", e);
+            throw e;
+        }
+    }
+    
     public void atualizar(List<ProdutoIMP> produtos, OpcaoProduto... opcoes) throws Exception {
 
         //<editor-fold defaultstate="collapsed" desc="Separa as opções entre 'com lista especial' e 'sem lista especial'">
