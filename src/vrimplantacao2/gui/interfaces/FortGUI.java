@@ -17,7 +17,6 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.interfaces.FenixDAO;
 import vrimplantacao2.dao.interfaces.FortDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
@@ -205,6 +204,14 @@ public class FortGUI extends VRInternalFrame implements ConexaoEvent {
                             }
                         }
                         
+                        if (chkCPreferencial.isSelected()) {
+                            importador.importarClientePreferencial();
+                        }
+                        
+                        if (chkCEventual.isSelected()) {
+                            importador.importarClienteEventual();
+                        }
+                        
                     } else if (tabOperacoes.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -241,7 +248,6 @@ public class FortGUI extends VRInternalFrame implements ConexaoEvent {
         tabImportacao = new javax.swing.JTabbedPane();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
-        jPanel3 = new javax.swing.JPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
         chkFTipoPagamento = new vrframework.bean.checkBox.VRCheckBox();
@@ -250,6 +256,9 @@ public class FortGUI extends VRInternalFrame implements ConexaoEvent {
         chkFTipoEmp = new vrframework.bean.checkBox.VRCheckBox();
         chkFTipoForn = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        tabCliente = new vrframework.bean.panel.VRPanel();
+        chkCPreferencial = new vrframework.bean.checkBox.VRCheckBox();
+        chkCEventual = new vrframework.bean.checkBox.VRCheckBox();
         tabUnificacao = new javax.swing.JPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         pnlLoja = new vrframework.bean.panel.VRPanel();
@@ -266,46 +275,46 @@ public class FortGUI extends VRInternalFrame implements ConexaoEvent {
 
         cmbLojaOrigem.setModel(new javax.swing.DefaultComboBoxModel());
 
+        tabProdutos.setImportador(null);
         tabImportacao.addTab("Produtos", tabProdutos);
 
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        tabFornecedor.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         chkFornecedor.setText("Fornecedor");
-        jPanel3.add(chkFornecedor);
+        tabFornecedor.add(chkFornecedor);
 
         chkFContatos.setText("Contatos");
-        jPanel3.add(chkFContatos);
+        tabFornecedor.add(chkFContatos);
 
         chkFTipoPagamento.setText("Tipo Pagamento");
-        jPanel3.add(chkFTipoPagamento);
+        tabFornecedor.add(chkFTipoPagamento);
 
         chkFEndereco.setText("Endereço");
-        jPanel3.add(chkFEndereco);
+        tabFornecedor.add(chkFEndereco);
 
         chkFNumero.setText("Número");
-        jPanel3.add(chkFNumero);
+        tabFornecedor.add(chkFNumero);
 
         chkFTipoEmp.setText("Tipo Empresa");
-        jPanel3.add(chkFTipoEmp);
+        tabFornecedor.add(chkFTipoEmp);
 
         chkFTipoForn.setText("Tipo Fornecedor");
-        jPanel3.add(chkFTipoForn);
+        tabFornecedor.add(chkFTipoForn);
 
         chkProdutoFornecedor.setText("Produto Fornecedor");
-        jPanel3.add(chkProdutoFornecedor);
-
-        javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
-        tabFornecedor.setLayout(tabFornecedorLayout);
-        tabFornecedorLayout.setHorizontalGroup(
-            tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 490, Short.MAX_VALUE)
-        );
-        tabFornecedorLayout.setVerticalGroup(
-            tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 276, Short.MAX_VALUE)
-        );
+        tabFornecedor.add(chkProdutoFornecedor);
 
         tabImportacao.addTab("Fornecedores", tabFornecedor);
+
+        tabCliente.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        chkCPreferencial.setText("Cliente Preferencial");
+        tabCliente.add(chkCPreferencial);
+
+        chkCEventual.setText("Cliente Eventual");
+        tabCliente.add(chkCEventual);
+
+        tabImportacao.addTab("Clientes", tabCliente);
 
         tabOperacoes.addTab("Importação", tabImportacao);
 
@@ -422,6 +431,8 @@ public class FortGUI extends VRInternalFrame implements ConexaoEvent {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkCEventual;
+    private vrframework.bean.checkBox.VRCheckBox chkCPreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFEndereco;
     private vrframework.bean.checkBox.VRCheckBox chkFNumero;
@@ -435,9 +446,9 @@ public class FortGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel conexaoFirebird;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel3;
     private org.jdesktop.swingx.JXDatePicker jXDatePicker1;
     private vrframework.bean.panel.VRPanel pnlLoja;
+    private vrframework.bean.panel.VRPanel tabCliente;
     private vrframework.bean.panel.VRPanel tabFornecedor;
     private javax.swing.JTabbedPane tabImportacao;
     private javax.swing.JTabbedPane tabOperacoes;

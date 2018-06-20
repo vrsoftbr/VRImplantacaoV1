@@ -8,6 +8,7 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -246,10 +247,94 @@ public class FortDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select\n" +
+                    "    c.id_cliente id,\n" +
+                    "    c.cnpj,\n" +
+                    "    c.ie,\n" +
+                    "    c.nome razao,\n" +
+                    "    c.fantasia,\n" +
+                    "    case c.status when 'C' then 0 else 1 end situacaocadastro,\n" +
+                    "    c.data_cancelado,\n" +
+                    "    case c.bloqueio_limite when 'S' then 1 else 0 end bloqueado,\n" +
+                    "    r.nome endereco,\n" +
+                    "    c.numero,\n" +
+                    "    c.compl complemento,\n" +
+                    "    b.nome bairro,\n" +
+                    "    cd.nome municipio,\n" +
+                    "    cd.uf,\n" +
+                    "    c.cep,\n" +
+                    "    c.estado_civil,\n" +
+                    "    c.data_nasc data_nascimento,\n" +
+                    "    c.data_cad data_cadastro,\n" +
+                    "    c.fone,\n" +
+                    "    c.fone2,\n" +
+                    "    c.fone3,\n" +
+                    "    c.saldo_credito,\n" +
+                    "    c.valor_limite,\n" +
+                    "    c.nome_conjuge,\n" +
+                    "    c.nome_pais nome_pai,\n" +
+                    "    c.nome_pais nome_mae,\n" +
+                    "    c.obs observacao2,\n" +
+                    "    c.dia_fat diavencimento,\n" +
+                    "    c.email,\n" +
+                    "    cr.nome cob_endereco,\n" +
+                    "    c.numerocob cob_numero,\n" +
+                    "    c.complcob cob_complemento,\n" +
+                    "    cb.nome cob_bairro,\n" +
+                    "    ccd.nome cob_municipio,\n" +
+                    "    ccd.uf cob_uf,\n" +
+                    "    c.cepcob cob_cep\n" +
+                    "from\n" +
+                    "    clientes c\n" +
+                    "    left join ruas r on c.id_rua = r.id_rua\n" +
+                    "    left join bairros b on r.id_bairro = b.id_bairro\n" +
+                    "    left join cidades cd on b.id_cidade = cd.id_cidade \n" +
+                    "    left join ruas cr on c.id_ruacob = cr.id_rua\n" +
+                    "    left join bairros cb on r.id_bairro = cb.id_bairro\n" +
+                    "    left join cidades ccd on b.id_cidade = ccd.id_cidade\n" +
+                    "order by\n" +
+                    "    c.id_cliente"
             )) {
                 while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
                     
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("ie"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setAtivo(rst.getBoolean("situacaocadastro"));
+                    imp.setDataBloqueio(rst.getDate("data_cancelado"));
+                    imp.setBloqueado(rst.getBoolean("bloqueado"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setEstadoCivil(TipoEstadoCivil.getByString(rst.getString("estado_civil")));
+                    imp.setDataNascimento(rst.getDate("data_nascimento"));
+                    imp.setDataCadastro(rst.getDate("data_cadastro"));
+                    imp.setTelefone(rst.getString("fone"));
+                    imp.addTelefone("FONE 2", rst.getString("fone2"));
+                    imp.addTelefone("FONE 3", rst.getString("fone3"));
+                    imp.setValorLimite(rst.getDouble("valor_limite"));
+                    imp.setNomeConjuge(rst.getString("nome_conjuge"));
+                    imp.setNomePai(rst.getString("nome_pai"));
+                    imp.setNomeMae(rst.getString("nome_mae"));
+                    imp.setObservacao2(rst.getString("observacao2"));
+                    imp.setDiaVencimento(rst.getInt("diavencimento"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setCobrancaEndereco(rst.getString("cob_endereco"));
+                    imp.setCobrancaNumero(rst.getString("cob_numero"));
+                    imp.setCobrancaComplemento(rst.getString("cob_complemento"));
+                    imp.setCobrancaBairro(rst.getString("cob_bairro"));
+                    imp.setCobrancaMunicipio(rst.getString("cob_municipio"));
+                    imp.setCobrancaUf(rst.getString("cob_uf"));
+                    imp.setCobrancaCep(rst.getString("cob_cep"));
+                    
+                    result.add(imp);
                 }
             }
         }
