@@ -11,14 +11,14 @@ package vrimplantacao2.vo.importacao;
  */
 public class AcumuladorIMP {
     
-    private String id;
+    private int id;
     private String descricao;
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
