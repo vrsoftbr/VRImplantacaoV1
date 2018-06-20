@@ -212,6 +212,10 @@ public class FortGUI extends VRInternalFrame implements ConexaoEvent {
                             importador.importarClienteEventual();
                         }
                         
+                        if (chkCFood.isSelected()) {
+                            importador.importarClienteVRFood();
+                        }
+                        
                     } else if (tabOperacoes.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -259,6 +263,7 @@ public class FortGUI extends VRInternalFrame implements ConexaoEvent {
         tabCliente = new vrframework.bean.panel.VRPanel();
         chkCPreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkCEventual = new vrframework.bean.checkBox.VRCheckBox();
+        chkCFood = new vrframework.bean.checkBox.VRCheckBox();
         tabUnificacao = new javax.swing.JPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         pnlLoja = new vrframework.bean.panel.VRPanel();
@@ -313,6 +318,9 @@ public class FortGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkCEventual.setText("Cliente Eventual");
         tabCliente.add(chkCEventual);
+
+        chkCFood.setText("Cliente (VR Food)");
+        tabCliente.add(chkCFood);
 
         tabImportacao.addTab("Clientes", tabCliente);
 
@@ -432,6 +440,7 @@ public class FortGUI extends VRInternalFrame implements ConexaoEvent {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkCEventual;
+    private vrframework.bean.checkBox.VRCheckBox chkCFood;
     private vrframework.bean.checkBox.VRCheckBox chkCPreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFEndereco;

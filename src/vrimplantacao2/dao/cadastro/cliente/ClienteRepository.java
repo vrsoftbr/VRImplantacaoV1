@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
@@ -28,6 +29,9 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
  * @author Leandro
  */
 public class ClienteRepository {
+    
+    private static final Logger LOG = Logger.getLogger(ClienteRepository.class.getName());
+    
     private ClienteRepositoryProvider provider;
 
     public ClienteRepository(ClienteRepositoryProvider provider) throws Exception {
@@ -910,5 +914,84 @@ public class ClienteRepository {
 
     private void atualizarClientePreferencial(ClientePreferencialVO vo, Set<OpcaoCliente> opt) throws Exception {
         provider.atualizarClientePreferencial(vo, opt);
+    }
+    
+    public void importarClienteVRFood(List<ClienteIMP> clientes, HashSet<OpcaoCliente> opt) throws Exception {
+        setNotificacao("Cliente (VRFood)...Carregando dados necessários...", 0);
+        LOG.info("Carregando informações necessárias para importar os clientes VRFood");
+        
+        
+        setNotificacao("Cliente (VRFood)...Gravando...", clientes.size());
+        LOG.info("Iniciando gravação das informações: " + clientes.size() + " registro(s)");
+        for (ClienteIMP imp: clientes) {
+            
+            ClienteVrFoodAnterior anterior = anteriores.get(imp.getId());
+            
+            //Organiza a listagem de telefones
+            Set<Long> impTelefones = new HashSet<>();
+            if (imp.getTelefone() != null && !"".equals(imp.getTelefone().trim())) {
+                impTelefones.add(Utils.stringToLong(imp.getTelefone()));
+            }
+            if (imp.getCelular()!= null && !"".equals(imp.getCelular().trim())) {
+                impTelefones.add(Utils.stringToLong(imp.getCelular()));
+            }
+            if (imp.getFax()!= null && !"".equals(imp.getFax().trim())) {
+                impTelefones.add(Utils.stringToLong(imp.getFax()));
+            }
+            for (ClienteContatoIMP contato: imp.getContatos()) {
+                if (contato.getTelefone()!= null && !"".equals(contato.getTelefone().trim())) {
+                    impTelefones.add(Utils.stringToLong(contato.getTelefone()));
+                }
+                if (contato.getCelular()!= null && !"".equals(contato.getCelular().trim())) {
+                    impTelefones.add(Utils.stringToLong(contato.getCelular()));
+                }
+            }
+            
+            //Verifica se o telefone já existe e retorna o código do cliente 
+            //que o possuí ou nulo.
+            ClienteVrFood codigoAtual = null;
+            for (Long telefone: impTelefones) {
+                codigoAtual = telefones.get(telefone);
+                if (codigoAtual != null) {
+                    break;
+                }
+            }
+            
+            //Não existe código anterior
+            if (anterior == null) {
+                anterior = converterClienteVrFoodAnterior(imp);
+                //Se um dos telefones já existir, joga o código atual deste cliente.
+                if (codigoAtual != null) {
+                    //Atualizo o código anterior
+                    anterior.setCodigoAtual(codigoAtual.getId());
+                    provider.gravarClienteVrFoodAnterior(anterior);
+                    //Inclui o anterior na lista.
+                    anteriores.put(imp.getId(), anterior);
+                    
+                    //Atualiza o cliente food
+                    codigoAtual = converterClienteVrFood(imp);
+                    provider.atualizarClienteVrFood(codigoAtual, opt);
+                    
+                    //Inclui os telefones
+                    for (Long telefone: impTelefones) {
+                        if (!codigoAtual.getTelefones().contains(telefone)) {
+                            provider.incluirTelefoneFood(codigoAtual.getId(), telefone);
+                            //Inclui o telefone na lista
+                            telefones.put(telefone, codigoAtual);
+                        }
+                    }
+                    
+                } else {
+                    
+                }                
+                
+            } else {
+                
+            }
+            
+            
+            notificar();
+        }
+        
     }
 }

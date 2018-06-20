@@ -434,6 +434,22 @@ public class Importador {
         ClienteRepository rep = new ClienteRepository(provider);
         rep.importarClienteEventual(clientes, new HashSet<>(Arrays.asList(opcoes)));
     }
+    
+    /**
+     * Importa o cadastro de clientes do VR Food.
+     * @param opcoes Opções para importar os dados do cliente.
+     * @throws Exception 
+     */
+    public void importarClienteVRFood(OpcaoCliente... opcoes) throws Exception {
+        ProgressBar.setStatus("Carregando clientes (VRFood)...");        
+        List<ClienteIMP> clientes = getInterfaceDAO().getClientesVRFood();
+        ClienteRepositoryProvider provider = new ClienteRepositoryProvider();
+        provider.setSistema(getInterfaceDAO().getSistema());
+        provider.setLojaOrigem(getInterfaceDAO().getLojaOrigem());
+        provider.setLojaVR(getLojaVR());
+        ClienteRepository rep = new ClienteRepository(provider);
+        rep.importarClienteVRFood(clientes, new HashSet<>(Arrays.asList(opcoes)));
+    }
 
     public void importarCreditoRotativo() throws Exception {
         ProgressBar.setStatus("Carregando crédito rotativo...");

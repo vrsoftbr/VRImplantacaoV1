@@ -217,7 +217,7 @@ public abstract class InterfaceDAO {
     
     /**
      * Este método foi criado caso houver a necessidade de separar a importação
-     * entre cliente eventual e preferêncial. Por padrão este método encapsula
+     * entre cliente VRFood, eventual e preferêncial. Por padrão este método encapsula
      * uma chamada ao método {@link InterfaceDAO#getClientes()}
      * @return Lista de Clientes
      * @throws Exception 
@@ -228,12 +228,23 @@ public abstract class InterfaceDAO {
     
     /**
      * Este método foi criado caso houver a necessidade de separar a importação
-     * entre cliente eventual e preferêncial. Por padrão este método encapsula
+     * entre cliente VRFood, eventual e preferêncial. Por padrão este método encapsula
      * uma chamada ao método {@link InterfaceDAO#getClientes()}
      * @return Lista de Clientes
      * @throws Exception 
      */
     public List<ClienteIMP> getClientesEventuais() throws Exception {
+        return getClientes();
+    }   
+
+    /**
+     * Este método foi criado caso houver a necessidade de separar a importação
+     * entre cliente VRFood, eventual e preferêncial. Por padrão este método encapsula
+     * uma chamada ao método {@link InterfaceDAO#getClientes()}
+     * @return Lista de Clientes
+     * @throws Exception 
+     */
+    public List<ClienteIMP> getClientesVRFood() throws Exception {
         return getClientes();
     }
     

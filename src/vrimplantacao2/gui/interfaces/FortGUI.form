@@ -185,6 +185,11 @@
                     <Property name="text" type="java.lang.String" value="Cliente Eventual"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCFood">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cliente (VR Food)"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
           </SubComponents>
