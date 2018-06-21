@@ -3,6 +3,7 @@ package vrimplantacao2.dao.cadastro.cliente;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.logging.Logger;
 import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.cliente.ClienteEventualAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.ClienteEventualContatoVO;
@@ -18,6 +20,8 @@ import vrimplantacao2.vo.cadastro.cliente.ClienteEventualVO;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialContatoVO;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialVO;
+import vrimplantacao2.vo.cadastro.cliente.food.ClienteFoodAnteriorVO;
+import vrimplantacao2.vo.cadastro.cliente.food.ClienteFoodVO;
 import vrimplantacao2.vo.cadastro.local.MunicipioVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoInscricao;
@@ -917,81 +921,206 @@ public class ClienteRepository {
     }
     
     public void importarClienteVRFood(List<ClienteIMP> clientes, HashSet<OpcaoCliente> opt) throws Exception {
-        setNotificacao("Cliente (VRFood)...Carregando dados necessários...", 0);
-        LOG.info("Carregando informações necessárias para importar os clientes VRFood");
         
-        
-        setNotificacao("Cliente (VRFood)...Gravando...", clientes.size());
-        LOG.info("Iniciando gravação das informações: " + clientes.size() + " registro(s)");
-        for (ClienteIMP imp: clientes) {
-            
-            ClienteVrFoodAnterior anterior = anteriores.get(imp.getId());
-            
-            //Organiza a listagem de telefones
-            Set<Long> impTelefones = new HashSet<>();
-            if (imp.getTelefone() != null && !"".equals(imp.getTelefone().trim())) {
-                impTelefones.add(Utils.stringToLong(imp.getTelefone()));
-            }
-            if (imp.getCelular()!= null && !"".equals(imp.getCelular().trim())) {
-                impTelefones.add(Utils.stringToLong(imp.getCelular()));
-            }
-            if (imp.getFax()!= null && !"".equals(imp.getFax().trim())) {
-                impTelefones.add(Utils.stringToLong(imp.getFax()));
-            }
-            for (ClienteContatoIMP contato: imp.getContatos()) {
-                if (contato.getTelefone()!= null && !"".equals(contato.getTelefone().trim())) {
-                    impTelefones.add(Utils.stringToLong(contato.getTelefone()));
-                }
-                if (contato.getCelular()!= null && !"".equals(contato.getCelular().trim())) {
-                    impTelefones.add(Utils.stringToLong(contato.getCelular()));
-                }
-            }
-            
-            //Verifica se o telefone já existe e retorna o código do cliente 
-            //que o possuí ou nulo.
-            ClienteVrFood codigoAtual = null;
-            for (Long telefone: impTelefones) {
-                codigoAtual = telefones.get(telefone);
-                if (codigoAtual != null) {
-                    break;
-                }
-            }
-            
-            //Não existe código anterior
-            if (anterior == null) {
-                anterior = converterClienteVrFoodAnterior(imp);
-                //Se um dos telefones já existir, joga o código atual deste cliente.
-                if (codigoAtual != null) {
-                    //Atualizo o código anterior
-                    anterior.setCodigoAtual(codigoAtual.getId());
-                    provider.gravarClienteVrFoodAnterior(anterior);
-                    //Inclui o anterior na lista.
-                    anteriores.put(imp.getId(), anterior);
-                    
-                    //Atualiza o cliente food
-                    codigoAtual = converterClienteVrFood(imp);
-                    provider.atualizarClienteVrFood(codigoAtual, opt);
-                    
-                    //Inclui os telefones
-                    for (Long telefone: impTelefones) {
-                        if (!codigoAtual.getTelefones().contains(telefone)) {
-                            provider.incluirTelefoneFood(codigoAtual.getId(), telefone);
-                            //Inclui o telefone na lista
-                            telefones.put(telefone, codigoAtual);
-                        }
+        provider.begin();
+        try {
+            setNotificacao("Cliente (VRFood)...Carregando dados necessários...", 0);
+            LOG.info("Carregando informações necessárias para importar os clientes VRFood");
+
+            Map<String, ClienteFoodAnteriorVO> anteriores = provider.food().getAnteriores();
+            Map<Long, ClienteFoodVO> telefones = provider.food().getTelefones();
+            IDStack ids = provider.food().getClienteVrFoodIds(clientes.size());
+
+            setNotificacao("Cliente (VRFood)...Gravando...", clientes.size());
+            LOG.info("Iniciando gravação das informações: " + clientes.size() + " registro(s)");
+            for (ClienteIMP imp: clientes) {
+
+                ClienteFoodAnteriorVO anterior = anteriores.get(imp.getId());
+
+                //Organiza a listagem de telefones
+                Set<Long> impTelefones = converterTelefones(imp);
+
+                //Verifica se o telefone já existe e retorna o código do cliente 
+                //que o possuí ou nulo.
+                ClienteFoodVO codigoAtual = null;
+                for (Long telefone: impTelefones) {
+                    codigoAtual = telefones.get(telefone);
+                    if (codigoAtual != null) {
+                        break;
                     }
-                    
+                }
+
+                //Não existe código anterior
+                if (anterior == null) {
+
+                    anterior = converterClienteFoodAnterior(imp);
+                    //Se um dos telefones já existir, joga o código atual deste cliente.
+                    if (codigoAtual != null && opt.contains(OpcaoCliente.IMP_CORRIGIR_TELEFONE)) {
+                        int id = codigoAtual.getId();
+                        //Atualizo o código anterior
+                        anterior.setCodigoAtual(id);
+                        provider.food().gravarClienteFoodAnterior(anterior);                    
+                        anteriores.put(imp.getId(), anterior); //Inclui o anterior na lista.
+
+                        //Atualiza o cliente food
+                        codigoAtual = converterClienteFood(imp);
+                        codigoAtual.setId(id);
+                        provider.food().atualizarClienteFood(codigoAtual, opt);
+
+                        //Inclui os telefones
+                        for (Long telefone: impTelefones) {
+                            if (!codigoAtual.getTelefones().contains(telefone)) {
+                                codigoAtual.getTelefones().add(telefone);
+                                provider.food().incluirTelefoneFood(codigoAtual.getId(), telefone);
+                                telefones.put(telefone, codigoAtual); //Inclui o telefone na lista
+                            }
+                        }
+
+                    } else if (opt.contains(OpcaoCliente.NOVOS)) {
+                        //Se não existir nenhuma informação do cliente no banco.
+
+                        //Converte e grava o cliente no banco.
+                        codigoAtual = converterClienteFood(imp);
+                        codigoAtual.setId((int) ids.pop(imp.getId()));
+                        provider.food().gravarClienteFood(codigoAtual);
+
+                        //Converte e grava o anterior
+                        anterior.setCodigoAtual(codigoAtual.getId());
+                        provider.food().gravarClienteFoodAnterior(anterior);
+                        anteriores.put(imp.getId(), anterior);
+
+                        //Inclui os telefones
+                        for (Long telefone: impTelefones) {
+                            if (!codigoAtual.getTelefones().contains(telefone)) {
+                                codigoAtual.getTelefones().add(telefone);
+                                provider.food().incluirTelefoneFood(codigoAtual.getId(), telefone);
+                                telefones.put(telefone, codigoAtual); //Inclui o telefone na lista
+                            }
+                        }
+                    }                
+
                 } else {
-                    
-                }                
-                
-            } else {
-                
+                    // Se o produto já houver sido importado, verifica se há alguma
+                    //opção de atualização.
+                    if (anterior.getCodigoAtual() != 0) {
+
+                        //Atualiza o cliente food
+                        codigoAtual = converterClienteFood(imp);
+                        codigoAtual.setId(anterior.getCodigoAtual());
+                        provider.food().atualizarClienteFood(codigoAtual, opt);
+
+                        //Inclui os telefones
+                        for (Long telefone: impTelefones) {
+                            if (!codigoAtual.getTelefones().contains(telefone)) {
+                                codigoAtual.getTelefones().add(telefone);
+                                provider.food().incluirTelefoneFood(codigoAtual.getId(), telefone);
+                                telefones.put(telefone, codigoAtual); //Inclui o telefone na lista
+                            }
+                        }
+
+                    } else if (anterior.isForcarGravacao()) {
+                        //Se o código atual for nulo
+
+                        //Converte e grava o cliente no banco.
+                        codigoAtual = converterClienteFood(imp);
+                        codigoAtual.setId((int) ids.pop(imp.getId()));
+                        provider.food().gravarClienteFood(codigoAtual);
+
+                        //Atualizo o código anterior
+                        anterior.setCodigoAtual(codigoAtual.getId());
+                        provider.food().atualizarClienteFoodAnterior(anterior);                    
+                        anteriores.put(imp.getId(), anterior); //Inclui o anterior na lista.                    
+
+                        //Inclui os telefones
+                        for (Long telefone: impTelefones) {
+                            if (!codigoAtual.getTelefones().contains(telefone)) {
+                                codigoAtual.getTelefones().add(telefone);
+                                provider.food().incluirTelefoneFood(codigoAtual.getId(), telefone);
+                                telefones.put(telefone, codigoAtual); //Inclui o telefone na lista
+                            }
+                        }
+
+                    }
+
+                }            
+
+                notificar();
             }
             
-            
-            notificar();
+            provider.commit();
+        } catch (Exception ex) {
+            provider.rollback();
+            throw ex;
         }
         
+    }
+
+    public Set<Long> converterTelefones(ClienteIMP imp) {
+        Set<Long> result = new HashSet<>();
+                
+        if (Utils.stringToLong(imp.getTelefone()) != 0) {
+            result.add(Utils.stringToLong(imp.getTelefone()));
+        }
+        if (Utils.stringToLong(imp.getCelular()) != 0) {
+            result.add(Utils.stringToLong(imp.getCelular()));
+        }
+        if (Utils.stringToLong(imp.getFax()) != 0) {
+            result.add(Utils.stringToLong(imp.getFax()));
+        }
+        for (ClienteContatoIMP contato: imp.getContatos()) {
+            if (Utils.stringToLong(contato.getTelefone()) != 0) {
+                result.add(Utils.stringToLong(contato.getTelefone()));
+            }
+            if (Utils.stringToLong(contato.getCelular()) != 0) {
+                result.add(Utils.stringToLong(contato.getCelular()));
+            }
+        }
+        
+        for (Iterator<Long> iterator = result.iterator(); iterator.hasNext(); ) {
+            long telefone = iterator.next();
+            if (telefone > 99999999999999L || telefone < 1) {
+                iterator.remove();
+            }
+        }
+        
+        return result;
+    }
+
+    private ClienteFoodAnteriorVO converterClienteFoodAnterior(ClienteIMP imp) throws Exception {
+        ClienteFoodAnteriorVO ant = new ClienteFoodAnteriorVO();
+        
+        ant.setSistema(provider.getSistema());
+        ant.setLoja(provider.getLojaOrigem());
+        ant.setId(imp.getId());
+        ant.setNome(imp.getRazao());
+        ant.setForcarGravacao(false);
+        
+        return ant;
+    }
+
+    private ClienteFoodVO converterClienteFood(ClienteIMP imp) throws Exception {
+        ClienteFoodVO vo = new ClienteFoodVO();
+        
+        vo.setNome(imp.getRazao());
+        vo.setEndereco(imp.getEndereco());
+        vo.setNumero(imp.getNumero());
+        vo.setBairro(imp.getBairro());
+        {
+            MunicipioVO mun = provider.getMunicipioById(imp.getMunicipioIBGE());
+            if (mun == null) {
+                mun = provider.getMunicipioByNomeUf(
+                        Utils.acertarTexto(imp.getMunicipio()), 
+                        Utils.acertarTexto(imp.getUf())
+                );
+                if (mun == null) {
+                    mun = provider.getMunicipioPadrao();
+                }
+            }
+            vo.setId_municipio(mun.getId());
+        }
+        vo.setObservacao(imp.getObservacao());
+        vo.setSituacaoCadastro(imp.isAtivo() ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+        
+        return vo;
     }
 }

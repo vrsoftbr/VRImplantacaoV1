@@ -2,12 +2,17 @@ package vrimplantacao2.dao.cadastro.cliente;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import vrframework.classe.Conexao;
 import vrimplantacao2.dao.cadastro.LocalDAO;
+import vrimplantacao2.dao.cadastro.cliente.food.ClienteFoodAnteriorDAO;
+import vrimplantacao2.dao.cadastro.cliente.food.ClienteFoodDAO;
+import vrimplantacao2.dao.cadastro.cliente.food.ClienteFoodTelefoneDAO;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.cliente.ClienteEventualAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.ClienteEventualContatoVO;
@@ -15,6 +20,8 @@ import vrimplantacao2.vo.cadastro.cliente.ClienteEventualVO;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialContatoVO;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialVO;
+import vrimplantacao2.vo.cadastro.cliente.food.ClienteFoodAnteriorVO;
+import vrimplantacao2.vo.cadastro.cliente.food.ClienteFoodVO;
 import vrimplantacao2.vo.cadastro.local.MunicipioVO;
 
 /**
@@ -33,6 +40,7 @@ public class ClienteRepositoryProvider {
     public ClienteRepositoryProvider() throws Exception {
         this.evt = new OrgEventual(this);
         this.pref = new OrgPreferencial(this);
+        this.food = new OrgClienteFood();
         this.clientePreferencialDAO = new ClientePreferencialDAO();
     }
     
@@ -118,8 +126,6 @@ public class ClienteRepositoryProvider {
     public OrgEventual eventual() {
         return evt;
     }
-
-    
 
     public static class OrgPreferencial {
         
@@ -211,5 +217,57 @@ public class ClienteRepositoryProvider {
     
     public void atualizarClientePreferencial(ClientePreferencialVO vo, Set<OpcaoCliente> opt) throws Exception {
         clientePreferencialDAO.atualizarClientePreferencial(vo, opt);
-    }    
+    }
+    
+    private OrgClienteFood food;
+
+    public OrgClienteFood food() {
+        return food;
+    }
+    
+    public class OrgClienteFood {
+        
+        private ClienteFoodAnteriorDAO anteriorDao;
+        private ClienteFoodTelefoneDAO clienteFoodTelefoneDao;
+        private ClienteFoodDAO clienteFoodDao;
+
+        public OrgClienteFood() throws Exception {
+            this.anteriorDao = new ClienteFoodAnteriorDAO();
+            this.clienteFoodTelefoneDao = new ClienteFoodTelefoneDAO();
+            this.clienteFoodDao = new ClienteFoodDAO();
+        }
+
+        public Map<String, ClienteFoodAnteriorVO> getAnteriores() throws Exception {
+            return anteriorDao.getAnteriores(getSistema(), getLojaOrigem());
+        }
+
+        public Map<Long, ClienteFoodVO> getTelefones() throws Exception {
+            return clienteFoodTelefoneDao.getTelefones();
+        }
+
+        public IDStack getClienteVrFoodIds(int qtdRegistros) throws Exception {
+            return clienteFoodDao.getIds(qtdRegistros);
+        }
+
+        public void gravarClienteFoodAnterior(ClienteFoodAnteriorVO anterior) throws Exception {
+            anteriorDao.gravar(anterior);
+        }
+
+        public void atualizarClienteFood(ClienteFoodVO codigoAtual, HashSet<OpcaoCliente> opt) throws Exception {
+            clienteFoodDao.atualizar(codigoAtual, opt);
+        }
+
+        public void gravarClienteFood(ClienteFoodVO codigoAtual) throws Exception {
+            clienteFoodDao.gravar(codigoAtual);
+        }
+
+        public void atualizarClienteFoodAnterior(ClienteFoodAnteriorVO anterior) throws Exception {
+            anteriorDao.atualizar(anterior);
+        }
+
+        public void incluirTelefoneFood(int id, Long telefone) throws Exception {
+            clienteFoodTelefoneDao.incluirTelefone(id, telefone);
+        }
+        
+    }
 }

@@ -31,8 +31,10 @@ public enum OpcaoCliente {
             return true;
         }        
     },
+    IMP_CORRIGIR_TELEFONE,
     DADOS,
     CONTATOS,
+    OBSERVACOES,
     OBSERVACOES2,
     SITUACAO_CADASTRO,
     VALOR_LIMITE,
@@ -44,7 +46,10 @@ public enum OpcaoCliente {
     ENDERECO_COMPLETO,
     TIPO_INSCRICAO,
     PERMITE_CHEQUE,
-    PERMITE_CREDITOROTATIVO;    
+    PERMITE_CREDITOROTATIVO, 
+    NOVOS, 
+    RAZAO, 
+    FANTASIA;    
     
     private static final Logger LOG = Logger.getLogger(OpcaoCliente.class.getName());
     private List<ClienteIMP> listaEspecial;

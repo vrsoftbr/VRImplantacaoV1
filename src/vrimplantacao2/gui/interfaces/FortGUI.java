@@ -16,6 +16,7 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.FortDAO;
 import vrimplantacao2.dao.interfaces.Importador;
@@ -212,9 +213,15 @@ public class FortGUI extends VRInternalFrame implements ConexaoEvent {
                             importador.importarClienteEventual();
                         }
                         
+                    {
+                        List<OpcaoCliente> opcoes = new ArrayList<>();
                         if (chkCFood.isSelected()) {
-                            importador.importarClienteVRFood();
+                            opcoes.add(OpcaoCliente.NOVOS);
                         }
+                        if (!opcoes.isEmpty()) {
+                            importador.importarClienteVRFood(opcoes.toArray(new OpcaoCliente[]{}));
+                        }
+                    }
                         
                     } else if (tabOperacoes.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
