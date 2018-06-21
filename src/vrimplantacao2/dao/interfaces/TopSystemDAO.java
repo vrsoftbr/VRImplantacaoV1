@@ -215,7 +215,7 @@ public class TopSystemDAO extends InterfaceDAO {
                     imp.setEstoqueMinimo(rst.getDouble("estoque_minimo"));
                     imp.setEstoque(rst.getDouble("qtde_atual"));
                     imp.setPiscofinsCstDebito(rst.getInt("cstcontrib_cod"));
-                    imp.setPiscofinsCstCredito(0);
+                    imp.setPiscofinsCstCredito(rst.getInt("cstcontrib_cod"));
                     if (!"0".equals(rst.getString("contraliqzero").trim())) {
                         imp.setPiscofinsNaturezaReceita(rst.getInt("contraliqzero"));
                     } else {

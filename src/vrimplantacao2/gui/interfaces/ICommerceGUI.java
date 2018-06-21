@@ -25,7 +25,7 @@ import vrimplantacao2.parametro.Parametros;
 
 public class ICommerceGUI extends VRInternalFrame {
 
-    private static final String NOME_SISTEMA = "I-Commerce";
+    private static final String NOME_SISTEMA = "ICommerce";
     private static final String SERVIDOR_SQL = "SQL Server";
     private static ICommerceGUI instance;
 
