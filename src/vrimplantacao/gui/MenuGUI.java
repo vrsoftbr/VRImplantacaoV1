@@ -170,7 +170,8 @@ import vrimplantacao2.gui.interfaces.SiacGUI;
 import vrimplantacao2.gui.interfaces.RMSAutomaHelpGUI;
 import vrimplantacao2.gui.interfaces.SiaCriareByFileGUI;
 import vrimplantacao2.gui.interfaces.SoftcomGUI;
-import vrimplantacao2.gui.interfaces.SysmoGUI;
+import vrimplantacao2.gui.interfaces.SysmoFirebirdGUI;
+import vrimplantacao2.gui.interfaces.SysmoPostgresGUI;
 import vrimplantacao2.gui.interfaces.TopSystemGUI2;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 
@@ -534,8 +535,8 @@ public final class MenuGUI extends VRMdiFrame {
         mnuPws = new javax.swing.JMenuItem();
         mnuFenix = new javax.swing.JMenuItem();
         mnuFacilite = new javax.swing.JMenuItem();
-        mnuSysmo = new javax.swing.JMenuItem();
         mnuFort = new javax.swing.JMenuItem();
+        mnuSysmoFirebird = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -589,6 +590,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAutoSystem = new javax.swing.JMenuItem();
         mnuAutoSystem1 = new javax.swing.JMenuItem();
         mnuWebsaq = new javax.swing.JMenuItem();
+        mnuSysmoPostgres = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -1080,14 +1082,6 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu5.add(mnuFacilite);
 
-        mnuSysmo.setText("Sysmo");
-        mnuSysmo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuSysmoActionPerformed(evt);
-            }
-        });
-        jMenu5.add(mnuSysmo);
-
         mnuFort.setText("Fort (Firebird)");
         mnuFort.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1095,6 +1089,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu5.add(mnuFort);
+
+        mnuSysmoFirebird.setText("Sysmo");
+        mnuSysmoFirebird.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSysmoFirebirdActionPerformed(evt);
+            }
+        });
+        jMenu5.add(mnuSysmoFirebird);
 
         jMenu2.add(jMenu5);
 
@@ -1507,6 +1509,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuWebsaq);
+
+        mnuSysmoPostgres.setText("Sysmo");
+        mnuSysmoPostgres.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSysmoPostgresActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuSysmoPostgres);
 
         jMenu2.add(jMenu8);
 
@@ -3767,9 +3777,9 @@ public final class MenuGUI extends VRMdiFrame {
         }
     }//GEN-LAST:event_mnupdvvendaitemActionPerformed
 
-    private void mnuSysmoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSysmoActionPerformed
-        SysmoGUI.exibir(this);
-    }//GEN-LAST:event_mnuSysmoActionPerformed
+    private void mnuSysmoPostgresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSysmoPostgresActionPerformed
+        SysmoPostgresGUI.exibir(this);
+    }//GEN-LAST:event_mnuSysmoPostgresActionPerformed
 
     private void mnuIcommerceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuIcommerceActionPerformed
         ICommerceGUI.exibir(this);
@@ -3778,6 +3788,10 @@ public final class MenuGUI extends VRMdiFrame {
     private void mnuFortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuFortActionPerformed
         FortGUI.exibir(this);
     }//GEN-LAST:event_mnuFortActionPerformed
+
+    private void mnuSysmoFirebirdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSysmoFirebirdActionPerformed
+        SysmoFirebirdGUI.exibir(this);
+    }//GEN-LAST:event_mnuSysmoFirebirdActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -3958,7 +3972,8 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSoftcom;
     private javax.swing.JMenuItem mnuSolidus;
     private javax.swing.JMenuItem mnuSuper;
-    private javax.swing.JMenuItem mnuSysmo;
+    private javax.swing.JMenuItem mnuSysmoFirebird;
+    private javax.swing.JMenuItem mnuSysmoPostgres;
     private javax.swing.JMenuItem mnuTsti;
     private javax.swing.JMenuItem mnuVisualComercio;
     private javax.swing.JMenuItem mnuWebsaq;

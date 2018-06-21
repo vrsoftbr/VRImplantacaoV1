@@ -125,6 +125,7 @@ public class ItensNaoExistentesController {
                                     + Utils.quoteSQL(mapa.getCodrfd())
                     )) {
                         if (!rst.next()) {
+                            
                             SQLBuilder sql = new SQLBuilder();
                             sql.setSchema("implantacao");
                             sql.setTableName("maparfd");

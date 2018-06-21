@@ -18,7 +18,7 @@ public class MultiMap<K extends Comparable, T> {
     
     private Factory<T> factory;
     private final int limite;    
-    private final Map<KeyList<K>, T> root = new LinkedHashMap<>();    
+    private final Map<KeyList<K>, T> root = new LinkedHashMap<>();   
     
     /**
      * Retorna true se o map estiver vazio.

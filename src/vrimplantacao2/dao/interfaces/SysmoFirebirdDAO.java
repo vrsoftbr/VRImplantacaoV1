@@ -5,11 +5,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -24,27 +24,31 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Guilherme
  */
-public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
+public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean v_usar_arquivoBalanca;
+    public String lojaMesmoID;
 
     @Override
     public String getSistema() {
-        return "Sysmo";
+        if(lojaMesmoID == null){ 
+            lojaMesmoID = "";
+        }
+        return "Sysmo" + lojaMesmoID;
     }
 
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> lojas = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "      emp.cod::integer as id,\n"
-                    + "      emp.ccg::bigint as cnpj,\n"
+                    + "      emp.cod as id,\n"
+                    + "      emp.ccg as cnpj,\n"
                     + "      emp.cnm as nome\n"
                     + "from\n"
                     + "    spsemp00 emp\n"
                     + "order by\n"
-                    + "      emp.cod::integer"
+                    + "      emp.cod"
             )) {
                 while (rs.next()) {
                     lojas.add(new Estabelecimento(rs.getString("id"), rs.getString("nome")));
@@ -57,11 +61,11 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "      distinct\n"
-                    + "      fiscal.cod::integer,\n"
+                    + "      fiscal.cod,\n"
                     + "      fiscal.dsc,\n"
                     + "      fiscal.ctr,\n"
                     + "      fiscal.ica,\n"
@@ -74,7 +78,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "     fiscal.ufd = 'RJ' and\n"
                     + "     fiscal.rgf = 0\n"
                     + "order by\n"
-                    + "     fiscal.cod::integer")) {
+                    + "     fiscal.cod")) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(rs.getString("cod"), rs.getString("dsc")));
                 }
@@ -86,7 +90,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + " coalesce(dep.cod, 1) mercadologico1,\n"
@@ -99,21 +103,21 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " coalesce(seg.dsc, subcat.dsc) descmercadologico4,\n"
                     + " coalesce(subseg.cod, 1) mercadologico5,\n"
                     + " coalesce(subseg.dsc, seg.dsc) descmercadologico5\n"
-                    + " from\n"
+                 + " from\n"
                     + " gcesec01 cat\n"
-                    + " left join\n"
+                 + " left join\n"
                     + " gcegrp01 subcat on cat.cod = subcat.sec and\n"
                     + " cat.dep = subcat.dep\n"
-                    + " join gcedep01 dep on cat.dep = dep.cod and\n"
+                 + " join gcedep01 dep on cat.dep = dep.cod and\n"
                     + " subcat.dep = dep.cod\n"
-                    + " join gceseg01 seg on dep.cod = seg.dep and\n"
+                 + " join gceseg01 seg on dep.cod = seg.dep and\n"
                     + " cat.cod = seg.ctg and\n"
                     + " subcat.cod = seg.sct\n"
-                    + " left join gcessg01 subseg on dep.cod = subseg.dep and\n"
+                 + " left join gcessg01 subseg on dep.cod = subseg.dep and\n"
                     + " cat.cod = subseg.ctg and\n"
                     + " subcat.cod = subseg.sct and\n"
                     + " seg.cod = subseg.seg\n"
-                    + " order by\n"
+                 + " order by\n"
                     + " dep.cod, cat.cod")) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -129,7 +133,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc4Descricao(rs.getString("descmercadologico4"));
                     imp.setMerc5ID(rs.getString("mercadologico5"));
                     imp.setMerc5Descricao(rs.getString("descmercadologico5"));
-
+                    
                     result.add(imp);
                 }
             }
@@ -140,7 +144,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "	pro idproduto,\n"
@@ -175,7 +179,6 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     result.add(imp);
                 }
-
             }
         }
         return result;
@@ -184,11 +187,11 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "      distinct\n"
-                    + "      prod.cod::integer as id,\n"
+                    + "      prod.cod as id,\n"
                     + "      prod.dsc as descricaocompleta,\n"
                     + "      prod.dsr as descricaoresumida,\n"
                     + "      prod.dsr as descricaogondola,\n"
@@ -198,7 +201,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "      coalesce(prod.seg, 1) as mercadologico4,\n"
                     + "      coalesce(prod.ssg, 1) as mercadologico5,\n"
                     + "      prod.dtc as datacadastro,\n"
-                    + "      ean.bar::bigint as ean,\n"
+                    + "      ean.bar as ean,\n"
                     + "      prod.emb as qtdembalagem,\n"
                     + "      prod.uni as tipoembalagem,\n"
                     + "      prod.tip as balanca,\n"
@@ -219,7 +222,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "      fis.ctr as cstdebito,\n"
                     + "      fis.icf as icmsdebito,\n"
                     + "      fis.icr as icmsreducao,\n"
-                    + "      prod.fpc::integer as piscofins\n"
+                    + "      prod.fpc as piscofins\n"
                     + "from\n"
                     + "      gcepro02 as prod\n"
                     + "left join gcebar01 as ean on ean.pro = prod.cod\n"
@@ -247,7 +250,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "     emp.cod = preco.emp and\n"
                     + "     emp.cod = " + getLojaOrigem() + "\n"
                     + "order by\n"
-                    + "      prod.cod::integer")) {
+                    + "      prod.cod")) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -264,7 +267,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico5(rs.getString("mercadologico5"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem") == 0 ? 1 : rs.getInt("qtdembalagem"));
-                    imp.setEan(rs.getString("ean"));
+                    imp.setEan(Utils.stringLong(rs.getString("ean")));
                     imp.setValidade(rs.getInt("validade"));
                    
                         if(("B".equals(rs.getString("balanca").trim()))) {
@@ -307,7 +310,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsAliqSaida(rs.getDouble("icmsdebito"));
                     imp.setIcmsReducao(rs.getDouble("icmsreducao"));
 
-                    if (rs.getInt("piscofins") == 1) {
+                    if (Utils.stringToInt(rs.getString("piscofins")) == 1) {
                         imp.setPiscofinsCstCredito(50);
                         imp.setPiscofinsCstDebito(1);
                     } else {
@@ -324,12 +327,12 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + " t.cod as id,\n"
                     + " t.nom as nome,\n"
-                    + " t.cgc::bigint as cpfcnpj,\n"
+                    + " t.cgc as cpfcnpj,\n"
                     + " t.pss as tipopessoa,\n"
                     + " t.fan as fantasia,\n"
                     + " t.log as endereco,\n"
@@ -361,7 +364,7 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
                     imp.setRazao(rs.getString("nome"));
-                    imp.setCnpj_cpf(rs.getString("cpfcnpj"));
+                    imp.setCnpj_cpf(Utils.stringLong(rs.getString("cpfcnpj")));
                     imp.setFantasia(rs.getString("fantasia"));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
@@ -396,12 +399,13 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird
+                .getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "      t.cod as id,\n"
                     + "      t.nom as nome,\n"
-                    + "      t.cgc::bigint as cpfcnpj,\n"
+                    + "      t.cgc as cpfcnpj,\n"
                     + "      t.pss as tipopessoa,\n"
                     + "      t.fan as fantasia,\n"
                     + "      t.log as endereco,\n"
@@ -422,21 +426,23 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "      t.obs,\n"
                     + "      t.dtc as datacadastro,\n"
                     + "      t.dtm as datamovimentacao,\n"
-                    + "      (select vlc from trsccv01 tr where tr.cod = t.cod) as limitecredito,\n"
+                    + "      --(select vlc from trsccv01 tr where tr.cod = t.cod) as limitecredito,\n"
+                    + "      conv.vlc as limitecredito, \n"        
                     + "      case when conv.dbl is null\n"
                     + "      then 0 else 1 end bloqueado \n"
                     + "from\n"
                     + "    trstra01 t\n"
-                    + "left join trstra01 conv on t.cod = conv.cod\n"
+                    + "left join trsccv01 conv on t.cod = conv.cod\n"
                     + "where\n"
-                    + "     t.tip in ('D', 'C')\n"
+                    + "     t.tip in ('D', 'C') and\n"
+                    + "    emp = " + getLojaOrigem() + "\n"        
                     + "order by\n"
                     + "     t.cod")) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rs.getString("id"));
                     imp.setRazao(rs.getString("nome"));
-                    imp.setCnpj(rs.getString("cpfcnpj"));
+                    imp.setCnpj(Utils.stringLong(rs.getString("cpfcnpj")));
                     imp.setFantasia(rs.getString("fantasia"));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
@@ -458,7 +464,6 @@ public class SysmoDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     result.add(imp);
                 }
-
             }
         }
         return result;
