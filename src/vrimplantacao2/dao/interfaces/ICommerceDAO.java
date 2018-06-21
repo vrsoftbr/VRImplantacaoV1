@@ -74,6 +74,120 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ProdutoIMP> getProdutos() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select  \n"
+                    + "	p.pro_codigo id, \n"
+                    + "	p.pro_barras ean, \n"
+                    + "	p.pro_descri descricaocompleta, \n"
+                    + "	p.pro_descri_fiscal descricaoreduzida, \n"
+                    + "	p.pro_un unidade, \n"
+                    + "	p.pro_qtde_embalagem qtdembalagem, \n"
+                    + "	p.pro_peso peso, \n"
+                    + "	p.pro_peso_liquido pesoliquido, \n"
+                    + "	p.pro_preco1 preco, \n"
+                    + "	p.pro_custo_unitario custo, \n"
+                    + " p.pro_lucro_esperado_p margem, \n"
+                    + "	pe.pro_saldo estoque, \n"
+                    + "	p.pro_est_min estoquemin, \n"
+                    + "	p.pro_est_max estoquemax, \n"
+                    + "	p.pro_cadastro datacadastro, \n"
+                    + "	p.pro_data_alt dataalteracao, \n"
+                    + "	p.pro_status ativo,\n"
+                    + "	aliq.alq_codigo as icmsid, \n"
+                    + "	p.pro_st cstdebito, \n"
+                    + "	p.pro_usa_balanca ebalanca, \n"
+                    + "	p.pro_validade validade, \n"
+                    + "	p.pro_st_ipi ipidebito, \n"
+                    + "	p.pro_st_pis pisdebito, \n"
+                    + "	p.pro_st_cofins stcofins, \n"
+                    + "	p.pro_aliq_pis aliqpis, \n"
+                    + "	p.pro_aliq_cofins aliqcofins, \n"
+                    + "	p.pro_ncm ncm, \n"
+                    + "	p.pro_st_pis_ent piscredito, \n"
+                    + "	p.pro_st_cofins_ent cofinscredito, \n"
+                    + "	p.pro_aliq_pis_ent aliqpiscredito, \n"
+                    + "	p.pro_aliq_cofins_ent aliqcofinscredito, \n"
+                    + " p.pro_ntr as naturezareceita \n"
+                    + "from \n"
+                    + "	produtos as p \n"
+                    + "	join produtos_estoque as pe on p.pro_codigo = pe.pro_codigo \n"
+                    + "	join lojas l on pe.pro_loja = l.loj_codigo\n"
+                    + "left join aliquotas_ecf  aliq on p.pro_aliquota = aliq.alq_codigo\n"
+                    + "where \n"
+                    + "	l.loj_codigo = " + getLojaOrigem() + "\n"
+                    + "order by \n"
+                    + "	p.pro_codigo")) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
+                while (rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setEan(rs.getString("ean"));
+                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+                    
+                    if ((rs.getString("descricaoreduzida") != null) && (!rs.getString("descricaoreduzida").trim().isEmpty())) {
+                        imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
+                    } else {
+                        imp.setDescricaoReduzida(rs.getString("descricaocompleta"));
+                    }
+                    
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    
+                    if (rs.getInt("qtdembalagem") == 0) {
+                        imp.setQtdEmbalagem(1);
+                    } else {
+                        imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                    }
+                    
+                    imp.setPesoBruto(rs.getDouble("peso"));
+                    imp.setPesoLiquido(rs.getDouble("pesoliquido"));
+                    imp.setPrecovenda(rs.getDouble("preco"));
+                    imp.setMargem(rs.getDouble("margem"));
+                    imp.setCustoComImposto(rs.getDouble("custo"));
+                    imp.setCustoSemImposto(rs.getDouble("custo"));
+                    imp.setEstoque(rs.getDouble("estoque"));
+                    imp.setEstoqueMinimo(rs.getDouble("estoquemin"));
+                    imp.setEstoqueMaximo(rs.getDouble("estoquemax"));
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+                    imp.setDataAlteracao(rs.getDate("dataalteracao"));
+                    imp.setNcm(rs.getString("ncm"));
+                    imp.setSituacaoCadastro("A".equals(rs.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+
+                    ProdutoBalancaVO produtoBalanca;
+                    long codigoProduto;
+                    codigoProduto = Long.parseLong(imp.getImportId().trim());
+                    if (codigoProduto <= Integer.MAX_VALUE) {
+                        produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                    } else {
+                        produtoBalanca = null;
+                    }
+                    if (produtoBalanca != null) {
+                        imp.seteBalanca(true);
+                        imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 1);
+                    } else {
+                        imp.setValidade(0);
+                        imp.seteBalanca(false);
+                    }
+
+                    imp.setIcmsDebitoId(rs.getString("icmsid"));
+                    imp.setIcmsCreditoId(rs.getString("icmsid"));
+                    imp.setPiscofinsCstCredito(rs.getString("piscredito"));
+                    imp.setPiscofinsCstDebito(rs.getString("pisdebito"));
+                    imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
@@ -178,107 +292,6 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
                     result.add(imp);
                 }
 
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<ProdutoIMP> getProdutos() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select  \n"
-                    + "	p.pro_codigo id, \n"
-                    + "	p.pro_barras ean, \n"
-                    + "	p.pro_descri_fiscal descricaocompleta, \n"
-                    + "	p.pro_descri descricaoreduzida, \n"
-                    + "	p.pro_un unidade, \n"
-                    + "	p.pro_qtde_embalagem qtdembalagem, \n"
-                    + "	p.pro_peso peso, \n"
-                    + "	p.pro_peso_liquido pesoliquido, \n"
-                    + "	p.pro_preco1 preco, \n"
-                    + "	p.pro_custo_unitario custo, \n"
-                    + " p.pro_lucro_esperado_p margem \n"
-                    + "	pe.pro_saldo estoque, \n"
-                    + "	p.pro_est_min estoquemin, \n"
-                    + "	p.pro_est_max estoquemax, \n"
-                    + "	p.pro_cadastro datacadastro, \n"
-                    + "	p.pro_data_alt dataalteracao, \n"
-                    + "	p.pro_status ativo,\n"
-                    + "	aliq.alq_aliquota as icmsdebito, \n"
-                    + "	p.pro_st cstdebito, \n"
-                    + "	p.pro_usa_balanca ebalanca, \n"
-                    + "	p.pro_validade validade, \n"
-                    + "	p.pro_st_ipi ipidebito, \n"
-                    + "	p.pro_st_pis pisdebito, \n"
-                    + "	p.pro_st_cofins stcofins, \n"
-                    + "	p.pro_aliq_pis aliqpis, \n"
-                    + "	p.pro_aliq_cofins aliqcofins, \n"
-                    + "	p.pro_ncm ncm, \n"
-                    + "	p.pro_st_pis_ent piscredito, \n"
-                    + "	p.pro_st_cofins_ent cofinscredito, \n"
-                    + "	p.pro_aliq_pis_ent aliqpiscredito, \n"
-                    + "	p.pro_aliq_cofins_ent aliqcofinscredito, \n"
-                    + " p.pro_ntr as naturezareceita \n"
-                    + "from \n"
-                    + "	produtos as p \n"
-                    + "	join produtos_estoque as pe on p.pro_codigo = pe.pro_codigo \n"
-                    + "	join lojas l on pe.pro_loja = l.loj_codigo\n"
-                    + "left join aliquotas_ecf  aliq on p.pro_aliquota = aliq.alq_codigo\n"
-                    + "where \n"
-                    + "	l.loj_codigo = " + getLojaOrigem() + "\n"
-                    + "order by \n"
-                    + "	p.pro_codigo")) {
-                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
-                while (rs.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rs.getString("id"));
-                    imp.setEan(rs.getString("ean"));
-                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
-                    imp.setTipoEmbalagem(rs.getString("unidade"));
-                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    imp.setPesoBruto(rs.getDouble("peso"));
-                    imp.setPesoLiquido(rs.getDouble("pesoliquido"));
-                    imp.setPrecovenda(rs.getDouble("preco"));
-                    imp.setMargem(rs.getDouble("margem"));
-                    imp.setCustoComImposto(rs.getDouble("custo"));
-                    imp.setCustoSemImposto(rs.getDouble("custo"));
-                    imp.setEstoque(rs.getDouble("estoque"));
-                    imp.setEstoqueMinimo(rs.getDouble("estoquemin"));
-                    imp.setEstoqueMaximo(rs.getDouble("estoquemax"));
-                    imp.setDataCadastro(rs.getDate("datacadastro"));
-                    imp.setDataAlteracao(rs.getDate("dataalteracao"));
-                    imp.setNcm(rs.getString("ncm"));
-                    imp.setSituacaoCadastro("A".equals(rs.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-
-                    ProdutoBalancaVO produtoBalanca;
-                    long codigoProduto;
-                    codigoProduto = Long.parseLong(imp.getImportId().trim());
-                    if (codigoProduto <= Integer.MAX_VALUE) {
-                        produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                    } else {
-                        produtoBalanca = null;
-                    }
-                    if (produtoBalanca != null) {
-                        imp.seteBalanca(true);
-                        imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 1);
-                    } else {
-                        imp.setValidade(0);
-                        imp.seteBalanca(false);
-                    }
-
-                    imp.setIcmsDebitoId(rs.getString("cstdebito"));
-                    imp.setIcmsCreditoId(rs.getString("cstdebito"));
-                    imp.setPiscofinsCstCredito(rs.getString("piscredito"));
-                    imp.setPiscofinsCstDebito(rs.getString("pisdebito"));
-                    imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
-
-                    result.add(imp);
-                }
             }
         }
         return result;

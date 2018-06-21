@@ -599,7 +599,7 @@
                               <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="320" max="32767" attributes="0"/>
+                          <EmptySpace pref="362" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -732,45 +732,49 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="txtPortaPostgres" min="-2" pref="65" max="-2" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Component id="txtPortaFirebird" min="-2" pref="45" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="txtLojaMesmoID" min="-2" pref="77" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="cmbLojaOrigem" max="32767" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="btnConectarPostgres" min="-2" pref="114" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="btnConectarFirebird" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Group type="102" alignment="1" attributes="0">
+                          <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="1" attributes="0">
                                   <Group type="102" alignment="1" attributes="0">
                                       <Component id="vRLabel7" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="-2" pref="45" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
+                                      <Component id="vRLabel8" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                       <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="0" pref="75" max="32767" attributes="0"/>
+                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                                   </Group>
                                   <Group type="102" alignment="1" attributes="0">
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Group type="102" attributes="0">
                                               <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
-                                              <EmptySpace min="0" pref="54" max="32767" attributes="0"/>
+                                              <EmptySpace min="0" pref="96" max="32767" attributes="0"/>
                                           </Group>
-                                          <Component id="txtHostPostgres" max="32767" attributes="0"/>
+                                          <Component id="txtHostFirebird" max="32767" attributes="0"/>
                                       </Group>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
-                                          <Component id="txtBancoDadosPostgres" min="-2" pref="122" max="-2" attributes="0"/>
+                                          <Component id="txtBancoDadosFirebird" min="-2" pref="122" max="-2" attributes="0"/>
                                       </Group>
                                       <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="txtUsuarioPostgres" min="-2" pref="100" max="-2" attributes="0"/>
+                                  <Component id="txtUsuarioFirebird" min="-2" pref="100" max="-2" attributes="0"/>
                                   <Component id="vRLabel4" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="vRLabel5" min="-2" max="-2" attributes="0"/>
-                                  <Component id="txtSenhaPostgres" min="-2" pref="84" max="-2" attributes="0"/>
+                                  <Component id="txtSenhaFirebird" min="-2" pref="84" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -789,33 +793,35 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="2" attributes="0">
-                          <Component id="txtSenhaPostgres" alignment="2" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtUsuarioPostgres" alignment="2" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtBancoDadosPostgres" alignment="2" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtHostPostgres" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtSenhaFirebird" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtUsuarioFirebird" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtBancoDadosFirebird" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtHostFirebird" alignment="2" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="vRLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="vRLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="vRLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="2" attributes="0">
-                          <Component id="txtPortaPostgres" alignment="2" min="-2" max="-2" attributes="0"/>
-                          <Component id="btnConectarPostgres" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtPortaFirebird" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnConectarFirebird" alignment="2" min="-2" max="-2" attributes="0"/>
                           <Component id="cmbLojaOrigem" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtLojaMesmoID" alignment="2" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Component class="vrframework.bean.textField.VRTextField" name="txtUsuarioPostgres">
+            <Component class="vrframework.bean.textField.VRTextField" name="txtUsuarioFirebird">
               <Properties>
                 <Property name="caixaAlta" type="boolean" value="false"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtUsuarioPostgresActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtUsuarioFirebirdActionPerformed"/>
               </Events>
             </Component>
             <Component class="vrframework.bean.label.VRLabel" name="vRLabel4">
@@ -823,13 +829,13 @@
                 <Property name="text" type="java.lang.String" value="Usu&#xe1;rio:"/>
               </Properties>
             </Component>
-            <Component class="vrframework.bean.passwordField.VRPasswordField" name="txtSenhaPostgres">
+            <Component class="vrframework.bean.passwordField.VRPasswordField" name="txtSenhaFirebird">
               <Properties>
                 <Property name="caixaAlta" type="boolean" value="false"/>
                 <Property name="mascara" type="java.lang.String" value=""/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtSenhaPostgresActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtSenhaFirebirdActionPerformed"/>
               </Events>
             </Component>
             <Component class="vrframework.bean.label.VRLabel" name="vRLabel5">
@@ -837,13 +843,13 @@
                 <Property name="text" type="java.lang.String" value="Senha:"/>
               </Properties>
             </Component>
-            <Component class="vrframework.bean.textField.VRTextField" name="txtPortaPostgres">
+            <Component class="vrframework.bean.textField.VRTextField" name="txtPortaFirebird">
               <Properties>
                 <Property name="text" type="java.lang.String" value="1521"/>
                 <Property name="caixaAlta" type="boolean" value="false"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtPortaPostgresActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtPortaFirebirdActionPerformed"/>
               </Events>
             </Component>
             <Component class="vrframework.bean.label.VRLabel" name="vRLabel7">
@@ -856,7 +862,7 @@
                 <Property name="text" type="java.lang.String" value="Banco de Dados"/>
               </Properties>
             </Component>
-            <Component class="vrframework.bean.textField.VRTextField" name="txtHostPostgres">
+            <Component class="vrframework.bean.textField.VRTextField" name="txtHostFirebird">
               <Properties>
                 <Property name="caixaAlta" type="boolean" value="false"/>
               </Properties>
@@ -866,7 +872,7 @@
                 <Property name="text" type="java.lang.String" value="Host:"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JToggleButton" name="btnConectarPostgres">
+            <Component class="javax.swing.JToggleButton" name="btnConectarFirebird">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/vrframework/img/chat/desconectado.png"/>
@@ -874,7 +880,7 @@
                 <Property name="text" type="java.lang.String" value="Conectar"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnConectarPostgresActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnConectarFirebirdActionPerformed"/>
               </Events>
             </Component>
             <Component class="vrframework.bean.label.VRLabel" name="vRLabel1">
@@ -882,7 +888,7 @@
                 <Property name="text" type="java.lang.String" value="Loja (Cliente):"/>
               </Properties>
             </Component>
-            <Component class="vrframework.bean.textField.VRTextField" name="txtBancoDadosPostgres">
+            <Component class="vrframework.bean.textField.VRTextField" name="txtBancoDadosFirebird">
               <Properties>
                 <Property name="caixaAlta" type="boolean" value="false"/>
               </Properties>
@@ -892,6 +898,13 @@
                 <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
                   <StringArray count="0"/>
                 </Property>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.textField.VRTextField" name="txtLojaMesmoID">
+            </Component>
+            <Component class="vrframework.bean.label.VRLabel" name="vRLabel8">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Loja Mesmo ID"/>
               </Properties>
             </Component>
           </SubComponents>
