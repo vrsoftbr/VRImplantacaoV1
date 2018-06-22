@@ -4,16 +4,22 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.utils.MathUtils;
+import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 
 /**
  *
@@ -342,5 +348,102 @@ public class FortDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+
+    private double ajuste(String valor) {
+        if (valor != null) {
+            valor = valor.replace(".", ",");
+        }
+        return MathUtils.round(Utils.stringToDouble(valor), 1);
+    }
+    
+    private int ajusteInt(String valor) {
+        if (valor != null) {
+            valor = valor.replace(".", ",");
+        }
+        return (int) MathUtils.round(Utils.stringToDouble(valor), 0);
+    }
+    
+    @Override
+    public List<NutricionalIMP> getNutricional(Set<OpcaoNutricional> opcoes) throws Exception {
+        List<NutricionalIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    n.id_tabela_nutricional id,\n" +
+                    "    n.bal_descricao descricao,\n" +
+                    "    n.tbn_valcal caloria,\n" +
+                    "    n.tbn_carb carboidrato,\n" +
+                    "    n.tbn_prot proteina,\n" +
+                    "    n.tbn_gord gordura,\n" +
+                    "    n.tbn_gordsat gordura_saturada,\n" +
+                    "    n.tbn_gordtrans gordura_trans,\n" +
+                    "    n.tbn_colest colesterol,\n" +
+                    "    n.tbn_fibra fibra,\n" +
+                    "    n.tbn_calcio calcio,\n" +
+                    "    n.tbn_ferro ferro,\n" +
+                    "    n.tbn_sodio sodio,\n" +
+                    "    n.tbn_calciop perc_caloria,\n" +
+                    "    n.tbn_carbp perc_carboidrato,\n" +
+                    "    n.tbn_protp perc_proteina,\n" +
+                    "    n.tbn_gordp perc_gordura,\n" +
+                    "    n.tbn_gordsatp perc_gordura_saturada,\n" +
+                    "    n.tbn_fibrap perc_fibra,\n" +
+                    "    n.tbn_calciop perc_calcio,\n" +
+                    "    n.tbn_ferrop perc_ferro,\n" +
+                    "    n.tbn_sodio perc_sodio,\n" +
+                    "    n.tbn_qtd porcao,\n" +
+                    "    n.tbn_un unidade,\n" +
+                    "    n.id_produto\n" +
+                    "from\n" +
+                    "    tabela_nutricional n\n" +
+                    "where\n" +
+                    "    not n.tbn_qtd is null\n" +
+                    "order by\n" +
+                    "    id"
+            )) {
+                while (rst.next()) {
+                    NutricionalIMP imp = new NutricionalIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    imp.setCaloria(ajusteInt(rst.getString("caloria")));
+                    imp.setCarboidrato(ajuste(rst.getString("carboidrato")));
+                    imp.setProteina(ajuste(rst.getString("proteina")));
+                    imp.setGordura(ajuste(rst.getString("gordura")));
+                    imp.setGorduraSaturada(ajuste(rst.getString("gordura_saturada")));
+                    imp.setGorduraTrans(ajuste(rst.getString("gordura_trans")));
+                    imp.setFibra(ajuste(rst.getString("fibra")));
+                    imp.setCalcio(ajuste(rst.getString("calcio")));
+                    imp.setFerro(ajuste(rst.getString("ferro")));
+                    imp.setSodio(ajuste(rst.getString("sodio")));
+                    imp.setPercentualCaloria(ajusteInt(rst.getString("perc_caloria")));
+                    imp.setPercentualCarboidrato(ajusteInt(rst.getString("perc_carboidrato")));
+                    imp.setPercentualProteina(ajusteInt(rst.getString("perc_proteina")));
+                    imp.setPercentualGordura(ajusteInt(rst.getString("perc_gordura")));
+                    imp.setPercentualGorduraSaturada(ajusteInt(rst.getString("perc_gordura_saturada")));
+                    imp.setPercentualFibra(ajusteInt(rst.getString("perc_fibra")));
+                    imp.setPercentualCalcio(ajusteInt(rst.getString("perc_calcio")));
+                    imp.setPercentualFerro(ajusteInt(rst.getString("perc_ferro")));
+                    imp.setPercentualSodio(ajusteInt(rst.getString("perc_sodio")));
+                    imp.setPorcao(
+                            Utils.acertarTexto(rst.getString("porcao"), "1") + " " +
+                            Utils.acertarTexto(rst.getString("unidade"), "UN")
+                    );
+                    imp.addProduto(rst.getString("id_produto"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
+        return super.getReceitaBalanca(opt); //To change body of generated methods, choose Tools | Templates.
+    }
+    
     
 }
