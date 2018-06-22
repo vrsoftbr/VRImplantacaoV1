@@ -18,6 +18,7 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 
@@ -442,7 +443,79 @@ public class FortDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
-        return super.getReceitaBalanca(opt); //To change body of generated methods, choose Tools | Templates.
+        List<ReceitaBalancaIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    r.id_tabela_nutricional id,\n" +
+                    "    r.bal_descricao,\n" +
+                    "    coalesce(trim(r.bal_ingred1),'') linha1,\n" +
+                    "    coalesce(trim(r.bal_ingred2),'') linha2,\n" +
+                    "    coalesce(trim(r.bal_ingred3),'') linha3,\n" +
+                    "    coalesce(trim(r.bal_ingred4),'') linha4,\n" +
+                    "    r.id_produto\n" +
+                    "from\n" +
+                    "    tabela_nutricional r\n" +
+                    "where\n" +
+                    "    trim(coalesce(trim(r.bal_ingred1),'') ||\n" +
+                    "    coalesce(trim(r.bal_ingred2),'') ||\n" +
+                    "    coalesce(trim(r.bal_ingred3),'') ||\n" +
+                    "    coalesce(trim(r.bal_ingred4),'')) != ''\n" +
+                    "order by\n" +
+                    "    id"
+            )) {
+                while (rst.next()) {
+                    ReceitaBalancaIMP imp = new ReceitaBalancaIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("bal_descricao"));
+                    imp.setReceita(                            
+                            (
+                                    rst.getString("linha1") + "\n" +
+                                    rst.getString("linha2") + "\n" +
+                                    rst.getString("linha3") + "\n" +
+                                    rst.getString("linha4")
+                            ).trim()
+                    );
+                    imp.getProdutos().add(rst.getString("id_produto"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    pr.id_fornecedor,\n" +
+                    "    pr.id_produto,\n" +
+                    "    pr.codigo_ref codigoexterno\n" +
+                    "from\n" +
+                    "    produto_ref pr"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setIdProduto(rst.getString("id_produto"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
     }
     
     

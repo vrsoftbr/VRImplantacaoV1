@@ -599,6 +599,35 @@ public class Utils {
 
         return texto;
     }
+    
+    /**
+     * Método para padronizar as informações de uma string.
+     *
+     * @param texto Texto a ser ajustado.
+     * @param tamanho Tamanho máximo do campo.
+     * @param stringPadrao Caso o texto seja nulo ou vazio, essa string é
+     * utilizada.
+     * @return Texto padronizado
+     */
+    public static String acertarTextoMultiLinha(String texto, int tamanho, String stringPadrao) {
+        if (tamanho < 0) {
+            tamanho = 0;
+        }
+
+        texto = acertarTextoMultiLinha(texto);
+
+        if ((texto != null)
+                && (!texto.trim().isEmpty())) {
+
+            if (texto.length() > tamanho) {
+                texto = texto.substring(0, tamanho);
+            }
+        } else {
+            texto = stringPadrao != null ? stringPadrao : VALOR_VAZIO;
+        }
+
+        return texto;
+    }
 
     /**
      * Método para padronizar as informações de uma string.
@@ -609,6 +638,17 @@ public class Utils {
      */
     public static String acertarTexto(String texto, int tamanho) {
         return Utils.acertarTexto(texto, tamanho, VALOR_VAZIO);
+    }
+    
+    /**
+     * Método para padronizar as informações de uma string.
+     *
+     * @param texto Texto a ser ajustado.
+     * @param tamanho Tamanho máximo do campo.
+     * @return Texto padronizado.
+     */
+    public static String acertarTextoMultiLinha(String texto, int tamanho) {
+        return Utils.acertarTextoMultiLinha(texto, tamanho, VALOR_VAZIO);
     }
 
     /**
@@ -622,6 +662,18 @@ public class Utils {
     public static String acertarTexto(String texto, String stringPadrao) {
         return Utils.acertarTexto(texto, 10000000, stringPadrao);
     }
+    
+    /**
+     * Método para padronizar as informações de uma string.
+     *
+     * @param texto Texto a ser ajustado.
+     * @param stringPadrao Caso o texto seja nulo ou vazio, essa string é
+     * utilizada.
+     * @return Texto padronizado.
+     */
+    public static String acertarTextoMultiLinha(String texto, String stringPadrao) {
+        return Utils.acertarTextoMultiLinha(texto, 10000000, stringPadrao);
+    }
 
     /**
      * Método para padronizar as informações de uma string.
@@ -633,6 +685,111 @@ public class Utils {
         if (texto != null && !texto.isEmpty()) {
             String vRetorno = "", textoAcertado = "",
                     strPode = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ?!@#%*()-_=+[{]}.>,<'|'";
+
+            if (!"".equals(texto)) {
+                texto = texto.replace("$", " ");
+                texto = texto.replace("&", " ");
+                texto = texto.replace("€", "C");
+                texto = texto.replace("a", "A");
+                texto = texto.replace("á", "A");
+                texto = texto.replace("à", "A");
+                texto = texto.replace("ã", "A");
+                texto = texto.replace("â", "A");
+                texto = texto.replace("Á", "A");
+                texto = texto.replace("À", "A");
+                texto = texto.replace("Ã", "A");
+                texto = texto.replace("Â", "A");
+                texto = texto.replace("b", "B");
+                texto = texto.replace("c", "C");
+                texto = texto.replace("ç", "C");
+                texto = texto.replace("Ç", "C");
+                texto = texto.replace("d", "D");
+                texto = texto.replace("e", "E");
+                texto = texto.replace("é", "E");
+                texto = texto.replace("ê", "E");
+                texto = texto.replace("È", "E");
+                texto = texto.replace("É", "E");
+                texto = texto.replace("Ê", "E");
+                texto = texto.replace("f", "F");
+                texto = texto.replace("g", "G");
+                texto = texto.replace("h", "H");
+                texto = texto.replace("i", "I");
+                texto = texto.replace("í", "I");
+                texto = texto.replace("Í", "I");
+                texto = texto.replace("j", "J");
+                texto = texto.replace("k", "K");
+                texto = texto.replace("l", "L");
+                texto = texto.replace("m", "M");
+                texto = texto.replace("n", "N");
+                texto = texto.replace("o", "O");
+                texto = texto.replace("ó", "O");
+                texto = texto.replace("õ", "O");
+                texto = texto.replace("ô", "O");
+                texto = texto.replace("ö", "O");
+                texto = texto.replace("Ó", "O");
+                texto = texto.replace("Õ", "O");
+                texto = texto.replace("Ô", "O");
+                texto = texto.replace("Ö", "O");
+                texto = texto.replace("p", "P");
+                texto = texto.replace("q", "Q");
+                texto = texto.replace("r", "R");
+                texto = texto.replace("s", "S");
+                texto = texto.replace("t", "T");
+                texto = texto.replace("u", "U");
+                texto = texto.replace("ú", "U");
+                texto = texto.replace("Ú", "U");
+                texto = texto.replace("v", "V");
+                texto = texto.replace("x", "X");
+                texto = texto.replace("y", "Y");
+                texto = texto.replace("w", "W");
+                texto = texto.replace("z", "Z");
+                texto = texto.replace("´", "");
+                texto = texto.replace("º", "R");
+                texto = texto.replace("¦", "R");
+                texto = texto.replace("°", " ");
+                texto = texto.replace("ª", " ");
+                texto = texto.replace("Ñ", "N");
+                texto = texto.replace("§", "");
+                texto = texto.replace("\"", "");
+                texto = texto.replace(";", "");
+                texto = texto.replace("ﾓ", "O");
+                texto = texto.replace("ﾁ", "A");
+                texto = texto.replace(":", " ");
+                texto = texto.replace("/", " ");
+                texto = texto.replace("\\", " ");
+                texto = texto.replace("'", "");
+                texto = texto.replace("`", "");
+                texto = texto.replace("´", "");
+
+                for (int i = 0; i < texto.length(); i++) {
+                    if (strPode.indexOf(texto.charAt(i)) != -1) {
+                        textoAcertado = textoAcertado + texto.charAt(i);
+                    } else {
+                        textoAcertado = textoAcertado + "?";
+                    }
+                }
+            }
+            vRetorno = textoAcertado.trim();
+
+            try {
+                byte[] bytes = vRetorno.getBytes();
+
+                vRetorno = new String(bytes, "ISO-8859-1");
+
+                return vRetorno;
+            } catch (UnsupportedEncodingException ex) {
+                Exceptions.printStackTrace(ex);
+                throw new RuntimeException(ex.getMessage(), ex);
+            }
+        } else {
+            return VALOR_VAZIO;
+        }
+    }
+    
+    public static String acertarTextoMultiLinha(String texto) {
+        if (texto != null && !texto.isEmpty()) {
+            String vRetorno = "", textoAcertado = "",
+                    strPode = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ?!@#%*()-_=+[{]}.>,<'|'\n\r";
 
             if (!"".equals(texto)) {
                 texto = texto.replace("$", " ");

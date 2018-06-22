@@ -35,14 +35,7 @@ public class ReceitaBalancaFilizolaVO {
     }
 
     public void setReceita(String receita) {
-        /*if (receita == null) {
-            this.receita = "";
-        } else if (receita.length() > 280) {
-            this.receita = receita.substring(0, 280);
-        } else {
-            this.receita = receita;
-        }*/
-        this.receita = Utils.acertarTexto(receita, 280, "").replace("?", "");
+        this.receita = Utils.acertarTextoMultiLinha(receita, 280, "").replace("?", "");
     }
 
     public SituacaoCadastro getSituacaoCadastro() {

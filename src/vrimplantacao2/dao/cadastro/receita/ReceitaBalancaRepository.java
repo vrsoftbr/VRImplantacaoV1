@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
-import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.utils.multimap.MultiMap;

@@ -61,14 +61,7 @@ public class ReceitaBalancaToledoVO {
     }
 
     private String formataLinha(String linha) {
-        /*if (linha == null) {
-            return "";
-        }
-        if (linha.length() > 56) {
-            return linha.substring(0, 56);
-        }
-        return linha;*/
-        return Utils.acertarTexto(linha, 56, "").replace("?", "");
+        return Utils.acertarTextoMultiLinha(linha, 56, "").replace("?", "");
     }
     
     public void setReceitaLinha1(String linha) {
