@@ -245,8 +245,8 @@ public class ClienteRepositoryProvider {
             return clienteFoodTelefoneDao.getTelefones();
         }
 
-        public IDStack getClienteVrFoodIds(int qtdRegistros) throws Exception {
-            return clienteFoodDao.getIds(qtdRegistros);
+        public IDStack getClienteVrFoodIds() throws Exception {
+            return clienteFoodDao.getIds();
         }
 
         public void gravarClienteFoodAnterior(ClienteFoodAnteriorVO anterior) throws Exception {

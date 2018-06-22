@@ -404,6 +404,9 @@ public class ClienteRepository {
     }
 
     public List<ClienteIMP> organizarListagem(List<ClienteIMP> clientes) {
+        
+        LOG.fine("Organizando a listagem dos clientes");
+        
         List<ClienteIMP> result = new ArrayList<>();
         Map<String, ClienteIMP> validos = new LinkedHashMap<>();
         Map<String, ClienteIMP> invalidos = new LinkedHashMap<>();
@@ -429,6 +432,8 @@ public class ClienteRepository {
          */
         result.addAll(validos.values());
         result.addAll(invalidos.values());
+        
+        LOG.fine("Quantidade de registros validos: " + validos.size() +  ", inválidos: " + invalidos.size());
                 
         //Liberar memória
         validos.clear();
@@ -929,11 +934,11 @@ public class ClienteRepository {
 
             Map<String, ClienteFoodAnteriorVO> anteriores = provider.food().getAnteriores();
             Map<Long, ClienteFoodVO> telefones = provider.food().getTelefones();
-            IDStack ids = provider.food().getClienteVrFoodIds(clientes.size());
+            IDStack ids = provider.food().getClienteVrFoodIds();
 
             setNotificacao("Cliente (VRFood)...Gravando...", clientes.size());
             LOG.info("Iniciando gravação das informações: " + clientes.size() + " registro(s)");
-            for (ClienteIMP imp: clientes) {
+            for (ClienteIMP imp: organizarListagem(clientes)) {
 
                 ClienteFoodAnteriorVO anterior = anteriores.get(imp.getId());
 

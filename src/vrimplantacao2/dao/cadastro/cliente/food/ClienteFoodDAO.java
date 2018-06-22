@@ -15,14 +15,14 @@ import vrimplantacao2.vo.cadastro.cliente.food.ClienteFoodVO;
  */
 public class ClienteFoodDAO {
 
-    public IDStack getIds(int qtdRegistros) throws Exception {
+    public IDStack getIds() throws Exception {
         IDStack result = new IDStack();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n" +
+                    "SELECT\n" +
                     "	id\n" +
                     "from\n" +
-                    "	(SELECT id FROM generate_series(1, (select coalesce(max(id), 1) + " + qtdRegistros + " from food.cliente)) AS s(id) \n" +
+                    "	(SELECT id FROM generate_series(1, 999999) AS s(id)\n" +
                     "	EXCEPT SELECT id FROM food.cliente) AS codigointerno\n" +
                     "order by id desc"
             )) {

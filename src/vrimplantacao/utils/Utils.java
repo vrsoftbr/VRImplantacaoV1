@@ -62,6 +62,23 @@ public class Utils {
         return "0";
     }
 
+    /**
+     * Formata números de telefone, incluindo 
+     * @param ddd
+     * @param telefone
+     * @return 
+     */
+    public static String formataTelefone(int ddd, String telefone) {
+        telefone = Utils.stringLong(telefone);
+        if ("0".equals(telefone)) {
+            return "";
+        }
+        if (telefone.length() <= 9) {
+            return ddd + telefone;
+        }
+        return telefone;
+    }
+
     public double calcularSemImposto(double i_custoComImposto, double i_icmsCredito, double i_pisCofins, double i_valorIva, double i_valorIpi) throws Exception {
         double custoSemImposto = ((i_custoComImposto - i_valorIva - i_valorIpi) * ((100 - i_icmsCredito - i_pisCofins) / 100)) + i_valorIva + i_valorIpi;
         return Util.round(custoSemImposto, 4);
