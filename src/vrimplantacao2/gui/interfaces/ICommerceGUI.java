@@ -173,6 +173,10 @@ public class ICommerceGUI extends VRInternalFrame {
 
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                    
+                    if (!txtLojaID.getText().trim().isEmpty()) {                    
+                        ideiaDAO.id_loja = " - "+txtLojaID.getText();
+                    }
 
                     Importador importador = new Importador(ideiaDAO);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
