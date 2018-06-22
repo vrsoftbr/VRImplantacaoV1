@@ -17,6 +17,7 @@ import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -517,6 +518,35 @@ public class FortDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
-    
+
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                "select\n" +
+                "    id_setores,\n" +
+                "    nome\n" +
+                "from\n" +
+                "    setores\n" +
+                "order by\n" +
+                "    1"
+            )) {
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setMerc1ID(rst.getString("id_setores"));
+                    imp.setMerc1Descricao(rst.getString("nome"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
     
 }
