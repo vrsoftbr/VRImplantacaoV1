@@ -65,6 +65,7 @@ public class ChecksProdutoPanelGUI extends JPanel {
         chkProdMercadologico = new vrframework.bean.checkBox.VRCheckBox();
         chkValidade = new vrframework.bean.checkBox.VRCheckBox();
         chkFamilia = new vrframework.bean.checkBox.VRCheckBox();
+        chkTipoEmbalagemProd = new vrframework.bean.checkBox.VRCheckBox();
         chkTipoEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkMargem = new vrframework.bean.checkBox.VRCheckBox();
@@ -203,6 +204,9 @@ public class ChecksProdutoPanelGUI extends JPanel {
         chkFamilia.setToolTipText("Corrige o relacionamento entre o produto e a família.");
         add(chkFamilia);
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkTipoEmbalagemProd, "Tipo Emb. Prod");
+        add(chkTipoEmbalagemProd);
+
         org.openide.awt.Mnemonics.setLocalizedText(chkTipoEmbalagemEAN, "Tipo Emb. EAN");
         add(chkTipoEmbalagemEAN);
 
@@ -309,6 +313,7 @@ public class ChecksProdutoPanelGUI extends JPanel {
     public vrframework.bean.checkBox.VRCheckBox chkProdutos;
     public vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
     public vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
+    public vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemProd;
     public vrframework.bean.checkBox.VRCheckBox chkValidade;
     public javax.swing.JPanel pnlMercNivel;
     public vrframework.bean.panel.VRPanel vRPanel1;
@@ -396,6 +401,9 @@ public class ChecksProdutoPanelGUI extends JPanel {
                 }
                 if (chkFamilia.isSelected()) {
                     opcoes.add(OpcaoProduto.FAMILIA);
+                }
+                if (chkTipoEmbalagemProd.isSelected()) {
+                    opcoes.add(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO);
                 }
                 if (chkTipoEmbalagemEAN.isSelected()) {
                     opcoes.add(OpcaoProduto.TIPO_EMBALAGEM_EAN);
