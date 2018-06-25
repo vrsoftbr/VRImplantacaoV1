@@ -1,9 +1,9 @@
 package vrimplantacao2.dao.cadastro.produto2.associado;
 
 import java.util.Map;
-import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.vo.cadastro.associado.AssociadoItemVO;
 import vrimplantacao2.vo.cadastro.associado.AssociadoVO;
 
@@ -16,6 +16,8 @@ public class AssociadoRepositoryProvider {
     private final String sistema;
     private final String loja;
     private final int lojaVR;
+    private final ProdutoAnteriorDAO produtoDAO = new ProdutoAnteriorDAO();
+    private final AssociadoDAO associadoDAO = new AssociadoDAO();
 
     public AssociadoRepositoryProvider(String sistema, String loja, int lojaVR) {
         this.sistema = sistema;
@@ -60,24 +62,20 @@ public class AssociadoRepositoryProvider {
         Conexao.rollback();
     }
 
-    Map<String, Integer> getProdutosAnteriores() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Map<String, Integer> getProdutosAnteriores() throws Exception {
+        return produtoDAO.getAnteriores(getSistema(), getLoja());
     }
 
-    Map<Integer, AssociadoVO> getAssociadosExistentes() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Map<Integer, AssociadoVO> getAssociadosExistentes() throws Exception {
+        return associadoDAO.getAssociadosExistentes();
     }
 
-    void gravar(AssociadoVO vo) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void gravar(AssociadoVO vo) throws Exception {
+        associadoDAO.gravar(vo);
     }
 
-    void atualizar(AssociadoVO vo, Set<OpcaoAssociado> opt) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    void gravar(AssociadoItemVO vItem) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void gravar(AssociadoItemVO vItem) throws Exception {
+        associadoDAO.gravar(vItem);
     }
     
 }

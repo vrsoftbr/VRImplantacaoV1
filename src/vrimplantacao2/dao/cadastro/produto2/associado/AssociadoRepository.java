@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import vrimplantacao2.vo.cadastro.associado.AssociadoItemVO;
 import vrimplantacao2.vo.cadastro.associado.AssociadoVO;
 import vrimplantacao2.vo.importacao.AssociadoIMP;
+import vrimplantacao2.vo.importacao.AssociadoItemIMP;
 
 /**
  *
@@ -30,52 +31,83 @@ public class AssociadoRepository {
             provider.setStatus("Associados...carregando listagens...");
             LOG.info("Carregando produtos anteriores");                
             Map<String, Integer> produtos = provider.getProdutosAnteriores();
-            LOG.info("Carregando os associados existentes");
+            LOG.info("Carregando os associados existentes e seus itens");
             Map<Integer, AssociadoVO> associadosExistentes = provider.getAssociadosExistentes();
             
             provider.setStatus("Associados...gravando...", associados.size());
             LOG.info("Iniciando gravação dos associados");
             
+            //Para cada associado, execute.
             for (AssociadoIMP imp: associados) {
-                
+                //Verifica a existência do produto pai na tabela codant_produto.
                 Integer produtoPai = produtos.get(imp.getId());
-                
-                //Verifica a existência do produto pai.
+                //TODO: Incluir uma rotina que verifica os itens pelo EAN.
                 if (produtoPai != null) {
-                    
+                    //Verifica se existe algum associado com este produto.
                     AssociadoVO vo = associadosExistentes.get(produtoPai);
                     if (vo == null) {
-                        vo = new AssociadoVO();
-                        
+                        //Se não existir cria um novo associado e o cadastra no VR.
+                        vo = new AssociadoVO();                        
                         vo.setIdProduto(produtoPai);
-                        vo.setQtdEmbalagem(imp.getQtdEmbalagem());
-                        
+                        vo.setQtdEmbalagem(1);
                         provider.gravar(vo);
                         associadosExistentes.put(vo.getId(), vo);
                         LOG.finest("Produto pai gravado com sucesso: " + vo.getId());
-                    } else {                        
-                        provider.atualizar(vo, opt);
-                        LOG.finest("Produto pai atualizado com sucesso: " + vo.getId());
                     }
                     
-                    for (AssociadoItemVO item: imp.getItens()) {
-                        Integer produtoFilho = produtos.get(item.getProdutoId());
-                        //Verifica a existencia do filho
+                    //Importa os itens do associados.
+                    for (AssociadoItemIMP item: imp.getItens()) {
+                        //Verifica a existencia do produto filho na tabela codant_produto.
+                        Integer produtoFilho = produtos.get(item.getIdProduto());
+                        //TODO: Incluir uma rotina que verifica os itens pelo EAN.
                         if (produtoFilho != null) {
-                            
+                            //Se o produto filho existir, verifica se já está cadastrado no associado.
                             AssociadoItemVO vItem = vo.getItens().get(produtoFilho);
                             if (vItem == null) {
-                                
-                                vItem = converterItem(item);
+                                //Se não estiver cadastrado, converte e cadastra.
+                                vItem = new AssociadoItemVO();
                                 vItem.setIdAssociado(vo.getId());
                                 vItem.setIdProduto(produtoFilho);
+                                vItem.setQtdEmbalagem(vItem.getQtdEmbalagem());
+                                vItem.setAplicaEstoque(true);
+                                vItem.setAplicaCusto(false);
+                                vItem.setAplicaPreco(false);
+                                vItem.setPercentualCustoEstoque(vItem.getPercentualCustoEstoque());
+                                vItem.setPercentualPreco(vItem.getPercentualPreco());                                
                                 provider.gravar(vItem);
                                 vo.getItens().put(vItem.getId(), vItem);
+                                
+                                //Gera a inversão se não existir
+                                if (opt.contains(OpcaoAssociado.IMP_INVERTER)) {                                    
+                                    //Verifica se o associado já existe.
+                                    if (!associadosExistentes.containsKey(produtoFilho)) {                                    
+                                        //Coloca o item do associado como pai.
+                                        AssociadoVO invertVo = new AssociadoVO();
+                                        invertVo.setIdProduto(vItem.getIdProduto());
+                                        invertVo.setQtdEmbalagem(vItem.getQtdEmbalagem());
+                                        provider.gravar(invertVo);
+                                        associadosExistentes.put(invertVo.getIdProduto(), invertVo);
+                                        
+                                        //Coloca o pai como filho.
+                                        AssociadoItemVO invertItem = new AssociadoItemVO();
+                                        invertItem.setIdAssociado(invertVo.getId());
+                                        invertItem.setIdProduto(vo.getIdProduto());
+                                        invertItem.setQtdEmbalagem(1);
+                                        invertItem.setAplicaEstoque(false);
+                                        invertItem.setAplicaCusto(true);
+                                        invertItem.setAplicaPreco(true);
+                                        invertItem.setPercentualCustoEstoque(0);
+                                        invertItem.setPercentualPreco(0);
+                                        provider.gravar(invertItem);
+                                        invertVo.getItens().put(produtoPai, invertItem);                                        
+                                    }
+                                    
+                                }
                                 
                             }
                             
                         } else {
-                            LOG.warning(imp.getId() + " '" + imp.getDescricao() + " -> Produto filho " + item.getProdutoId() + " '" + item.getDescricao() + "' não foi encontrado!");
+                            LOG.warning(imp.getId() + " '" + imp.getDescricao() + " -> Produto filho " + item.getIdProduto() + " '" + item.getDescricao() + "' não foi encontrado!");
                         }
                     }                    
                 } else {
@@ -91,10 +123,6 @@ public class AssociadoRepository {
             throw ex;
         }
         
-    }
-
-    private AssociadoItemVO converterItem(AssociadoItemVO item) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }
