@@ -9,18 +9,20 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
-import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -52,138 +54,231 @@ public class TopSystemDAO extends InterfaceDAO {
     }
 
     @Override
-    public List<MercadologicoIMP> getMercadologicos() throws Exception {
-        List<MercadologicoIMP> vResult = new ArrayList<>();
+    public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
+        Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
+        
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select codigo, descricao from cad_setor order by codigo"
+                    "select "
+                    + "nivel1 merc1, "
+                    + "descricao merc1_descricao\n"
+                    + "from cad_produto_estru\n"
+                    + "where nivel2 = 0\n"
+                    + "and nivel3 = 0\n"
+                    + "order by nivel1"
             )) {
                 while (rst.next()) {
-                    MercadologicoIMP imp = new MercadologicoIMP();
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setMerc1ID(rst.getString("codigo"));
-                    imp.setMerc1Descricao(rst.getString("descricao"));
-                    vResult.add(imp);
+                    MercadologicoNivelIMP imp = new MercadologicoNivelIMP();
+                    imp.setId(rst.getString("merc1"));
+                    imp.setDescricao(rst.getString("merc1_descricao"));
+                    merc.put(imp.getId(), imp);
+                }
+            }
+            
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "nivel1 merc1, \n"
+                    + "coalesce(nivel2, 0) merc2,\n"
+                    + "descricao merc2_descricao\n"
+                    + "from cad_produto_estru\n"
+                    + "where coalesce(nivel2, 0) > 0\n"
+                    + "and nivel3 = 0\n"
+                    + "order by nivel1, coalesce(nivel2, 0)"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP merc1 = merc.get(rst.getString("merc1"));
+                    if (merc1 != null) {
+                        merc1.addFilho(
+                                rst.getString("merc2"), 
+                                rst.getString("merc2_descricao")
+                        );
+                    }
+                }
+            }
+            
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "nivel1 merc1, \n"
+                    + "coalesce(nivel2, 0) merc2,\n"
+                    + "coalesce(nivel3, 0) merc3,\n"
+                    + "descricao merc3_descricao\n"
+                    + "from cad_produto_estru\n"
+                    + "where coalesce(nivel2, 0) > 0\n"
+                    + "and coalesce(nivel3, 0) > 0\n"
+                    + "order by nivel1, \n"
+                    + "coalesce(nivel2, 0), \n"
+                    + "coalesce(nivel3, 0)"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP merc1 = merc.get(rst.getString("merc1"));
+                    if (merc1 != null) {
+                        MercadologicoNivelIMP merc2 = merc1.getNiveis().get(rst.getString("merc2"));
+                        if (merc2 != null) {
+                            merc2.addFilho(
+                                    rst.getString("merc3"), 
+                                    rst.getString("merc3_descricao")
+                            );
+                        }
+                    }
                 }
             }
         }
-        return vResult;
+        return new ArrayList<>(merc.values());
     }
-
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    p.codigo codproduto,\n" +
-                    "    p.descricao,\n" +
-                    "    p.descricao_complementar,\n" +
-                    "    p.codigo_interno,   \n" +
-                    "    case trim(coalesce(p.cean,'')) when '' then p.codigo else trim(coalesce(p.cean,'')) end codbarras, \n" +
-                    "    case when p.pesavel in ('S', 'U') then 1 else 0 end pesavel,\n" +
-                    "    case p.pesavel when 'S' then 'KG' when 'U' then 'UN' else  p.unidade end unidade,\n" +
-                    "    p.peso_liquido_embalagem,\n" +
-                    "    p.peso_bruto_embalagem,\n" +
-                    "    p.grupo,\n" +
-                    "    p.class_fiscal_mercosul,\n" +
-                    "    p.preco_venda1,\n" +
-                    "    p.preco_custo,\n" +
-                    "    p.margem_lucro,\n" +
-                    "    p.validade,\n" +
-                    "    p.familia,\n" +
-                    "    p.inativo,\n" +
-                    "    p.familiaproduto,\n" +
-                    "    p.cest,\n" +
-                    "    p.estoque_minimo,\n" +
-                    "    est.qtde_atual,\n" +
-                    "    p.tribcontrib,\n" +
-                    "    p.contrmonaliqdif,\n" +
-                    "    p.contrmonaliqund,\n" +
-                    "    p.contrsubsttrib,\n" +
-                    "    p.contraliqzero,\n" +
-                    "    pis.cstcontrib_cod,\n" +
-                    "    p.st_ecf,\n" +
-                    "    trib.sit_trib,\n" +
-                    "    trib.pct_red_calc_icms,\n" +
-                    "    trib.aliq_icms\n" +
-                    "from\n" +
-                    "    cad_produto p\n" +
-                    "    join cad_empresa emp on emp.codigo = " + getLojaOrigem() + "\n" +
-                    "    inner join ger_tribcontribitem pis on pis.cod = p.tribcontrib\n" +
-                    "    left join trib_estado trib on trib.cod_prod = p.codigo and trib.uf = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n" +
-                    "    left join cad_estoque est on est.empresa = emp.codigo and est.codigo = p.codigo and est.tipo_estoque = 1\n" +
-                    "union \n" +
-                    "select\n" +
-                    "    p.codigo codproduto,\n" +
-                    "    p.descricao,\n" +
-                    "    p.descricao_complementar,\n" +
-                    "    p.codigo_interno,   \n" +
-                    "    p.codigo codbarras, \n" +
-                    "    case when p.pesavel in ('S', 'U') then 1 else 0 end pesavel,\n" +
-                    "    case p.pesavel when 'S' then 'KG' when 'U' then 'UN' else  p.unidade end unidade,\n" +
-                    "    p.peso_liquido_embalagem,\n" +
-                    "    p.peso_bruto_embalagem,\n" +
-                    "    p.grupo,\n" +
-                    "    p.class_fiscal_mercosul,\n" +
-                    "    p.preco_venda1,\n" +
-                    "    p.preco_custo,\n" +
-                    "    p.margem_lucro,\n" +
-                    "    p.validade,\n" +
-                    "    p.familia,\n" +
-                    "    p.inativo,\n" +
-                    "    p.familiaproduto,\n" +
-                    "    p.cest,\n" +
-                    "    p.estoque_minimo,\n" +
-                    "    est.qtde_atual,\n" +
-                    "    p.tribcontrib,\n" +
-                    "    p.contrmonaliqdif,\n" +
-                    "    p.contrmonaliqund,\n" +
-                    "    p.contrsubsttrib,\n" +
-                    "    p.contraliqzero,\n" +
-                    "    pis.cstcontrib_cod,\n" +
-                    "    p.st_ecf,\n" +
-                    "    trib.sit_trib,\n" +
-                    "    trib.pct_red_calc_icms,\n" +
-                    "    trib.aliq_icms\n" +
-                    "from\n" +
-                    "    cad_produto p\n" +
-                    "    join cad_empresa emp on emp.codigo = " + getLojaOrigem() + "\n" +
-                    "    inner join ger_tribcontribitem pis on pis.cod = p.tribcontrib\n" +
-                    "    left join trib_estado trib on trib.cod_prod = p.codigo and trib.uf = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n" +
-                    "    left join cad_estoque est on est.empresa = emp.codigo and est.codigo = p.codigo and est.tipo_estoque = 1"
+                    "select\n"
+                    + "    p.codigo codproduto,\n"
+                    + "    p.codigo as codBarras,\n"
+                    + "    p.descricao,\n"
+                    + "    p.descricao_complementar,\n"
+                    + "    case trim(coalesce(p.cean,'')) when '' then p.codigo else trim(coalesce(p.cean,'')) end codbarras, \n"
+                    + "    case when p.pesavel in ('S', 'U') then 1 else 0 end pesavel,\n"
+                    + "    case p.pesavel when 'S' then 'KG' when 'U' then 'UN' else  p.unidade end unidade,\n"
+                    + "    p.peso_liquido_embalagem,\n"
+                    + "    p.peso_bruto_embalagem,\n"
+                    + "    p.grupo,\n"
+                    + "    p.nivel1, \n"
+                    + "    p.nivel2, \n"
+                    + "    p.nivel3, \n"
+                    + "    p.class_fiscal_mercosul,\n"
+                    + "    p.preco_venda1,\n"
+                    + "    p.preco_custo,\n"
+                    + "    p.margem_lucro,\n"
+                    + "    p.validade,\n"
+                    + "    p.familia,\n"
+                    + "    p.inativo,\n"
+                    + "    p.familiaproduto,\n"
+                    + "    p.cest,\n"
+                    + "    p.estoque_minimo,\n"
+                    + "    est.qtde_atual,\n"
+                    + "    p.tribcontrib,\n"
+                    + "    p.contrmonaliqdif,\n"
+                    + "    p.contrmonaliqund,\n"
+                    + "    p.contrsubsttrib,\n"
+                    + "    p.contraliqzero,\n"
+                    + "    pis.cstcontrib_cod,\n"
+                    + "    p.st_ecf,\n"
+                    + "    trib.sit_trib,\n"
+                    + "    trib.pct_red_calc_icms,\n"
+                    + "    trib.aliq_icms\n"
+                    + "from\n"
+                    + "    cad_produto p\n"
+                    + "    join cad_empresa emp on emp.codigo = " + getLojaOrigem() + "\n"
+                    + "    inner join ger_tribcontribitem pis on pis.cod = p.tribcontrib\n"
+                    + "    left join trib_estado trib on trib.cod_prod = p.codigo and trib.uf = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"
+                    + "    left join cad_estoque est on est.empresa = emp.codigo and est.codigo = p.codigo and est.tipo_estoque = 1\n" /*"union \n" +
+             "select\n" +
+             "    p.codigo codproduto,\n" +
+             "    p.descricao,\n" +
+             "    p.descricao_complementar,\n" +
+             "    p.codigo_interno,   \n" +
+             "    p.codigo codbarras, \n" +
+             "    case when p.pesavel in ('S', 'U') then 1 else 0 end pesavel,\n" +
+             "    case p.pesavel when 'S' then 'KG' when 'U' then 'UN' else  p.unidade end unidade,\n" +
+             "    p.peso_liquido_embalagem,\n" +
+             "    p.peso_bruto_embalagem,\n" +
+             "    p.grupo,\n" +
+             "    p.class_fiscal_mercosul,\n" +
+             "    p.preco_venda1,\n" +
+             "    p.preco_custo,\n" +
+             "    p.margem_lucro,\n" +
+             "    p.validade,\n" +
+             "    p.familia,\n" +
+             "    p.inativo,\n" +
+             "    p.familiaproduto,\n" +
+             "    p.cest,\n" +
+             "    p.estoque_minimo,\n" +
+             "    est.qtde_atual,\n" +
+             "    p.tribcontrib,\n" +
+             "    p.contrmonaliqdif,\n" +
+             "    p.contrmonaliqund,\n" +
+             "    p.contrsubsttrib,\n" +
+             "    p.contraliqzero,\n" +
+             "    pis.cstcontrib_cod,\n" +
+             "    p.st_ecf,\n" +
+             "    trib.sit_trib,\n" +
+             "    trib.pct_red_calc_icms,\n" +
+             "    trib.aliq_icms\n" +
+             "from\n" +
+             "    cad_produto p\n" +
+             "    join cad_empresa emp on emp.codigo = " + getLojaOrigem() + "\n" +
+             "    inner join ger_tribcontribitem pis on pis.cod = p.tribcontrib\n" +
+             "    left join trib_estado trib on trib.cod_prod = p.codigo and trib.uf = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n" +
+             "    left join cad_estoque est on est.empresa = emp.codigo and est.codigo = p.codigo and est.tipo_estoque = 1"*/
             )) {
                 while (rst.next()) {
 
-                    
                     int cst;
                     double aliquota = 0, reducao = 0;
-                    
+
                     String icms = rst.getString("st_ecf");
                     if (icms == null) {
                         icms = "";
                     }
                     icms = icms.trim().toUpperCase();
-                    
+
                     if (!"".equals(icms)) {
                         switch (icms) {
-                            case "FF": cst = 60; break;
-                            case "II": cst = 40; break;
-                            case "NN": cst = 90; break;
-                            case "7,0": cst = 0; aliquota = 7; break;
-                            case "07": cst = 0; aliquota = 7; break;
-                            case "8,4": cst = 0; aliquota = 8.4; break;
-                            case "12,0": cst = 0; aliquota = 12; break;
-                            case "12": cst = 0; aliquota = 12; break;
-                            case "18,0": cst = 0; aliquota = 18; break;
-                            case "18": cst = 0; aliquota = 18; break;
-                            case "25,0": cst = 0; aliquota = 25; break;
-                            case "25": cst = 0; aliquota = 25; break;
-                            case "0,0": cst = 90; break;
-                            case "00": cst = 90; break;
-                            default: cst = 90; break;
-                        }  
+                            case "FF":
+                                cst = 60;
+                                break;
+                            case "II":
+                                cst = 40;
+                                break;
+                            case "NN":
+                                cst = 90;
+                                break;
+                            case "7,0":
+                                cst = 0;
+                                aliquota = 7;
+                                break;
+                            case "07":
+                                cst = 0;
+                                aliquota = 7;
+                                break;
+                            case "8,4":
+                                cst = 0;
+                                aliquota = 8.4;
+                                break;
+                            case "12,0":
+                                cst = 0;
+                                aliquota = 12;
+                                break;
+                            case "12":
+                                cst = 0;
+                                aliquota = 12;
+                                break;
+                            case "18,0":
+                                cst = 0;
+                                aliquota = 18;
+                                break;
+                            case "18":
+                                cst = 0;
+                                aliquota = 18;
+                                break;
+                            case "25,0":
+                                cst = 0;
+                                aliquota = 25;
+                                break;
+                            case "25":
+                                cst = 0;
+                                aliquota = 25;
+                                break;
+                            case "0,0":
+                                cst = 90;
+                                break;
+                            case "00":
+                                cst = 90;
+                                break;
+                            default:
+                                cst = 90;
+                                break;
+                        }
                     } else {
                         cst = 90;
                         aliquota = 0;
@@ -210,6 +305,9 @@ public class TopSystemDAO extends InterfaceDAO {
                     imp.setMargem(rst.getDouble("Margem_Lucro"));
                     imp.setValidade(rst.getInt("Validade"));
                     imp.setSituacaoCadastro((rst.getInt("inativo") == 0 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
+                    imp.setCodMercadologico1(rst.getString("nivel1"));
+                    imp.setCodMercadologico2(rst.getString("nivel2"));
+                    imp.setCodMercadologico3(rst.getString("nivel3"));
                     imp.setIdFamiliaProduto(rst.getString("familiaproduto"));
                     imp.setCest(rst.getString("cest"));
                     imp.setEstoqueMinimo(rst.getDouble("estoque_minimo"));
@@ -224,6 +322,29 @@ public class TopSystemDAO extends InterfaceDAO {
                     imp.setIcmsCst(cst);
                     imp.setIcmsAliq(aliquota);
                     imp.setIcmsReducao(reducao);
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "codigo_interno as codProduto, \n"
+                    + "Codigoa as codBarras\n"
+                    + "from cad_produto "
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("codProduto"));
+                    imp.setEan(rst.getString("codBarras"));
                     vResult.add(imp);
                 }
             }
@@ -312,18 +433,18 @@ public class TopSystemDAO extends InterfaceDAO {
         List<ProdutoFornecedorIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n" +
-                    "     pf.CodForn id_fornecedor,\n" +
-                    "     pf.Produto id_produto,     \n" +
-                    "     pf.ProdForn codigoexterno,     \n" +
-                    "     (select cv.FatorConv from cad_produto_fatconv cv where cv.codigo_produto = pf.Produto and cv.UnidMedida = 'CX' limit 1) qtdCX,     \n" +
-                    "     (select cv.FatorConv from cad_produto_fatconv cv where cv.codigo_produto = pf.Produto and cv.UnidMedida = 'DP' limit 1) qtdDP,     \n" +
-                    "     (select cv.FatorConv from cad_produto_fatconv cv where cv.codigo_produto = pf.Produto and cv.UnidMedida = 'PT' limit 1) qtdPT,     \n" +
-                    "     (select cv.FatorConv from cad_produto_fatconv cv where cv.codigo_produto = pf.Produto and cv.UnidMedida in ('PC', 'PCT') limit 1) qtdPCT,\n" +
-                    "     (select concat(cv.UnidMedida,'&&',cv.FatorConv) from cad_produto_fatconv cv where cv.codigo_produto = pf.Produto limit 1) qtdOutras\n" +
-                    "from \n" +
-                    "	cad_forn_prod pf\n" +
-                    "order by Produto "
+                    "select \n"
+                    + "     pf.CodForn id_fornecedor,\n"
+                    + "     pf.Produto id_produto,     \n"
+                    + "     pf.ProdForn codigoexterno,     \n"
+                    + "     (select cv.FatorConv from cad_produto_fatconv cv where cv.codigo_produto = pf.Produto and cv.UnidMedida = 'CX' limit 1) qtdCX,     \n"
+                    + "     (select cv.FatorConv from cad_produto_fatconv cv where cv.codigo_produto = pf.Produto and cv.UnidMedida = 'DP' limit 1) qtdDP,     \n"
+                    + "     (select cv.FatorConv from cad_produto_fatconv cv where cv.codigo_produto = pf.Produto and cv.UnidMedida = 'PT' limit 1) qtdPT,     \n"
+                    + "     (select cv.FatorConv from cad_produto_fatconv cv where cv.codigo_produto = pf.Produto and cv.UnidMedida in ('PC', 'PCT') limit 1) qtdPCT,\n"
+                    + "     (select concat(cv.UnidMedida,'&&',cv.FatorConv) from cad_produto_fatconv cv where cv.codigo_produto = pf.Produto limit 1) qtdOutras\n"
+                    + "from \n"
+                    + "	cad_forn_prod pf\n"
+                    + "order by Produto "
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -341,7 +462,7 @@ public class TopSystemDAO extends InterfaceDAO {
                     } else if (rst.getString("qtdPCT") != null) {
                         imp.setQtdEmbalagem(rst.getInt("qtdPCT"));
                     } else if (rst.getString("qtdOutras") != null) {
-                        String[] val = rst.getString("qtdOutras").split("&&");                        
+                        String[] val = rst.getString("qtdOutras").split("&&");
                         imp.setQtdEmbalagem(Utils.stringToDouble(val[1]));
                     }
                     vResult.add(imp);
@@ -431,20 +552,20 @@ public class TopSystemDAO extends InterfaceDAO {
                 while (rst.next()) {
                     CreditoRotativoIMP vo = new CreditoRotativoIMP();
                     vo.setId(
-                            rst.getString("empresa") + "-" +
-                            rst.getString("tipo_doc") + "-" +
-                            rst.getString("serie") + "-" +
-                            rst.getString("numero_doc") + "-" +
-                            rst.getString("sequencia")
+                            rst.getString("empresa") + "-"
+                            + rst.getString("tipo_doc") + "-"
+                            + rst.getString("serie") + "-"
+                            + rst.getString("numero_doc") + "-"
+                            + rst.getString("sequencia")
                     );
                     vo.setDataEmissao(rst.getDate("data_emissao"));
                     vo.setDataVencimento(rst.getDate("data_vencimento"));
                     vo.setNumeroCupom(rst.getString("numero_doc"));
                     vo.setIdCliente(rst.getString("cliente"));
                     vo.setValor(rst.getDouble("saldo"));
-                    
-                    if ((rst.getString("observacao") != null) &&
-                            (!rst.getString("observacao").trim().isEmpty())) {
+
+                    if ((rst.getString("observacao") != null)
+                            && (!rst.getString("observacao").trim().isEmpty())) {
                         vo.setObservacao(rst.getString("observacao").trim());
                     }
                     vResult.add(vo);
@@ -453,8 +574,6 @@ public class TopSystemDAO extends InterfaceDAO {
         }
         return vResult;
     }
-    
-    
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
