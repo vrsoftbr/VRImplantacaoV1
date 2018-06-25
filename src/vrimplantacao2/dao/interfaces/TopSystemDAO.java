@@ -8,6 +8,7 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,13 +17,18 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
+import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -56,7 +62,7 @@ public class TopSystemDAO extends InterfaceDAO {
     @Override
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
         Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
-        
+
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
@@ -74,7 +80,7 @@ public class TopSystemDAO extends InterfaceDAO {
                     merc.put(imp.getId(), imp);
                 }
             }
-            
+
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
                     + "nivel1 merc1, \n"
@@ -89,13 +95,13 @@ public class TopSystemDAO extends InterfaceDAO {
                     MercadologicoNivelIMP merc1 = merc.get(rst.getString("merc1"));
                     if (merc1 != null) {
                         merc1.addFilho(
-                                rst.getString("merc2"), 
+                                rst.getString("merc2"),
                                 rst.getString("merc2_descricao")
                         );
                     }
                 }
             }
-            
+
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
                     + "nivel1 merc1, \n"
@@ -115,7 +121,7 @@ public class TopSystemDAO extends InterfaceDAO {
                         MercadologicoNivelIMP merc2 = merc1.getNiveis().get(rst.getString("merc2"));
                         if (merc2 != null) {
                             merc2.addFilho(
-                                    rst.getString("merc3"), 
+                                    rst.getString("merc3"),
                                     rst.getString("merc3_descricao")
                             );
                         }
@@ -125,7 +131,7 @@ public class TopSystemDAO extends InterfaceDAO {
         }
         return new ArrayList<>(merc.values());
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> vResult = new ArrayList<>();
@@ -481,7 +487,8 @@ public class TopSystemDAO extends InterfaceDAO {
                     "select Codigo, Nome_Reduzido, Razao_Social, Endereco, Numero, \n"
                     + "       Complemento, Bairro, CEP, CPF_CNPJ, Data_Nascimento, \n"
                     + "       Nome_Pai, Nome_Mae, Insc_Estadual_Rg, Insc_Municipal, \n"
-                    + "       DDD, Telefone, Ramal, Fax, E_Mail, Limite_Credito, Contato, Data_Cadastramento,\n"
+                    + "       DDD, Telefone, Ramal, Fax, E_Mail, Limite_Credito, "
+                    + "       Contato, Data_Cadastramento, observacao, \n"
                     + "       Bloqueado, Celular, municipio, uf, cod_oficial_mun, Ativo, DDD_Celular\n"
                     + "  from cad_cliente"
             )) {
@@ -498,7 +505,7 @@ public class TopSystemDAO extends InterfaceDAO {
                     imp.setMunicipio(rst.getString("municipio"));
                     imp.setUf(rst.getString("uf"));
                     imp.setCnpj(rst.getString("CPF_CNPJ"));
-                    imp.setInscricaoestadual(rst.getString("Insc_Estadual_Rg"));
+                    imp.setInscricaoestadual(rst.getString("Insc_Municipal"));
                     imp.setNomePai(rst.getString("Nome_Pai"));
                     imp.setNomeMae(rst.getString("Nome_Mae"));
                     imp.setTelefone(rst.getString("DDD") + rst.getString("Telefone"));
@@ -506,7 +513,17 @@ public class TopSystemDAO extends InterfaceDAO {
                     imp.setEmail(rst.getString("E_Mail"));
                     imp.setValorLimite(rst.getDouble("Limite_Credito"));
                     imp.setBloqueado(!"N".equals(rst.getString("Bloqueado")));
+
+                    if (imp.isBloqueado()) {
+                        imp.setPermiteCreditoRotativo(false);
+                        imp.setPermiteCheque(false);
+                    } else {
+                        imp.setPermiteCreditoRotativo(true);
+                        imp.setPermiteCheque(true);
+                    }
+
                     imp.setAtivo("S".equals(rst.getString("Ativo")));
+                    imp.setObservacao(rst.getString("observacao"));
                     if ((rst.getString("Data_Cadastramento") != null)
                             && (!rst.getString("Data_Cadastramento").trim().isEmpty())) {
                         imp.setDataCadastro(rst.getDate("Data_Cadastramento"));
@@ -573,6 +590,93 @@ public class TopSystemDAO extends InterfaceDAO {
             }
         }
         return vResult;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "ch.Empresa, ch.Banco, ch.Codigo_Oficial, ch.Codigo_Agencia, ch.CC_Numero,\n"
+                    + "ch.CC_Dv, ch.Numero_Cheque, ch.Numero_Documentov, ch.Valor_Cheque,\n"
+                    + "ch.Data_Entrada, ch.Observacao, ch.Emitente, ch.Data_Devolucao1, ch.Data_Devolucao2,\n"
+                    + "c.Razao_Social, c.CPF_CNPJ, c.Insc_Municipal, c.Telefone, ch.Data_Original_PDeposito\n"
+                    + "from cad_cheque3 ch\n"
+                    + "left join cad_cliente c on c.Codigo = ch.Codigo_Cliente\n"
+                    + "where ch.Codigo_Cliente = 1 \n"
+                    + "and ch.Data_Baixa1Deposito is null\n"
+                    + "and ch.Data_Baixa2Deposito is null\n"
+                    + "and ch.Data_Baixa_Uso is null"
+            )) {
+                while (rst.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    imp.setId(
+                            rst.getString("Empresa")
+                            + " - " + rst.getString("Banco")
+                            + " - " + rst.getString("Codigo_Oficial")
+                            + " - " + rst.getString("Codigo_Agencia")
+                            + " - " + rst.getString("CC_Numero")
+                            + " - " + rst.getString("CC_Dv")
+                            + " - " + rst.getString("Numero_Cheque")
+                    );
+
+                    imp.setDate(rst.getDate("Data_Entrada"));
+                    imp.setDataDeposito(rst.getDate("Data_Original_PDeposito"));
+                    imp.setNome(rst.getString("Emitente"));
+                    imp.setValor(rst.getDouble("Valor_Cheque"));
+                    imp.setAgencia(rst.getString("Codigo_Agencia"));
+                    imp.setConta(rst.getString("CC_Numero"));
+                    imp.setNumeroCheque(rst.getString("Numero_Cheque"));
+                    imp.setObservacao(rst.getString("Observacao"));
+
+                    if ((rst.getString("Data_Devolucao1") != null)
+                            && (!rst.getString("Data_Devolucao1").trim().isEmpty())
+                            || (rst.getString("Data_Devolucao2") != null)
+                            && (!rst.getString("Data_Devolucao2").trim().isEmpty())) {
+                        imp.setAlinea(11);
+                    } else {
+                        imp.setAlinea(0);
+                    }
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(java.util.Date dataTermino) throws Exception {
+        if (dataTermino == null) {
+            dataTermino = new java.util.Date();
+        }
+        List<OfertaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "produto, "
+                    + "dt_inicio, "
+                    + "dt_final, "
+                    + "preco_venda\n"
+                    + "from cad_produto_prom "
+                    + "where filial = " + getLojaOrigem()
+                    + " and dt_final > " + SQLUtils.stringSQL(new SimpleDateFormat("yyyy-MM-dd").format(dataTermino))
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    imp.setIdProduto(rst.getString("produto"));
+                    imp.setDataInicio(rst.getDate("dt_inicio"));
+                    imp.setDataFim(rst.getDate("dt_final"));
+                    imp.setPrecoOferta(rst.getDouble("preco_venda"));
+                    imp.setSituacaoOferta(SituacaoOferta.ATIVO);
+                    imp.setTipoOferta(TipoOfertaVO.CAPA);
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {

@@ -65,6 +65,7 @@ public class ClienteRepository {
                 opt.add(OpcaoCliente.DADOS);
                 opt.add(OpcaoCliente.CONTATOS);
                 opt.add(OpcaoCliente.OBSERVACOES2);
+                opt.add(OpcaoCliente.OBSERVACOES);                        
                 opt.add(OpcaoCliente.SITUACAO_CADASTRO);
                 opt.add(OpcaoCliente.INSCRICAO_ESTADUAL);
                 opt.add(OpcaoCliente.DATA_NASCIMENTO);
@@ -138,6 +139,7 @@ public class ClienteRepository {
                         }
                     } else {
                         if ((opt.contains(OpcaoCliente.OBSERVACOES2))
+                                || (opt.contains(OpcaoCliente.OBSERVACOES))
                                 || (opt.contains(OpcaoCliente.SITUACAO_CADASTRO))
                                 || (opt.contains(OpcaoCliente.VALOR_LIMITE))
                                 || (opt.contains(OpcaoCliente.INSCRICAO_ESTADUAL))

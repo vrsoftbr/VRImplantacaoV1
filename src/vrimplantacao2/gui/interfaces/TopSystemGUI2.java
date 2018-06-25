@@ -13,6 +13,7 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
@@ -221,6 +222,11 @@ public class TopSystemGUI2 extends VRInternalFrame {
                                 importador.atualizarProdutos(opcoes);
                             }
                         }
+                        
+                        if (chkOferta.isSelected()) {
+                            importador.importarOfertas(null);
+                        }
+                        
                         if (chkEAN.isSelected()) {
                             importador.importarEAN();
                         }
@@ -246,7 +252,13 @@ public class TopSystemGUI2 extends VRInternalFrame {
                         }
                         
                         if (chkClientePreferencial.isSelected()) {
-                            importador.importarClientePreferencial();
+                            importador.importarClientePreferencial(
+                                    OpcaoCliente.DADOS, 
+                                    OpcaoCliente.INSCRICAO_ESTADUAL,
+                                    OpcaoCliente.PERMITE_CREDITOROTATIVO,
+                                    OpcaoCliente.PERMITE_CHEQUE,
+                                    OpcaoCliente.VALOR_LIMITE,
+                                    OpcaoCliente.OBSERVACOES);
                         }
                         
                         if (chkCreditoRotativo.isSelected()) {
@@ -310,6 +322,7 @@ public class TopSystemGUI2 extends VRInternalFrame {
         chkTipoEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkMargem = new vrframework.bean.checkBox.VRCheckBox();
+        chkOferta = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
@@ -435,6 +448,9 @@ public class TopSystemGUI2 extends VRInternalFrame {
 
         chkMargem.setText("Margem");
         tabProdutos.add(chkMargem);
+
+        chkOferta.setText("Oferta");
+        tabProdutos.add(chkOferta);
 
         tabImportacao.addTab("Produtos", tabProdutos);
 
@@ -624,6 +640,7 @@ public class TopSystemGUI2 extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkNatReceita;
+    private vrframework.bean.checkBox.VRCheckBox chkOferta;
     private vrframework.bean.checkBox.VRCheckBox chkPisCofins;
     private vrframework.bean.checkBox.VRCheckBox chkPreco;
     private vrframework.bean.checkBox.VRCheckBox chkProdMercadologico;

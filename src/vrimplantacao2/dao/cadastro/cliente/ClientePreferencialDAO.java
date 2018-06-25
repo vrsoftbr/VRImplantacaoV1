@@ -265,7 +265,9 @@ public class ClientePreferencialDAO {
                 SQLBuilder sql = new SQLBuilder();
                 sql.setTableName("clientepreferencial");
                 if (opt.contains(OpcaoCliente.OBSERVACOES2)) {
-                    sql.put("observacao2", vo.getObservacao2());
+                    sql.put("observacao2", vo.getObservacao2());                    
+                }
+                if (opt.contains(OpcaoCliente.OBSERVACOES)) {
                     sql.put("observacao", vo.getObservacao());
                 }
                 if (opt.contains(OpcaoCliente.SITUACAO_CADASTRO)) {
