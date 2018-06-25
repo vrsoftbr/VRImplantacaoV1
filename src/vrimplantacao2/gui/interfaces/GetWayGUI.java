@@ -316,6 +316,9 @@ public class GetWayGUI extends VRInternalFrame {
                         if (chkT1EANemBranco.isSelected()) {
                             importador.importarEANemBranco();
                         }
+                        if (chkAssociado.isSelected()) {
+                            importador.importarAssociado();
+                        }
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
@@ -465,6 +468,7 @@ public class GetWayGUI extends VRInternalFrame {
         chkT1CEST = new vrframework.bean.checkBox.VRCheckBox();
         chkTemArquivoBalanca = new vrframework.bean.checkBox.VRCheckBox();
         chkDtAlteracao = new vrframework.bean.checkBox.VRCheckBox();
+        chkAssociado = new vrframework.bean.checkBox.VRCheckBox();
         jPanel2 = new javax.swing.JPanel();
         chkMargem = new vrframework.bean.checkBox.VRCheckBox();
         chkUsarMargemBruta = new vrframework.bean.checkBox.VRCheckBox();
@@ -695,6 +699,9 @@ public class GetWayGUI extends VRInternalFrame {
 
         chkDtAlteracao.setText("Data Alteração");
         vRPanel7.add(chkDtAlteracao);
+
+        chkAssociado.setText("Associado");
+        vRPanel7.add(chkAssociado);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -1395,6 +1402,7 @@ public class GetWayGUI extends VRInternalFrame {
     private javax.swing.JToggleButton btnConectar;
     private vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTrib;
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkAssociado;
     private vrframework.bean.checkBox.VRCheckBox chkAtacado;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
