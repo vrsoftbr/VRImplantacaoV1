@@ -28,10 +28,14 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean v_usar_arquivoBalanca;
+    public String id_loja;
 
     @Override
     public String getSistema() {
-        return "ICommerce";
+        if (id_loja == null) {
+            id_loja = "";
+        }   
+        return "ICommerce" + id_loja;        
     }
 
     @Override
