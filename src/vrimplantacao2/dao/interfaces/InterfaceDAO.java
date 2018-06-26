@@ -13,6 +13,7 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.cadastro.venda.VendaHistoricoIMP;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
@@ -21,6 +22,7 @@ import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.importacao.AcumuladorIMP;
 import vrimplantacao2.vo.importacao.AcumuladorLayoutIMP;
 import vrimplantacao2.vo.importacao.AcumuladorLayoutRetornoIMP;
+import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
@@ -466,4 +468,14 @@ public abstract class InterfaceDAO {
     public List<InventarioIMP> getInventario(Date dataInventario) throws Exception {
         return new ArrayList<>();
     }   
+
+    /**
+     * Permite a importação dos associados no sistema.
+     * @param opt Parâmetros de importação.
+     * @return Lista de associados.
+     * @throws Exception 
+     */
+    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
+        return new ArrayList<>();
+    }
 }

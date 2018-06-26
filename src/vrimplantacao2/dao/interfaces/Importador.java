@@ -70,12 +70,16 @@ import vrimplantacao2.dao.cadastro.pdv.acumulador.AcumuladorRepository;
 import vrimplantacao2.dao.cadastro.pdv.acumulador.AcumuladorRepositoryProvider;
 import vrimplantacao2.dao.cadastro.pdv.operador.OperadorRepository;
 import vrimplantacao2.dao.cadastro.pdv.operador.OperadorRepositoryProvider;
+import vrimplantacao2.dao.cadastro.produto2.associado.AssociadoRepository;
+import vrimplantacao2.dao.cadastro.produto2.associado.AssociadoRepositoryProvider;
+import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.importacao.AcumuladorIMP;
 import vrimplantacao2.vo.importacao.AcumuladorLayoutIMP;
 import vrimplantacao2.vo.importacao.AcumuladorLayoutRetornoIMP;
+import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
@@ -942,4 +946,23 @@ public class Importador {
         InventarioRepository rep = new InventarioRepository(provider);
         rep.importarInventario(inventario);
     }
+
+    /**
+     * Importa o cadastro de associados do sistema.
+     * @param opcoes Opções de importação do associado.
+     * @throws Exception 
+     */
+    public void importarAssociado(OpcaoAssociado... opcoes) throws Exception {
+        ProgressBar.setStatus("Carregando associado...");
+        HashSet<OpcaoAssociado> opt = new HashSet<>(Arrays.asList(opcoes));
+        List<AssociadoIMP> associados = getInterfaceDAO().getAssociados(opt);
+        AssociadoRepositoryProvider provider = new AssociadoRepositoryProvider(
+                getSistema(),
+                getLojaOrigem(),
+                getLojaVR()
+        );
+        AssociadoRepository rep = new AssociadoRepository(provider);
+        rep.importarAssociado(associados, opt);
+    }
+    
 }
