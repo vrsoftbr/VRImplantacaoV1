@@ -156,28 +156,40 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MercadologicoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select CRECEITA.CODCRECEITA AS MERC1, "
-                    + "coalesce(CRECEITA.DESCRICAO,'DIVERSOS') AS  DESCRICAO_M1, "
-                    + "coalesce(GRUPO.CODGRUPO, 1) AS MERC2, "
-                    + "coalesce(GRUPO.DESCRICAO, CRECEITA.DESCRICAO) AS  DESCRICAO_M2, "
-                    + "coalesce(CATEGORIA.CODCATEGORIA, 1) AS MERC3,  "
-                    + "coalesce(CATEGORIA.DESCRICAO,GRUPO.DESCRICAO) as DESCRICAO_M3 "
-                    + "from "
-                    + "CRECEITA "
-                    + "left join GRUPO on GRUPO.CODCRECEITA = CRECEITA.CODCRECEITA "
-                    + "left join CATEGORIA on CATEGORIA.CODGRUPO = GRUPO.CODGRUPO "
-                    + "order by CRECEITA.CODCRECEITA, GRUPO.CODGRUPO, CATEGORIA.CODCATEGORIA "
+                    "select\n" +
+                    "	p.CODCRECEITA m1,\n" +
+                    "	coalesce(m1.DESCRICAO, 'PADRAO') m1_desc,\n" +
+                    "	p.CODGRUPO m2,\n" +
+                    "	coalesce(m2.DESCRICAO, 'PADRAO') m2_desc,\n" +
+                    "	p.CODCATEGORIA m3,\n" +
+                    "	coalesce(m3.DESCRICAO, 'PADRAO') m3_desc\n" +
+                    "from\n" +
+                    "	(select distinct\n" +
+                    "		codcreceita,\n" +
+                    "		codgrupo,\n" +
+                    "		codcategoria\n" +
+                    "	from\n" +
+                    "		PRODUTOS) p\n" +
+                    "	left join creceita m1 on\n" +
+                    "		p.codcreceita = m1.codcreceita\n" +
+                    "	left join grupo m2 on\n" +
+                    "		p.CODCRECEITA = m2.CODCRECEITA and\n" +
+                    "		p.CODGRUPO = m2.CODGRUPO\n" +
+                    "	left join categoria m3 on\n" +
+                    "		p.CODCATEGORIA = m3.CODCATEGORIA\n" +
+                    "order by\n" +
+                    "	m1, m2, m3"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setMerc1ID(rst.getString("MERC1"));
-                    imp.setMerc2ID(rst.getString("MERC2"));
-                    imp.setMerc3ID(rst.getString("MERC3"));
-                    imp.setMerc1Descricao(rst.getString("DESCRICAO_M1"));
-                    imp.setMerc2Descricao(rst.getString("DESCRICAO_M2"));
-                    imp.setMerc3Descricao(rst.getString("DESCRICAO_M3"));
+                    imp.setMerc1ID(rst.getString("m1"));
+                    imp.setMerc2ID(rst.getString("m2"));
+                    imp.setMerc3ID(rst.getString("m3"));
+                    imp.setMerc1Descricao(rst.getString("m1_desc"));
+                    imp.setMerc2Descricao(rst.getString("m2_desc"));
+                    imp.setMerc3Descricao(rst.getString("m3_desc"));
                     vResult.add(imp);
                 }
             }
@@ -188,59 +200,57 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> vResult = new ArrayList<>();
-        int cstSaida, cstEntrada;
-        double valIcmsCredito;
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	 fam.codfamilia,\n"
-                    + "	 prod.validade,\n"
-                    + "	 prod.codprod,\n"
-                    + "	 prod.descricao,\n"
-                    + "	 prod.desc_pdv,\n"
-                    + "	 coalesce(merc.codcreceita, 1) as merc1,\n"
-                    + "	 coalesce(merc.codgrupo, 1) as merc2,\n"
-                    + "	 coalesce(merc.codcategoria, 1) as merc3,\n"
-                    + "	 prod.codaliq,\n"
-                    + "	 prod.BARRA as ean,\n"
-                    + "	 prod.unidade,\n"
-                    + "	 prod.estoque,\n"
-                    + "	 prod.preco_cust,\n"
-                    + "	 prod.preco_unit,\n"
-                    + "	 prod.margem_bruta,\n"
-                    + "	 prod.margem_param,\n"
-                    + "	 prod.codaliq_nf,\n"
-                    + "	 prod.obs,\n"
-                    + "	 prod.dtaltera,\n"
-                    + "	 prod.dtinclui,\n"
-                    + "	 prod.qtd_emb,\n"
-                    + "	 prod.preco_especial,\n"
-                    + "	 prod.cst_pisentrada,\n"
-                    + "	 prod.cst_pissaida,\n"
-                    + "	 prod.cst_cofinsentrada,\n"
-                    + "	 prod.cst_cofinssaida,\n"
-                    + "	 prod.nat_rec,\n"
-                    + "	 prod.generoitem_sef2,\n"
-                    + "	 prod.aliquota_ibpt,\n"
-                    + "	 prod.aliquota_ibptest,\n"
-                    + "	 prod.aliquota_ibptmun,\n"
-                    + "	 prod.codncm,\n"
-                    + "	 prod.ativo,\n"
-                    + "	 prod.codcest,\n"
-                    + "	 prod.qtd_embvenda,\n"
-                    + "	 prod.codaliq cst_debito,\n"
-                    + "	 prod.codaliq_nf cst_entrada,\n"
-                    + "	 prod.codcest,\n"
-                    + "	 prod.dtinclui,\n"
-                    + "	 prod.desativacompra\n"
-                    + "from\n"
-                    + "	 produtos prod\n"
-                    + "	 left outer join categoria merc on merc.codcreceita = prod.codcreceita \n"
-                    + " and merc.codgrupo = prod.codgrupo \n"
-                    + " and merc.codcategoria = prod.codcategoria\n"
-                    + "	 left outer join prod_familia fam on fam.codprod = prod.codprod \n"
-                    + " and prod.codprod > 0\n"
-                    + "  order by prod.DESCRICAO"
+                    "select\n" +
+                    "	 prod.validade,\n" +
+                    "	 prod.codprod,\n" +
+                    "	 prod.descricao,\n" +
+                    "	 prod.desc_pdv,\n" +
+                    "	 coalesce(prod.codcreceita, 1) as merc1,\n" +
+                    "	 coalesce(prod.codgrupo, 1) as merc2,\n" +
+                    "	 coalesce(prod.codcategoria, 1) as merc3,\n" +
+                    "	 fam.codfamilia,\n" +
+                    "	 prod.codaliq,\n" +
+                    "	 prod.BARRA as ean,\n" +
+                    "	 prod.unidade,\n" +
+                    "	 prod.estoque,\n" +
+                    "	 prod.preco_cust,\n" +
+                    "	 prod.preco_unit,\n" +
+                    "	 prod.margem_bruta,\n" +
+                    "	 prod.margem_param,\n" +
+                    "	 prod.codaliq_nf,\n" +
+                    "	 prod.obs,\n" +
+                    "	 prod.dtaltera,\n" +
+                    "	 prod.dtinclui,\n" +
+                    "	 prod.qtd_emb,\n" +
+                    "	 prod.preco_especial,\n" +
+                    "	 prod.cst_pisentrada,\n" +
+                    "	 prod.cst_pissaida,\n" +
+                    "	 prod.cst_cofinsentrada,\n" +
+                    "	 prod.cst_cofinssaida,\n" +
+                    "	 prod.nat_rec,\n" +
+                    "	 prod.generoitem_sef2,\n" +
+                    "	 prod.aliquota_ibpt,\n" +
+                    "	 prod.aliquota_ibptest,\n" +
+                    "	 prod.aliquota_ibptmun,\n" +
+                    "	 prod.codncm,\n" +
+                    "	 prod.ativo,\n" +
+                    "	 prod.codcest,\n" +
+                    "	 prod.qtd_embvenda,\n" +
+                    "	 prod.codaliq cst_debito,\n" +
+                    "	 prod.codaliq_nf cst_entrada,\n" +
+                    "	 prod.codcest,\n" +
+                    "	 prod.dtinclui,\n" +
+                    "	 prod.desativacompra\n" +
+                    "from\n" +
+                    "	 produtos prod\n" +
+                    "	 left outer join prod_familia fam on\n" +
+                    "		fam.codprod = prod.codprod and\n" +
+                    "		prod.codprod > 0\n" +
+                    " order by\n" +
+                    "	prod.DESCRICAO"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
