@@ -31,6 +31,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.cadastro.verba.receber.ReceberVerbaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -49,6 +50,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.cadastro.financeiro.ReceberDevolucaoVO;
 import vrimplantacao2.vo.cadastro.financeiro.ReceberVerbaVO;
 import vrimplantacao2.vo.enums.TipoFornecedor;
+import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -1236,6 +1238,46 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    @Override
+    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
+        List<AssociadoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	pi.codprod produtopai,\n" +
+                    "	p.descricao descricaopai,\n" +
+                    "	pi.qtd qtdembalagem,\n" +
+                    "	pi.codprod_itm produtofilho,\n" +
+                    "	pitem.descricao descricaofilho\n" +
+                    "from\n" +
+                    "	prod_itens pi\n" +
+                    "	join produtos p on\n" +
+                    "		pi.CODPROD = p.CODPROD\n" +
+                    "	join produtos pitem on\n" +
+                    "		pi.CODPROD_ITM = pitem.CODPROD\n" +
+                    "order by\n" +
+                    "	produtopai, produtofilho"
+            )) {
+                while (rst.next()) {
+                    AssociadoIMP imp = new AssociadoIMP();
+                    
+                    imp.setId(rst.getString("produtopai"));
+                    imp.setDescricao(rst.getString("descricaopai"));
+                    imp.addItem(
+                            rst.getString("descricaofilho"), 
+                            rst.getString("produtofilho"), 
+                            rst.getInt("qtdembalagem")
+                    );
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
     private static class VendaIterator implements Iterator<VendaIMP> {
 
         private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");

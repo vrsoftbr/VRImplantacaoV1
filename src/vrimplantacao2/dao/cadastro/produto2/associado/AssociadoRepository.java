@@ -51,7 +51,7 @@ public class AssociadoRepository {
                         vo.setIdProduto(produtoPai);
                         vo.setQtdEmbalagem(1);
                         provider.gravar(vo);
-                        associadosExistentes.put(vo.getId(), vo);
+                        associadosExistentes.put(vo.getIdProduto(), vo);
                         LOG.finest("Produto pai gravado com sucesso: " + vo.getId());
                     }
                     
@@ -68,14 +68,14 @@ public class AssociadoRepository {
                                 vItem = new AssociadoItemVO();
                                 vItem.setIdAssociado(vo.getId());
                                 vItem.setIdProduto(produtoFilho);
-                                vItem.setQtdEmbalagem(vItem.getQtdEmbalagem());
+                                vItem.setQtdEmbalagem(item.getQtdEmbalagem());
                                 vItem.setAplicaEstoque(true);
                                 vItem.setAplicaCusto(false);
                                 vItem.setAplicaPreco(false);
-                                vItem.setPercentualCustoEstoque(vItem.getPercentualCustoEstoque());
-                                vItem.setPercentualPreco(vItem.getPercentualPreco());                                
+                                vItem.setPercentualCustoEstoque(item.getPercentualCusto());
+                                vItem.setPercentualPreco(item.getPercentualPreco());                                
                                 provider.gravar(vItem);
-                                vo.getItens().put(vItem.getId(), vItem);
+                                vo.getItens().put(vItem.getIdProduto(), vItem);
                                 
                                 //Gera a inversão se não existir
                                 if (opt.contains(OpcaoAssociado.IMP_INVERTER)) {                                    
@@ -99,7 +99,7 @@ public class AssociadoRepository {
                                         invertItem.setPercentualCustoEstoque(0);
                                         invertItem.setPercentualPreco(0);
                                         provider.gravar(invertItem);
-                                        invertVo.getItens().put(produtoPai, invertItem);                                        
+                                        invertVo.getItens().put(invertItem.getIdProduto(), invertItem);                                        
                                     }
                                     
                                 }

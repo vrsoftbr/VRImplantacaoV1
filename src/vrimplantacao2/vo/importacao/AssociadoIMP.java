@@ -33,8 +33,8 @@ public class AssociadoIMP {
         return itens;
     }
 
-    public boolean addItem(String descricao, String idProduto, int qtdEmbalagem, boolean aplicaPreco, boolean aplicaCusto, boolean aplicaEstoque) {
-        return itens.add(new AssociadoItemIMP(descricao, idProduto, qtdEmbalagem, aplicaPreco, aplicaCusto, aplicaEstoque));
+    public boolean addItem(String descricao, String idProduto, int qtdEmbalagem) {
+        return itens.add(new AssociadoItemIMP(descricao, idProduto, qtdEmbalagem));
     }
     
 }

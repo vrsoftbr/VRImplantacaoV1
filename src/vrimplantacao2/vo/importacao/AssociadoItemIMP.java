@@ -11,17 +11,11 @@ public class AssociadoItemIMP {
     private int qtdEmbalagem;
     private double percentualPreco = 0;
     private double percentualCusto = 0;
-    private boolean aplicaPreco;
-    private boolean aplicaCusto;
-    private boolean aplicaEstoque;
 
-    public AssociadoItemIMP(String descricao, String idProduto, int qtdEmbalagem, boolean aplicaPreco, boolean aplicaCusto, boolean aplicaEstoque) {
+    public AssociadoItemIMP(String descricao, String idProduto, int qtdEmbalagem) {
         this.descricao = descricao;
         this.idProduto = idProduto;
         this.qtdEmbalagem = qtdEmbalagem;
-        this.aplicaPreco = aplicaPreco;
-        this.aplicaCusto = aplicaCusto;
-        this.aplicaEstoque = aplicaEstoque;
     }
 
     public AssociadoItemIMP() {
@@ -66,29 +60,5 @@ public class AssociadoItemIMP {
     public void setPercentualCusto(double percentualCusto) {
         this.percentualCusto = percentualCusto;
     }
-
-    public boolean isAplicaPreco() {
-        return aplicaPreco;
-    }
-
-    public void setAplicaPreco(boolean aplicaPreco) {
-        this.aplicaPreco = aplicaPreco;
-    }
-
-    public boolean isAplicaCusto() {
-        return aplicaCusto;
-    }
-
-    public void setAplicaCusto(boolean aplicaCusto) {
-        this.aplicaCusto = aplicaCusto;
-    }
-
-    public boolean isAplicaEstoque() {
-        return aplicaEstoque;
-    }
-
-    public void setAplicaEstoque(boolean aplicaEstoque) {
-        this.aplicaEstoque = aplicaEstoque;
-    }
-        
+    
 }

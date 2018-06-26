@@ -954,14 +954,15 @@ public class Importador {
      */
     public void importarAssociado(OpcaoAssociado... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando associado...");
-        List<AssociadoIMP> associados = getInterfaceDAO().getAssociados();
+        HashSet<OpcaoAssociado> opt = new HashSet<>(Arrays.asList(opcoes));
+        List<AssociadoIMP> associados = getInterfaceDAO().getAssociados(opt);
         AssociadoRepositoryProvider provider = new AssociadoRepositoryProvider(
                 getSistema(),
                 getLojaOrigem(),
                 getLojaVR()
         );
         AssociadoRepository rep = new AssociadoRepository(provider);
-        rep.importarAssociado(associados, new HashSet<>(Arrays.asList(opcoes)));
+        rep.importarAssociado(associados, opt);
     }
     
 }

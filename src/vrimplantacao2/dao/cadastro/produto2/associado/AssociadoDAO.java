@@ -36,9 +36,9 @@ public class AssociadoDAO {
             )) {
                 while (rst.next()) {
                     AssociadoVO vo = new AssociadoVO();
-                    vo.setId(rst.getInt(""));
-                    vo.setIdProduto(rst.getInt(""));
-                    vo.setQtdEmbalagem(rst.getInt(""));
+                    vo.setId(rst.getInt("id"));
+                    vo.setIdProduto(rst.getInt("id_produto"));
+                    vo.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     result.put(vo.getIdProduto(), vo);
                 }
             }
