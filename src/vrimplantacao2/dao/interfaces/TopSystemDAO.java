@@ -28,11 +28,15 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 public class TopSystemDAO extends InterfaceDAO {
+
+    public boolean mercadologico;
+    public boolean mercadologicoNivel;
 
     @Override
     public String getSistema() {
@@ -130,6 +134,34 @@ public class TopSystemDAO extends InterfaceDAO {
             }
         }
         return new ArrayList<>(merc.values());
+    }
+
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "Codigo, \n"
+                    + "Descricao \n"
+                    + "from cad_setor\n"
+                    + "order by Codigo"
+            )) {
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setMerc1ID(rst.getString("Codigo"));
+                    imp.setMerc1Descricao(rst.getString("Descricao"));
+                    imp.setMerc2ID("1");
+                    imp.setMerc2Descricao(rst.getString("Descricao"));
+                    imp.setMerc3ID("1");
+                    imp.setMerc3Descricao(rst.getString("Descricao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -311,10 +343,20 @@ public class TopSystemDAO extends InterfaceDAO {
                     imp.setMargem(rst.getDouble("Margem_Lucro"));
                     imp.setValidade(rst.getInt("Validade"));
                     imp.setSituacaoCadastro((rst.getInt("inativo") == 0 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
-                    imp.setCodMercadologico1(rst.getString("nivel1"));
-                    imp.setCodMercadologico2(rst.getString("nivel2"));
-                    imp.setCodMercadologico3(rst.getString("nivel3"));
-                    imp.setIdFamiliaProduto(rst.getString("familiaproduto"));
+
+                    if (mercadologico) {
+                        imp.setCodMercadologico1(rst.getString("grupo"));
+                        imp.setCodMercadologico2("1");
+                        imp.setCodMercadologico3("1");
+                    }
+
+                    if (mercadologicoNivel) {
+                        imp.setCodMercadologico1(rst.getString("nivel1"));
+                        imp.setCodMercadologico2(rst.getString("nivel2"));
+                        imp.setCodMercadologico3(rst.getString("nivel3"));
+                    }
+
+                    imp.setIdFamiliaProduto(rst.getString("familia"));
                     imp.setCest(rst.getString("cest"));
                     imp.setEstoqueMinimo(rst.getDouble("estoque_minimo"));
                     imp.setEstoque(rst.getDouble("qtde_atual"));

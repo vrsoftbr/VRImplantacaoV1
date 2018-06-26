@@ -29,19 +29,14 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="0" pref="406" max="32767" attributes="0"/>
+                  </Group>
+                  <Component id="cmbLojaOrigem" alignment="0" max="32767" attributes="0"/>
                   <Component id="pnlLoja" alignment="0" max="32767" attributes="0"/>
                   <Component id="conexaoMySQL" alignment="0" pref="474" max="32767" attributes="0"/>
                   <Component id="tabOperacoes" alignment="0" pref="0" max="32767" attributes="0"/>
-                  <Group type="102" attributes="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" attributes="0">
-                              <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                          </Group>
-                          <Component id="cmbLojaOrigem" max="32767" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="-2" pref="115" max="-2" attributes="0"/>
-                  </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -57,7 +52,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="cmbLojaOrigem" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="tabOperacoes" pref="260" max="32767" attributes="0"/>
+              <Component id="tabOperacoes" pref="264" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pnlLoja" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -123,6 +118,17 @@
                       <Connection code="true" type="code"/>
                     </Property>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkMercadologicoActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMercadologicoNivel">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Mercadologico Por Nivel"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkMercadologicoNivelActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFamiliaProduto">
                   <Properties>

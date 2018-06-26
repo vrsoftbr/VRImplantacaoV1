@@ -143,6 +143,8 @@ public class TopSystemGUI2 extends VRInternalFrame {
 
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                    dao.mercadologico = chkMercadologico.isSelected();
+                    dao.mercadologicoNivel = chkMercadologicoNivel.isSelected();
 
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
@@ -155,6 +157,10 @@ public class TopSystemGUI2 extends VRInternalFrame {
                         }
 
                         if (chkMercadologico.isSelected()) {
+                            importador.importarMercadologico();
+                        }
+
+                        if (chkMercadologicoNivel.isSelected()) {
                             importador.importarMercadologicoPorNiveis(false);
                         }
 
@@ -222,11 +228,11 @@ public class TopSystemGUI2 extends VRInternalFrame {
                                 importador.atualizarProdutos(opcoes);
                             }
                         }
-                        
+
                         if (chkOferta.isSelected()) {
                             importador.importarOfertas(null);
                         }
-                        
+
                         if (chkEAN.isSelected()) {
                             importador.importarEAN();
                         }
@@ -250,21 +256,22 @@ public class TopSystemGUI2 extends VRInternalFrame {
                         if (!opcoes.isEmpty()) {
                             importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
                         }
-                        
+
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(
-                                    OpcaoCliente.DADOS, 
+                                    OpcaoCliente.IMP_REINICIAR_NUMERACAO.addParametro("N_REINICIO", 1),
+                                    OpcaoCliente.DADOS,
                                     OpcaoCliente.INSCRICAO_ESTADUAL,
                                     OpcaoCliente.PERMITE_CREDITOROTATIVO,
                                     OpcaoCliente.PERMITE_CHEQUE,
                                     OpcaoCliente.VALOR_LIMITE,
                                     OpcaoCliente.OBSERVACOES);
                         }
-                        
+
                         if (chkCreditoRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }
-                        
+
                         if (chkCheque.isSelected()) {
                             importador.importarCheque();
                         }
@@ -298,6 +305,7 @@ public class TopSystemGUI2 extends VRInternalFrame {
         tabImportacao = new javax.swing.JTabbedPane();
         tabProdutos = new javax.swing.JPanel();
         chkMercadologico = new vrframework.bean.checkBox.VRCheckBox();
+        chkMercadologicoNivel = new vrframework.bean.checkBox.VRCheckBox();
         chkFamiliaProduto = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         chkProdutos = new vrframework.bean.checkBox.VRCheckBox();
@@ -349,7 +357,20 @@ public class TopSystemGUI2 extends VRInternalFrame {
 
         chkMercadologico.setText("Mercadologico");
         chkMercadologico.setEnabled(true);
+        chkMercadologico.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkMercadologicoActionPerformed(evt);
+            }
+        });
         tabProdutos.add(chkMercadologico);
+
+        chkMercadologicoNivel.setText("Mercadologico Por Nivel");
+        chkMercadologicoNivel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkMercadologicoNivelActionPerformed(evt);
+            }
+        });
+        tabProdutos.add(chkMercadologicoNivel);
 
         chkFamiliaProduto.setText("Familia Produto");
         chkFamiliaProduto.setEnabled(true);
@@ -566,16 +587,13 @@ public class TopSystemGUI2 extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 406, Short.MAX_VALUE))
+                    .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(pnlLoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(conexaoMySQL, javax.swing.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
-                    .addComponent(tabOperacoes, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(115, 115, 115)))
+                    .addComponent(tabOperacoes, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -588,7 +606,7 @@ public class TopSystemGUI2 extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(tabOperacoes, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
+                .addComponent(tabOperacoes, javax.swing.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -616,6 +634,20 @@ public class TopSystemGUI2 extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFamiliaProdutoActionPerformed
 
+    private void chkMercadologicoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkMercadologicoActionPerformed
+        // TODO add your handling code here:
+        if (chkMercadologico.isSelected()) {
+            chkMercadologicoNivel.setSelected(false);
+        }
+    }//GEN-LAST:event_chkMercadologicoActionPerformed
+
+    private void chkMercadologicoNivelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkMercadologicoNivelActionPerformed
+        // TODO add your handling code here:
+        if (chkMercadologicoNivel.isSelected()) {
+            chkMercadologico.setSelected(false);
+        }
+    }//GEN-LAST:event_chkMercadologicoNivelActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkAtivoInativo;
@@ -639,6 +671,7 @@ public class TopSystemGUI2 extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
+    private vrframework.bean.checkBox.VRCheckBox chkMercadologicoNivel;
     private vrframework.bean.checkBox.VRCheckBox chkNatReceita;
     private vrframework.bean.checkBox.VRCheckBox chkOferta;
     private vrframework.bean.checkBox.VRCheckBox chkPisCofins;
