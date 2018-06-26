@@ -1,8 +1,5 @@
 package vrimplantacao2.vo.importacao;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Representa a importação do associado.
  * @author Leandro
@@ -11,7 +8,11 @@ public class AssociadoIMP {
     
     private String id;
     private String descricao;
-    private final List<AssociadoItemIMP> itens = new ArrayList<>();
+    private int qtdEmbalagem;
+    private String produtoAssociadoId;
+    private String descricaoProdutoAssociado;
+    private double percentualPreco = 0;
+    private double percentualCusto = 0;
 
     public String getId() {
         return id;
@@ -29,12 +30,44 @@ public class AssociadoIMP {
         this.descricao = descricao;
     }
 
-    public List<AssociadoItemIMP> getItens() {
-        return itens;
+    public int getQtdEmbalagem() {
+        return qtdEmbalagem;
     }
 
-    public boolean addItem(String descricao, String idProduto, int qtdEmbalagem) {
-        return itens.add(new AssociadoItemIMP(descricao, idProduto, qtdEmbalagem));
+    public void setQtdEmbalagem(int qtdEmbalagem) {
+        this.qtdEmbalagem = qtdEmbalagem;
+    }
+
+    public String getProdutoAssociadoId() {
+        return produtoAssociadoId;
+    }
+
+    public void setProdutoAssociadoId(String produtoAssociadoId) {
+        this.produtoAssociadoId = produtoAssociadoId;
+    }
+
+    public String getDescricaoProdutoAssociado() {
+        return descricaoProdutoAssociado;
+    }
+
+    public void setDescricaoProdutoAssociado(String descricaoProdutoAssociado) {
+        this.descricaoProdutoAssociado = descricaoProdutoAssociado;
+    }
+
+    public double getPercentualPreco() {
+        return percentualPreco;
+    }
+
+    public void setPercentualPreco(double percentualPreco) {
+        this.percentualPreco = percentualPreco;
+    }
+
+    public double getPercentualCusto() {
+        return percentualCusto;
+    }
+
+    public void setPercentualCusto(double percentualCusto) {
+        this.percentualCusto = percentualCusto;
     }
     
 }

@@ -1264,11 +1264,9 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     imp.setId(rst.getString("produtopai"));
                     imp.setDescricao(rst.getString("descricaopai"));
-                    imp.addItem(
-                            rst.getString("descricaofilho"), 
-                            rst.getString("produtofilho"), 
-                            rst.getInt("qtdembalagem")
-                    );
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem")) ;                 
+                    imp.setProdutoAssociadoId(rst.getString("produtofilho"));
+                    imp.setDescricaoProdutoAssociado(rst.getString("descricaofilho"));
                     
                     result.add(imp);
                 }
