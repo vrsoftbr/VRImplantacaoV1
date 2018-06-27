@@ -38,20 +38,14 @@ public class AcumuladorRepository {
 
             for (AcumuladorIMP imp : acumuladores) {
 
-                AcumuladorVO gravado = gravados.get(
-                        imp.getId()
-                );
-                
                 AcumuladorVO acumulador = null;
-                
-                if (gravado == null) {
-                    acumulador = converterAcumulador(imp);
-                    gravarAcumulador(acumulador);
-                    
-                    gravados.put(acumulador, imp.getId());
-                    
-                    notificar();
-                }
+
+                acumulador = converterAcumulador(imp);
+                gravarAcumulador(acumulador);
+
+                gravados.put(acumulador, imp.getId());
+
+                notificar();
             }
 
             setNotificacao("Preparando para gravar acumuladores layout...", acumuladoresLayout.size());

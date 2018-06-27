@@ -232,7 +232,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     public List<PromocaoIMP> getProcomocoes() throws Exception {
         List<PromocaoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
@@ -267,9 +267,33 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     PromocaoIMP imp = new PromocaoIMP();
+                    imp.setId(rst.getInt("id"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    imp.setDataInicio(rst.getDate("datainicio"));
+                    imp.setDataTermino(rst.getDate("datatermino"));
+                    imp.setPontuacao(rst.getInt("pontuacao"));
+                    imp.setQuantidade(rst.getInt("quantidade"));
+                    imp.setQtdcupom(rst.getInt("qtdcupom"));
+                    imp.setIdSituacaocadastro(rst.getInt("id_situacaocadastro"));
+                    imp.setVerificaProdutosAuditados(rst.getBoolean("verificaprodutosauditados"));
+                    imp.setIdTipopromocao(rst.getInt("id_tipopromocao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setControle(rst.getInt("controle"));
+                    imp.setIdTipopercentualvalor(rst.getInt("id_tipopercentualvalor"));
+                    imp.setIdTipoquantidade(rst.getInt("id_tipoquantidade"));
+                    imp.setAplicatodos(rst.getBoolean("aplicatodos"));
+                    imp.setValorReferenteItensLista(rst.getBoolean("valorreferenteitenslista"));
+                    imp.setValordesconto(rst.getDouble("valordesconto"));
+                    imp.setValorPaga(rst.getDouble("valorpaga"));
+                    imp.setIdTipoPercentualValorDesconto(rst.getInt("id_tipopercentualvalordesconto"));
+                    imp.setDesconsiderarItem(rst.getBoolean("desconsideraritem"));
+                    imp.setQtdLimite(rst.getInt("qtdlimite"));
+                    imp.setSomenteClubeVantagens(rst.getBoolean("somenteclubevantagens"));
+                    imp.setDiasExpiracao(rst.getInt("diasexpiracao"));
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 }

@@ -404,7 +404,7 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
                     boolean ativo = "A".equals(rs.getString("ativo")) ? true : false;
                     imp.setAtivo(ativo);
                     imp.setRazao(rs.getString("nome"));
-                    imp.setRazao(rs.getString("fantasia"));
+                    imp.setFantasia(rs.getString("fantasia"));
                     if (rs.getString("sexo") != null) {
                         imp.setSexo("1".equals(rs.getString("sexo")) ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
                     }
