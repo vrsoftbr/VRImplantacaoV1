@@ -54,7 +54,7 @@ public class ProdutoAutomacaoVO {
     }
 
     public void setQtdEmbalagem(int qtdEmbalagem) {
-        this.qtdEmbalagem = qtdEmbalagem;
+        this.qtdEmbalagem = qtdEmbalagem < 1 ? 1 : qtdEmbalagem ;
     }
 
     public double getPesoBruto() {

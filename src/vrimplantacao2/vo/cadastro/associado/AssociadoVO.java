@@ -35,7 +35,7 @@ public class AssociadoVO {
     }
 
     public void setQtdEmbalagem(int qtdEmbalagem) {
-        this.qtdEmbalagem = qtdEmbalagem;
+        this.qtdEmbalagem = qtdEmbalagem < 1 ? 1 : qtdEmbalagem;
     }
 
     public Map<Integer, AssociadoItemVO> getItens() {

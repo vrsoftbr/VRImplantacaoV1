@@ -344,8 +344,12 @@ public final class Parametros implements Iterable<Parametro>{
      * @param keys Identificação do parâmetro.
      */
     public void put(Date param, String... keys) {
-        String valor = DATA_FORMAT.format(param);
-        params.put(valor, keys);
+        if (param != null) {
+            String valor = DATA_FORMAT.format(param);
+            params.put(valor, keys);
+        } else {
+            params.put(null, keys);
+        }
     }
 
     /**

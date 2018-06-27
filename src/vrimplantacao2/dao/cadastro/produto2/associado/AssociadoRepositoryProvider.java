@@ -1,6 +1,7 @@
 package vrimplantacao2.dao.cadastro.produto2.associado;
 
 import java.util.Map;
+import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
@@ -76,6 +77,10 @@ public class AssociadoRepositoryProvider {
 
     public void gravar(AssociadoItemVO vItem) throws Exception {
         associadoDAO.gravar(vItem);
+    }
+
+    public Set<Integer> getProdutosAtivos() throws Exception {
+        return associadoDAO.getProdutosAtivos(getLojaVR());
     }
     
 }

@@ -166,18 +166,6 @@ public class ProdutoAutomacaoDAO {
                 while (rst.next()) {
                     int idProduto  = rst.getInt("id");
                     long codigobarras = idProduto;
-
-                    /*if (rst.getInt("id_tipoembalagem") == 4) {
-                        codigobarras = Utils.gerarEan13((int) idProduto, false);
-                    } else if (rst.getInt("id_tipoembalagem") != 4 && rst.getBoolean("pesavel")) {
-                        codigobarras = Utils.gerarEan13((int) idProduto, false);
-                    } else if (rst.getInt("id_tipoembalagem") != 4 && !rst.getBoolean("pesavel") && idProduto >= 10000) {
-                        codigobarras = Utils.gerarEan13((int) idProduto, true);
-                    } else if (rst.getInt("id_tipoembalagem") != 4 && idProduto < 10000) {
-                        codigobarras = Utils.gerarEan13((int) idProduto, false);
-                    } else {
-                        codigobarras = Utils.gerarEan13((int) idProduto, true);
-                    }*/
                     
                     ProdutoVO oProduto = new ProdutoVO();
                     oProduto.setId(idProduto);

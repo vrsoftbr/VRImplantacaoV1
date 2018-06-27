@@ -3,7 +3,9 @@ package vrimplantacao2.dao.cadastro.produto2.associado;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.associado.AssociadoItemVO;
@@ -117,6 +119,22 @@ public class AssociadoDAO {
             
             stm.execute(sql.getInsert());
         }
+    }
+
+    public Set<Integer> getProdutosAtivos(int lojaVR) throws Exception {
+        Set<Integer> result = new HashSet<>();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select id_produto from produtocomplemento where id_loja = " + lojaVR + " and id_situacaocadastro = 1"
+            )) {
+                while (rst.next()) {
+                    result.add(rst.getInt("id_produto"));
+                }
+            }
+        }
+        
+        return result;
     }
     
 }
