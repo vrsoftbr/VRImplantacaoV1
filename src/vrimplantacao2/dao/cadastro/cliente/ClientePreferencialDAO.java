@@ -307,6 +307,9 @@ public class ClientePreferencialDAO {
                 if (opt.contains(OpcaoCliente.PERMITE_CREDITOROTATIVO)) {
                     sql.put("permitecreditorotativo", vo.isPermiteCreditoRotativo());
                 }
+                if (opt.contains(OpcaoCliente.RAZAO)) {
+                    sql.put("nome", vo.getNome());
+                }
 
                 sql.setWhere("id = " + vo.getId());
                 stm.execute(sql.getUpdate());

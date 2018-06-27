@@ -72,6 +72,7 @@ public class ClienteRepository {
                 opt.add(OpcaoCliente.CELULAR);
                 opt.add(OpcaoCliente.PERMITE_CHEQUE);
                 opt.add(OpcaoCliente.PERMITE_CREDITOROTATIVO);
+                opt.add(OpcaoCliente.RAZAO);
             }
 
             this.provider.begin();
@@ -147,7 +148,8 @@ public class ClienteRepository {
                                 || (opt.contains(OpcaoCliente.TELEFONE))
                                 || (opt.contains(OpcaoCliente.CELULAR))
                                 || (opt.contains(OpcaoCliente.PERMITE_CHEQUE))
-                                || (opt.contains(OpcaoCliente.PERMITE_CREDITOROTATIVO))) {
+                                || (opt.contains(OpcaoCliente.PERMITE_CREDITOROTATIVO))
+                                || (opt.contains(OpcaoCliente.RAZAO))) {
 
                             cliente = converterClientePreferencial(imp);
                             cliente.setId(anterior.getCodigoAtual().getId());

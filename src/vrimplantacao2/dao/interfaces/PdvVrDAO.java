@@ -18,6 +18,7 @@ import vrimplantacao2.vo.importacao.AcumuladorLayoutRetornoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.OperadorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.PromocaoIMP;
 
 /**
  *
@@ -225,6 +226,70 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdAcumulador(rst.getString("id_acumulador"));
                     imp.setRetorno(rst.getString("retorno"));
                     imp.setTitulo(rst.getString("titulo"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<PromocaoIMP> getProcomocoes() throws Exception {
+        List<PromocaoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "id,\n"
+                    + "descricao,\n"
+                    + "datainicio,\n"
+                    + "datatermino,\n"
+                    + "pontuacao,\n"
+                    + "quantidade,\n"
+                    + "qtdcupom,\n"
+                    + "id_situacaocadastro,\n"
+                    + "verificaprodutosauditados,\n"
+                    + "id_tipopromocao,\n"
+                    + "valor,\n"
+                    + "controle,\n"
+                    + "id_tipopercentualvalor,\n"
+                    + "id_tipoquantidade,\n"
+                    + "aplicatodos,\n"
+                    + "valorreferenteitenslista,\n"
+                    + "valordesconto,\n"
+                    + "codigoscanntech,\n"
+                    + "valorpaga,\n"
+                    + "id_tipopercentualvalordesconto,\n"
+                    + "desconsideraritem,\n"
+                    + "qtdlimite,\n"
+                    + "somenteclubevantagens,\n"
+                    + "diasexpiracao\n"
+                    + "from promocao\n"
+                    + "order by id"
+            )) {
+                while (rst.next()) {
+                    PromocaoIMP imp = new PromocaoIMP();
+                    imp.setId(rst.getInt("id"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    imp.setDataInicio(rst.getDate("datainicio"));
+                    imp.setDataTermino(rst.getDate("datatermino"));
+                    imp.setPontuacao(rst.getInt("pontuacao"));
+                    imp.setQuantidade(rst.getInt("quantidade"));
+                    imp.setQtdcupom(rst.getInt("qtdcupom"));
+                    imp.setIdSituacaocadastro(rst.getInt("id_situacaocadastro"));
+                    imp.setVerificaProdutosAuditados(rst.getBoolean("verificaprodutosauditados"));
+                    imp.setIdTipopromocao(rst.getInt("id_tipopromocao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setControle(rst.getInt("controle"));
+                    imp.setIdTipopercentualvalor(rst.getInt("id_tipopercentualvalor"));
+                    imp.setIdTipoquantidade(rst.getInt("id_tipoquantidade"));
+                    imp.setAplicatodos(rst.getBoolean("aplicatodos"));
+                    imp.setValorReferenteItensLista(rst.getBoolean("valorreferenteitenslista"));
+                    imp.setValordesconto(rst.getDouble("valordesconto"));
+                    imp.setValorPaga(rst.getDouble("valorpaga"));
+                    imp.setIdTipoPercentualValorDesconto(rst.getInt("id_tipopercentualvalordesconto"));
+                    imp.setDesconsiderarItem(rst.getBoolean("desconsideraritem"));
+                    imp.setQtdLimite(rst.getInt("qtdlimite"));
+                    imp.setSomenteClubeVantagens(rst.getBoolean("somenteclubevantagens"));
+                    imp.setDiasExpiracao(rst.getInt("diasexpiracao"));
                     result.add(imp);
                 }
             }
