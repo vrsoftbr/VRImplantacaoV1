@@ -179,6 +179,11 @@ public enum OpcaoProduto {
         public String toString() {
             return "Data de Alteração";
         }
+    }, ICMS_INDIVIDUAL {
+        @Override
+        public String toString() {
+            return "Icms Individual";
+        }
     },
     IMPORTAR_RESETAR_BALANCA, IMPORTAR_GERAR_SUBNIVEL_MERC, IMPORTAR_MANTER_BALANCA, UNIFICAR_PRODUTO_BALANCA;
     

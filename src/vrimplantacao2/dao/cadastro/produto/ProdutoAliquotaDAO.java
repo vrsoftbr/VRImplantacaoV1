@@ -111,6 +111,13 @@ public class ProdutoAliquotaDAO {
             } else if (opt.contains(OpcaoProduto.ICMS_FORNECEDOR)) {
                 sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
                 sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoFornecedor()); //Caso especifico para importação do Arius (Cliente Ameripan)                
+            } else if (opt.contains(OpcaoProduto.ICMS_INDIVIDUAL)) {
+                sql.put("id_aliquotadebito", vo.getAliquotaDebito().getId());
+                sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
+                sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
+                sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
+                sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
+                sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
             }
             if (!sql.isEmpty()) {
                 sql.setWhere(

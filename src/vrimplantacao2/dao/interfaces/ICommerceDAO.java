@@ -9,7 +9,10 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
@@ -189,6 +192,48 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        if (opt == OpcaoProduto.ICMS_INDIVIDUAL) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select  \n"
+                        + "	p.pro_codigo id, \n"
+                        + "	aliq.alq_codigo as icmsid \n"
+                        + "from \n"
+                        + "	produtos as p \n"
+                        + "	join produtos_estoque as pe on p.pro_codigo = pe.pro_codigo \n"
+                        + "	join lojas l on pe.pro_loja = l.loj_codigo\n"
+                        + "left join aliquotas_ecf  aliq on p.pro_aliquota = aliq.alq_codigo\n"
+                        + "where \n"
+                        + "	l.loj_codigo = " + getLojaOrigem() + "\n"
+                        + "order by \n"
+                        + "	p.pro_codigo"
+                )) {
+                    Map<String, ProdutoAnteriorVO> anteriores = new ProdutoAnteriorDAO().getAnterior(getSistema());
+                    while (rst.next()) {
+
+                        ProdutoAnteriorVO anterior;
+                        anterior = anteriores.get(rst.getString("id"));
+
+                        if (anterior != null) {
+                            ProdutoIMP imp = new ProdutoIMP();
+                            imp.setImportLoja(getLojaOrigem());
+                            imp.setImportSistema(getSistema());
+                            imp.setImportId(rst.getString("id"));
+                            imp.setIcmsDebitoId(rst.getString("icmsid"));
+                            imp.setIcmsCreditoId(rst.getString("icmsid"));
+                            result.add(imp);
+                        }
+                    }
+                }
+                return result;
+            }
+        }
+        return null;
     }
     
     @Override

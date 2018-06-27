@@ -598,4 +598,28 @@ public class ProdutoAnteriorDAO {
         return result;
     }
 
+    public Map<String, ProdutoAnteriorVO> getAnterior(String sistema) throws Exception {
+        Map<String, ProdutoAnteriorVO> result = new HashMap<>();
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "impsistema, \n"
+                    + "impid, \n"
+                    + "imploja \n"
+                    + "from implantacao.codant_produto \n"
+                    + "where impsistema = " + SQLUtils.stringSQL(sistema) + "\n"
+                    + "and codigoatual not in \n"
+                    + "(select codigoatual from implantacao.codant_produto where impsistema <> " + SQLUtils.stringSQL(sistema) + ")"
+            )) {
+                while (rst.next()) {
+                    ProdutoAnteriorVO vo = new ProdutoAnteriorVO();
+                    vo.setImportSistema(rst.getString("impsistema"));
+                    vo.setImportLoja(rst.getString("imploja"));
+                    vo.setImportId(rst.getString("impid"));
+                    result.put(rst.getString("impid"), vo);
+                }
+            }
+        }
+        return result;
+    }
 }
