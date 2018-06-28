@@ -409,60 +409,51 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                             + " Prazo entrega: " + rst.getInt("PENTREGA") + " Prazo visita: " + rst.getInt("PVISITA"));
                     imp.setDatacadastro(rst.getDate("DTCAD"));
                     imp.setTipoFornecedor(TipoFornecedor.getById(rst.getInt("CODTIPOFORNEC")));
-                    if ((rst.getString("FAX") != null)
-                            && (!rst.getString("FAX").trim().isEmpty())) {
-                        imp.addContato(
-                                "1",
-                                "FAX",
-                                rst.getString("FAX"),
-                                null,
-                                TipoContato.COMERCIAL,
-                                null
-                        );
-                    }
-                    if ((rst.getString("EMAIL") != null)
-                            && (!rst.getString("EMAIL").trim().isEmpty())) {
-                        imp.addContato(
-                                "2",
-                                "EMAIL",
-                                null,
-                                null,
-                                TipoContato.COMERCIAL,
-                                rst.getString("EMAIL").toLowerCase()
-                        );
-                    }
-                    if ((rst.getString("CELULAR") != null)
-                            && (!rst.getString("CELULAR").trim().isEmpty())) {
-                        imp.addContato(
-                                "3",
-                                "CELULAR",
-                                null,
-                                rst.getString("CELULAR"),
-                                TipoContato.COMERCIAL,
-                                null
-                        );
-                    }
-                    if ((rst.getString("FONE1") != null)
-                            && (!rst.getString("FONE1").trim().isEmpty())) {
-                        imp.addContato(
-                                "4",
-                                "TELEFONE",
-                                rst.getString("FONE1"),
-                                null,
-                                TipoContato.COMERCIAL,
-                                null
-                        );
-                    }
+                    
+                    imp.addTelefone("FAX", rst.getString("FAX"));
                     if ((rst.getString("CONTATO") != null)
                             && (!rst.getString("CONTATO").trim().isEmpty())) {
                         imp.addContato(
-                                "5",
                                 rst.getString("CONTATO"),
-                                null,
-                                null,
+                                (Utils.stringLong(rst.getString("FONE1")).equals("0") ? rst.getString("TELEFONE") : rst.getString("FONE1")),
+                                rst.getString("CELULAR"),
                                 TipoContato.COMERCIAL,
-                                null
+                                rst.getString("EMAIL")
                         );
+                    } else {
+                        if ((rst.getString("EMAIL") != null)
+                                && (!rst.getString("EMAIL").trim().isEmpty())) {
+                            imp.addContato(
+                                    "2",
+                                    "EMAIL",
+                                    null,
+                                    null,
+                                    TipoContato.COMERCIAL,
+                                    rst.getString("EMAIL").toLowerCase()
+                            );
+                        }
+                        if ((rst.getString("CELULAR") != null)
+                                && (!rst.getString("CELULAR").trim().isEmpty())) {
+                            imp.addContato(
+                                    "3",
+                                    "CELULAR",
+                                    null,
+                                    rst.getString("CELULAR"),
+                                    TipoContato.COMERCIAL,
+                                    null
+                            );
+                        }
+                        if ((rst.getString("FONE1") != null)
+                                && (!rst.getString("FONE1").trim().isEmpty())) {
+                            imp.addContato(
+                                    "4",
+                                    "TELEFONE",
+                                    rst.getString("FONE1"),
+                                    null,
+                                    TipoContato.COMERCIAL,
+                                    null
+                            );
+                        }                        
                     }
 
                     try (Statement stm2 = ConexaoSqlServer.getConexao().createStatement()) {
