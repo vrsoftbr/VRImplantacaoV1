@@ -129,7 +129,6 @@ public class SysmoPostgresGUI extends VRInternalFrame {
         gravarParametros();
     }
 
-
     public void carregarLojaVR() throws Exception {
         cmbLojaVR.setModel(new DefaultComboBoxModel());
         int cont = 0;
