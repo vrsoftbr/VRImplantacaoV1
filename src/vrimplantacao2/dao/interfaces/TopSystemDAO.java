@@ -37,10 +37,15 @@ public class TopSystemDAO extends InterfaceDAO {
 
     public boolean mercadologico;
     public boolean mercadologicoNivel;
+    public String id_loja;
 
     @Override
     public String getSistema() {
-        return "TopSystem";
+        if ((id_loja != null) && (!id_loja.trim().isEmpty())) {
+            return "TopSystem" + id_loja;
+        } else {
+            return "TopSystem";
+        }
     }
 
     @Override
