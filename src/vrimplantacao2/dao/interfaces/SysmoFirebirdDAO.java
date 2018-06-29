@@ -201,7 +201,7 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     + "      coalesce(prod.seg, 1) as mercadologico4,\n"
                     + "      coalesce(prod.ssg, 1) as mercadologico5,\n"
                     + "      prod.dtc as datacadastro,\n"
-                    + "      ean.bar as ean,\n"
+                    + "      cast(ean.bar as bigint) as ean,\n"
                     + "      prod.emb as qtdembalagem,\n"
                     + "      prod.uni as tipoembalagem,\n"
                     + "      prod.tip as balanca,\n"

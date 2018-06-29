@@ -1,10 +1,20 @@
 package vrimplantacao2.dao.interfaces;
 
+import java.io.File;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.WorkbookSettings;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STMerge;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
@@ -13,6 +23,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
+import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
@@ -21,6 +32,7 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -32,13 +44,15 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean v_usar_arquivoBalanca;
     public String id_loja;
+    public String i_arquivo = "";
 
     @Override
     public String getSistema() {
-        if (id_loja == null) {
-            id_loja = "";
-        }   
-        return "ICommerce" + id_loja;        
+        if ((id_loja != null) && (!id_loja.trim().isEmpty())) {
+            return "ICommerce" + id_loja;
+        } else {
+            return "ICommerce";
+        }        
     }
 
     @Override
@@ -81,6 +95,76 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
+        Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "gru_codigo merc1, \n"
+                    + "gru_descri merc1_descricao \n"
+                    + "from grupos \n"
+                    + "order by gru_codigo"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP imp = new MercadologicoNivelIMP();
+                    imp.setId(rst.getString("merc1"));
+                    imp.setDescricao(rst.getString("merc1_descricao"));
+                    merc.put(imp.getId(), imp);
+                }
+            }
+            
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct \n"
+                    + "p.pro_grupo merc1, \n"
+                    + "p.pro_sub_grupo merc2,\n"
+                    + "s.sub_descri merc2_descricao\n"
+                    + "from produtos p\n"
+                    + "inner join sub_grupo s on s.sub_codigo = p.pro_sub_grupo\n"
+                    + "where p.pro_grupo is not null\n"
+                    + "and p.pro_sub_grupo is not null\n"
+                    + "order by 1, 2"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP merc1 = merc.get(rst.getString("merc1"));
+                    if (merc1 != null) {
+                        merc1.addFilho(
+                                rst.getString("merc2"),
+                                rst.getString("merc2_descricao")
+                        );
+                    }
+                }
+            }
+            
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct \n"
+                    + "p.pro_grupo merc1, \n"
+                    + "p.pro_sub_grupo merc2,\n"
+                    + "s.sub_descri merc3_descricao,\n"
+                    + "'1' merc3\n"
+                    + "from produtos p\n"
+                    + "inner join sub_grupo s on s.sub_codigo = p.pro_sub_grupo\n"
+                    + "where p.pro_grupo is not null\n"
+                    + "and p.pro_sub_grupo is not null\n"
+                    + "order by 1, 2"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP merc1 = merc.get(rst.getString("merc1"));
+                    if (merc1 != null) {
+                        MercadologicoNivelIMP merc2 = merc1.getNiveis().get(rst.getString("merc2"));
+                        if (merc2 != null) {
+                            merc2.addFilho(
+                                    rst.getString("merc3"),
+                                    rst.getString("merc3_descricao")
+                            );
+                        }
+                    }
+                }
+            }
+        }
+        return new ArrayList<>(merc.values());
+    }
+    
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
@@ -91,6 +175,8 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.pro_descri descricaocompleta, \n"
                     + "	p.pro_descri_fiscal descricaoreduzida, \n"
                     + "	p.pro_un unidade, \n"
+                    + " p.pro_grupo, \n"
+                    + " p.pro_sub_grupo, \n"
                     + "	p.pro_qtde_embalagem qtdembalagem, \n"
                     + "	p.pro_peso peso, \n"
                     + "	p.pro_peso_liquido pesoliquido, \n"
@@ -150,6 +236,10 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     }
+                    
+                    imp.setCodMercadologico1(rs.getString("pro_grupo"));
+                    imp.setCodMercadologico2(rs.getString("pro_sub_grupo"));
+                    imp.setCodMercadologico3("1");                    
                     
                     imp.setPesoBruto(rs.getDouble("peso"));
                     imp.setPesoLiquido(rs.getDouble("pesoliquido"));
@@ -470,8 +560,7 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
-    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+    public List<CreditoRotativoIMP> getCreditoRotativoOLD() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
@@ -513,5 +602,64 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
+    }
+    
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        java.sql.Date dataEmissao, dataVencimento;
+        DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
+        WorkbookSettings settings = new WorkbookSettings();
+        Workbook arquivo = Workbook.getWorkbook(new File(i_arquivo), settings);
+        Sheet[] sheets = arquivo.getSheets();
+        int linha;
+
+        try {
+
+            for (int sh = 0; sh < sheets.length; sh++) {
+                Sheet sheet = arquivo.getSheet(sh);
+                linha = 0;
+
+                for (int i = 0; i < sheet.getRows(); i++) {
+                    linha++;
+                    if (linha == 1) {
+                        continue;
+                    }
+
+                    Cell cellIdVenda = sheet.getCell(0, i);
+                    Cell cellCodCliente = sheet.getCell(2, i);
+                    Cell cellEmissao = sheet.getCell(6, i);
+                    Cell cellVencimento = sheet.getCell(7, i);
+                    Cell cellValor = sheet.getCell(9, i);
+                    Cell cellJuros = sheet.getCell(11, i);
+
+                    if ((cellEmissao.getContents() != null)
+                            && (!cellEmissao.getContents().trim().isEmpty())) {
+                        dataEmissao = new java.sql.Date(fmt.parse(cellEmissao.getContents()).getTime());
+                    } else {
+                        dataEmissao = new Date(new java.util.Date().getTime());
+                    }
+
+                    if ((cellVencimento.getContents() != null)
+                            && (!cellVencimento.getContents().trim().isEmpty())) {
+                        dataVencimento = new java.sql.Date(fmt.parse(cellVencimento.getContents()).getTime());
+                    } else {
+                        dataVencimento = new Date(new java.util.Date().getTime());
+                    }
+
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(cellIdVenda.getContents());
+                    imp.setIdCliente(cellCodCliente.getContents().substring(0, cellCodCliente.getContents().indexOf("-")));
+                    imp.setDataEmissao(dataEmissao);
+                    imp.setDataVencimento(dataVencimento);
+                    imp.setValor(Double.parseDouble(cellValor.getContents().trim().replace(".", "").replace(",", ".")));
+                    imp.setJuros(Double.parseDouble(cellJuros.getContents().trim().replace(".", "").replace(",", ".")));
+                    result.add(imp);
+                }
+            }
+            return result;
+        } catch (Exception ex) {
+            throw ex;
+        }
     }
 }
