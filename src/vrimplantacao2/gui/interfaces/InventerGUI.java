@@ -75,8 +75,8 @@ public class InventerGUI extends VRInternalFrame implements ConexaoEvent {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         
         tabProdutos.chkMercadologico.setVisible(false);
-        tabProdutos.chkPReceitaFilizola.setVisible(false);
-        tabProdutos.chkPReceitaToledo.setVisible(false);
+        tabProdutos.chkReceitaFilizola.setVisible(false);
+        tabProdutos.chkReceitaToledo.setVisible(false);
         tabProdutos.btnMapaTribut.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {

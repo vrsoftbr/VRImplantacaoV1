@@ -143,7 +143,7 @@ public enum OpcaoProduto {
         public String toString() {
             return "Data Cadastro";
         }
-    }, PAUTA_FISCAL {
+    }, PAUTA_FISCAL_PRODUTO {
         @Override
         public String toString() {
             return "Pauta Fiscal";
@@ -168,7 +168,7 @@ public enum OpcaoProduto {
         public String toString() {
             return "Sugestão de Pedido";
         }
-    }, COMPRADOR {
+    }, COMPRADOR_PRODUTO {
         @Override
         public String toString() {
             return "Comprador";
@@ -189,8 +189,8 @@ public enum OpcaoProduto {
             return "Icms Individual";
         }
     },
-    FAMILIA_PRODUTO,PRODUTOS,EAN, EAN_EM_BRANCO, MERCADOLOGICO_PRODUTO, RECEITA_BALANCA, NUTRICIONAL,
-    IMPORTAR_RESETAR_BALANCA, IMPORTAR_GERAR_SUBNIVEL_MERC, IMPORTAR_MANTER_BALANCA, UNIFICAR_PRODUTO_BALANCA;
+    FAMILIA_PRODUTO,PRODUTOS,EAN, EAN_EM_BRANCO, MERCADOLOGICO_PRODUTO, RECEITA_BALANCA, NUTRICIONAL, COMPRADOR, MAPA_TRIBUTACAO,
+    IMPORTAR_RESETAR_BALANCA, IMPORTAR_GERAR_SUBNIVEL_MERC, IMPORTAR_MANTER_BALANCA, UNIFICAR_PRODUTO_BALANCA, OFERTA, PAUTA_FISCAL, ASSOCIADO, MERCADOLOGICO_POR_NIVEL_REPLICAR, MERCADOLOGICO_POR_NIVEL;
 
     public static Set<OpcaoProduto> getAll() {
         return new HashSet<>(Arrays.asList(OpcaoProduto.values()));
@@ -198,9 +198,9 @@ public enum OpcaoProduto {
 
     public static Set<OpcaoProduto> getPadrao() {
         Set<OpcaoProduto> result = new HashSet<>();
-        
-        result.add(MERCADOLOGICO);
-        result.add(FAMILIA_PRODUTO);
+        result.addAll(getMercadologico());
+        result.addAll(getFamilia());
+        result.add(IMPORTAR_MANTER_BALANCA);
         result.add(PRODUTOS);
         result.add(EAN);
         result.add(EAN_EM_BRANCO);
@@ -224,8 +224,6 @@ public enum OpcaoProduto {
                 PESAVEL,
                 QTD_EMBALAGEM_COTACAO,
                 QTD_EMBALAGEM_EAN,
-                SUGESTAO_COTACAO,
-                SUGESTAO_PEDIDO,
                 TIPO_EMBALAGEM_EAN,
                 TIPO_EMBALAGEM_PRODUTO,
                 VALIDADE,
