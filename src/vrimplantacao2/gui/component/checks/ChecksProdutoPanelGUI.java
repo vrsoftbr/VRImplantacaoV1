@@ -1,7 +1,7 @@
 package vrimplantacao2.gui.component.checks;
 
-import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -9,6 +9,7 @@ import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 
@@ -31,7 +32,6 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         tabParametros.removeAll();
                 
         chkManterBalanca.setVisible(opt.contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA));
-        
                 
         if (
                 opt.contains(OpcaoProduto.MERCADOLOGICO_PRODUTO) ||
@@ -388,7 +388,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
         scrollParametros.setViewportView(tabParametros);
 
-        addTab("tab1", scrollParametros);
+        addTab("Parâmetros", scrollParametros);
 
         scrollImportação.setBorder(null);
 
@@ -781,7 +781,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
         scrollImportação.setViewportView(tabImportacao);
 
-        addTab("tab2", scrollImportação);
+        addTab("Importação de Produtos", scrollImportação);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnMapaTributActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaTributActionPerformed
@@ -869,6 +869,24 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         if (produtoPanelImportador != null) {
             produtoPanelImportador.importar();
         }
+    }
+
+    public void gravarParametros(Parametros parametros, String... params) {
+        List<String> pr = Arrays.asList(params);
+        parametros.put(chkMercadologicoPorNivel.isSelected(), pr.toArray(new String[] { "MERCADOLOGICO_POR_NIVEL" }));
+        parametros.put(chkMercadologicoPorNivelReplicar.isSelected(), pr.toArray(new String[] { "MERCADOLOGICO_POR_NIVEL_REPLICAR" }));
+        parametros.put(chkManterBalanca.isSelected(), pr.toArray(new String[] { "MANTER_PLU_BALANCA" }));
+        parametros.put(chkInverterAssociado.isSelected(), pr.toArray(new String[] { "INVERTER_ASSOCIADO" }));
+        parametros.put(chkAssociadoSomenteAtivos.isSelected(), pr.toArray(new String[] { "SOMENTES_ASSOCIADOS_DE_PRODUTOS_ATIVOS" }));
+    }
+
+    public void carregarParametros(Parametros parametros, String... params) {
+        List<String> pr = Arrays.asList(params);
+        chkMercadologicoPorNivel.setSelected(parametros.getBool(pr.toArray(new String[] { "MERCADOLOGICO_POR_NIVEL" })));
+        chkMercadologicoPorNivelReplicar.setSelected(parametros.getBool(pr.toArray(new String[] { "MERCADOLOGICO_POR_NIVEL_REPLICAR" })));
+        chkManterBalanca.setSelected(parametros.getBool(pr.toArray(new String[] { "MANTER_PLU_BALANCA" })));
+        chkInverterAssociado.setSelected(parametros.getBool(pr.toArray(new String[] { "INVERTER_ASSOCIADO" })));
+        chkAssociadoSomenteAtivos.setSelected(parametros.getBool(pr.toArray(new String[] { "SOMENTES_ASSOCIADOS_DE_PRODUTOS_ATIVOS" })));
     }
     
     public class ProdutoPanelImportador {

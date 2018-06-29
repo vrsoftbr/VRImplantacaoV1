@@ -551,7 +551,13 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         Arquivo arq = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
         
         for (LinhaArquivo linha: arq) {                        
-            result.add(new MapaTributoIMP(linha.getString("codtrib"), linha.getString("descricao")));
+            result.add(new MapaTributoIMP(
+                    linha.getString("codtrib"),
+                    linha.getString("descricao"),
+                    linha.getInt("cst"),
+                    linha.getDouble("aliquota"),
+                    linha.getDouble("reduzido")
+            ));
         }
         
         return result;
