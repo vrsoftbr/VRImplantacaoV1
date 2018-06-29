@@ -16,9 +16,6 @@
   <Properties>
     <Property name="resizable" type="boolean" value="true"/>
     <Property name="title" type="java.lang.String" value="Importa&#xe7;&#xe3;o de Planilha"/>
-    <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-      <Dimension value="[700, 1024]"/>
-    </Property>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="2"/>
@@ -373,7 +370,7 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnMapaTribut" min="-2" pref="32" max="-2" attributes="0"/>
-                              <EmptySpace pref="133" max="32767" attributes="0"/>
+                              <EmptySpace pref="137" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -747,7 +744,7 @@
                       <Component id="chkHistVenda" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="chkPdvVendas" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="196" max="32767" attributes="0"/>
+                      <EmptySpace pref="200" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>

@@ -5,9 +5,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -348,7 +350,12 @@ public class FenixDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
-    
-    
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        Set<OpcaoProduto> opt = OpcaoProduto.getPadrao();
+        opt.removeAll(OpcaoProduto.getFamilia());
+        return opt;
+    }
     
 }

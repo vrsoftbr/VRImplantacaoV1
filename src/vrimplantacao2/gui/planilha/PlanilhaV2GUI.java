@@ -44,6 +44,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
         centralizarForm();
         this.setMaximum(false);
+        tabProdImportacao.setOpcoesDisponiveis(dao);
     }
     
     private static PlanilhaV2GUI instance;
@@ -157,7 +158,6 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
         setResizable(true);
         setTitle("Importação de Planilha");
-        setMaximumSize(new java.awt.Dimension(700, 1024));
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
@@ -305,7 +305,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                         .addComponent(txtDelimitadorTribut, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMapaTribut, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(133, Short.MAX_VALUE))
+                .addContainerGap(137, Short.MAX_VALUE))
         );
 
         tabsProduto.addTab("Mapa de tributações", tabMapaTributacao);
@@ -578,7 +578,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 .addComponent(chkHistVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(196, Short.MAX_VALUE))
+                .addContainerGap(200, Short.MAX_VALUE))
         );
 
         tabModel.addTab("Vendas", tabVenda);

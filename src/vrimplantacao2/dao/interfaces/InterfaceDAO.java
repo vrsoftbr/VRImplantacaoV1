@@ -478,4 +478,12 @@ public abstract class InterfaceDAO {
     public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
         return new ArrayList<>();
     }
+    
+    /**
+     * Retorna uma lista com todos os campos que este importa para os produtos.
+     * @return Lista com os parâmetros.
+     */
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return OpcaoProduto.getPadrao();
+    }
 }
