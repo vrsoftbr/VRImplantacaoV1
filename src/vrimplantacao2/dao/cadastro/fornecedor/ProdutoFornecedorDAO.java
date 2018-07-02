@@ -2,8 +2,6 @@ package vrimplantacao2.dao.cadastro.fornecedor;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

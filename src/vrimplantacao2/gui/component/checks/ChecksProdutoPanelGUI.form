@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.4" maxVersion="1.9">
+  <NonVisualComponents>
+    <Component class="javax.swing.ButtonGroup" name="btgPautaFiscal">
+    </Component>
+  </NonVisualComponents>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
@@ -46,7 +50,7 @@
                           <Component id="chkMercadologicoPorNivel" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkMercadologicoPorNivelReplicar" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="233" max="32767" attributes="0"/>
+                          <EmptySpace pref="493" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -107,7 +111,7 @@
                               <Component id="btnMapaTribut" alignment="0" min="-2" pref="235" max="-2" attributes="0"/>
                               <Component id="chkManterBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace min="0" pref="248" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="508" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -172,7 +176,7 @@
                           <Component id="chkInverterAssociado" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkAssociadoSomenteAtivos" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="273" max="32767" attributes="0"/>
+                          <EmptySpace pref="533" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -213,6 +217,98 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Somente produtos ativos"/>
                     <Property name="toolTipText" type="java.lang.String" value="Selecione essa op&#xe7;&#xe3;o para que ao importar o associado, seja gerado tamb&#xe9;m o associado para pre&#xe7;o e custo."/>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="vrframework.bean.panel.VRPanel" name="pnlOptPautaFiscal">
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                          <Component id="jLabel10" min="-2" pref="132" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="rdbPautaIdPauta" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="rdbPautaIdProduto" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="rdbPautaEan" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkPautaUsarEansMenores" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="324" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="jLabel10" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
+                              <Component id="rdbPautaIdPauta" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="rdbPautaIdProduto" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="rdbPautaEan" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkPautaUsarEansMenores" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JLabel" name="jLabel10">
+                  <Properties>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Tahoma" size="11" style="1"/>
+                    </Property>
+                    <Property name="horizontalAlignment" type="int" value="4"/>
+                    <Property name="text" type="java.lang.String" value="PAUTA FISCAL"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[132, 14]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.radioButton.VRRadioButton" name="rdbPautaIdPauta">
+                  <Properties>
+                    <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                      <ComponentRef name="btgPautaFiscal"/>
+                    </Property>
+                    <Property name="selected" type="boolean" value="true"/>
+                    <Property name="text" type="java.lang.String" value="Usar ID da Pauta"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rdbPautaEanActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.radioButton.VRRadioButton" name="rdbPautaIdProduto">
+                  <Properties>
+                    <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                      <ComponentRef name="btgPautaFiscal"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Usar ID de Produto"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rdbPautaEanActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.radioButton.VRRadioButton" name="rdbPautaEan">
+                  <Properties>
+                    <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                      <ComponentRef name="btgPautaFiscal"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Usar EAN"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rdbPautaEanActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPautaUsarEansMenores">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Usar EANs menores"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Considera EANs menores ou iguais a 999999 na busca por EAN."/>
+                    <Property name="enabled" type="boolean" value="false"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -284,6 +380,22 @@
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
                       <ComponentRef name="pnlOptAssociado"/>
+                    </ExpressionProvider>
+                  </ExpressionOrigin>
+                </CodeExpression>
+              </Parameters>
+            </CodeStatement>
+            <CodeStatement>
+              <CodeExpression id="1_tabParametros"/>
+              <StatementProvider type="CodeMethod">
+                <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
+              </StatementProvider>
+              <Parameters>
+                <CodeExpression id="6_pnlOptPautaFiscal">
+                  <CodeVariable name="pnlOptPautaFiscal" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
+                  <ExpressionOrigin>
+                    <ExpressionProvider type="ComponentRef">
+                      <ComponentRef name="pnlOptPautaFiscal"/>
                     </ExpressionProvider>
                   </ExpressionOrigin>
                 </CodeExpression>
@@ -933,7 +1045,7 @@
           </SubComponents>
           <LayoutCode>
             <CodeStatement>
-              <CodeExpression id="6_tabImportacao">
+              <CodeExpression id="7_tabImportacao">
                 <CodeVariable name="tabImportacao" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                 <ExpressionOrigin>
                   <ExpressionProvider type="ComponentRef">
@@ -945,7 +1057,7 @@
                 <CodeMethod name="setLayout" class="java.awt.Container" parameterTypes="java.awt.LayoutManager"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="7">
+                <CodeExpression id="8">
                   <ExpressionOrigin>
                     <ExpressionProvider type="CodeConstructor">
                       <CodeConstructor class="org.jdesktop.swingx.VerticalLayout" parameterTypes=""/>
@@ -955,12 +1067,12 @@
               </Parameters>
             </CodeStatement>
             <CodeStatement>
-              <CodeExpression id="6_tabImportacao"/>
+              <CodeExpression id="7_tabImportacao"/>
               <StatementProvider type="CodeMethod">
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="8_pnlImpMercadologico">
+                <CodeExpression id="9_pnlImpMercadologico">
                   <CodeVariable name="pnlImpMercadologico" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
@@ -971,12 +1083,12 @@
               </Parameters>
             </CodeStatement>
             <CodeStatement>
-              <CodeExpression id="6_tabImportacao"/>
+              <CodeExpression id="7_tabImportacao"/>
               <StatementProvider type="CodeMethod">
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="9_pnlImpProduto">
+                <CodeExpression id="10_pnlImpProduto">
                   <CodeVariable name="pnlImpProduto" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
@@ -987,12 +1099,12 @@
               </Parameters>
             </CodeStatement>
             <CodeStatement>
-              <CodeExpression id="6_tabImportacao"/>
+              <CodeExpression id="7_tabImportacao"/>
               <StatementProvider type="CodeMethod">
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="10_pnlImpCompl">
+                <CodeExpression id="11_pnlImpCompl">
                   <CodeVariable name="pnlImpCompl" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
@@ -1003,12 +1115,12 @@
               </Parameters>
             </CodeStatement>
             <CodeStatement>
-              <CodeExpression id="6_tabImportacao"/>
+              <CodeExpression id="7_tabImportacao"/>
               <StatementProvider type="CodeMethod">
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="11_pnlImpTributacao">
+                <CodeExpression id="12_pnlImpTributacao">
                   <CodeVariable name="pnlImpTributacao" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
@@ -1019,12 +1131,12 @@
               </Parameters>
             </CodeStatement>
             <CodeStatement>
-              <CodeExpression id="6_tabImportacao"/>
+              <CodeExpression id="7_tabImportacao"/>
               <StatementProvider type="CodeMethod">
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="12_pnlImpInfoAdic">
+                <CodeExpression id="13_pnlImpInfoAdic">
                   <CodeVariable name="pnlImpInfoAdic" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
@@ -1035,12 +1147,12 @@
               </Parameters>
             </CodeStatement>
             <CodeStatement>
-              <CodeExpression id="6_tabImportacao"/>
+              <CodeExpression id="7_tabImportacao"/>
               <StatementProvider type="CodeMethod">
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="13_pnlImpOutrosDados">
+                <CodeExpression id="14_pnlImpOutrosDados">
                   <CodeVariable name="pnlImpOutrosDados" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">

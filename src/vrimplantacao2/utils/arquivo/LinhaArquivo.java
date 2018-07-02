@@ -80,8 +80,22 @@ public interface LinhaArquivo {
     /**
      * Inclui um {@link Time} no campo informado.
      * @param campo Nome do campo onde será inclusa a informação.
-     * @param contents  Conteúdo do campo.
+     * @param contents Conteúdo do campo.
      */
-    public void setTime(String campo, Time contents);
+    public void putTime(String campo, Time contents);
+    
+    /**
+     * Inclui um boolean no campo informado.
+     * @param campo Nome do campo onde será inclusa a informação.
+     * @param contents Conteúdo do campo.
+     */
+    public void putBoolean(String campo, boolean contents);
+    
+    /**
+     * Retorna um campo no formato boolean.
+     * @param campo Campo a ser retornado.
+     * @return Valor encontrado. 
+     */
+    public boolean getBoolean(String campo);
     
 }

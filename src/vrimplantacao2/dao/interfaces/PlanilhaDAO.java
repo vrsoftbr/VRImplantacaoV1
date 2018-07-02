@@ -6,9 +6,11 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.arquivo.Arquivo;
@@ -16,6 +18,7 @@ import vrimplantacao2.utils.arquivo.ArquivoFactory;
 import vrimplantacao2.utils.arquivo.LinhaArquivo;
 import vrimplantacao2.utils.arquivo.csv.ArquivoCSV2;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoCancelamento;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -33,6 +36,7 @@ import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -45,6 +49,18 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     private String arquivo;
     private String sistema = "PLANILHA";
     private Map<String, String> opcoes = new LinkedHashMap<>();
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        
+        Set<OpcaoProduto> result = super.getOpcoesDisponiveisProdutos();
+        result.add(OpcaoProduto.PAUTA_FISCAL);
+        result.add(OpcaoProduto.PAUTA_FISCAL_PRODUTO);
+        
+        return result;
+    }
+    
+    
     
     public void setSistema(String sistema) {
         if (sistema == null) {
@@ -228,6 +244,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 produto.setIcmsReducao(linha.getDouble("icms_reduzido"));
                 produto.setIcmsCreditoId(linha.getString("icms_credito_id"));
                 produto.setIcmsDebitoId(linha.getString("icms_debito_id"));
+                produto.setPautaFiscalId(linha.getString("id_pautafiscal"));
 
                 result.add(produto);
             }
@@ -727,4 +744,70 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         }
     }
 
+    @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+        
+        Arquivo produtos = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());  
+        
+        ProgressBar.setStatus("Carregando Pautas Fiscais");
+        
+        for (LinhaArquivo linha: produtos) {
+            PautaFiscalIMP imp = new PautaFiscalIMP();
+
+            imp.setId(linha.getString("id"));
+            imp.setNcm(linha.getString("ncm"));            
+            imp.setIva(linha.getDouble("iva"));
+            imp.setIvaAjustado(linha.getDouble("ivaajustado"));
+            
+            imp.setIcmsRecolhidoAntecipadamente(linha.getBoolean("recolhidoantecipado"));
+            if (linha.existsColumn("id_aliquotadebito")) {
+                imp.setAliquotaDebitoId(linha.getString("id_aliquotadebito"));
+            } else {
+                imp.setAliquotaDebito(
+                        linha.getInt("aliquotadebito_cst"),
+                        linha.getDouble("aliquotadebito_aliquota"), 
+                        linha.getDouble("aliquotadebito_reduzido")
+                );
+            }
+            
+            if (linha.existsColumn("id_aliquotacredito")) {
+                imp.setAliquotaCreditoId(linha.getString("id_aliquotacredito"));
+            } else {
+                imp.setAliquotaCredito(
+                        linha.getInt("aliquotacredito_cst"),
+                        linha.getDouble("aliquotacredito_aliquota"), 
+                        linha.getDouble("aliquotacredito_reduzido")
+                );
+            }
+            
+            if (linha.existsColumn("id_aliquotacreditoforaestado")) {
+                imp.setAliquotaCreditoForaEstadoId(linha.getString("id_aliquotacreditoforaestado"));
+            } else {
+                imp.setAliquotaCreditoForaEstado(
+                        linha.getInt("aliquotacreditoforaestado_cst"),
+                        linha.getDouble("aliquotacreditoforaestado_aliquota"), 
+                        linha.getDouble("aliquotacreditoforaestado_reduzido")
+                );
+            }
+            
+            if (linha.existsColumn("id_aliquotadebitoforaestado")) {
+                imp.setAliquotaDebitoForaEstadoId(linha.getString("id_aliquotadebitoforaestado"));
+            } else {
+                imp.setAliquotaDebitoForaEstado(
+                        linha.getInt("aliquotadebitoforaestado_cst"),
+                        linha.getDouble("aliquotadebitoforaestado_aliquota"), 
+                        linha.getDouble("aliquotadebitoforaestado_reduzido")
+                );
+            }
+            
+            result.add(imp);
+            
+        }
+        
+        return result;
+    }
+
+    
+    
 }

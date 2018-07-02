@@ -114,6 +114,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkPautaFiscal.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL_PRODUTO));
             chkPautaFiscalProduto.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL));
             tabImportacao.add(pnlImpTributacao);
+            if (opt.contains(OpcaoProduto.PAUTA_FISCAL)) {
+                tabParametros.add(pnlOptPautaFiscal);
+            }
         }
         
         if (
@@ -191,6 +194,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        btgPautaFiscal = new javax.swing.ButtonGroup();
         scrollParametros = new javax.swing.JScrollPane();
         tabParametros = new vrframework.bean.panel.VRPanel();
         pnlOptMercadologico = new vrframework.bean.panel.VRPanel();
@@ -205,6 +209,12 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         jLabel2 = new javax.swing.JLabel();
         chkInverterAssociado = new vrframework.bean.checkBox.VRCheckBox();
         chkAssociadoSomenteAtivos = new vrframework.bean.checkBox.VRCheckBox();
+        pnlOptPautaFiscal = new vrframework.bean.panel.VRPanel();
+        jLabel10 = new javax.swing.JLabel();
+        rdbPautaIdPauta = new vrframework.bean.radioButton.VRRadioButton();
+        rdbPautaIdProduto = new vrframework.bean.radioButton.VRRadioButton();
+        rdbPautaEan = new vrframework.bean.radioButton.VRRadioButton();
+        chkPautaUsarEansMenores = new vrframework.bean.checkBox.VRCheckBox();
         scrollImportação = new javax.swing.JScrollPane();
         tabImportacao = new vrframework.bean.panel.VRPanel();
         pnlImpMercadologico = new vrframework.bean.panel.VRPanel();
@@ -287,7 +297,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addComponent(chkMercadologicoPorNivel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkMercadologicoPorNivelReplicar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(233, Short.MAX_VALUE))
+                .addContainerGap(493, Short.MAX_VALUE))
         );
         pnlOptMercadologicoLayout.setVerticalGroup(
             pnlOptMercadologicoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -329,7 +339,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addGroup(pnlOptProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnMapaTribut, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 248, Short.MAX_VALUE))
+                .addGap(0, 508, Short.MAX_VALUE))
         );
         pnlOptProdutoLayout.setVerticalGroup(
             pnlOptProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -369,7 +379,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addComponent(chkInverterAssociado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkAssociadoSomenteAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(273, Short.MAX_VALUE))
+                .addContainerGap(533, Short.MAX_VALUE))
         );
         pnlOptAssociadoLayout.setVerticalGroup(
             pnlOptAssociadoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -385,6 +395,72 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         pnlOptAssociadoLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {chkAssociadoSomenteAtivos, chkInverterAssociado, jLabel2});
 
         tabParametros.add(pnlOptAssociado);
+
+        jLabel10.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel10, "PAUTA FISCAL");
+        jLabel10.setPreferredSize(new java.awt.Dimension(132, 14));
+
+        btgPautaFiscal.add(rdbPautaIdPauta);
+        rdbPautaIdPauta.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(rdbPautaIdPauta, "Usar ID da Pauta");
+        rdbPautaIdPauta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rdbPautaEanActionPerformed(evt);
+            }
+        });
+
+        btgPautaFiscal.add(rdbPautaIdProduto);
+        org.openide.awt.Mnemonics.setLocalizedText(rdbPautaIdProduto, "Usar ID de Produto");
+        rdbPautaIdProduto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rdbPautaEanActionPerformed(evt);
+            }
+        });
+
+        btgPautaFiscal.add(rdbPautaEan);
+        org.openide.awt.Mnemonics.setLocalizedText(rdbPautaEan, "Usar EAN");
+        rdbPautaEan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rdbPautaEanActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkPautaUsarEansMenores, "Usar EANs menores");
+        chkPautaUsarEansMenores.setToolTipText("Considera EANs menores ou iguais a 999999 na busca por EAN.");
+        chkPautaUsarEansMenores.setEnabled(false);
+
+        javax.swing.GroupLayout pnlOptPautaFiscalLayout = new javax.swing.GroupLayout(pnlOptPautaFiscal);
+        pnlOptPautaFiscal.setLayout(pnlOptPautaFiscalLayout);
+        pnlOptPautaFiscalLayout.setHorizontalGroup(
+            pnlOptPautaFiscalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlOptPautaFiscalLayout.createSequentialGroup()
+                .addGap(5, 5, 5)
+                .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(rdbPautaIdPauta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(rdbPautaIdProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(rdbPautaEan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkPautaUsarEansMenores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(324, Short.MAX_VALUE))
+        );
+        pnlOptPautaFiscalLayout.setVerticalGroup(
+            pnlOptPautaFiscalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlOptPautaFiscalLayout.createSequentialGroup()
+                .addGap(5, 5, 5)
+                .addGroup(pnlOptPautaFiscalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(rdbPautaIdPauta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(rdbPautaIdProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(rdbPautaEan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkPautaUsarEansMenores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        tabParametros.add(pnlOptPautaFiscal);
 
         scrollParametros.setViewportView(tabParametros);
 
@@ -788,8 +864,13 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
     }//GEN-LAST:event_btnMapaTributActionPerformed
 
+    private void rdbPautaEanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbPautaEanActionPerformed
+        chkPautaUsarEansMenores.setEnabled(rdbPautaEan.isSelected());
+    }//GEN-LAST:event_rdbPautaEanActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    public javax.swing.ButtonGroup btgPautaFiscal;
     public vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTribut;
     public vrframework.bean.checkBox.VRCheckBox chkAssociado;
     public vrframework.bean.checkBox.VRCheckBox chkAssociadoSomenteAtivos;
@@ -823,6 +904,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkOferta;
     public vrframework.bean.checkBox.VRCheckBox chkPautaFiscal;
     public vrframework.bean.checkBox.VRCheckBox chkPautaFiscalProduto;
+    public vrframework.bean.checkBox.VRCheckBox chkPautaUsarEansMenores;
     public vrframework.bean.checkBox.VRCheckBox chkPisCofins;
     public vrframework.bean.checkBox.VRCheckBox chkPreco;
     public vrframework.bean.checkBox.VRCheckBox chkProdMercadologico;
@@ -839,6 +921,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkValidade;
     public vrframework.bean.checkBox.VRCheckBox chkVendaPdv;
     public javax.swing.JLabel jLabel1;
+    public javax.swing.JLabel jLabel10;
     public javax.swing.JLabel jLabel2;
     public javax.swing.JLabel jLabel3;
     public javax.swing.JLabel jLabel4;
@@ -855,7 +938,11 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.panel.VRPanel pnlImpTributacao;
     public vrframework.bean.panel.VRPanel pnlOptAssociado;
     public vrframework.bean.panel.VRPanel pnlOptMercadologico;
+    public vrframework.bean.panel.VRPanel pnlOptPautaFiscal;
     public vrframework.bean.panel.VRPanel pnlOptProduto;
+    public vrframework.bean.radioButton.VRRadioButton rdbPautaEan;
+    public vrframework.bean.radioButton.VRRadioButton rdbPautaIdPauta;
+    public vrframework.bean.radioButton.VRRadioButton rdbPautaIdProduto;
     public javax.swing.JScrollPane scrollImportação;
     public javax.swing.JScrollPane scrollParametros;
     public vrframework.bean.panel.VRPanel tabImportacao;
@@ -870,23 +957,46 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             produtoPanelImportador.importar();
         }
     }
+    
+    private String[] concat(String[] params, String novo) {
+        params = Arrays.copyOf(params, params.length + 1);
+        params[params.length - 1] = novo;
+        return params;
+    }
 
-    public void gravarParametros(Parametros parametros, String... params) {
-        List<String> pr = Arrays.asList(params);
-        parametros.put(chkMercadologicoPorNivel.isSelected(), pr.toArray(new String[] { "MERCADOLOGICO_POR_NIVEL" }));
-        parametros.put(chkMercadologicoPorNivelReplicar.isSelected(), pr.toArray(new String[] { "MERCADOLOGICO_POR_NIVEL_REPLICAR" }));
-        parametros.put(chkManterBalanca.isSelected(), pr.toArray(new String[] { "MANTER_PLU_BALANCA" }));
-        parametros.put(chkInverterAssociado.isSelected(), pr.toArray(new String[] { "INVERTER_ASSOCIADO" }));
-        parametros.put(chkAssociadoSomenteAtivos.isSelected(), pr.toArray(new String[] { "SOMENTES_ASSOCIADOS_DE_PRODUTOS_ATIVOS" }));
+    public void gravarParametros(Parametros parametros, String... params) {        
+        
+        parametros.put(chkMercadologicoPorNivel.isSelected(), concat(params, "MERCADOLOGICO_POR_NIVEL"));
+        parametros.put(chkMercadologicoPorNivelReplicar.isSelected(), concat(params, "MERCADOLOGICO_POR_NIVEL_REPLICAR" ));
+        parametros.put(chkManterBalanca.isSelected(), concat(params, "MANTER_PLU_BALANCA" ));
+        parametros.put(chkInverterAssociado.isSelected(), concat(params, "INVERTER_ASSOCIADO" ));
+        parametros.put(chkAssociadoSomenteAtivos.isSelected(), concat(params, "SOMENTES_ASSOCIADOS_DE_PRODUTOS_ATIVOS" ));
+        if (rdbPautaIdPauta.isSelected()) {
+            parametros.put(1, concat(params, "PAUTA_OPCAO" ));
+        } else if (rdbPautaIdProduto.isSelected()) {
+            parametros.put(2, concat(params, "PAUTA_OPCAO" ));
+        } else if (rdbPautaEan.isSelected()) {
+            parametros.put(3, concat(params, "PAUTA_OPCAO" ));
+        }
+        parametros.put(chkPautaUsarEansMenores.isSelected(), concat(params, "PAUTA_USAR_EANS_MENORES" ));
     }
 
     public void carregarParametros(Parametros parametros, String... params) {
-        List<String> pr = Arrays.asList(params);
-        chkMercadologicoPorNivel.setSelected(parametros.getBool(pr.toArray(new String[] { "MERCADOLOGICO_POR_NIVEL" })));
-        chkMercadologicoPorNivelReplicar.setSelected(parametros.getBool(pr.toArray(new String[] { "MERCADOLOGICO_POR_NIVEL_REPLICAR" })));
-        chkManterBalanca.setSelected(parametros.getBool(pr.toArray(new String[] { "MANTER_PLU_BALANCA" })));
-        chkInverterAssociado.setSelected(parametros.getBool(pr.toArray(new String[] { "INVERTER_ASSOCIADO" })));
-        chkAssociadoSomenteAtivos.setSelected(parametros.getBool(pr.toArray(new String[] { "SOMENTES_ASSOCIADOS_DE_PRODUTOS_ATIVOS" })));
+        
+        chkMercadologicoPorNivel.setSelected(parametros.getBool(concat(params, "MERCADOLOGICO_POR_NIVEL" )));
+        chkMercadologicoPorNivelReplicar.setSelected(parametros.getBool(concat(params, "MERCADOLOGICO_POR_NIVEL_REPLICAR" )));
+        chkManterBalanca.setSelected(parametros.getBool(concat(params, "MANTER_PLU_BALANCA" )));
+        chkInverterAssociado.setSelected(parametros.getBool(concat(params, "INVERTER_ASSOCIADO" )));
+        chkAssociadoSomenteAtivos.setSelected(parametros.getBool(concat(params, "SOMENTES_ASSOCIADOS_DE_PRODUTOS_ATIVOS" )));
+        
+        switch (parametros.getInt(concat(params, "PAUTA_OPCAO" ))) {
+            case 2: rdbPautaIdProduto.setSelected(true); break;
+            case 3: rdbPautaEan.setSelected(true); break;
+            default: rdbPautaIdPauta.setSelected(true); break;
+        }
+        rdbPautaEanActionPerformed(null);
+        chkPautaUsarEansMenores.setSelected(parametros.getBool(concat(params, "PAUTA_USAR_EANS_MENORES" )));
+        
     }
     
     public class ProdutoPanelImportador {
@@ -908,7 +1018,23 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 importador.importarProduto(chkManterBalanca.isSelected());
             }
             if (chkPautaFiscal.isSelected()) {
-                importador.importarPautaFiscal(OpcaoFiscal.NOVOS);
+                
+                List<OpcaoFiscal> opcoes = new ArrayList<>();
+                
+                if (rdbPautaIdProduto.isSelected()) {
+                    opcoes.add(OpcaoFiscal.USAR_IDPRODUTO);
+                }
+                if (rdbPautaEan.isSelected()) {
+                    opcoes.add(OpcaoFiscal.USAR_EAN);
+                }
+                if (chkPautaUsarEansMenores.isSelected()) {
+                    opcoes.add(OpcaoFiscal.UTILIZAR_EANS_MENORES);
+                }
+                opcoes.add(OpcaoFiscal.NOVOS);
+                
+                if (!opcoes.isEmpty()) {
+                    importador.importarPautaFiscal(opcoes.toArray(new OpcaoFiscal[]{}));
+                }
             }
             if (chkComprador.isSelected()) {
                 importador.importarComprador();
@@ -1006,7 +1132,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             }
             if (chkEANemBranco.isSelected()) {
                 importador.importarEANemBranco();
-            }                        
+            }
 
             {
                 List<OpcaoNutricional> opcoes = new ArrayList<>();

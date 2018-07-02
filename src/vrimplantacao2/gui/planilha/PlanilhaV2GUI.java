@@ -1312,7 +1312,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
             }
         }
         
-        tabProdImportacao.carregarParametros(parametros, "IMPORATACAO", "PLANILHA");
+        tabProdImportacao.carregarParametros(parametros, "IMPORTACAO", "PLANILHA");
         
         String arquivoForn = parametros.get("IMPORTACAO", "PLANILHA", "FORNECEDOR", "ARQUIVO");
         txtFornecedorFile.setArquivo(arquivoForn != null ? arquivoForn : "");
