@@ -12,12 +12,14 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoDB2;
+import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -493,6 +495,53 @@ public class CissDAO extends InterfaceDAO {
             }
         }
 
+        return result;
+    }
+    
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()){
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "        cr.idplanilha as id,\n" +
+                    "        cr.idtitulo,\n" +
+                    "        cr.dtmovimento as dataemissao,\n" +
+                    "        cr.numcupomfiscal as ccf,\n" +
+                    "        cr.idcaixa as ecf,\n" +
+                    "        cr.idclifor as idcliente,\n" +
+                    "        cf.cnpjcpf as cnpj,\n" +
+                    "        cr.valtitulo as valor,\n" +
+                    "        cr.dtvencimento as vencimento,\n" +
+                    "        cr.obstitulo as observacao,\n" +
+                    "        cr.sumvaljuroscobrado as juros\n" +
+                    "from\n" +
+                    "        contas_receber cr\n" +
+                    "join\n" +
+                    "        cliente_fornecedor cf on cr.idclifor = cf.idclifor\n" +
+                    "where\n" +
+                    "        idempresa = " + getLojaOrigem() + " and\n" +
+                    "        flagbaixada = 'F'\n" +
+                    "order by\n" +
+                    "        cr.dtmovimento")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setCnpjCliente(rs.getString("cnpj"));
+                    imp.setDataEmissao(rs.getDate("dataemissao"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setNumeroCupom(rs.getString("ccf"));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setJuros(rs.getDouble("juros"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+                
         return result;
     }
 
