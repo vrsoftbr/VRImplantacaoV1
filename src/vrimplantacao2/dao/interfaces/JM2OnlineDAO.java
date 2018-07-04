@@ -4,9 +4,11 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -525,7 +527,10 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
- 
-    
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return OpcaoProduto.getPadrao();
+    }
     
 }

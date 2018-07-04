@@ -77,9 +77,7 @@ public class FortGUI extends VRInternalFrame implements ConexaoEvent {
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         
-        tabProdutos.pnlMercNivel.setVisible(false);
-        tabProdutos.chkFamilia.setVisible(false);
-        tabProdutos.chkFamiliaProduto.setVisible(false);
+        tabProdutos.setOpcoesDisponiveis(dao);
         tabProdutos.btnMapaTribut.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {

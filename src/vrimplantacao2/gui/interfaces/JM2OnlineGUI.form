@@ -114,7 +114,7 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jPanel3" alignment="0" pref="538" max="32767" attributes="0"/>
+                      <Component id="jPanel3" alignment="0" pref="550" max="32767" attributes="0"/>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
@@ -194,7 +194,7 @@
                               <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="413" max="32767" attributes="0"/>
+                          <EmptySpace pref="425" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -250,7 +250,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="cmbLojaVR" pref="405" max="32767" attributes="0"/>
+                  <Component id="cmbLojaVR" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnMigrar" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>

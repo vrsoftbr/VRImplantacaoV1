@@ -76,9 +76,7 @@ public class FaciliteGUI extends VRInternalFrame implements ConexaoEvent {
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         
-        tabProdutos.pnlMercNivel.setVisible(false);
-        tabProdutos.chkPReceitaFilizola.setVisible(false);
-        tabProdutos.chkPReceitaToledo.setVisible(false);
+        tabProdutos.setOpcoesDisponiveis(dao);
         tabProdutos.btnMapaTribut.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -318,7 +316,7 @@ public class FaciliteGUI extends VRInternalFrame implements ConexaoEvent {
         tabFornecedor.setLayout(tabFornecedorLayout);
         tabFornecedorLayout.setHorizontalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 494, Short.MAX_VALUE)
+            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 552, Short.MAX_VALUE)
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -345,7 +343,7 @@ public class FaciliteGUI extends VRInternalFrame implements ConexaoEvent {
         tabClientes.setLayout(tabClientesLayout);
         tabClientesLayout.setHorizontalGroup(
             tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
+            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, 552, Short.MAX_VALUE)
         );
         tabClientesLayout.setVerticalGroup(
             tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -378,7 +376,7 @@ public class FaciliteGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(chkUnifProdutosFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClientesPreferenciais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClientesEventuais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(108, Short.MAX_VALUE))
+                .addContainerGap(170, Short.MAX_VALUE))
         );
         tabUnificacaoLayout.setVerticalGroup(
             tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -419,7 +417,7 @@ public class FaciliteGUI extends VRInternalFrame implements ConexaoEvent {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(cmbLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, 357, Short.MAX_VALUE)
+                .addComponent(cmbLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, 419, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())

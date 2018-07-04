@@ -134,5 +134,13 @@ public class PautaFiscalRepositoryProvider {
 
         return icm;
     }
+
+    public Map<String, ProdutoPautaVO> getNcmsProduto() throws Exception {
+        return dao.getNcmsProduto(getSistema(), getLoja(), getLojaVR());
+    }
+
+    public Map<Long, ProdutoPautaVO> getNcmsEan() throws Exception {
+        return dao.getNcmsProduto(getLojaVR());
+    }
     
 }

@@ -250,7 +250,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                                 opcoes.add(OpcaoProduto.SUGESTAO_COTACAO);
                             }
                             if (chkPProdComprador.isSelected()) {
-                                opcoes.add(OpcaoProduto.COMPRADOR);
+                                opcoes.add(OpcaoProduto.COMPRADOR_PRODUTO);
                             }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);

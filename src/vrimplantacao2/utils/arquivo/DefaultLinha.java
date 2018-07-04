@@ -35,7 +35,7 @@ public class DefaultLinha implements LinhaArquivo {
         if (campo == null) {
             campo = "";
         }
-        return campo.toUpperCase();
+        return campo.toUpperCase().trim();
     }
 
     @Override
@@ -154,10 +154,26 @@ public class DefaultLinha implements LinhaArquivo {
     }
 
     @Override
-    public void setTime(String campo, Time contents) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void putTime(String campo, Time contents) {
+        putString(campo, TIME_FORMAT.format(contents));
     }
-    
-    
+
+    @Override
+    public void putBoolean(String campo, boolean contents) {
+        linha.put(campo, (contents ? "S" : "N"));
+    }
+
+    @Override
+    public boolean getBoolean(String campo) {
+        String string = getString(campo);
+        
+        if (string != null && !"".equals(string.trim())) {
+            String val = string.trim().toUpperCase();                
+
+            return val.matches("(S.*|T.*|Y.*|OK|V.*)");
+        }
+
+        return false; 
+    }
     
 }

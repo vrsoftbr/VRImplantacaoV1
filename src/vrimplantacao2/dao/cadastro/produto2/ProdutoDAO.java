@@ -254,7 +254,7 @@ public class ProdutoDAO {
                 sql.putNull("id_familiaproduto");
             }
         }
-        if (opt.contains(OpcaoProduto.COMPRADOR)) {
+        if (opt.contains(OpcaoProduto.COMPRADOR_PRODUTO)) {
             sql.put("id_comprador", vo.getIdComprador());
         }
         if (opt.contains(OpcaoProduto.NCM)) {
