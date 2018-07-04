@@ -9,6 +9,7 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
@@ -547,6 +548,15 @@ public class FortDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         
         return result;
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        Set<OpcaoProduto> opt = OpcaoProduto.getPadrao();
+        opt.removeAll(OpcaoProduto.getFamilia());
+        opt.add(OpcaoProduto.NUTRICIONAL);
+        opt.add(OpcaoProduto.RECEITA_BALANCA);
+        return opt;
     }
     
 }

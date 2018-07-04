@@ -1,6 +1,10 @@
 package vrimplantacao2.dao.cadastro.produto;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 public enum OpcaoProduto {
@@ -139,7 +143,7 @@ public enum OpcaoProduto {
         public String toString() {
             return "Data Cadastro";
         }
-    }, PAUTA_FISCAL {
+    }, PAUTA_FISCAL_PRODUTO {
         @Override
         public String toString() {
             return "Pauta Fiscal";
@@ -164,7 +168,7 @@ public enum OpcaoProduto {
         public String toString() {
             return "Sugestão de Pedido";
         }
-    }, COMPRADOR {
+    }, COMPRADOR_PRODUTO {
         @Override
         public String toString() {
             return "Comprador";
@@ -195,8 +199,82 @@ public enum OpcaoProduto {
             return "NCM Individual";
         }
     },
+
+    FAMILIA_PRODUTO,PRODUTOS,EAN, EAN_EM_BRANCO, MERCADOLOGICO_PRODUTO, RECEITA_BALANCA, NUTRICIONAL, COMPRADOR, MAPA_TRIBUTACAO,
+    IMPORTAR_RESETAR_BALANCA, IMPORTAR_GERAR_SUBNIVEL_MERC, IMPORTAR_MANTER_BALANCA, UNIFICAR_PRODUTO_BALANCA, OFERTA, PAUTA_FISCAL, ASSOCIADO, MERCADOLOGICO_POR_NIVEL_REPLICAR, MERCADOLOGICO_POR_NIVEL;
+
+    public static Set<OpcaoProduto> getAll() {
+        return new HashSet<>(Arrays.asList(OpcaoProduto.values()));
+    }
+
+    public static Set<OpcaoProduto> getPadrao() {
+        Set<OpcaoProduto> result = new HashSet<>();
+        result.addAll(getMercadologico());
+        result.addAll(getFamilia());
+        result.add(IMPORTAR_MANTER_BALANCA);
+        result.add(PRODUTOS);
+        result.add(EAN);
+        result.add(EAN_EM_BRANCO);
+        result.add(IMPORTAR_MANTER_BALANCA);
+        result.addAll(getInfoAdicional());
+        result.addAll(getComplementos());
+        result.addAll(getTributos());
+        
+        return result;
+    }
     
-    IMPORTAR_RESETAR_BALANCA, IMPORTAR_GERAR_SUBNIVEL_MERC, IMPORTAR_MANTER_BALANCA, UNIFICAR_PRODUTO_BALANCA;
+    public static Set<OpcaoProduto> getInfoAdicional() {
+        return new HashSet<>(Arrays.asList(
+                DESC_COMPLETA,
+                DESC_REDUZIDA,
+                DESC_GONDOLA,
+                ATIVO,
+                DESCONTINUADO,
+                DATA_CADASTRO,
+                DATA_ALTERACAO,
+                PESAVEL,
+                QTD_EMBALAGEM_COTACAO,
+                QTD_EMBALAGEM_EAN,
+                TIPO_EMBALAGEM_EAN,
+                TIPO_EMBALAGEM_PRODUTO,
+                VALIDADE,
+                VENDA_PDV
+        ));   
+    }
+    
+    public static Set<OpcaoProduto> getComplementos() {
+        return new HashSet<>(Arrays.asList(
+                PRECO,
+                CUSTO,
+                CUSTO_COM_IMPOSTO,
+                CUSTO_SEM_IMPOSTO,
+                ESTOQUE,
+                MARGEM
+        ));        
+    }
+    
+    public static Set<OpcaoProduto> getTributos() {
+        return new HashSet<>(Arrays.asList(
+                NCM,
+                CEST,
+                ICMS,
+                PIS_COFINS,
+                NATUREZA_RECEITA
+        )); 
+    }
+
+    public static Set<OpcaoProduto> getFamilia() {
+        return new HashSet<>(Arrays.asList(
+                FAMILIA,
+                FAMILIA_PRODUTO
+        )); 
+    }
+    public static Set<OpcaoProduto> getMercadologico() {
+        return new HashSet<>(Arrays.asList(
+                MERCADOLOGICO,
+                MERCADOLOGICO_PRODUTO
+        )); 
+    }
     
     private List<ProdutoIMP> listaEspecial;
     

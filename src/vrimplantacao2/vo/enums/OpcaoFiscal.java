@@ -5,5 +5,5 @@ package vrimplantacao2.vo.enums;
  * @author Leandro
  */
 public enum OpcaoFiscal {
-    NOVOS;
+    NOVOS, USAR_IDPRODUTO, USAR_EAN, UTILIZAR_EANS_MENORES;
 }

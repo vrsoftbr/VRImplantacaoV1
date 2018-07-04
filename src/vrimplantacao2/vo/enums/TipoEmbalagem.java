@@ -1,5 +1,7 @@
 package vrimplantacao2.vo.enums;
 
+import vrimplantacao.utils.Utils;
+
 public enum TipoEmbalagem {
     UN (0,"UN","UNIDADE"),
     CX (1,"CX","CAIXA"),
@@ -50,7 +52,7 @@ public enum TipoEmbalagem {
         if (siglaDescricao == null) {
             siglaDescricao = "";
         } else {
-            siglaDescricao = siglaDescricao.trim().toUpperCase();
+            siglaDescricao = Utils.acertarTexto(siglaDescricao, 2);
         }
         
         TipoEmbalagem[] aa = values();

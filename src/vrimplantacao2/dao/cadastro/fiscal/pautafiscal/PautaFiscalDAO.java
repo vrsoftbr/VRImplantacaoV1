@@ -8,6 +8,7 @@ import java.util.Set;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.fiscal.pautafiscal.PautaFiscalVO;
+import vrimplantacao2.vo.enums.NcmVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 
 /**
@@ -82,6 +83,101 @@ public class PautaFiscalDAO {
             )) {
                 while (rst.next()) {
                     result.put(rst.getString("id"), rst.getInt("excecao"));
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    public Map<String, ProdutoPautaVO> getNcmsProduto(String sistema, String loja, int idLojaVR ) throws Exception {
+        Map<String, ProdutoPautaVO> result = new HashMap<>();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	ant.impid,\n" +
+                    "	p.ncm1,\n" +
+                    "	p.ncm2,\n" +
+                    "	p.ncm3,\n" +
+                    "	pa.id_aliquotadebito,\n" +
+                    "	pa.id_aliquotadebitoforaestado,\n" +
+                    "	pa.id_aliquotacredito,\n" +
+                    "	pa.id_aliquotacreditoforaestado\n" +
+                    "from\n" +
+                    "	implantacao.codant_produto ant\n" +
+                    "	join produto p on\n" +
+                    "		ant.codigoatual = p.id\n" +
+                    "	join produtoaliquota pa on\n" +
+                    "		pa.id_produto = p.id\n" +
+                    "		and pa.id_estado = (select f.id_estado from loja l join fornecedor f on l.id_fornecedor = l.id where l.id = " + idLojaVR + ")\n" +
+                    "where\n" +
+                    "	ant.impsistema = '" + sistema + "'\n" +
+                    "	and ant.imploja = '" + loja + "'\n" +
+                    "order by\n" +
+                    "	ant.impid"
+            )) {
+                while (rst.next()) {
+                    ProdutoPautaVO vo = new ProdutoPautaVO();
+                    NcmVO ncm = new NcmVO();
+                    
+                    ncm.setNcm1(rst.getInt("ncm1"));
+                    ncm.setNcm2(rst.getInt("ncm2"));
+                    ncm.setNcm3(rst.getInt("ncm3"));
+                    
+                    vo.setNcm(ncm);
+                    vo.setId_aliquotaCredito(rst.getInt("id_aliquotacredito"));
+                    vo.setId_aliquotaCreditoForaEstado(rst.getInt("id_aliquotacreditoforaestado"));
+                    vo.setId_aliquotaDebito(rst.getInt("id_aliquotadebito"));
+                    vo.setId_aliquotaDebitoForaEstado(rst.getInt("id_aliquotadebitoforaestado"));
+                    
+                    result.put(rst.getString("impid"), vo);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    public Map<Long, ProdutoPautaVO> getNcmsProduto(int idLojaVR) throws Exception {
+        Map<Long, ProdutoPautaVO> result = new HashMap<>();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	ean.codigobarras,\n" +
+                    "	p.ncm1,\n" +
+                    "	p.ncm2,\n" +
+                    "	p.ncm3,\n" +
+                    "	pa.id_aliquotadebito,\n" +
+                    "	pa.id_aliquotadebitoforaestado,\n" +
+                    "	pa.id_aliquotacredito,\n" +
+                    "	pa.id_aliquotacreditoforaestado\n" +
+                    "from\n" +
+                    "	produtoautomacao ean\n" +
+                    "	join produto p on\n" +
+                    "		ean.id_produto = p.id\n" +
+                    "	join produtoaliquota pa on\n" +
+                    "		pa.id_produto = p.id\n" +
+                    "		and pa.id_estado = (select f.id_estado from loja l join fornecedor f on l.id_fornecedor = l.id where l.id = " + idLojaVR + ")\n" +
+                    "order by\n" +
+                    "	ean.codigobarras"
+            )) {
+                while (rst.next()) {
+                    ProdutoPautaVO vo = new ProdutoPautaVO();
+                    NcmVO ncm = new NcmVO();
+                    
+                    ncm.setNcm1(rst.getInt("ncm1"));
+                    ncm.setNcm2(rst.getInt("ncm2"));
+                    ncm.setNcm3(rst.getInt("ncm3"));
+                    
+                    vo.setNcm(ncm);
+                    vo.setId_aliquotaCredito(rst.getInt("id_aliquotacredito"));
+                    vo.setId_aliquotaCreditoForaEstado(rst.getInt("id_aliquotacreditoforaestado"));
+                    vo.setId_aliquotaDebito(rst.getInt("id_aliquotadebito"));
+                    vo.setId_aliquotaDebitoForaEstado(rst.getInt("id_aliquotadebitoforaestado"));
+                    
+                    result.put(rst.getLong("codigobarras"), vo);
                 }
             }
         }

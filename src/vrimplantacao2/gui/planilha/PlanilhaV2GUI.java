@@ -44,6 +44,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
         centralizarForm();
         this.setMaximum(false);
+        tabProdImportacao.setOpcoesDisponiveis(dao);
     }
     
     private static PlanilhaV2GUI instance;
@@ -88,8 +89,6 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         txtTributoFile = new vrframework.bean.fileChooser.VRFileChooser();
         vRLabel10 = new vrframework.bean.label.VRLabel();
         tabArquivoBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
-        vRPanel1 = new vrframework.bean.panel.VRPanel();
-        chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
         vRLabel8 = new vrframework.bean.label.VRLabel();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         vRLabel3 = new vrframework.bean.label.VRLabel();
@@ -157,7 +156,6 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
         setResizable(true);
         setTitle("Importação de Planilha");
-        setMaximumSize(new java.awt.Dimension(700, 1024));
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
@@ -279,13 +277,11 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(tabMapaTributacaoLayout.createSequentialGroup()
                         .addGroup(tabMapaTributacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(tabMapaTributacaoLayout.createSequentialGroup()
-                                .addComponent(vRLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(txtDelimitadorTribut))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(vRLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtDelimitadorTribut, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(6, 6, 6)
                         .addGroup(tabMapaTributacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtTributoFile, javax.swing.GroupLayout.PREFERRED_SIZE, 555, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtTributoFile, javax.swing.GroupLayout.DEFAULT_SIZE, 555, Short.MAX_VALUE)
                             .addComponent(vRLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
@@ -305,30 +301,11 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                         .addComponent(txtDelimitadorTribut, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMapaTribut, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(133, Short.MAX_VALUE))
+                .addContainerGap(193, Short.MAX_VALUE))
         );
 
         tabsProduto.addTab("Mapa de tributações", tabMapaTributacao);
         tabsProduto.addTab("Arquivo de Balança", tabArquivoBalanca);
-
-        vRPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Opções dos produtos"));
-
-        org.openide.awt.Mnemonics.setLocalizedText(chkManterBalanca, "Usar PLU como ID (Balança)");
-        chkManterBalanca.setToolTipText("Marque esta opção quando o deseja que o código enviado\npara a balança (PLU) seja mantido na importação.O campo \nEAN será utilizado no lugar do campo ID da planilha.");
-
-        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
-        vRPanel1.setLayout(vRPanel1Layout);
-        vRPanel1Layout.setHorizontalGroup(
-            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        vRPanel1Layout.setVerticalGroup(
-            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-        );
 
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel8, "Del");
 
@@ -352,9 +329,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                 .addComponent(txtProdutoFile, javax.swing.GroupLayout.DEFAULT_SIZE, 604, Short.MAX_VALUE)
                                 .addContainerGap())))
                     .addGroup(tabProdutosLayout.createSequentialGroup()
-                        .addGroup(tabProdutosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(vRPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(tabsProduto, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addComponent(tabsProduto, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                         .addContainerGap())))
         );
         tabProdutosLayout.setVerticalGroup(
@@ -372,9 +347,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtDelimitadorProd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabsProduto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(tabsProduto, javax.swing.GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -578,7 +551,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 .addComponent(chkHistVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(196, Short.MAX_VALUE))
+                .addContainerGap(200, Short.MAX_VALUE))
         );
 
         tabModel.addTab("Vendas", tabVenda);
@@ -860,6 +833,18 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel4, "Sistema");
 
+        txtSistema.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                onSetLojaEvent(evt);
+            }
+        });
+
+        txtCodLojaOrigem.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                onSetLojaEvent(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -1044,6 +1029,11 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         }
     }//GEN-LAST:event_btnMapaTributActionPerformed
 
+    private void onSetLojaEvent(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_onSetLojaEvent
+        tabArquivoBalanca.setSistema(txtSistema.getText());
+        tabArquivoBalanca.setLoja(txtCodLojaOrigem.getText());
+    }//GEN-LAST:event_onSetLojaEvent
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnDelEvtContatos;
     private vrframework.bean.button.VRButton btnDelEvtDados;
@@ -1071,7 +1061,6 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFornUnificar;
     private vrframework.bean.checkBox.VRCheckBox chkFornUnificarProd;
     private vrframework.bean.checkBox.VRCheckBox chkHistVenda;
-    private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private vrframework.bean.checkBox.VRCheckBox chkProdUnifProdutos;
     private javax.swing.JComboBox cmbLojaDestino;
@@ -1124,7 +1113,6 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel6;
     private vrframework.bean.label.VRLabel vRLabel8;
     private vrframework.bean.label.VRLabel vRLabel9;
-    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.panel.VRPanel vRPanel4;
@@ -1283,11 +1271,11 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     }
 
     private void gravarParametros() throws Exception {
-        parametros.put(txtProdutoFile.getArquivo(), "IMPORATACAO", "PLANILHA", "ARQUIVO_PRODUTO");
+        tabProdImportacao.gravarParametros(parametros, "IMPORTACAO", "PLANILHA");
+        parametros.put(txtProdutoFile.getArquivo(), "IMPORTACAO", "PLANILHA", "ARQUIVO_PRODUTO");
         parametros.put(txtSistema.getText(), "IMPORTACAO", "PLANILHA", "SISTEMA");
         parametros.put(txtCodLojaOrigem.getText(), "IMPORTACAO", "PLANILHA", "LOJA_ORIGEM");
         parametros.put(((ItemComboVO) cmbLojaDestino.getSelectedItem()).id, "IMPORTACAO", "PLANILHA", "LOJA_VR");
-        parametros.put(chkManterBalanca.isSelected(), "IMPORTACAO", "PLANILHA", "MANTER_BALANCA");
         parametros.put(txtFornecedorFile.getArquivo(), "IMPORTACAO", "PLANILHA", "FORNECEDOR", "ARQUIVO");
         parametros.put(txtClienteDelimitador.getText(), "IMPORTACAO", "PLANILHA", "CLIENTE", "DELIMITER");
         parametros.put(txtClienteStrQuote.getText(), "IMPORTACAO", "PLANILHA", "CLIENTE", "QUOTE");
@@ -1302,13 +1290,14 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     }
     
     private void carregarParametros() throws Exception {
-        String arquivo = parametros.get("IMPORATACAO", "PLANILHA", "ARQUIVO_PRODUTO");
-        String origem = parametros.get("IMPORTACAO", "PLANILHA", "LOJA_ORIGEM");
-        String sistema = parametros.get("IMPORTACAO", "PLANILHA", "SISTEMA");
+        String arquivo = parametros.get("IMPORTACAO", "PLANILHA", "ARQUIVO_PRODUTO");
+        String origem = parametros.getWithNull("1", "IMPORTACAO", "PLANILHA", "LOJA_ORIGEM");
+        String sistema = parametros.getWithNull("PLANILHA", "IMPORTACAO", "PLANILHA", "SISTEMA");
         int idLojaVR = parametros.getInt("IMPORTACAO", "PLANILHA", "LOJA_VR");
         txtProdutoFile.setArquivo(arquivo != null ? arquivo : "");
-        txtCodLojaOrigem.setText(origem != null ? origem : "1");
-        txtSistema.setText(sistema != null ? sistema : "PLANILHA");
+        txtSistema.setText(sistema);
+        txtCodLojaOrigem.setText(origem);
+        onSetLojaEvent(null);
         if (idLojaVR > 0) {
             int index = -1;
             for (int i = 0; i < cmbLojaDestino.getItemCount(); i++) {
@@ -1322,7 +1311,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 cmbLojaDestino.setSelectedIndex(index);
             }
         }
-        chkManterBalanca.setSelected(parametros.getBool("IMPORTACAO", "PLANILHA", "MANTER_BALANCA"));
+        
+        tabProdImportacao.carregarParametros(parametros, "IMPORTACAO", "PLANILHA");
+        
         String arquivoForn = parametros.get("IMPORTACAO", "PLANILHA", "FORNECEDOR", "ARQUIVO");
         txtFornecedorFile.setArquivo(arquivoForn != null ? arquivoForn : "");
         String arquivoCli = parametros.get("IMPORTACAO", "PLANILHA", "CLIENTE", "ARQUIVO");

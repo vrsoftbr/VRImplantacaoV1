@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.vo.cadastro.fiscal.pautafiscal.PautaFiscalAnteriorVO;
 import vrimplantacao2.vo.cadastro.fiscal.pautafiscal.PautaFiscalVO;
 import vrimplantacao2.vo.cadastro.local.EstadoVO;
@@ -37,16 +38,49 @@ public class PautaFiscalRepository {
             pautas.clear();
             System.gc();
             
+            boolean isIdProduto = opt.contains(OpcaoFiscal.USAR_IDPRODUTO);
+            boolean isEan = opt.contains(OpcaoFiscal.USAR_EAN);
+            boolean utilizarEansMenores = opt.contains(OpcaoFiscal.UTILIZAR_EANS_MENORES);
+            
             Map<String, PautaFiscalAnteriorVO> anteriores = provider.getAnteriores();
+
+            Map<String, ProdutoPautaVO> ncmsProduto = null;
+            Map<Long, ProdutoPautaVO> ncmsEan = null;
+            if (isIdProduto) {
+                ncmsProduto = provider.getNcmsProduto();
+            } else if (isEan) {
+                ncmsEan = provider.getNcmsEan();
+            }            
             
             provider.notificar("Pauta Fiscal...Gravando...", organizados.size());
             for (PautaFiscalIMP imp: organizados.values()) {
                 PautaFiscalAnteriorVO anterior = anteriores.get(imp.getId());
                 
-                NcmVO ncm = provider.getNcm(imp.getNcm());
+                NcmVO ncm;
+                ProdutoPautaVO ppauta = null;
+                if (isIdProduto) {
+                    ppauta = ncmsProduto.get(imp.getId());
+                    if (ppauta == null) {
+                        continue;
+                    }
+                    ncm = ppauta.getNcm();
+                } else if (isEan) {
+                    long ean = Utils.stringToLong(imp.getId());
+                    if (ean > 999999L || utilizarEansMenores) {
+                        ppauta = ncmsEan.get(ean);
+                        ncm = ppauta.getNcm();
+                    } else {                        
+                        anterior = converterPautaAnterior(imp);
+                        provider.gravarAnterior(anterior);
+                        anteriores.put(anterior.getId(), anterior);
+                        continue;
+                    }
+                } else {
+                    ncm = provider.getNcm(imp.getNcm());
+                }
                 
                 /**
-                 * Se for um NCM válido executa.
+                 * Se for um NCM válido executa ou se um produto foi encontrado.
                  */
                 if (ncm != null) {
                     /**
@@ -56,7 +90,12 @@ public class PautaFiscalRepository {
                         anterior = converterPautaAnterior(imp);  
 
                         if (opt.contains(OpcaoFiscal.NOVOS)) { 
-                            PautaFiscalVO vo = converterPauta(imp, ncm);
+                            PautaFiscalVO vo;
+                            if (isIdProduto || isEan) {
+                                vo = converterPauta(imp, ppauta);
+                            } else {
+                                vo = converterPauta(imp, ncm);
+                            }
                             provider.gravar(vo, opt);                      
                             anterior.setCodigoAtual(vo);
                         }
@@ -72,7 +111,12 @@ public class PautaFiscalRepository {
                          */                    
                         if (anterior.getCodigoAtual() == null) {
                             if (opt.contains(OpcaoFiscal.NOVOS)) {
-                                PautaFiscalVO vo = converterPauta(imp, ncm);
+                                PautaFiscalVO vo;
+                                if (isIdProduto || isEan) {
+                                    vo = converterPauta(imp, ppauta);
+                                } else {
+                                    vo = converterPauta(imp, ncm);
+                                }
                                 provider.gravar(vo, opt);
                                 anterior.setCodigoAtual(vo);
                             }
@@ -181,6 +225,25 @@ public class PautaFiscalRepository {
         ant.setId(imp.getId());
         
         return ant;
+    }
+
+    private PautaFiscalVO converterPauta(PautaFiscalIMP imp, ProdutoPautaVO ppauta) throws Exception {
+        PautaFiscalVO result = converterPauta(imp, ppauta.getNcm());
+        
+        if (ppauta.getId_aliquotaCredito() != 0) {
+            result.setId_aliquotaCredito(ppauta.getId_aliquotaCredito());
+        }
+        if (ppauta.getId_aliquotaCreditoForaEstado() != 0) {
+            result.setId_aliquotaCreditoForaEstado(ppauta.getId_aliquotaCreditoForaEstado());
+        }
+        if (ppauta.getId_aliquotaDebito() != 0) {
+            result.setId_aliquotaDebito(ppauta.getId_aliquotaDebito());
+        }
+        if (ppauta.getId_aliquotaDebitoForaEstado() != 0) {
+            result.setId_aliquotaDebitoForaEstado(ppauta.getId_aliquotaDebitoForaEstado());
+        }
+        
+        return result;
     }
     
 }
