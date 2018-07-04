@@ -14,7 +14,6 @@ import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.STMerge;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
@@ -32,7 +31,6 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
-import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -52,7 +50,7 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
             return "ICommerce" + id_loja;
         } else {
             return "ICommerce";
-        }        
+        }
     }
 
     @Override
@@ -112,7 +110,7 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
                     merc.put(imp.getId(), imp);
                 }
             }
-            
+
             try (ResultSet rst = stm.executeQuery(
                     "select distinct \n"
                     + "p.pro_grupo merc1, \n"
@@ -134,7 +132,7 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                 }
             }
-            
+
             try (ResultSet rst = stm.executeQuery(
                     "select distinct \n"
                     + "p.pro_grupo merc1, \n"
@@ -163,7 +161,7 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return new ArrayList<>(merc.values());
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -221,26 +219,26 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rs.getString("id"));
                     imp.setEan(rs.getString("ean"));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
-                    
+
                     if ((rs.getString("descricaoreduzida") != null) && (!rs.getString("descricaoreduzida").trim().isEmpty())) {
                         imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     } else {
                         imp.setDescricaoReduzida(rs.getString("descricaocompleta"));
                     }
-                    
+
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setTipoEmbalagem(rs.getString("unidade"));
-                    
+
                     if (rs.getInt("qtdembalagem") == 0) {
                         imp.setQtdEmbalagem(1);
                     } else {
                         imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     }
-                    
+
                     imp.setCodMercadologico1(rs.getString("pro_grupo"));
                     imp.setCodMercadologico2(rs.getString("pro_sub_grupo"));
-                    imp.setCodMercadologico3("1");                    
-                    
+                    imp.setCodMercadologico3("1");
+
                     imp.setPesoBruto(rs.getDouble("peso"));
                     imp.setPesoLiquido(rs.getDouble("pesoliquido"));
                     imp.setPrecovenda(rs.getDouble("preco"));
@@ -283,7 +281,7 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -323,9 +321,148 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
                 return result;
             }
         }
+
+        if (opt == OpcaoProduto.PISCOFINS_INDIVIDUAL) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select  \n"
+                        + "	p.pro_codigo id, \n"
+                        + "	p.pro_barras ean, \n"
+                        + "	p.pro_descri descricaocompleta, \n"
+                        + "	p.pro_descri_fiscal descricaoreduzida, \n"
+                        + "	p.pro_un unidade, \n"
+                        + " p.pro_grupo, \n"
+                        + " p.pro_sub_grupo, \n"
+                        + "	p.pro_qtde_embalagem qtdembalagem, \n"
+                        + "	p.pro_peso peso, \n"
+                        + "	p.pro_peso_liquido pesoliquido, \n"
+                        + "	p.pro_preco1 preco, \n"
+                        + "	p.pro_custo_unitario custo, \n"
+                        + " p.pro_lucro_esperado_p margem, \n"
+                        + "	pe.pro_saldo estoque, \n"
+                        + "	p.pro_est_min estoquemin, \n"
+                        + "	p.pro_est_max estoquemax, \n"
+                        + "	p.pro_cadastro datacadastro, \n"
+                        + "	p.pro_data_alt dataalteracao, \n"
+                        + "	p.pro_status ativo,\n"
+                        + "	aliq.alq_codigo as icmsid, \n"
+                        + "	p.pro_st cstdebito, \n"
+                        + "	p.pro_usa_balanca ebalanca, \n"
+                        + "	p.pro_validade validade, \n"
+                        + "	p.pro_st_ipi ipidebito, \n"
+                        + "	p.pro_st_pis pisdebito, \n"
+                        + "	p.pro_st_cofins stcofins, \n"
+                        + "	p.pro_aliq_pis aliqpis, \n"
+                        + "	p.pro_aliq_cofins aliqcofins, \n"
+                        + "	p.pro_ncm ncm, \n"
+                        + "	p.pro_st_pis_ent piscredito, \n"
+                        + "	p.pro_st_cofins_ent cofinscredito, \n"
+                        + "	p.pro_aliq_pis_ent aliqpiscredito, \n"
+                        + "	p.pro_aliq_cofins_ent aliqcofinscredito, \n"
+                        + " p.pro_ntr as naturezareceita \n"
+                        + "from \n"
+                        + "	produtos as p \n"
+                        + "	join produtos_estoque as pe on p.pro_codigo = pe.pro_codigo \n"
+                        + "	join lojas l on pe.pro_loja = l.loj_codigo\n"
+                        + "left join aliquotas_ecf  aliq on p.pro_aliquota = aliq.alq_codigo\n"
+                        + "where \n"
+                        + "	l.loj_codigo = " + getLojaOrigem() + "\n"
+                        + "order by \n"
+                        + "	p.pro_codigo"
+                )) {
+                    Map<String, ProdutoAnteriorVO> anteriores = new ProdutoAnteriorDAO().getAnterior(getSistema());
+                    while (rst.next()) {
+
+                        ProdutoAnteriorVO anterior;
+                        anterior = anteriores.get(rst.getString("id"));
+
+                        if (anterior != null) {
+                            ProdutoIMP imp = new ProdutoIMP();
+                            imp.setImportLoja(getLojaOrigem());
+                            imp.setImportSistema(getSistema());
+                            imp.setImportId(rst.getString("id"));
+                            imp.setPiscofinsCstCredito(rst.getString("piscredito"));
+                            imp.setPiscofinsCstDebito(rst.getString("pisdebito"));
+                            imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
+                            result.add(imp);
+                        }
+                    }
+                }
+                return result;
+            }
+        }
+        
+        if (opt == OpcaoProduto.NCM_INDIVIDUAL) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select  \n"
+                        + "	p.pro_codigo id, \n"
+                        + "	p.pro_barras ean, \n"
+                        + "	p.pro_descri descricaocompleta, \n"
+                        + "	p.pro_descri_fiscal descricaoreduzida, \n"
+                        + "	p.pro_un unidade, \n"
+                        + " p.pro_grupo, \n"
+                        + " p.pro_sub_grupo, \n"
+                        + "	p.pro_qtde_embalagem qtdembalagem, \n"
+                        + "	p.pro_peso peso, \n"
+                        + "	p.pro_peso_liquido pesoliquido, \n"
+                        + "	p.pro_preco1 preco, \n"
+                        + "	p.pro_custo_unitario custo, \n"
+                        + " p.pro_lucro_esperado_p margem, \n"
+                        + "	pe.pro_saldo estoque, \n"
+                        + "	p.pro_est_min estoquemin, \n"
+                        + "	p.pro_est_max estoquemax, \n"
+                        + "	p.pro_cadastro datacadastro, \n"
+                        + "	p.pro_data_alt dataalteracao, \n"
+                        + "	p.pro_status ativo,\n"
+                        + "	aliq.alq_codigo as icmsid, \n"
+                        + "	p.pro_st cstdebito, \n"
+                        + "	p.pro_usa_balanca ebalanca, \n"
+                        + "	p.pro_validade validade, \n"
+                        + "	p.pro_st_ipi ipidebito, \n"
+                        + "	p.pro_st_pis pisdebito, \n"
+                        + "	p.pro_st_cofins stcofins, \n"
+                        + "	p.pro_aliq_pis aliqpis, \n"
+                        + "	p.pro_aliq_cofins aliqcofins, \n"
+                        + "	p.pro_ncm ncm, \n"
+                        + "	p.pro_st_pis_ent piscredito, \n"
+                        + "	p.pro_st_cofins_ent cofinscredito, \n"
+                        + "	p.pro_aliq_pis_ent aliqpiscredito, \n"
+                        + "	p.pro_aliq_cofins_ent aliqcofinscredito, \n"
+                        + " p.pro_ntr as naturezareceita \n"
+                        + "from \n"
+                        + "	produtos as p \n"
+                        + "	join produtos_estoque as pe on p.pro_codigo = pe.pro_codigo \n"
+                        + "	join lojas l on pe.pro_loja = l.loj_codigo\n"
+                        + "left join aliquotas_ecf  aliq on p.pro_aliquota = aliq.alq_codigo\n"
+                        + "where \n"
+                        + "	l.loj_codigo = " + getLojaOrigem() + "\n"
+                        + "order by \n"
+                        + "	p.pro_codigo"
+                )) {
+                    Map<String, ProdutoAnteriorVO> anteriores = new ProdutoAnteriorDAO().getAnterior(getSistema());
+                    while (rst.next()) {
+
+                        ProdutoAnteriorVO anterior;
+                        anterior = anteriores.get(rst.getString("id"));
+
+                        if (anterior != null) {
+                            ProdutoIMP imp = new ProdutoIMP();
+                            imp.setImportLoja(getLojaOrigem());
+                            imp.setImportSistema(getSistema());
+                            imp.setImportId(rst.getString("id"));
+                            imp.setNcm(rst.getString("ncm"));
+                            result.add(imp);
+                        }
+                    }
+                }
+                return result;
+            }
+        }
+        
         return null;
     }
-    
+
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -603,7 +740,7 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();

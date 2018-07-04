@@ -184,7 +184,18 @@ public enum OpcaoProduto {
         public String toString() {
             return "Icms Individual";
         }
+    }, PISCOFINS_INDIVIDUAL {
+        @Override
+        public String toString() {
+            return "Piscofins Individual";
+        }
+    }, NCM_INDIVIDUAL {
+        @Override
+        public String toString() {
+            return "NCM Individual";
+        }
     },
+    
     IMPORTAR_RESETAR_BALANCA, IMPORTAR_GERAR_SUBNIVEL_MERC, IMPORTAR_MANTER_BALANCA, UNIFICAR_PRODUTO_BALANCA;
     
     private List<ProdutoIMP> listaEspecial;
