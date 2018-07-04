@@ -13,11 +13,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoDB2;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.dao.cadastro.BancoDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -501,7 +503,7 @@ public class CissDAO extends InterfaceDAO {
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()){
+        try(Statement stm = ConexaoDB2.getConexao().createStatement()){
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
                     "        cr.idplanilha as id,\n" +
@@ -542,6 +544,58 @@ public class CissDAO extends InterfaceDAO {
             }
         }
                 
+        return result;
+    }
+    
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoDB2.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "        ch.idplanilha as id,\n" +
+                    "        cf.nome,\n" +
+                    "        ch.cnpjcpfdono as cpf,\n" +
+                    "        cf.inscrestadual as rg,\n" +
+                    "        ch.idnumcheque as idcheque,\n" +
+                    "        ch.idclifor as idcliente,\n" +
+                    "        ch.idbanco,\n" +
+                    "        ch.idagencia,\n" +
+                    "        ch.numconta as numeroconta,\n" +
+                    "        ch.valor,\n" +
+                    "        ch.dtvencimento\n" +
+                    "from\n" +
+                    "        cheques ch\n" +
+                    "join\n" +
+                    "        cliente_fornecedor cf on ch.idclifor = cf.idclifor\n" +
+                    "where\n" +
+                    "        ch.idempresa = " + getLojaOrigem() + " and\n" +
+                    "        ch.codcompensacao = 18\n" +
+                    "order by\n" +
+                    "        ch.dtvencimento")) {
+                while(rs.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    
+                    int idBanco = new BancoDAO().getId(rs.getInt("idbanco"));
+                    imp.setId(rs.getString("id"));
+                    imp.setNome(rs.getString("nome"));
+                    imp.setCpf(rs.getString("cpf"));
+                    imp.setRg(rs.getString("rg"));
+                    imp.setDate(rs.getDate("dtvencimento"));
+                    imp.setDataDeposito(rs.getDate("dtvencimento"));
+                    imp.setNumeroCheque(rs.getString("idcheque"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setBanco(idBanco);
+                    imp.setAgencia(rs.getString("idagencia"));
+                    imp.setAlinea(0);
+                    imp.setConta(rs.getString("numeroconta"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
         return result;
     }
 
