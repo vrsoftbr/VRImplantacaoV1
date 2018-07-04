@@ -130,6 +130,7 @@ public class ChequeRepository {
         vo.setAgencia(imp.getAgencia());
         vo.setConta(imp.getConta());
         vo.setCheque(imp.getNumeroCheque());
+        vo.setValor(imp.getValor());
         return vo;
     }
 
