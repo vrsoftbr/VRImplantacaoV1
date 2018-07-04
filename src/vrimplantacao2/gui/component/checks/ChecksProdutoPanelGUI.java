@@ -1123,6 +1123,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 if (chkCest.isSelected()) {
                     opcoes.add(OpcaoProduto.CEST);
                 }
+                if (chkQtdEmbalagemProd.isSelected()) {
+                    opcoes.add(OpcaoProduto.QTD_EMBALAGEM_COTACAO);
+                }
                 if (!opcoes.isEmpty()) {
                     importador.atualizarProdutos(opcoes);
                 }

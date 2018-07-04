@@ -35,7 +35,7 @@ public class DefaultLinha implements LinhaArquivo {
         if (campo == null) {
             campo = "";
         }
-        return campo.toUpperCase();
+        return campo.toUpperCase().trim();
     }
 
     @Override
