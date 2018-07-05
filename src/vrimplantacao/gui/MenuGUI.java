@@ -147,6 +147,7 @@ import vrimplantacao2.gui.interfaces.AvanceGUI;
 import vrimplantacao2.gui.interfaces.TstiGUI;
 import vrimplantacao2.gui.interfaces.CPlusGUI;
 import vrimplantacao2.gui.interfaces.CissGUI;
+import vrimplantacao2.gui.interfaces.DtComGUI;
 import vrimplantacao2.gui.interfaces.FaciliteGUI;
 import vrimplantacao2.gui.interfaces.FenixGUI;
 import vrimplantacao2.gui.interfaces.FortGUI;
@@ -1720,6 +1721,11 @@ public final class MenuGUI extends VRMdiFrame {
         mnuOrion.add(mnuMSIInfor);
 
         mnuDtCom.setText("DtCom");
+        mnuDtCom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuDtComActionPerformed(evt);
+            }
+        });
         mnuOrion.add(mnuDtCom);
 
         jMenu2.add(mnuOrion);
@@ -3796,6 +3802,10 @@ public final class MenuGUI extends VRMdiFrame {
     private void mnuSysmoFirebirdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSysmoFirebirdActionPerformed
         SysmoFirebirdGUI.exibir(this);
     }//GEN-LAST:event_mnuSysmoFirebirdActionPerformed
+
+    private void mnuDtComActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuDtComActionPerformed
+        DtComGUI.exibir(this);
+    }//GEN-LAST:event_mnuDtComActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
