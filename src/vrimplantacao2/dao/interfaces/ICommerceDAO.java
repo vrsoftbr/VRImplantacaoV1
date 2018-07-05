@@ -686,7 +686,7 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setEstadoCivil(TipoEstadoCivil.OUTROS);
                     }
-                    imp.setLimiteCompra(rs.getDouble("limite"));
+                    imp.setValorLimite(rs.getDouble("limite"));
                     imp.setObservacao(rs.getString("observacao"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     result.add(imp);
@@ -765,25 +765,38 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     Cell cellIdVenda = sheet.getCell(0, i);
                     Cell cellCodCliente = sheet.getCell(2, i);
-                    Cell cellEmissao = sheet.getCell(6, i);
-                    Cell cellVencimento = sheet.getCell(7, i);
-                    Cell cellValor = sheet.getCell(9, i);
-                    Cell cellJuros = sheet.getCell(11, i);
+                    Cell cellEmissao = sheet.getCell(3, i);
+                    Cell cellVencimento = sheet.getCell(4, i);
+                    Cell cellValor = sheet.getCell(5, i);
+                    Cell cellJuros = sheet.getCell(6, i);
 
-                    if ((cellEmissao.getContents() != null)
-                            && (!cellEmissao.getContents().trim().isEmpty())) {
-                        dataEmissao = new java.sql.Date(fmt.parse(cellEmissao.getContents()).getTime());
-                    } else {
+                    if ((!cellEmissao.getContents().contains("/"))
+                            && (!cellVencimento.getContents().contains("/"))) {
                         dataEmissao = new Date(new java.util.Date().getTime());
-                    }
-
-                    if ((cellVencimento.getContents() != null)
-                            && (!cellVencimento.getContents().trim().isEmpty())) {
-                        dataVencimento = new java.sql.Date(fmt.parse(cellVencimento.getContents()).getTime());
-                    } else {
                         dataVencimento = new Date(new java.util.Date().getTime());
-                    }
+                    } else {
 
+                        if ((cellEmissao.getContents() != null)
+                                && (!cellEmissao.getContents().trim().isEmpty())
+                                && (cellEmissao.getContents().contains("/"))) {
+
+                            dataEmissao = new java.sql.Date(fmt.parse(cellEmissao.getContents()).getTime());
+                        } else {
+
+                            dataEmissao = new java.sql.Date(fmt.parse(cellVencimento.getContents()).getTime());
+                        }
+
+                        if ((cellVencimento.getContents() != null)
+                                && (!cellVencimento.getContents().trim().isEmpty())
+                                && (cellVencimento.getContents().contains("/"))) {
+
+                            dataVencimento = new java.sql.Date(fmt.parse(cellVencimento.getContents()).getTime());
+                        } else {
+
+                            dataVencimento = new java.sql.Date(fmt.parse(cellEmissao.getContents()).getTime());
+                        }
+                    }
+                    
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(cellIdVenda.getContents());
                     imp.setIdCliente(cellCodCliente.getContents().substring(0, cellCodCliente.getContents().indexOf("-")));
