@@ -617,6 +617,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuJacsys = new javax.swing.JMenuItem();
         mnuEsSystem = new javax.swing.JMenuItem();
         mnuMSIInfor = new javax.swing.JMenuItem();
+        mnuDtCom = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuCache = new javax.swing.JMenu();
@@ -1717,6 +1718,9 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuOrion.add(mnuMSIInfor);
+
+        mnuDtCom.setText("DtCom");
+        mnuOrion.add(mnuDtCom);
 
         jMenu2.add(mnuOrion);
 
@@ -3915,6 +3919,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuCplus;
     private javax.swing.JMenu mnuDB2;
     private javax.swing.JMenuItem mnuDelfi;
+    private javax.swing.JMenuItem mnuDtCom;
     private javax.swing.JMenuItem mnuEmporio;
     private javax.swing.JMenuItem mnuEsSystem;
     private javax.swing.JMenuItem mnuFG;
