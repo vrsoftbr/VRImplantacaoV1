@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoDB2;
-import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.BancoDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;

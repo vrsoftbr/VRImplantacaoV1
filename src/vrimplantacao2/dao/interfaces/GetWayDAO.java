@@ -77,7 +77,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
     
     @Override
     public String getSistema() {
-            return "GetWay" + v_lojaMesmoId;
+        return "GetWay" + v_lojaMesmoId;
     }
 
     public List<Estabelecimento> getLojas() throws Exception {
