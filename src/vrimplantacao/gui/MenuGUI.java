@@ -55,7 +55,7 @@ import vrimplantacao.gui.interfaces.PlanilhaChequeGUI;
 import vrimplantacao.gui.interfaces.BoechatSoftGUI;
 import vrimplantacao.gui.interfaces.ConcretizeGUI;
 import vrimplantacao.gui.interfaces.ControlWareGUI;
-import vrimplantacao.gui.interfaces.IntelliCashGUI;
+import vrimplantacao2.gui.interfaces.IntelliCashGUI;
 import vrimplantacao.gui.interfaces.SoftaExGUI;
 import vrimplantacao.gui.interfaces.UltraSistGUI;
 import vrimplantacao2.gui.interfaces.KairosGUI;
