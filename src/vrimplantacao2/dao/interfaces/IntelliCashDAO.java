@@ -10,11 +10,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
-import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -436,7 +436,41 @@ public class IntelliCashDAO extends InterfaceDAO {
         }
         return result;
     }
-    
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "id,\n"
+                    + "data,\n"
+                    + "vencimento,\n"
+                    + "doc,\n"
+                    + "codag,\n"
+                    + "valor,\n"
+                    + "descricao,\n"
+                    + "juros\n"
+                    + "from agendafin\n"
+                    + "where vpg = 0\n"
+                    + "and empresa = " + getLojaOrigem()
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdCliente(rst.getString("codag"));
+                    imp.setDataEmissao(rst.getDate("data"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setJuros(rst.getDouble("juros"));
+                    imp.setObservacao(rst.getString("descricao") + " NUMERO DOC " + rst.getString("doc"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> lojas = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
