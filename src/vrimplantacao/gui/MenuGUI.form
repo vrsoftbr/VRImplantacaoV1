@@ -523,6 +523,21 @@
                         </MenuItem>
                       </SubComponents>
                     </Menu>
+                    <Menu class="javax.swing.JMenu" name="mnuSqlServer2">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="SQL Server 2"/>
+                      </Properties>
+                      <SubComponents>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuKcms">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="KCMS"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuKcmsActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                      </SubComponents>
+                    </Menu>
                     <Menu class="javax.swing.JMenu" name="jMenu7">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Oracle"/>

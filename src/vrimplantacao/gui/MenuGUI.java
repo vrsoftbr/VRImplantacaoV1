@@ -166,6 +166,7 @@ import vrimplantacao2.gui.interfaces.PdvVrGUI;
 import vrimplantacao2.gui.interfaces.InfoMacGUI;
 import vrimplantacao2.gui.interfaces.InventerGUI;
 import vrimplantacao2.gui.interfaces.JM2OnlineGUI;
+import vrimplantacao2.gui.interfaces.KcmsGUI;
 import vrimplantacao2.gui.interfaces.PwsGUI;
 import vrimplantacao2.gui.interfaces.SiacGUI;
 import vrimplantacao2.gui.interfaces.RMSAutomaHelpGUI;
@@ -569,6 +570,8 @@ public final class MenuGUI extends VRMdiFrame {
         mnuInventer = new javax.swing.JMenuItem();
         mnuSoftcom = new javax.swing.JMenuItem();
         mnuIcommerce = new javax.swing.JMenuItem();
+        mnuSqlServer2 = new javax.swing.JMenu();
+        mnuKcms = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1345,6 +1348,18 @@ public final class MenuGUI extends VRMdiFrame {
         jMenu6.add(mnuIcommerce);
 
         jMenu2.add(jMenu6);
+
+        mnuSqlServer2.setText("SQL Server 2");
+
+        mnuKcms.setText("KCMS");
+        mnuKcms.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuKcmsActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuKcms);
+
+        jMenu2.add(mnuSqlServer2);
 
         jMenu7.setText("Oracle");
 
@@ -3807,6 +3822,10 @@ public final class MenuGUI extends VRMdiFrame {
         DtComGUI.exibir(this);
     }//GEN-LAST:event_mnuDtComActionPerformed
 
+    private void mnuKcmsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuKcmsActionPerformed
+        KcmsGUI.exibir(this);
+    }//GEN-LAST:event_mnuKcmsActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -3957,6 +3976,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuJacsys;
     private javax.swing.JMenu mnuJanela;
     private javax.swing.JMenuItem mnuJrf;
+    private javax.swing.JMenuItem mnuKcms;
     private javax.swing.JMenuItem mnuLinner;
     private javax.swing.JMenuItem mnuLogus;
     private javax.swing.JMenuItem mnuMSIInfor;
@@ -3986,6 +4006,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSistemaLogin;
     private javax.swing.JMenuItem mnuSoftcom;
     private javax.swing.JMenuItem mnuSolidus;
+    private javax.swing.JMenu mnuSqlServer2;
     private javax.swing.JMenuItem mnuSuper;
     private javax.swing.JMenuItem mnuSysmoFirebird;
     private javax.swing.JMenuItem mnuSysmoPostgres;
