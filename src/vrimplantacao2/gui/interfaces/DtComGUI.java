@@ -24,6 +24,7 @@ public class DtComGUI extends VRInternalFrame {
     private static final String SISTEMA = "DTCOM";
     private static final String SERVIDOR_SQL = "DBF";
     private static DtComGUI instance;
+
     
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
