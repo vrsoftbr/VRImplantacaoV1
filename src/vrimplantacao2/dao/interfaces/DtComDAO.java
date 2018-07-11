@@ -6,13 +6,18 @@ import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
 
 /**
  *
  * @author Importacao
  */
-public class DtComDAO extends InterfaceDAO {
+public class DtComDAO extends InterfaceDAO implements MapaTributoProvider{
 
     @Override
     public String getSistema() {
@@ -35,6 +40,59 @@ public class DtComDAO extends InterfaceDAO {
         }
         return result;
     }
+    
+     @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	tribu,\n" +
+                    "	desctribu\n"+
+                    "from\n" +
+                    "	aliquo\n" +
+                    "order by\n" +
+                    "	desctribu")) {
+                while(rs.next()) {
+                    result.add(new MapaTributoIMP(rs.getString("tribu"), rs.getString("desctribu")));
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+   public List<MercadologicoIMP> getMercadologicos() throws Exception {
+       List<MercadologicoIMP> result = new ArrayList<>();
+       
+       try(Statement stm = ConexaoDBF.getConexao().createStatement()) {
+           try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	secao merc1, nomesec descmerc1,\n" +
+                    "	subsec merc2, nomesub descmerc2,\n" +
+                    "	'1' merc3, nomesub descmerc3\n" +
+                    "from\n" +
+                    "	secoes\n" +
+                    "order by\n" +
+                    "	nomesec, nomesub")) {
+               while(rs.next()) {
+                   MercadologicoIMP imp = new MercadologicoIMP();
+                   imp.setImportSistema(getSistema());
+                   imp.setImportLoja(getLojaOrigem());
+                   imp.setMerc1ID(rs.getString("merc1"));
+                   imp.setMerc1Descricao(rs.getString("descmerc1"));
+                   imp.setMerc2ID(rs.getString("merc2"));
+                   imp.setMerc2Descricao(rs.getString("descmerc2"));
+                   imp.setMerc3ID(rs.getString("merc3"));
+                   imp.setMerc3Descricao(rs.getString("descmerc3"));
+                   
+                   result.add(imp);
+               }
+           }
+       }
+       return result;
+   } 
     
     @Override
    public List<ClienteIMP> getClientes() throws Exception {
@@ -119,6 +177,78 @@ public class DtComDAO extends InterfaceDAO {
                    imp.setDataNascimento(rs.getDate("nascimento"));
                    
                    result.add(imp);
+               }
+           }
+       }
+       
+       return result;
+   }
+   
+    @Override
+   public List<FornecedorIMP> getFornecedores() throws Exception {
+       List<FornecedorIMP> result = new ArrayList<>();
+       
+       try(Statement stm = ConexaoDBF.getConexao().createStatement()) {
+           try(ResultSet rs = stm.executeQuery(
+                   "select\n" +
+                    "	cgc,\n" +
+                    "	inscricao,\n" +
+                    "	nome1,\n" +
+                    "	fantasia,\n" +
+                    "	contato,\n" +
+                    "	endereco,\n" +
+                    "	bairro,\n" +
+                    "	cidade,\n" +
+                    "	estado,\n" +
+                    "	cep,\n" +
+                    "	telefone,\n" +
+                    "	fax,\n" +
+                    "	observacao,\n" +
+                    "   observa1,\n" +
+                    "   observa2,\n" +
+                    "	prazo1,\n" +
+                    "	prazo2,\n" +
+                    "	prazo3,\n" +
+                    "	condpg,\n" +
+                    "	cod_uf,\n" +
+                    "	cod_mun\n" +
+                    "from\n" +
+                    "	fornec\n" +
+                    "order by\n" +
+                    "	nome1")) {
+               while(rs.next()) {
+                   FornecedorIMP imp = new FornecedorIMP();
+                   imp.setImportSistema(getSistema());
+                   imp.setImportLoja(getLojaOrigem());
+                   imp.setImportId(rs.getString("cgc"));
+                   imp.setInsc_municipal(rs.getString("inscricao"));
+                   imp.setRazao(rs.getString("nome1"));
+                   imp.setFantasia(rs.getString("fantasia"));
+                   if(!"".equals(rs.getString("contato"))) {
+                        imp.addContato("1", rs.getString("contato"), null, null, TipoContato.COMERCIAL, null);
+                   }
+                   imp.setEndereco(rs.getString("endereco"));
+                   imp.setBairro(rs.getString("bairro"));
+                   imp.setIbge_municipio(rs.getInt("cod_mun"));
+                   imp.setMunicipio(rs.getString("cidade"));
+                   imp.setIbge_uf(rs.getInt("cod_uf"));
+                   imp.setUf(rs.getString("estado"));
+                   imp.setCep(rs.getString("cep"));
+                   imp.setTel_principal(rs.getString("telefone"));
+                   if(!"".equals(rs.getString("fax"))){
+                        imp.addContato("2", rs.getString("fax"), null, null, TipoContato.COMERCIAL, null);
+                   }
+                   String obs1 = "", obs2 = "";
+                   if(!"".equals(rs.getString("observa1"))) {
+                       obs1 = "Obs2: " + rs.getString("observa1");
+                   } else if(!"".equals(rs.getString("observa2"))) {
+                       obs2 = "Obs3: " + rs.getString("observa2");
+                   } else {
+                       obs1 = "";
+                       obs2 = "";
+                   }
+                   imp.setObservacao(rs.getString("observacao") + obs1 + obs2);
+                   
                }
            }
        }
