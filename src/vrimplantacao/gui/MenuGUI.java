@@ -172,6 +172,7 @@ import vrimplantacao2.gui.interfaces.SiacGUI;
 import vrimplantacao2.gui.interfaces.RMSAutomaHelpGUI;
 import vrimplantacao2.gui.interfaces.SiaCriareByFileGUI;
 import vrimplantacao2.gui.interfaces.SoftcomGUI;
+import vrimplantacao2.gui.interfaces.SriGUI;
 import vrimplantacao2.gui.interfaces.SysmoFirebirdGUI;
 import vrimplantacao2.gui.interfaces.SysmoPostgresGUI;
 import vrimplantacao2.gui.interfaces.TopSystemGUI2;
@@ -539,6 +540,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuFacilite = new javax.swing.JMenuItem();
         mnuFort = new javax.swing.JMenuItem();
         mnuSysmoFirebird = new javax.swing.JMenuItem();
+        mnuSri = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1102,6 +1104,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu5.add(mnuSysmoFirebird);
+
+        mnuSri.setText("SRI");
+        mnuSri.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSriActionPerformed(evt);
+            }
+        });
+        jMenu5.add(mnuSri);
 
         jMenu2.add(jMenu5);
 
@@ -3826,6 +3836,11 @@ public final class MenuGUI extends VRMdiFrame {
         KcmsGUI.exibir(this);
     }//GEN-LAST:event_mnuKcmsActionPerformed
 
+    private void mnuSriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSriActionPerformed
+        // TODO add your handling code here:
+        SriGUI.exibir(this);
+    }//GEN-LAST:event_mnuSriActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -4007,6 +4022,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSoftcom;
     private javax.swing.JMenuItem mnuSolidus;
     private javax.swing.JMenu mnuSqlServer2;
+    private javax.swing.JMenuItem mnuSri;
     private javax.swing.JMenuItem mnuSuper;
     private javax.swing.JMenuItem mnuSysmoFirebird;
     private javax.swing.JMenuItem mnuSysmoPostgres;
