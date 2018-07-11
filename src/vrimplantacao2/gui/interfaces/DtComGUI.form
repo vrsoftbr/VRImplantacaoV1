@@ -299,7 +299,7 @@
               <SubComponents>
                 <Component class="vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel" name="vRImportaArquivBalancaPanel1">
                   <Properties>
-                    <Property name="sistema" type="java.lang.String" value="GetWay"/>
+                    <Property name="sistema" type="java.lang.String" value="DtCom"/>
                   </Properties>
                 </Component>
               </SubComponents>

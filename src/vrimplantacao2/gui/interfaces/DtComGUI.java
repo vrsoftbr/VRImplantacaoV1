@@ -392,7 +392,7 @@ public class DtComGUI extends VRInternalFrame {
 
         vRTabbedPane2.addTab("Produtos", vRPanel7);
 
-        vRImportaArquivBalancaPanel1.setSistema("GetWay");
+        vRImportaArquivBalancaPanel1.setSistema("DtCom");
 
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);

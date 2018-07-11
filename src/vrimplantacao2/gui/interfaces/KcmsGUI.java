@@ -39,8 +39,8 @@ public class KcmsGUI extends VRInternalFrame {
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         txtHostSQLServer.setText(params.getWithNull("192.168.1.100", NOME_SISTEMA, "HOST"));
-        txtBancoDadosSQLServer.setText(params.getWithNull("KCMS", NOME_SISTEMA, "DATABASE"));
-        txtPortaSQLServer.setText(params.getWithNull("50009", NOME_SISTEMA, "PORTA"));
+        txtBancoDadosSQLServer.setText(params.getWithNull("DBSOLUS", NOME_SISTEMA, "DATABASE"));
+        txtPortaSQLServer.setText(params.getWithNull("1433", NOME_SISTEMA, "PORTA"));
         txtUsuarioSQLServer.setText(params.getWithNull("KCMS", NOME_SISTEMA, "USUARIO"));
         txtSenhaSQLServer.setText(params.getWithNull("kcms2011", NOME_SISTEMA, "SENHA"));
         vLojaCliente = params.get(NOME_SISTEMA, "LOJA_CLIENTE");
@@ -284,7 +284,7 @@ public class KcmsGUI extends VRInternalFrame {
                         }
 
                         if (chkProdutoFornecedor.isSelected()) {
-                            importador.importarProdutoFornecedor();
+                            importador.importarProdutoFornecedor(); 
                         }
                     } else if (tab.getSelectedIndex() == 2) {
                         if (chkClientePreferencial.isSelected()) {
