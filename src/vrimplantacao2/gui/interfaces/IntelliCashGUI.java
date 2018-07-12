@@ -1,6 +1,5 @@
 package vrimplantacao2.gui.interfaces;
 
-import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
@@ -19,8 +18,6 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
 public class IntelliCashGUI extends VRInternalFrame {    

@@ -404,7 +404,7 @@ public class IntelliCashDAO extends InterfaceDAO {
                     + "    left join cidadesibge cidibge on cidibge.id2 = cid.id\n"
                     + "    left join docs dcie on dcie.codag = a.id and dcie.tipo = 66\n"
                     + "    left join docs dcrg on dcrg.codag = a.id and dcrg.tipo = 67\n"
-                    + "    left join EC_EXPT_AGENTE ec on ec.id = a.id"
+                    + "    left join EC_EXPT_AGENTE ec on ec.id = a.id\n"
                     + "order by\n"
                     + "    a.id"
             )) {
@@ -430,8 +430,7 @@ public class IntelliCashDAO extends InterfaceDAO {
                     imp.setDiaVencimento(rst.getInt("prazodias"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setEmail(rst.getString("email"));
-                    imp.setValorLimite(rst.getDouble("limitepreferencial"));
-                    imp.setObservacao("IMPORTADO VR");
+                    imp.setValorLimite(rst.getDouble("limitepreferencial"));   
                     imp.setSalario(rst.getDouble("salario"));
                     imp.setPermiteCreditoRotativo(true);
                     imp.setPermiteCheque(true);
@@ -452,17 +451,20 @@ public class IntelliCashDAO extends InterfaceDAO {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "id,\n"
-                    + "data,\n"
-                    + "vencimento,\n"
-                    + "doc,\n"
-                    + "codag,\n"
-                    + "valor,\n"
-                    + "descricao,\n"
-                    + "juros\n"
-                    + "from agendafin\n"
-                    + "where vpg = 0\n"
-                    + "and empresa = " + getLojaOrigem()
+                    + "    af.id,\n"
+                    + "    af.data,\n"
+                    + "    af.vencimento,\n"
+                    + "    af.doc,\n"
+                    + "    af.codag,\n"
+                    + "    cli.codigo,\n"
+                    + "    af.valor,\n"
+                    + "    af.descricao,\n"
+                    + "    af.juros\n"
+                    + "from agendafin af\n"
+                    + "inner join agentes ag on ag.id = af.codag\n"
+                    + "inner join clientes cli on cli.id = ag.id\n"
+                    + "where af.vpg = 0\n"
+                    + "and af.empresa = " + getLojaOrigem()
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();

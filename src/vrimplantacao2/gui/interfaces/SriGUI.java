@@ -1,5 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
@@ -18,6 +19,8 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.SriDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
 public class SriGUI extends VRInternalFrame {    
@@ -40,6 +43,7 @@ public class SriGUI extends VRInternalFrame {
         txtPortaFirebird.setText(params.getWithNull("5432", NOME_SISTEMA, "PORTA"));
         txtUsuarioFirebird.setText(params.getWithNull("sysdba", NOME_SISTEMA, "USUARIO"));
         txtSenhaFirebird.setText(params.getWithNull("L$5a7*(B", NOME_SISTEMA, "SENHA"));
+        txtLojaOrigem.setText(params.getWithNull("0", NOME_SISTEMA, "LOJA_CLIENTE"));
         vLojaCliente = params.get(NOME_SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(NOME_SISTEMA, "LOJA_VR");
         vTipoVenda = params.getInt(NOME_SISTEMA, "TIPO_VENDA");
@@ -52,11 +56,8 @@ public class SriGUI extends VRInternalFrame {
         params.put(txtPortaFirebird.getText(), NOME_SISTEMA, "PORTA");
         params.put(txtUsuarioFirebird.getText(), NOME_SISTEMA, "USUARIO");
         params.put(txtSenhaFirebird.getText(), NOME_SISTEMA, "SENHA");
-        Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
-        if (cliente != null) {
-            params.put(cliente.cnpj, NOME_SISTEMA, "LOJA_CLIENTE");
-            vLojaCliente = cliente.cnpj;
-        }
+        params.put(txtLojaOrigem.getText(), NOME_SISTEMA, "LOJA_CLIENTE");        
+        vLojaCliente = txtLojaOrigem.getText();
         ItemComboVO vr = (ItemComboVO) cmbLojaVR.getSelectedItem();
         if (vr != null) {
             params.put(vr.id, NOME_SISTEMA, "LOJA_VR");
@@ -70,12 +71,10 @@ public class SriGUI extends VRInternalFrame {
         initComponents();
         
         this.title = "Importação " + NOME_SISTEMA;
-                
-        cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
         carregarParametros();
         
-        /*btnMapaTribbtnMapaTribbtnMapaTribbtnMapaTribbtnMapaTrib.setProvider(new MapaTributacaoButtonProvider() {
+        btnMapaTrib.setProvider(new MapaTributacaoButtonProvider() {
             @Override
             public MapaTributoProvider getProvider() {
                 return dao;
@@ -95,7 +94,7 @@ public class SriGUI extends VRInternalFrame {
             public Frame getFrame() {
                 return mdiFrame;
             }
-        });*/
+        });
         
         centralizarForm();
         this.setMaximum(false);  
@@ -122,7 +121,6 @@ public class SriGUI extends VRInternalFrame {
         
         btnMapaTrib.setEnabled(true);
         carregarLojaVR();
-        carregarLojaCliente();
         gravarParametros();
     }
 
@@ -141,20 +139,6 @@ public class SriGUI extends VRInternalFrame {
         cmbLojaVR.setSelectedIndex(index);
     }
     
-    public void carregarLojaCliente() throws Exception {
-        cmbLojaOrigem.setModel(new DefaultComboBoxModel());
-        int cont = 0;
-        int index = 0;
-        for (Estabelecimento loja: dao.getLojas()) {
-            cmbLojaOrigem.addItem(loja);
-            if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
-                index = cont;
-            }
-            cont++;
-        }
-        cmbLojaOrigem.setSelectedIndex(index);
-    }
-    
     public void importarTabelas() throws Exception {
         Thread thread = new Thread() {
             int idLojaVR, balanca;
@@ -166,7 +150,7 @@ public class SriGUI extends VRInternalFrame {
                     ProgressBar.setCancel(true);                   
                     
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
-                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                    idLojaCliente = txtLojaOrigem.getText();
                     
                     /*if((!"".equals(txtLojaMesmoID.getText())) && (!txtLojaMesmoID.getText().isEmpty())) {
                         dao.lojaMesmoID = " - " + txtLojaMesmoID.getText();
@@ -259,6 +243,9 @@ public class SriGUI extends VRInternalFrame {
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
+                        if (chkProdutoFornecedor.isSelected()) {
+                            importador.importarProdutoFornecedor();
+                        }
                     } else if (tab.getSelectedIndex() == 2) {
                         if (chkClientePreferencial.isSelected()) {                            
                             importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS, OpcaoCliente.VALOR_LIMITE, OpcaoCliente.SITUACAO_CADASTRO);
@@ -346,6 +333,7 @@ public class SriGUI extends VRInternalFrame {
         chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         tabCliente = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabClienteDados = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -366,10 +354,10 @@ public class SriGUI extends VRInternalFrame {
         vRLabel2 = new vrframework.bean.label.VRLabel();
         btnConectarFirebird = new javax.swing.JToggleButton();
         vRLabel1 = new vrframework.bean.label.VRLabel();
-        cmbLojaOrigem = new javax.swing.JComboBox();
         txtLojaMesmoID = new vrframework.bean.textField.VRTextField();
         vRLabel8 = new vrframework.bean.label.VRLabel();
         txtBancoDadosFirebird = new vrframework.bean.fileChooser.VRFileChooser();
+        txtLojaOrigem = new vrframework.bean.textField.VRTextField();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
 
         setResizable(true);
@@ -611,21 +599,27 @@ public class SriGUI extends VRInternalFrame {
             }
         });
 
+        chkProdutoFornecedor.setText("Produto Fornecedor");
+
         javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
         tabFornecedor.setLayout(tabFornecedorLayout);
         tabFornecedorLayout.setHorizontalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(525, Short.MAX_VALUE))
+                .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(485, Short.MAX_VALUE))
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(191, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(172, Short.MAX_VALUE))
         );
 
         tab.addTab("Fornecedores", tabFornecedor);
@@ -693,7 +687,7 @@ public class SriGUI extends VRInternalFrame {
 
         tab.addTab("Unificação", tabUnificacao);
 
-        pnlConexao.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Origem - Firebird SRI (Cliente e Fornecedor), SRI2 (Produto)"));
+        pnlConexao.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Origem - Firebird SRI (Mercadologico, Cliente e Fornecedor), SRI2 (Produto, Produto Fornecedor)"));
         pnlConexao.setPreferredSize(new java.awt.Dimension(350, 350));
 
         txtUsuarioFirebird.setCaixaAlta(false);
@@ -751,21 +745,6 @@ public class SriGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlConexaoLayout.createSequentialGroup()
-                        .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(25, 25, 25)
-                        .addComponent(vRLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlConexaoLayout.createSequentialGroup()
-                        .addComponent(txtPortaFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtLojaMesmoID, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnConectarFirebird))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlConexaoLayout.createSequentialGroup()
                         .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtHostFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -783,7 +762,24 @@ public class SriGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(vRLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtSenhaFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(txtSenhaFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(pnlConexaoLayout.createSequentialGroup()
+                        .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(pnlConexaoLayout.createSequentialGroup()
+                                .addComponent(txtPortaFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtLojaMesmoID, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtLojaOrigem, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(pnlConexaoLayout.createSequentialGroup()
+                                .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(25, 25, 25)
+                                .addComponent(vRLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnConectarFirebird)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         pnlConexaoLayout.setVerticalGroup(
@@ -809,8 +805,8 @@ public class SriGUI extends VRInternalFrame {
                 .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(txtPortaFirebird, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnConectarFirebird)
-                    .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtLojaMesmoID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(txtLojaMesmoID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         vRTabbedPane1.addTab("Conexão", pnlConexao);
@@ -824,7 +820,7 @@ public class SriGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tab, javax.swing.GroupLayout.DEFAULT_SIZE, 621, Short.MAX_VALUE)
+                    .addComponent(tab, javax.swing.GroupLayout.PREFERRED_SIZE, 621, Short.MAX_VALUE)
                     .addComponent(vRTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -928,6 +924,7 @@ public class SriGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
+    private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbCotacao;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
@@ -946,7 +943,6 @@ public class SriGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkT1ProdMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagem;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
-    private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrframework.bean.panel.VRPanel pnlConexao;
@@ -959,6 +955,7 @@ public class SriGUI extends VRInternalFrame {
     private vrframework.bean.fileChooser.VRFileChooser txtBancoDadosFirebird;
     private vrframework.bean.textField.VRTextField txtHostFirebird;
     private vrframework.bean.textField.VRTextField txtLojaMesmoID;
+    private vrframework.bean.textField.VRTextField txtLojaOrigem;
     private vrframework.bean.textField.VRTextField txtPortaFirebird;
     private vrframework.bean.passwordField.VRPasswordField txtSenhaFirebird;
     private vrframework.bean.textField.VRTextField txtUsuarioFirebird;
