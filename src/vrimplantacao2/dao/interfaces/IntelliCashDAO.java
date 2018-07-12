@@ -40,19 +40,16 @@ public class IntelliCashDAO extends InterfaceDAO {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select distinct\n"
-                    + "    p.secao merc1,\n"
-                    + "    m1.descricao merc1_desc,\n"
-                    + "    p.grupo merc2,\n"
-                    + "    m2.descricao merc2_desc,\n"
-                    + "    p.subgrupo merc3,\n"
-                    + "    m3.descricao merc3_desc\n"
+                    + "p.grupo merc1, m1.descricao merc1_desc,\n"
+                    + "p.secao merc2, m2.descricao merc2_desc,\n"
+                    + "p.subgrupo merc3, m3.descricao merc3_desc\n"
                     + "from\n"
-                    + "    produtos p\n"
-                    + "    join secoes m1 on m1.id = p.secao\n"
-                    + "    join grupos m2 on m2.id = p.grupo\n"
-                    + "    join subgrupos m3 on m3.id = p.subgrupo\n"
+                    + "produtos p\n"
+                    + "join grupos m1 on m1.id = p.grupo\n"
+                    + "join secoes m2 on m2.id = p.secao\n"
+                    + "join subgrupos m3 on m3.id = p.subgrupo\n"
                     + "order by\n"
-                    + "    merc1, merc2, merc3"
+                    + "merc1, merc2, merc3"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -117,9 +114,9 @@ public class IntelliCashDAO extends InterfaceDAO {
                     + "    p.descricao descricaoCompleta,\n"
                     + "    p.ref descricaoReduzida,\n"
                     + "    p.descricao descricaoGondola,\n"
-                    + "    p.secao codMercadologico1,\n"
+                    + "    p.grupo codMercadologico1,\n"
                     + "    ob2.descricao as mercadologico1,\n"
-                    + "    p.grupo codMercadologico2,\n"
+                    + "    p.secao codMercadologico2,\n"
                     + "    ob3.descricao as mercadologico2, \n"
                     + "    p.subgrupo codMercadologico3,\n"
                     + "    subg.descricao as mercadologico3,\n"
@@ -129,13 +126,13 @@ public class IntelliCashDAO extends InterfaceDAO {
                     + "    p.estqmax estoqueMaximo,\n"
                     + "    (select qtde from getestqprod(p.id, emp.id)) estoque, \n"
                     + "    p.mkp as margem,      \n"
-                    + "    p.custo custoSemImposto,\n"
-                    + "    p.custo custoComImposto,\n"
-                    + "    p.preco precoVenda,\n"
+                    + "    c.custoatual custoSemImposto,\n"
+                    + "    c.custoatual custoComImposto,\n"
+                    + "    prc.vpreco precoVenda,\n"
                     + "    p.ativo,\n"
                     + "    fisco.ncm,\n"
                     + "    pst.cod_cest cest,    \n"
-                    + "    coalesce(fisco.pis_cst_e, 13) pis_cst_e,\n"
+                    + "    coalesce(fisco.pis_cst_s, 13) pis_cst_e,\n"
                     + "    coalesce(fisco.pis_cst_s, 1) pis_cst_s,\n"
                     + "    fisco.cod_natureza_receita pis_natureza_receita,\n"
                     + "    case substring(icms.descricao from 1 for 1)\n"
@@ -160,6 +157,8 @@ public class IntelliCashDAO extends InterfaceDAO {
                     + "    left join objetos ob3 on ob3.id = p.grupo\n"
                     + "    left join objetos icms on icms.id = p.trib\n"
                     + "    left join objetos subg on subg.id = p.subgrupo\n"
+                    + "    left join custoanterior c on c.id = p.id\n"
+                    + "    left join VW_EC_EXPT_PRODUTOS prc on prc.idproduto = p.id\n"
                     + "order by\n"
                     + "    p.id"
             )) {
@@ -366,7 +365,7 @@ public class IntelliCashDAO extends InterfaceDAO {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "    a.id,\n"
+                    + "    c.codigo id,\n"
                     + "    a.nome,\n"
                     + "    en.logradouro res_endereco,\n"
                     + "    en.numero res_numero,\n"
@@ -391,16 +390,21 @@ public class IntelliCashDAO extends InterfaceDAO {
                     + "    tpcl.descricao,\n"
                     + "    c.cadastro,\n"
                     + "    cidibge.id,\n"
-                    + "    dcrg.doc as rg\n"
+                    + "    dcrg.doc as rg,\n"
+                    + "    f.pai,\n"
+                    + "    f.mae,\n"
+                    + "    ec.nascimento\n"
                     + "from\n"
                     + "    agentes a\n"
                     + "    join clientes c on c.id = a.id\n"
+                    + "    left join filiacao f on f.id = a.id\n"
                     + "    left join enderecos en on en.agente = a.id\n"
                     + "    left join cidades cid on cid.id = en.cidade\n"
                     + "    left join tiposclientes tpcl on tpcl.id = c.tipocliente\n"
                     + "    left join cidadesibge cidibge on cidibge.id2 = cid.id\n"
                     + "    left join docs dcie on dcie.codag = a.id and dcie.tipo = 66\n"
                     + "    left join docs dcrg on dcrg.codag = a.id and dcrg.tipo = 67\n"
+                    + "    left join EC_EXPT_AGENTE ec on ec.id = a.id"
                     + "order by\n"
                     + "    a.id"
             )) {
@@ -429,6 +433,11 @@ public class IntelliCashDAO extends InterfaceDAO {
                     imp.setValorLimite(rst.getDouble("limitepreferencial"));
                     imp.setObservacao("IMPORTADO VR");
                     imp.setSalario(rst.getDouble("salario"));
+                    imp.setPermiteCreditoRotativo(true);
+                    imp.setPermiteCheque(true);
+                    imp.setNomePai(rst.getString("pai"));
+                    imp.setNomeMae(rst.getString("mae"));
+                    imp.setDataNascimento(rst.getDate("nascimento"));
 
                     result.add(imp);
                 }
