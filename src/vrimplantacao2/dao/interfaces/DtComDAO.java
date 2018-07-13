@@ -248,7 +248,6 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider{
                        obs2 = "";
                    }
                    imp.setObservacao(rs.getString("observacao") + obs1 + obs2);
-                   
                }
            }
        }

@@ -25,6 +25,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -359,6 +360,35 @@ public class SysPdvDAO extends InterfaceDAO {
             }
         }
         
+        return result;
+    }
+    
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try(Statement stm = tipoConexao.getConnection().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	procod as id_produto,\n" +
+                    "	forcod as id_fornecedor,\n" +
+                    "	prfreffor as ref,\n" +
+                    "	prfqtd as qtdemb\n" +
+                    "from\n" +
+                    "	produto_fornecedor")) {
+                while(rs.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setIdProduto(rs.getString("id_produto"));
+                    imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                    imp.setCodigoExterno(rs.getString("ref"));
+                    imp.setQtdEmbalagem(rs.getDouble("qtdemb"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 
