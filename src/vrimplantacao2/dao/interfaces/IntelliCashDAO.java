@@ -456,7 +456,7 @@ public class IntelliCashDAO extends InterfaceDAO {
                     + "    af.vencimento,\n"
                     + "    af.doc,\n"
                     + "    af.codag,\n"
-                    + "    cli.codigo,\n"
+                    + "    cli.codigo as id_cliente,\n"
                     + "    af.valor,\n"
                     + "    af.descricao,\n"
                     + "    af.juros\n"
@@ -469,12 +469,13 @@ public class IntelliCashDAO extends InterfaceDAO {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rst.getString("id"));
-                    imp.setIdCliente(rst.getString("codag"));
+                    imp.setIdCliente(rst.getString("id_cliente"));
                     imp.setDataEmissao(rst.getDate("data"));
                     imp.setDataVencimento(rst.getDate("vencimento"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setJuros(rst.getDouble("juros"));
                     imp.setObservacao(rst.getString("descricao") + " NUMERO DOC " + rst.getString("doc"));
+                    imp.setNumeroCupom(Utils.formataNumero(rst.getString("doc")));
                     result.add(imp);
                 }
             }
