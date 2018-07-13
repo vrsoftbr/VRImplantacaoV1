@@ -165,7 +165,8 @@ public class DtComGUI extends VRInternalFrame {
                     ProgressBar.setCancel(true);
                     
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
-                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;                                        
+                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                    DtComDAO.vBalanca = chkBalanca.isSelected();
                     
                     Importador importador = new Importador(dtcomDAO);
                     importador.setLojaOrigem(idLojaCliente);
@@ -174,6 +175,10 @@ public class DtComGUI extends VRInternalFrame {
                     if (tabs.getSelectedIndex() == 0) {
                         if (chkProdutos.isSelected()) {
                             importador.importarProduto(chkManterBalanca.isSelected());
+                        }
+                        
+                        if(chkMercadologico.isSelected()) {
+                            importador.importarMercadologico();
                         }
 
                         {
@@ -288,12 +293,14 @@ public class DtComGUI extends VRInternalFrame {
         chkT1DescReduzida = new vrframework.bean.checkBox.VRCheckBox();
         chkT1DescGondola = new vrframework.bean.checkBox.VRCheckBox();
         chkT1ProdMercadologico = new vrframework.bean.checkBox.VRCheckBox();
+        chkMercadologico = new vrframework.bean.checkBox.VRCheckBox();
         chkValidade = new vrframework.bean.checkBox.VRCheckBox();
         chkAtacado = new vrframework.bean.checkBox.VRCheckBox();
         chkTipoEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
-        chkQtdEmbCotacao = new vrframework.bean.checkBox.VRCheckBox();
         btnMapaTrib = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
+        chkQtdEmbCotacao = new vrframework.bean.checkBox.VRCheckBox();
+        chkBalanca = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
@@ -400,6 +407,9 @@ public class DtComGUI extends VRInternalFrame {
         chkT1ProdMercadologico.setText("Prod. Mercadológico");
         vRPanel7.add(chkT1ProdMercadologico);
 
+        chkMercadologico.setText("Mercadológico");
+        vRPanel7.add(chkMercadologico);
+
         chkValidade.setText("Validade");
         vRPanel7.add(chkValidade);
 
@@ -412,9 +422,6 @@ public class DtComGUI extends VRInternalFrame {
         chkQtdEmbalagemEAN.setText("Qtd. Emb. EAN");
         vRPanel7.add(chkQtdEmbalagemEAN);
 
-        chkQtdEmbCotacao.setText("Qtd. Emb. (Cotação)");
-        vRPanel7.add(chkQtdEmbCotacao);
-
         btnMapaTrib.setEnabled(false);
         btnMapaTrib.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -422,6 +429,12 @@ public class DtComGUI extends VRInternalFrame {
             }
         });
         vRPanel7.add(btnMapaTrib);
+
+        chkQtdEmbCotacao.setText("Qtd. Emb. (Cotação)");
+        vRPanel7.add(chkQtdEmbCotacao);
+
+        chkBalanca.setText("Tem Balança");
+        vRPanel7.add(chkBalanca);
 
         vRTabbedPane2.addTab("Produtos", vRPanel7);
 
@@ -625,7 +638,9 @@ public class DtComGUI extends VRInternalFrame {
     private vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTrib;
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkAtacado;
+    private vrframework.bean.checkBox.VRCheckBox chkBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
+    private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbCotacao;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
