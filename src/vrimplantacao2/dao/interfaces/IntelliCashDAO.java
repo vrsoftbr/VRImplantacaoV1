@@ -430,7 +430,7 @@ public class IntelliCashDAO extends InterfaceDAO {
                     imp.setDiaVencimento(rst.getInt("prazodias"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setEmail(rst.getString("email"));
-                    imp.setValorLimite(rst.getDouble("limitepreferencial"));   
+                    imp.setValorLimite(rst.getDouble("limitepreferencial"));
                     imp.setSalario(rst.getDouble("salario"));
                     imp.setPermiteCreditoRotativo(true);
                     imp.setPermiteCheque(true);
