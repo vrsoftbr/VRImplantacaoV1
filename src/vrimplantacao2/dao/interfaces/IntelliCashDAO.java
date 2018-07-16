@@ -405,6 +405,7 @@ public class IntelliCashDAO extends InterfaceDAO {
                     + "    left join docs dcie on dcie.codag = a.id and dcie.tipo = 66\n"
                     + "    left join docs dcrg on dcrg.codag = a.id and dcrg.tipo = 67\n"
                     + "    left join EC_EXPT_AGENTE ec on ec.id = a.id\n"
+                    + "    where coalesce(c.codigo, 0) > 0\n"
                     + "order by\n"
                     + "    a.id"
             )) {
