@@ -42,7 +42,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="vRPanel6" min="-2" pref="152" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabs" pref="185" max="32767" attributes="0"/>
+              <Component id="tabs" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -120,7 +120,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
-        <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="vRTabbedPane2">
+        <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="tpDadosMigracao">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Importa&#xe7;&#xe3;o">
@@ -275,6 +275,138 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkBalanca">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Tem Balan&#xe7;a"/>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="vrframework.bean.panel.VRPanel" name="vRPanel5">
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                  <JTabbedPaneConstraints tabName="Fornecedores">
+                    <Property name="tabTitle" type="java.lang.String" value="Fornecedores"/>
+                  </JTabbedPaneConstraints>
+                </Constraint>
+              </Constraints>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFContatos" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkSituacaoCadastroForn" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFPrazoFornecedor" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFCondicaoPagamento" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="314" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFCondicaoPagamento" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkProdutoFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFPrazoFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkFContatos" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkSituacaoCadastroForn" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="49" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornecedor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Fornecedor"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoFornecedor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Produto Fornecedor"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFContatos">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Contatos"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFCondicaoPagamento">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Condi&#xe7;&#xe3;o de Pagamento"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFPrazoFornecedor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Prazo Fornecedor"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkSituacaoCadastroForn">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Situa&#xe7;&#xe3;o Fornecedor"/>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="vrframework.bean.panel.VRPanel" name="vRPanel4">
+              <Constraints>
+                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                  <JTabbedPaneConstraints tabName="Clientes">
+                    <Property name="tabTitle" type="java.lang.String" value="Clientes"/>
+                  </JTabbedPaneConstraints>
+                </Constraint>
+              </Constraints>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkCliente" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkLimiteCredito" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="463" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkCliente" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkLimiteCredito" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="75" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliente">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cliente Preferencial"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkLimiteCredito">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Limite de Cr&#xe9;dito"/>
                   </Properties>
                 </Component>
               </SubComponents>

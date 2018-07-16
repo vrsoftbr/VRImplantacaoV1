@@ -161,8 +161,8 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico3("1");
                     imp.setEan(rs.getString("ean1"));
                     imp.setPrecovenda(rs.getDouble("venda"));
-                    imp.setCustoComImposto(rs.getDouble("custunit"));
-                    imp.setCustoSemImposto(rs.getDouble("cust_fisca"));
+                    imp.setCustoComImposto(rs.getDouble("cust_fisca"));
+                    imp.setCustoSemImposto(rs.getDouble("custunit"));
                     imp.setMargem(rs.getDouble("perfixo"));
                     imp.setEstoque(rs.getDouble("qtest"));
                     imp.setEstoqueMinimo(rs.getDouble("minimo"));
@@ -171,9 +171,11 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstDebito(rs.getString("cstpis"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setIcmsCstSaida(rs.getInt("cstvenda"));
+                    imp.setIcmsCstEntrada(rs.getInt("cstvenda"));
                     imp.setIcmsAliqSaida(rs.getDouble("picms"));
                     imp.setIcmsAliqEntrada(rs.getDouble("picms"));
                     imp.setIcmsCreditoForaEstadoId(rs.getString("picms"));
+                    imp.setIcmsAliq(rs.getDouble("picms"));
                     imp.setSituacaoCadastro((rs.getDate("dat_can")) == null ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     if (vBalanca) {
                         if ((rs.getString("ean1") != null)
@@ -182,6 +184,8 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setImportId(rs.getString("ean1"));
                             imp.seteBalanca(true);
                         }
+                    } else {
+                        imp.setEan(rs.getString("ean1"));
                     }
                     result.add(imp);
                 }
