@@ -20,19 +20,19 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.parametro.Parametros;
 
-public class IntelliCashGUI extends VRInternalFrame {    
-    
+public class IntelliCashGUI extends VRInternalFrame {
+
     private static final String NOME_SISTEMA = "IntelliCash";
     private static final String SERVIDOR_SQL = "Firebird";
     private static IntelliCashGUI instance;
-    
+
     private final IntelliCashDAO dao = new IntelliCashDAO();
     private final ConexaoFirebird connSQL = new ConexaoFirebird();
-    
+
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
     private int vTipoVenda = -1;
-    
+
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         txtHostFirebird.setText(params.getWithNull("192.168.0.200", NOME_SISTEMA, "HOST"));
@@ -44,7 +44,7 @@ public class IntelliCashGUI extends VRInternalFrame {
         vLojaVR = params.getInt(NOME_SISTEMA, "LOJA_VR");
         vTipoVenda = params.getInt(NOME_SISTEMA, "TIPO_VENDA");
     }
-    
+
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         params.put(txtHostFirebird.getText(), NOME_SISTEMA, "HOST");
@@ -64,41 +64,40 @@ public class IntelliCashGUI extends VRInternalFrame {
         }
         params.salvar();
     }
-    
+
     private IntelliCashGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
-        
+
         this.title = "Importação " + NOME_SISTEMA;
-                
+
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
         carregarParametros();
-        
+
         /*btnMapaTribbtnMapaTribbtnMapaTribbtnMapaTribbtnMapaTrib.setProvider(new MapaTributacaoButtonProvider() {
-            @Override
-            public MapaTributoProvider getProvider() {
-                return dao;
-            }
+         @Override
+         public MapaTributoProvider getProvider() {
+         return dao;
+         }
 
-            @Override
-            public String getSistema() {
-                return NOME_SISTEMA;
-            }
+         @Override
+         public String getSistema() {
+         return NOME_SISTEMA;
+         }
 
-            @Override
-            public String getLoja() {
-                return vLojaCliente;
-            }
+         @Override
+         public String getLoja() {
+         return vLojaCliente;
+         }
 
-            @Override
-            public Frame getFrame() {
-                return mdiFrame;
-            }
-        });*/
-        
+         @Override
+         public Frame getFrame() {
+         return mdiFrame;
+         }
+         });*/
         centralizarForm();
-        this.setMaximum(false);  
+        this.setMaximum(false);
     }
 
     public void validarDadosAcessoPostgres() throws Exception {
@@ -116,16 +115,15 @@ public class IntelliCashGUI extends VRInternalFrame {
         if (txtUsuarioFirebird.getText().isEmpty()) {
             throw new VRException("Favor informar o usuário do banco de dados " + SERVIDOR_SQL);
         }
-        
-        connSQL.abrirConexao(txtHostFirebird.getText(), txtPortaFirebird.getInt(), 
+
+        connSQL.abrirConexao(txtHostFirebird.getText(), txtPortaFirebird.getInt(),
                 txtBancoDadosFirebird.getArquivo(), txtUsuarioFirebird.getText(), txtSenhaFirebird.getText());
-        
+
         btnMapaTrib.setEnabled(true);
         carregarLojaVR();
         carregarLojaCliente();
         gravarParametros();
     }
-
 
     public void carregarLojaVR() throws Exception {
         cmbLojaVR.setModel(new DefaultComboBoxModel());
@@ -140,12 +138,12 @@ public class IntelliCashGUI extends VRInternalFrame {
         }
         cmbLojaVR.setSelectedIndex(index);
     }
-    
+
     public void carregarLojaCliente() throws Exception {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja: dao.getLojas()) {
+        for (Estabelecimento loja : dao.getLojas()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -154,30 +152,30 @@ public class IntelliCashGUI extends VRInternalFrame {
         }
         cmbLojaOrigem.setSelectedIndex(index);
     }
-    
+
     public void importarTabelas() throws Exception {
         Thread thread = new Thread() {
             int idLojaVR, balanca;
             String idLojaCliente;
+
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
-                    ProgressBar.setCancel(true);                   
-                    
-                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
+                    ProgressBar.setCancel(true);
+
+                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
-                    
+
                     /*if((!"".equals(txtLojaMesmoID.getText())) && (!txtLojaMesmoID.getText().isEmpty())) {
-                        dao.lojaMesmoID = " - " + txtLojaMesmoID.getText();
-                    }*/
-                    
+                     dao.lojaMesmoID = " - " + txtLojaMesmoID.getText();
+                     }*/
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
                     importador.setLojaVR(idLojaVR);
-                    
+
                     if (tab.getSelectedIndex() == 0) {
-                        if (chkFamiliaProduto.isSelected()) {                        
+                        if (chkFamiliaProduto.isSelected()) {
                             importador.importarFamiliaProduto();
                         }
 
@@ -211,7 +209,7 @@ public class IntelliCashGUI extends VRInternalFrame {
                             }
                             if (chkT1AtivoInativo.isSelected()) {
                                 opcoes.add(OpcaoProduto.ATIVO);
-                            }    
+                            }
                             if (chkT1DescCompleta.isSelected()) {
                                 opcoes.add(OpcaoProduto.DESC_COMPLETA);
                             }
@@ -223,7 +221,7 @@ public class IntelliCashGUI extends VRInternalFrame {
                             }
                             if (chkT1ProdMercadologico.isSelected()) {
                                 opcoes.add(OpcaoProduto.MERCADOLOGICO);
-                            }                        
+                            }
                             if (chkFamilia.isSelected()) {
                                 opcoes.add(OpcaoProduto.FAMILIA);
                             }
@@ -254,36 +252,36 @@ public class IntelliCashGUI extends VRInternalFrame {
                         if (chkT1EANemBranco.isSelected()) {
                             importador.importarEANemBranco();
                         }
-                        
+
                     } else if (tab.getSelectedIndex() == 1) {
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
                     } else if (tab.getSelectedIndex() == 2) {
-                        if (chkClientePreferencial.isSelected()) {                            
+                        if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS, OpcaoCliente.VALOR_LIMITE, OpcaoCliente.SITUACAO_CADASTRO);
                         }
-                         if(chkRotativo.isSelected()){
+                        if (chkRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }
-                        
+
                     } else if (tab.getSelectedIndex() == 3) {
-                        if (cbxUnifProdutos.isSelected()) {  
+                        if (cbxUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
                         }
-                        if (cbxUnifFornecedores.isSelected()) {  
+                        if (cbxUnifFornecedores.isSelected()) {
                             importador.unificarFornecedor();
                         }
-                        if (cbxUnifCliPreferencial.isSelected()) {  
+                        if (cbxUnifCliPreferencial.isSelected()) {
                             importador.unificarClientePreferencial();
                         }
-                    }                    
+                    }
                     gravarParametros();
-                    
+
                     ProgressBar.dispose();
 
                     Util.exibirMensagem("Importação " + NOME_SISTEMA + " realizada com sucesso!", getTitle());
-                    
+
                     connSQL.close();
                 } catch (Exception ex) {
                     ProgressBar.dispose();
@@ -294,10 +292,10 @@ public class IntelliCashGUI extends VRInternalFrame {
 
         thread.start();
     }
-    
+
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
-            i_mdiFrame.setWaitCursor();            
+            i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
                 instance = new IntelliCashGUI(i_mdiFrame);
             }
@@ -892,15 +890,15 @@ public class IntelliCashGUI extends VRInternalFrame {
     }//GEN-LAST:event_btnMigrarActionPerformed
 
     private void txtUsuarioFirebirdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsuarioFirebirdActionPerformed
-        
+
     }//GEN-LAST:event_txtUsuarioFirebirdActionPerformed
 
     private void txtSenhaFirebirdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSenhaFirebirdActionPerformed
-        
+
     }//GEN-LAST:event_txtSenhaFirebirdActionPerformed
 
     private void txtPortaFirebirdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPortaFirebirdActionPerformed
-        
+
     }//GEN-LAST:event_txtPortaFirebirdActionPerformed
 
     private void btnConectarFirebirdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectarFirebirdActionPerformed
@@ -927,7 +925,7 @@ public class IntelliCashGUI extends VRInternalFrame {
     }//GEN-LAST:event_onClose
 
     private void chkClientePreferencialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkClientePreferencialActionPerformed
-        
+
     }//GEN-LAST:event_chkClientePreferencialActionPerformed
 
     private void chkFornecedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFornecedorActionPerformed
@@ -935,7 +933,7 @@ public class IntelliCashGUI extends VRInternalFrame {
     }//GEN-LAST:event_chkFornecedorActionPerformed
 
     private void btnMapaTribActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaTribActionPerformed
-        
+
     }//GEN-LAST:event_btnMapaTribActionPerformed
 
     private void chkFamiliaProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFamiliaProdutoActionPerformed
