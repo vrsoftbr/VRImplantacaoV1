@@ -176,6 +176,7 @@ import vrimplantacao2.gui.interfaces.SriGUI;
 import vrimplantacao2.gui.interfaces.SysmoFirebirdGUI;
 import vrimplantacao2.gui.interfaces.SysmoPostgresGUI;
 import vrimplantacao2.gui.interfaces.TopSystemGUI2;
+import vrimplantacao2.gui.interfaces.WShopGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 
 public final class MenuGUI extends VRMdiFrame {
@@ -597,6 +598,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAutoSystem1 = new javax.swing.JMenuItem();
         mnuWebsaq = new javax.swing.JMenuItem();
         mnuSysmoPostgres = new javax.swing.JMenuItem();
+        mnuAlterDataWShop = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -1544,6 +1546,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuSysmoPostgres);
+
+        mnuAlterDataWShop.setText("AlterData (WShop)");
+        mnuAlterDataWShop.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAlterDataWShopActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuAlterDataWShop);
 
         jMenu2.add(jMenu8);
 
@@ -3837,9 +3847,12 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuKcmsActionPerformed
 
     private void mnuSriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSriActionPerformed
-        // TODO add your handling code here:
         SriGUI.exibir(this);
     }//GEN-LAST:event_mnuSriActionPerformed
+
+    private void mnuAlterDataWShopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAlterDataWShopActionPerformed
+        WShopGUI.exibir(this);
+    }//GEN-LAST:event_mnuAlterDataWShopActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -3947,6 +3960,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuASoft;
     private javax.swing.JMenu mnuAjuda;
     private javax.swing.JMenuItem mnuAjudaSobre;
+    private javax.swing.JMenuItem mnuAlterDataWShop;
     private javax.swing.JMenuItem mnuApollo;
     private javax.swing.JMenuItem mnuAsefe;
     private javax.swing.JMenuItem mnuAutoSystem;
