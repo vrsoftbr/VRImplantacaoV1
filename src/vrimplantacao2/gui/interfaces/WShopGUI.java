@@ -26,6 +26,7 @@ public class WShopGUI extends VRInternalFrame {
     private int vLojaVR = -1;
     
     private void carregarParametros() throws Exception {
+        conexao.carregarParametros();
         Parametros params = Parametros.get();
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
