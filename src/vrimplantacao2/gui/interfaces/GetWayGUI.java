@@ -111,7 +111,11 @@ public class GetWayGUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
-                return SISTEMA;
+                if (!txtLojaMesmoID.getText().trim().isEmpty()) {
+                    return SISTEMA + " - " + txtLojaMesmoID.getText();
+                } else {
+                    return SISTEMA;
+                }
             }
 
             @Override

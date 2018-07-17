@@ -331,7 +331,8 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     if ((rst.getString("ean") != null)
                             && (!rst.getString("ean").trim().isEmpty())
                             && (rst.getString("ean").trim().length() >= 4)
-                            && (rst.getString("ean").trim().length() <= 6)) {
+                            && (rst.getString("ean").trim().length() <= 6)
+                            && (!Utils.encontrouLetraCampoNumerico(rst.getString("ean").trim()))) {
 
                         if (v_usar_arquivoBalanca) {
                             ProdutoBalancaVO produtoBalanca;
@@ -349,6 +350,9 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                                 imp.setValidade(0);
                                 imp.seteBalanca(false);
                             }
+                        } else {
+                            imp.seteBalanca(true);
+                            imp.setValidade(rst.getInt("VALIDADE"));
                         }
                     }
                     
@@ -404,11 +408,30 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIe_rg(rst.getString("IE"));
                     imp.setTel_principal(rst.getString("TELEFONE"));
                     imp.setAtivo("S".equals(rst.getString("ATIVO")));
-                    imp.setObservacao(rst.getString("OBS").isEmpty() ? "" : rst.getString("OBS") + " Cond. pag: "
+                    
+                    imp.setObservacao(rst.getString("OBS"));
+                    
+                    if ((rst.getString("DESCRICAOPAG") != null) && (!rst.getString("DESCRICAOPAG").trim().isEmpty())) {
+                        imp.setObservacao(imp.getObservacao()
+                                + " Cond. pag: " + Utils.acertarTexto(rst.getString("DESCRICAOPAG")));
+                    }
+                    if ((rst.getString("PENTREGA") != null) && (!rst.getString("PENTREGA").trim().isEmpty())) {
+                        imp.setObservacao(imp.getObservacao()
+                                + " - Prazo entrega: " + rst.getInt("PENTREGA"));
+                    }
+                    if ((rst.getString("PVISITA") != null) && (!rst.getString("PVISITA").trim().isEmpty())) {
+                        imp.setObservacao(imp.getObservacao()
+                                + " - Prazo visita: " + rst.getInt("PVISITA"));
+                    }
+                    /*imp.setObservacao(rst.getString("OBS").isEmpty() ? "" : rst.getString("OBS") + " Cond. pag: "
                             + Utils.acertarTexto(rst.getString("DESCRICAOPAG").isEmpty() ? "0" : rst.getString("DESCRICAOPAG"))
-                            + " - Prazo entrega: " + rst.getInt("PENTREGA") + " - Prazo visita: " + rst.getInt("PVISITA"));
+                            + " - Prazo entrega: " + rst.getInt("PENTREGA") + " - Prazo visita: " + rst.getInt("PVISITA"));*/
+
+                        
+                        
                     imp.setDatacadastro(rst.getDate("DTCAD"));
-                    imp.setTipoFornecedor(TipoFornecedor.getById(rst.getInt("CODTIPOFORNEC")));
+                    //imp.setTipoFornecedor(TipoFornecedor.getById(rst.getInt("CODTIPOFORNEC")));
+                    imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR);
                     
                     imp.addTelefone("FAX", rst.getString("FAX"));
                     if ((rst.getString("CONTATO") != null)
