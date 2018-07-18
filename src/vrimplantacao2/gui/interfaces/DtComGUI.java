@@ -266,12 +266,21 @@ public class DtComGUI extends VRInternalFrame {
                         if (chkSituacaoCadastroForn.isSelected()) {
                             opcoes.add(OpcaoFornecedor.SITUACAO_CADASTRO);
                         }
+                        if (chkCpfCnpj.isSelected()) {
+                            opcoes.add(OpcaoFornecedor.CNPJ_CPF);
+                        }
+                        if (chkObservacao.isSelected()) {
+                            opcoes.add(OpcaoFornecedor.OBSERVACAO);
+                        }
                         if (!opcoes.isEmpty()) {
                             importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
                         }
                         
                         if(chkCliente.isSelected()) {
-                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS, OpcaoCliente.VALOR_LIMITE, OpcaoCliente.SITUACAO_CADASTRO);
+                            importador.importarClientePreferencial(OpcaoCliente.DADOS, 
+                                                                   OpcaoCliente.CONTATOS, 
+                                                                   OpcaoCliente.VALOR_LIMITE, 
+                                                                   OpcaoCliente.SITUACAO_CADASTRO);
                         }
                         
                     } else if (tabs.getSelectedIndex() == 1) {
@@ -339,6 +348,8 @@ public class DtComGUI extends VRInternalFrame {
         chkFCondicaoPagamento = new vrframework.bean.checkBox.VRCheckBox();
         chkFPrazoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkSituacaoCadastroForn = new vrframework.bean.checkBox.VRCheckBox();
+        chkCpfCnpj = new vrframework.bean.checkBox.VRCheckBox();
+        chkObservacao = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel4 = new vrframework.bean.panel.VRPanel();
         chkCliente = new vrframework.bean.checkBox.VRCheckBox();
         chkLimiteCredito = new vrframework.bean.checkBox.VRCheckBox();
@@ -491,6 +502,10 @@ public class DtComGUI extends VRInternalFrame {
 
         chkSituacaoCadastroForn.setText("Situação Fornecedor");
 
+        chkCpfCnpj.setText("CPF / CNPJ");
+
+        chkObservacao.setText("Observação");
+
         javax.swing.GroupLayout vRPanel5Layout = new javax.swing.GroupLayout(vRPanel5);
         vRPanel5.setLayout(vRPanel5Layout);
         vRPanel5Layout.setHorizontalGroup(
@@ -500,9 +515,11 @@ public class DtComGUI extends VRInternalFrame {
                 .addGroup(vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCpfCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(6, 6, 6)
                 .addGroup(vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkObservacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkSituacaoCadastroForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFPrazoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFCondicaoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -523,7 +540,11 @@ public class DtComGUI extends VRInternalFrame {
                 .addGroup(vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkSituacaoCadastroForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(49, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkCpfCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkObservacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
 
         tpDadosMigracao.addTab("Fornecedores", vRPanel5);
@@ -757,6 +778,7 @@ public class DtComGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkAtacado;
     private vrframework.bean.checkBox.VRCheckBox chkBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkCliente;
+    private vrframework.bean.checkBox.VRCheckBox chkCpfCnpj;
     private vrframework.bean.checkBox.VRCheckBox chkFCondicaoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFPrazoFornecedor;
@@ -764,6 +786,7 @@ public class DtComGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkLimiteCredito;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
+    private vrframework.bean.checkBox.VRCheckBox chkObservacao;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbCotacao;

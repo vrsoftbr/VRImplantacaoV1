@@ -177,6 +177,8 @@ public class KcmsGUI extends VRInternalFrame {
 
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                    kcmsDAO.usarMargemBruta = chkUsarMargemBruta.isSelected();
+                    kcmsDAO.vBalanca = chkUsarBalanca.isSelected();
                     
                     if (!txtLojaID.getText().trim().isEmpty()) {
                         kcmsDAO.id_loja = " - " + txtLojaID.getText();
@@ -196,7 +198,7 @@ public class KcmsGUI extends VRInternalFrame {
                         }
                         
                         if (chkMercadologico.isSelected()) {
-                            importador.importarMercadologicoPorNiveis(false);
+                            importador.importarMercadologico();
                         }
 
                         if (chkProdutos.isSelected()) {
@@ -261,7 +263,8 @@ public class KcmsGUI extends VRInternalFrame {
                             }
                             if (chkProdMercadologico.isSelected()) {
                                 opcoes.add(OpcaoProduto.MERCADOLOGICO);
-                            }
+                                opcoes.add(OpcaoProduto.MERCADOLOGICO_POR_NIVEL);
+                            }                            
                             if (chkT1NcmIndividual.isSelected()) {
                                 opcoes.add(OpcaoProduto.NCM_INDIVIDUAL);
                             }
@@ -389,6 +392,8 @@ public class KcmsGUI extends VRInternalFrame {
         chkProdMercadologico = new vrframework.bean.checkBox.VRCheckBox();
         chkT1PisCofinsIndividual = new vrframework.bean.checkBox.VRCheckBox();
         chkT1NcmIndividual = new vrframework.bean.checkBox.VRCheckBox();
+        chkUsarMargemBruta = new vrframework.bean.checkBox.VRCheckBox();
+        chkUsarBalanca = new vrframework.bean.checkBox.VRCheckBox();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -574,6 +579,10 @@ public class KcmsGUI extends VRInternalFrame {
 
         chkT1NcmIndividual.setText("NCM Individual");
 
+        chkUsarMargemBruta.setText("Usar Margem Bruta");
+
+        chkUsarBalanca.setText("Tem Balança");
+
         javax.swing.GroupLayout tabDadosLayout = new javax.swing.GroupLayout(tabDados);
         tabDados.setLayout(tabDadosLayout);
         tabDadosLayout.setHorizontalGroup(
@@ -583,6 +592,10 @@ public class KcmsGUI extends VRInternalFrame {
                 .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tabDadosLayout.createSequentialGroup()
                         .addComponent(chkT1NcmIndividual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkUsarMargemBruta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(chkUsarBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(tabDadosLayout.createSequentialGroup()
                         .addComponent(chkT1AtivoInativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -682,7 +695,10 @@ public class KcmsGUI extends VRInternalFrame {
                     .addComponent(chkProdMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkT1PisCofinsIndividual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkT1NcmIndividual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkT1NcmIndividual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUsarMargemBruta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUsarBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
                 .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -1147,6 +1163,8 @@ public class KcmsGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkT1Preco;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagem;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
+    private vrframework.bean.checkBox.VRCheckBox chkUsarBalanca;
+    private vrframework.bean.checkBox.VRCheckBox chkUsarMargemBruta;
     private vrframework.bean.checkBox.VRCheckBox chkValorLimite;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
