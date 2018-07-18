@@ -677,6 +677,9 @@ public class FornecedorDAO {
                 if (opt.contains(OpcaoFornecedor.TIPO_PAGAMENTO)) {
                     sql.put("id_tipopagamento", vo.getTipoPagamento().getId());
                 }
+                if (opt.contains(OpcaoFornecedor.OBSERVACAO)) {
+                    sql.put("observacao", vo.getObservacao());
+                }
                 sql.setWhere("id = " + vo.getId());
                 stm.execute(sql.getUpdate());
             }

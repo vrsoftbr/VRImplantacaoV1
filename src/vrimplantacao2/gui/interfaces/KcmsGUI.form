@@ -143,6 +143,10 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
                               <Component id="chkT1NcmIndividual" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="chkUsarMargemBruta" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="chkUsarBalanca" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
@@ -262,7 +266,11 @@
                           <Component id="chkT1PisCofinsIndividual" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="chkT1NcmIndividual" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="chkT1NcmIndividual" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkUsarMargemBruta" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkUsarBalanca" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace pref="15" max="32767" attributes="0"/>
                       <Component id="btnMapaTrib" min="-2" pref="45" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -434,6 +442,16 @@
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1NcmIndividual">
               <Properties>
                 <Property name="text" type="java.lang.String" value="NCM Individual"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUsarMargemBruta">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Usar Margem Bruta"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUsarBalanca">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Tem Balan&#xe7;a"/>
               </Properties>
             </Component>
           </SubComponents>

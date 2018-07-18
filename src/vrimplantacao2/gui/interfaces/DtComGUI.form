@@ -297,9 +297,11 @@
                               <Component id="chkFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFContatos" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCpfCnpj" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkObservacao" min="-2" max="-2" attributes="0"/>
                               <Component id="chkSituacaoCadastroForn" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFPrazoFornecedor" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFCondicaoPagamento" min="-2" max="-2" attributes="0"/>
@@ -326,7 +328,12 @@
                               <Component id="chkFContatos" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkSituacaoCadastroForn" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="49" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkCpfCnpj" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkObservacao" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="26" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -360,6 +367,16 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkSituacaoCadastroForn">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Situa&#xe7;&#xe3;o Fornecedor"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCpfCnpj">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="CPF / CNPJ"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkObservacao">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Observa&#xe7;&#xe3;o"/>
                   </Properties>
                 </Component>
               </SubComponents>

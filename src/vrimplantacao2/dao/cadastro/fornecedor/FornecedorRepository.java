@@ -174,7 +174,8 @@ public class FornecedorRepository {
                             || (opt.contains(OpcaoFornecedor.MUNICIPIO))
                             || (opt.contains(OpcaoFornecedor.TIPO_FORNECEDOR))
                             || (opt.contains(OpcaoFornecedor.TIPO_EMPRESA))
-                            || (opt.contains(OpcaoFornecedor.TIPO_PAGAMENTO))) {
+                            || (opt.contains(OpcaoFornecedor.TIPO_PAGAMENTO))
+                            || (opt.contains(OpcaoFornecedor.OBSERVACAO))) {
                         atualizarFornecedor(vo, opt);
                     }
 

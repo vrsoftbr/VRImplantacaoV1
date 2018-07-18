@@ -5,6 +5,8 @@ import java.sql.Statement;
 import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.Util;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -23,6 +25,8 @@ import vrimplantacao2.vo.enums.NcmVO;
  */
 public class ProdutoDAO {
 
+    private static final Logger LOG = Logger.getLogger(ProdutoDAO.class.getName());
+    
     /**
      * Retorna um {@link IDStack} com todos os IDs disponíveis maiores que 0 e 
      * menores que 10000 para produtos de balança.
@@ -209,8 +213,11 @@ public class ProdutoDAO {
         if (opt.contains(OpcaoProduto.MERCADOLOGICO)) {
             MercadologicoVO mercadologico = vo.getMercadologico();
             sql.put("mercadologico1", mercadologico.getMercadologico1());
+            LOG.fine("Prod: " + vo.getId() + " Merc1: " + mercadologico.getMercadologico1());
             sql.put("mercadologico2", mercadologico.getMercadologico2());
+            LOG.fine("Prod: " + vo.getId() + " Merc2: " + mercadologico.getMercadologico2());
             sql.put("mercadologico3", mercadologico.getMercadologico3());
+            LOG.fine("Prod: " + vo.getId() + " Merc3: " + mercadologico.getMercadologico3());
             sql.put("mercadologico4", mercadologico.getMercadologico4());
             sql.put("mercadologico5", mercadologico.getMercadologico5());
         }

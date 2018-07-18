@@ -12,10 +12,12 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoPagamento;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -194,7 +196,36 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-
+    
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	codigo,\n" +
+                    "	cgc,\n" +
+                    "	codfor\n" +
+                    "from\n" +
+                    "	prodfor\n" +
+                    "order by\n" +
+                    "	codigo")) {
+                while(rs.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rs.getString("codigo"));
+                    imp.setIdFornecedor(rs.getString("cgc"));
+                    imp.setCodigoExterno(rs.getString("codfor"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+ 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
@@ -284,6 +315,8 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
+    
+    
 
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
@@ -322,6 +355,7 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("cgc"));
+                    imp.setCnpj_cpf(rs.getString("cgc"));
                     imp.setInsc_municipal(rs.getString("inscricao"));
                     imp.setRazao(rs.getString("nome1"));
                     imp.setFantasia(rs.getString("fantasia"));
@@ -340,15 +374,28 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.addContato("2", rs.getString("fax"), null, null, TipoContato.COMERCIAL, null);
                     }
                     String obs1 = "", obs2 = "";
-                    if (!"".equals(rs.getString("observa1"))) {
-                        obs1 = "Obs2: " + rs.getString("observa1");
-                    } else if (!"".equals(rs.getString("observa2"))) {
-                        obs2 = "Obs3: " + rs.getString("observa2");
+                    if ((rs.getString("observa1") != null) && (!"".equals(rs.getString("observa1")))) {
+                        obs1 = " Obs2: " + rs.getString("observa1");
+                    } else if ((rs.getString("observa2") != null) && !"".equals(rs.getString("observa2"))) {
+                        obs2 = " Obs3: " + rs.getString("observa2");
                     } else {
                         obs1 = "";
                         obs2 = "";
                     }
                     imp.setObservacao(rs.getString("observacao") + obs1 + obs2);
+                    
+                    if(!"".equals(String.valueOf(rs.getInt("prazo1")))) {
+                        imp.addPagamento("1", rs.getInt("prazo1"));
+                    }
+                    if(!"".equals(String.valueOf(rs.getInt("prazo2")))) {
+                        imp.addPagamento("2", rs.getInt("prazo2"));
+                    }
+                    if(!"".equals(String.valueOf(rs.getInt("prazo3")))) {
+                        imp.addPagamento("3", rs.getInt("prazo3"));
+                    }
+                    imp.setTipoPagamento(new TipoPagamento(1, rs.getString("condpg")));
+                    
+                    result.add(imp);
                 }
             }
         }
