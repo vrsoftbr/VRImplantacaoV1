@@ -146,6 +146,7 @@ import vrimplantacao2.gui.interfaces.AutoSystemGUI;
 import vrimplantacao2.gui.interfaces.AvanceGUI;
 import vrimplantacao2.gui.interfaces.TstiGUI;
 import vrimplantacao2.gui.interfaces.CPlusGUI;
+import vrimplantacao2.gui.interfaces.CadastraFacilGUI;
 import vrimplantacao2.gui.interfaces.CissGUI;
 import vrimplantacao2.gui.interfaces.DtComGUI;
 import vrimplantacao2.gui.interfaces.FaciliteGUI;
@@ -542,6 +543,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuFort = new javax.swing.JMenuItem();
         mnuSysmoFirebird = new javax.swing.JMenuItem();
         mnuSri = new javax.swing.JMenuItem();
+        mnuCadastraFacil = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1114,6 +1116,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu5.add(mnuSri);
+
+        mnuCadastraFacil.setText("CadastraFacil");
+        mnuCadastraFacil.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuCadastraFacilActionPerformed(evt);
+            }
+        });
+        jMenu5.add(mnuCadastraFacil);
 
         jMenu2.add(jMenu5);
 
@@ -3854,6 +3864,10 @@ public final class MenuGUI extends VRMdiFrame {
         WShopGUI.exibir(this);
     }//GEN-LAST:event_mnuAlterDataWShopActionPerformed
 
+    private void mnuCadastraFacilActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCadastraFacilActionPerformed
+        CadastraFacilGUI.exibir(this);
+    }//GEN-LAST:event_mnuCadastraFacilActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -3971,6 +3985,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuBrainSoft;
     private javax.swing.JMenuItem mnuCPGestor;
     private javax.swing.JMenu mnuCache;
+    private javax.swing.JMenuItem mnuCadastraFacil;
     private javax.swing.JMenu mnuCaixa;
     private javax.swing.JMenuItem mnuCodigoBarrasAtacado;
     private javax.swing.JMenuItem mnuControll;
