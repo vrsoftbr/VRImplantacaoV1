@@ -166,7 +166,7 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	P.QTDEMBALCPR,\n" +
                     "	P.CODGENERO,\n" +
                     "	P.CODGRUPO,\n" +
-                    "	coalesce(P.CODSUBGRUPO, 1) codsubgrupo,\n" +
+                    "	1 codsubgrupo,\n" +
                     "	P.CODFAMILIA,\n" +
                     "	P.ESTOATU,\n" +
                     "	P.ESTOMIN,\n" +
@@ -266,12 +266,12 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstDebito(rs.getString("cod_cst_cofins"));
                     imp.setPiscofinsCstCredito(rs.getString("cod_cst_cofins"));
                     imp.setNcm(rs.getString("codncm"));
-                    
-                    String ean = rs.getString("codbarra").substring(2, rs.getString("codbarra").length());
-                    
-                    if((rs.getString("codbarra") != null) && ("S".equals(rs.getString("pesavel"))) && 
-                            (ean.trim().length() <= 6)){
+         
+                    if((rs.getString("codbarra") != null) && 
+                            ("S".equals(rs.getString("pesavel"))) && 
+                                (rs.getString("codbarra").length() <= 7)){
                         if(vBalanca) {
+                            imp.setEan(rs.getString("codbarra").substring(2, rs.getString("codbarra").length()));
                             ProdutoBalancaVO produtoBalanca;
                             long codigoProduto;
                             codigoProduto = Long.parseLong(imp.getEan().trim());
@@ -290,8 +290,7 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                         } else {
                             imp.seteBalanca(true);
                             imp.setValidade(rs.getInt("valbalanca"));
-                        }
-                       
+                        } 
                     }
                     
                     result.add(imp);
