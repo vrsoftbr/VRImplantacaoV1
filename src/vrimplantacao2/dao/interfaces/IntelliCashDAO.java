@@ -28,6 +28,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class IntelliCashDAO extends InterfaceDAO {
 
+    public boolean i_importarCodigoCliente;
+
     @Override
     public String getSistema() {
         return "IntelliCash";
@@ -365,7 +367,8 @@ public class IntelliCashDAO extends InterfaceDAO {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "    c.codigo id,\n"
+                    + "    a.id id_agente,\n"
+                    + "    c.codigo id_cliente,\n"
                     + "    a.nome,\n"
                     + "    en.logradouro res_endereco,\n"
                     + "    en.numero res_numero,\n"
@@ -405,14 +408,18 @@ public class IntelliCashDAO extends InterfaceDAO {
                     + "    left join docs dcie on dcie.codag = a.id and dcie.tipo = 66\n"
                     + "    left join docs dcrg on dcrg.codag = a.id and dcrg.tipo = 67\n"
                     + "    left join EC_EXPT_AGENTE ec on ec.id = a.id\n"
-                    + "    where coalesce(c.codigo, 0) > 0\n"
                     + "order by\n"
                     + "    a.id"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
 
-                    imp.setId(rst.getString("id"));
+                    if (i_importarCodigoCliente) {
+                        imp.setId(rst.getString("id_cliente"));
+                    } else {
+                        imp.setId(rst.getString("id_agente"));
+                    }
+
                     imp.setRazao(rst.getString("nome"));
                     imp.setEndereco(rst.getString("res_endereco"));
                     imp.setNumero(rst.getString("res_numero"));
@@ -456,7 +463,7 @@ public class IntelliCashDAO extends InterfaceDAO {
                     + "    af.data,\n"
                     + "    af.vencimento,\n"
                     + "    af.doc,\n"
-                    + "    af.codag,\n"
+                    + "    af.codag as id_agente,\n"
                     + "    cli.codigo as id_cliente,\n"
                     + "    af.valor,\n"
                     + "    af.descricao,\n"
@@ -470,13 +477,28 @@ public class IntelliCashDAO extends InterfaceDAO {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rst.getString("id"));
-                    imp.setIdCliente(rst.getString("id_cliente"));
+
+                    if (i_importarCodigoCliente) {
+                        imp.setIdCliente(rst.getString("id_cliente"));
+                    } else {
+                        imp.setIdCliente(rst.getString("id_agente"));
+                    }
+
                     imp.setDataEmissao(rst.getDate("data"));
                     imp.setDataVencimento(rst.getDate("vencimento"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setJuros(rst.getDouble("juros"));
                     imp.setObservacao(rst.getString("descricao") + " NUMERO DOC " + rst.getString("doc"));
-                    imp.setNumeroCupom(Utils.formataNumero(rst.getString("doc")));
+
+                    if ((rst.getString("doc") != null)
+                            && (!rst.getString("doc").trim().isEmpty())
+                            && (rst.getString("doc").trim().length() <= 14)) {
+
+                        if (Long.parseLong(Utils.formataNumero(rst.getString("doc").trim())) <= Integer.MAX_VALUE) {
+                            imp.setNumeroCupom(Utils.formataNumero(rst.getString("doc")));
+                        }
+                    }
+
                     result.add(imp);
                 }
             }

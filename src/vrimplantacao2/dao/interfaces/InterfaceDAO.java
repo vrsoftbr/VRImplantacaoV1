@@ -115,6 +115,15 @@ public abstract class InterfaceDAO {
     }
 
     /**
+     * Retorna uma listagem com os produtos na unificação.
+     * @return Retorna uma listagem com os produtos cadastrados.
+     * @throws Exception 
+     */
+    public List<ProdutoIMP> getProdutosUnificacao() throws Exception {
+        return new ArrayList<>();
+    }
+    
+    /**
      * Retorna uma listagem com os produtos complemento sistema SD Informatica.
      * @return Retorna uma listagem com os produtos cadastrados.
      * @throws Exception 
