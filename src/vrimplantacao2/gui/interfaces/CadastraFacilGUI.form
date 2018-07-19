@@ -214,7 +214,7 @@
                                   </Group>
                                   <Component id="btnMapaTrib" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="127" max="32767" attributes="0"/>
+                              <EmptySpace pref="62" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -558,7 +558,7 @@
                               <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
                               <Component id="chkValorLimite" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="475" max="32767" attributes="0"/>
+                          <EmptySpace pref="410" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -611,7 +611,7 @@
                               <Group type="102" attributes="0">
                                   <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="txtFileCreditoRotativo" pref="481" max="32767" attributes="0"/>
+                                  <Component id="txtFileCreditoRotativo" pref="416" max="32767" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
@@ -760,24 +760,24 @@
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" attributes="0">
                                       <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                      <EmptySpace min="0" pref="56" max="32767" attributes="0"/>
                                   </Group>
                                   <Component id="txtHostFirebird" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="txtBancoDadosFirebird" min="-2" pref="303" max="-2" attributes="0"/>
+                                  <Component id="txtBancoDadosFirebird" min="-2" pref="231" max="-2" attributes="0"/>
                                   <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="txtUsuarioFirebird" min="-2" pref="74" max="-2" attributes="0"/>
                                   <Component id="vRLabel4" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtUsuarioFirebird" min="-2" pref="86" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="vRLabel5" min="-2" max="-2" attributes="0"/>
-                                  <Component id="txtSenhaFirebird" min="-2" pref="74" max="-2" attributes="0"/>
+                                  <Component id="txtSenhaFirebird" min="-2" pref="95" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
@@ -792,16 +792,14 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" attributes="0">
-                                      <Component id="cmbLojaOrigem" pref="291" max="32767" attributes="0"/>
+                                  <Component id="vRLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="cmbLojaOrigem" min="-2" pref="226" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="btnConectarSQLServer" min="-2" pref="113" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
