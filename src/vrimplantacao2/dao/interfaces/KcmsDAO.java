@@ -9,11 +9,14 @@ import java.util.List;
 import java.util.Map;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -461,6 +464,142 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
+        return result;
+    }
+    
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	codcli,\n" +
+                    "	TIPOJURFIS,\n" +
+                    "	razaosocial, \n" +
+                    "	fantasia,\n" +
+                    "	cnpj,\n" +
+                    "	ie,\n" +
+                    "	cpf,\n" +
+                    "	rg,\n" +
+                    "	endereco,\n" +
+                    "	nrcasa,\n" +
+                    "	complemento,\n" +
+                    "	bairro,\n" +
+                    "	cep,\n" +
+                    "	cidade,\n" +
+                    "	estado,\n" +
+                    "	email,\n" +
+                    "	fone,\n" +
+                    "	fone2,\n" +
+                    "	celular,\n" +
+                    "	fax,\n" +
+                    "	obs,\n" +
+                    "	contato,\n" +
+                    "	endcobr,\n" +
+                    "	nrcasacobr,\n" +
+                    "	complcobr,\n" +
+                    "	bairrocobr,\n" +
+                    "	cepcobr,\n" +
+                    "	estadocobr,\n" +
+                    "	cidadecobr,\n" +
+                    "	endentrg,\n" +
+                    "	nrcasaentr,\n" +
+                    "	bairroentrg,\n" +
+                    "	cepentrg,\n" +
+                    "	estadoentrg,\n" +
+                    "	cidadeentrg,\n" +
+                    "	dtcadast,\n" +
+                    "	dtalteracao,\n" +
+                    "	dtnasc,\n" +
+                    "	limitecred,\n" +
+                    "	saldo,\n" +
+                    "	inativo,\n" +
+                    "	dtalter,\n" +
+                    "	codibge_municipio, \n" +
+                    "	produtor_rural\n" +
+                    "from\n" +
+                    "	cdclientes\n" +
+                    "where\n" +
+                    "	codcli > 0\n" +
+                    "order by\n" +
+                    "	codcli")) {
+                while(rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rs.getString("codcli"));
+                    imp.setRazao(rs.getString("razaosocial"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    if("J".equals(rs.getString("tipojurfis"))) {
+                        imp.setCnpj(rs.getString("cnpj"));
+                        imp.setInscricaoestadual(rs.getString("ie"));
+                    } else if ("F".equals(rs.getString("tipojurfis")) && ("".equals(rs.getString("cnpj").replace("/", "").replace(".", "").replace("-", "").trim()))
+                            && ("".equals(rs.getString("ie")))) {
+                        imp.setCnpj(rs.getString("cpf"));
+                        if(rs.getString("rg") != null){
+                            imp.setInscricaoestadual(rs.getString("rg"));
+                        }
+                    } else if ("F".equals(rs.getString("tipojurfis")) && ("".equals(rs.getString("cnpj").replace("/", "").replace(".", "").replace("-", "").trim()))
+                            && ("ISENTO".equals(rs.getString("ie")))) {
+                        imp.setCnpj(rs.getString("cnpj"));
+                        if(rs.getString("rg") != null) {
+                            imp.setInscricaoestadual(rs.getString("rg"));
+                        } 
+                    } else {
+                            imp.setCnpj("cpf");
+                            imp.setInscricaoestadual("");
+                        }
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("nrcasa"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setMunicipioIBGE(rs.getInt("codibge_municipio"));
+                    imp.setUf(rs.getString("estado"));
+                    imp.setEmail(rs.getString("email"));
+                    imp.setTelefone(rs.getString("fone"));
+                    if((rs.getString("fone2") != null) && (!"".equals(rs.getString("fone2")))) {
+                        imp.addTelefone("Telefone 2", rs.getString("fone2"));
+                    }
+                    imp.setCelular(rs.getString("celular"));
+                    imp.setFax(rs.getString("fax"));
+                    if((rs.getString("contato") != null) && (!"".equals(rs.getString("contato")))) {
+                        imp.addContato("1", "Contato", rs.getString("contato"), null, null);
+                    }
+                    //Endereço de Cobrança
+                    imp.setCobrancaEndereco(rs.getString("endcobr"));
+                    imp.setCobrancaNumero(rs.getString("nrcasacobr"));
+                    imp.setCobrancaComplemento(rs.getString("complcobr"));
+                    imp.setCobrancaBairro(rs.getString("bairrocobr"));
+                    imp.setCobrancaCep(rs.getString("cepcobr"));
+                    imp.setCobrancaUf(rs.getString("estadocobr"));
+                    imp.setCobrancaMunicipio(rs.getString("cidadecobr"));
+                    
+                    imp.setDataCadastro(rs.getDate("dtcadast"));
+                    imp.setDataNascimento(rs.getDate("dtnasc"));
+                    imp.setValorLimite(rs.getDouble("limitecred"));
+                    imp.setAtivo("N".equals(rs.getString("inativo")) ? true : false);
+                    imp.setPermiteCreditoRotativo(true);
+                    imp.setPermiteCheque(true);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "")) {
+                
+            }
+            
+         }
         return result;
     }
 }
