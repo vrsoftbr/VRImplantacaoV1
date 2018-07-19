@@ -9,6 +9,7 @@ import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.WShopDAO;
@@ -24,11 +25,13 @@ public class WShopGUI extends VRInternalFrame {
     private final ConexaoPostgres connSQL = new ConexaoPostgres();
     
     private int vLojaVR = -1;
+    private String vLojaCliente = "-1";
     
     private void carregarParametros() throws Exception {
         conexao.carregarParametros();
         Parametros params = Parametros.get();
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
+        vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
     }
     
     private void gravarParametros() throws Exception {
@@ -37,6 +40,11 @@ public class WShopGUI extends VRInternalFrame {
         if (vr != null) {
             params.put(vr.id, SISTEMA, "LOJA_VR");
             vLojaVR = vr.id;
+        }
+        Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
+        if (cliente != null) {
+            params.put(cliente.cnpj, SISTEMA, "LOJA_CLIENTE");
+            vLojaCliente = cliente.cnpj;
         }
         params.salvar();
     }
@@ -58,6 +66,7 @@ public class WShopGUI extends VRInternalFrame {
             @Override
             public void executar() throws Exception {
                 carregarLojaVR();
+                carregarLojaCliente();
                 gravarParametros();
             }
         });
@@ -84,6 +93,20 @@ public class WShopGUI extends VRInternalFrame {
         cmbLojaVR.setSelectedIndex(index);
     }
     
+    public void carregarLojaCliente() throws Exception {
+        cmbLojaOrigem.setModel(new DefaultComboBoxModel());
+        int cont = 0;
+        int index = 0;
+        for (Estabelecimento loja: dao.getLojas()) {
+            cmbLojaOrigem.addItem(loja);
+            if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
+                index = cont;
+            }
+            cont++;
+        }
+        cmbLojaOrigem.setSelectedIndex(index);
+    }
+    
     public void importarTabelas() throws Exception {
         Thread thread = new Thread() {
             int idLojaVR, balanca;
@@ -95,7 +118,7 @@ public class WShopGUI extends VRInternalFrame {
                     ProgressBar.setCancel(true);                   
                     
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
-                    idLojaCliente = "1";
+                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
                     
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
@@ -104,6 +127,7 @@ public class WShopGUI extends VRInternalFrame {
                     if (tab.getSelectedIndex() == 0) {
                         
                         tabProduto.setImportador(importador);
+                        tabProduto.executarImportacao();
                         
                     } else if (tab.getSelectedIndex() == 1) {
                         if (chkFornecedor.isSelected()) {
@@ -204,6 +228,8 @@ public class WShopGUI extends VRInternalFrame {
         cbxUnifCliPreferencial = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifCliEventual = new vrframework.bean.checkBox.VRCheckBox();
         conexao = new vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel();
+        cmbLojaOrigem = new javax.swing.JComboBox();
+        vRLabel1 = new vrframework.bean.label.VRLabel();
 
         setTitle("Sysmo");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
@@ -366,7 +392,7 @@ public class WShopGUI extends VRInternalFrame {
                 .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(198, Short.MAX_VALUE))
+                .addContainerGap(185, Short.MAX_VALUE))
         );
 
         tabCliente.addTab("Crédito Rotativo", tablCreditoRotativo);
@@ -415,6 +441,8 @@ public class WShopGUI extends VRInternalFrame {
 
         tab.addTab("Unificação", tabUnificacao);
 
+        vRLabel1.setText("Loja (Cliente):");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -424,10 +452,14 @@ public class WShopGUI extends VRInternalFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(tab, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(conexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(conexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -437,7 +469,11 @@ public class WShopGUI extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(conexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tab, javax.swing.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(tab, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -493,6 +529,7 @@ public class WShopGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
+    private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel conexao;
     private vrframework.bean.tabbedPane.VRTabbedPane tab;
@@ -503,6 +540,7 @@ public class WShopGUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel tabUnificacao;
     private javax.swing.JPanel tablCreditoRotativo;
     private vrframework.bean.consultaContaContabil.VRConsultaContaContabil vRConsultaContaContabil1;
+    private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.label.VRLabel vRLabel6;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
