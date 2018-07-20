@@ -2,18 +2,23 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.exolab.castor.types.Date;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoPagamento;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -37,10 +42,10 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
+                   "select\n"
                     + "codloja,\n"
                     + "nomeloja\n"
-                    + "from\n"
+                 + "from\n"
                     + "lojas")) {
                 while (rs.next()) {
                     result.add(new Estabelecimento(rs.getString("codloja"), rs.getString("nomeloja")));
@@ -59,9 +64,9 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select\n"
                     + "	tribu,\n"
                     + "	desctribu\n"
-                    + "from\n"
+                  + "from\n"
                     + "	aliquo\n"
-                    + "order by\n"
+                  + "order by\n"
                     + "	desctribu")) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(rs.getString("tribu"), rs.getString("desctribu")));
@@ -81,9 +86,9 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	secao merc1, nomesec descmerc1,\n"
                     + "	coalesce(subsec, secao) merc2, coalesce(nomesub, nomesec) descmerc2,\n"
                     + "	'1' merc3, nomesub descmerc3\n"
-                    + "from\n"
+                  + "from\n"
                     + "	secoes\n"
-                    + "order by\n"
+                  + "order by\n"
                     + "	nomesec, nomesub")) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -182,12 +187,28 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (vBalanca) {
                         if ((rs.getString("ean1") != null)
                                 && ("KG".equals(rs.getString("unidade").toUpperCase()))
-                                && (rs.getString("ean1").trim().substring(9, 13).length() <= 5)) {
-                            imp.setImportId(rs.getString("ean1"));
-                            imp.seteBalanca(true);
+                                && (rs.getString("ean1").trim().substring(6, 12).length() <= 6)) { //0000000004213
+                            ProdutoBalancaVO produtoBalanca;
+                            long codigoProduto;
+                            String ean = rs.getString("ean1").trim().substring(6, 12);
+                            imp.setEan(ean);
+                            codigoProduto = Long.parseLong(imp.getEan().trim());
+                            if (codigoProduto <= Integer.MAX_VALUE) {
+                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                            } else {
+                                produtoBalanca = null;
+                            }
+                            if (produtoBalanca != null) {
+                                imp.seteBalanca(true);
+                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rs.getInt("validade"));
+                            } else {
+                                imp.setValidade(0);
+                                imp.seteBalanca(false);
+                            }
                         }
                     } else {
-                        imp.setEan(rs.getString("ean1"));
+                        imp.seteBalanca(true);
+                        imp.setValidade(rs.getInt("validade"));
                     }
                     result.add(imp);
                 }
@@ -196,117 +217,27 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	codigo,\n" +
-                    "	cgc,\n" +
-                    "	codfor\n" +
-                    "from\n" +
-                    "	prodfor\n" +
-                    "order by\n" +
-                    "	codigo")) {
-                while(rs.next()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	codigo,\n"
+                    + "	cgc,\n"
+                    + "	codfor\n"
+                  + "from\n"
+                    + "	prodfor\n"
+                  + "order by\n"
+                    + "	codigo")) {
+                while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setIdProduto(rs.getString("codigo"));
                     imp.setIdFornecedor(rs.getString("cgc"));
                     imp.setCodigoExterno(rs.getString("codfor"));
-                    
-                    result.add(imp);
-                }
-            }
-        }
-        
-        return result;
-    }
- 
-    @Override
-    public List<ClienteIMP> getClientes() throws Exception {
-        List<ClienteIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	codigo,\n"
-                    + "	cpf,\n"
-                    + "   inscricao,\n"
-                    + "	identidade,\n"
-                    + "	nome1,\n"
-                    + "	endereco,\n"
-                    + "	bairro,\n"
-                    + "	cidade,\n"
-                    + "	estado,\n"
-                    + "	cep,\n"
-                    + "	telefone,\n"
-                    + "	fonetrab,\n"
-                    + "	limite,\n"
-                    + "	situacao,\n"
-                    + "	observacao,\n"
-                    + "	data_cad,\n"
-                    + "	motivo,\n"
-                    + "	filiacao,\n"
-                    + "	nascimento,\n"
-                    + "	cod_mun,\n"
-                    + "	cod_uf,\n"
-                    + "	coment1,\n"
-                    + "   coment2 \n"
-                    + "from\n"
-                    + "	clientes\n"
-                    + "order by\n"
-                    + "	codigo")) {
-                while (rs.next()) {
-                    ClienteIMP imp = new ClienteIMP();
-                    imp.setId(rs.getString("codigo"));
-                    imp.setCnpj(rs.getString("cpf").substring(2, rs.getString("cpf").length()));
-                    if ((!"".equals(rs.getString("identidade"))) && !"000000000000".equals(rs.getString("identidade"))) {
-                        imp.setInscricaoestadual("identidade");
-                    } else if ((!"".equals(rs.getString("inscricao"))) && (!"00000000000000".equals(rs.getString("inscricao")))) {
-                        imp.setInscricaoestadual("inscricao");
-                    } else {
-                        imp.setInscricaoestadual("ISENTO");
-                    }
-                    imp.setInscricaoestadual(rs.getString("inscricao"));
-                    imp.setRazao(rs.getString("nome1"));
-                    imp.setEndereco(rs.getString("endereco"));
-                    imp.setBairro(rs.getString("bairro"));
-                    imp.setMunicipio(rs.getString("cidade"));
-                    imp.setMunicipioIBGE(rs.getInt("cod_mun"));
-                    imp.setUf(rs.getString("estado"));
-                    imp.setUfIBGE(rs.getInt("cod_uf"));
-                    imp.setCep(rs.getString("cep"));
-                    imp.setTelefone(rs.getString("telefone"));
-                    if (!"".equals(rs.getString("fonetrab"))) {
-                        imp.addContato("1", "Tel. Trabalho", rs.getString("fonetrab"), null, null);
-                    }
-                    imp.setValorLimite(rs.getDouble("limite"));
-                    if ((rs.getInt("situacao")) == 1) {
-                        imp.setAtivo(true);
-                    } else {
-                        imp.setAtivo(false);
-                    }
-                    String obs2;
-                    String obs3;
-                    if (!"".equals(rs.getString("coment1"))) {
-                        obs2 = "Obs2: " + rs.getString("coment1");
-                    } else {
-                        obs2 = "";
-                    }
-                    if (!"".equals(rs.getString("coment2"))) {
-                        obs3 = "Obs3: " + rs.getString("coment2");
-                    } else {
-                        obs3 = "";
-                    }
-                    if (!"".equals(rs.getString("coment3"))) {
-                        imp.setObservacao2(rs.getString("coment3"));
-                    }
-                    imp.setObservacao(rs.getString("observacao") + obs2 + obs3);
-                    imp.setDataCadastro(rs.getDate("data_cad"));
-                    imp.setDataNascimento(rs.getDate("nascimento"));
 
                     result.add(imp);
                 }
@@ -316,8 +247,6 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
     
-    
-
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -338,17 +267,17 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	telefone,\n"
                     + "	fax,\n"
                     + "	observacao,\n"
-                    + "   observa1,\n"
-                    + "   observa2,\n"
+                    + " observa1,\n"
+                    + " observa2,\n"
                     + "	prazo1,\n"
                     + "	prazo2,\n"
                     + "	prazo3,\n"
                     + "	condpg,\n"
                     + "	cod_uf,\n"
                     + "	cod_mun\n"
-                    + "from\n"
+                  + "from\n"
                     + "	fornec\n"
-                    + "order by\n"
+                  + "order by\n"
                     + "	nome1")) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -383,17 +312,120 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                         obs2 = "";
                     }
                     imp.setObservacao(rs.getString("observacao") + obs1 + obs2);
-                    
-                    if(!"".equals(String.valueOf(rs.getInt("prazo1")))) {
+
+                    if (!"".equals(String.valueOf(rs.getInt("prazo1")))) {
                         imp.addPagamento("1", rs.getInt("prazo1"));
                     }
-                    if(!"".equals(String.valueOf(rs.getInt("prazo2")))) {
+                    if (!"".equals(String.valueOf(rs.getInt("prazo2")))) {
                         imp.addPagamento("2", rs.getInt("prazo2"));
                     }
-                    if(!"".equals(String.valueOf(rs.getInt("prazo3")))) {
+                    if (!"".equals(String.valueOf(rs.getInt("prazo3")))) {
                         imp.addPagamento("3", rs.getInt("prazo3"));
                     }
                     imp.setTipoPagamento(new TipoPagamento(1, rs.getString("condpg")));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+ }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	codigo,\n"
+                    + "	cpf,\n"
+                    + " inscricao,\n"
+                    + "	identidade,\n"
+                    + "	nome1,\n"
+                    + "	endereco,\n"
+                    + "	bairro,\n"
+                    + "	cidade,\n"
+                    + "	estado,\n"
+                    + "	cep,\n"
+                    + "	telefone,\n"
+                    + "	fonetrab,\n"
+                    + "	limite,\n"
+                    + "	situacao,\n"
+                    + "	observacao,\n"
+                    + "	data_cad,\n"
+                    + "	motivo,\n"
+                    + "	filiacao,\n"
+                    + "	nascimento,\n"
+                    + "	cod_mun,\n"
+                    + "	cod_uf,\n"
+                    + "	coment1,\n"
+                    + " coment2,\n"
+                    + " coment3\n"
+                  + "from\n"
+                    + "	clientes\n"
+                  + "order by\n"
+                    + "	codigo")) {
+                while (rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rs.getString("codigo"));
+                    imp.setCnpj(rs.getString("cpf"));
+                    if ((rs.getString("identidade") != null) && (!"".equals(rs.getString("identidade")))) {
+                        imp.setInscricaoestadual(rs.getString("identidade"));
+                    } else if ((rs.getString("inscricao") != null) && (!"".equals(rs.getString("inscricao")))) {
+                        imp.setInscricaoestadual(rs.getString("inscricao"));
+                    } else {
+                        imp.setInscricaoestadual("ISENTO");
+                    }
+                    imp.setRazao(rs.getString("nome1"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setMunicipioIBGE(rs.getInt("cod_mun"));
+                    imp.setUf(rs.getString("estado"));
+                    imp.setUfIBGE(rs.getInt("cod_uf"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    
+                    if((rs.getString("fonetrab") != null) && !"".equals(rs.getString("fonetrab"))) {
+                        int qtdString = rs.getString("fonetrab").length();
+                        if(qtdString > 14) {
+                            imp.addContato("1", "Tel. Trabalho", rs.getString("fonetrab").trim().substring(0, 13), null, null);
+                        } else {
+                            imp.addContato("1", "Tel. Trabalho", rs.getString("fonetrab").trim(), null, null);
+                        }
+                    }
+                    
+                    imp.setValorLimite(rs.getDouble("limite"));
+                    if ((rs.getInt("situacao")) == 1) {
+                        imp.setAtivo(true);
+                    } else {
+                        imp.setAtivo(false);
+                    }
+                    String obs1;
+                    String obs2;
+                    String obs3;
+                    if ((rs.getString("coment1") != null) && !"".equals(rs.getString("coment1"))) {
+                        obs2 = " Obs2: " + rs.getString("coment1");
+                    } else {
+                        obs2 = "";
+                    }
+                    if ((rs.getString("coment2") != null) && !"".equals(rs.getString("coment2"))) {
+                        obs3 = " Obs3: " + rs.getString("coment2");
+                    } else {
+                        obs3 = "";
+                    }
+                    if (!"".equals(rs.getString("coment3"))) {
+                        imp.setObservacao2(rs.getString("coment3"));
+                    }
+                    if((rs.getString("observacao") != null) && (!"".equals(rs.getString("observacao")))) {
+                        obs1 = rs.getString("observacao");
+                    } else {
+                        obs1 = "";
+                    }
+                    imp.setObservacao(obs1 + obs2 + obs3);
+                    imp.setDataCadastro(rs.getDate("data_cad"));
+                    imp.setDataNascimento(rs.getDate("nascimento"));
+                    imp.setAtivo(rs.getInt("situacao") == 1 ? true : false);
                     
                     result.add(imp);
                 }
@@ -402,5 +434,126 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-
+    
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	r.cgc as idcliente,\n" +
+                    "	r.cheque as idconta,\n" +
+                    "   c.codigo,\n" +
+                    "	r.valor,\n" +
+                    "	r.vencto,\n" +
+                    "	r.movto,\n" +
+                    "	r.parcela\n" +
+                    "from\n" +
+                    "	receb r\n" +
+                    "left join\n" +
+                    "	clientes c\n" +
+                            " on c.cpf = r.cgc\n" +
+                    "where\n" +
+                    "	tipo = 2 and\n" +
+                    "	dtpg is null\n")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setCnpjCliente(rs.getString("idcliente"));
+                    imp.setIdCliente(rs.getString("codigo"));
+                    
+                    if(Integer.parseInt(rs.getString("movto").substring(1, 2)) < 10) {
+                        String data = "200" + rs.getString("movto").substring(1, 2) + 
+                            "-" + rs.getString("movto").substring(2, 4) + "-" + rs.getString("movto").substring(4, 6);
+                        imp.setDataEmissao(Utils.convertStringToDate("yyyy-MM-dd", data.trim()));
+                    } else {
+                        String data = "20" + rs.getString("movto").substring(1, 2) + 
+                            "-" + rs.getString("movto").substring(2, 4) + "-" + rs.getString("movto").substring(4, 6);
+                        imp.setDataEmissao(Utils.convertStringToDate("yyyy-MM-dd", data.trim()));
+                    }
+                    
+                    if(Integer.parseInt(rs.getString("vencto").substring(1, 2)) < 10) {
+                        String dataDeposito = "200" + rs.getString("vencto").substring(1, 2) + 
+                            "-" + rs.getString("vencto").substring(2, 4) + "-" + rs.getString("vencto").substring(4, 6);
+                        imp.setDataVencimento(Utils.convertStringToDate("yyyy-MM-dd", dataDeposito.trim()));
+                    } else {
+                        String dataDeposito = "20" + rs.getString("vencto").substring(1, 2) + 
+                            "-" + rs.getString("vencto").substring(2, 4) + "-" + rs.getString("vencto").substring(4, 6);
+                        imp.setDataVencimento(Utils.convertStringToDate("yyyy-MM-dd", dataDeposito.trim()));
+                    }
+                    
+                    imp.setParcela(rs.getInt("parcela"));
+                    imp.setId(rs.getString("idconta"));
+                    imp.setNumeroCupom(rs.getString("idconta"));
+                    imp.setParcela(rs.getInt("parcela"));
+                    imp.setValor(rs.getDouble("valor"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        List<ChequeIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	r.cgc as idcliente,\n" +
+                    "	c.identidade,\n" +
+                    "	c.inscricao,\n" +
+                    "	c.nome1,\n" +
+                    "	r.banco,\n" +
+                    "	r.agencia,\n" +
+                    "	r.conta,\n" +
+                    "	r.cheque,\n" +
+                    "	r.valor,\n" +
+                    "	r.vencto,\n" +
+                    "	r.movto,\n" +
+                    "	r.parcela\n" +
+                    "from\n" +
+                    "	receb r\n" +
+                    "join\n" +
+                    "	clientes c\n" +
+                    "       on c.cpf = r.cgc\n" +
+                    "where\n" +
+                    "	tipo = 1 and\n" +
+                    "	dtpg is null and\n" +
+                    "	vlpg = '0.00'")) {
+                while(rs.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    imp.setAgencia(rs.getString("agencia"));
+                    imp.setBanco(rs.getInt("banco"));
+                    imp.setConta(rs.getString("conta"));
+                    imp.setCpf(rs.getString("idcliente"));
+                    imp.setNumeroCheque(rs.getString("cheque"));
+                    imp.setObservacao(rs.getString("comen"));
+                    if((rs.getString("identidade") != null) && (!"000000000000".equals(rs.getString("").trim()))) {
+                        imp.setRg(rs.getString("identidade"));
+                    }else {
+                        imp.setRg("inscricao");
+                    }
+                    imp.setNome(rs.getString("nome1"));
+                    
+                    String data = "20" + rs.getString("movto").substring(1, 2) + 
+                            "-" + rs.getString("movto").substring(2, 4) + "-" + rs.getString("movto").substring(4, 6);
+                    
+                    String dataDeposito = "20" + rs.getString("vencto").substring(1, 2) + 
+                            "-" + rs.getString("vencto").substring(2, 4) + "-" + rs.getString("vencto").substring(4, 6);
+                                        
+                    imp.setDataDeposito(rs.getDate(sdf.format(dataDeposito)));
+                    imp.setDate(rs.getDate(sdf.format(data)));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setAlinea(0);
+                 
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 }

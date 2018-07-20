@@ -256,7 +256,7 @@ public class SysPdvDAO extends InterfaceDAO {
                     "    p.proprccst custosemimposto,\n" +
                     "    p.prodatcadinc datacadastro,\n" +
                     "    p.proiteemb qtdembalagem,\n" +
-                    "    p.promrg1 margem,\n" +
+                    "    round(((proprcvdavar / case when p.proprccst = 0.00 then 1 else p.proprccst end) - 1) * (100),2) margem,\n" +
                     "    proprcvdavar precovenda,\n" +
                     "    items.procodsim id_familiaproduto,\n" +
                     "    p.propesbrt pesobruto,\n" +
