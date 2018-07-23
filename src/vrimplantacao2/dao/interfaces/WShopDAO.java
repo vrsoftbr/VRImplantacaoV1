@@ -16,8 +16,12 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -284,7 +288,117 @@ public class WShopDAO extends InterfaceDAO {
         
         return result;
     }
-    
-    
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	p.idpessoa id,\n" +
+                    "	p.cdchamada chamada,\n" +
+                    "	p.nmpessoa razao,\n" +
+                    "	coalesce(p.nmfantasia, p.nmpessoa) fantasia,\n" +
+                    "	p.nrinscrmun inscricaomunicipal,\n" +
+                    "	p.nrcgc_cic cnpj,\n" +
+                    "	p.nrincrest_rg ierj,\n" +
+                    "	(p.stativo = 'S') ativo,\n" +
+                    "	p.nmendereco endereco,\n" +
+                    "	p.nrlogradouro numero,\n" +
+                    "	p.dscomplemento complemento,\n" +
+                    "	p.nmbairro bairro,\n" +
+                    "	p.nmcidade municipio,\n" +
+                    "	p.iduf uf,\n" +
+                    "	p.nmcep cep,\n" +
+                    "	p.email,\n" +
+                    "	p.nrtelefone,\n" +
+                    "	p.nrtelcomercial,\n" +
+                    "	p.nrtelfax,\n" +
+                    "	p.diavencimento,\n" +
+                    "	p.diafaturamento,\n" +
+                    "	p.idprazo,\n" +
+                    "	p.dtcadastro datacadastro,\n" +
+                    "	p.nmobservacao,\n" +
+                    "	p.sticmssimples simplesnacional\n" +
+                    "from\n" +
+                    "	wshop.pessoas p\n" +
+                    "where\n" +
+                    "	sttipopessoa = 'F'\n" +
+                    "order by\n" +
+                    "	p.cdchamada::integer;"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("chamada"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setInsc_municipal(rst.getString("inscricaomunicipal"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("ierj"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.addEmail("EMAIL", rst.getString("email"), TipoContato.COMERCIAL);
+                    imp.setTel_principal(rst.getString("nrtelefone"));
+                    imp.addTelefone("COMERCIAL", rst.getString("nrtelcomercial"));
+                    imp.addTelefone("FAX", rst.getString("nrtelfax"));
+                    imp.setDatacadastro(rst.getDate("datacadastro"));
+                    imp.setObservacao(rst.getString("nmobservacao"));
+                    imp.setTipoEmpresa(rst.getBoolean("simplesnacional") ? TipoEmpresa.ME_SIMPLES : TipoEmpresa.LUCRO_REAL);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	f.cdchamada idfornecedor,\n" +
+                    "	ids.dscodigo idproduto,\n" +
+                    "	pf.cdprodutofornecedor codigoexterno,\n" +
+                    "	pf.dtultimacompra dataalteracao\n" +
+                    "from\n" +
+                    "	wshop.prodfor pf\n" +
+                    "	join wshop.produto p on pf.idproduto = p.idproduto\n" +
+                    "	join wshop.detalhe dt on p.idproduto = dt.idproduto\n" +
+                    "	join wshop.codigos ids on dt.iddetalhe = ids.iddetalhe and dt.idproduto = ids.idproduto and ids.tpcodigo = 'Chamada'\n" +
+                    "	join wshop.pessoas f on f.idpessoa = pf.idpessoa\n" +
+                    "order by\n" +
+                    "	1,2"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
     
 }
