@@ -283,6 +283,13 @@ public class DtComGUI extends VRInternalFrame {
                                                                    OpcaoCliente.SITUACAO_CADASTRO);
                         }
                         
+                        if(chkCreditoRotativo.isSelected()) {
+                            importador.importarCreditoRotativo();
+                        }
+                        if(chkCheques.isSelected()) {
+                            importador.importarCheque();
+                        }
+                        
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -353,6 +360,9 @@ public class DtComGUI extends VRInternalFrame {
         vRPanel4 = new vrframework.bean.panel.VRPanel();
         chkCliente = new vrframework.bean.checkBox.VRCheckBox();
         chkLimiteCredito = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel8 = new vrframework.bean.panel.VRPanel();
+        chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        chkCheques = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
@@ -553,6 +563,33 @@ public class DtComGUI extends VRInternalFrame {
 
         chkLimiteCredito.setText("Limite de Crédito");
 
+        vRPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Contas"));
+
+        chkCreditoRotativo.setText("Crédito Rotativo");
+
+        chkCheques.setText("Cheques");
+
+        javax.swing.GroupLayout vRPanel8Layout = new javax.swing.GroupLayout(vRPanel8);
+        vRPanel8.setLayout(vRPanel8Layout);
+        vRPanel8Layout.setHorizontalGroup(
+            vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCheques, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        vRPanel8Layout.setVerticalGroup(
+            vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 5, Short.MAX_VALUE)
+                .addComponent(chkCheques, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
         javax.swing.GroupLayout vRPanel4Layout = new javax.swing.GroupLayout(vRPanel4);
         vRPanel4.setLayout(vRPanel4Layout);
         vRPanel4Layout.setHorizontalGroup(
@@ -562,16 +599,21 @@ public class DtComGUI extends VRInternalFrame {
                 .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkLimiteCredito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(463, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(vRPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(316, Short.MAX_VALUE))
         );
         vRPanel4Layout.setVerticalGroup(
             vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkLimiteCredito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(75, Short.MAX_VALUE))
+                .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(vRPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(vRPanel4Layout.createSequentialGroup()
+                        .addComponent(chkCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkLimiteCredito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(33, Short.MAX_VALUE))
         );
 
         tpDadosMigracao.addTab("Clientes", vRPanel4);
@@ -777,8 +819,10 @@ public class DtComGUI extends VRInternalFrame {
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkAtacado;
     private vrframework.bean.checkBox.VRCheckBox chkBalanca;
+    private vrframework.bean.checkBox.VRCheckBox chkCheques;
     private vrframework.bean.checkBox.VRCheckBox chkCliente;
     private vrframework.bean.checkBox.VRCheckBox chkCpfCnpj;
+    private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkFCondicaoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFPrazoFornecedor;
@@ -826,6 +870,7 @@ public class DtComGUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel vRPanel5;
     private vrframework.bean.panel.VRPanel vRPanel6;
     private vrframework.bean.panel.VRPanel vRPanel7;
+    private vrframework.bean.panel.VRPanel vRPanel8;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
     // End of variables declaration//GEN-END:variables
 

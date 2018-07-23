@@ -192,6 +192,12 @@ public class ProdutoRepositoryProvider {
             dao.salvar(anterior);
         }
 
+        public void alterar(ProdutoAnteriorVO anterior) throws Exception {
+            dao.setImportSistema(getSistema());
+            dao.setImportLoja(getLoja());
+            dao.alterar(anterior);
+        }
+        
         public boolean cadastrado(String id) throws Exception {
             dao.setImportSistema(getSistema());
             dao.setImportLoja(getLoja());

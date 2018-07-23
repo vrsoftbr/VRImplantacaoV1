@@ -482,6 +482,24 @@ public class ProdutoAnteriorDAO {
         }
     }
 
+    public void alterar(ProdutoAnteriorVO anterior) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+            sql.setSchema("implantacao");
+            sql.setTableName("codant_produto");
+            sql.put("codigoatual", (anterior.getCodigoAtual() != null ? anterior.getCodigoAtual().getId() : null));
+            
+            sql.setWhere(
+                    "impsistema = '" + anterior.getImportSistema() + "'"
+                    + " and imploja = '" + anterior.getImportLoja() + "'"
+                    + " and impid = '" + anterior.getImportId() + "'");
+            
+            if (!sql.isEmpty()) {
+                stm.execute(sql.getUpdate());
+            }
+        }
+    }
+    
     public Map<String, ProdutoAnteriorVO> getCodigoAnterior(String sistema, String loja) throws Exception {
         Map<String, ProdutoAnteriorVO> result = new LinkedHashMap<>();
         createTable();
