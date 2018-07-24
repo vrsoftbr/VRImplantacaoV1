@@ -475,13 +475,14 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="vRPanel1" min="-2" max="-2" attributes="0"/>
                           <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
                           <Component id="chkProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace pref="275" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -492,7 +493,9 @@
                       <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="vRPanel1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="74" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -520,6 +523,51 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkProdutoFornecedorActionPerformed"/>
               </Events>
             </Component>
+            <Container class="vrframework.bean.panel.VRPanel" name="vRPanel1">
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="lblContaPagar" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkContaPagar" min="-2" max="-2" attributes="0"/>
+                              <Component id="cmbContaPagar" alignment="0" min="-2" pref="197" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="32" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkContaPagar" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="lblContaPagar" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="cmbContaPagar" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="18" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkContaPagar">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Contas a Pagar"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.label.VRLabel" name="lblContaPagar">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Plano de Contas"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.comboBox.VRComboBox" name="cmbContaPagar">
+                </Component>
+              </SubComponents>
+            </Container>
           </SubComponents>
         </Container>
         <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="tabCliente">
@@ -608,17 +656,12 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="txtFileCreditoRotativo" pref="404" max="32767" attributes="0"/>
-                              </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                              </Group>
+                              <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="cmbPlanoContas" alignment="0" min="-2" pref="174" max="-2" attributes="0"/>
+                              <Component id="lblPlanoContas" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <EmptySpace pref="343" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -626,13 +669,14 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="1" attributes="0">
-                              <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtFileCreditoRotativo" min="-2" max="-2" attributes="0"/>
-                          </Group>
+                          <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="141" max="32767" attributes="0"/>
+                          <EmptySpace min="-2" pref="13" max="-2" attributes="0"/>
+                          <Component id="lblPlanoContas" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="cmbPlanoContas" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="98" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -648,7 +692,12 @@
                     <Property name="text" type="java.lang.String" value="Cheque"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtFileCreditoRotativo">
+                <Component class="vrframework.bean.comboBox.VRComboBox" name="cmbPlanoContas">
+                </Component>
+                <Component class="vrframework.bean.label.VRLabel" name="lblPlanoContas">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Plano de Contas"/>
+                  </Properties>
                 </Component>
               </SubComponents>
             </Container>
