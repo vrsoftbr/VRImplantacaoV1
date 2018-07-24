@@ -9,6 +9,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import vrframework.classe.Conexao;
 import vrimplantacao2.parametro.Versao;
+import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.cadastro.oferta.OfertaVO;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
@@ -216,6 +217,7 @@ public class ProdutoComplementoDAO {
     public void atualizar(ProdutoComplementoVO complemento, Set<OpcaoProduto> opt) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
+            String oft = "";
             sql.setTableName("produtocomplemento");
             if (opt.contains(OpcaoProduto.PRECO)) {
                 OfertaVO oferta = getOfertas().get(complemento.getIdLoja(), complemento.getProduto().getId());
@@ -228,7 +230,8 @@ public class ProdutoComplementoDAO {
                         sql.put("precodiaseguinte", oferta.getPrecoOferta());
                     } else {
                         sql.put("precodiaseguinte", complemento.getPrecoDiaSeguinte());
-                    }
+                    }                    
+                    oft = "update oferta set preconormal = " + MathUtils.round(complemento.getPrecoVenda(), 2) + " where id = " + oferta.getId();
                 }
             }
             if (opt.contains(OpcaoProduto.CUSTO)) {
@@ -265,6 +268,9 @@ public class ProdutoComplementoDAO {
             }
             if (!sql.isEmpty()) {
                 stm.execute(sql.getUpdate());
+                if (!"".equals(oft)) {
+                    stm.execute(oft);
+                }
             }
         }
     }
