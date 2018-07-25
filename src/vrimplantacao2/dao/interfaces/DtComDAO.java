@@ -7,10 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import org.exolab.castor.types.Date;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
-import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -33,6 +31,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public static boolean vBalanca;
+    private final SimpleDateFormat FORMAT = new SimpleDateFormat("yyMMdd");
     private static final Logger LOG = Logger.getLogger(DtComDAO.class.getName());
 
     @Override
@@ -44,10 +43,10 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
+                   "select\n"
                     + "codloja,\n"
                     + "nomeloja\n"
-                  + "from\n"
+                 + "from\n"
                     + "lojas")) {
                 while (rs.next()) {
                     result.add(new Estabelecimento(rs.getString("codloja"), rs.getString("nomeloja")));
@@ -246,6 +245,39 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
+        return result;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	codigo,\n" +
+                    "	qtdcaixa,\n" +
+                    "	ean2\n" +
+                    "from\n" +
+                    "	produtos\n" +
+                    "order by\n" +
+                    "	codigo")) {
+                while (rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("codigo"));
+                    imp.setQtdEmbalagem(rs.getInt("qtdcaixa"));
+                    
+                    if ((rs.getString("ean2") != null) && 
+                            (!"0000000000000".equals(rs.getString("ean2")))) {
+                        imp.setEan(rs.getString("ean2"));
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 
@@ -461,32 +493,18 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	dtpg is null\n")) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                                        
                     imp.setCnpjCliente(rs.getString("idcliente"));
                     imp.setIdCliente(rs.getString("codigo"));
 
                     //Data emissão
-                    if ((rs.getString("movto") != null)
-                            && (Integer.parseInt(rs.getString("movto").substring(1, 2).trim()) < 10)) {
-                        String data = "200" + rs.getString("movto").substring(1, 2)
-                                + "-" + rs.getString("movto").substring(2, 4) + "-" + rs.getString("movto").substring(4, 6);
-                        imp.setDataEmissao(Utils.convertStringToDate("yyyy-MM-dd", data.trim()));
-                        LOG.fine("Cliente: " + rs.getString("idcliente")
-                                + " Data Emissão: " + data.trim() + " Conta: " + rs.getString("cheque"));
-                    } else {
-                        String data = "20" + rs.getString("movto").substring(1, 2)
-                                + "-" + rs.getString("movto").substring(2, 4) + "-" + rs.getString("movto").substring(4, 6);
-                        imp.setDataEmissao(Utils.convertStringToDate("yyyy-MM-dd", data.trim()));
+                    if ((rs.getString("movto") != null)) {
+                       imp.setDataEmissao(FORMAT.parse(rs.getString("movto")));
                     }
 
                     //Data vencimento
-                    if((rs.getString("vencto") != null) && (Integer.parseInt(rs.getString("vencto").substring(1, 2)) < 10)) { 
-                     String dataDeposito = "200" + rs.getString("vencto").substring(1, 2) + 
-                     "-" + rs.getString("vencto").substring(2, 4) + "-" + rs.getString("vencto").substring(4, 6);
-                     imp.setDataVencimento(Utils.convertStringToDate("yyyy-MM-dd", dataDeposito.trim()));
-                     } else {
-                     String dataDeposito = "20" + rs.getString("vencto").substring(1, 2) + 
-                     "-" + rs.getString("vencto").substring(2, 4) + "-" + rs.getString("vencto").substring(4, 6);
-                     imp.setDataVencimento(Utils.convertStringToDate("yyyy-MM-dd", dataDeposito.trim()));
+                    if((rs.getString("vencto") != null)) {
+                        imp.setDataVencimento(FORMAT.parse(rs.getString("vencto")));
                      }
                     
                     imp.setParcela(rs.getInt("parcela"));
@@ -504,7 +522,6 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         List<ChequeIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
@@ -521,16 +538,16 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	r.valor,\n"
                     + "	r.vencto,\n"
                     + "	r.movto,\n"
-                    + "	r.parcela\n"
+                    + "	r.parcela,\n"
+                    + " r.comen\n"        
                  + "from\n"
                     + "	receb r\n"
                  + "join\n"
                     + "	clientes c\n"
                     + "       on c.cpf = r.cgc\n"
                  + "where\n"
-                    + "	tipo = 1 and\n"
-                    + "	dtpg is null and\n"
-                    + "	vlpg = '0.00'")) {
+                    + "	r.tipo = 1 and\n"
+                    + "	r.dtpg is null")) {
                 while (rs.next()) {
                     ChequeIMP imp = new ChequeIMP();
                     imp.setAgencia(rs.getString("agencia"));
@@ -539,21 +556,15 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCpf(rs.getString("idcliente"));
                     imp.setNumeroCheque(rs.getString("cheque"));
                     imp.setObservacao(rs.getString("comen"));
-                    if ((rs.getString("identidade") != null) && (!"000000000000".equals(rs.getString("").trim()))) {
+                    if ((rs.getString("identidade") != null) && (!"000000000000".equals(rs.getString("identidade").trim()))) {
                         imp.setRg(rs.getString("identidade"));
                     } else {
                         imp.setRg("inscricao");
                     }
                     imp.setNome(rs.getString("nome1"));
 
-                    String data = "20" + rs.getString("movto").substring(1, 2)
-                            + "-" + rs.getString("movto").substring(2, 4) + "-" + rs.getString("movto").substring(4, 6);
-
-                    String dataDeposito = "20" + rs.getString("vencto").substring(1, 2)
-                            + "-" + rs.getString("vencto").substring(2, 4) + "-" + rs.getString("vencto").substring(4, 6);
-
-                    imp.setDataDeposito(rs.getDate(sdf.format(dataDeposito)));
-                    imp.setDate(rs.getDate(sdf.format(data)));
+                    imp.setDataDeposito(FORMAT.parse(rs.getString("vencto")));
+                    imp.setDate(FORMAT.parse(rs.getString("movto")));
                     imp.setValor(rs.getDouble("valor"));
                     imp.setAlinea(0);
 
