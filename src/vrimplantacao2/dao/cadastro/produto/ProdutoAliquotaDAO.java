@@ -84,6 +84,14 @@ public class ProdutoAliquotaDAO {
                     sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
                 } else if (opt.contains(OpcaoProduto.ICMS_FORNECEDOR)) {
                     sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCredito().getId());
+                } else if (opt.contains(OpcaoProduto.ICMS_ENTRADA)) {
+                    sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
+                    sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
+                } else if (opt.contains(OpcaoProduto.ICMS_SAIDA)) {
+                    sql.put("id_aliquotadebito", vo.getAliquotaDebito().getId());
+                    sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
+                    sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
+                    sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
                 }
                 if (!sql.isEmpty()) {
                     sql.setWhere(
@@ -116,6 +124,14 @@ public class ProdutoAliquotaDAO {
                 sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
                 sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
                 sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
+                sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
+                sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
+            } else if (opt.contains(OpcaoProduto.ICMS_ENTRADA)) {
+                sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
+                sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
+            } else if (opt.contains(OpcaoProduto.ICMS_SAIDA)) {
+                sql.put("id_aliquotadebito", vo.getAliquotaDebito().getId());
+                sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
                 sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
                 sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
             }

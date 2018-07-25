@@ -372,6 +372,16 @@
                     <Property name="text" type="java.lang.String" value="ICMS"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIcmsEntrada">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="ICMS (Entrada)"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIcmsSaida">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="ICMS (Sa&#xed;da)"/>
+                  </Properties>
+                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1AtivoInativo">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Ativo/Inativo"/>

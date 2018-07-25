@@ -402,6 +402,7 @@ public class Importador {
         provider.setLojaVR(getLojaVR());
         provider.getOpcoes().add(OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC);
         ProdutoRepository repository = new ProdutoRepository(provider);
+        LOG.info("Produtos da listagem normal repassados: " + produtos.size());
         repository.atualizar(produtos, opcoes.toArray(new OpcaoProduto[]{}));
     }
 

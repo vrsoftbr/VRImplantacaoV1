@@ -47,6 +47,16 @@ public enum OpcaoProduto {
         public String toString() {
             return "ICMS";
         }
+    }, ICMS_ENTRADA {
+        @Override
+        public String toString() {
+            return "ICMS (Entrada)";
+        }
+    }, ICMS_SAIDA {
+        @Override
+        public String toString() {
+            return "ICMS (Saída)";
+        }
     }, ATIVO {
         @Override
         public String toString() {
@@ -172,7 +182,12 @@ public enum OpcaoProduto {
         public String toString() {
             return "Comprador";
         }
-    }, ICMS_FORNECEDOR {
+    }, 
+    /**
+     * @deprecated Utilizar {@link #ICMS_ENTRADA}
+     */
+    @Deprecated
+    ICMS_FORNECEDOR {
         @Override
         public String toString() {
             return "Icms Entrada Fornecedor";

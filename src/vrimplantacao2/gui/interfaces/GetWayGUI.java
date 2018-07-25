@@ -278,6 +278,12 @@ public class GetWayGUI extends VRInternalFrame {
                             if (chkT1ICMS.isSelected()) {
                                 opcoes.add(OpcaoProduto.ICMS);
                             }
+                            if (chkIcmsEntrada.isSelected()) {
+                                opcoes.add(OpcaoProduto.ICMS_ENTRADA);
+                            }
+                            if (chkIcmsSaida.isSelected()) {
+                                opcoes.add(OpcaoProduto.ICMS_SAIDA);
+                            }
                             if (chkT1NCM.isSelected()) {
                                 opcoes.add(OpcaoProduto.NCM);
                             }
@@ -490,6 +496,8 @@ public class GetWayGUI extends VRInternalFrame {
         chkT1PisCofins = new vrframework.bean.checkBox.VRCheckBox();
         chkT1NatReceita = new vrframework.bean.checkBox.VRCheckBox();
         chkT1ICMS = new vrframework.bean.checkBox.VRCheckBox();
+        chkIcmsEntrada = new vrframework.bean.checkBox.VRCheckBox();
+        chkIcmsSaida = new vrframework.bean.checkBox.VRCheckBox();
         chkT1AtivoInativo = new vrframework.bean.checkBox.VRCheckBox();
         chkDescontinuado = new vrframework.bean.checkBox.VRCheckBox();
         chkT1DescCompleta = new vrframework.bean.checkBox.VRCheckBox();
@@ -748,6 +756,12 @@ public class GetWayGUI extends VRInternalFrame {
 
         chkT1ICMS.setText("ICMS");
         vRPanel7.add(chkT1ICMS);
+
+        chkIcmsEntrada.setText("ICMS (Entrada)");
+        vRPanel7.add(chkIcmsEntrada);
+
+        chkIcmsSaida.setText("ICMS (Saída)");
+        vRPanel7.add(chkIcmsSaida);
 
         chkT1AtivoInativo.setText("Ativo/Inativo");
         vRPanel7.add(chkT1AtivoInativo);
@@ -1545,6 +1559,8 @@ public class GetWayGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
     private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkIcmsEntrada;
+    private vrframework.bean.checkBox.VRCheckBox chkIcmsSaida;
     private vrframework.bean.checkBox.VRCheckBox chkInverterAssociado;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMargem;

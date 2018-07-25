@@ -34,6 +34,8 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.cadastro.verba.receber.ReceberVerbaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.utils.MathUtils;
+import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
@@ -208,51 +210,82 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> vResult = new ArrayList<>();
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            MultiMap<Comparable, Void> icms = new MultiMap<>();
+            try (Statement st = Conexao.createStatement()) {
+                try (ResultSet rs = st.executeQuery(
+                        "select \n" +
+                        "	situacaotributaria cst, \n" +
+                        "	porcentagem aliq, \n" +
+                        "	reduzido \n" +
+                        "from \n" +
+                        "	aliquota \n" +
+                        "where \n" +
+                        "	id_situacaocadastro = 1 \n" +
+                        "order by \n" +
+                        "	1, 2, 3"
+                )) {
+                    while (rs.next()) {
+                        icms.put(
+                                null,
+                                rs.getInt("cst"),
+                                MathUtils.trunc(rs.getDouble("aliq"), 2),
+                                MathUtils.trunc(rs.getDouble("reduzido"), 1)
+                        );
+                    }
+                }
+            }
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	 prod.codprod id,\n"
-                    + "	 prod.dtinclui datacadastro,\n"
-                    + "	 prod.dtaltera dataalteracao,\n"
-                    + "	 prod.BARRA as ean,\n"
-                    + "	 case when prod.qtd_emb < 1 then 1 else prod.qtd_emb end qtdembalagemcotacao,\n"
-                    + "	 '1' as qtdembalagem,\n"
-                    + "	 prod.unidade,\n"
-                    + "	 case when prod.codsetor is null then 0 else 1 end e_balanca,\n"
-                    + "	 prod.validade,\n"
-                    + "	 prod.descricao descricaocompleta,\n"
-                    + "	 prod.desc_pdv descricaoreduzida,\n"
-                    + "	 coalesce(prod.codcreceita, 1) as merc1,\n"
-                    + "	 coalesce(prod.codgrupo, 1) as merc2,\n"
-                    + "	 coalesce(prod.codcategoria, 1) as merc3,\n"
-                    + "	 fam.codfamilia id_familia,\n"
-                    + "	 prod.peso_bruto pesobruto,\n"
-                    + "	 prod.peso_liq pesoliquido,\n"
-                    + "	 prod.estoque_max estoquemaximo,\n"
-                    + "	 prod.estoque_min estoqueminimo,\n"
-                    + "	 prod.estoque,\n"
-                    + "	 prod.preco_cust custo,\n"
-                    + "	 prod.preco_unit preco,\n"
-                    + "	 prod.margem_bruta,\n"
-                    + "	 prod.margem_param,\n"
-                    + "	 prod.ativo,\n"
-                    + "	 case when prod.descricao like '*%' then 1 else 0 end descontinuado,\n"
-                    + "	 prod.codncm ncm,\n"
-                    + "	 prod.codcest cest,\n"
-                    + "	 prod.cst_pisentrada piscofins_entrada,\n"
-                    + "	 prod.cst_pissaida piscofins_saida,\n"
-                    + "	 prod.nat_rec piscofins_natrec,\n"
-                    + "	 prod.codaliq cst_debito,\n"
-                    + "	 prod.codaliq_nf cst_entrada,\n"
-                    + "	 prod.desativacompra\n"
-                    + "from\n"
-                    + "	 produtos prod\n"
-                    + "	 left outer join prod_familia fam on\n"
-                    + "	 fam.codprod = prod.codprod and\n"
-                    + "     prod.codprod > 0"
-                    + "order by\n"
-                    + "id"
+                    "select\n" +
+                    "	prod.codprod id,\n" +
+                    "	prod.dtinclui datacadastro,\n" +
+                    "	prod.dtaltera dataalteracao,\n" +
+                    "	prod.BARRA as ean,\n" +
+                    "	case when prod.qtd_emb < 1 then 1 else prod.qtd_emb end qtdembalagemcotacao,\n" +
+                    "	'1' as qtdembalagem,\n" +
+                    "	prod.unidade,\n" +
+                    "	case when prod.codsetor is null then 0 else 1 end e_balanca,\n" +
+                    "	prod.validade,\n" +
+                    "	prod.descricao descricaocompleta,\n" +
+                    "	prod.desc_pdv descricaoreduzida,\n" +
+                    "	coalesce(prod.codcreceita, 1) as merc1,\n" +
+                    "	coalesce(prod.codgrupo, 1) as merc2,\n" +
+                    "	coalesce(prod.codcategoria, 1) as merc3,\n" +
+                    "	fam.codfamilia id_familia,\n" +
+                    "	prod.peso_bruto pesobruto,\n" +
+                    "	prod.peso_liq pesoliquido,\n" +
+                    "	prod.estoque_max estoquemaximo,\n" +
+                    "	prod.estoque_min estoqueminimo,\n" +
+                    "	prod.estoque,\n" +
+                    "	prod.preco_cust custo,\n" +
+                    "	prod.preco_unit preco,\n" +
+                    "	prod.margem_bruta,\n" +
+                    "	prod.margem_param,\n" +
+                    "	prod.ativo,\n" +
+                    "	case when prod.descricao like '*%' then 1 else 0 end descontinuado,\n" +
+                    "	prod.codncm ncm,\n" +
+                    "	prod.codcest cest,\n" +
+                    "	prod.cst_pisentrada piscofins_entrada,\n" +
+                    "	prod.cst_pissaida piscofins_saida,\n" +
+                    "	prod.nat_rec piscofins_natrec," +
+                    "   prod.codaliq icms_saida_id,\n" +
+                    "	prod.CODTRIB icms_cst_saida,\n" +
+                    "	al.ALIQUOTA icms_aliquota_saida,\n" +
+                    "	prod.PER_REDUC icms_reduzido_saida,\n" +
+                    "	prod.CODTRIB_ENT icms_cst_entrada,\n" +
+                    "	prod.ulticmscred icms_aliquota_entrada,\n" +
+                    "	prod.PER_REDUC_ENT icms_reduzido_entrada,\n" +
+                    "	prod.desativacompra\n" +
+                    "from\n" +
+                    "	produtos prod\n" +
+                    "	left outer join prod_familia fam on\n" +
+                    "		fam.codprod = prod.codprod and\n" +
+                    "		prod.codprod > 0\n" +
+                    "	join aliquota_icms al on\n" +
+                    "		al.CODALIQ = prod.codaliq_nf\n" +
+                    "order by\n" +
+                    "id"
             )) {
-                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();                
                 while (rst.next()) {
 
                     ProdutoIMP imp = new ProdutoIMP();
@@ -293,9 +326,48 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstCredito(rst.getString("piscofins_entrada"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofins_saida"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_natrec"));
-                    imp.setIcmsDebitoId(rst.getString("cst_debito"));
-                    imp.setIcmsCreditoId(rst.getString("cst_entrada"));
-                    //imp.setAtacadoPreco(rst.getDouble("precoatacado") != imp.getPrecovenda() ? rst.getDouble("precoatacado") : 0);
+                    
+                    imp.setIcmsDebitoId(rst.getString("icms_saida_id"));
+                    //imp.setIcmsCstSaida(Utils.stringToInt(rst.getString("icms_cst_saida")));
+                    //imp.setIcmsAliqSaida(Utils.stringToDouble(rst.getString("icms_aliquota_saida")));
+                    //imp.setIcmsReducaoSaida(Utils.stringToDouble(rst.getString("icms_reduzido_saida")));
+                    
+                    imp.setIcmsCstEntrada(Utils.stringToInt(rst.getString("icms_cst_entrada")));
+                    imp.setIcmsAliqEntrada(Utils.stringToDouble(rst.getString("icms_aliquota_entrada")));
+                    imp.setIcmsReducaoEntrada(Utils.stringToDouble(rst.getString("icms_reduzido_entrada")));
+                    
+                    if (imp.getIcmsCstEntrada() != 20) {
+                        imp.setIcmsReducaoEntrada(0);
+                    }
+                    if (
+                            imp.getIcmsCstEntrada() != 0 && 
+                            imp.getIcmsCstEntrada() != 10 && 
+                            imp.getIcmsCstEntrada() != 20 && 
+                            imp.getIcmsCstEntrada() != 70
+                    ) {
+                        imp.setIcmsAliqEntrada(0);
+                        imp.setIcmsReducaoEntrada(0);
+                    }
+                    
+                    String str = (imp.getImportId() + " - ICMS Entrada: " + 
+                            imp.getIcmsCstEntrada() + " - " +                                                        
+                            MathUtils.trunc(imp.getIcmsAliqEntrada(), 2) + " - " +
+                            MathUtils.trunc(imp.getIcmsReducaoEntrada(), 1)
+                    );
+                    
+                    if (!icms.containsKey(
+                            imp.getIcmsCstEntrada(),
+                            MathUtils.trunc(imp.getIcmsAliqEntrada(), 2),
+                            MathUtils.trunc(imp.getIcmsReducaoEntrada(), 1)
+                    )) {
+                        imp.setIcmsCreditoId(imp.getIcmsDebitoId());
+                    } else {
+                        imp.setIcmsCreditoId(null);
+                        str += " - Encontrou";
+                    }
+                    
+                    LOG.finest(str);
+                    
 
                     if ((rst.getString("ean") != null)
                             && (!rst.getString("ean").trim().isEmpty())
@@ -495,9 +567,9 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
     
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
-        List<ProdutoIMP> vResult = new ArrayList<>();
 
         if (opt == OpcaoProduto.ATACADO) {
+            List<ProdutoIMP> vResult = new ArrayList<>();
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select  \n"
@@ -523,8 +595,10 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                 }
             }
+            return vResult;
         }
-        return vResult;
+        
+        return null;
     }
 
     @Override
