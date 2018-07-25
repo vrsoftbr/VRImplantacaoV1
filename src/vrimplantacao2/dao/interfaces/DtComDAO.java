@@ -6,10 +6,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.exolab.castor.types.Date;
+import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
-import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -32,6 +31,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public static boolean vBalanca;
+    private final SimpleDateFormat FORMAT = new SimpleDateFormat("yyMMdd");
+    private static final Logger LOG = Logger.getLogger(DtComDAO.class.getName());
 
     @Override
     public String getSistema() {
@@ -114,7 +115,7 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
+                   "select \n"
                     + "distinct \n"
                     + "codigo, \n"
                     + "descricao, \n"
@@ -146,11 +147,11 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "ppis, \n"
                     + "pcofins, \n"
                     + "picms \n"
-                  + "from \n"
+                 + "from \n"
                     + "produtos \n"
-                  + "left join\n"
+                 + "left join\n"
                     + "secoes on secoes.sec_sub = produtos.secao\n"
-                  + "order by \n"
+                 + "order by \n"
                     + "codigo")) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rs.next()) {
@@ -248,6 +249,39 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
     }
     
     @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	codigo,\n" +
+                    "	qtdcaixa,\n" +
+                    "	ean2\n" +
+                    "from\n" +
+                    "	produtos\n" +
+                    "order by\n" +
+                    "	codigo")) {
+                while (rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("codigo"));
+                    imp.setQtdEmbalagem(rs.getInt("qtdcaixa"));
+                    
+                    if ((rs.getString("ean2") != null) && 
+                            (!"0000000000000".equals(rs.getString("ean2")))) {
+                        imp.setEan(rs.getString("ean2"));
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
 
@@ -329,7 +363,7 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
- }
+    }
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
@@ -385,16 +419,16 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUfIBGE(rs.getInt("cod_uf"));
                     imp.setCep(rs.getString("cep"));
                     imp.setTelefone(rs.getString("telefone"));
-                    
-                    if((rs.getString("fonetrab") != null) && !"".equals(rs.getString("fonetrab"))) {
+
+                    if ((rs.getString("fonetrab") != null) && !"".equals(rs.getString("fonetrab"))) {
                         int qtdString = rs.getString("fonetrab").length();
-                        if(qtdString > 14) {
+                        if (qtdString > 14) {
                             imp.addContato("1", "Tel. Trabalho", rs.getString("fonetrab").trim().substring(0, 13), null, null);
                         } else {
                             imp.addContato("1", "Tel. Trabalho", rs.getString("fonetrab").trim(), null, null);
                         }
                     }
-                    
+
                     imp.setValorLimite(rs.getDouble("limite"));
                     if ((rs.getInt("situacao")) == 1) {
                         imp.setAtivo(true);
@@ -417,7 +451,7 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (!"".equals(rs.getString("coment3"))) {
                         imp.setObservacao2(rs.getString("coment3"));
                     }
-                    if((rs.getString("observacao") != null) && (!"".equals(rs.getString("observacao")))) {
+                    if ((rs.getString("observacao") != null) && (!"".equals(rs.getString("observacao")))) {
                         obs1 = rs.getString("observacao");
                     } else {
                         obs1 = "";
@@ -426,7 +460,7 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rs.getDate("data_cad"));
                     imp.setDataNascimento(rs.getDate("nascimento"));
                     imp.setAtivo(rs.getInt("situacao") == 1 ? true : false);
-                    
+
                     result.add(imp);
                 }
             }
@@ -434,97 +468,87 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
-    
+
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoDBF.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	r.cgc as idcliente,\n" +
-                    "	r.cheque as idconta,\n" +
-                    "   c.codigo,\n" +
-                    "	r.valor,\n" +
-                    "	r.vencto,\n" +
-                    "	r.movto,\n" +
-                    "	r.parcela\n" +
-                    "from\n" +
-                    "	receb r\n" +
-                    "left join\n" +
-                    "	clientes c\n" +
-                            " on c.cpf = r.cgc\n" +
-                    "where\n" +
-                    "	tipo = 2 and\n" +
-                    "	dtpg is null\n")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	r.cgc as idcliente,\n"
+                    + "	r.cheque as idconta,\n"
+                    + " c.codigo,\n"
+                    + "	r.valor,\n"
+                    + "	r.vencto,\n"
+                    + "	r.movto,\n"
+                    + "	r.parcela\n"
+                  + "from\n"
+                    + "	receb r\n"
+                  + "join\n"
+                    + "	clientes c\n"
+                    + " on c.cpf = r.cgc\n"
+                  + "where\n"
+                    + "	tipo = 2 and\n"
+                    + "	dtpg is null\n")) {
+                while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                                        
                     imp.setCnpjCliente(rs.getString("idcliente"));
                     imp.setIdCliente(rs.getString("codigo"));
-                    
-                    if(Integer.parseInt(rs.getString("movto").substring(1, 2)) < 10) {
-                        String data = "200" + rs.getString("movto").substring(1, 2) + 
-                            "-" + rs.getString("movto").substring(2, 4) + "-" + rs.getString("movto").substring(4, 6);
-                        imp.setDataEmissao(Utils.convertStringToDate("yyyy-MM-dd", data.trim()));
-                    } else {
-                        String data = "20" + rs.getString("movto").substring(1, 2) + 
-                            "-" + rs.getString("movto").substring(2, 4) + "-" + rs.getString("movto").substring(4, 6);
-                        imp.setDataEmissao(Utils.convertStringToDate("yyyy-MM-dd", data.trim()));
+
+                    //Data emissão
+                    if ((rs.getString("movto") != null)) {
+                       imp.setDataEmissao(FORMAT.parse(rs.getString("movto")));
                     }
-                    
-                    if(Integer.parseInt(rs.getString("vencto").substring(1, 2)) < 10) {
-                        String dataDeposito = "200" + rs.getString("vencto").substring(1, 2) + 
-                            "-" + rs.getString("vencto").substring(2, 4) + "-" + rs.getString("vencto").substring(4, 6);
-                        imp.setDataVencimento(Utils.convertStringToDate("yyyy-MM-dd", dataDeposito.trim()));
-                    } else {
-                        String dataDeposito = "20" + rs.getString("vencto").substring(1, 2) + 
-                            "-" + rs.getString("vencto").substring(2, 4) + "-" + rs.getString("vencto").substring(4, 6);
-                        imp.setDataVencimento(Utils.convertStringToDate("yyyy-MM-dd", dataDeposito.trim()));
-                    }
+
+                    //Data vencimento
+                    if((rs.getString("vencto") != null)) {
+                        imp.setDataVencimento(FORMAT.parse(rs.getString("vencto")));
+                     }
                     
                     imp.setParcela(rs.getInt("parcela"));
                     imp.setId(rs.getString("idconta"));
                     imp.setNumeroCupom(rs.getString("idconta"));
                     imp.setParcela(rs.getInt("parcela"));
                     imp.setValor(rs.getDouble("valor"));
-                    
+
                     result.add(imp);
                 }
             }
         }
         return result;
     }
-    
+
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         List<ChequeIMP> result = new ArrayList<>();
-        
-        try(Statement stm = ConexaoDBF.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	r.cgc as idcliente,\n" +
-                    "	c.identidade,\n" +
-                    "	c.inscricao,\n" +
-                    "	c.nome1,\n" +
-                    "	r.banco,\n" +
-                    "	r.agencia,\n" +
-                    "	r.conta,\n" +
-                    "	r.cheque,\n" +
-                    "	r.valor,\n" +
-                    "	r.vencto,\n" +
-                    "	r.movto,\n" +
-                    "	r.parcela\n" +
-                    "from\n" +
-                    "	receb r\n" +
-                    "join\n" +
-                    "	clientes c\n" +
-                    "       on c.cpf = r.cgc\n" +
-                    "where\n" +
-                    "	tipo = 1 and\n" +
-                    "	dtpg is null and\n" +
-                    "	vlpg = '0.00'")) {
-                while(rs.next()) {
+
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	r.cgc as idcliente,\n"
+                    + "	c.identidade,\n"
+                    + "	c.inscricao,\n"
+                    + "	c.nome1,\n"
+                    + "	r.banco,\n"
+                    + "	r.agencia,\n"
+                    + "	r.conta,\n"
+                    + "	r.cheque,\n"
+                    + "	r.valor,\n"
+                    + "	r.vencto,\n"
+                    + "	r.movto,\n"
+                    + "	r.parcela,\n"
+                    + " r.comen\n"        
+                 + "from\n"
+                    + "	receb r\n"
+                 + "join\n"
+                    + "	clientes c\n"
+                    + "       on c.cpf = r.cgc\n"
+                 + "where\n"
+                    + "	r.tipo = 1 and\n"
+                    + "	r.dtpg is null")) {
+                while (rs.next()) {
                     ChequeIMP imp = new ChequeIMP();
                     imp.setAgencia(rs.getString("agencia"));
                     imp.setBanco(rs.getInt("banco"));
@@ -532,24 +556,18 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCpf(rs.getString("idcliente"));
                     imp.setNumeroCheque(rs.getString("cheque"));
                     imp.setObservacao(rs.getString("comen"));
-                    if((rs.getString("identidade") != null) && (!"000000000000".equals(rs.getString("").trim()))) {
+                    if ((rs.getString("identidade") != null) && (!"000000000000".equals(rs.getString("identidade").trim()))) {
                         imp.setRg(rs.getString("identidade"));
-                    }else {
+                    } else {
                         imp.setRg("inscricao");
                     }
                     imp.setNome(rs.getString("nome1"));
-                    
-                    String data = "20" + rs.getString("movto").substring(1, 2) + 
-                            "-" + rs.getString("movto").substring(2, 4) + "-" + rs.getString("movto").substring(4, 6);
-                    
-                    String dataDeposito = "20" + rs.getString("vencto").substring(1, 2) + 
-                            "-" + rs.getString("vencto").substring(2, 4) + "-" + rs.getString("vencto").substring(4, 6);
-                                        
-                    imp.setDataDeposito(rs.getDate(sdf.format(dataDeposito)));
-                    imp.setDate(rs.getDate(sdf.format(data)));
+
+                    imp.setDataDeposito(FORMAT.parse(rs.getString("vencto")));
+                    imp.setDate(FORMAT.parse(rs.getString("movto")));
                     imp.setValor(rs.getDouble("valor"));
                     imp.setAlinea(0);
-                 
+
                     result.add(imp);
                 }
             }

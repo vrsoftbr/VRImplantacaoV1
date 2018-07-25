@@ -16,6 +16,7 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.KcmsDAO;
@@ -34,7 +35,8 @@ public class KcmsGUI extends VRInternalFrame {
 
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
-    private int vTipoVenda = -1;
+    private int vPlanoContas = -1;
+    private int vContaPagar = -1;
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -45,7 +47,8 @@ public class KcmsGUI extends VRInternalFrame {
         txtSenhaSQLServer.setText(params.getWithNull("kcms2011", NOME_SISTEMA, "SENHA"));
         vLojaCliente = params.get(NOME_SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(NOME_SISTEMA, "LOJA_VR");
-        vTipoVenda = params.getInt(NOME_SISTEMA, "TIPO_VENDA");
+        vPlanoContas = params.getInt(NOME_SISTEMA, "TIPO_PLANO_CONTAS");
+        vContaPagar = params.getInt(NOME_SISTEMA, "TIPO_PLANO_CONTAS_CP");
     }
 
     private void gravarParametros() throws Exception {
@@ -55,16 +58,31 @@ public class KcmsGUI extends VRInternalFrame {
         params.put(txtPortaSQLServer.getText(), NOME_SISTEMA, "PORTA");
         params.put(txtUsuarioSQLServer.getText(), NOME_SISTEMA, "USUARIO");
         params.put(txtSenhaSQLServer.getText(), NOME_SISTEMA, "SENHA");
+        
+        ItemComboVO tipoPlanoContas = (ItemComboVO) cmbPlanoContas.getSelectedItem();
+        if (tipoPlanoContas != null) {
+            params.put(tipoPlanoContas.id, "KCMS", "TIPO_PLANO_CONTAS");
+            vPlanoContas = tipoPlanoContas.id;
+        }
+        
+        ItemComboVO tipoPlanoContaCP = (ItemComboVO) cmbContaPagar.getSelectedItem();
+        if(tipoPlanoContaCP != null) {
+            params.put(tipoPlanoContaCP.id, "KCMS", "TIPO_PLANO_CONTAS_CP");
+            vContaPagar = tipoPlanoContaCP.id;
+        }
+        
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
             params.put(cliente.cnpj, NOME_SISTEMA, "LOJA_CLIENTE");
             vLojaCliente = cliente.cnpj;
         }
+        
         ItemComboVO vr = (ItemComboVO) cmbLojaVR.getSelectedItem();
         if (vr != null) {
             params.put(vr.id, NOME_SISTEMA, "LOJA_VR");
             vLojaVR = vr.id;
         }
+        
         params.salvar();
     }
 
@@ -133,6 +151,8 @@ public class KcmsGUI extends VRInternalFrame {
         btnMapaTrib.setEnabled(true);
         carregarLojaVR();
         carregarLojaCliente();
+        carregarPlanoContas();
+        carregarPlanoContaCP();
         gravarParametros();
     }
 
@@ -163,6 +183,32 @@ public class KcmsGUI extends VRInternalFrame {
         }
         cmbLojaOrigem.setSelectedIndex(index);
     }
+    
+    public void carregarPlanoContas() throws Exception {
+        cmbPlanoContas.setModel(new DefaultComboBoxModel());
+        int cont = 0;
+        int index = 0;
+        for(ItemComboVO plano : kcmsDAO.getPlanoContas()) {
+            cmbPlanoContas.addItem(plano);
+            if (plano.id == vPlanoContas) {
+                index = cont;
+            }
+            cont++;
+        }
+    }
+    
+    public void carregarPlanoContaCP() throws Exception {
+        cmbContaPagar.setModel(new DefaultComboBoxModel());
+        int cont = 0;
+        int index = 0;
+        for(ItemComboVO plano : kcmsDAO.getPlanoContas()) {
+            cmbContaPagar.addItem(plano);
+            if(plano.id == vContaPagar) {
+                index = cont;
+            }
+            cont++;
+        }
+    }
 
     public void importarTabelas() throws Exception {
         Thread thread = new Thread() {
@@ -179,6 +225,8 @@ public class KcmsGUI extends VRInternalFrame {
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
                     kcmsDAO.usarMargemBruta = chkUsarMargemBruta.isSelected();
                     kcmsDAO.vBalanca = chkUsarBalanca.isSelected();
+                    kcmsDAO.vPlanoContas = ((ItemComboVO)cmbPlanoContas.getSelectedItem()).id;
+                    kcmsDAO.vPlanoContaCP = ((ItemComboVO) cmbContaPagar.getSelectedItem()).id;
                     
                     if (!txtLojaID.getText().trim().isEmpty()) {
                         kcmsDAO.id_loja = " - " + txtLojaID.getText();
@@ -289,6 +337,10 @@ public class KcmsGUI extends VRInternalFrame {
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor(); 
                         }
+                        
+                         if(chkContaPagar.isSelected()) {
+                            importador.importarContasPagar(OpcaoContaPagar.NOVOS);
+                        }
                     } else if (tab.getSelectedIndex() == 2) {
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS, OpcaoCliente.VALOR_LIMITE, OpcaoCliente.SITUACAO_CADASTRO);
@@ -298,9 +350,12 @@ public class KcmsGUI extends VRInternalFrame {
                             importador.atualizarClientePreferencial(OpcaoCliente.VALOR_LIMITE);
                         }
                         
-                        if ((chkRotativo.isSelected())
-                                && (!txtFileCreditoRotativo.getArquivo().trim().isEmpty())) {
+                        if (chkRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
+                        }
+                        
+                        if (chkCheque.isSelected()) {
+                            importador.importarCheque();
                         }
 
                     } else if (tab.getSelectedIndex() == 3) {
@@ -397,6 +452,10 @@ public class KcmsGUI extends VRInternalFrame {
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel1 = new vrframework.bean.panel.VRPanel();
+        chkContaPagar = new vrframework.bean.checkBox.VRCheckBox();
+        lblContaPagar = new vrframework.bean.label.VRLabel();
+        cmbContaPagar = new vrframework.bean.comboBox.VRComboBox();
         tabCliente = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabClienteDados = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -404,7 +463,8 @@ public class KcmsGUI extends VRInternalFrame {
         tablCreditoRotativo = new javax.swing.JPanel();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
-        txtFileCreditoRotativo = new vrframework.bean.fileChooser.VRFileChooser();
+        cmbPlanoContas = new vrframework.bean.comboBox.VRComboBox();
+        lblPlanoContas = new vrframework.bean.label.VRLabel();
         tabUnificacao = new vrframework.bean.panel.VRPanel();
         cbxUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
@@ -724,6 +784,34 @@ public class KcmsGUI extends VRInternalFrame {
             }
         });
 
+        chkContaPagar.setText("Contas a Pagar");
+
+        lblContaPagar.setText("Plano de Contas");
+
+        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
+        vRPanel1.setLayout(vRPanel1Layout);
+        vRPanel1Layout.setHorizontalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(32, Short.MAX_VALUE))
+        );
+        vRPanel1Layout.setVerticalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cmbContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(18, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
         tabFornecedor.setLayout(tabFornecedorLayout);
         tabFornecedorLayout.setHorizontalGroup(
@@ -731,9 +819,10 @@ public class KcmsGUI extends VRInternalFrame {
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(275, Short.MAX_VALUE))
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -742,7 +831,9 @@ public class KcmsGUI extends VRInternalFrame {
                 .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(74, Short.MAX_VALUE))
         );
 
         tab.addTab("Fornecedores", tabFornecedor);
@@ -786,6 +877,8 @@ public class KcmsGUI extends VRInternalFrame {
 
         chkCheque.setText("Cheque");
 
+        lblPlanoContas.setText("Plano de Contas");
+
         javax.swing.GroupLayout tablCreditoRotativoLayout = new javax.swing.GroupLayout(tablCreditoRotativo);
         tablCreditoRotativo.setLayout(tablCreditoRotativoLayout);
         tablCreditoRotativoLayout.setHorizontalGroup(
@@ -793,25 +886,24 @@ public class KcmsGUI extends VRInternalFrame {
             .addGroup(tablCreditoRotativoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(tablCreditoRotativoLayout.createSequentialGroup()
-                        .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtFileCreditoRotativo, javax.swing.GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE))
-                    .addGroup(tablCreditoRotativoLayout.createSequentialGroup()
-                        .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                    .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbPlanoContas, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblPlanoContas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(343, Short.MAX_VALUE))
         );
         tablCreditoRotativoLayout.setVerticalGroup(
             tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tablCreditoRotativoLayout.createSequentialGroup()
                 .addGap(10, 10, 10)
-                .addGroup(tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtFileCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(141, Short.MAX_VALUE))
+                .addGap(13, 13, 13)
+                .addComponent(lblPlanoContas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cmbPlanoContas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(98, Short.MAX_VALUE))
         );
 
         tabCliente.addTab("Crédito Rotativo", tablCreditoRotativo);
@@ -1134,6 +1226,7 @@ public class KcmsGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
+    private vrframework.bean.checkBox.VRCheckBox chkContaPagar;
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
     private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
@@ -1166,8 +1259,12 @@ public class KcmsGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUsarBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkUsarMargemBruta;
     private vrframework.bean.checkBox.VRCheckBox chkValorLimite;
+    private vrframework.bean.comboBox.VRComboBox cmbContaPagar;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
+    private vrframework.bean.comboBox.VRComboBox cmbPlanoContas;
+    private vrframework.bean.label.VRLabel lblContaPagar;
+    private vrframework.bean.label.VRLabel lblPlanoContas;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrframework.bean.panel.VRPanel pnlConexao;
     private vrframework.bean.tabbedPane.VRTabbedPane tab;
@@ -1178,7 +1275,6 @@ public class KcmsGUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel tabUnificacao;
     private javax.swing.JPanel tablCreditoRotativo;
     private vrframework.bean.textField.VRTextField txtBancoDadosSQLServer;
-    private vrframework.bean.fileChooser.VRFileChooser txtFileCreditoRotativo;
     private vrframework.bean.textField.VRTextField txtHostSQLServer;
     private vrframework.bean.textField.VRTextField txtInstance;
     private vrframework.bean.textField.VRTextField txtLojaID;
@@ -1195,6 +1291,7 @@ public class KcmsGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel7;
     private vrframework.bean.label.VRLabel vRLabel8;
     private vrframework.bean.label.VRLabel vRLabel9;
+    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane1;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;

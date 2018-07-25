@@ -7,15 +7,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
-import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.SituacaoCheque;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -34,6 +37,8 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
     public String id_loja;
     public boolean usarMargemBruta;
     public boolean vBalanca;
+    public int vPlanoContas;
+    public int vPlanoContaCP;
     
     @Override
     public String getSistema() {
@@ -589,17 +594,180 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
     
+    public List<ItemComboVO> getPlanoContas() throws Exception {
+        List<ItemComboVO> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	codforma,\n" +
+                    "	descricao\n" +
+                    "from \n" +
+                    "	cdformapgto\n" +
+                   "order by\n" +
+                      "descricao")) {
+                while(rs.next()) {
+                    result.add(new ItemComboVO(rs.getInt("codforma"), rs.getString("descricao")));
+                }
+            }
+        }        
+        return result;
+    }
+    
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         
         try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "")) {
-                
+                    "select\n" +
+                    "	l.idlancfin as id,\n" +
+                    "	l.codcli as idcliente,\n" +
+                    "	c.cnpj,\n" +
+                    "	c.cpf,\n" +
+                    "	l.nrseqparc as parcela,\n" +
+                    "	l.nrtitulo as idconta,\n" +
+                    "	l.historico as obs,\n" +
+                    "	l.dtemissao,\n" +
+                    "	l.dtvenc,\n" +
+                    "	l.vlrtitulo\n" +
+                    "from\n" +
+                    "	lanc_fin l \n" +
+                    "join\n" +
+                    "	cdclientes c on c.codcli = l.codcli\n" +
+                    "where\n" +
+                    "	l.codforma = " + vPlanoContas + " and\n" +
+                    "	l.status = 'AB' and\n" +
+                    "	l.tipotrans = 'C'\n" +
+                    "order by\n" +
+                    "	l.dtemissao")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setIdCliente(rs.getString("idcliente"));
+                    if((rs.getString("cnpj") != null) 
+                            && ((rs.getString("cnpj").replace("/", "").replace("-", "").replace(".", "").trim()) != null) &&
+                                (!"".equals(rs.getString("cnpj").replace("/", "").replace("-", "").replace(".", "").trim()))) {
+                        imp.setCnpjCliente(rs.getString("cnpj"));
+                    } else {
+                        imp.setCnpjCliente(rs.getString("cpf"));
+                    }
+                    imp.setParcela(rs.getInt("parcela"));
+                    imp.setNumeroCupom(rs.getString("idconta"));
+                    imp.setObservacao(rs.getString("obs"));
+                    imp.setDataEmissao(rs.getDate("dtemissao"));
+                    imp.setDataVencimento(rs.getDate("dtvenc"));
+                    imp.setValor(rs.getDouble("vlrtitulo"));
+                    
+                    result.add(imp);
+                }
             }
             
          }
+        return result;
+    }
+    
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	l.idlancfin as id,\n" +
+                    "	l.codcli as idcliente,\n" +
+                    "	c.cnpj,\n" +
+                    "	c.cpf,\n" +
+                    "   c.rg,\n" +
+                    "   c.RAZAOSOCIAL,\n" +
+                    "   c.fone,\n" +
+                    "	l.nrseqparc as parcerla,\n" +
+                    "	l.nrtitulo as idconta,\n" +
+                    "	l.historico as obs,\n" +
+                    "	l.dtemissao,\n" +
+                    "	l.dtvenc,\n" +
+                    "	l.vlrtitulo,\n" +
+                    "	lc.AGENCIA,\n" +
+                    "	lc.CODBANCO,\n" +
+                    "	lc.CTACORRENTE,\n" +
+                    "	lc.NRCHEQUE\n" +
+                    "from\n" +
+                    "	lanc_fin l \n" +
+                    "join\n" +
+                    "	cdclientes c on c.codcli = l.codcli\n" +
+                    "join\n" +
+                    "	lanc_cheques lc on lc.idlancfin = l.idlancfin\n" +
+                    "where\n" +
+                    "	l.codforma = " + vPlanoContas + " and\n" +
+                    "	l.status = 'AB' and\n" +
+                    "	l.tipotrans = 'C'\n" +
+                    "order by\n" +
+                    "	l.dtemissao")) {
+                while(rs.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    imp.setAgencia(rs.getString("agencia"));
+                    imp.setAlinea(0);
+                    imp.setBanco(rs.getInt("codbanco"));
+                    imp.setCpf(rs.getString("cpf"));
+                    imp.setRg(rs.getString("rg"));
+                    imp.setConta(rs.getString("ctacorrente"));
+                    imp.setDate(rs.getDate("dtemissao"));
+                    imp.setDataDeposito(rs.getDate("dtvenc"));
+                    imp.setId(rs.getString("id"));
+                    imp.setNumeroCheque(rs.getString("nrcheque"));
+                    imp.setNumeroCupom(rs.getString("idconta"));
+                    imp.setObservacao(rs.getString("obs"));
+                    imp.setValor(rs.getDouble("vlrtitulo"));
+                    imp.setNome(rs.getString("razaosocial"));
+                    imp.setSituacaoCheque(SituacaoCheque.ABERTO);
+                    imp.setTelefone(rs.getString("fone"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    l.idlancfin as id,\n" +
+                    "    l.CODFORN,\n" +
+                    "    l.nrseqparc as parcela,\n" +
+                    "    l.nrtitulo as idconta,\n" +
+                    "    l.historico as obs,\n" +
+                    "    l.dtemissao,\n" +
+                    "    l.dtentrada, \n" +
+                    "    l.dtvenc,\n" +
+                    "    l.vlrtitulo\n" +
+                    "from\n" +
+                    "    lanc_fin l \n" +
+                    "where\n" +
+                    "    l.codforma = " + vPlanoContaCP + " and\n" +
+                    "    l.status = 'AB' and\n" +
+                    "    l.tipotrans = 'D'\n" +
+                    "order by\n" +
+                    "    l.dtemissao")) {
+                while(rs.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setIdFornecedor(rs.getString("codforn"));
+                    imp.setNumeroDocumento(rs.getString("idconta"));
+                    imp.setObservacao(rs.getString("obs"));
+                    imp.setValor(rs.getDouble("vlrtitulo"));
+                    imp.setDataEmissao(rs.getDate("dtemissao"));
+                    imp.setDataEntrada(rs.getDate("dtentrada"));
+                    imp.addVencimento(rs.getDate("dtvenc"), imp.getValor());
+                    
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 }
