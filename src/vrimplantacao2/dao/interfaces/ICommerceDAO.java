@@ -285,7 +285,7 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        if (opt == OpcaoProduto.ICMS_INDIVIDUAL) {
+        if (opt == OpcaoProduto.ICMS_LOJA) {
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select  \n"
@@ -322,7 +322,7 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
-        if (opt == OpcaoProduto.PISCOFINS_INDIVIDUAL) {
+        if (opt == OpcaoProduto.PISCOFINS_LOJA) {
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select  \n"
@@ -392,7 +392,7 @@ public class ICommerceDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         
-        if (opt == OpcaoProduto.NCM_INDIVIDUAL) {
+        if (opt == OpcaoProduto.NCM_LOJA) {
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select  \n"

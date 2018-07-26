@@ -184,7 +184,7 @@ public class CadastraFacilGUI extends VRInternalFrame {
                                 opcoes.add(OpcaoProduto.PIS_COFINS);
                             }
                             if (chkT1PisCofinsIndividual.isSelected()) {
-                                opcoes.add(OpcaoProduto.PISCOFINS_INDIVIDUAL);
+                                opcoes.add(OpcaoProduto.PISCOFINS_LOJA);
                             }
                             if (chkT1NatReceita.isSelected()) {
                                 opcoes.add(OpcaoProduto.NATUREZA_RECEITA);
@@ -193,7 +193,7 @@ public class CadastraFacilGUI extends VRInternalFrame {
                                 opcoes.add(OpcaoProduto.ICMS);
                             }
                             if (chkIcmsIndividual.isSelected()) {
-                                opcoes.add(OpcaoProduto.ICMS_INDIVIDUAL);
+                                opcoes.add(OpcaoProduto.ICMS_LOJA);
                             }
                             if (chkT1AtivoInativo.isSelected()) {
                                 opcoes.add(OpcaoProduto.ATIVO);
@@ -230,7 +230,7 @@ public class CadastraFacilGUI extends VRInternalFrame {
                                 opcoes.add(OpcaoProduto.MERCADOLOGICO_POR_NIVEL);
                             }                            
                             if (chkT1NcmIndividual.isSelected()) {
-                                opcoes.add(OpcaoProduto.NCM_INDIVIDUAL);
+                                opcoes.add(OpcaoProduto.NCM_LOJA);
                             }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
@@ -531,15 +531,15 @@ public class CadastraFacilGUI extends VRInternalFrame {
         chkManterBalanca.setText("Manter Balança");
         chkManterBalanca.setEnabled(true);
 
-        chkIcmsIndividual.setText("ICMS Individual");
+        chkIcmsIndividual.setText("ICMS Loja");
 
         chkMercadologico.setText("Mercadologico");
 
         chkProdMercadologico.setText("Prod. Mercadologico");
 
-        chkT1PisCofinsIndividual.setText("PIS/COFINS Individual");
+        chkT1PisCofinsIndividual.setText("PIS/COFINS Loja");
 
-        chkT1NcmIndividual.setText("NCM Individual");
+        chkT1NcmIndividual.setText("NCM Loja");
 
         chkUsarMargemBruta.setText("Usar Margem Bruta");
 

@@ -240,7 +240,7 @@ public class ProdutoDAO {
             sql.put("id_tipopiscofins", vo.getPisCofinsDebito().getId());
             sql.put("id_tipopiscofinscredito", vo.getPisCofinsCredito().getId());
         }
-        if (opt.contains(OpcaoProduto.PISCOFINS_INDIVIDUAL)) {
+        if (opt.contains(OpcaoProduto.PISCOFINS_LOJA)) {
             sql.put("id_tipopiscofins", vo.getPisCofinsDebito().getId());
             sql.put("id_tipopiscofinscredito", vo.getPisCofinsCredito().getId());
             NaturezaReceitaVO nat = vo.getPisCofinsNaturezaReceita();
@@ -276,7 +276,7 @@ public class ProdutoDAO {
             sql.put("ncm2", vo.getNcm().getNcm2());
             sql.put("ncm3", vo.getNcm().getNcm3());
         }
-        if (opt.contains(OpcaoProduto.NCM_INDIVIDUAL)) {
+        if (opt.contains(OpcaoProduto.NCM_LOJA)) {
             sql.put("ncm1", vo.getNcm().getNcm1());
             sql.put("ncm2", vo.getNcm().getNcm2());
             sql.put("ncm3", vo.getNcm().getNcm3());

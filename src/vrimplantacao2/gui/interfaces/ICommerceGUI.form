@@ -413,8 +413,11 @@
             </Component>
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIcmsIndividual">
               <Properties>
-                <Property name="text" type="java.lang.String" value="ICMS Individual"/>
+                <Property name="text" type="java.lang.String" value="ICMS Loja"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkIcmsIndividualActionPerformed"/>
+              </Events>
             </Component>
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMercadologico">
               <Properties>
@@ -428,12 +431,12 @@
             </Component>
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1PisCofinsIndividual">
               <Properties>
-                <Property name="text" type="java.lang.String" value="PIS/COFINS Individual"/>
+                <Property name="text" type="java.lang.String" value="PIS/COFINS Loja"/>
               </Properties>
             </Component>
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1NcmIndividual">
               <Properties>
-                <Property name="text" type="java.lang.String" value="NCM Individual"/>
+                <Property name="text" type="java.lang.String" value="NCM Loja"/>
               </Properties>
             </Component>
           </SubComponents>

@@ -197,17 +197,17 @@ public enum OpcaoProduto {
         public String toString() {
             return "Data de Alteração";
         }
-    }, ICMS_INDIVIDUAL {
+    }, ICMS_LOJA {
         @Override
         public String toString() {
-            return "Icms Individual";
+            return "Icms Loja";
         }
-    }, PISCOFINS_INDIVIDUAL {
+    }, PISCOFINS_LOJA {
         @Override
         public String toString() {
             return "Piscofins Individual";
         }
-    }, NCM_INDIVIDUAL {
+    }, NCM_LOJA {
         @Override
         public String toString() {
             return "NCM Individual";
