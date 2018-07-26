@@ -58,7 +58,7 @@ public class DefaultLinha implements LinhaArquivo {
                 }
                 return Integer.parseInt(inteiro);
             } else {
-                return Integer.parseInt(valor);
+                return Integer.parseInt(valor.trim());
             }
         } else {
             return 0;

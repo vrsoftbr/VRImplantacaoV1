@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -159,9 +160,9 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("codigo"));
-                    imp.setDescricaoCompleta(rs.getString("descricao"));
-                    imp.setDescricaoReduzida(rs.getString("descpdv"));
-                    imp.setDescricaoGondola(rs.getString("descricao"));
+                    imp.setDescricaoCompleta(Utils.acertarTexto(rs.getString("descricao")));
+                    imp.setDescricaoReduzida(Utils.acertarTexto(rs.getString("descpdv")));
+                    imp.setDescricaoGondola(Utils.acertarTexto(rs.getString("descricao")));
                     imp.setTipoEmbalagem(rs.getString("unidade").toUpperCase());
                     imp.setValidade(rs.getInt("validade"));
                     imp.setCodMercadologico1(rs.getString("secao"));
@@ -320,8 +321,8 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rs.getString("cgc"));
                     imp.setCnpj_cpf(rs.getString("cgc"));
                     imp.setInsc_municipal(rs.getString("inscricao"));
-                    imp.setRazao(rs.getString("nome1"));
-                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setRazao(Utils.acertarTexto(rs.getString("nome1")));
+                    imp.setFantasia(Utils.acertarTexto(rs.getString("fantasia")));
                     if (!"".equals(rs.getString("contato"))) {
                         imp.addContato("1", rs.getString("contato"), null, null, TipoContato.COMERCIAL, null);
                     }
@@ -410,7 +411,7 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setInscricaoestadual("ISENTO");
                     }
-                    imp.setRazao(rs.getString("nome1"));
+                    imp.setRazao(Utils.acertarTexto(rs.getString("nome1")));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setBairro(rs.getString("bairro"));
                     imp.setMunicipio(rs.getString("cidade"));
@@ -459,7 +460,6 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao(obs1 + obs2 + obs3);
                     imp.setDataCadastro(rs.getDate("data_cad"));
                     imp.setDataNascimento(rs.getDate("nascimento"));
-                    imp.setAtivo(rs.getInt("situacao") == 1 ? true : false);
 
                     result.add(imp);
                 }
@@ -561,7 +561,7 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setRg("inscricao");
                     }
-                    imp.setNome(rs.getString("nome1"));
+                    imp.setNome(Utils.acertarTexto(rs.getString("nome1")));
 
                     imp.setDataDeposito(FORMAT.parse(rs.getString("vencto")));
                     imp.setDate(FORMAT.parse(rs.getString("movto")));

@@ -1685,7 +1685,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setCancelado(rst.getBoolean("cancelado"));
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setUnidadeMedida(rst.getString("unidade"));
-
+                        
                         String trib = rst.getString("codaliq_venda");
                         if (trib == null || "".equals(trib)) {
                             trib = rst.getString("codaliq_produto");
