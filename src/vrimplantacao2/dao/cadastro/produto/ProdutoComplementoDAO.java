@@ -247,6 +247,12 @@ public class ProdutoComplementoDAO {
             if (opt.contains(OpcaoProduto.ESTOQUE)) {
                 sql.put("estoque", complemento.getEstoque());
             }
+            if (opt.contains(OpcaoProduto.ESTOQUE_MINIMO)) {
+                sql.put("estoqueminimo", complemento.getEstoqueMinimo());
+            }
+            if (opt.contains(OpcaoProduto.ESTOQUE_MAXIMO)) {
+                sql.put("estoquemaximo", complemento.getEstoqueMaximo());
+            }
             if (opt.contains(OpcaoProduto.ATIVO)) {
                 sql.put("id_situacaocadastro", complemento.getSituacaoCadastro().getId());
             }

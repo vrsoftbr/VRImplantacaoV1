@@ -212,6 +212,16 @@ public enum OpcaoProduto {
         public String toString() {
             return "NCM Individual";
         }
+    }, ESTOQUE_MINIMO {
+        @Override
+        public String toString() {
+            return "Estoque Minimo";
+        }
+    }, ESTOQUE_MAXIMO {
+        @Override
+        public String toString() {
+            return "Estoque Maximo";
+        }
     },
 
     FAMILIA_PRODUTO,PRODUTOS,EAN, EAN_EM_BRANCO, MERCADOLOGICO_PRODUTO, RECEITA_BALANCA, NUTRICIONAL, COMPRADOR, MAPA_TRIBUTACAO,

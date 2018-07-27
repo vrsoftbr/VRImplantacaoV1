@@ -13,6 +13,7 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -182,7 +183,7 @@ public class IntelliCashDAO extends InterfaceDAO {
                     imp.setCodMercadologico3(rst.getString("codMercadologico3"));
                     imp.setIdFamiliaProduto(rst.getString("idFamiliaProduto"));
                     imp.setEstoqueMinimo(rst.getInt("estoqueMinimo"));
-                    imp.setEstoqueMinimo(rst.getInt("estoqueMaximo"));
+                    imp.setEstoqueMaximo(rst.getInt("estoqueMaximo"));
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setCustoSemImposto(rst.getDouble("custoSemImposto"));
@@ -320,7 +321,6 @@ public class IntelliCashDAO extends InterfaceDAO {
                                 }
                             }
                         }
-
                         result.add(imp);
                     }
                 }
