@@ -49,7 +49,8 @@ public enum OpcaoCliente {
     PERMITE_CREDITOROTATIVO, 
     NOVOS, 
     RAZAO, 
-    FANTASIA;    
+    FANTASIA,
+    EMAIL;    
     
     private static final Logger LOG = Logger.getLogger(OpcaoCliente.class.getName());
     private List<ClienteIMP> listaEspecial;

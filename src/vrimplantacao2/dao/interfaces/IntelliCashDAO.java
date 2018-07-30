@@ -315,8 +315,8 @@ public class IntelliCashDAO extends InterfaceDAO {
                                         imp.getContatos().put(contato, String.valueOf(cont));
                                     }
                                 }
-                                if ("EMAIL".equals(rst2.getString("tipo"))) {
-                                    contato.setEmail(rst2.getString("valor"));
+                                if ((rst2.getString("tipo").contains("EMAIL"))) {
+                                    contato.setEmail(rst2.getString("valor").toLowerCase());
                                     imp.getContatos().put(contato, String.valueOf(cont));
                                 }
                             }
@@ -446,6 +446,49 @@ public class IntelliCashDAO extends InterfaceDAO {
                     imp.setNomeMae(rst.getString("mae"));
                     imp.setDataNascimento(rst.getDate("nascimento"));
 
+                    int cont = 0;
+                    try (Statement stm2 = ConexaoFirebird.getConexao().createStatement()) {
+                        try (ResultSet rst2 = stm2.executeQuery(
+                                "select\n"
+                                + "    id,\n"
+                                + "    agente,\n"
+                                + "    email valor,\n"
+                                + "    'EMAIL' tipo,\n"
+                                + "    '' contato\n"
+                                + "from\n"
+                                + "    emails\n"
+                                + "where\n"
+                                + "    agente = " + Utils.quoteSQL(imp.getId()) + "\n"
+                                + "union\n"
+                                + "select\n"
+                                + "    id,\n"
+                                + "    agente,\n"
+                                + "    coalesce(coalesce('('||ddd||')','')||telefone,'') valor,\n"
+                                + "    'TELEFONE' tipo,\n"
+                                + "    coalesce(contato,'') contato\n"
+                                + "from\n"
+                                + "    telefones\n"
+                                + "where\n"
+                                + "    agente = " + Utils.quoteSQL(imp.getId())
+                        )) {
+                            while (rst2.next()) {
+                                if ((rst2.getString("tipo").contains("EMAIL"))) {
+                                    imp.setEmail(rst2.getString("valor").toLowerCase());
+                                }
+                                
+                                if ("TELEFONE".equals(rst2.getString("tipo"))) {
+                                    if (!rst2.getString("valor").equals(imp.getTelefone())) {
+                                        imp.addContato(
+                                                rst2.getString("id"), 
+                                                rst2.getString("tipo"), 
+                                                rst2.getString("valor"), 
+                                                null, 
+                                                null);
+                                    }
+                                }
+                            }
+                        }
+                    }                    
                     result.add(imp);
                 }
             }

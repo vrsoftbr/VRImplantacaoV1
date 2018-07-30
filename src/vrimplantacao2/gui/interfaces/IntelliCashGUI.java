@@ -267,7 +267,12 @@ public class IntelliCashGUI extends VRInternalFrame {
                         }
                     } else if (tab.getSelectedIndex() == 2) {
                         if (chkClientePreferencial.isSelected()) {
-                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS, OpcaoCliente.VALOR_LIMITE, OpcaoCliente.SITUACAO_CADASTRO);
+                            importador.importarClientePreferencial(
+                                    OpcaoCliente.DADOS, 
+                                    OpcaoCliente.CONTATOS, 
+                                    OpcaoCliente.VALOR_LIMITE, 
+                                    OpcaoCliente.SITUACAO_CADASTRO,
+                                    OpcaoCliente.EMAIL);
                         }
                         if (chkRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
