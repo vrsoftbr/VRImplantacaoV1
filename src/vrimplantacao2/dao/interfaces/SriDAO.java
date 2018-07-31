@@ -119,7 +119,7 @@ public class SriDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "liquido,\n"
                     + "estoque,\n"
                     + "minimo,\n"
-                    + "custo,\n"
+                    + "compra as custo,\n"
                     + "venda,\n"
                     + "icms_in,\n"
                     + "icms_out,\n"
