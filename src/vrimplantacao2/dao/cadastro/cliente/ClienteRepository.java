@@ -224,6 +224,12 @@ public class ClienteRepository {
                     if (opt.contains(OpcaoCliente.TIPO_INSCRICAO)) {
                         atualizarClientePreferencial(vo, opt);
                     }
+                    if (opt.contains(OpcaoCliente.INSCRICAO_ESTADUAL)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.CNPJ)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
                 }
                 notificar();
             }

@@ -310,6 +310,9 @@ public class ClientePreferencialDAO {
                 if (opt.contains(OpcaoCliente.RAZAO)) {
                     sql.put("nome", vo.getNome());
                 }
+                if (opt.contains(OpcaoCliente.CNPJ)) {
+                    sql.put("cnpj", vo.getCnpj());
+                }
 
                 sql.setWhere("id = " + vo.getId());
                 stm.execute(sql.getUpdate());

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -491,82 +492,84 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
         try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
-                    "	codcli,\n" +
-                    "	TIPOJURFIS,\n" +
-                    "	razaosocial, \n" +
-                    "	fantasia,\n" +
-                    "	cnpj,\n" +
-                    "	ie,\n" +
-                    "	cpf,\n" +
-                    "	rg,\n" +
-                    "	endereco,\n" +
-                    "	nrcasa,\n" +
-                    "	complemento,\n" +
-                    "	bairro,\n" +
-                    "	cep,\n" +
-                    "	cidade,\n" +
-                    "	estado,\n" +
-                    "	email,\n" +
-                    "	fone,\n" +
-                    "	fone2,\n" +
-                    "	celular,\n" +
-                    "	fax,\n" +
-                    "	obs,\n" +
-                    "	contato,\n" +
-                    "	endcobr,\n" +
-                    "	nrcasacobr,\n" +
-                    "	complcobr,\n" +
-                    "	bairrocobr,\n" +
-                    "	cepcobr,\n" +
-                    "	estadocobr,\n" +
-                    "	cidadecobr,\n" +
-                    "	endentrg,\n" +
-                    "	nrcasaentr,\n" +
-                    "	bairroentrg,\n" +
-                    "	cepentrg,\n" +
-                    "	estadoentrg,\n" +
-                    "	cidadeentrg,\n" +
-                    "	dtcadast,\n" +
-                    "	dtalteracao,\n" +
-                    "	dtnasc,\n" +
-                    "	limitecred,\n" +
-                    "	saldo,\n" +
-                    "	inativo,\n" +
-                    "	dtalter,\n" +
-                    "	codibge_municipio, \n" +
-                    "	produtor_rural\n" +
+                    "    codcli,\n" +
+                    "    TIPOJURFIS,\n" +
+                    "    razaosocial, \n" +
+                    "    fantasia,\n" +
+                    "    cnpj,\n" +
+                    "    ie,\n" +
+                    "    cpf,\n" +
+                    "    rg,\n" +
+                    "    endereco,\n" +
+                    "    nrcasa,\n" +
+                    "    complemento,\n" +
+                    "    bairro,\n" +
+                    "    cep,\n" +
+                    "    cidade,\n" +
+                    "    estado,\n" +
+                    "    email,\n" +
+                    "    fone,\n" +
+                    "    fone2,\n" +
+                    "    celular,\n" +
+                    "    fax,\n" +
+                    "    obs,\n" +
+                    "    contato,\n" +
+                    "    endcobr,\n" +
+                    "    nrcasacobr,\n" +
+                    "    complcobr,\n" +
+                    "    bairrocobr,\n" +
+                    "    cepcobr,\n" +
+                    "    estadocobr,\n" +
+                    "    cidadecobr,\n" +
+                    "    endentrg,\n" +
+                    "    nrcasaentr,\n" +
+                    "    bairroentrg,\n" +
+                    "    cepentrg,\n" +
+                    "    estadoentrg,\n" +
+                    "    cidadeentrg,\n" +
+                    "    dtcadast,\n" +
+                    "    dtalteracao,\n" +
+                    "    dtnasc,\n" +
+                    "    limitecred,\n" +
+                    "    saldo,\n" +
+                    "    inativo,\n" +
+                    "    dtalter,\n" +
+                    "    codibge_municipio,\n" +
+                    "    produtor_rural\n" +
                     "from\n" +
-                    "	cdclientes\n" +
+                    "    cdclientes\n" +
                     "where\n" +
-                    "	codcli > 0\n" +
+                    "   codcli > 0\n" +
                     "order by\n" +
-                    "	codcli")) {
+                    "    codcli")) {
                 while(rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rs.getString("codcli"));
                     imp.setRazao(rs.getString("razaosocial"));
                     imp.setFantasia(rs.getString("fantasia"));
-                    if("J".equals(rs.getString("tipojurfis"))) {
-                        imp.setCnpj(rs.getString("cnpj"));
-                        imp.setInscricaoestadual(rs.getString("ie"));
-                    } else if ("F".equals(rs.getString("tipojurfis")) && 
-                                ("".equals(rs.getString("cnpj").replace("/", "").replace(".", "").replace("-", "").trim())) && 
-                                    ("".equals(rs.getString("ie")))) {
+                    
+                    if ( (rs.getString("cpf") != null) && (rs.getString("tipojurfis") != null) && ("F".equals(rs.getString("tipojurfis"))) ) {
+                        if ( rs.getString("cpf").contains("T") ) {
+                            imp.setCnpj(imp.getId());
+                            imp.setInscricaoestadual(rs.getString("rg"));
+                        } else {
                             imp.setCnpj(rs.getString("cpf"));
-                        if(rs.getString("rg") != null){
                             imp.setInscricaoestadual(rs.getString("rg"));
                         }
-                    } else if ("F".equals(rs.getString("tipojurfis")) && 
-                                ("".equals(rs.getString("cnpj").replace("/", "").replace(".", "").replace("-", "").trim())) && 
-                                ("ISENTO".equals(rs.getString("ie")))) {
+                    } else if ( (rs.getString("tipojurfis") != null) && ("J".equals(rs.getString("tipojurfis"))) ) {
+                        if ( rs.getString("cnpj").contains("T") ) {
+                            imp.setCnpj(imp.getId());
+                            imp.setInscricaoestadual(rs.getString("ie"));
+                        } else {
                             imp.setCnpj(rs.getString("cnpj"));
-                        if(rs.getString("rg") != null) {
-                            imp.setInscricaoestadual(rs.getString("rg"));
-                        } 
-                    } else {
-                            imp.setCnpj("cpf");
-                            imp.setInscricaoestadual("");
+                            imp.setInscricaoestadual(rs.getString("ie"));
                         }
+                    } else {
+                        imp.setCnpj(rs.getString("cpf"));
+                        imp.setInscricaoestadual(rs.getString("rg"));
+                    }
+                            
+                    
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("nrcasa"));
                     imp.setComplemento(rs.getString("complemento"));
@@ -577,14 +580,16 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUf(rs.getString("estado"));
                     imp.setEmail(rs.getString("email"));
                     imp.setTelefone(rs.getString("fone"));
-                    if((rs.getString("fone2") != null) && (!"".equals(rs.getString("fone2")))) {
+                    if( (rs.getString("fone2") != null) && (!"".equals(rs.getString("fone2"))) ) {
                         imp.addTelefone("Telefone 2", rs.getString("fone2"));
                     }
                     imp.setCelular(rs.getString("celular"));
                     imp.setFax(rs.getString("fax"));
-                    if((rs.getString("contato") != null) && (!"".equals(rs.getString("contato")))) {
+                    if( (rs.getString("contato") != null) && (!"".equals(rs.getString("contato"))) ) {
                         imp.addContato("1", "Contato", rs.getString("contato"), null, null);
                     }
+                    imp.setObservacao(rs.getString("obs"));
+                    
                     //Endereço de Cobrança
                     imp.setCobrancaEndereco(rs.getString("endcobr"));
                     imp.setCobrancaNumero(rs.getString("nrcasacobr"));
@@ -600,6 +605,8 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setAtivo("N".equals(rs.getString("inativo")) ? true : false);
                     imp.setPermiteCreditoRotativo(true);
                     imp.setPermiteCheque(true);
+                    
+                    LOG.fine("id_cliente: " + imp.getId() + " cnpj: " + imp.getCnpj());
                     
                     result.add(imp);
                 }
@@ -823,16 +830,12 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                 if(next == null) {
                     if(rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("idvenda");
-                        if (!uk.add(id)) {
-                            LOG.warning("Venda " + id + " já existe na listagem");
-                        next.setId(id);
+                            
+                        next.setId(rst.getString("idvenda"));
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("cupomfiscal")));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
                         next.setData(rst.getDate("dtemissao"));
                         next.setIdClientePreferencial(rst.getString("codcli"));
-                        //String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
-                        //String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horatermino");
                         next.setHoraInicio(timestamp.parse(rst.getString("dhemissao")));
                         next.setHoraTermino(timestamp.parse(rst.getString("datahoraautorizacao")));
                         next.setCancelado(rst.getBoolean("cancelado"));
@@ -841,7 +844,7 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setCpf(rst.getString("cpf"));
                         next.setValorDesconto(rst.getDouble("vldesc"));
                         next.setValorAcrescimo(rst.getDouble("vlacres"));
-                        next.setNumeroSerie(rst.getString("numserieecf"));
+                        next.setNumeroSerie(rst.getString("numserieecf") + " PDV: " + rst.getString("codpdv"));
                         next.setModeloImpressora(rst.getString("modeloecf"));
                         next.setChaveCfe(rst.getString("chave_acesso"));
                         next.setNomeCliente(rst.getString("razaosocial"));
@@ -855,7 +858,8 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                                 + Utils.acertarTexto(rst.getString("estado")) + ","
                                 + Utils.acertarTexto(rst.getString("cep"));
                         next.setEnderecoCliente(endereco);
-                        }
+                        
+                        
                     }
                 }
                 
@@ -869,7 +873,8 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = "select\n" +
                     "	v.idvdapdv as idvenda,\n" +
-                    "	v.codpdv as ecf,\n" +
+                    "   v.codpdv,\n" +
+                    "	cast(v.codpdv as varchar) + ' ' + isnull(v.numserieecf, v.CODPDV)  as ecf,\n" +
                     "	v.coo as cupomfiscal,\n" +
                     "	v.dtemissao,\n" +
                     "	v.hremissao,\n" +
@@ -899,13 +904,14 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	c.cep,\n" +
                     "	tri.percentual\n" +
                     "from\n" +
-                    "	vdapdv v\n" +
+                    "	vdapdv v\n"+
                     "left join\n" +
                     "	cdclientes c on c.codcli = v.codcli\n" +
                     "left join\n" +
                     "	cdaliquota tri on tri.codaliq = v.regime_tributacao\n" +
                     "where\n" +
-                    "	(v.dtemissao between convert(datetime, '" + FORMAT.format(dataInicio) + "', 103) and convert(datetime, '" + FORMAT.format(dataTermino) + "', 103))\n" +
+                    "	(v.dtemissao between convert(datetime, '" + FORMAT.format(dataInicio) + "', 103) and convert(datetime, '" + FORMAT.format(dataTermino) + "', 103)) and\n" +
+                    "   v.coo <> 0\n" +
                     "order by\n" +
                     "	v.dtemissao, v.coo";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
@@ -982,7 +988,7 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                     "   vi.vlrdesc as desconto,\n" +
                     "   vi.vlracres as acrescimo,\n" +
                     "	vi.totalitem as valortotal,\n" +
-                    "	case when v.cancelado = 'N' then 0 else 1 end as cancelado,\n" +
+                    "	case when vi.cancelado = 'N' then 0 else 1 end as cancelado,\n" +
                     "	vi.percicms as aliqicms,\n" +
                     "	vi.csticms,\n" +
                     "	vi.cstcofins,\n" +
