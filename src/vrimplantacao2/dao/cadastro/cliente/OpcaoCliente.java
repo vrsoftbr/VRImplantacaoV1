@@ -50,11 +50,8 @@ public enum OpcaoCliente {
     NOVOS, 
     RAZAO, 
     FANTASIA,
-<<<<<<< HEAD
-    CNPJ;    
-=======
-    EMAIL;    
->>>>>>> c98a9a8dd3f335505af3afb8516526526c55f120
+    CNPJ,
+    EMAIL;
     
     private static final Logger LOG = Logger.getLogger(OpcaoCliente.class.getName());
     private List<ClienteIMP> listaEspecial;

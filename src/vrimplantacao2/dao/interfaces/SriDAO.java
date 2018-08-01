@@ -12,7 +12,6 @@ import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -149,7 +148,7 @@ public class SriDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValidade(rst.getInt("bal_validade"));
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
-                    imp.setDescricaoGondola(imp.getDescricaoGondola());
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setCodMercadologico1(rst.getString("cod_grupo"));
                     imp.setCodMercadologico2(rst.getString("cod_subgrupo"));
                     imp.setCodMercadologico3("1");
@@ -159,7 +158,7 @@ public class SriDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrecovenda(rst.getDouble("venda"));
                     imp.setEstoqueMinimo(rst.getDouble("minimo"));
                     imp.setEstoque(rst.getDouble("estoque"));
-                    imp.setSituacaoCadastro("A".equals(rst.getString("inativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    //imp.setSituacaoCadastro("A".equals(rst.getString("inativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setNcm(rst.getString("cod_ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("cstpc"));
