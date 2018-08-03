@@ -168,6 +168,7 @@ import vrimplantacao2.gui.interfaces.InfoMacGUI;
 import vrimplantacao2.gui.interfaces.InventerGUI;
 import vrimplantacao2.gui.interfaces.JM2OnlineGUI;
 import vrimplantacao2.gui.interfaces.KcmsGUI;
+import vrimplantacao2.gui.interfaces.PlanilhaVrGUI;
 import vrimplantacao2.gui.interfaces.PwsGUI;
 import vrimplantacao2.gui.interfaces.SiacGUI;
 import vrimplantacao2.gui.interfaces.RMSAutomaHelpGUI;
@@ -677,6 +678,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuImportarNfce = new javax.swing.JMenuItem();
         jMenu14 = new javax.swing.JMenu();
         mnupdvvendaitem = new javax.swing.JMenuItem();
+        mnuPlanilhaVr = new javax.swing.JMenuItem();
         jMenuItemVRPdv = new javax.swing.JMenuItem();
         jMenuItem13 = new javax.swing.JMenuItem();
         mnuSistema = new javax.swing.JMenu();
@@ -2126,6 +2128,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu14.add(mnupdvvendaitem);
+
+        mnuPlanilhaVr.setText("Acertar Fiscal Produtos Vr");
+        mnuPlanilhaVr.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuPlanilhaVrActionPerformed(evt);
+            }
+        });
+        jMenu14.add(mnuPlanilhaVr);
 
         jMenu1.add(jMenu14);
 
@@ -3868,6 +3878,11 @@ public final class MenuGUI extends VRMdiFrame {
         CadastraFacilGUI.exibir(this);
     }//GEN-LAST:event_mnuCadastraFacilActionPerformed
 
+    private void mnuPlanilhaVrActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPlanilhaVrActionPerformed
+        // TODO add your handling code here:
+        PlanilhaVrGUI.exibir(this);
+    }//GEN-LAST:event_mnuPlanilhaVrActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -4032,6 +4047,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuPlanilhaForn;
     private javax.swing.JMenuItem mnuPlanilhaPadrao;
     private javax.swing.JMenuItem mnuPlanilhaV2;
+    private javax.swing.JMenuItem mnuPlanilhaVr;
     private javax.swing.JMenuItem mnuPws;
     private javax.swing.JMenuItem mnuRCNet;
     private javax.swing.JMenuItem mnuRMS_2;

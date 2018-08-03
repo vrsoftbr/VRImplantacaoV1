@@ -9,10 +9,15 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmbalagem;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -113,6 +118,7 @@ public class SriDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "cod_produto,\n"
                     + "descricao,\n"
                     + "cod_grupo,\n"
+                    + "unidade,\n"
                     + "cod_subgrupo,\n"
                     + "bruto,\n"
                     + "liquido,\n"
@@ -138,14 +144,13 @@ public class SriDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from produto\n"
                     + "where empresa = " + getLojaOrigem()
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("cod_interno"));
                     imp.setEan(rst.getString("cod_produto"));
-                    imp.seteBalanca("S".equals(rst.getString("balanca")));
-                    imp.setValidade(rst.getInt("bal_validade"));
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -170,6 +175,30 @@ public class SriDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsAliqEntrada(rst.getDouble("icms_in"));
                     imp.setIcmsReducaoSaida(0);
                     imp.setIcmsReducaoEntrada(0);
+                    
+                    if ((rst.getString("cod_produto") != null)
+                            && (!rst.getString("cod_produto").trim().isEmpty())
+                            && (rst.getString("cod_produto").trim().length() <= 6)
+                            && (!Utils.encontrouLetraCampoNumerico(rst.getString("cod_produto").trim()))) {
+
+                            ProdutoBalancaVO produtoBalanca;
+                            long codigoProduto;
+                            codigoProduto = Long.parseLong(Utils.formataNumero(imp.getEan().trim()));
+                            if (codigoProduto <= Integer.MAX_VALUE) {
+                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                            } else {
+                                produtoBalanca = null;
+                            }
+                            
+                            if (produtoBalanca != null) {
+                                imp.setTipoEmbalagem("P".equals(produtoBalanca.getPesavel()) ? "KG" : "UN");
+                                imp.seteBalanca(true);
+                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rst.getInt("bal_validade"));
+                            } else {
+                                imp.setValidade(0);
+                                imp.seteBalanca(false);
+                            }
+                    }
                     result.add(imp);
                 }
             }
