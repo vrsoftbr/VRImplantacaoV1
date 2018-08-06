@@ -163,41 +163,37 @@ public class SriDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrecovenda(rst.getDouble("venda"));
                     imp.setEstoqueMinimo(rst.getDouble("minimo"));
                     imp.setEstoque(rst.getDouble("estoque"));
-                    //imp.setSituacaoCadastro("A".equals(rst.getString("inativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setNcm(rst.getString("cod_ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("cstpc"));
                     imp.setPiscofinsCstCredito(rst.getString("cstpc_entrada"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("cod_receita_pis"));
-                    imp.setIcmsCstSaida(rst.getInt("st_out"));
-                    imp.setIcmsCstEntrada(rst.getInt("st"));
-                    imp.setIcmsAliqSaida(rst.getDouble("icms_out"));
-                    imp.setIcmsAliqEntrada(rst.getDouble("icms_in"));
-                    imp.setIcmsReducaoSaida(0);
-                    imp.setIcmsReducaoEntrada(0);
-                    
+                    imp.setIcmsCst(rst.getInt("st"));
+                    imp.setIcmsAliq(rst.getDouble("icms_in"));
+                    imp.setIcmsReducao(0);
+
                     if ((rst.getString("cod_produto") != null)
                             && (!rst.getString("cod_produto").trim().isEmpty())
                             && (rst.getString("cod_produto").trim().length() <= 6)
                             && (!Utils.encontrouLetraCampoNumerico(rst.getString("cod_produto").trim()))) {
 
-                            ProdutoBalancaVO produtoBalanca;
-                            long codigoProduto;
-                            codigoProduto = Long.parseLong(Utils.formataNumero(imp.getEan().trim()));
-                            if (codigoProduto <= Integer.MAX_VALUE) {
-                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                            } else {
-                                produtoBalanca = null;
-                            }
-                            
-                            if (produtoBalanca != null) {
-                                imp.setTipoEmbalagem("P".equals(produtoBalanca.getPesavel()) ? "KG" : "UN");
-                                imp.seteBalanca(true);
-                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rst.getInt("bal_validade"));
-                            } else {
-                                imp.setValidade(0);
-                                imp.seteBalanca(false);
-                            }
+                        ProdutoBalancaVO produtoBalanca;
+                        long codigoProduto;
+                        codigoProduto = Long.parseLong(Utils.formataNumero(imp.getEan().trim()));
+                        if (codigoProduto <= Integer.MAX_VALUE) {
+                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                        } else {
+                            produtoBalanca = null;
+                        }
+
+                        if (produtoBalanca != null) {
+                            imp.setTipoEmbalagem("P".equals(produtoBalanca.getPesavel()) ? "KG" : "UN");
+                            imp.seteBalanca(true);
+                            imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rst.getInt("bal_validade"));
+                        } else {
+                            imp.setValidade(0);
+                            imp.seteBalanca(false);
+                        }
                     }
                     result.add(imp);
                 }
@@ -274,7 +270,8 @@ public class SriDAO extends InterfaceDAO implements MapaTributoProvider {
                             && (!rst.getString("contato").trim().isEmpty())) {
                         imp.addContato(
                                 rst.getString("contato"),
-                                null, null,
+                                null,
+                                null,
                                 TipoContato.COMERCIAL,
                                 null
                         );
