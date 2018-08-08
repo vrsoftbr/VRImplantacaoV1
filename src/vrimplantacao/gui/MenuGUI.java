@@ -165,6 +165,7 @@ import vrimplantacao2.gui.interfaces.Wm_byFileGUI;
 import vrimplantacao2.gui.interfaces.WmsiGUI;
 import vrimplantacao2.gui.interfaces.PdvVrGUI;
 import vrimplantacao2.gui.interfaces.InfoMacGUI;
+import vrimplantacao2.gui.interfaces.IntelliconGUI;
 import vrimplantacao2.gui.interfaces.InventerGUI;
 import vrimplantacao2.gui.interfaces.JM2OnlineGUI;
 import vrimplantacao2.gui.interfaces.KcmsGUI;
@@ -544,6 +545,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSysmoFirebird = new javax.swing.JMenuItem();
         mnuSri = new javax.swing.JMenuItem();
         mnuCadastraFacil = new javax.swing.JMenuItem();
+        mnuIntellicon = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1124,6 +1126,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu5.add(mnuCadastraFacil);
+
+        mnuIntellicon.setText("Intellicon");
+        mnuIntellicon.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuIntelliconActionPerformed(evt);
+            }
+        });
+        jMenu5.add(mnuIntellicon);
 
         jMenu2.add(jMenu5);
 
@@ -3868,6 +3878,10 @@ public final class MenuGUI extends VRMdiFrame {
         CadastraFacilGUI.exibir(this);
     }//GEN-LAST:event_mnuCadastraFacilActionPerformed
 
+    private void mnuIntelliconActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuIntelliconActionPerformed
+        IntelliconGUI.exibir(this);
+    }//GEN-LAST:event_mnuIntelliconActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -4013,6 +4027,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuImportarNCM;
     private javax.swing.JMenuItem mnuImportarNfce;
     private javax.swing.JMenuItem mnuInfoMacStore;
+    private javax.swing.JMenuItem mnuIntellicon;
     private javax.swing.JMenuItem mnuInteragem;
     private javax.swing.JMenu mnuInterface;
     private javax.swing.JMenuItem mnuInventer;
