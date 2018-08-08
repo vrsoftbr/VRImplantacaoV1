@@ -4787,6 +4787,71 @@ public class ProdutoDAO {
         }
     }
 
+    public void adicionarNcmCestProdutoVR(List<ProdutoVO> v_produto) throws Exception {
+
+        StringBuilder sql = null;
+        Statement stm = null, stm2 = null;
+        ResultSet rst = null, rst2 = null;
+        double idProduto = 0;
+        int idCest = -1;
+
+        try {
+
+            Conexao.begin();
+            stm = Conexao.createStatement();
+            stm2 = Conexao.createStatement();
+            ProgressBar.setMaximum(v_produto.size());
+            ProgressBar.setStatus("Atualizando dados ...NCM x CEST...");
+
+            for (ProdutoVO i_produto : v_produto) {
+                if (i_produto.idDouble > 0) {
+                    idProduto = i_produto.idDouble;
+                } else {
+                    idProduto = i_produto.id;
+                }
+
+                sql = new StringBuilder();
+                sql.append("select n.id id_ncm, p.id_cest ");
+                sql.append("from produto p ");
+                sql.append("inner join ncm n on n.ncm1 = p.ncm1 and n.ncm2 = p.ncm2 and n.ncm3 = p.ncm3 ");
+                sql.append("inner join cest c on c.id = p.id_cest ");
+                sql.append("where n.ncm1 = " + i_produto.ncm1 + " ");
+                sql.append("  and n.ncm2 = " + i_produto.ncm2 + " ");
+                sql.append("  and n.ncm3 = " + i_produto.ncm3 + " ");
+                sql.append("  and c.cest1 = " + i_produto.cest1 + " ");
+                sql.append("  and c.cest2 = " + i_produto.cest2 + " ");
+                sql.append("  and c.cest3 = " + i_produto.cest3 + " ");
+                sql.append("  and p.id_cest is not null; ");
+                rst = stm.executeQuery(sql.toString());
+
+                if (rst.next()) {
+                    sql = new StringBuilder();
+                    sql.append("select * from ncmcest ");
+                    sql.append(" where id_ncm = " + rst.getInt("id_ncm") + " ");
+                    sql.append("   and id_cest = " + rst.getInt("id_cest") + ";");
+
+                    rst2 = stm2.executeQuery(sql.toString());
+
+                    if (!rst2.next()) {
+                        sql = new StringBuilder();
+                        sql.append("insert into ncmcest (id_ncm, id_cest) ");
+                        sql.append("values ( ");
+                        sql.append(rst.getInt("id_ncm") + ", ");
+                        sql.append(rst.getInt("id_cest") + ");");
+                        stm2.execute(sql.toString());
+                    }
+                }
+                ProgressBar.next();
+            }
+            stm.close();
+            stm2.close();
+            Conexao.commit();
+        } catch (Exception ex) {
+            Conexao.rollback();
+            throw ex;
+        }
+    }
+
     public void alterarMercadologicoProdutoRapido(List<ProdutoVO> v_produto) throws Exception {
         StringBuilder sql = null;
         Statement stm = null;

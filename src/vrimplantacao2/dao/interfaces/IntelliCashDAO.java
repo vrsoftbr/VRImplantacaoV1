@@ -514,7 +514,7 @@ public class IntelliCashDAO extends InterfaceDAO {
                     + "from agendafin af\n"
                     + "inner join agentes ag on ag.id = af.codag\n"
                     + "inner join clientes cli on cli.id = ag.id\n"
-                    + "where af.vpg = 0\n"
+                    + "where af.pg is null\n"
                     + "and af.empresa = " + getLojaOrigem()
             )) {
                 while (rst.next()) {

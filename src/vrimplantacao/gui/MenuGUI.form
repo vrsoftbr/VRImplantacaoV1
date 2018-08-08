@@ -1348,6 +1348,14 @@
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnupdvvendaitemActionPerformed"/>
                       </Events>
                     </MenuItem>
+                    <MenuItem class="javax.swing.JMenuItem" name="mnuPlanilhaVr">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Acertar Fiscal Produtos Vr"/>
+                      </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuPlanilhaVrActionPerformed"/>
+                      </Events>
+                    </MenuItem>
                   </SubComponents>
                 </Menu>
               </SubComponents>

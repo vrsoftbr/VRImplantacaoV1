@@ -55,9 +55,21 @@ public class ProdutoIMP {
     private double icmsAliqEntrada = 0;
     private double icmsReducaoEntrada = 0;
     
+    private int icmsCstEntradaForaEstado = 60;
+    private double icmsAliqEntradaForaEstado = 0;
+    private double icmsReducaoEntradaForaEstado = 0;
+    
     private int icmsCstSaida = 60;
     private double icmsAliqSaida = 0;
     private double icmsReducaoSaida = 0;
+
+    private int icmsCstSaidaForaEstado = 60;
+    private double icmsAliqSaidaForaEstado = 0;
+    private double icmsReducaoSaidaForaEstado = 0;
+
+    private int icmsCstSaidaForaEstadoNF = 60;
+    private double icmsAliqSaidaForaEstadoNF = 0;
+    private double icmsReducaoSaidaForaEstadoNF = 0;
     
     private String icmsDebitoId;
     private String icmsCreditoId;
@@ -568,6 +580,132 @@ public class ProdutoIMP {
 
     public void setUf(String uf) {
         this.uf = uf;
+    }
+
+    /**
+     * @return the icmsCstEntradaForaEstado
+     */
+    public int getIcmsCstEntradaForaEstado() {
+        return icmsCstEntradaForaEstado;
+    }
+
+    /**
+     * @param icmsCstEntradaForaEstado the icmsCstEntradaForaEstado to set
+     */
+    public void setIcmsCstEntradaForaEstado(int icmsCstEntradaForaEstado) {
+        this.icmsCstEntradaForaEstado = icmsCstEntradaForaEstado;
+    }
+
+    /**
+     * @return the icmsAliqEntradaForaEstado
+     */
+    public double getIcmsAliqEntradaForaEstado() {
+        return icmsAliqEntradaForaEstado;
+    }
+
+    /**
+     * @param icmsAliqEntradaForaEstado the icmsAliqEntradaForaEstado to set
+     */
+    public void setIcmsAliqEntradaForaEstado(double icmsAliqEntradaForaEstado) {
+        this.icmsAliqEntradaForaEstado = icmsAliqEntradaForaEstado;
+    }
+
+    /**
+     * @return the icmsReducaoEntradaForaEstado
+     */
+    public double getIcmsReducaoEntradaForaEstado() {
+        return icmsReducaoEntradaForaEstado;
+    }
+
+    /**
+     * @param icmsReducaoEntradaForaEstado the icmsReducaoEntradaForaEstado to set
+     */
+    public void setIcmsReducaoEntradaForaEstado(double icmsReducaoEntradaForaEstado) {
+        this.icmsReducaoEntradaForaEstado = icmsReducaoEntradaForaEstado;
+    }
+
+    /**
+     * @return the icmsCstSaidaForaEstado
+     */
+    public int getIcmsCstSaidaForaEstado() {
+        return icmsCstSaidaForaEstado;
+    }
+
+    /**
+     * @param icmsCstSaidaForaEstado the icmsCstSaidaForaEstado to set
+     */
+    public void setIcmsCstSaidaForaEstado(int icmsCstSaidaForaEstado) {
+        this.icmsCstSaidaForaEstado = icmsCstSaidaForaEstado;
+    }
+
+    /**
+     * @return the icmsAliqSaidaForaEstado
+     */
+    public double getIcmsAliqSaidaForaEstado() {
+        return icmsAliqSaidaForaEstado;
+    }
+
+    /**
+     * @param icmsAliqSaidaForaEstado the icmsAliqSaidaForaEstado to set
+     */
+    public void setIcmsAliqSaidaForaEstado(double icmsAliqSaidaForaEstado) {
+        this.icmsAliqSaidaForaEstado = icmsAliqSaidaForaEstado;
+    }
+
+    /**
+     * @return the icmsReducaoSaidaForaEstado
+     */
+    public double getIcmsReducaoSaidaForaEstado() {
+        return icmsReducaoSaidaForaEstado;
+    }
+
+    /**
+     * @param icmsReducaoSaidaForaEstado the icmsReducaoSaidaForaEstado to set
+     */
+    public void setIcmsReducaoSaidaForaEstado(double icmsReducaoSaidaForaEstado) {
+        this.icmsReducaoSaidaForaEstado = icmsReducaoSaidaForaEstado;
+    }
+
+    /**
+     * @return the icmsCstSaidaForaEstadoNF
+     */
+    public int getIcmsCstSaidaForaEstadoNF() {
+        return icmsCstSaidaForaEstadoNF;
+    }
+
+    /**
+     * @param icmsCstSaidaForaEstadoNF the icmsCstSaidaForaEstadoNF to set
+     */
+    public void setIcmsCstSaidaForaEstadoNF(int icmsCstSaidaForaEstadoNF) {
+        this.icmsCstSaidaForaEstadoNF = icmsCstSaidaForaEstadoNF;
+    }
+
+    /**
+     * @return the icmsAliqSaidaForaEstadoNF
+     */
+    public double getIcmsAliqSaidaForaEstadoNF() {
+        return icmsAliqSaidaForaEstadoNF;
+    }
+
+    /**
+     * @param icmsAliqSaidaForaEstadoNF the icmsAliqSaidaForaEstadoNF to set
+     */
+    public void setIcmsAliqSaidaForaEstadoNF(double icmsAliqSaidaForaEstadoNF) {
+        this.icmsAliqSaidaForaEstadoNF = icmsAliqSaidaForaEstadoNF;
+    }
+
+    /**
+     * @return the icmsReducaoSaidaForaEstadoNF
+     */
+    public double getIcmsReducaoSaidaForaEstadoNF() {
+        return icmsReducaoSaidaForaEstadoNF;
+    }
+
+    /**
+     * @param icmsReducaoSaidaForaEstadoNF the icmsReducaoSaidaForaEstadoNF to set
+     */
+    public void setIcmsReducaoSaidaForaEstadoNF(double icmsReducaoSaidaForaEstadoNF) {
+        this.icmsReducaoSaidaForaEstadoNF = icmsReducaoSaidaForaEstadoNF;
     }
     
 }
