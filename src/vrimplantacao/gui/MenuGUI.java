@@ -169,6 +169,7 @@ import vrimplantacao2.gui.interfaces.IntelliconGUI;
 import vrimplantacao2.gui.interfaces.InventerGUI;
 import vrimplantacao2.gui.interfaces.JM2OnlineGUI;
 import vrimplantacao2.gui.interfaces.KcmsGUI;
+import vrimplantacao2.gui.interfaces.MarketGUI;
 import vrimplantacao2.gui.interfaces.PlanilhaVrGUI;
 import vrimplantacao2.gui.interfaces.PwsGUI;
 import vrimplantacao2.gui.interfaces.SiacGUI;
@@ -604,6 +605,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuWebsaq = new javax.swing.JMenuItem();
         mnuSysmoPostgres = new javax.swing.JMenuItem();
         mnuAlterDataWShop = new javax.swing.JMenuItem();
+        mnuMarket = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -1576,6 +1578,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuAlterDataWShop);
+
+        mnuMarket.setText("Market");
+        mnuMarket.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMarketActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuMarket);
 
         jMenu2.add(jMenu8);
 
@@ -3897,6 +3907,10 @@ public final class MenuGUI extends VRMdiFrame {
         PlanilhaVrGUI.exibir(this);
     }//GEN-LAST:event_mnuPlanilhaVrActionPerformed
 
+    private void mnuMarketActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMarketActionPerformed
+        MarketGUI.exibir(this);
+    }//GEN-LAST:event_mnuMarketActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -4055,6 +4069,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuLogus;
     private javax.swing.JMenuItem mnuMSIInfor;
     private javax.swing.JMenuItem mnuMapeamentoMercadologico;
+    private javax.swing.JMenuItem mnuMarket;
     private javax.swing.JMenuBar mnuMenu;
     private javax.swing.JMenu mnuOrion;
     private javax.swing.JMenuItem mnuParametros;
