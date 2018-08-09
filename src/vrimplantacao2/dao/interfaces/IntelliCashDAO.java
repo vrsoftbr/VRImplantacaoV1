@@ -14,6 +14,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -475,20 +476,20 @@ public class IntelliCashDAO extends InterfaceDAO {
                                 if ((rst2.getString("tipo").contains("EMAIL"))) {
                                     imp.setEmail(rst2.getString("valor").toLowerCase());
                                 }
-                                
+
                                 if ("TELEFONE".equals(rst2.getString("tipo"))) {
                                     if (!rst2.getString("valor").equals(imp.getTelefone())) {
                                         imp.addContato(
-                                                rst2.getString("id"), 
-                                                rst2.getString("tipo"), 
-                                                rst2.getString("valor"), 
-                                                null, 
+                                                rst2.getString("id"),
+                                                rst2.getString("tipo"),
+                                                rst2.getString("valor"),
+                                                null,
                                                 null);
                                     }
                                 }
                             }
                         }
-                    }                    
+                    }
                     result.add(imp);
                 }
             }
@@ -542,6 +543,45 @@ public class IntelliCashDAO extends InterfaceDAO {
                         }
                     }
 
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "id,\n"
+                    + "data,\n"
+                    + "datadeposito,\n"
+                    + "valor,\n"
+                    + "banco,\n"
+                    + "agencia,\n"
+                    + "conta,\n"
+                    + "numchq,\n"
+                    + "emitente,\n"
+                    + "cmc7\n"
+                    + "from cheques\n"
+                    + "where data >= '25.06.2018'\n"
+                    + "order by id"
+            )) {
+                while (rst.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setDate(rst.getDate("data"));
+                    imp.setDataDeposito(rst.getDate("datadeposito"));
+                    imp.setNome(rst.getString("emitente"));
+                    imp.setNumeroCheque(rst.getString("numchq"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setBanco(rst.getInt("banco"));
+                    imp.setAgencia(rst.getString("agencia"));
+                    imp.setConta(rst.getString("numchq"));
+                    imp.setCmc7(rst.getString("cmc7"));
                     result.add(imp);
                 }
             }

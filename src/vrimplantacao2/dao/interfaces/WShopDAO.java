@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.interfaces;
 
+import com.ibm.db2.jcc.DB2BaseDataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -31,7 +32,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class WShopDAO extends InterfaceDAO {
 
     private static final Logger LOG = Logger.getLogger(WShopDAO.class.getName());
-    
+
     @Override
     public String getSistema() {
         return "WShop";
@@ -50,36 +51,36 @@ public class WShopDAO extends InterfaceDAO {
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	idgrupo merc1,\n" +
-                    "	nmgrupo merc1_desc\n" +
-                    "from\n" +
-                    "	wshop.grupo\n" +
-                    "order by \n" +
-                    "	nmgrupo"
+                    "select\n"
+                    + "	idgrupo merc1,\n"
+                    + "	nmgrupo merc1_desc\n"
+                    + "from\n"
+                    + "	wshop.grupo\n"
+                    + "order by \n"
+                    + "	nmgrupo"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setMerc1ID(rst.getString("merc1"));
                     imp.setMerc1Descricao(rst.getString("merc1_desc"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
-    
+
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select cdempresa, nrcgc || '-' || nmempresa razao from wshop.empshop order by cdempresa"
@@ -89,20 +90,20 @@ public class WShopDAO extends InterfaceDAO {
                 }
             }
         }
-        
+
         return result;
     }
-    
+
     private Map<String, String> mapaFamilia;
 
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
-        
+
         Set<String> fam = mapearFamilia();
-        
+
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            for (String key: fam) {
+            for (String key : fam) {
                 try (ResultSet rst = stm.executeQuery(
                         "select iddetalhe, dsdetalhe from wshop.detalhe where iddetalhe = '" + key + "'"
                 )) {
@@ -116,9 +117,8 @@ public class WShopDAO extends InterfaceDAO {
                     }
                 }
             }
-        }   
-        
-        
+        }
+
         return result;
     }
 
@@ -126,22 +126,22 @@ public class WShopDAO extends InterfaceDAO {
         Set<List<String>> itens = new LinkedHashSet<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct\n" +
-                            "	iddetalhe,\n" +
-                            "	iddetalhe iddetalheequivalente\n" +
-                            "from\n" +
-                            "	wshop.prodequivalente\n" +
-                            "union\n" +
-                            "select \n" +
-                            "	iddetalhe, \n" +
-                            "	iddetalheequivalente \n" +
-                            "from \n" +
-                            "	wshop.ProdEquivalente \n" +
-                            "order by \n" +
-                            "	1, 2"
+                    "select distinct\n"
+                    + "	iddetalhe,\n"
+                    + "	iddetalhe iddetalheequivalente\n"
+                    + "from\n"
+                    + "	wshop.prodequivalente\n"
+                    + "union\n"
+                    + "select \n"
+                    + "	iddetalhe, \n"
+                    + "	iddetalheequivalente \n"
+                    + "from \n"
+                    + "	wshop.ProdEquivalente \n"
+                    + "order by \n"
+                    + "	1, 2"
             )) {
-                String lastKey = null;           
-                
+                String lastKey = null;
+
                 List<String> listaAtual = null;
                 while (rst.next()) {
                     String key = rst.getString("iddetalhe");
@@ -152,7 +152,7 @@ public class WShopDAO extends InterfaceDAO {
                         }
                         listaAtual = new ArrayList<>();
                         lastKey = key;
-                    }                    
+                    }
                     listaAtual.add(value);
                 }
                 System.out.println("Lista: " + itens.size());
@@ -160,9 +160,9 @@ public class WShopDAO extends InterfaceDAO {
         }
         mapaFamilia = new HashMap<>();
         Set<String> fam = new HashSet<>();
-        for (List<String> lista: itens) {
+        for (List<String> lista : itens) {
             fam.add(lista.get(0));
-            for (String item: lista) {
+            for (String item : lista) {
                 mapaFamilia.put(item, lista.get(0));
             }
         }
@@ -172,81 +172,81 @@ public class WShopDAO extends InterfaceDAO {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	ids.dscodigo id,\n" +
-                    "	dt.dtcadastro datacadastro,\n" +
-                    "	dt.dtaltvlprecovenda dataalteracao,\n" +
-                    "	coalesce(ean.dscodigo, ids.dscodigo) ean,\n" +
-                    "	coalesce(nullif(dt.qtembalagem, 0), 1) qtdembalagemcotacao,\n" +
-                    "	substring(un.dssigla, 1,2) unidade,\n" +
-                    "	dt.stbalanca ebalanca,\n" +
-                    "	coalesce(bal.nrdiasvalidade, 0) validade,\n" +
-                    "	p.nmproduto descricaocompleta,\n" +
-                    "	dt.dsdetalhe descricaoreduzida,\n" +
-                    "	p.idgrupo merc1,\n" +
-                    "	dt.idproduto,\n" +
-                    "	dt.iddetalhe,\n" +
-                    "	dt.pesoliquido,\n" +
-                    "	dt.pesobruto,\n" +
-                    "	est.qtestoque estoque,\n" +
-                    "	dt.allucro margem,\n" +
-                    "	dt.vlprecocusto custocomimposto,\n" +
-                    "	dt.vlprecovenda precovenda,\n" +
-                    "	dt.stdetalheativo ativo,\n" +
-                    "	p.cdipi ncm,\n" +
-                    "	p.cest,\n" +
-                    "	dt.cdsittribpisentrada piscofins_entrada,\n" +
-                    "	dt.cdsittribpis piscofins_saida,\n" +
-                    "	dt.cdnaturezareceita piscofins_naturezareceita,	\n" +
-                    "	icms.cdsituacaotributaria icms_cst,\n" +
-                    "	icms.alicms icms_aliquota,\n" +
-                    "	0 as icms_reduzido\n" +
-                    "from\n" +
-                    "	wshop.produto p\n" +
-                    "	join wshop.empshop emp on emp.cdempresa = '" + getLojaOrigem() + "'\n" +
-                    "	join wshop.detalhe dt on p.idproduto = dt.idproduto\n" +
-                    "	join wshop.codigos ids on dt.iddetalhe = ids.iddetalhe and dt.idproduto = ids.idproduto and ids.tpcodigo = 'Chamada'\n" +
-                    "	left join (\n" +
-                    "		select \n" +
-                    "			ean.*\n" +
-                    "		from\n" +
-                    "			wshop.codigos ean\n" +
-                    "			join wshop.detalhe dt on ean.iddetalhe = dt.iddetalhe and ean.idproduto = dt.idproduto\n" +
-                    "		where\n" +
-                    "			(dt.stbalanca and ean.tpcodigo = 'Chamada') or\n" +
-                    "			(not dt.stbalanca and ean.tpcodigo != 'Chamada')\n" +
-                    "	) ean on dt.iddetalhe = ean.iddetalhe and dt.idproduto = ean.idproduto	\n" +
-                    "	left join wshop.unidade un on un.idunidade = p.idunidade\n" +
-                    "	left join wshop.produto_balanca bal on bal.iddetalhe = dt.iddetalhe\n" +
-                    "	left join (\n" +
-                    "		select\n" +
-                    "			est.iddetalhe,\n" +
-                    "			est.cdempresa,\n" +
-                    "			est.qtestoque\n" +
-                    "		from\n" +
-                    "			wshop.estoque est\n" +
-                    "			join (\n" +
-                    "				select \n" +
-                    "					iddetalhe, \n" +
-                    "					cdempresa,\n" +
-                    "					max(dtreferencia) dtreferencia \n" +
-                    "				from\n" +
-                    "					wshop.estoque\n" +
-                    "				group by \n" +
-                    "					iddetalhe, cdempresa\n" +
-                    "			) a on est.iddetalhe = a.iddetalhe and est.dtreferencia = a.dtreferencia\n" +
-                    "	) est on est.iddetalhe = dt.iddetalhe and est.cdempresa = emp.cdempresa\n" +
-                    "	left join wshop.icms_uf icms on p.idcalculoicms = icms.idcalculoicms and iduf = emp.cduf and idufdestino = emp.cduf and stvendaconsumidorfinal\n" +
-                    "order by\n" +
-                    "	id"
+                    "select\n"
+                    + "	ids.dscodigo id,\n"
+                    + "	dt.dtcadastro datacadastro,\n"
+                    + "	dt.dtaltvlprecovenda dataalteracao,\n"
+                    + "	coalesce(ean.dscodigo, ids.dscodigo) ean,\n"
+                    + "	coalesce(nullif(dt.qtembalagem, 0), 1) qtdembalagemcotacao,\n"
+                    + "	substring(un.dssigla, 1,2) unidade,\n"
+                    + "	dt.stbalanca ebalanca,\n"
+                    + "	coalesce(bal.nrdiasvalidade, 0) validade,\n"
+                    + "	p.nmproduto descricaocompleta,\n"
+                    + "	dt.dsdetalhe descricaoreduzida,\n"
+                    + "	p.idgrupo merc1,\n"
+                    + "	dt.idproduto,\n"
+                    + "	dt.iddetalhe,\n"
+                    + "	dt.pesoliquido,\n"
+                    + "	dt.pesobruto,\n"
+                    + "	est.qtestoque estoque,\n"
+                    + "	dt.allucro margem,\n"
+                    + "	dt.vlprecocusto custocomimposto,\n"
+                    + "	dt.vlprecovenda precovenda,\n"
+                    + "	dt.stdetalheativo ativo,\n"
+                    + "	p.cdipi ncm,\n"
+                    + "	p.cest,\n"
+                    + "	dt.cdsittribpisentrada piscofins_entrada,\n"
+                    + "	dt.cdsittribpis piscofins_saida,\n"
+                    + "	dt.cdnaturezareceita piscofins_naturezareceita,	\n"
+                    + "	icms.cdsituacaotributaria icms_cst,\n"
+                    + "	icms.alicms icms_aliquota,\n"
+                    + "	0 as icms_reduzido\n"
+                    + "from\n"
+                    + "	wshop.produto p\n"
+                    + "	join wshop.empshop emp on emp.cdempresa = '" + getLojaOrigem() + "'\n"
+                    + "	join wshop.detalhe dt on p.idproduto = dt.idproduto\n"
+                    + "	join wshop.codigos ids on dt.iddetalhe = ids.iddetalhe and dt.idproduto = ids.idproduto and ids.tpcodigo = 'Chamada'\n"
+                    + "	left join (\n"
+                    + "		select \n"
+                    + "			ean.*\n"
+                    + "		from\n"
+                    + "			wshop.codigos ean\n"
+                    + "			join wshop.detalhe dt on ean.iddetalhe = dt.iddetalhe and ean.idproduto = dt.idproduto\n"
+                    + "		where\n"
+                    + "			(dt.stbalanca and ean.tpcodigo = 'Chamada') or\n"
+                    + "			(not dt.stbalanca and ean.tpcodigo != 'Chamada')\n"
+                    + "	) ean on dt.iddetalhe = ean.iddetalhe and dt.idproduto = ean.idproduto	\n"
+                    + "	left join wshop.unidade un on un.idunidade = p.idunidade\n"
+                    + "	left join wshop.produto_balanca bal on bal.iddetalhe = dt.iddetalhe\n"
+                    + "	left join (\n"
+                    + "		select\n"
+                    + "			est.iddetalhe,\n"
+                    + "			est.cdempresa,\n"
+                    + "			est.qtestoque\n"
+                    + "		from\n"
+                    + "			wshop.estoque est\n"
+                    + "			join (\n"
+                    + "				select \n"
+                    + "					iddetalhe, \n"
+                    + "					cdempresa,\n"
+                    + "					max(dtreferencia) dtreferencia \n"
+                    + "				from\n"
+                    + "					wshop.estoque\n"
+                    + "				group by \n"
+                    + "					iddetalhe, cdempresa\n"
+                    + "			) a on est.iddetalhe = a.iddetalhe and est.dtreferencia = a.dtreferencia\n"
+                    + "	) est on est.iddetalhe = dt.iddetalhe and est.cdempresa = emp.cdempresa\n"
+                    + "	left join wshop.icms_uf icms on p.idcalculoicms = icms.idcalculoicms and iduf = emp.cduf and idufdestino = emp.cduf and stvendaconsumidorfinal\n"
+                    + "order by\n"
+                    + "	id"
             )) {
                 mapearFamilia();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
@@ -262,7 +262,9 @@ public class WShopDAO extends InterfaceDAO {
                     imp.setDescricaoGondola(rst.getString("descricaocompleta"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     String familia = mapaFamilia.get(rst.getString("iddetalhe"));
-                    if (familia != null) LOG.finer("Familia " + familia + " encontrada para " + imp.getImportId() + " - " + imp.getDescricaoCompleta());
+                    if (familia != null) {
+                        LOG.finer("Familia " + familia + " encontrada para " + imp.getImportId() + " - " + imp.getDescricaoCompleta());
+                    }
                     imp.setIdFamiliaProduto(familia);
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
@@ -270,7 +272,7 @@ public class WShopDAO extends InterfaceDAO {
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custocomimposto"));
-                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    //imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setSituacaoCadastro(rst.getBoolean("ativo") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
@@ -280,57 +282,93 @@ public class WShopDAO extends InterfaceDAO {
                     imp.setIcmsCst(Utils.stringToInt(rst.getString("icms_cst")));
                     imp.setIcmsAliq(rst.getDouble("icms_aliquota"));
                     imp.setIcmsReducao(rst.getDouble("icms_reduzido"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        if (opt == OpcaoProduto.PRECO) {
+            try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "with precovenda_alt as (\n"
+                        + "  select d.cdprincipal, max(e.dtreferencia) as precovenda_alt \n"
+                        + "    from wshop.detalhe d\n"
+                        + "   inner join wshop.estoque e on e.iddetalhe = d.iddetalhe\n"
+                        + "   where e.cdempresa in ('" + getLojaOrigem() + "')\n"
+                        + "     and e.qtvenda = 1\n"
+                        + "   group by d.cdprincipal\n"
+                        + ") \n"
+                        + "select d.cdprincipal, e.vlvenda, e.dtreferencia\n"
+                        + "  from wshop.detalhe d\n"
+                        + " inner join wshop.estoque e on e.iddetalhe = d.iddetalhe\n"
+                        + " inner join precovenda_alt alt on alt.cdprincipal = d.cdprincipal and alt.precovenda_alt = e.dtreferencia\n"
+                        + " where e.cdempresa in ('" + getLojaOrigem() + "')\n"
+                        + "   and e.qtvenda = 1"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportId(rst.getString("cdprincipal"));
+                        imp.setPrecovenda(rst.getDouble("vlvenda"));
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+        return null;
     }
 
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	p.idpessoa id,\n" +
-                    "	p.cdchamada chamada,\n" +
-                    "	p.nmpessoa razao,\n" +
-                    "	coalesce(p.nmfantasia, p.nmpessoa) fantasia,\n" +
-                    "	p.nrinscrmun inscricaomunicipal,\n" +
-                    "	p.nrcgc_cic cnpj,\n" +
-                    "	p.nrincrest_rg ierj,\n" +
-                    "	(p.stativo = 'S') ativo,\n" +
-                    "	p.nmendereco endereco,\n" +
-                    "	p.nrlogradouro numero,\n" +
-                    "	p.dscomplemento complemento,\n" +
-                    "	p.nmbairro bairro,\n" +
-                    "	p.nmcidade municipio,\n" +
-                    "	p.iduf uf,\n" +
-                    "	p.nmcep cep,\n" +
-                    "	p.email,\n" +
-                    "	p.nrtelefone,\n" +
-                    "	p.nrtelcomercial,\n" +
-                    "	p.nrtelfax,\n" +
-                    "	p.diavencimento,\n" +
-                    "	p.diafaturamento,\n" +
-                    "	p.idprazo,\n" +
-                    "	p.dtcadastro datacadastro,\n" +
-                    "	p.nmobservacao,\n" +
-                    "	p.sticmssimples simplesnacional\n" +
-                    "from\n" +
-                    "	wshop.pessoas p\n" +
-                    "where\n" +
-                    "	sttipopessoa = 'F'\n" +
-                    "order by\n" +
-                    "	p.cdchamada::integer;"
+                    "select\n"
+                    + "	p.idpessoa id,\n"
+                    + "	p.cdchamada chamada,\n"
+                    + "	p.nmpessoa razao,\n"
+                    + "	coalesce(p.nmfantasia, p.nmpessoa) fantasia,\n"
+                    + "	p.nrinscrmun inscricaomunicipal,\n"
+                    + "	p.nrcgc_cic cnpj,\n"
+                    + "	p.nrincrest_rg ierj,\n"
+                    + "	(p.stativo = 'S') ativo,\n"
+                    + "	p.nmendereco endereco,\n"
+                    + "	p.nrlogradouro numero,\n"
+                    + "	p.dscomplemento complemento,\n"
+                    + "	p.nmbairro bairro,\n"
+                    + "	p.nmcidade municipio,\n"
+                    + "	p.iduf uf,\n"
+                    + "	p.nmcep cep,\n"
+                    + "	p.email,\n"
+                    + "	p.nrtelefone,\n"
+                    + "	p.nrtelcomercial,\n"
+                    + "	p.nrtelfax,\n"
+                    + "	p.diavencimento,\n"
+                    + "	p.diafaturamento,\n"
+                    + "	p.idprazo,\n"
+                    + "	p.dtcadastro datacadastro,\n"
+                    + "	p.nmobservacao,\n"
+                    + "	p.sticmssimples simplesnacional\n"
+                    + "from\n"
+                    + "	wshop.pessoas p\n"
+                    + "where\n"
+                    + "	sttipopessoa = 'F'\n"
+                    + "order by\n"
+                    + "	p.cdchamada::integer;"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("chamada"));
@@ -354,51 +392,51 @@ public class WShopDAO extends InterfaceDAO {
                     imp.setDatacadastro(rst.getDate("datacadastro"));
                     imp.setObservacao(rst.getString("nmobservacao"));
                     imp.setTipoEmpresa(rst.getBoolean("simplesnacional") ? TipoEmpresa.ME_SIMPLES : TipoEmpresa.LUCRO_REAL);
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	f.cdchamada idfornecedor,\n" +
-                    "	ids.dscodigo idproduto,\n" +
-                    "	pf.cdprodutofornecedor codigoexterno,\n" +
-                    "	pf.dtultimacompra dataalteracao\n" +
-                    "from\n" +
-                    "	wshop.prodfor pf\n" +
-                    "	join wshop.produto p on pf.idproduto = p.idproduto\n" +
-                    "	join wshop.detalhe dt on p.idproduto = dt.idproduto\n" +
-                    "	join wshop.codigos ids on dt.iddetalhe = ids.iddetalhe and dt.idproduto = ids.idproduto and ids.tpcodigo = 'Chamada'\n" +
-                    "	join wshop.pessoas f on f.idpessoa = pf.idpessoa\n" +
-                    "order by\n" +
-                    "	1,2"
+                    "select\n"
+                    + "	f.cdchamada idfornecedor,\n"
+                    + "	ids.dscodigo idproduto,\n"
+                    + "	pf.cdprodutofornecedor codigoexterno,\n"
+                    + "	pf.dtultimacompra dataalteracao\n"
+                    + "from\n"
+                    + "	wshop.prodfor pf\n"
+                    + "	join wshop.produto p on pf.idproduto = p.idproduto\n"
+                    + "	join wshop.detalhe dt on p.idproduto = dt.idproduto\n"
+                    + "	join wshop.codigos ids on dt.iddetalhe = ids.iddetalhe and dt.idproduto = ids.idproduto and ids.tpcodigo = 'Chamada'\n"
+                    + "	join wshop.pessoas f on f.idpessoa = pf.idpessoa\n"
+                    + "order by\n"
+                    + "	1,2"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
                     imp.setIdProduto(rst.getString("idproduto"));
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
-    
+
 }
