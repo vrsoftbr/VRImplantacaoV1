@@ -255,10 +255,11 @@ public class GuiaSistemasDAO extends InterfaceDAO {
                     imp.setCnpj_cpf(rst.getString("vfd_cpf"));
                     imp.setIe_rg(rst.getString("vfd_ie"));
                     imp.setTel_principal(rst.getString("vfd_fone"));
+                    vResult.add(imp);
                 }
             }
         }
-        return null;
+        return vResult;
     }
 
     @Override
@@ -270,14 +271,21 @@ public class GuiaSistemasDAO extends InterfaceDAO {
                     + "VFD_CODPRODUTO, "
                     + "VFD_CODFORNECEDOR, "
                     + "VFD_CODREFERENCIA "
-                    + "FROM TAB_REFPRODUTO ORDER BY VFD_CODPRODUTO"
+                    + "FROM TAB_REFPRODUTO "
+                    + "ORDER BY VFD_CODPRODUTO"
             )) {
                 while (rst.next()) {
-
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("VFD_CODPRODUTO"));
+                    imp.setIdFornecedor(rst.getString("VFD_CODFORNECEDOR"));
+                    imp.setCodigoExterno(rst.getString("VFD_CODREFERENCIA"));
+                    vResult.add(imp);
                 }
             }
         }
-        return null;
+        return vResult;
     }
 
     @Override
@@ -286,21 +294,63 @@ public class GuiaSistemasDAO extends InterfaceDAO {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
-                    + "vfd_codCliente, vfd_nomecliente, vfd_tipopessoa, vfd_rg, vfd_cpf, "
-                    + "vfd_nomepdv, vfd_sexo, vfd_cidade, vfd_estadocivil, vfd_estado, "
-                    + "vfd_endereco, vfd_numero, vfd_complemento, vfd_cep, vfd_ddd, vfd_fone, "
-                    + "vfd_bairro, vfd_datanascimento, vfd_renda, vfd_situacao, "
-                    + "vfd_datacadastro, vfd_limitecheque, vfd_email,vfd_dddcelular, "
-                    + "vfd_celular, vfd_limitecredito, vfd_observacoes "
+                    + "vfd_codCliente, "
+                    + "vfd_nomecliente, "
+                    + "vfd_tipopessoa, "
+                    + "vfd_rg, "
+                    + "vfd_cpf, "
+                    + "vfd_nomepdv, "
+                    + "vfd_sexo, "
+                    + "vfd_cidade, "
+                    + "vfd_estadocivil, "
+                    + "vfd_estado, "
+                    + "vfd_endereco, "
+                    + "vfd_numero, "
+                    + "vfd_complemento, "
+                    + "vfd_cep, "
+                    + "vfd_ddd, "
+                    + "vfd_fone, "
+                    + "vfd_bairro, "
+                    + "vfd_datanascimento, "
+                    + "vfd_renda, "
+                    + "vfd_situacao, "
+                    + "vfd_datacadastro, "
+                    + "vfd_limitecheque, "
+                    + "vfd_email,"
+                    + "vfd_dddcelular, "
+                    + "vfd_celular, "
+                    + "vfd_limitecredito, "
+                    + "vfd_observacoes "
                     + "from tab_clientes "
                     + "order by vfd_codCliente"
             )) {
                 while (rst.next()) {
-
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("vfd_codCliente"));
+                    imp.setRazao(rst.getString("vfd_nomecliente"));
+                    imp.setFantasia(rst.getString("vfd_nomepdv"));
+                    imp.setCnpj(rst.getString("vfd_cpf"));
+                    imp.setInscricaoestadual(rst.getString("vfd_rg"));
+                    imp.setEndereco(rst.getString("vfd_endereco"));
+                    imp.setNumero(rst.getString("vfd_numero"));
+                    imp.setComplemento(rst.getString("vfd_complemento"));
+                    imp.setCep(rst.getString("vfd_cep"));
+                    imp.setBairro(rst.getString("vfd_bairro"));
+                    imp.setMunicipio(rst.getString("vfd_cidade"));
+                    imp.setUf(rst.getString("vfd_estado"));
+                    imp.setEmail(rst.getString("vfd_email"));
+                    imp.setTelefone(rst.getString("vfd_ddd") + rst.getString("vfd_fone"));
+                    imp.setCelular(rst.getString("vfd_dddcelular") + rst.getString("vfd_celular"));
+                    imp.setDataCadastro(rst.getDate("vfd_datacadastro"));
+                    imp.setDataNascimento(rst.getDate("vfd_datanascimento"));
+                    imp.setSalario(rst.getDouble("vfd_renda"));
+                    imp.setValorLimite(rst.getDouble("vfd_limitecredito"));
+                    imp.setObservacao(rst.getString("vfd_observacoes"));
+                    vResult.add(imp);
                 }
             }
         }
-        return null;
+        return vResult;
     }
 
     @Override
