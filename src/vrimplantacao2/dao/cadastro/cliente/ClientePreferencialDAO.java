@@ -312,7 +312,7 @@ public class ClientePreferencialDAO {
                 }
                 if (opt.contains(OpcaoCliente.CNPJ)) {
                     sql.put("cnpj", vo.getCnpj());
-				}
+		}
                 if (opt.contains(OpcaoCliente.EMAIL)) {
                     sql.put("email", vo.getEmail());
                 }

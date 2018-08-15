@@ -537,10 +537,14 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="chkLimite" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace pref="273" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -548,7 +552,10 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkClientePreferencial" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkLimite" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="32767" attributes="0"/>
@@ -579,6 +586,11 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkClienteEventualActionPerformed"/>
                   </Events>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkLimite">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Limite"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="javax.swing.JPanel" name="tablCreditoRotativo">
@@ -598,8 +610,10 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="cmbPlanoContas" alignment="0" min="-2" pref="226" max="-2" attributes="0"/>
+                              <Component id="lblPlanoContas" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="362" max="32767" attributes="0"/>
+                          <EmptySpace pref="237" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -610,7 +624,11 @@
                           <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="159" max="32767" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="lblPlanoContas" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="cmbPlanoContas" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="116" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -624,6 +642,13 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCheque">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cheque"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.comboBox.VRComboBox" name="cmbPlanoContas">
+                </Component>
+                <Component class="vrframework.bean.label.VRLabel" name="lblPlanoContas">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Plano de Contas"/>
                   </Properties>
                 </Component>
               </SubComponents>

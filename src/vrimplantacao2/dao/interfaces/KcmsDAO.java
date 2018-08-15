@@ -20,6 +20,7 @@ import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.SituacaoCheque;
@@ -171,85 +172,85 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "  SELECT \n" +
-                    "	P.CODPROD,\n" +
-                    "	P.CODBARRA,\n" +
-                    "	P.DESCRICAO,\n" +
-                    "	P.DTCADAST,\n" +
-                    "	P.DESCRNF,\n" +
-                    "	P.DESCRBAL,\n" +
-                    "	P.VALBALANCA,\n" +
-                    "	P.PESAVEL,\n" +
-                    "	P.UNIDADE,\n" +
-                    "	P.UNDCOMPRA,\n" +
-                    "	P.QTDEMBAL,\n" +
-                    "	P.QTDEMBALCPR,\n" +
-                    "	P.CODGENERO,\n" +
-                    "	P.CODGRUPO,\n" +
-                    "	1 codsubgrupo,\n" +
-                    "	P.CODFAMILIA,\n" +
-                    "	P.ESTOATU,\n" +
-                    "	P.ESTOMIN,\n" +
-                    "	P.PRECOENTR,\n" +
-                    "	P.PRECOCUSTO,\n" +
-                    "	P.PRECOVEND,\n" +
-                    "	P.CODTRIB,\n" +
-                    "	trib.SITTRIB as csticms,\n" +
-                    "	P.CODALIQ,\n" +
-                    "	P.CODALIQNF,\n" +
-                    "	P.PERCICMSCR,\n" +
-                    "	P.PERCREDUC,\n" +
-                    "	P.MARGBRUT,\n" +
-                    "	P.MARGPARAM,\n" +
-                    "	P.CODSETOR,\n" +
-                    "	P.PROMOCAO,\n" +
-                    "	P.PEGAR_PESO,\n" +
-                    "	P.INATIVO,\n" +
-                    "	P.ESTOIDEAL,\n" +
-                    "	P.CODTIPOPRODUTO,\n" +
-                    "	P.IDCDTIPOCOFINS,\n" +
-                    "	fc.cod_cst_cofins,\n" +
-                    "	P.IDCDTIPOPIS,\n" +
-                    "	fp.cod_cst_pis,\n" +
-                    "	P.MARGBRUTWEB,\n" +
-                    "	P.CODLOJA,\n" +
-                    "	P.CODCFOP,\n" +
-                    "	P.CODSIMILAR,\n" +
-                    "	P.CODGRUPOFISCAL,\n" +
-                    "	P.PERCALIQSUBTRIB,\n" +
-                    "	P.TIPOSUBTRIB,\n" +
-                    "	P.CODALIQECF,\n" +
-                    "	P.IDNCM,\n" +
-                    "	P.CODTRIBSN,\n" +
-                    "	P.CODCSTPIS,\n" +
-                    "	P.CODCSTCOFINS,\n" +
-                    "	P.COD_NAT_BC_CRED_COFINS,\n" +
-                    "	P.COD_NAT_BC_CRED_PIS,\n" +
-                    "	P.COD_TIPO_CREDITO_COFINS,\n" +
-                    "	P.COD_TIPO_CREDITO_PIS,\n" +
-                    "	P.CODCFOP_ENTRADA,\n" +
-                    "	P.NAT_RECEITA_COFINS,\n" +
-                    "	P.NAT_RECEITA_PIS,\n" +
-                    "	P.CODCSTPIS_ENTRADA,\n" +
-                    "	P.CODCSTCOFINS_ENTRADA,\n" +
-                    "	P.PERCCOFINS_ENTRADA,\n" +
-                    "	NCM.CODNCM\n" +
+                    "SELECT \n" +
+                    "    P.CODPROD,\n" +
+                    "    P.CODBARRA,\n" +
+                    "    P.DESCRICAO,\n" +
+                    "    P.DTCADAST,\n" +
+                    "    P.DESCRNF,\n" +
+                    "    P.DESCRBAL,\n" +
+                    "    P.VALBALANCA,\n" +
+                    "    P.PESAVEL,\n" +
+                    "    P.UNIDADE,\n" +
+                    "    P.UNDCOMPRA,\n" +
+                    "    P.QTDEMBAL,\n" +
+                    "    P.QTDEMBALCPR,\n" +
+                    "    P.CODGENERO,\n" +
+                    "    P.CODGRUPO,\n" +
+                    "    1 codsubgrupo,\n" +
+                    "    P.CODFAMILIA,\n" +
+                    "    P.ESTOATU,\n" +
+                    "    P.ESTOMIN,\n" +
+                    "    P.PRECOENTR,\n" +
+                    "    P.PRECOCUSTO,\n" +
+                    "    P.PRECOVEND,\n" +
+                    "    P.CODTRIB,\n" +
+                    "    trib.SITTRIB as csticms,\n" +
+                    "    P.CODALIQ,\n" +
+                    "    P.CODALIQNF,\n" +
+                    "    P.PERCICMSCR,\n" +
+                    "    P.PERCREDUC,\n" +
+                    "    P.MARGBRUT,\n" +
+                    "    P.MARGPARAM,\n" +
+                    "    P.CODSETOR,\n" +
+                    "    P.PROMOCAO,\n" +
+                    "    P.PEGAR_PESO,\n" +
+                    "    P.INATIVO,\n" +
+                    "    P.ESTOIDEAL,\n" +
+                    "    P.CODTIPOPRODUTO,\n" +
+                    "    P.IDCDTIPOCOFINS,\n" +
+                    "    fc.cod_cst_cofins,\n" +
+                    "    P.IDCDTIPOPIS,\n" +
+                    "    fp.cod_cst_pis,\n" +
+                    "    P.MARGBRUTWEB,\n" +
+                    "    P.CODLOJA,\n" +
+                    "    P.CODCFOP,\n" +
+                    "    P.CODSIMILAR,\n" +
+                    "    P.CODGRUPOFISCAL,\n" +
+                    "    P.PERCALIQSUBTRIB,\n" +
+                    "    P.TIPOSUBTRIB,\n" +
+                    "    P.CODALIQECF,\n" +
+                    "    P.IDNCM,\n" +
+                    "    P.CODTRIBSN,\n" +
+                    "    P.CODCSTPIS,\n" +
+                    "    P.CODCSTCOFINS,\n" +
+                    "    P.COD_NAT_BC_CRED_COFINS,\n" +
+                    "    P.COD_NAT_BC_CRED_PIS,\n" +
+                    "    P.COD_TIPO_CREDITO_COFINS,\n" +
+                    "    P.COD_TIPO_CREDITO_PIS,\n" +
+                    "    P.CODCFOP_ENTRADA,\n" +
+                    "    P.NAT_RECEITA_COFINS,\n" +
+                    "    P.NAT_RECEITA_PIS,\n" +
+                    "    P.CODCSTPIS_ENTRADA,\n" +
+                    "    P.CODCSTCOFINS_ENTRADA,\n" +
+                    "    P.PERCCOFINS_ENTRADA,\n" +
+                    "    NCM.CODNCM\n" +
                     "FROM \n" +
-                    "	CDPRODUTOS AS P\n" +
+                    "    CDPRODUTOS AS P\n" +
                     "LEFT JOIN \n" +
-                    "	CDNCM AS NCM ON NCM.IDNCM = P.IDNCM\n" +
+                    "    CDNCM AS NCM ON NCM.IDNCM = P.IDNCM\n" +
                     "LEFT JOIN\n" +
-                    "	fis_cst_cofins fc ON fc.id_fis_cst_cofins = p.IDCDTIPOCOFINS\n" +
+                    "    fis_cst_cofins fc ON fc.id_fis_cst_cofins = p.CODCSTCOFINS\n" +
                     "LEFT JOIN\n" +
-                    "	fis_cst_pis fp ON fp.id_fis_cst_pis = p.IDCDTIPOPIS\n" +
+                    "    fis_cst_pis fp ON fp.id_fis_cst_pis = p.CODCSTPIS\n" +
                     "LEFT JOIN\n" +
-                    "	CDTRIBUTACAO trib ON trib.CODTRIB = p.CODTRIB\n" +
-                    " --where \n" +
-                    "	--codbarra  = '2000256' \n" +
-                    "  --where p.CODPROD = 58531\n" +
+                    "    CDTRIBUTACAO trib ON trib.CODTRIB = p.CODTRIB\n" +
+                    "    --where \n" +
+                    "    --codbarra  = '2000256' \n" +
+                    "    --where p.CODPROD in (428, 791)\n" +
                     "ORDER BY \n" +
-                    "	PESAVEL DESC,\n" +
-                    "	DESCRICAO")) {
+                    "    PESAVEL DESC,\n" +
+                    "    DESCRICAO")) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -257,10 +258,10 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("codprod"));
                     imp.setEan(rs.getString("codbarra"));                    
-                    imp.setDescricaoCompleta(rs.getString("descrnf"));
+                    imp.setDescricaoCompleta(rs.getString("descricao"));
                     imp.setDescricaoReduzida(rs.getString("descricao"));
                     imp.setDataCadastro(rs.getDate("dtcadast"));
-                    imp.setDescricaoGondola(rs.getString("descricao"));
+                    imp.setDescricaoGondola(rs.getString("descrnf"));
                     imp.setValidade(rs.getInt("valbalanca"));
                     imp.seteBalanca("S".equals(rs.getString("pesavel")) ? true : false);
                     imp.setTipoEmbalagem(rs.getString("unidade"));
@@ -495,9 +496,9 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    TIPOJURFIS,\n" +
                     "    razaosocial, \n" +
                     "    fantasia,\n" +
-                    "    cnpj,\n" +
                     "    ie,\n" +
-                    "    cpf,\n" +
+                    "	 replace(replace(replace(CNPJ, '.', ''), '/', ''), '-', '') as cnpj,\n" +
+                    "	 replace(replace(cpf, '.', ''), '-', '') as cpf,\n" +
                     "    rg,\n" +
                     "    endereco,\n" +
                     "    nrcasa,\n" +
@@ -546,7 +547,7 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rs.getString("codcli"));
                     imp.setRazao(rs.getString("razaosocial"));
                     imp.setFantasia(rs.getString("fantasia"));
-                    
+                                     
                     if ( (rs.getString("cpf") != null) && (rs.getString("tipojurfis") != null) && ("F".equals(rs.getString("tipojurfis"))) ) {
                         if ( rs.getString("cpf").contains("T") ) {
                             imp.setCnpj(imp.getId());
