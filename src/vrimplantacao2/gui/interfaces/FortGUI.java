@@ -338,7 +338,7 @@ public class FortGUI extends VRInternalFrame implements ConexaoEvent {
             .addGroup(tabUnificacaoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(256, Short.MAX_VALUE))
+                .addContainerGap(363, Short.MAX_VALUE))
         );
         tabUnificacaoLayout.setVerticalGroup(
             tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -371,7 +371,7 @@ public class FortGUI extends VRInternalFrame implements ConexaoEvent {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(cmbLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, 357, Short.MAX_VALUE)
+                .addComponent(cmbLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, 464, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
