@@ -175,7 +175,8 @@ public class FornecedorRepository {
                             || (opt.contains(OpcaoFornecedor.TIPO_FORNECEDOR))
                             || (opt.contains(OpcaoFornecedor.TIPO_EMPRESA))
                             || (opt.contains(OpcaoFornecedor.TIPO_PAGAMENTO))
-                            || (opt.contains(OpcaoFornecedor.OBSERVACAO))) {
+                            || (opt.contains(OpcaoFornecedor.OBSERVACAO))
+                            || (opt.contains(OpcaoFornecedor.BANCO_PADRAO))) {
                         atualizarFornecedor(vo, opt);
                     }
 
@@ -507,7 +508,8 @@ public class FornecedorRepository {
         vo.setTipoFornecedor(imp.getTipoFornecedor());
         vo.setTipoEmpresa(imp.getTipoEmpresa());
         vo.setTipoPagamento(imp.getTipoPagamento());
-
+        vo.setIdBanco(imp.getIdBanco() == 0 ? 804 : imp.getIdBanco());
+        
         //<editor-fold defaultstate="collapsed" desc="ENDEREÇO">
         vo.setEndereco(imp.getEndereco());
         vo.setNumero(imp.getNumero());

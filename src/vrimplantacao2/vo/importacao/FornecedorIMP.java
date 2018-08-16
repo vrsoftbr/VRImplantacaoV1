@@ -62,6 +62,7 @@ public class FornecedorIMP {
     
     private TipoEmpresa tipoEmpresa = TipoEmpresa.LUCRO_REAL;
     private TipoPagamento tipoPagamento;
+    private int idBanco;
 
     public Set<Integer> getCondicoesPagamentos() {
         return condicoesPagamentos;
@@ -585,5 +586,12 @@ public class FornecedorIMP {
     public void setTipoPagamento(TipoPagamento tipoPagamento) {
         this.tipoPagamento = tipoPagamento;
     }
-    
+
+    public int getIdBanco() {
+        return idBanco;
+    }
+
+    public void setIdBanco(int idBanco) {
+        this.idBanco = idBanco;
+    }
 }

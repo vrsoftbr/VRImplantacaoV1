@@ -578,7 +578,7 @@ public class FornecedorDAO {
             sql.put("digitoagencia", "");// character varying(2) NOT NULL,
             sql.put("conta", "");// character varying(12) NOT NULL,
             sql.put("digitoconta", "");// character varying(2) NOT NULL,
-            sql.put("id_banco", 804);// integer,
+            sql.put("id_banco", vo.getIdBanco() != 0 ? vo.getIdBanco() : 804);// integer,
             sql.putNull("id_fornecedorfavorecido");// integer,
             sql.put("enderecocobranca", vo.getEnderecoCobranca());// character varying(40) NOT NULL,
             sql.put("bairrocobranca", vo.getBairroCobranca());// character varying(30) NOT NULL,
@@ -607,7 +607,7 @@ public class FornecedorDAO {
             sql.put("tiponegociacao", 0);// integer NOT NULL DEFAULT 0,
             sql.put("utilizacrossdocking", false);// boolean NOT NULL DEFAULT false,
             sql.putNull("id_lojacrossdocking");// integer,
-            sql.put("observacao", "IMPORTADO VR " + vo.getObservacao());// character varying(2500) NOT NULL DEFAULT '::character varying'::character varying,
+            sql.put("observacao", "IMPORTADO VR " + vo.getObservacao() == null ? "" : vo.getObservacao());// character varying(2500) NOT NULL DEFAULT '::character varying'::character varying,
             sql.put("id_pais", 1058);// integer NOT NULL,
             sql.put("inscricaomunicipal", vo.getInscricaoMunicipal());// character varying(20) DEFAULT ''::character varying,
             sql.putNull("id_contacontabilfiscalpassivo");// bigint,
@@ -679,6 +679,9 @@ public class FornecedorDAO {
                 }
                 if (opt.contains(OpcaoFornecedor.OBSERVACAO)) {
                     sql.put("observacao", vo.getObservacao());
+                }
+                if (opt.contains(OpcaoFornecedor.BANCO_PADRAO)) {
+                    sql.put("id_banco", vo.getIdBanco());
                 }
                 sql.setWhere("id = " + vo.getId());
                 stm.execute(sql.getUpdate());

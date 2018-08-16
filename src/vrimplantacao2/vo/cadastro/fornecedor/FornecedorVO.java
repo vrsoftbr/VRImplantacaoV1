@@ -51,6 +51,7 @@ public class FornecedorVO {
     private TipoFornecedor tipoFornecedor = TipoFornecedor.ATACADO;
     private TipoEmpresa tipoEmpresa = TipoEmpresa.LUCRO_REAL;
     private TipoPagamento tipoPagamento = Parametros.get().getTipoPagamento();
+    private int idBanco;
     
     private final MultiMap<String, FornecedorContatoVO> contatos = new MultiMap<>(
         new Factory<FornecedorContatoVO>() {
@@ -343,5 +344,12 @@ public class FornecedorVO {
     public void setTipoPagamento(TipoPagamento tipoPagamento) {
         this.tipoPagamento = tipoPagamento == null ? Parametros.get().getTipoPagamento(): tipoPagamento;
     }
-    
+
+    public int getIdBanco() {
+        return idBanco;
+    }
+
+    public void setIdBanco(int idBanco) {
+        this.idBanco = idBanco;
+    }
 }
