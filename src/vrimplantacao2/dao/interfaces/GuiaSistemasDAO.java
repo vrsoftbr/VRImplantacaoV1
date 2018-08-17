@@ -12,6 +12,7 @@ import java.util.List;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -254,7 +255,61 @@ public class GuiaSistemasDAO extends InterfaceDAO {
                     imp.setCep(rst.getString("vfd_cep"));
                     imp.setCnpj_cpf(rst.getString("vfd_cpf"));
                     imp.setIe_rg(rst.getString("vfd_ie"));
+                    imp.setPrazoVisita(rst.getInt("dias"));
+                    imp.setPrazoEntrega(rst.getInt("vfd_prazo"));
                     imp.setTel_principal(rst.getString("vfd_fone"));
+                    
+                    if ((rst.getString("vfd_nomevendedor") != null)
+                            && (!rst.getString("vfd_nomevendedor").trim().isEmpty())) {
+                        imp.setObservacao("NOME VENDEDOR " + rst.getString("vfd_nomevendedor"));
+                    }
+
+                    if ((rst.getString("vfd_emailvendedor") != null)
+                            && (!rst.getString("vfd_emailvendedor").trim().isEmpty())
+                            && (rst.getString("vfd_emailvendedor").contains("@"))) {
+                        imp.addContato(
+                                "EMAIL VENDEDOR",
+                                null,
+                                null,
+                                TipoContato.COMERCIAL,
+                                rst.getString("vfd_emailvendedor").toLowerCase()
+                        );
+                    }
+
+                    if ((rst.getString("vfd_emailvendas") != null)
+                            && (!rst.getString("vfd_emailvendas").trim().isEmpty())
+                            && (rst.getString("vfd_emailvendas").contains("@"))) {
+                        imp.addContato(
+                                "EMAIL VENDAS",
+                                null,
+                                null,
+                                TipoContato.NFE,
+                                rst.getString("vfd_emailvendas").toLowerCase()
+                        );
+                    }
+
+                    if ((rst.getString("vfd_faxvendedor") != null)
+                            && (!rst.getString("vfd_faxvendedor").trim().isEmpty())) {
+                        imp.addContato(
+                                "FAX VENDEDOR",
+                                null,
+                                null,
+                                TipoContato.COMERCIAL,
+                                rst.getString("vfd_faxvendedor").toLowerCase()
+                        );
+                    }
+
+                    if ((rst.getString("vfd_fonevendedor") != null)
+                            && (!rst.getString("vfd_fonevendedor").trim().isEmpty())) {
+                        imp.addContato(
+                                "TELEFONE VENDEDOR",
+                                null,
+                                null,
+                                TipoContato.COMERCIAL,
+                                rst.getString("vfd_fonevendedor").toLowerCase()
+                        );
+                    }
+
                     vResult.add(imp);
                 }
             }
