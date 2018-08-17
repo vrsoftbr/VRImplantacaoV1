@@ -12,6 +12,9 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -347,6 +350,118 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider{
                         imp.setIdBanco(rs.getInt("banco_padrao"));
                     }
     
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    c.cod_cliente as id,\n" +
+                    "    c.nome_cliente as razao,\n" +
+                    "    c.endereco,\n" +
+                    "    c.bairro,\n" +
+                    "    c.cep,\n" +
+                    "    c.numero,\n" +
+                    "    c.cod_municipio as idmunicipio,\n" +
+                    "    c.cidade,\n" +
+                    "    c.cod_uf as iduf,\n" +
+                    "    c.estado,\n" +
+                    "    c.fone_1 as fone1,\n" +
+                    "    c.fone_2 as fone2,\n" +
+                    "    c.fax,\n" +
+                    "    c.celular,\n" +
+                    "    c.ramal,\n" +
+                    "    c.sexo,\n" +
+                    "    c.data_nascimento,\n" +
+                    "    c.rg,\n" +
+                    "    c.cpfcnpj,\n" +
+                    "    c.data_cadastro,\n" +
+                    "    c.situacao\n" +
+                    "from\n" +
+                    "    cliente c\n" +
+                    "order by\n" +
+                    "    c.cod_cliente")) {
+                while (rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setMunicipioIBGE(rs.getInt("idmunicipio"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setUfIBGE(rs.getInt("iduf"));
+                    imp.setUf(rs.getString("estado"));
+                    imp.setTelefone(rs.getString("fone1"));
+                    if ( (rs.getString("fone2") != null) && (!"".equals(rs.getString("fone2"))) ) {
+                        imp.addTelefone("Telefone2", rs.getString("fone2"));
+                    }
+                    imp.setFax(rs.getString("fax"));
+                    imp.setCelular(rs.getString("celular"));
+                    imp.setSexo("M".equals(rs.getString("sexo")) ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
+                    imp.setDataNascimento(rs.getDate("data_nascimento"));
+                    imp.setInscricaoestadual(rs.getString("rg"));
+                    imp.setCnpj(rs.getString("cpfcnpj"));
+                    imp.setDataCadastro(rs.getDate("data_cadastro"));
+                 
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    dr.cod_cliente,\n" +
+                    "    c.cpfcnpj as cnpj,\n" +
+                    "    c.rg,\n" +
+                    "    dr.data_cupom as datacupom,\n" +
+                    "    dr.num_ecf as ecf,\n" +
+                    "    dr.num_cupom as coo,\n" +
+                    "    dr.num_parcela as parcela,\n" +
+                    "    dr.valor,\n" +
+                    "    dr.obs,\n" +
+                    "    dr.data_vencto as dtvencimento,\n" +
+                    "    dr.num_recibo as recibo,\n" +
+                    "    dr.parcelas,\n" +
+                    "    dr.data_recpag as dtrecimento,\n" +
+                    "    dr.num_documento as nrdoc\n" +
+                    "from\n" +
+                    "    debitorotativo dr\n" +
+                    "join\n" +
+                    "    cliente c on c.cod_cliente = dr.cod_cliente\n" +
+                    "where\n" +
+                    "    dr.loja = 2 and\n" +
+                    "    dr.pago = 'N'\n" +
+                    "order by\n" +
+                    "    dr.data_cupom")) {
+                while (rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setIdCliente(rs.getString("cod_cliente"));
+                    imp.setCnpjCliente(rs.getString("cnpj"));
+                    imp.setDataEmissao(rs.getDate("datacupom"));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setNumeroCupom(rs.getString("coo"));
+                    imp.setParcela(rs.getInt("parcela"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setObservacao(rs.getString("obs"));
+                    imp.setDataVencimento(rs.getDate("dtvencimento"));
+                    
                     result.add(imp);
                 }
             }

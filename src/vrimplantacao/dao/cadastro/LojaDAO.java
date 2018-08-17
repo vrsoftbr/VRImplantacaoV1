@@ -363,6 +363,22 @@ public class LojaDAO {
                 sql.append("and matricula = 500001 ");
 
                 stm.execute(sql.toString());
+                
+                sql = new StringBuilder();
+                sql.append(
+                        "insert into notasaidasequencia (id_loja, numerocontrole, serie) values (" + i_loja.id + ", 1, 1); \n " +
+                        "insert into tiposaidanotasaidasequencia (id_loja, id_tiposaida, id_notasaidasequencia)\n" +
+                        "select \n" +
+                        "	" + i_loja.id + ",\n" +
+                        "	id_tiposaida,\n" +
+                        "	" + i_loja.id +"\n" +
+                        "from \n" +
+                        "	tiposaidanotasaidasequencia\n" +
+                        "where\n" +
+                        "	id_notasaidasequencia not in (" + i_loja.id + ") and id_notasaidasequencia = 1");
+                
+                stm.execute(sql.toString());
+                
             } else {
                 sql = new StringBuilder();
                 sql.append("UPDATE loja SET");

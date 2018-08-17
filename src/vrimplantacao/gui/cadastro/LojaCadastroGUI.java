@@ -216,6 +216,11 @@ public class LojaCadastroGUI extends VRInternalFrame {
         txtCodigo.setMascara("Numero");
         txtCodigo.setName(""); // NOI18N
         txtCodigo.setObrigatorio(true);
+        txtCodigo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtCodigoActionPerformed(evt);
+            }
+        });
         txtCodigo.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtCodigoFocusLost(evt);
@@ -458,6 +463,11 @@ public class LojaCadastroGUI extends VRInternalFrame {
             this.setDefaultCursor();
         }
     }//GEN-LAST:event_txtCodigoFocusLost
+
+    private void txtCodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCodigoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtCodigoActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnSair;
     private vrframework.bean.button.VRButton btnSalvar;
