@@ -13,6 +13,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -446,7 +447,7 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider{
                     "join\n" +
                     "    cliente c on c.cod_cliente = dr.cod_cliente\n" +
                     "where\n" +
-                    "    dr.loja = 2 and\n" +
+                    "    dr.loja = " + getLojaOrigem() + " and\n" +
                     "    dr.pago = 'N'\n" +
                     "order by\n" +
                     "    dr.data_cupom")) {
@@ -464,6 +465,58 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider{
                     
                     result.add(imp);
                 }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    c.num_cupom as coo,\n" +
+                    "    c.data_venda as dtcheque,\n" +
+                    "    c.terminal as ecf,\n" +
+                    "    c.cod_cliente as idcliente,\n" +
+                    "    c.nome_cliente as razao,\n" +
+                    "    c.valor,\n" +
+                    "    c.num_cheque as nrcheque,\n" +
+                    "    c.banco,\n" +
+                    "    c.conta,\n" +
+                    "    c.agencia,\n" +
+                    "    c.cpfcnpj,\n" +
+                    "    c.telefone,\n" +
+                    "    c.data_pre as dtvencimento,\n" +
+                    "    c.cod_alinea,\n" +
+                    "    c.num_parcelas,\n" +
+                    "    c.situacao\n" +
+                    "from\n" +
+                    "    cheque c\n" +
+                    "where\n" +
+                    "    loja = " + getLojaOrigem() + "\n" +
+                    "order by\n" +
+                    "    c.data_venda")) {
+                ChequeIMP imp = new ChequeIMP();
+                imp.setNumeroCupom(rs.getString("coo"));
+                imp.setDate(rs.getDate("dtcheque"));
+                imp.setEcf(rs.getString("ecf"));
+                imp.setNome(rs.getString("razao"));
+                imp.setValor(rs.getDouble("valor"));
+                imp.setNumeroCheque(rs.getString("nrcheque"));
+                imp.setBanco(rs.getInt("banco"));
+                imp.setConta(rs.getString("conta"));
+                imp.setAgencia(rs.getString("agencia"));
+                imp.setCpf(rs.getString("cpfcnpj"));
+                if ( (rs.getString("telefone") != null) && (!"".equals(rs.getString("telefone"))) ) {
+                    imp.setTelefone(rs.getString("telefone"));
+                }
+                imp.setDataDeposito(rs.getDate("dtvencimento"));
+                imp.setAlinea(rs.getInt("alinea"));
+                
+                result.add(imp);
             }
         }
         return result;

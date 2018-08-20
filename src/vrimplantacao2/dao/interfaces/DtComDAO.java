@@ -147,7 +147,8 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "cstcofins, \n"
                     + "ppis, \n"
                     + "pcofins, \n"
-                    + "picms \n"
+                    + "picms, \n"
+                    + "tipvenda \n"
                  + "from \n"
                     + "produtos \n"
                  + "left join\n"
@@ -188,8 +189,8 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSituacaoCadastro((rs.getDate("dat_can")) == null ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     if (vBalanca) {
                         if ((rs.getString("ean1") != null)
-                                && ("KG".equals(rs.getString("unidade").toUpperCase()))
-                                && (rs.getString("ean1").trim().substring(6, 12).length() <= 6)) { //0000000004213
+                                && ("F".equals(rs.getString("tipvenda").trim()))) {
+                                //&& (rs.getString("ean1").trim().substring(6, 12).length() <= 6)) { //0000000004213
                             ProdutoBalancaVO produtoBalanca;
                             long codigoProduto;
                             String ean = rs.getString("ean1").trim().substring(6, 12);
