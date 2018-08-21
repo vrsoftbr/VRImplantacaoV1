@@ -83,4 +83,45 @@ public class CreditoRotativoDAO {
             );
         }
     } 
+    
+    public void excluirCreditoRotativoCheque(int id_loja) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(
+                    "begin;\n" +
+                    "do $$\n" +
+                    "declare idLoja integer;\n" +
+                    "begin\n" +
+                    "	idLoja = " + id_loja + "; \n" +
+                    "	delete from \n" +
+                    "		recebercreditorotativo \n" +
+                    "	where \n" +
+                    "		id in\n" +
+                    "			(select\n" +
+                    "				r.id\n" +
+                    "			from\n" +
+                    "				recebercreditorotativo r \n" +
+                    "			inner join\n" +
+                    "				implantacao.codant_recebercreditorotativo imp on imp.codigoatual = r.id) and\n" +
+                    "		id_loja = idLoja;\n" +
+                    "	alter sequence recebercreditorotativo_id_seq restart with 1;\n" +
+                    "	delete from implantacao.codant_recebercreditorotativo;\n" +
+                    "\n" +
+                    "	delete from\n" +
+                    "		recebercheque\n" +
+                    "	where\n" +
+                    "		id in\n" +
+                    "			(select\n" +
+                    "				ch.id\n" +
+                    "			from\n" +
+                    "				recebercheque ch\n" +
+                    "			inner join\n" +
+                    "				implantacao.codant_recebercheque imp on imp.codigoatual = ch.id) and\n" +
+                    "		id_loja = idLoja;\n" +
+                    "	alter sequence recebercheque_id_seq restart with 1;\n" +
+                    "	delete from implantacao.codant_recebercheque;\n" +
+                    "end\n" +
+                    "$$;\n" +
+                    "commit;");
+            }
+    }
 }

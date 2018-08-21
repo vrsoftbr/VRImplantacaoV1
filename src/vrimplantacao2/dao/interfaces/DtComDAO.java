@@ -190,7 +190,6 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (vBalanca) {
                         if ((rs.getString("ean1") != null)
                                 && ("F".equals(rs.getString("tipvenda").trim()))) {
-                                //&& (rs.getString("ean1").trim().substring(6, 12).length() <= 6)) { //0000000004213
                             ProdutoBalancaVO produtoBalanca;
                             long codigoProduto;
                             String ean = rs.getString("ean1").trim().substring(6, 12);

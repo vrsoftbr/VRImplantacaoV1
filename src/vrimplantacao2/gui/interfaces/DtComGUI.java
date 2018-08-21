@@ -16,6 +16,7 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.CreditoRotativoDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.DtComDAO;
@@ -65,6 +66,7 @@ public class DtComGUI extends VRInternalFrame {
     
     private DtComDAO dtcomDAO = new DtComDAO();
     private ConexaoDBF connDBF = new ConexaoDBF();
+    private CreditoRotativoDAO creditoRotativoDAO;
     
     private DtComGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
@@ -102,7 +104,7 @@ public class DtComGUI extends VRInternalFrame {
         this.setMaximum(false);
     }
 
-    public void validarDadosAcessoOracle() throws Exception {
+    public void validarDadosAcessoDBF() throws Exception {
                 
         ConexaoDBF.abrirConexao(txtDatabase.getArquivo());
         
@@ -312,6 +314,24 @@ public class DtComGUI extends VRInternalFrame {
 
         thread.start();
     }
+    
+    public void excluirCreditoCheque() {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    ProgressBar.setStatus("Deletando Crédito Rotativo / Cheque...");
+                    creditoRotativoDAO = new CreditoRotativoDAO();
+                    creditoRotativoDAO.excluirCreditoRotativoCheque(((ItemComboVO) cmbLojaVR.getSelectedItem()).id);
+                    ProgressBar.dispose();
+                } catch (Exception ex) {
+                    ProgressBar.dispose();
+                    Util.exibirMensagemErro(ex, getTitle());
+                }
+            }
+        };
+        thread.start();
+    }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -363,6 +383,7 @@ public class DtComGUI extends VRInternalFrame {
         vRPanel8 = new vrframework.bean.panel.VRPanel();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkCheques = new vrframework.bean.checkBox.VRCheckBox();
+        btnExcluirCreditoRotativoCheque = new vrframework.bean.button.VRButton();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
@@ -554,7 +575,7 @@ public class DtComGUI extends VRInternalFrame {
                 .addGroup(vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkCpfCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkObservacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addContainerGap(39, Short.MAX_VALUE))
         );
 
         tpDadosMigracao.addTab("Fornecedores", vRPanel5);
@@ -590,6 +611,14 @@ public class DtComGUI extends VRInternalFrame {
                 .addContainerGap())
         );
 
+        btnExcluirCreditoRotativoCheque.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/excluir.png"))); // NOI18N
+        btnExcluirCreditoRotativoCheque.setText("Excluir Crédito Rotativo / Cheque");
+        btnExcluirCreditoRotativoCheque.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExcluirCreditoRotativoChequeActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout vRPanel4Layout = new javax.swing.GroupLayout(vRPanel4);
         vRPanel4.setLayout(vRPanel4Layout);
         vRPanel4Layout.setHorizontalGroup(
@@ -600,8 +629,10 @@ public class DtComGUI extends VRInternalFrame {
                     .addComponent(chkCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkLimiteCredito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(vRPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(316, Short.MAX_VALUE))
+                .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnExcluirCreditoRotativoCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(232, Short.MAX_VALUE))
         );
         vRPanel4Layout.setVerticalGroup(
             vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -613,7 +644,9 @@ public class DtComGUI extends VRInternalFrame {
                         .addComponent(chkCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkLimiteCredito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(33, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnExcluirCreditoRotativoCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         tpDadosMigracao.addTab("Clientes", vRPanel4);
@@ -633,7 +666,7 @@ public class DtComGUI extends VRInternalFrame {
         );
         vRPanel1Layout.setVerticalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 124, Short.MAX_VALUE)
+            .addGap(0, 141, Short.MAX_VALUE)
             .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(vRPanel1Layout.createSequentialGroup()
                     .addContainerGap()
@@ -661,7 +694,7 @@ public class DtComGUI extends VRInternalFrame {
             .addGroup(vRPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(122, Short.MAX_VALUE))
+                .addContainerGap(139, Short.MAX_VALUE))
         );
 
         tabs.addTab("Unificação", vRPanel2);
@@ -794,7 +827,7 @@ public class DtComGUI extends VRInternalFrame {
                 connDBF.close();
             }
 
-            validarDadosAcessoOracle();
+            validarDadosAcessoDBF();
             btnConectar.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/chat/conectado.png")));
             btnMapaTrib.setEnabled(true);
         } catch (Exception ex) {
@@ -813,8 +846,20 @@ public class DtComGUI extends VRInternalFrame {
 
     }//GEN-LAST:event_btnMapaTribActionPerformed
 
+    private void btnExcluirCreditoRotativoChequeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirCreditoRotativoChequeActionPerformed
+        try {
+            ProgressBar.show();
+            excluirCreditoCheque();
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, getTitle());
+        } finally {
+            this.setDefaultCursor();
+        }
+    }//GEN-LAST:event_btnExcluirCreditoRotativoChequeActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
+    private vrframework.bean.button.VRButton btnExcluirCreditoRotativoCheque;
     private vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTrib;
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkAtacado;
