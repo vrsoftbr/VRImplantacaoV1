@@ -26,7 +26,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Importacao
  */
-public class MarketDAO extends InterfaceDAO implements MapaTributoProvider{
+public class MarketDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean v_usar_arquivoBalanca;
     public String lojaMesmoID;

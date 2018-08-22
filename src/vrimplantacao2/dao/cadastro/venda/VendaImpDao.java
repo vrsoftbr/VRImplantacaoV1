@@ -1,4 +1,3 @@
-
 package vrimplantacao2.dao.cadastro.venda;
 
 import com.j256.ormlite.dao.Dao;

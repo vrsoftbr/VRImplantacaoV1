@@ -858,8 +858,6 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                                 + Utils.acertarTexto(rst.getString("estado")) + ","
                                 + Utils.acertarTexto(rst.getString("cep"));
                         next.setEnderecoCliente(endereco);
-                        
-                        
                     }
                 }
                 
@@ -871,49 +869,52 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
         
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "select\n" +
-                    "	v.idvdapdv as idvenda,\n" +
-                    "   v.codpdv,\n" +
-                    "	cast(v.codpdv as varchar) + ' ' + isnull(v.numserieecf, v.CODPDV)  as ecf,\n" +
-                    "	v.coo as cupomfiscal,\n" +
-                    "	v.dtemissao,\n" +
-                    "	v.hremissao,\n" +
-                    "   v.dhemissao,\n" +
-                    "   v.datahoraautorizacao,\n" +
-                    "	case when v.cancelado = 'N' then 0 else 1 end as cancelado,\n" +
-                    "	coalesce(v.vlrcompra, 0) as vlcompra,\n" +
-                    "	coalesce(v.vlrdesc, 0) as vldesc,\n" +
-                    "	coalesce(v.vlracres, 0) as vlacres,\n" +
-                    "	coalesce(v.vlrtotal, 0) as vltotal,\n" +
-                    "	v.dtmovto,\n" +
-                    "	v.modeloecf,\n" +
-                    "	v.numserieecf,\n" +
-                    "	v.chave_acesso,\n" +
-                    "	v.modelo_doc,\n" +
-                    "	v.totimpostocf,\n" +
-                    "	c.codcli,\n" +
-                    "	c.razaosocial,\n" +
-                    "	c.CPF,\n" +
-                    "	c.cnpj,\n" +
-                    "	c.endereco,\n" +
-                    "	c.nrcasa,\n" +
-                    "	c.complemento,\n" +
-                    "	c.bairro,\n" +
-                    "	c.cidade,\n" +
-                    "	c.estado,\n" +
-                    "	c.cep,\n" +
-                    "	tri.percentual\n" +
-                    "from\n" +
-                    "	vdapdv v\n"+
-                    "left join\n" +
-                    "	cdclientes c on c.codcli = v.codcli\n" +
-                    "left join\n" +
-                    "	cdaliquota tri on tri.codaliq = v.regime_tributacao\n" +
-                    "where\n" +
-                    "	(v.dtemissao between convert(datetime, '" + FORMAT.format(dataInicio) + "', 103) and convert(datetime, '" + FORMAT.format(dataTermino) + "', 103)) and\n" +
-                    "   v.coo <> 0\n" +
-                    "order by\n" +
-                    "	v.dtemissao, v.coo";
+                    =   "select\n" +
+                        "    v.idvdapdv as idvenda,\n" +
+                        "    v.codpdv,\n" +
+                        "    cast(v.codpdv as varchar) + ' ' + isnull(v.ID_EXTERNO, v.NUMSERIEECF)  as ecf,\n" +
+                        "    v.id_externo,\n" +
+                        "    v.coo as cupomfiscal,\n" +
+                        "    v.dtemissao,\n" +
+                        "    v.hremissao,\n" +
+                        "    v.dhemissao,\n" +
+                        "    v.datahoraautorizacao,\n" +
+                        "    case when v.cancelado = 'N' then 0 else 1 end as cancelado,\n" +
+                        "    coalesce(v.vlrcompra, 0) as vlcompra,\n" +
+                        "    coalesce(v.vlrdesc, 0) as vldesc,\n" +
+                        "    coalesce(v.vlracres, 0) as vlacres,\n" +
+                        "    coalesce(v.vlrtotal, 0) as vltotal,\n" +
+                        "    v.dtmovto,\n" +
+                        "    v.modeloecf,\n" +
+                        "    v.numserieecf,\n" +
+                        "    v.chave_acesso,\n" +
+                        "    v.modelo_doc,\n" +
+                        "    v.totimpostocf,\n" +
+                        "    case when v.cancelado = 'N' then 0 else 1 end as cancelado,\n" +
+                        "    case when c.codcli = 0 then null else c.codcli end as codcli,\n" +
+                        "    c.razaosocial,\n" +
+                        "    c.CPF,\n" +
+                        "    c.cnpj,\n" +
+                        "    c.endereco,\n" +
+                        "    c.nrcasa,\n" +
+                        "    c.complemento,\n" +
+                        "    c.bairro,\n" +
+                        "    c.cidade,\n" +
+                        "    c.estado,\n" +
+                        "    c.cep,\n" +
+                        "    tri.percentual\n" +
+                        "from\n" +
+                        "    vdapdv v\n" +
+                        "left join\n" +
+                        "    cdclientes c on c.codcli = v.codcli\n" +
+                        "left join\n" +
+                        "    cdaliquota tri on tri.codaliq = v.regime_tributacao\n" +
+                        "where\n" +
+                        "    (v.dtemissao between convert(datetime, '" + FORMAT.format(dataInicio) + "', 103) and convert(datetime, '" + FORMAT.format(dataTermino) + "', 103)) and\n" +
+                        "    v.coo <> 0 and\n" +
+                        "    v.vlrcompra is not null\n" +
+                        "order by\n" +
+                        "    v.dtemissao, v.coo";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -990,7 +991,7 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	vi.totalitem as valortotal,\n" +
                     "	case when vi.cancelado = 'N' then 0 else 1 end as cancelado,\n" +
                     "	vi.percicms as aliqicms,\n" +
-                    "	vi.csticms,\n" +
+                    "	cast(vi.csticms as integer) as csticms,\n" +
                     "	vi.cstcofins,\n" +
                     "	vi.percpis,\n" +
                     "	vi.perccofins,\n" +
