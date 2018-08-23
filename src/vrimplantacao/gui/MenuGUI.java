@@ -24,6 +24,7 @@ import vrimplantacao.gui.assistente.mapamercadologico.MapaMercadologicoGUI;
 import vrimplantacao.gui.assistente.parametro.ParametroGUI;
 import vrimplantacao.gui.cadastro.LojaConsultaGUI;
 import vrimplantacao.gui.interfaces.AcertarCodigoInternoGUI;
+import vrimplantacao.gui.interfaces.AcertarIdsProdutoGUI;
 import vrimplantacao.gui.interfaces.ActiveGUI;
 import vrimplantacao.gui.interfaces.ArquivoPadraoGUI;
 import vrimplantacao2.gui.interfaces.CgaGUI;
@@ -271,6 +272,7 @@ public final class MenuGUI extends VRMdiFrame {
     public PlanilhaFornecedorGUI formPlanilhaFornecedor = null;
     public PlanilhaV2GUI formPlanilhaV2 = null;
     public AcertarCodigoInternoGUI formAcertarCodigoInterno = null;
+    public AcertarIdsProdutoGUI formAcertarIdsProduto = null;
     public PlanilhaNCMGUI formPlanilhaNCM = null;
     public PlanilhaInventarioGUI formPlanilhaInventario = null;
     public PlanilhaProdutosLanchoneteGUI formPlanilhaProdutosLanchonete = null;
@@ -683,6 +685,7 @@ public final class MenuGUI extends VRMdiFrame {
         jMenu14 = new javax.swing.JMenu();
         mnupdvvendaitem = new javax.swing.JMenuItem();
         mnuPlanilhaVr = new javax.swing.JMenuItem();
+        mnuAcertarIdsProdutos = new javax.swing.JMenuItem();
         jMenuItemVRPdv = new javax.swing.JMenuItem();
         jMenuItem13 = new javax.swing.JMenuItem();
         mnuSistema = new javax.swing.JMenu();
@@ -2158,6 +2161,14 @@ public final class MenuGUI extends VRMdiFrame {
         jMenu14.add(mnuPlanilhaVr);
 
         jMenu1.add(jMenu14);
+
+        mnuAcertarIdsProdutos.setText("Acertar Ids Produtos");
+        mnuAcertarIdsProdutos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAcertarIdsProdutosActionPerformed(evt);
+            }
+        });
+        jMenu1.add(mnuAcertarIdsProdutos);
 
         mnuInterface.add(jMenu1);
 
@@ -3911,6 +3922,24 @@ public final class MenuGUI extends VRMdiFrame {
         MarketGUI.exibir(this);
     }//GEN-LAST:event_mnuMarketActionPerformed
 
+    private void mnuAcertarIdsProdutosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAcertarIdsProdutosActionPerformed
+        // TODO add your handling code here:
+        try {
+            this.setWaitCursor();
+            if (formAcertarIdsProduto == null || formAcertarIdsProduto.isClosed()) {
+                formAcertarIdsProduto = new AcertarIdsProdutoGUI(this);
+            }
+
+            formAcertarIdsProduto.setVisible(true);
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, getTitle());
+
+        } finally {
+            this.setDefaultCursor();
+        }
+        
+    }//GEN-LAST:event_mnuAcertarIdsProdutosActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -4015,6 +4044,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mmnuGestora;
     private javax.swing.JMenu mnuADT;
     private javax.swing.JMenuItem mnuASoft;
+    private javax.swing.JMenuItem mnuAcertarIdsProdutos;
     private javax.swing.JMenu mnuAjuda;
     private javax.swing.JMenuItem mnuAjudaSobre;
     private javax.swing.JMenuItem mnuAlterDataWShop;

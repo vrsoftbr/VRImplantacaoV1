@@ -16,6 +16,8 @@ import vrimplantacao2.vo.enums.TipoEmbalagem;
 public class ProdutoVO {
     
     private int id = 0;
+    private int idProduto2 = 0;
+    private String impId = "";
     private String descricaoCompleta = "SEM DESCRICAO";
     private String descricaoReduzida = "SEM DESCRICAO";
     private String descricaoGondola = "SEM DESCRICAO";
@@ -95,6 +97,22 @@ public class ProdutoVO {
         this.id = id;
     }
 
+    public int getIdProduto2() {
+        return this.idProduto2;
+    }
+
+    public void setIdProduto2(int idProduto2) {
+        this.idProduto2 = idProduto2;
+    }
+
+    public String getImpId() {
+        return this.impId;
+    }
+
+    public void setImpId(String impId) {
+        this.impId = impId;
+    }
+    
     public void setDescricaoCompleta(String descricaoCompleta) {
         this.descricaoCompleta = Utils.acertarTexto(descricaoCompleta, 60, "PRODUTO SEM DESCRICAO");
     }
