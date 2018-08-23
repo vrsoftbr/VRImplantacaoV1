@@ -441,7 +441,7 @@ public class GetWayGUI extends VRInternalFrame {
                         }
                     } else if (tabs.getSelectedIndex() == 2) {
                         if (chkUnifProdutos.isSelected()) {
-                            importador.unificarProdutos2();
+                            importador.unificarProdutos();
                         }
                         if (chkUnifFornecedor.isSelected()) {
                             importador.unificarFornecedor();
