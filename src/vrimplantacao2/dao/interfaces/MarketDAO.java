@@ -493,6 +493,8 @@ public class MarketDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEmail(rs.getString("emailnfe"));
                     imp.setAtivo(rs.getBoolean("ativo"));
                     imp.setValorLimite(rs.getDouble("vl_limite"));
+                    imp.setPermiteCheque(true);
+                    imp.setPermiteCreditoRotativo(true);
                     
                     result.add(imp);
                 }

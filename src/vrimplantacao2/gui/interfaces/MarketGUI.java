@@ -432,7 +432,7 @@ public class MarketGUI extends VRInternalFrame {
         vRLabel8 = new vrframework.bean.label.VRLabel();
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
 
-        setTitle("Sysmo");
+        setTitle("Market");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }

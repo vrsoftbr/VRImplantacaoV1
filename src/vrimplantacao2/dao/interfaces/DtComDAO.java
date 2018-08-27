@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
@@ -542,14 +543,15 @@ public class DtComDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " r.comen\n"        
                  + "from\n"
                     + "	receb r\n"
-                 + "join\n"
+                 + "inner join\n"
                     + "	clientes c\n"
                     + "       on c.cpf = r.cgc\n"
                  + "where\n"
-                    + "	r.tipo = 1 and\n"
-                    + "	r.dtpg is null")) {
+                    + "	trim(r.tipo) = 1 and\n"
+                    + "	r.vlpg = 0")) {
                 while (rs.next()) {
                     ChequeIMP imp = new ChequeIMP();
+                    imp.setId(rs.getString("cheque") + rs.getString("banco") + rs.getString("agencia") + rs.getString("conta"));
                     imp.setAgencia(rs.getString("agencia"));
                     imp.setBanco(rs.getInt("banco"));
                     imp.setConta(rs.getString("conta"));
