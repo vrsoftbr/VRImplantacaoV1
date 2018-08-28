@@ -68,9 +68,9 @@ public class AcertarIdsProdutoDAO {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
                     + "p.id, p.descricaocompleta,\n"
-                    + "ant.impid, ant.codigoatual\n"
+                    + "coalesce(ant.impid, '0') as impid, ant.codigoatual\n"
                     + "from produto p \n"
-                    + "inner join implantacao.codant_produto ant on ant.codigoatual = p.id\n"
+                    + "left join implantacao.codant_produto ant on ant.codigoatual = p.id\n"
                     + "where p.id_produto2 = 0\n"
                     + "and ant.imploja = '" + lojaOrigem + "'\n"
                     + "order by p.id"
@@ -78,7 +78,7 @@ public class AcertarIdsProdutoDAO {
                 while (rst.next()) {
                     ProdutoVO vo = new ProdutoVO();
                     vo.setId(rst.getInt("id"));
-                    vo.setImpId(rst.getString("impid"));
+                    vo.setImpId("0".equals(rst.getString("impid")) ? rst.getString("id") : rst.getString("impid"));
                     result.add(vo);
                 }
             }

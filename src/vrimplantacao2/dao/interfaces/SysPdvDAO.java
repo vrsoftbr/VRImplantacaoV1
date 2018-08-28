@@ -532,7 +532,7 @@ public class SysPdvDAO extends InterfaceDAO {
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemento"));
                     imp.setBairro(rst.getString("bairro"));
-                    imp.setMunicipioIBGE(rst.getInt("ibge_municipio"));
+                    imp.setMunicipioIBGE(Integer.parseInt(Utils.formataNumero(rst.getString("ibge_municipio"))));
                     imp.setMunicipio(rst.getString("cidade"));
                     imp.setUf(rst.getString("estado"));
                     imp.setCep(rst.getString("cep"));

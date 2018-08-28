@@ -110,9 +110,9 @@ public class InteragemDAO extends InterfaceDAO {
                     imp.setDescricaoGondola(imp.getDescricaoGondola());
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                    imp.setMargem(rst.getDouble("margem"));
-                    imp.setPesoBruto(rst.getDouble("pesobruto"));
-                    imp.setPesoLiquido(rst.getDouble("pesoliquido"));
+                    imp.setMargem(MathUtils.trunc(rst.getDouble("margem"), 2));
+                    imp.setPesoBruto(MathUtils.trunc(rst.getDouble("pesobruto"), 2));
+                    imp.setPesoLiquido(MathUtils.trunc(rst.getDouble("pesoliquido"), 2));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(Integer.parseInt(Utils.formataNumero(rst.getString("piscofins_cst_debito"))));
@@ -205,8 +205,8 @@ public class InteragemDAO extends InterfaceDAO {
                     imp.setEndereco(rst.getString("endfor"));
                     imp.setBairro(rst.getString("baifor"));
                     imp.setComplemento(rst.getString("pontoref"));
-                    imp.setMunicipio(rst.getString("cidade"));
-                    imp.setUf(rst.getString("uf"));
+                    imp.setMunicipio(rst.getString("cidade").toUpperCase());
+                    imp.setUf(rst.getString("uf").toUpperCase());
                     imp.setCep(rst.getString("cep"));
                     imp.setAtivo(("A".equals(rst.getString("situacao"))));
                     imp.setCnpj_cpf(Utils.formataNumero(rst.getString("cnpj")));
