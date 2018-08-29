@@ -189,8 +189,8 @@ public class TopSystemDAO extends InterfaceDAO {
                     + "    p.nivel2, \n"
                     + "    p.nivel3, \n"
                     + "    p.class_fiscal_mercosul,\n"
-                    + "    p.preco_venda1,\n"
-                    + "    p.preco_custo,\n"
+                    + "    preco.preco_venda,\n"
+                    + "    custo.preco_custo,\n"
                     + "    p.margem_lucro,\n"
                     + "    p.validade,\n"
                     + "    p.familia,\n"
@@ -212,6 +212,11 @@ public class TopSystemDAO extends InterfaceDAO {
                     + "from\n"
                     + "    cad_produto p\n"
                     + "    join cad_empresa emp on emp.codigo = " + getLojaOrigem() + "\n"
+                    + "    left join cad_produto_pvenda preco on preco.cod_produto = p.codigo \n"
+                    + "         and preco.empresa = " + getLojaOrigem() + "\n"
+                    + "         and preco.tabela_preco = 1\n"
+                    + "    left join cad_produto_pcusto custo on custo.cod_produto = p.codigo \n"
+                    + "         and custo.empresa = " + getLojaOrigem() + "\n"
                     + "    inner join ger_tribcontribitem pis on pis.cod = p.tribcontrib\n"
                     + "    left join trib_estado trib on trib.cod_prod = p.codigo and trib.uf = '" + Parametros.get().getUfPadraoV2().getSigla() + "'\n"
                     + "    left join cad_estoque est on est.empresa = emp.codigo and est.codigo = p.codigo and est.tipo_estoque = 1\n" /*"union \n" +
@@ -342,8 +347,8 @@ public class TopSystemDAO extends InterfaceDAO {
                     imp.setPesoBruto(rst.getDouble("peso_bruto_embalagem"));
                     imp.setCodMercadologico1(rst.getString("grupo"));
                     imp.setNcm(rst.getString("class_fiscal_mercosul"));
-                    imp.setPrecovenda(rst.getDouble("preco_venda1"));
-                    imp.setCustoComImposto(rst.getDouble("Preco_Custo"));
+                    imp.setPrecovenda(rst.getDouble("preco_venda"));
+                    imp.setCustoComImposto(rst.getDouble("preco_custo"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setMargem(rst.getDouble("Margem_Lucro"));
                     imp.setValidade(rst.getInt("Validade"));
@@ -361,7 +366,7 @@ public class TopSystemDAO extends InterfaceDAO {
                         imp.setCodMercadologico3(rst.getString("nivel3"));
                     }
 
-                    imp.setIdFamiliaProduto(rst.getString("familia"));
+                    imp.setIdFamiliaProduto(rst.getString("familiaproduto"));
                     imp.setCest(rst.getString("cest"));
                     imp.setEstoqueMinimo(rst.getDouble("estoque_minimo"));
                     imp.setEstoque(rst.getDouble("qtde_atual"));
