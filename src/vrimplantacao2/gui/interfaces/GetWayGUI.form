@@ -500,6 +500,11 @@
                     <Property name="text" type="java.lang.String" value="Associado"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUsaMargemLiquida">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Usa Margem Liquida Praticada"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="vRPanel9">

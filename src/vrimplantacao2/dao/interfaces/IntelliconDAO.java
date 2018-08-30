@@ -26,7 +26,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Importacao
  */
-public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider{
+public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean vBalanca;
     
@@ -187,7 +187,7 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider{
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
-                    imp.setMargem(rs.getDouble("margem"));
+                    imp.setMargem(rs.getDouble("margembruta"));
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     

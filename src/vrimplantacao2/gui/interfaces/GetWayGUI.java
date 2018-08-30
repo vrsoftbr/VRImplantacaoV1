@@ -234,6 +234,7 @@ public class GetWayGUI extends VRInternalFrame {
                     getWayDAO.v_usar_arquivoBalancaUnificacao = chkTemArquivoBalancaUnificacao.isSelected();
                     getWayDAO.usarMargemBruta = chkUsarMargemBruta.isSelected();
                     getWayDAO.setUsarQtdEmbDoProduto(chkUsarQtdCotacaoProdFornecedor.isSelected());
+                    getWayDAO.usaMargemLiquidaPraticada = chkUsaMargemLiquida.isSelected();
                     
                      if (!"".equals(txtLojaMesmoID.getText()) && !txtLojaMesmoID.getText().isEmpty()) {
                         lojaMesmoId = " - " + txtLojaMesmoID.getText();
@@ -333,6 +334,10 @@ public class GetWayGUI extends VRInternalFrame {
                                 opcoes.add(OpcaoProduto.QTD_EMBALAGEM_EAN);
                             }
                             if (chkMargem.isSelected()) {
+                                opcoes.add(OpcaoProduto.MARGEM);
+                            }
+                            
+                            if (chkUsaMargemLiquida.isSelected()) {
                                 opcoes.add(OpcaoProduto.MARGEM);
                             }
 
@@ -536,6 +541,7 @@ public class GetWayGUI extends VRInternalFrame {
         chkDtAlteracao = new vrframework.bean.checkBox.VRCheckBox();
         chkMargem = new vrframework.bean.checkBox.VRCheckBox();
         chkAssociado = new vrframework.bean.checkBox.VRCheckBox();
+        chkUsaMargemLiquida = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel9 = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -851,6 +857,9 @@ public class GetWayGUI extends VRInternalFrame {
 
         chkAssociado.setText("Associado");
         vRPanel7.add(chkAssociado);
+
+        chkUsaMargemLiquida.setText("Usa Margem Liquida Praticada");
+        vRPanel7.add(chkUsaMargemLiquida);
 
         vRTabbedPane2.addTab("Produtos", vRPanel7);
 
@@ -1619,6 +1628,7 @@ public class GetWayGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
+    private vrframework.bean.checkBox.VRCheckBox chkUsaMargemLiquida;
     private vrframework.bean.checkBox.VRCheckBox chkUsarMargemBruta;
     private vrframework.bean.checkBox.VRCheckBox chkUsarQtdCotacaoProdFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkValidade;

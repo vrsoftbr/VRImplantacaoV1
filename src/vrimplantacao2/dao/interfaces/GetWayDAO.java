@@ -73,6 +73,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
     public boolean usarMargemBruta = false;
     public String v_lojaMesmoId;
     public boolean usarQtdEmbDoProduto = false;
+    public boolean usaMargemLiquidaPraticada = false;
 
     public void setUsarQtdEmbDoProduto(boolean usarQtdEmbDoProduto) {
         this.usarQtdEmbDoProduto = usarQtdEmbDoProduto;
@@ -260,6 +261,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	prod.preco_unit preco,\n"
                     + "	prod.margem_bruta,\n"
                     + "	prod.margem_param,\n"
+                    + " prod.lucroliq margemliquidapraticada,\n"
                     + "	prod.ativo,\n"
                     + "	case when prod.descricao like '*%' then 1 else 0 end descontinuado,\n"
                     + "	prod.codncm ncm,\n"
@@ -316,6 +318,8 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrecovenda(rst.getDouble("preco"));
                     if (usarMargemBruta) {
                         imp.setMargem(rst.getDouble("margem_bruta"));
+                    } else if (usaMargemLiquidaPraticada) {
+                        imp.setMargem(rst.getDouble("margemliquidapraticada"));
                     } else {
                         imp.setMargem(rst.getDouble("margem_param"));
                     }
