@@ -385,7 +385,8 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    c.rg,\n" +
                     "    c.cpfcnpj,\n" +
                     "    c.data_cadastro,\n" +
-                    "    c.situacao\n" +
+                    "    c.situacao,\n" +
+                    "    c.statusshop\n" +
                     "from\n" +
                     "    cliente c\n" +
                     "order by\n" +
@@ -409,6 +410,7 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFax(rs.getString("fax"));
                     imp.setCelular(rs.getString("celular"));
                     imp.setSexo("M".equals(rs.getString("sexo")) ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
+                    imp.setAtivo("S".equals(rs.getString("statusshop")) ? false : true);
                     imp.setDataNascimento(rs.getDate("data_nascimento"));
                     imp.setInscricaoestadual(rs.getString("rg"));
                     imp.setCnpj(rs.getString("cpfcnpj"));
@@ -448,7 +450,8 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    cliente c on c.cod_cliente = dr.cod_cliente\n" +
                     "where\n" +
                     "    dr.loja = " + getLojaOrigem() + " and\n" +
-                    "    dr.pago = 'N'\n" +
+                    "    dr.pago = 'N' and\n" +
+                    "    dr.num_ecf != 0\n" +        
                     "order by\n" +
                     "    dr.data_cupom")) {
                 while (rs.next()) {
@@ -496,7 +499,8 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
                     "from\n" +
                     "    cheque c\n" +
                     "where\n" +
-                    "    loja = " + getLojaOrigem() + "\n" +
+                    "    loja = " + getLojaOrigem() + " and\n" +
+                    "    c.situacao = 1\n" +
                     "order by\n" +
                     "    c.data_venda")) {
                 ChequeIMP imp = new ChequeIMP();

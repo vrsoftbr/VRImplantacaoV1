@@ -75,7 +75,6 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         txtProdutoFile = new vrframework.bean.fileChooser.VRFileChooser();
         vRLabel1 = new vrframework.bean.label.VRLabel();
         tabsProduto = new vrframework.bean.tabbedPane.VRTabbedPane();
-        tabProdImportacao = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabProdEspeciais = new vrframework.bean.panel.VRPanel();
         btnDelMercadologico = new vrframework.bean.button.VRButton();
         btnDelFamiliaProduto = new vrframework.bean.button.VRButton();
@@ -89,6 +88,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         txtTributoFile = new vrframework.bean.fileChooser.VRFileChooser();
         vRLabel10 = new vrframework.bean.label.VRLabel();
         tabArquivoBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
+        tabProdImportacao = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         vRLabel8 = new vrframework.bean.label.VRLabel();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         vRLabel3 = new vrframework.bean.label.VRLabel();
@@ -181,7 +181,6 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel1, "Informe o arquivo dos produtos");
 
         tabsProduto.setPreferredSize(new java.awt.Dimension(900, 202));
-        tabsProduto.addTab("Importação", tabProdImportacao);
 
         org.openide.awt.Mnemonics.setLocalizedText(btnDelMercadologico, "Eliminar mercadológico");
         btnDelMercadologico.addActionListener(new java.awt.event.ActionListener() {
@@ -306,6 +305,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
         tabsProduto.addTab("Mapa de tributações", tabMapaTributacao);
         tabsProduto.addTab("Arquivo de Balança", tabArquivoBalanca);
+        tabsProduto.addTab("Importação", tabProdImportacao);
 
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel8, "Del");
 
