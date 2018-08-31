@@ -35,7 +35,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  * @author Leandro
  */
 public class SysPdvDAO extends InterfaceDAO {
-    
+
     private TipoConexao tipoConexao;
 
     public void setTipoConexao(TipoConexao tipoConexao) {
@@ -50,31 +50,31 @@ public class SysPdvDAO extends InterfaceDAO {
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n" +
-                    "	m1.seccod, \n" +
-                    "	m1.secdes, \n" +
-                    "	m2.grpcod, \n" +
-                    "	m2.grpdes, \n" +
-                    "	m3.sgrcod, \n" +
-                    "	m3.sgrdes \n" +
-                    "from \n" +
-                    "	secao as m1 \n" +
-                    "	left join grupo as m2 on \n" +
-                    "		m2.seccod = m1.seccod \n" +
-                    "	left join subgrupo as m3 on \n" +
-                    "		m3.seccod = m1.seccod and\n" +
-                    "		m3.grpcod = m2.grpcod \n" +
-                    "order by \n" +
-                    "	m1.seccod,\n" +
-                    "	m2.grpcod,\n" +
-                    "	m3.sgrcod"
+                    "select \n"
+                    + "	m1.seccod, \n"
+                    + "	m1.secdes, \n"
+                    + "	m2.grpcod, \n"
+                    + "	m2.grpdes, \n"
+                    + "	m3.sgrcod, \n"
+                    + "	m3.sgrdes \n"
+                    + "from \n"
+                    + "	secao as m1 \n"
+                    + "	left join grupo as m2 on \n"
+                    + "		m2.seccod = m1.seccod \n"
+                    + "	left join subgrupo as m3 on \n"
+                    + "		m3.seccod = m1.seccod and\n"
+                    + "		m3.grpcod = m2.grpcod \n"
+                    + "order by \n"
+                    + "	m1.seccod,\n"
+                    + "	m2.grpcod,\n"
+                    + "	m3.sgrcod"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setMerc1ID(rst.getString("seccod"));
@@ -83,48 +83,48 @@ public class SysPdvDAO extends InterfaceDAO {
                     imp.setMerc2Descricao(rst.getString("grpdes"));
                     imp.setMerc3ID(rst.getString("sgrcod"));
                     imp.setMerc3Descricao(rst.getString("sgrdes"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
-         List<FamiliaProdutoIMP> result = new ArrayList<>();
-        
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	procodsim,\n" +
-                    "	similaresdes\n" +
-                    "from\n" +
-                    "	similares"
+                    "select\n"
+                    + "	procodsim,\n"
+                    + "	similaresdes\n"
+                    + "from\n"
+                    + "	similares"
             )) {
                 while (rst.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("procodsim"));
                     imp.setDescricao(rst.getString("similaresdes"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     private static class Ean {
-        
+
         public String idProduto;
         public String ean;
-        public int qtdEmbalagem;        
+        public int qtdEmbalagem;
 
         public Ean(String idProduto, String ean, int qtdEmbalagem) {
             this.idProduto = idProduto;
@@ -158,140 +158,140 @@ public class SysPdvDAO extends InterfaceDAO {
             }
             return Double.doubleToLongBits(this.qtdEmbalagem) == Double.doubleToLongBits(other.qtdEmbalagem);
         }
-        
+
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
-            Map<String, int[]> piscofins = new HashMap<>();            
+            Map<String, int[]> piscofins = new HashMap<>();
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    p.procod id_produto,\n" +
-                    "    pis.impfedst piscofins_entrada,\n" +
-                    "    pis.impfedstsai piscofins_saida\n" +
-                    "from\n" +
-                    "    (select\n" +
-                    "         pispro.procod,\n" +
-                    "         min(pispro.impfedsim) impfedsim\n" +
-                    "     from\n" +
-                    "         impostos_federais pis\n" +
-                    "         join impostos_federais_produto pispro on\n" +
-                    "            pis.impfedsim = pispro.impfedsim\n" +
-                    "            and pis.impfedtip = 'P'\n" +
-                    "     group by\n" +
-                    "         pispro.procod) p\n" +
-                    "     join impostos_federais pis on\n" +
-                    "        p.impfedsim = pis.impfedsim"
+                    "select\n"
+                    + "    p.procod id_produto,\n"
+                    + "    pis.impfedst piscofins_entrada,\n"
+                    + "    pis.impfedstsai piscofins_saida\n"
+                    + "from\n"
+                    + "    (select\n"
+                    + "         pispro.procod,\n"
+                    + "         min(pispro.impfedsim) impfedsim\n"
+                    + "     from\n"
+                    + "         impostos_federais pis\n"
+                    + "         join impostos_federais_produto pispro on\n"
+                    + "            pis.impfedsim = pispro.impfedsim\n"
+                    + "            and pis.impfedtip = 'P'\n"
+                    + "     group by\n"
+                    + "         pispro.procod) p\n"
+                    + "     join impostos_federais pis on\n"
+                    + "        p.impfedsim = pis.impfedsim"
             )) {
                 while (rst.next()) {
                     piscofins.put(
-                            rst.getString("id_produto"), 
-                            new int[] {
+                            rst.getString("id_produto"),
+                            new int[]{
                                 Utils.stringToInt(rst.getString("piscofins_entrada")),
                                 Utils.stringToInt(rst.getString("piscofins_saida"))
                             }
                     );
                 }
             }
-            
-            Map<String, Set<Ean>> eans = new HashMap<>();            
+
+            Map<String, Set<Ean>> eans = new HashMap<>();
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    procod id_produto,\n" +
-                    "    procod ean,\n" +
-                    "    1 qtdembalagem\n" +
-                    "from\n" +
-                    "    produto\n" +
-                    "union\n" +
-                    "select\n" +
-                    "    procod id_produto,\n" +
-                    "    procodaux ean,\n" +
-                    "    coalesce(profatormult, 1) qtdembalagem\n" +
-                    "from\n" +
-                    "    produtoaux\n" +
-                    "order by\n" +
-                    "    1"
+                    "select\n"
+                    + "    procod id_produto,\n"
+                    + "    procod ean,\n"
+                    + "    1 qtdembalagem\n"
+                    + "from\n"
+                    + "    produto\n"
+                    + "union\n"
+                    + "select\n"
+                    + "    procod id_produto,\n"
+                    + "    procodaux ean,\n"
+                    + "    coalesce(profatormult, 1) qtdembalagem\n"
+                    + "from\n"
+                    + "    produtoaux\n"
+                    + "order by\n"
+                    + "    1"
             )) {
                 while (rst.next()) {
                     long ean = Utils.stringToLong(rst.getString("ean"), -2);
                     if (ean > 999999 || !String.valueOf(rst.getString("ean")).equals(rst.getString("id_produto"))) {
-                        
+
                         Set<Ean> ea = eans.get(rst.getString("id_produto"));
-                        
+
                         if (ea == null) {
                             ea = new HashSet<>();
                         }
-                        
+
                         ea.add(
-                            new Ean(
-                                rst.getString("id_produto"),
-                                rst.getString("ean"),
-                                Math.round(rst.getFloat("qtdembalagem"))
-                            )
+                                new Ean(
+                                        rst.getString("id_produto"),
+                                        rst.getString("ean"),
+                                        Math.round(rst.getFloat("qtdembalagem"))
+                                )
                         );
-                        
+
                         eans.put(
-                            rst.getString("id_produto"),                             
-                            ea
+                                rst.getString("id_produto"),
+                                ea
                         );
                     }
                 }
             }
-            
+
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n" +
-                    "    p.procod id,\n" +
-                    "    p.prodes descricaocompleta,\n" +
-                    "    p.prodesrdz descricaoreduzida,\n" +
-                    "    p.seccod merc1,\n" +
-                    "    p.grpcod merc2,\n" +
-                    "    p.sgrcod merc3,\n" +
-                    "    p.proestmin estoqueminimo,\n" +
-                    "    p.proestmax estoquemaximo,\n" +
-                    "    est.estatu estoque,\n" +
-                    "    p.proncm ncm,\n" +
-                    "    case when p.proforlin = 'S' then 0 else 1 end situacaocadastro,\n" +
-                    "    p.proprccst custocomimposto,\n" +
-                    "    p.proprccst custosemimposto,\n" +
-                    "    p.prodatcadinc datacadastro,\n" +
-                    "    p.proiteemb qtdembalagem,\n" +
-                    "    round(((proprcvdavar / case when p.proprccst = 0.00 then 1 else p.proprccst end) - 1) * (100),2) margem,\n" +
-                    "    p.promrg1 as margem2, \n" +
-                    "    proprcvdavar precovenda,\n" +
-                    "    items.procodsim id_familiaproduto,\n" +
-                    "    p.propesbrt pesobruto,\n" +
-                    "    p.propesliq pesoliquido,\n" +
-                    "    case p.propesvar\n" +
-                    "    when 'S' then 'KG'\n" +
-                    "    when 'P' then 'KG'\n" +
-                    "    else 'UN' end as tipoembalagem,\n" +
-                    "    p.prounid, \n" +
-                    "    case when p.proenvbal = 'S' then 1 else 0 end e_balanca,\n" +
-                    "    coalesce(p.provld, 0) validade,\n" +
-                    "    i.trbtabb icms_cst, \n" +
-                    "    i.trbalq icms_aliquota, \n" +
-                    "    i.trbred icms_reducao, \n" +
-                    "    p.procest cest,\n" +
-                    "    p.natcodigo piscofins_natrec\n" +
-                    "FROM \n" +
-                    "    produto p\n" +
-                    "    LEFT JOIN item_similares items ON \n" +
-                    "        items.procod = p.procod\n" +
-                    "    left join tributacao i on \n" +
-                    "        i.trbid = p.trbid\n" +
-                    "    left join estoque est on\n" +
-                    "        est.PROCOD = p.PROCOD\n" +
-                    "ORDER BY \n" +
-                    "    cast(replace(p.procod,',','') as bigint)"
+                    "SELECT\n"
+                    + "    p.procod id,\n"
+                    + "    p.prodes descricaocompleta,\n"
+                    + "    p.prodesrdz descricaoreduzida,\n"
+                    + "    p.seccod merc1,\n"
+                    + "    p.grpcod merc2,\n"
+                    + "    p.sgrcod merc3,\n"
+                    + "    p.proestmin estoqueminimo,\n"
+                    + "    p.proestmax estoquemaximo,\n"
+                    + "    est.estatu estoque,\n"
+                    + "    p.proncm ncm,\n"
+                    + "    case when p.proforlin = 'S' then 0 else 1 end situacaocadastro,\n"
+                    + "    p.proprccst custocomimposto,\n"
+                    + "    p.proprccst custosemimposto,\n"
+                    + "    p.prodatcadinc datacadastro,\n"
+                    + "    p.proiteemb qtdembalagem,\n"
+                    + "    round(((proprcvdavar / case when p.proprccst = 0.00 then 1 else p.proprccst end) - 1) * (100),2) margem,\n"
+                    + "    p.promrg1 as margem2, \n"
+                    + "    proprcvdavar precovenda,\n"
+                    + "    items.procodsim id_familiaproduto,\n"
+                    + "    p.propesbrt pesobruto,\n"
+                    + "    p.propesliq pesoliquido,\n"
+                    + "    case p.propesvar\n"
+                    + "    when 'S' then 'KG'\n"
+                    + "    when 'P' then 'KG'\n"
+                    + "    else 'UN' end as tipoembalagem,\n"
+                    + "    p.prounid, \n"
+                    + "    case when p.proenvbal = 'S' then 1 else 0 end e_balanca,\n"
+                    + "    coalesce(p.provld, 0) validade,\n"
+                    + "    i.trbtabb icms_cst, \n"
+                    + "    i.trbalq icms_aliquota, \n"
+                    + "    i.trbred icms_reducao, \n"
+                    + "    p.procest cest,\n"
+                    + "    p.natcodigo piscofins_natrec\n"
+                    + "FROM \n"
+                    + "    produto p\n"
+                    + "    LEFT JOIN item_similares items ON \n"
+                    + "        items.procod = p.procod\n"
+                    + "    left join tributacao i on \n"
+                    + "        i.trbid = p.trbid\n"
+                    + "    left join estoque est on\n"
+                    + "        est.PROCOD = p.PROCOD\n"
+                    + "ORDER BY \n"
+                    + "    cast(replace(p.procod,',','') as bigint)"
             )) {
                 Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
-                    
-                    for (Ean ean: eans.get(rst.getString("id"))) {
-                    
+
+                    for (Ean ean : eans.get(rst.getString("id"))) {
+
                         ProdutoIMP imp = new ProdutoIMP();
 
                         imp.setImportSistema(getSistema());
@@ -306,10 +306,10 @@ public class SysPdvDAO extends InterfaceDAO {
                         imp.setCodMercadologico2(rst.getString("merc2"));
                         imp.setCodMercadologico3(rst.getString("merc3"));
 
-                        ProdutoBalancaVO bal = balanca.get(Utils.stringToInt(rst.getString("id")));                    
+                        ProdutoBalancaVO bal = balanca.get(Utils.stringToInt(rst.getString("id")));
                         if (bal != null) {
                             imp.seteBalanca(true);
-                            if (null != bal.getPesavel()) { 
+                            if (null != bal.getPesavel()) {
                                 switch (bal.getPesavel()) {
                                     case "P":
                                         imp.setTipoEmbalagem("KG");
@@ -349,9 +349,9 @@ public class SysPdvDAO extends InterfaceDAO {
                         imp.setIcmsAliq(rst.getDouble("icms_aliquota"));
                         imp.setIcmsReducao(rst.getDouble("icms_reducao"));
                         imp.setCest(rst.getString("cest"));
-                        
+
                         int[] pis = piscofins.get(rst.getString("id"));
-                        
+
                         if (pis != null) {
                             imp.setPiscofinsCstCredito(pis[0]);
                             imp.setPiscofinsCstDebito(pis[1]);
@@ -359,15 +359,15 @@ public class SysPdvDAO extends InterfaceDAO {
                         }
 
                         result.add(imp);
-                        
+
                     }
                 }
             }
         }
-        
+
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -397,13 +397,12 @@ public class SysPdvDAO extends InterfaceDAO {
             return result;
         }
     }
-    
-    
+
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         double desconto = 0;
-        
+
         if (opt == OpcaoProduto.ATACADO) {
             try (Statement stm = tipoConexao.getConnection().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -416,15 +415,9 @@ public class SysPdvDAO extends InterfaceDAO {
                         + "where proqtdminprc2 > 1"
                 )) {
                     while (rst.next()) {
-                        
-                        desconto = (rst.getDouble("proprc1") - rst.getDouble("proprc2") * 100) / rst.getDouble("proprc1");
-                        
-                        if (desconto < 0) {
-                            desconto = desconto * (-1);
-                        }
-                        
+
                         int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("procod"));
-                        
+
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
@@ -441,21 +434,21 @@ public class SysPdvDAO extends InterfaceDAO {
         }
         return null;
     }
-    
+
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
-        
-        try(Statement stm = tipoConexao.getConnection().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	procod as id_produto,\n" +
-                    "	forcod as id_fornecedor,\n" +
-                    "	prfreffor as ref,\n" +
-                    "	prfqtd as qtdemb\n" +
-                    "from\n" +
-                    "	produto_fornecedor")) {
-                while(rs.next()) {
+
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	procod as id_produto,\n"
+                    + "	forcod as id_fornecedor,\n"
+                    + "	prfreffor as ref,\n"
+                    + "	prfqtd as qtdemb\n"
+                    + "from\n"
+                    + "	produto_fornecedor")) {
+                while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
@@ -463,7 +456,7 @@ public class SysPdvDAO extends InterfaceDAO {
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
                     imp.setCodigoExterno(rs.getString("ref"));
                     imp.setQtdEmbalagem(rs.getDouble("qtdemb"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -474,37 +467,37 @@ public class SysPdvDAO extends InterfaceDAO {
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    f.forcod id,\n" +
-                    "    f.fordes razao,\n" +
-                    "    f.forfan fantasia,\n" +
-                    "    f.forcgc cnpj,\n" +
-                    "    f.forcgf inscricaoestadual,\n" +
-                    "    f.forend endereco,\n" +
-                    "    f.fornum numero,\n" +
-                    "    f.forcmp complemento,\n" +
-                    "    f.forbai bairro,\n" +
-                    "    f.forcodibge ibge_municipio,\n" +
-                    "    f.forcep cep,\n" +
-                    "    f.fortel telefone,\n" +
-                    "    " + (tipoConexao == TipoConexao.FIREBIRD ? "current_date" : "getdate()") + " datacadastro,\n" +
-                    "    f.forobs observacao,\n" +
-                    "    f.forprz prazoentrega,\n" +
-                    "    f.forcon contato,\n" +
-                    "    f.forfax fax\n" +
-                    "from\n" +
-                    "    fornecedor f\n" +
-                    "where\n" +
-                    "    f.forcod != '0000'\n" +
-                    "order by\n" +
-                    "    1"
+                    "select\n"
+                    + "    f.forcod id,\n"
+                    + "    f.fordes razao,\n"
+                    + "    f.forfan fantasia,\n"
+                    + "    f.forcgc cnpj,\n"
+                    + "    f.forcgf inscricaoestadual,\n"
+                    + "    f.forend endereco,\n"
+                    + "    f.fornum numero,\n"
+                    + "    f.forcmp complemento,\n"
+                    + "    f.forbai bairro,\n"
+                    + "    f.forcodibge ibge_municipio,\n"
+                    + "    f.forcep cep,\n"
+                    + "    f.fortel telefone,\n"
+                    + "    " + (tipoConexao == TipoConexao.FIREBIRD ? "current_date" : "getdate()") + " datacadastro,\n"
+                    + "    f.forobs observacao,\n"
+                    + "    f.forprz prazoentrega,\n"
+                    + "    f.forcon contato,\n"
+                    + "    f.forfax fax\n"
+                    + "from\n"
+                    + "    fornecedor f\n"
+                    + "where\n"
+                    + "    f.forcod != '0000'\n"
+                    + "order by\n"
+                    + "    1"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
@@ -527,78 +520,78 @@ public class SysPdvDAO extends InterfaceDAO {
                         imp.addContato(contato, rst.getString("telefone"), null, TipoContato.COMERCIAL, "");
                     }
                     imp.addTelefone("FAX", rst.getString("fax"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    c.clicod id,\n" +
-                    "    c.clicpfcgc cnpj,\n" +
-                    "    c.clirgcgf inscricaoestadual,\n" +
-                    "    c.clirgexp emissor,\n" +
-                    "    c.clides razao,\n" +
-                    "    c.clifan fantasia,\n" +
-                    "    case when st.stablq = 'S' then 1 else 0 end bloqueado,\n" +
-                    "    c.clidtblo databloqueio,\n" +
-                    "    c.cliend endereco,\n" +
-                    "    c.clinum numero,\n" +
-                    "    c.clicmp complemento,\n" +
-                    "    c.clibai bairro,\n" +
-                    "    c.clicodigoibge ibge_municipio,\n" +
-                    "    c.clicid cidade,\n" +
-                    "    c.cliest estado,\n" +
-                    "    c.clicep cep,\n" +
-                    "    c.cliestciv estadocivil,\n" +
-                    "    c.clidtcad datacadastro,\n" +
-                    "    c.clidtnas datanascimento,\n" +
-                    "    c.clisex sexo,\n" +
-                    "    c.cliemptrb empresa,\n" +
-                    "    c.cliempend empresa_endereco,\n" +
-                    "    c.cliemptel empresa_telefone,\n" +
-                    "    c.cliempcar empresa_cargo,\n" +
-                    "    c.clisal empresa_salario,\n" +
-                    "    c.clilimcre valorlimite,\n" +
-                    "    c.clipai nomepai,\n" +
-                    "    c.climae nomemae,\n" +
-                    "    c.cliobs observacao2,\n" +
-                    "    c.clidiafec diavencimento,\n" +
-                    "    c.clitel telefone,\n" +
-                    "    c.clitel2 telefone2,\n" +
-                    "    c.cliemail email,\n" +
-                    "    c.clifax fax,\n" +
-                    "    c.cliendcob cob_endereco,\n" +
-                    "    c.clinumcob cob_numero,\n" +
-                    "    c.clicmp cob_complemento,\n" +
-                    "    c.clibai cob_bairro,\n" +
-                    "    c.clicidcob cob_cidade,\n" +
-                    "    c.cliestcob cob_estado,\n" +
-                    "    c.clicepcob cob_cep,\n" +
-                    "    c.cliprz prazopagamento,\n" +
-                    "    c.cliinscmun inscricaomunicipal,\n" +
-                    "    c.clilimcre2 limitecompra\n" +
-                    "from\n" +
-                    "    cliente c\n" +
-                    "    left join status st on\n" +
-                    "        c.stacod = st.stacod\n" +
-                    "where\n" +
-                    "    c.clicod != '000000000000000'\n" +
-                    "order by\n" +
-                    "    c.clicod"
+                    "select\n"
+                    + "    c.clicod id,\n"
+                    + "    c.clicpfcgc cnpj,\n"
+                    + "    c.clirgcgf inscricaoestadual,\n"
+                    + "    c.clirgexp emissor,\n"
+                    + "    c.clides razao,\n"
+                    + "    c.clifan fantasia,\n"
+                    + "    case when st.stablq = 'S' then 1 else 0 end bloqueado,\n"
+                    + "    c.clidtblo databloqueio,\n"
+                    + "    c.cliend endereco,\n"
+                    + "    c.clinum numero,\n"
+                    + "    c.clicmp complemento,\n"
+                    + "    c.clibai bairro,\n"
+                    + "    c.clicodigoibge ibge_municipio,\n"
+                    + "    c.clicid cidade,\n"
+                    + "    c.cliest estado,\n"
+                    + "    c.clicep cep,\n"
+                    + "    c.cliestciv estadocivil,\n"
+                    + "    c.clidtcad datacadastro,\n"
+                    + "    c.clidtnas datanascimento,\n"
+                    + "    c.clisex sexo,\n"
+                    + "    c.cliemptrb empresa,\n"
+                    + "    c.cliempend empresa_endereco,\n"
+                    + "    c.cliemptel empresa_telefone,\n"
+                    + "    c.cliempcar empresa_cargo,\n"
+                    + "    c.clisal empresa_salario,\n"
+                    + "    c.clilimcre valorlimite,\n"
+                    + "    c.clipai nomepai,\n"
+                    + "    c.climae nomemae,\n"
+                    + "    c.cliobs observacao2,\n"
+                    + "    c.clidiafec diavencimento,\n"
+                    + "    c.clitel telefone,\n"
+                    + "    c.clitel2 telefone2,\n"
+                    + "    c.cliemail email,\n"
+                    + "    c.clifax fax,\n"
+                    + "    c.cliendcob cob_endereco,\n"
+                    + "    c.clinumcob cob_numero,\n"
+                    + "    c.clicmp cob_complemento,\n"
+                    + "    c.clibai cob_bairro,\n"
+                    + "    c.clicidcob cob_cidade,\n"
+                    + "    c.cliestcob cob_estado,\n"
+                    + "    c.clicepcob cob_cep,\n"
+                    + "    c.cliprz prazopagamento,\n"
+                    + "    c.cliinscmun inscricaomunicipal,\n"
+                    + "    c.clilimcre2 limitecompra\n"
+                    + "from\n"
+                    + "    cliente c\n"
+                    + "    left join status st on\n"
+                    + "        c.stacod = st.stacod\n"
+                    + "where\n"
+                    + "    c.clicod != '000000000000000'\n"
+                    + "order by\n"
+                    + "    c.clicod"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
-                    
+
                     imp.setId(rst.getString("id"));
                     imp.setCnpj(rst.getString("cnpj"));
                     imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
@@ -616,15 +609,25 @@ public class SysPdvDAO extends InterfaceDAO {
                     imp.setUf(rst.getString("estado"));
                     imp.setCep(rst.getString("cep"));
                     switch (Utils.acertarTexto(rst.getString("estadocivil"))) {
-                        case "S": imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO); break;
-                        case "O": imp.setEstadoCivil(TipoEstadoCivil.CASADO); break;
-                        default : imp.setEstadoCivil(TipoEstadoCivil.OUTROS); break;
+                        case "S":
+                            imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
+                            break;
+                        case "O":
+                            imp.setEstadoCivil(TipoEstadoCivil.CASADO);
+                            break;
+                        default:
+                            imp.setEstadoCivil(TipoEstadoCivil.OUTROS);
+                            break;
                     }
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDataNascimento(rst.getDate("datanascimento"));
                     switch (Utils.acertarTexto(rst.getString("sexo"))) {
-                        case "F": imp.setSexo(TipoSexo.FEMININO); break;
-                        default : imp.setSexo(TipoSexo.MASCULINO); break;
+                        case "F":
+                            imp.setSexo(TipoSexo.FEMININO);
+                            break;
+                        default:
+                            imp.setSexo(TipoSexo.MASCULINO);
+                            break;
                     }
                     imp.setEmpresa(rst.getString("empresa"));
                     imp.setEmpresaEndereco(rst.getString("empresa_endereco"));
@@ -650,39 +653,39 @@ public class SysPdvDAO extends InterfaceDAO {
                     imp.setPrazoPagamento(rst.getInt("prazopagamento"));
                     imp.setInscricaoMunicipal(rst.getString("inscricaomunicipal"));
                     imp.setLimiteCompra(rst.getDouble("limitecompra"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n" +
-                    "    CTRID,\n" +
-                    "    ctrnum,\n" +
-                    "    clicod,\n" +
-                    "    cxanum,\n" +
-                    "    ctrdatemi,\n" +
-                    "    ctrdatvnc,\n" +
-                    "    ctrvlrdev,\n" +
-                    "    ctrobs\n" +
-                    "FROM CONTARECEBER\n" +
-                    "WHERE \n" +
-                    "    (COALESCE(CTRVLRPAG,0) < CTRVLRNOM) AND \n" +
-                    "    COALESCE(ctrvlrdev,0) > 0 and\n" +
-                    "    (COALESCE(FZDCOD,'000') IN ('004'))"
+                    "SELECT\n"
+                    + "    CTRID,\n"
+                    + "    ctrnum,\n"
+                    + "    clicod,\n"
+                    + "    cxanum,\n"
+                    + "    ctrdatemi,\n"
+                    + "    ctrdatvnc,\n"
+                    + "    ctrvlrdev,\n"
+                    + "    ctrobs\n"
+                    + "FROM CONTARECEBER\n"
+                    + "WHERE \n"
+                    + "    (COALESCE(CTRVLRPAG,0) < CTRVLRNOM) AND \n"
+                    + "    COALESCE(ctrvlrdev,0) > 0 and\n"
+                    + "    (COALESCE(FZDCOD,'000') IN ('004'))"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    
+
                     imp.setId(rst.getString("CTRID"));
                     imp.setNumeroCupom(rst.getString("ctrnum"));
                     imp.setIdCliente(rst.getString("clicod"));
@@ -691,20 +694,18 @@ public class SysPdvDAO extends InterfaceDAO {
                     imp.setDataVencimento(rst.getDate("ctrdatvnc"));
                     imp.setValor(rst.getDouble("ctrvlrdev"));
                     imp.setObservacao(rst.getString("ctrobs"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
-    
-    
     public List<Estabelecimento> getLojasCliente() throws SQLException {
         List<Estabelecimento> result = new ArrayList<>();
-        
+
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT prpcod, prpfan FROM PROPRIO"
@@ -714,39 +715,43 @@ public class SysPdvDAO extends InterfaceDAO {
                 }
             }
         }
-        
+
         return result;
     }
-        
+
     public static enum TipoConexao {
-        
+
         FIREBIRD {
-            @Override
-            public Connection getConnection() {
-                return ConexaoFirebird.getConexao();
-            }
-            @Override
-            public String getSistema() {
-                return "SysPdv(FIREBIRD)";
-            }
-        },
+                    @Override
+                    public Connection getConnection() {
+                        return ConexaoFirebird.getConexao();
+                    }
+
+                    @Override
+                    public String getSistema() {
+                        return "SysPdv(FIREBIRD)";
+                    }
+                },
         SQL_SERVER {
-            @Override
-            public Connection getConnection() {
-                return ConexaoSqlServer.getConexao();
-            }
-            @Override
-            public String getSistema() {
-                return "SysPdv(SQLSERVER)";
-            }
-        };
-        
+                    @Override
+                    public Connection getConnection() {
+                        return ConexaoSqlServer.getConexao();
+                    }
+
+                    @Override
+                    public String getSistema() {
+                        return "SysPdv(SQLSERVER)";
+                    }
+                };
+
         public abstract Connection getConnection();
+
         public abstract String getSistema();
+
         public String getLojasClienteSQL() {
             return "";
         }
-        
+
     }
-    
+
 }
