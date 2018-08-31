@@ -321,6 +321,11 @@
                     <Property name="text" type="java.lang.String" value="Margem"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAtacado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Atacado"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="tabImpFornecedor">

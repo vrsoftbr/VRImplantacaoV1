@@ -15,6 +15,8 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -257,6 +259,7 @@ public class SysPdvDAO extends InterfaceDAO {
                     "    p.prodatcadinc datacadastro,\n" +
                     "    p.proiteemb qtdembalagem,\n" +
                     "    round(((proprcvdavar / case when p.proprccst = 0.00 then 1 else p.proprccst end) - 1) * (100),2) margem,\n" +
+                    "    p.promrg1 as margem2, \n" +
                     "    proprcvdavar precovenda,\n" +
                     "    items.procodsim id_familiaproduto,\n" +
                     "    p.propesbrt pesobruto,\n" +
@@ -265,6 +268,7 @@ public class SysPdvDAO extends InterfaceDAO {
                     "    when 'S' then 'KG'\n" +
                     "    when 'P' then 'KG'\n" +
                     "    else 'UN' end as tipoembalagem,\n" +
+                    "    p.prounid, \n" +
                     "    case when p.proenvbal = 'S' then 1 else 0 end e_balanca,\n" +
                     "    coalesce(p.provld, 0) validade,\n" +
                     "    i.trbtabb icms_cst, \n" +
@@ -297,6 +301,7 @@ public class SysPdvDAO extends InterfaceDAO {
                         imp.setQtdEmbalagem(ean.qtdEmbalagem);
                         imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                         imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                        imp.setDescricaoGondola(imp.getDescricaoCompleta());
                         imp.setCodMercadologico1(rst.getString("merc1"));
                         imp.setCodMercadologico2(rst.getString("merc2"));
                         imp.setCodMercadologico3(rst.getString("merc3"));
@@ -318,10 +323,10 @@ public class SysPdvDAO extends InterfaceDAO {
                         } else {
                             if (balanca.isEmpty()) {
                                 imp.seteBalanca(rst.getBoolean("e_balanca"));
-                                imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                                imp.setTipoEmbalagem(rst.getString("prounid"));
                             } else {
                                 imp.seteBalanca(false);
-                                imp.setTipoEmbalagem("UN");
+                                imp.setTipoEmbalagem(rst.getString("prounid"));
                             }
                             imp.setValidade(Utils.stringToInt(rst.getString("validade")));
                         }
@@ -335,7 +340,7 @@ public class SysPdvDAO extends InterfaceDAO {
                         imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                         imp.setDataCadastro(rst.getDate("datacadastro"));
                         imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
-                        imp.setMargem(rst.getDouble("margem"));
+                        imp.setMargem(rst.getDouble("margem2"));
                         imp.setPrecovenda(rst.getDouble("precovenda"));
                         imp.setIdFamiliaProduto(rst.getString("id_familiaproduto"));
                         imp.setPesoBruto(rst.getDouble("pesobruto"));
@@ -361,6 +366,80 @@ public class SysPdvDAO extends InterfaceDAO {
         }
         
         return result;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "procod, "
+                    + "proprc1, "
+                    + "proprc2, "
+                    + "proqtdminprc2 "
+                    + "from produto\n"
+                    + "where proqtdminprc2 > 1"
+            )) {
+                while (rst.next()) {
+
+                    int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("procod"));
+
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("procod"));
+                    imp.setEan("99999" + String.valueOf(codigoAtual));
+                    imp.setQtdEmbalagem(rst.getInt("proqtdminprc2"));
+                    result.add(imp);
+                }
+            }
+            return result;
+        }
+    }
+    
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        double desconto = 0;
+        
+        if (opt == OpcaoProduto.ATACADO) {
+            try (Statement stm = tipoConexao.getConnection().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select "
+                        + "procod, "
+                        + "proprc1, "
+                        + "proprc2, "
+                        + "proqtdminprc2 "
+                        + "from produto\n"
+                        + "where proqtdminprc2 > 1"
+                )) {
+                    while (rst.next()) {
+                        
+                        desconto = (rst.getDouble("proprc1") - rst.getDouble("proprc2") * 100) / rst.getDouble("proprc1");
+                        
+                        if (desconto < 0) {
+                            desconto = desconto * (-1);
+                        }
+                        
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("procod"));
+                        
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("procod"));
+                        imp.setEan("99999" + String.valueOf(codigoAtual));
+                        imp.setPrecovenda(rst.getDouble("proprc1"));
+                        imp.setAtacadoPreco(rst.getDouble("proprc2"));
+                        imp.setQtdEmbalagem(rst.getInt("proqtdminprc2"));
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+        return null;
     }
     
     @Override

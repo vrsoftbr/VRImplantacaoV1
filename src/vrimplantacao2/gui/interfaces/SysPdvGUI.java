@@ -246,6 +246,9 @@ public class SysPdvGUI extends VRInternalFrame {
                             if(chkMargem.isSelected()) {
                                 opcoes.add(OpcaoProduto.MARGEM);
                             }
+                            if (chkAtacado.isSelected()) {
+                                opcoes.add(OpcaoProduto.ATACADO);
+                            }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
                             }
@@ -349,6 +352,7 @@ public class SysPdvGUI extends VRInternalFrame {
         chkCustoSemImposto = new vrframework.bean.checkBox.VRCheckBox();
         chkFabricante = new vrframework.bean.checkBox.VRCheckBox();
         chkMargem = new vrframework.bean.checkBox.VRCheckBox();
+        chkAtacado = new vrframework.bean.checkBox.VRCheckBox();
         tabImpFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -519,6 +523,9 @@ public class SysPdvGUI extends VRInternalFrame {
 
         chkMargem.setText("Margem");
         tabImpProduto.add(chkMargem);
+
+        chkAtacado.setText("Atacado");
+        tabImpProduto.add(chkAtacado);
 
         vRTabbedPane2.addTab("Produtos", tabImpProduto);
 
@@ -803,6 +810,7 @@ public class SysPdvGUI extends VRInternalFrame {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkAtacado;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
