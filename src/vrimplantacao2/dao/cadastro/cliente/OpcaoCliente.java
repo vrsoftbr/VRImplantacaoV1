@@ -50,7 +50,7 @@ public enum OpcaoCliente {
     NOVOS, 
     RAZAO, 
     FANTASIA,
-    CNPJ,   
+    CNPJ,
     EMAIL;    
     
     private static final Logger LOG = Logger.getLogger(OpcaoCliente.class.getName());
