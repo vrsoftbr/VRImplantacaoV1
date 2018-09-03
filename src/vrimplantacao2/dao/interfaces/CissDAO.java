@@ -20,6 +20,7 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -424,6 +425,50 @@ public class CissDAO extends InterfaceDAO {
 
         return result;
     }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoDB2.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "        trim(cp.IDEMPRESA||'-'||cp.IDCLIFOR||'-'||cp.DIGITOTITULO||'-'||cp.SERIENOTA||'-'||cp.IDTITULO) id,\n" +
+                    "        cp.idclifor idfornecedor,\n" +
+                    "        cp.idtitulo,\n" +
+                    "        cp.dtmovimento dataemissao,\n" +
+                    "        cp.valtitulo valor,\n" +
+                    "        cp.dtvencimento vencimento,\n" +
+                    "        cp.obstitulo observacao,\n" +
+                    "        cp.origemmovimento\n" +
+                    "from\n" +
+                    "        dba.contas_pagar cp\n" +
+                    "where\n" +
+                    "        cp.idempresa = " + getLojaOrigem() + "\n" +
+                    "        and cp.flagbaixada = 'F'\n" +
+                    "order by\n" +
+                    "        cp.dtmovimento"
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setNumeroDocumento(rst.getString("idtitulo"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setVencimento(rst.getDate("vencimento"));
+                    imp.setObservacao("ORIGEM - " + rst.getString("origemmovimento") + " - " + rst.getString("observacao"));
+                    
+                    result.add(imp);
+                }
+            }            
+        }
+        
+        return result;
+    }
+    
+    
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {

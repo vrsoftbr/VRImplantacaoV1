@@ -105,5 +105,10 @@ public class ContaPagarIMP {
         imp.setValor(valor);
         return imp;
     }
+
+    public void setVencimento(Date vencimento) {
+        this.vencimentos.clear();
+        this.addVencimento(vencimento, this.valor);
+    }
     
 }
