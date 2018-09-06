@@ -1591,7 +1591,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static class VendaIterator implements Iterator<VendaIMP> {
 
-        private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+        private final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
         private Statement stm = ConexaoSqlServer.getConexao().createStatement();
         private ResultSet rst;
@@ -1650,7 +1650,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    cx.coo as numerocupom,\n"
                     + "    cx.codcaixa as ecf,\n"
                     + "    cx.data as data,\n"
-                    + "    cx.cliente as idclientepreferencial,\n"
+                    + "    coalesce(cx.cliente, '') as idclientepreferencial,\n"
                     + "    min(cx.hora) as horainicio,\n"
                     + "    max(cx.hora) as horatermino,\n"
                     + "    min(case when cx.cancelado = 'N' then 0 else 1 end) as cancelado,\n"
@@ -1677,7 +1677,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    left join parampdv pdv on cx.codloja = pdv.CODLOJA and cx.codcaixa = pdv.CODCAIXA\n"
                     + "where\n"
                     + "    cx.tipolancto = '' and\n"
-                    + "    (cx.data between convert(datetime, '" + FORMAT.format(dataInicio) + "', 103) and convert(datetime, '" + FORMAT.format(dataTermino) + "', 103)) and\n"
+                    + "    (cx.data between convert(date, '" + FORMAT.format(dataInicio) + "', 23) and convert(date, '" + FORMAT.format(dataTermino) + "', 23)) and\n"
                     + "    cx.codloja = " + idLojaCliente + " and\n"
                     + "    cx.atualizado = 'S' and\n"
                     + "    (cx.flgrupo = 'S' or cx.flgrupo = 'N')\n"
@@ -1685,7 +1685,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	   cx.coo,\n"
                     + "    cx.codcaixa,\n"
                     + "    cx.data,\n"
-                    + "    cx.cliente,\n"
+                    + "    coalesce(cx.cliente, ''),\n"
                     + "	   cl.cnpj_cpf,\n"
                     + "    pdv.NUM_SERIE,\n"
                     + "    pdv.IMP_MODELO,\n"
@@ -1854,7 +1854,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    left join ALIQUOTA_ICMS ic on pr.codaliq = ic.codaliq\n"
                     + "where\n"
                     + "    cx.tipolancto = '' and\n"
-                    + "    (cx.data between convert(datetime, '" + FORMAT.format(dataInicio) + "', 103) and convert(datetime, '" + FORMAT.format(dataTermino) + "', 103)) and\n"
+                    + "    (cx.data between convert(date, '" + FORMAT.format(dataInicio) + "', 23) and convert(date, '" + FORMAT.format(dataTermino) + "', 23)) and\n"
                     + "    cx.codloja = " + idLojaCliente + " and\n"
                     + "    cx.atualizado = 'S' and\n"
                     + "    (cx.flgrupo = 'S' or cx.flgrupo = 'N')";

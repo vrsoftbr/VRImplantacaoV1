@@ -131,6 +131,9 @@ public class GetWayGUI extends VRInternalFrame {
             }
         });
 
+        edtDtVendaIni.setFormats(new SimpleDateFormat("dd/MM/yyyy"));
+        edtDtVendaFim.setFormats(new SimpleDateFormat("dd/MM/yyyy"));
+        
         centralizarForm();
         this.setMaximum(false);
     }
