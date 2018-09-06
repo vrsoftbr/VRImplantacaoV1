@@ -195,6 +195,15 @@
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
               <SubComponents>
+                <Component class="vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI" name="tabProdImportacao">
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+                      <JTabbedPaneConstraints tabName="Importa&#xe7;&#xe3;o">
+                        <Property name="tabTitle" type="java.lang.String" value="Importa&#xe7;&#xe3;o"/>
+                      </JTabbedPaneConstraints>
+                    </Constraint>
+                  </Constraints>
+                </Component>
                 <Container class="vrframework.bean.panel.VRPanel" name="tabProdEspeciais">
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
@@ -391,15 +400,6 @@
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
                       <JTabbedPaneConstraints tabName="Arquivo de Balan&#xe7;a">
                         <Property name="tabTitle" type="java.lang.String" value="Arquivo de Balan&#xe7;a"/>
-                      </JTabbedPaneConstraints>
-                    </Constraint>
-                  </Constraints>
-                </Component>
-                <Component class="vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI" name="tabProdImportacao">
-                  <Constraints>
-                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                      <JTabbedPaneConstraints tabName="Importa&#xe7;&#xe3;o">
-                        <Property name="tabTitle" type="java.lang.String" value="Importa&#xe7;&#xe3;o"/>
                       </JTabbedPaneConstraints>
                     </Constraint>
                   </Constraints>
