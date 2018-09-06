@@ -2,7 +2,9 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -20,6 +22,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -123,6 +126,41 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        SimpleDateFormat FORMAT = new SimpleDateFormat("dd.MM.yyyy");
+        List<OfertaIMP> result = new ArrayList<>();
+        
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    p.loja, \n" +
+                    "    p.cod_produto,\n" +
+                    "    p.data_inicial, \n" +
+                    "    p.data_final,\n" +
+                    "    p.preco_promocional,\n" +
+                    "    p.preco_alterado,\n" +
+                    "    p.margem\n" +
+                    "from\n" +
+                    "    promocao p\n" +
+                    "where\n" +
+                    "    p.data_final >= '" + FORMAT.format(dataTermino) + " 23:59' \n" +
+                    "order by\n" +
+                    "    p.data_final")) {
+                while (rs.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    imp.setDataFim(rs.getDate("data_final"));
+                    imp.setDataInicio(rs.getDate("data_inicial"));
+                    imp.setIdProduto(rs.getString("cod_produto"));
+                    imp.setPrecoOferta(rs.getDouble("preco_promocional"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
@@ -197,6 +235,8 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
                             ProdutoBalancaVO produtoBalanca;
                             long codigoProduto;
                             codigoProduto = Long.parseLong(imp.getImportId().trim());
+                            imp.setEan(String.valueOf(codigoProduto));
+                            
                             if (codigoProduto <= Integer.MAX_VALUE) {
                                 produtoBalanca = produtosBalanca.get((int) codigoProduto);
                             } else {
