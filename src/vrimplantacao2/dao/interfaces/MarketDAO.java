@@ -152,7 +152,7 @@ public class MarketDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	preco.vl_custo as custocomimposto,\n" +
                     "	preco.vl_venda,\n" +
                     "	produto.fn_get_produto_margem_liquida(l.cd_loja, pro.cd_produto) as margem,\n" +
-                    "	est.qt_estoque,\n" +
+                    "	est.qt_saldo,\n" +
                     "	pro.cd_depto as codmerc1,\n" +
                     "	pro.cd_depto_secao as codmerc2,\n" +
                     "	pro.cd_depto_grupo as codmerc3,\n" +
@@ -182,7 +182,7 @@ public class MarketDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		f.nr_cst_pis_cofins_saida\n" +
                     "	from\n" +
                     "		produto.tb_ncm_figura_vigencia_federal f\n" +
-                    "\n" +
+                    "    \n" +
                     "	where\n" +
                     "		f.dt_vigencia in\n" +
                     "			(select \n" +
@@ -197,7 +197,7 @@ public class MarketDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		f.nr_cst_pis_cofins_entrada\n" +
                     "	from\n" +
                     "		produto.tb_ncm_figura_vigencia_federal f\n" +
-                    "\n" +
+                    "    \n" +
                     "	where\n" +
                     "		f.dt_vigencia in\n" +
                     "			(select \n" +
@@ -208,15 +208,15 @@ public class MarketDAO extends InterfaceDAO implements MapaTributoProvider {
                     "				n.cd_ncm_figura_mva = f.cd_ncm_figura_mva) and\n" +
                     "		f.cd_ncm_figura_mva = pro.cd_ncm_figura_mva) as cstpiscofinsentrada,\n" +
                     "	pb.qt_dias_validade_balanca as validade,\n" +
-                    "   pro.cd_produto_semelhante as idfamilia\n" +
-                    "  from \n" +
+                    "       pro.cd_produto_semelhante as idfamilia\n" +
+                    "from \n" +
                     "	produto.tb_produto pro\n" +
                     "left join\n" +
                     "	produto.tb_produto_codbarra barra on barra.cd_produto = pro.cd_produto\n" +
                     "left join\n" +
                     "	produto.tb_produto_loja preco on preco.cd_produto = pro.cd_produto\n" +
                     "left join\n" +
-                    "	paf.tb_mercadoria_estoque est on est.cd_mercadoria = pro.cd_produto\n" +
+                    "	saldo.vw_saldo_loja est on est.nr_produto = pro.nr_produto\n" +
                     "join\n" +
                     "	cadastro.tb_loja l on l.cd_loja = preco.cd_loja\n" +
                     "left join\n" +
@@ -241,7 +241,7 @@ public class MarketDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setPrecovenda(rs.getDouble("vl_venda"));
                     imp.setMargem(rs.getDouble("margem"));
-                    imp.setEstoque(rs.getDouble("qt_estoque"));
+                    imp.setEstoque(rs.getDouble("qt_saldo"));
                     imp.setCodMercadologico1(rs.getString("codmerc1"));
                     imp.setCodMercadologico2(rs.getString("codmerc2"));
                     imp.setCodMercadologico3(rs.getString("codmerc3"));

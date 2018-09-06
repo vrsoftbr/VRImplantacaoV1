@@ -648,6 +648,9 @@ public class FornecedorDAO {
                 if (opt.contains(OpcaoFornecedor.ENDERECO)) {
                     sql.put("endereco", vo.getEndereco());
                 }
+                if (opt.contains(OpcaoFornecedor.COMPLEMENTO)) {
+                    sql.put("complemento", vo.getComplemento());
+                }
                 if (opt.contains(OpcaoFornecedor.NUMERO)) {
                     sql.put("numero", vo.getNumero());
                 }

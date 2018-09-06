@@ -34,7 +34,8 @@ public enum OpcaoFornecedor {
     NUMERO, 
     TIPO_FORNECEDOR,
     OBSERVACAO,
-    BANCO_PADRAO;
+    BANCO_PADRAO,
+    COMPLEMENTO;
     
     private List<FornecedorIMP> listaEspecial;
 

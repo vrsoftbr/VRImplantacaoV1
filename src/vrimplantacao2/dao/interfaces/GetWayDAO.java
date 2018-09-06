@@ -711,7 +711,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "    f.codfornec, f.razao, f.fantasia, f.endereco, f.numero, f.bairro, \n"
+                    + "    f.codfornec, f.razao, f.fantasia, f.endereco, f.numero, f.bairro, f.complemento, \n"
                     + "    f.cidade, f.estado, f.cep, f.telefone, f.fax, f.email, f.celular, f.fone1, \n"
                     + "    f.contato, f.ie, f.cnpj_cpf, f.agencia, f.banco, f.conta,  f.dtcad, \n"
                     + "    f.valor_compra, f.ativo, \n"
@@ -741,6 +741,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setRazao(rst.getString("RAZAO"));
                     imp.setFantasia(rst.getString("FANTASIA"));
                     imp.setEndereco(rst.getString("ENDERECO"));
+                    imp.setComplemento(rst.getString("COMPLEMENTO"));
                     imp.setNumero(rst.getString("NUMERO"));
                     imp.setBairro(rst.getString("BAIRRO"));
                     imp.setMunicipio(rst.getString("CIDADE"));
