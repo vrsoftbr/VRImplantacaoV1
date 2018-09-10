@@ -85,6 +85,58 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
 
             try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    p.id,\n" +
+                    "    p.precovenda,\n" +
+                    "    p.descricaocompleta,\n" +
+                    "    p.descricaoreduzida,\n" +
+                    "    p.precovenda,\n" +
+                    "    p.id_aliquota,\n" +
+                    "    p.id_situacaocadastro,\n" +
+                    "    p.aceitamultiplicacaopdv,\n" +
+                    "    p.tipoembalagem,\n" +
+                    "    p.ncm,\n" +
+                    "    p.id_tipopiscofins,\n" +
+                    "    p.cest,\n" +
+                    "    a.situacaotributaria cstIcms,\n" +
+                    "    a.porcentagem,\n" +
+                    "    pis.cst cstPis,\n" +
+                    "    p.id_aliquota\n" +
+                    "from produto p\n" +
+                    "    left join aliquota a on a.id_aliquota = p.id_aliquota\n" +
+                    "    left join tipopiscofins pis on pis.id = p.id_tipopiscofins\n" +
+                    "order by p.id"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setSituacaoCadastro(rst.getInt("id_situacaocadastro"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+                    imp.setPiscofinsCstDebito(rst.getString("cstPis"));
+                    imp.setPiscofinsCstCredito(rst.getString("cstPis"));
+                    imp.setIcmsDebitoId(rst.getString("id_aliquota"));
+                    imp.setIcmsCreditoId(rst.getString("id_aliquota"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+
+            try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "p.id,\n"
                     + "pa.codigobarras,\n"
