@@ -167,6 +167,12 @@ public class InteragemDAO extends InterfaceDAO {
                     + "p.codigo codigobarras,\n"
                     + "p.qtdun qtdembalagem\n"
                     + "from tabprocod p"
+                    
+            /*select
+             codpreco, codprod, quantmin, prvapro
+             from tabpreitem
+             where quantmin > 1
+             order by codprod;*/
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();

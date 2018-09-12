@@ -335,7 +335,8 @@ public class NotaSaidaNfceDAO {
                 }
 
                 String codigoBarras;
-                codigoBarras = ("".equals(cEAN.getTextContent()) ? String.valueOf(codigoProduto) : cEAN.getTextContent());
+                
+                codigoBarras = ("0".equals(Utils.formataNumero(cEAN.getTextContent())) ? String.valueOf(codigoProduto) : cEAN.getTextContent());
 
                 VendaItemVO oVendaItem = new VendaItemVO();
                 oVendaItem.idProduto = codigoProduto;
@@ -451,7 +452,7 @@ public class NotaSaidaNfceDAO {
             sql.append((i_oVenda.idClienteEventual == -1 ? "NULL" : i_oVenda.idClienteEventual) + ",");
             sql.append(i_oVenda.cpfCrm + ", ");
             sql.append("'" + i_oVenda.chaveCFe + "', ");
-            sql.append("'" + i_oVenda.xml + "', ");
+            sql.append("'" + i_oVenda.xml.replace("'", "") + "', ");
             sql.append("'" + i_oVenda.chaveNfce + "', ");
             sql.append("'" + i_oVenda.protocoloRecebimentoNfce + "', ");
             sql.append((i_oVenda.dataHoraEmissaoNfce.isEmpty() ? "NULL" : "'" + i_oVenda.dataHoraEmissaoNfce + "'") + ", ");
@@ -459,7 +460,7 @@ public class NotaSaidaNfceDAO {
             sql.append("'" + i_oVenda.reciboNfce + "',");
             sql.append("'" + i_oVenda.razaoSocialEntidade + "',");
             sql.append("" + i_oVenda.cpfCnpjEntidade + ");");
-
+            
             stm.execute(sql.toString());
 
             rst = stm.executeQuery("SELECT CURRVAL('pdv.venda_id_seq') AS id");
@@ -522,7 +523,7 @@ public class NotaSaidaNfceDAO {
                 sql.append(" datahorarecebimentonfce, recibonfce, transmitido, contingencia, protocolocancelamentonfce,");
                 sql.append(" datahoracancelamentonfce, justificativacancelamento) VALUES (");
                 sql.append(idVenda + ", ");
-                sql.append("'" + i_oVenda.xml + "', ");
+                sql.append("'" + i_oVenda.xml.replace("'", "") + "', ");
                 sql.append("'" + i_oVenda.chaveNfce + "', ");
                 sql.append("'" + i_oVenda.protocoloRecebimentoNfce + "', ");
                 sql.append((i_oVenda.dataHoraEmissaoNfce.isEmpty() ? "NULL" : "'" + i_oVenda.dataHoraEmissaoNfce + "'") + ", ");
@@ -561,7 +562,7 @@ public class NotaSaidaNfceDAO {
             // VENDA
             sql = new StringBuilder();
             sql.append("UPDATE pdv.vendanfce SET");
-            sql.append(" xml = '" + i_oVenda.xml + "', ");
+            sql.append(" xml = '" + i_oVenda.xml.replace("'", "") + "', ");
             sql.append(" chavenfce = '" + i_oVenda.chaveNfce + "', ");
             sql.append(" protocolorecebimentonfce = '" + i_oVenda.protocoloRecebimentoNfce + "', ");
             sql.append(" datahoraemissaonfce = " + (i_oVenda.dataHoraEmissaoNfce.isEmpty() ? "NULL" : "'" + i_oVenda.dataHoraEmissaoNfce + "'") + ", ");
@@ -586,7 +587,7 @@ public class NotaSaidaNfceDAO {
 
                 sql = new StringBuilder();
                 sql.append("UPDATE pdv.venda SET");
-                sql.append("  xml = '" + i_oVenda.xml + "', ");
+                sql.append("  xml = '" + i_oVenda.xml.replace("'", "") + "', ");
                 sql.append("  chavenfce = '" + i_oVenda.chaveNfce + "', ");
                 sql.append("  protocolorecebimentonfce = '" + i_oVenda.protocoloRecebimentoNfce + "', ");
                 sql.append("  datahoraemissaonfce = " + (i_oVenda.dataHoraEmissaoNfce.isEmpty() ? "NULL" : "'" + i_oVenda.dataHoraEmissaoNfce + "'") + ", ");
