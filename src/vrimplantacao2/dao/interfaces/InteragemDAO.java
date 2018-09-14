@@ -11,6 +11,8 @@ import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
@@ -21,6 +23,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class InteragemDAO extends InterfaceDAO {
 
     public String i_arquivoXLS;
+    public String id_loja;
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
@@ -41,7 +44,11 @@ public class InteragemDAO extends InterfaceDAO {
 
     @Override
     public String getSistema() {
-        return "Interagem";
+        if ((id_loja != null) && (!id_loja.trim().isEmpty())) {
+            return "Interagem" + id_loja;
+        } else {
+            return "Interagem";
+        }
     }
 
     @Override
@@ -167,12 +174,6 @@ public class InteragemDAO extends InterfaceDAO {
                     + "p.codigo codigobarras,\n"
                     + "p.qtdun qtdembalagem\n"
                     + "from tabprocod p"
-                    
-            /*select
-             codpreco, codprod, quantmin, prvapro
-             from tabpreitem
-             where quantmin > 1
-             order by codprod;*/
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -186,6 +187,88 @@ public class InteragemDAO extends InterfaceDAO {
             }
         }
         return vResult;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANsAtacado() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        String codigoBarras;
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + "a.codpreco, "
+                        + "a.codprod, "
+                        + "a.quantmin, "
+                        + "a.prvapro precoatacao, "
+                        + "p.prvapro precovenda\n"
+                        + "from tabpreitem a\n"
+                        + "inner join tabprofil p on p.codpro = a.codprod\n"
+                        + "where a.quantmin > 1\n"
+                        + "and a.prvapro < p.prvapro\n"
+                        + "and p.codfil = " + getLojaOrigem() + "\n"
+                        + "order by a.codprod"
+            )) {
+                while (rst.next()) {
+                    int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("codprod"));
+                    
+                    codigoBarras = rst.getString("codpreco") + "999999" + String.valueOf(codigoAtual);
+                    
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("codprod"));
+                    imp.setEan(codigoBarras);
+                    imp.setQtdEmbalagem(rst.getInt("quantmin"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setAtacadoPreco(rst.getDouble("precoatacao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        String codigoBarras;
+
+        if (opt == OpcaoProduto.ATACADO) {
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + "a.codpreco, "
+                        + "a.codprod, "
+                        + "a.quantmin, "
+                        + "a.prvapro precoatacao, "
+                        + "p.prvapro precovenda\n"
+                        + "from tabpreitem a\n"
+                        + "inner join tabprofil p on p.codpro = a.codprod\n"
+                        + "where a.quantmin > 1\n"
+                        + "and a.prvapro < p.prvapro\n"
+                        + "and p.codfil = " + getLojaOrigem() + "\n"
+                        + "order by a.codprod"
+                )) {
+                    while (rst.next()) {
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("codprod"));
+
+                        codigoBarras = rst.getString("codpreco") + "999999" + String.valueOf(codigoAtual);
+                        
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("codprod"));
+                        imp.setEan(codigoBarras);
+                        imp.setQtdEmbalagem(rst.getInt("quantmin"));
+                        imp.setPrecovenda(rst.getDouble("precovenda"));
+                        imp.setAtacadoPreco(rst.getDouble("precoatacao"));
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+        return null;
     }
 
     @Override

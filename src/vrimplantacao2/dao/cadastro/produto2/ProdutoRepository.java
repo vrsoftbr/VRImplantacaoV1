@@ -16,6 +16,7 @@ import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.multimap.KeyList;
@@ -387,9 +388,13 @@ public class ProdutoRepository {
                             provider.aliquota().salvar(aliquota);
                             aliquotas.put(null, prod.getId(), aliquota.getEstado().getId());
                         }
-                        if (precoAtacadoLoja.getPrecoVenda() > 0 && precoAtacadoLoja.getPrecoVenda() != complemento.getPrecoVenda()) {
-                            provider.atacado().atualizarLoja(precoAtacadoLoja, optSimples);
+                        
+                        if (Versao.menorQue(3, 18, 1)) {
+                            if (precoAtacadoLoja.getPrecoVenda() > 0 && precoAtacadoLoja.getPrecoVenda() != complemento.getPrecoVenda()) {
+                                provider.atacado().atualizarLoja(precoAtacadoLoja, optSimples);
+                            }
                         }
+                        
                         if (precoAtacadoDesconto.getDesconto() > 0) {
                             provider.atacado().atualizarDesconto(precoAtacadoDesconto, optSimples);
                         }
