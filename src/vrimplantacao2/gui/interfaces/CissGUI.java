@@ -278,6 +278,14 @@ public class CissGUI extends VRInternalFrame {
                             opcoes.add(OpcaoFornecedor.CNPJ_CPF);
                         }
                         
+                        if(chkFTpEmpresa.isSelected()) {
+                            opcoes.add(OpcaoFornecedor.TIPO_EMPRESA);
+                        }
+                        
+                        if(chkFTpFornecedor.isSelected()) {
+                            opcoes.add(OpcaoFornecedor.TIPO_FORNECEDOR);
+                        }
+                        
                         if (!opcoes.isEmpty()) {
                             importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
                         }
@@ -407,6 +415,8 @@ public class CissGUI extends VRInternalFrame {
         chkFCondicaoPagamento = new vrframework.bean.checkBox.VRCheckBox();
         chkContasPagar = new vrframework.bean.checkBox.VRCheckBox();
         chkFCnpjCpf = new vrframework.bean.checkBox.VRCheckBox();
+        chkFTpEmpresa = new vrframework.bean.checkBox.VRCheckBox();
+        chkFTpFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         tabOutras = new javax.swing.JPanel();
         pnlConvenio = new javax.swing.JPanel();
         chkConvEmpresa = new vrframework.bean.checkBox.VRCheckBox();
@@ -665,7 +675,7 @@ public class CissGUI extends VRInternalFrame {
                             .addComponent(chkOfertas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(txtDtOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addContainerGap(34, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Produtos", vRPanel7);
@@ -746,7 +756,7 @@ public class CissGUI extends VRInternalFrame {
                 .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkPagamentoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(42, Short.MAX_VALUE))
+                .addContainerGap(53, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Clientes", vRPanel9);
@@ -803,6 +813,22 @@ public class CissGUI extends VRInternalFrame {
             }
         });
 
+        chkFTpEmpresa.setText("Tipo empresa");
+        chkFTpEmpresa.setEnabled(true);
+        chkFTpEmpresa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkFTpEmpresaActionPerformed(evt);
+            }
+        });
+
+        chkFTpFornecedor.setText("Tipo fornecedor");
+        chkFTpFornecedor.setEnabled(true);
+        chkFTpFornecedor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkFTpFornecedorActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout vRPanel8Layout = new javax.swing.GroupLayout(vRPanel8);
         vRPanel8.setLayout(vRPanel8Layout);
         vRPanel8Layout.setHorizontalGroup(
@@ -820,7 +846,9 @@ public class CissGUI extends VRInternalFrame {
                         .addGroup(vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chkContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(chkFCnpjCpf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkFCnpjCpf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkFTpEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkFTpFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(343, Short.MAX_VALUE))
         );
         vRPanel8Layout.setVerticalGroup(
@@ -840,7 +868,11 @@ public class CissGUI extends VRInternalFrame {
                 .addComponent(chkFCondicaoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkFCnpjCpf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(42, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkFTpEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkFTpFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Fornecedores", vRPanel8);
@@ -961,7 +993,7 @@ public class CissGUI extends VRInternalFrame {
                 .addGroup(tabOutrasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(pnlConvenio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(pnlVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 68, Short.MAX_VALUE))
+                .addGap(0, 79, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Outras", tabOutras);
@@ -1005,7 +1037,7 @@ public class CissGUI extends VRInternalFrame {
                 .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(70, Short.MAX_VALUE))
+                .addContainerGap(81, Short.MAX_VALUE))
         );
 
         tabs.addTab("Unificação", vRPanel2);
@@ -1282,6 +1314,14 @@ public class CissGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkVendasActionPerformed
 
+    private void chkFTpEmpresaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFTpEmpresaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkFTpEmpresaActionPerformed
+
+    private void chkFTpFornecedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFTpFornecedorActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkFTpFornecedorActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
     private vrframework.bean.button.VRButton btnMigrar;
@@ -1298,6 +1338,8 @@ public class CissGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFCondicaoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFPrazoFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkFTpEmpresa;
+    private vrframework.bean.checkBox.VRCheckBox chkFTpFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
     private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;

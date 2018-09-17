@@ -296,7 +296,7 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace pref="23" max="32767" attributes="0"/>
+                          <EmptySpace pref="34" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -504,7 +504,7 @@
                           <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkPagamentoRotativo" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="42" max="32767" attributes="0"/>
+                          <EmptySpace pref="53" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -607,6 +607,8 @@
                                   </Group>
                               </Group>
                               <Component id="chkFCnpjCpf" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFTpEmpresa" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFTpFornecedor" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="343" max="32767" attributes="0"/>
                       </Group>
@@ -631,7 +633,11 @@
                           <Component id="chkFCondicaoPagamento" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkFCnpjCpf" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="42" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkFTpEmpresa" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkFTpFornecedor" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -708,6 +714,28 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFCnpjCpfActionPerformed"/>
                   </Events>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFTpEmpresa">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo empresa"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
+                    </Property>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFTpEmpresaActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFTpFornecedor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo fornecedor"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
+                    </Property>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFTpFornecedorActionPerformed"/>
+                  </Events>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="javax.swing.JPanel" name="tabOutras">
@@ -738,7 +766,7 @@
                               <Component id="pnlConvenio" min="-2" max="-2" attributes="0"/>
                               <Component id="pnlVenda" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace min="0" pref="68" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="79" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -943,7 +971,7 @@
                       <Component id="chkUnifClientePreferencial" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkUnifClienteEventual" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="70" max="32767" attributes="0"/>
+                      <EmptySpace pref="81" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
