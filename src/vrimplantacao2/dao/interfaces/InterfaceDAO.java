@@ -180,6 +180,15 @@ public abstract class InterfaceDAO {
     }
 
     /**
+     * Retorna uma lista com os EANs Atacado dos produtos
+     * @return 
+     * @throws java.lang.Exception 
+     */   
+    public List<ProdutoIMP> getEANsAtacado() throws Exception {
+        return getProdutos();
+    }
+    
+    /**
      * Retorna uma lista dos produto fornecedores.
      * @return 
      * @throws java.lang.Exception 

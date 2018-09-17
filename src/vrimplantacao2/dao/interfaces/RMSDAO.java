@@ -418,7 +418,7 @@ public class RMSDAO extends InterfaceDAO {
                     "order by\n" +
                     "    id"
             )) {
-                SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
+                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yy");
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportSistema(getSistema());
@@ -434,7 +434,33 @@ public class RMSDAO extends InterfaceDAO {
                     imp.setMunicipio(rst.getString("cidade"));
                     imp.setUf(rst.getString("uf"));
                     imp.setCep(rst.getString("cep"));
-                    imp.setDatacadastro(format.parse(rst.getString("datacadastro")));
+                    //imp.setDatacadastro(format.parse(rst.getString("datacadastro")));
+                    String datacadastro;
+                    java.sql.Date data = null;
+                    if ((rst.getString("datacadastro") != null) &&
+                            (!rst.getString("datacadastro").trim().isEmpty())) {
+                        if (rst.getString("datacadastro").trim().length() == 5) {
+                            datacadastro = rst.getString("datacadastro").trim();
+                            datacadastro = rst.getString("datacadastro").substring(0, 1) + "/"
+                                    + rst.getString("datacadastro").substring(1, 3) + "/"
+                                    + rst.getString("datacadastro").substring(3, 5);
+                            datacadastro = datacadastro.trim();
+                            data = new java.sql.Date(format.parse(datacadastro).getTime());
+                            imp.setDatacadastro(data);
+                        } else if (rst.getString("datacadastro").trim().length() == 6) {
+                            datacadastro = rst.getString("datacadastro").trim();
+                            datacadastro = rst.getString("datacadastro").substring(0, 2) + "/"
+                                    + rst.getString("datacadastro").substring(2, 4) + "/"
+                                    + rst.getString("datacadastro").substring(4, 6);
+                            datacadastro = datacadastro.trim();
+                            data = new java.sql.Date(format.parse(datacadastro).getTime());
+                            imp.setDatacadastro(data);
+                        }
+                    } else {
+                        datacadastro = "";
+                        data = null;
+                        imp.setDatacadastro(data);
+                    }
                     imp.setTel_principal(rst.getString("fone1"));                    
                     if (Utils.stringToLong(rst.getString("fone2")) > 0) {
                         FornecedorContatoIMP cont = new FornecedorContatoIMP();
@@ -570,7 +596,7 @@ public class RMSDAO extends InterfaceDAO {
 
     
     
-    @Override
+    /*@Override
     public List<ClienteIMP> getClientesPreferenciais() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         
@@ -723,6 +749,101 @@ public class RMSDAO extends InterfaceDAO {
             }
         }
         
+        return result;
+    }*/
+    
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT \n" +
+                    "	TIP.tip_cgc_cpf Cgc_cpf, \n" +
+                    "   TIP.tip_codigo Codigo , \n" +
+                    "	TIP.tip_razao_social Razao_social, \n" +
+                    "   TIP.tip_nome_fantasia Nome_fantasia,  \n" +
+                    "	TIP.tip_endereco Endereco, \n" +
+                    "   TIP.tip_bairro Bairro, \n" +
+                    "   TIP.tip_cidade Cidade,  \n" +
+                    "	TIP.tip_estado Estado, \n" +
+                    "   TIP.tip_cep Cep, \n" +
+                    "   TIP.tip_natureza Natureza,  \n" +
+                    "	TIP.tip_data_cad Data_cad, \n" +
+                    "   TIP.tip_fax_ddd Fax_ddd, \n" +
+                    "   TIP.tip_fax_num Fax_num,  \n" +
+                    "	TIP.tip_fone_ddd Fone_ddd, \n" +
+                    "   TIP.tip_fone_num Fone_num, \n" +
+                    "   TIP.tip_fis_jur Fis_jur,  \n" +
+                    "	TIP.tip_insc_est_ident Insc_est_ident, \n" +
+                    "   TIP.tip_regiao  Regiao,  \n" +
+                    "	TIP.tip_divisao Divisao, \n" +
+                    "   TIP.tip_distrito Distrito, \n" +
+                    "   CLI.cli_contato Contato_principal,  \n" +
+                    "	CLI.cli_cod_vend Vendedor,  \n" +
+                    "	CLI.cli_situacao Status, \n" +
+                    "   CLI.cli_limite_cred,  \n" +
+                    "	Round(CLI.cli_limite_cred * (SELECT To_number(Substr(tab_conteudo, 1, 15) ) / 1000000  \n" +
+                    "				FROM   aa2ctabe WHERE  tab_codigo = (SELECT emp_ind_limite  \n" +
+                    "				FROM   aa2cempr  \n" +
+                    "				WHERE emp_codigo = TIP.tip_empresa) AND tab_acesso = Rpad( \n" +
+                    "				To_char(SYSDATE, 'YYMMDD'), 10, ' ')), 2) Limite_cred,  \n" +
+                    "	Nvl(por_banco, 0) banco,  \n" +
+                    "	Decode(cli.cli_situacao, 'A', 'ATIVO',\n" +
+                    "	Decode(cli.cli_situacao, 'I', 'INATIVO',\n" +
+                    "	Decode(cli.cli_situacao, 'C', 'CANCELADO',\n" +
+                    "	Decode(cli.cli_situacao, 'S', 'SUSPENSO',\n" +
+                    "	'ATIVO'))))\n" +
+                    "	SIGLA_STATUS,\n" +
+                    "	Nvl(dtip_cod_municipio, 0) COD_MUNI\n" +
+                    "FROM   \n" +
+                    "  aa2cclir CLI, \n" +
+                    "  aa2ctipo TIP, \n" +
+                    "  final_cliente FIN, \n" +
+                    "  aa1rport, \n" +
+                    "  aa1dtipo \n" +
+                    "WHERE  \n" +
+                    "	        TIP.tip_cgc_cpf >= 0 \n" +
+                    "   AND 	TIP.tip_codigo >= 0 \n" +
+                    "   AND 	TIP.tip_digito >= 0 \n" +
+                    "   AND 	TIP.tip_codigo = CLI.cli_codigo \n" +
+                    "   AND 	TIP.tip_digito = CLI.cli_digito \n" +
+                    "   AND 	FIN.cli_codigo(+) = CLI.cli_codigo \n" +
+                    "   AND 	por_portador (+) = cli.cli_port \n" +
+                    "   AND 	dtip_codigo (+) = tip_codigo\n" +
+                    "   and     tip.tip_loj_cli = 'C'")) {
+                SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
+                while(rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rs.getString("Codigo"));
+                    imp.setRazao(rs.getString("Razao_social"));
+                    imp.setCnpj(rs.getString("Cgc_cpf"));
+                    imp.setFantasia(rs.getString("Nome_fantasia"));
+                    imp.setEndereco(rs.getString("Endereco"));
+                    imp.setBairro(rs.getString("Bairro"));
+                    imp.setMunicipio(rs.getString("Cidade"));
+                    imp.setMunicipioIBGE(rs.getInt("COD_MUNI"));
+                    imp.setUf(rs.getString("Estado"));
+                    imp.setCep(rs.getString("Cep"));
+                    imp.setDataCadastro(format.parse(rs.getString("Data_cad")));
+                    if (rs.getString("Fax_ddd") != null &&
+                            !"0".equals(rs.getString("Fax_ddd"))) {
+                        imp.addContato("Fax", "Fax", rs.getString("Fax_ddd") + rs.getString("Fax_num"), null, null);
+                    }
+                    if (rs.getString("Fone_ddd") != null &&
+                            !"0".equals(rs.getString("Fone_ddd"))) {
+                        imp.setTelefone(rs.getString("Fone_ddd") + rs.getString("Fone_num"));
+                    }
+                    imp.setInscricaoestadual(rs.getString("Insc_est_ident"));
+                    if(rs.getString("Contato_principal") != null) {
+                        imp.addContato("Contato Principal", rs.getString("Contato_principal"), null, null, null);
+                    }
+                    imp.setAtivo("A".equals(rs.getString("Status").trim()) ? true : false);
+                    imp.setValorLimite(rs.getDouble("Limite_cred"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 

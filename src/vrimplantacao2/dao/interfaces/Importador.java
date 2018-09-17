@@ -353,6 +353,21 @@ public class Importador {
     }
 
     /**
+     * Importa os códigos de barras atacado dos produtos.
+     *
+     * @throws Exception
+     */
+    public void importarEANAtacado() throws Exception {
+        ProgressBar.setStatus("Carregando produtos...");
+        List<ProdutoIMP> produtos = getInterfaceDAO().getEANsAtacado();
+        ProdutoDAO dao = new ProdutoDAO();
+        dao.setImportSistema(getInterfaceDAO().getSistema());
+        dao.setImportLoja(getInterfaceDAO().getLojaOrigem());
+        dao.setIdLojaVR(getLojaVR());
+        dao.salvarEAN(produtos);
+    }
+    
+    /**
      * Todo produto que não possuir um EAN, ao executar este método, eles
      * recebem um código de barras, baseado em seu ID.
      *
