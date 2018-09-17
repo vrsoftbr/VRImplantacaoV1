@@ -15,6 +15,7 @@ import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -298,7 +299,8 @@ public class RMSGUI_2 extends VRInternalFrame {
                         }
 
                         if (chkClientePreferencial.isSelected()) {
-                            importador.importarClientePreferencial();
+                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.VALOR_LIMITE,
+                                    OpcaoCliente.SITUACAO_CADASTRO, OpcaoCliente.INSCRICAO_ESTADUAL, OpcaoCliente.OBSERVACOES2);
                         }
 
                         if (chkClienteEventual.isSelected()) {
