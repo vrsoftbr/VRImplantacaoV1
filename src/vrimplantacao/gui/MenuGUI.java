@@ -47,7 +47,7 @@ import vrimplantacao.gui.interfaces.PlanilhaPadraoGUI;
 import vrimplantacao.gui.interfaces.PlanilhaVendasGUI;
 import vrimplantacao.gui.interfaces.VRSoftwareGUI;
 import vrimplantacao.gui.interfaces.WisaSoftGUI_2;
-import vrimplantacao.gui.interfaces.GuiaSistemasGUI;
+import vrimplantacao2.gui.interfaces.GuiaSistemasGUI;
 import vrimplantacao.gui.interfaces.GCFGUI;
 import vrimplantacao2.gui.interfaces.MultiPdvGUI;
 import vrimplantacao2.gui.interfaces.OrionGUI;
@@ -181,6 +181,7 @@ import vrimplantacao2.gui.interfaces.SriGUI;
 import vrimplantacao2.gui.interfaces.SysmoFirebirdGUI;
 import vrimplantacao2.gui.interfaces.SysmoPostgresGUI;
 import vrimplantacao2.gui.interfaces.TopSystemGUI2;
+import vrimplantacao2.gui.interfaces.UniplusGUI;
 import vrimplantacao2.gui.interfaces.WShopGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 
@@ -608,6 +609,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSysmoPostgres = new javax.swing.JMenuItem();
         mnuAlterDataWShop = new javax.swing.JMenuItem();
         mnuMarket = new javax.swing.JMenuItem();
+        mnuUniplus = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -1589,6 +1591,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuMarket);
+
+        mnuUniplus.setText("Uniplus");
+        mnuUniplus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuUniplusActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuUniplus);
 
         jMenu2.add(jMenu8);
 
@@ -2670,19 +2680,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemFMSistemasActionPerformed
 
     private void jMenuItemGuiaSistemasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGuiaSistemasActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarGuiaSistemas == null || formImportarGuiaSistemas.isClosed()) {
-                formImportarGuiaSistemas = new GuiaSistemasGUI(this);
-            }
-
-            formImportarGuiaSistemas.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
+        GuiaSistemasGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemGuiaSistemasActionPerformed
 
     private void jMenuItemBoechatSoftActionPerformed(java.awt.event.ActionEvent evt) {
@@ -3940,6 +3938,10 @@ public final class MenuGUI extends VRMdiFrame {
         
     }//GEN-LAST:event_mnuAcertarIdsProdutosActionPerformed
 
+    private void mnuUniplusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuUniplusActionPerformed
+        UniplusGUI.exibir(this);
+    }//GEN-LAST:event_mnuUniplusActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -4132,6 +4134,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSysmoFirebird;
     private javax.swing.JMenuItem mnuSysmoPostgres;
     private javax.swing.JMenuItem mnuTsti;
+    private javax.swing.JMenuItem mnuUniplus;
     private javax.swing.JMenuItem mnuVisualComercio;
     private javax.swing.JMenuItem mnuWebsaq;
     private javax.swing.JMenuItem mnuWmByFile;
