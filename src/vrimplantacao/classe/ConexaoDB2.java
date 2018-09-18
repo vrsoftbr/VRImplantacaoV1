@@ -1,5 +1,6 @@
 package vrimplantacao.classe;
 
+import com.ibm.db2.jcc.DB2Connection;
 import java.sql.Connection;
 
 /**

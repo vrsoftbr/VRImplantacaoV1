@@ -18,6 +18,8 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
+import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -40,6 +42,10 @@ public class CissDAO extends InterfaceDAO {
     
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
+
+    public CissDAO() {
+        System.setProperty("db2.jcc.charsetDecoderEncoder", "3");
+    }
 
     public void setDataInicioVenda(Date dataInicioVenda) {
         this.dataInicioVenda = dataInicioVenda;
@@ -339,7 +345,9 @@ public class CissDAO extends InterfaceDAO {
                     + "	case f.idsituacao when 4 then 0 else 1 end id_situacaoCadastro,\n"
                     + "	f.FONE2,\n"
                     + "	f.FONEFAX fax,\n"
-                    + "	f.EMAIL, f.tipofisicajuridica \n"
+                    + "	f.EMAIL, f.tipofisicajuridica, \n"
+                    + "	f.tiporegimetribfederal,\n"
+                    + "	f.tiporegimetributacao\n"
                     + "from \n"
                     + "	dba.cliente_fornecedor f\n"
                     + "	left join dba.cidades_ibge c on f.idcidade = c.idcidade\n"
@@ -347,6 +355,7 @@ public class CissDAO extends InterfaceDAO {
                     + "	f.TIPOCADASTRO in ('A','F')\n"
                     + "order by f.idclifor"
             )) {
+                
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
 
@@ -377,6 +386,20 @@ public class CissDAO extends InterfaceDAO {
                     }
                     if (!"".equals(Utils.acertarTexto(rst.getString("EMAIL")))) {
                         imp.addContato("C", "EMAIL", "", "", TipoContato.COMERCIAL, rst.getString("EMAIL"));
+                    }
+                    
+                    switch (rst.getString("tiporegimetribfederal")) {
+                        //case "I": imp.setTipoEmpresa(TipoEmpresa. ISENTO); break;
+                        case "P": imp.setTipoEmpresa(TipoEmpresa.LUCRO_PRESUMIDO); break;
+                        case "R": imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL); break;
+                        case "S": imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES); break;
+                    }
+                    
+                    switch (rst.getString("tiporegimetributacao")) {
+                        case "A": imp.setTipoFornecedor(TipoFornecedor.ATACADO); break;
+                        case "S": imp.setTipoFornecedor(TipoFornecedor.SEMTIPO); break;
+                        case "F": imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA); break;
+                        case "N": imp.setTipoFornecedor(TipoFornecedor.DISTRIBUIDOR); break;
                     }
 
                     result.add(imp);
