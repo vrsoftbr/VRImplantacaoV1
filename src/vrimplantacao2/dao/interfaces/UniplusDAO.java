@@ -105,7 +105,9 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.precocusto,\n" +
                     "	p.lucrobruto as margembruta,\n" +
                     "	p.percentuallucroajustado as margem,\n" +
-                    "   round((((p.preco / case when p.precocusto = 0 then 1 else p.precocusto end) - 1) * 100),2) as margemcalculada,\n" +
+                    "   case when p.precocusto = 0.000000 then\n" +
+                    "   0 else\n" +
+                    "   round((((p.preco / case when p.precocusto = 0.000000 then 1 else p.precocusto end) - 1) * 100), 2) end as margemcalculada,\n" +
                     "	p.percentualmarkup,\n" +
                     "	p.preco as precovenda,\n" +
                     "	p.quantidademinima,\n" +
