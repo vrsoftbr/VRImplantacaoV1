@@ -13,7 +13,6 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
-import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -150,17 +149,23 @@ public class GuiaSistemasDAO extends InterfaceDAO {
                     + "VFD_SITUACAO AS ATIVO, \n"
                     + "vfd_TipoInventarioFatorConversao as ProUnid,\n"
                     + "prod.vfd_icmss,\n"
-                    + "i.vfd_CodIcms, \n"
-                    + "i.vfd_Descricao, \n"
-                    + "i.vfd_Aliquota, \n"
-                    + "i.vfd_Base, \n"
-                    + "i.vfd_CST,\n"
+                    + "sai.vfd_CodIcms codIcmsS, \n"
+                    + "sai.vfd_Descricao descIcmsS, \n"
+                    + "sai.vfd_Aliquota aliqS, \n"
+                    + "sai.vfd_Base baseS, \n"
+                    + "sai.vfd_CST cstS,\n"
+                    + "ent.vfd_CodIcms codIcmsE, \n"
+                    + "ent.vfd_Descricao descIcmsE, \n"
+                    + "ent.vfd_Aliquota aliqE, \n"
+                    + "ent.vfd_Base baseE, \n"
+                    + "ent.vfd_CST cstE,\n"
                     + "prod.vfd_CEST, \n"
                     + "pr.vfd_CustoAquisicao,\n"
-                    + "pr.vfd_PrecoVenda, "
+                    + "pr.vfd_PrecoVenda, \n"
                     + "est.vfd_QtdLoja\n"
                     + "from tab_produto as prod\n"
-                    + "LEFT JOIN tab_ICMS i on i.vfd_CodIcms = prod.vfd_icmss\n"
+                    + "LEFT JOIN tab_ICMS sai on sai.vfd_CodIcms = prod.vfd_icmss\n"
+                    + "LEFT JOIN tab_ICMS ent on ent.vfd_CodIcms = prod.vfd_icmse\n"
                     + "LEFT JOIN tab_EMBALAGEM AS EMB ON EMB.VFD_CODPRODUTO = prod.vfd_codproduto \n"
                     + "LEFT JOIN tmp_ListProdBalanca AS BALANCA ON BALANCA.VFD_CODPRODUTO = prod.vfd_codproduto\n"
                     + "LEFT OUTER JOIN [Tab_cadCOFINS] AS COFINS ON COFINS.vfd_CodCOFINS = PROD.VFD_CODCOFINS\n"
@@ -191,9 +196,12 @@ public class GuiaSistemasDAO extends InterfaceDAO {
                     imp.setCest(rst.getString("vfd_CEST"));
                     imp.setPiscofinsCstDebito(rst.getString("VFD_CSTSAIDA"));
                     imp.setPiscofinsCstCredito(rst.getString("VFD_CSTENTRADA"));
-                    imp.setIcmsCst(rst.getInt("vfd_CST"));
-                    imp.setIcmsAliq(rst.getDouble("vfd_Aliquota"));
-                    imp.setIcmsReducao(imp.getIcmsCst() == 0 ? 0 : rst.getDouble("vfd_Base"));
+                    imp.setIcmsCstSaida(rst.getInt("cstS"));
+                    imp.setIcmsAliqSaida(rst.getDouble("aliqS"));
+                    imp.setIcmsReducaoSaida(imp.getIcmsCstSaida() == 0 ? 0 : rst.getDouble("baseS"));
+                    imp.setIcmsCstEntrada(rst.getInt("cstE"));
+                    imp.setIcmsAliqEntrada(rst.getDouble("aliqE"));
+                    imp.setIcmsReducaoEntrada(imp.getIcmsCstEntrada() == 0 ? 0 : rst.getDouble("baseE"));
                     imp.setMargem(rst.getDouble("vfd_margem"));
                     imp.setPrecovenda(rst.getDouble("vfd_PrecoVenda"));
                     imp.setCustoComImposto(rst.getDouble("vfd_CustoAquisicao"));
@@ -258,7 +266,7 @@ public class GuiaSistemasDAO extends InterfaceDAO {
                     imp.setPrazoVisita(rst.getInt("dias"));
                     imp.setPrazoEntrega(rst.getInt("vfd_prazo"));
                     imp.setTel_principal(rst.getString("vfd_fone"));
-                    
+
                     if ((rst.getString("vfd_nomevendedor") != null)
                             && (!rst.getString("vfd_nomevendedor").trim().isEmpty())) {
                         imp.setObservacao("NOME VENDEDOR " + rst.getString("vfd_nomevendedor"));
@@ -413,40 +421,35 @@ public class GuiaSistemasDAO extends InterfaceDAO {
         List<CreditoRotativoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT "
-                    + "ctrnum, clicod, cxanum, ctrdatemi, "
-                    + "ctrdatvnc, ctrvlrdev, ctrobs "
-                    + "FROM CONTARECEBER "
-                    + "WHERE CTRVLRPAG < CTRVLRNOM "
-                    + "or CTRVLRPAG IS NULL "
+                    "select \n"
+                    + "vfd_Caixa, "
+                    + "vfd_Cupom, "
+                    + "vfd_NumDocumento,\n"
+                    + "vfd_DataLancamento, "
+                    + "vfd_NumeroParcela,\n"
+                    + "vfd_CodSacado, "
+                    + "vfd_DataVencimento,\n"
+                    + "vfd_VlrDocumento, "
+                    + "vfd_VlrJuros \n"
+                    + "from tab_fin_contasrec \n"
+                    + "where vfd_TipoSacado = 'C'\n"
+                    + "and vfd_DataBaixa is null\n"
+                    + "and vfd_CodFilial = " + getLojaOrigem()
             )) {
                 while (rst.next()) {
-
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("vfd_Caixa") + rst.getString("vfd_Cupom") + rst.getString("vfd_DataLancamento"));
+                    imp.setIdCliente(rst.getString("vfd_CodSacado"));
+                    imp.setNumeroCupom(rst.getString("vfd_Cupom"));
+                    imp.setDataEmissao(rst.getDate("vfd_DataLancamento"));
+                    imp.setDataVencimento(rst.getDate("vfd_DataVencimento"));
+                    imp.setValor(rst.getDouble("vfd_VlrDocumento"));
+                    imp.setJuros(rst.getDouble("vfd_VlrJuros"));
+                    imp.setEcf(rst.getString("vfd_Caixa"));
+                    vResult.add(imp);
                 }
             }
         }
-        return null;
-    }
-
-    @Override
-    public List<ChequeIMP> getCheques() throws Exception {
-        List<ChequeIMP> vResult = new ArrayList<>();
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "SELECT "
-                    + "c.cheque, c.ciccgc, c.client, c.bancox, c.agenci, c.contax, "
-                    + "c.valorx, c.dataxx, c.vencim, c.status, c.devol1, c.motdv1, "
-                    + "c.devol2, c.motdv2, c.reapre, c.quitad, c.codfor, c.nomfor, "
-                    + "c.datfor, c.caixax, c.observ, c.seqdev, c.datcad, c.usucad, "
-                    + "c.datalt, c.usualt, c.cobran, c.datcob, c.entrad "
-                    + "FROM CHEQUES c "
-                    + "WHERE c.FILIAL = " + getLojaOrigem()
-            )) {
-                while (rst.next()) {
-
-                }
-            }
-        }
-        return null;
+        return vResult;
     }
 }

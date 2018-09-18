@@ -47,7 +47,7 @@ import vrimplantacao.gui.interfaces.PlanilhaPadraoGUI;
 import vrimplantacao.gui.interfaces.PlanilhaVendasGUI;
 import vrimplantacao.gui.interfaces.VRSoftwareGUI;
 import vrimplantacao.gui.interfaces.WisaSoftGUI_2;
-import vrimplantacao.gui.interfaces.GuiaSistemasGUI;
+import vrimplantacao2.gui.interfaces.GuiaSistemasGUI;
 import vrimplantacao.gui.interfaces.GCFGUI;
 import vrimplantacao2.gui.interfaces.MultiPdvGUI;
 import vrimplantacao2.gui.interfaces.OrionGUI;
@@ -2680,19 +2680,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemFMSistemasActionPerformed
 
     private void jMenuItemGuiaSistemasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGuiaSistemasActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarGuiaSistemas == null || formImportarGuiaSistemas.isClosed()) {
-                formImportarGuiaSistemas = new GuiaSistemasGUI(this);
-            }
-
-            formImportarGuiaSistemas.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
+        GuiaSistemasGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemGuiaSistemasActionPerformed
 
     private void jMenuItemBoechatSoftActionPerformed(java.awt.event.ActionEvent evt) {
@@ -3575,7 +3563,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuFlatanActionPerformed
 
     private void mnuBrainSoftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuBrainSoftActionPerformed
-        // TODO add your handling code here t:
+        // TODO add your handling code here:
         try {
             this.setWaitCursor();
             if (formImportarBrainSoft == null || formImportarBrainSoft.isClosed()) {
