@@ -405,9 +405,24 @@ public class GetWayGUI extends VRInternalFrame {
                             importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.VALOR_LIMITE,
                                     OpcaoCliente.SITUACAO_CADASTRO, OpcaoCliente.INSCRICAO_ESTADUAL, OpcaoCliente.OBSERVACOES2);
                         }
+                        
+                        {
+                            List<OpcaoCliente> opt = new ArrayList<>();
+                            
+                            if (chkValorLimite.isSelected()) {
+                                opt.add(OpcaoCliente.VALOR_LIMITE);
+                            }
+                            
+                            if (!opt.isEmpty()) {
+                                importador.atualizarClientePreferencial(opt.toArray(new OpcaoCliente[] {}));
+                            }
+                            
+                        }
+                        
                         if (chkClienteEventual.isSelected()) {
                             importador.importarClienteEventual();
                         }
+                        
                         if (chkRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }
