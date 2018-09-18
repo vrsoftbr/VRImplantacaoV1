@@ -58,7 +58,9 @@
                           <Component id="chkMercadologicoPorNivel" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkMercadologicoPorNivelReplicar" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="173" max="32767" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="chkMercadologicoNaoExcluir" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="34" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -70,6 +72,7 @@
                               <Group type="103" alignment="0" groupAlignment="3" attributes="0">
                                   <Component id="chkMercadologicoPorNivelReplicar" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkMercadologicoPorNivel" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkMercadologicoNaoExcluir" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="jLabel3" min="-2" pref="23" max="-2" attributes="0"/>
                           </Group>
@@ -99,6 +102,15 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMercadologicoPorNivelReplicar">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Replicar Subn&#xed;veis"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMercadologicoNaoExcluir">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="N&#xe3;o Excluir ao importar"/>
+                    <Property name="toolTipText" type="java.lang.String" value="N&#xe3;o executa a rotina de exclus&#xe3;o dos mercadol&#xf3;gicos anteriores durante a importa&#xe7;&#xe3;o do mercadol&#xf3;gico"/>
                     <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                       <Connection code="true" type="code"/>
                     </Property>

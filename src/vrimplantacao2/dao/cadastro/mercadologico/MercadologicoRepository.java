@@ -2,6 +2,8 @@ package vrimplantacao2.dao.cadastro.mercadologico;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoAnteriorVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
@@ -13,7 +15,6 @@ import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 public class MercadologicoRepository {
     
     private final MercadologicoRepositoryProvider provider;
-    private boolean gerarNiveisComoSubniveis = false;
 
     public MercadologicoRepository(String sistema, String lojaOrigem, int lojaVR) throws Exception {
         this(new MercadologicoRepositoryProvider(
@@ -22,26 +23,25 @@ public class MercadologicoRepository {
                 lojaVR
         ));
     }
-
-    public void setGerarNiveisComoSubniveis(boolean gerarNiveisComoSubniveis) {
-        this.gerarNiveisComoSubniveis = gerarNiveisComoSubniveis;
-    }
     
     public MercadologicoRepository(MercadologicoRepositoryProvider provider) throws Exception {
         this.provider = provider;
     }
 
-    public void salvar(List<MercadologicoNivelIMP> mercadologicos) throws Exception {
+    public void salvar(List<MercadologicoNivelIMP> mercadologicos, Set<OpcaoProduto> opt) throws Exception {
         provider.setStatus("Gravando mercadológicos...");
         try {
             provider.begin();
-            provider.excluir();
+            if (!opt.contains(OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR)) {
+                provider.excluir();
+            }
+            
             int nivelMaximo = getNivelMaximo(mercadologicos);
             if (nivelMaximo < 3) {
                 nivelMaximo = 3;
             }
             for (MercadologicoNivelIMP merc: mercadologicos) {
-                salvar(null, merc, 1, nivelMaximo);
+                salvar(null, merc, 1, nivelMaximo, opt);
             }
             provider.gerarAAcertar(nivelMaximo);
             provider.commit();
@@ -51,7 +51,7 @@ public class MercadologicoRepository {
         }
     }
     
-    public void salvar(MercadologicoVO pai, MercadologicoNivelIMP merc, int nivel, int nivelMaximo) throws Exception {
+    public void salvar(MercadologicoVO pai, MercadologicoNivelIMP merc, int nivel, int nivelMaximo, Set<OpcaoProduto> opt) throws Exception {
         MercadologicoVO vo = converterMercadologico(pai, merc, nivel);
         gravarMercadologico(vo);
         
@@ -59,11 +59,11 @@ public class MercadologicoRepository {
         gravarMercadologico(ant);
         
         if (!merc.getNiveis().isEmpty()) {
-            if (this.gerarNiveisComoSubniveis) {
+            if (opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR)) {
                 completarSubNiveis(vo, nivel, nivelMaximo);
             }
             for (MercadologicoNivelIMP imp: merc.getNiveis().values()) {
-                salvar(vo, imp, nivel + 1, nivelMaximo);
+                salvar(vo, imp, nivel + 1, nivelMaximo, opt);
             }
         } else {
             if (nivelMaximo > nivel) {

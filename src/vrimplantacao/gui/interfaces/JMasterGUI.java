@@ -137,7 +137,7 @@ public class JMasterGUI extends VRInternalFrame {
                             importador.importarFamiliaProduto();
                         }
                         if (chkMercadologico.isSelected()) {
-                            importador.importarMercadologicoPorNiveis(true);
+                            importador.importarMercadologicoPorNiveis(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR);
                         }
                         if (chkProdutos.isSelected()) {
                             importador.importarProduto(chkManterBalanca.isSelected());

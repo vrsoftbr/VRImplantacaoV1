@@ -159,23 +159,24 @@ public class Importador {
     /**
      * Importa os mercadológicos dos produtos.
      *
+     * @param opcoes
      * @throws Exception
      */
-    public void importarMercadologico() throws Exception {
+    public void importarMercadologico(OpcaoProduto... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando dados do mercadológico...");
         List<MercadologicoIMP> mercadologicos = getInterfaceDAO().getMercadologicos();
         MercadologicoDAO dao = new MercadologicoDAO();
-        dao.salvar(mercadologicos);
+        dao.salvar(mercadologicos, new HashSet<>(Arrays.asList(opcoes)));
     }
 
     /**
      * Importa os mercadológicos dos produtos por níveis.
      *
-     * @param gerarNiveisComoSubNiveis Faz com que um nível seja representado
+     * @param opcoes
      * entre os seus subníveis.
      * @throws Exception
      */
-    public void importarMercadologicoPorNiveis(boolean gerarNiveisComoSubNiveis) throws Exception {
+    public void importarMercadologicoPorNiveis(OpcaoProduto... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando dados do mercadológico em níveis...");
         List<MercadologicoNivelIMP> mercadologicos = getInterfaceDAO().getMercadologicoPorNivel();
         MercadologicoRepository repository = new MercadologicoRepository(
@@ -183,8 +184,7 @@ public class Importador {
                 getLojaOrigem(),
                 getLojaVR()
         );
-        repository.setGerarNiveisComoSubniveis(gerarNiveisComoSubNiveis);
-        repository.salvar(mercadologicos);
+        repository.salvar(mercadologicos, new HashSet<>(Arrays.asList(opcoes)));
     }
 
     /**

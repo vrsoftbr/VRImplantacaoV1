@@ -167,7 +167,7 @@ public class TopSystemGUI2 extends VRInternalFrame {
                         }
 
                         if (chkMercadologicoNivel.isSelected()) {
-                            importador.importarMercadologicoPorNiveis(false);
+                            importador.importarMercadologicoPorNiveis();
                         }
 
                         if (chkProdutos.isSelected()) {

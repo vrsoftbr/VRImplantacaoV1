@@ -183,7 +183,7 @@ public class ScefGUI extends VRInternalFrame {
                         }
 
                         if (chkMercadologico.isSelected()) {
-                            importador.importarMercadologicoPorNiveis(false);
+                            importador.importarMercadologicoPorNiveis();
                         }
 
                         if (chkProdutos.isSelected()) {
