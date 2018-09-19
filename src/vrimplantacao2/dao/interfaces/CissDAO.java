@@ -571,7 +571,7 @@ public class CissDAO extends InterfaceDAO {
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try(Statement stm = ConexaoDB2.getConexao().createStatement()){
-            try(ResultSet rs = stm.executeQuery(
+            try(ResultSet rs = stm.executeQuery(                    
                     "select\n" +
                     "        cr.idplanilha as id,\n" +
                     "        cr.idtitulo,\n" +
@@ -586,11 +586,14 @@ public class CissDAO extends InterfaceDAO {
                     "        cr.sumvaljuroscobrado as juros\n" +
                     "from\n" +
                     "        contas_receber cr\n" +
+                    "        join cliente_fornecedor cl on\n" +
+                    "                cr.idclifor = cl.idclifor\n" +
                     "join\n" +
                     "        cliente_fornecedor cf on cr.idclifor = cf.idclifor\n" +
                     "where\n" +
-                    "        idempresa = " + getLojaOrigem() + " and\n" +
-                    "        flagbaixada = 'F'\n" +
+                    "        idempresa = " + getLojaOrigem() + "  and\n" +
+                    "        flagbaixada = 'F' and\n" +
+                    "        not upper(cl.nome) like '%CONSUMIDOR%FINAL%'\n" +
                     "order by\n" +
                     "        cr.dtmovimento")) {
                 while(rs.next()) {
@@ -638,6 +641,7 @@ public class CissDAO extends InterfaceDAO {
                     "        cliente_fornecedor cf on ch.idclifor = cf.idclifor\n" +
                     "where\n" +
                     "        ch.idempresa = " + getLojaOrigem() + " and\n" +
+                    "        not upper(cf.nome) like '%CONSUMIDOR%FINAL%' and\n" +
                     "        ch.codcompensacao = 18\n" +
                     "order by\n" +
                     "        ch.dtvencimento")) {
