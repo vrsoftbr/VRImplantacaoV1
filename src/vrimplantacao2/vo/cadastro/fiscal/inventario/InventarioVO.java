@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package vrimplantacao2.vo.cadastro.fiscal.inventario;
 
 import java.util.Date;
@@ -47,6 +42,7 @@ public class InventarioVO {
     }
 
     public int getIdProduto() {
+        ProdutoInventario a;
         return idProduto;
     }
 
@@ -122,7 +118,7 @@ public class InventarioVO {
         return idAliquotadebito;
     }
 
-    public void setIdAliquotadebito(int idAliquotadebito) {
+    public void setIdAliquotaDebito(int idAliquotadebito) {
         this.idAliquotadebito = idAliquotadebito;
     }
 

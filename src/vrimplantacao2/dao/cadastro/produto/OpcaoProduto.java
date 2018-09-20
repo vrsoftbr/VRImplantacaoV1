@@ -246,6 +246,7 @@ public enum OpcaoProduto {
         result.addAll(getInfoAdicional());
         result.addAll(getComplementos());
         result.addAll(getTributos());
+        result.add(INVENTARIO);
 
         return result;
     }
