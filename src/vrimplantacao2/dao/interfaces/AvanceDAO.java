@@ -668,7 +668,6 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                         InventarioIMP imp = new InventarioIMP();
                         imp.setId(getLojaOrigem() + "-" + rst.getString("dt_inv") + "-" + rst.getString("Codigo"));
                         imp.setData(dataInventario);
-                        imp.setDataGeracao(dataInventario);
                         imp.setIdProduto(rst.getString("Codigo"));
                         imp.setDescricao(rst.getString("DESCRICAO"));
                         imp.setCustoComImposto(rst.getDouble("CUSTO"));

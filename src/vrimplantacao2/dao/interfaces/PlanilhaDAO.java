@@ -34,6 +34,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.InventarioIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
@@ -812,6 +813,42 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    
+    @Override
+    public List<InventarioIMP> getInventario() throws Exception {
+        List<InventarioIMP> result = new ArrayList<>();
+        
+        Arquivo inventario = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());  
+        
+        ProgressBar.setStatus("Carregando Inventário...");
+        
+        for (LinhaArquivo linha: inventario) {            
+            InventarioIMP imp = new InventarioIMP();
+            
+            imp.setId(linha.getString("id"));
+            imp.setIdProduto(linha.getString("id_produto"));
+            imp.setData(linha.getData("data"));
+            imp.setDescricao(linha.getString("descricao"));
+            imp.setPrecoVenda(linha.getDouble("preco"));
+            imp.setQuantidade(linha.getDouble("quantidade"));
+            imp.setCustoComImposto(linha.getDouble("custocomimposto"));
+            imp.setCustoSemImposto(linha.getDouble("custosemimposto"));
+            imp.setCstCredito(linha.getString("cst_credito"));
+            imp.setAliquotaCredito(linha.getDouble("aliquota_credito"));
+            imp.setReduzidoCredito(linha.getDouble("reducao_credito"));
+            imp.setCstDebito(linha.getString("cst_debito"));
+            imp.setAliquotaDebito(linha.getDouble("aliquota_debito"));
+            imp.setReduzidoDebito(linha.getDouble("reducao_debito"));
+            imp.setIdAliquotaCredito(linha.getString("id_icms_credito"));
+            imp.setIdAliquotaDebito(linha.getString("id_icms_debito"));
+            imp.setPis(linha.getDouble("pis"));
+            imp.setCofins(linha.getDouble("cofins"));
+            imp.setCustoMedioComImposto(linha.getDouble("customediocomimposto"));
+            imp.setCustoMedioSemImposto(linha.getDouble("customediosemimposto"));
+            
+            result.add(imp);            
+        }
+        
+        return result;
+    }
     
 }

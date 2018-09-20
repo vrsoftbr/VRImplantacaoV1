@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package vrimplantacao2.dao.cadastro.fiscal.inventario;
 
 import java.util.List;
@@ -94,7 +89,6 @@ public class InventarioRepository {
         InventarioVO vo = new InventarioVO();
         
         vo.setData(imp.getData());
-        vo.setDatageracao(imp.getDataGeracao());
         vo.setIdProduto(idProduto);
         vo.setIdLoja(provider.getLojaVR());
         vo.setDescricao(imp.getDescricao());
@@ -116,7 +110,6 @@ public class InventarioRepository {
         vo.setSistema(provider.getSistema());
         vo.setIdLoja(provider.getLojaOrigem());
         vo.setData(imp.getData());
-        vo.setDatageracao(imp.getDataGeracao());
         vo.setId(imp.getId());
         vo.setCodigoAnteior(imp.getIdProduto());
         vo.setCodigoAtual(idProduto);
