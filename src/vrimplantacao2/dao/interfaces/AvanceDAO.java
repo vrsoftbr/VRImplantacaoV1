@@ -30,6 +30,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private Date dataInventario;
     
     @Override
     public String getSistema() {
@@ -630,7 +631,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<InventarioIMP> getInventario(Date dataInventario) throws Exception {
+    public List<InventarioIMP> getInventario() throws Exception {
         List<InventarioIMP> result = new ArrayList<>();
         String nomeTable = "";
 
@@ -686,5 +687,10 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
+    }
+
+    public void setDataInventario(Date dataInventario) {
+        this.dataInventario = dataInventario;
+        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
     }
 }

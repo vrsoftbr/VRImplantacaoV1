@@ -964,13 +964,11 @@ public class Importador {
 
     /**
      * Importa o cadastro dos operadores.
-     *
-     * @param dataInventario
      * @throws Exception
      */
-    public void importarInventario(Date dataInventario) throws Exception {
+    public void importarInventario() throws Exception {
         ProgressBar.setStatus("Carregando inventário...");
-        List<InventarioIMP> inventario = getInterfaceDAO().getInventario(dataInventario);
+        List<InventarioIMP> inventario = getInterfaceDAO().getInventario();
         InventarioRepositoryProvider provider = new InventarioRepositoryProvider(
                 getSistema(),
                 getLojaOrigem(),

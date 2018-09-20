@@ -479,11 +479,10 @@ public abstract class InterfaceDAO {
     
     /**
      * Permite o retorno listas especificadas de inventario.
-     * @param dataInventario
      * @return
      * @throws Exception 
      */    
-    public List<InventarioIMP> getInventario(Date dataInventario) throws Exception {
+    public List<InventarioIMP> getInventario() throws Exception {
         return new ArrayList<>();
     }   
 

@@ -232,7 +232,8 @@ public class AvanceGUI extends VRInternalFrame {
                         }
 
                         if (chkInventario.isSelected()) {
-                            importador.importarInventario(txtDataInventario.getDate());
+                            avanceDAO.setDataInventario(txtDataInventario.getDate());
+                            importador.importarInventario();
                         }
                         
                         if (chkFornecedor.isSelected()) {
