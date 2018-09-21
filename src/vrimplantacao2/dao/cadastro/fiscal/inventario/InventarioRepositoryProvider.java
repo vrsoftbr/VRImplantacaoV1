@@ -5,19 +5,16 @@
  */
 package vrimplantacao2.dao.cadastro.fiscal.inventario;
 
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import vrframework.classe.Conexao;
-import vrimplantacao.vo.vrimplantacao.EstadoVO;
+import vrimplantacao.dao.cadastro.AliquotaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoVO;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.fiscal.inventario.InventarioVO;
 import vrimplantacao2.vo.cadastro.fiscal.inventario.InventarioAnteriorVO;
-import vrimplantacao2.vo.enums.Icms;
+import vrimplantacao2.vo.cadastro.fiscal.inventario.ProdutoInventario;
 
 /**
  *
@@ -32,75 +29,29 @@ public class InventarioRepositoryProvider {
     private Date data;
     private InventarioDAO inventarioDAO;
     private InventarioAnteriorDAO inventarioAnteriorDAO; 
-    private Tributo tributo = new Tributo();
+    private MapaTributacaoDAO mapaDao;
+    private AliquotaDAO aliquotaDAO;
     
     public InventarioRepositoryProvider(String sistema, String loja, int idLovaVR) throws Exception {
         this.sistema = sistema;
         this.lojaOrigem = loja;
         this.lojaVR = idLovaVR;
+        this.mapaDao = new MapaTributacaoDAO();
         this.inventarioDAO = new InventarioDAO();
         this.inventarioAnteriorDAO = new InventarioAnteriorDAO();
+        this.aliquotaDAO = new AliquotaDAO();
     }
-    
-    
-    public class Tributo {
-        
-        private MapaTributacaoDAO mapaDao = new MapaTributacaoDAO();
-        
-        private EstadoVO ufLoja = null;
-        public EstadoVO getUf(int idVrLoja) throws Exception {
-            if ( ufLoja == null ) {
-                try (Statement stm = Conexao.createStatement()) {
-                    try (ResultSet rst = stm.executeQuery(
-                            "select \n" +
-                            "	e.id,\n" +
-                            "	e.sigla,\n" +
-                            "	e.descricao\n" +
-                            "from \n" +
-                            "	loja l \n" +
-                            "	join fornecedor f on \n" +
-                            "		l.id_fornecedor = f.id \n" +
-                            "	join estado e on\n" +
-                            "		f.id_estado = e.id\n" +
-                            "where l.id = " + idVrLoja
-                    )) {
-                        if (rst.next()) {
-                            EstadoVO uf = new EstadoVO();
-                            uf.setId(rst.getInt("id"));
-                            uf.setSigla(rst.getString("sigla"));
-                            uf.setDescricao(rst.getString("descricao"));
-                            ufLoja = uf;                            
-                        }
-                    }
-                }
-            }
-            
-            return ufLoja;
-        }
-        
-        private Map<String, Icms> icms;
-        public Icms getAliquotaByMapaId(String icmsId) throws Exception {
-            if (icms == null) {
-                icms = new HashMap<>();
-                for (MapaTributoVO vo: mapaDao.getMapa(getSistema(), getLojaOrigem())) {
-                    if (vo.getAliquota() != null) {
-                        icms.put(vo.getOrigId(), vo.getAliquota());
-                    }
-                }
-            }
-            
-            Icms icm = icms.get(icmsId);
-            if (icm == null) {
-                icm = Icms.getIsento();
-            }
-            
-            return icm;
-        }
-        
+
+    public Map<String, ProdutoInventario> getProdutosInventario() throws Exception {
+        return inventarioDAO.getProdutosInventario(getSistema(), getLojaOrigem());
     }
-    
-    public Tributo tributo() {
-        return tributo;
+
+    public MultiMap<Comparable, Integer> getAliquotas() throws Exception {
+        return aliquotaDAO.getIdAliquotasPorCstAliqReduz();
+    }
+
+    public Map<String, MapaTributoVO> getMapaAliquotas() throws Exception {
+        return mapaDao.getMapaAsMap(getSistema(), getLojaOrigem());
     }
 
     public String getSistema() {

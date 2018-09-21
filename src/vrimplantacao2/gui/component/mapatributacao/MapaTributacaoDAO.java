@@ -3,7 +3,9 @@ package vrimplantacao2.gui.component.mapatributacao;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.utils.sql.SQLUtils;
@@ -38,6 +40,17 @@ public class MapaTributacaoDAO {
         }
     }
 
+    public Map<String, MapaTributoVO> getMapaAsMap(String sistema, String agrupador) throws Exception {
+        Map<String, MapaTributoVO> result = new HashMap<>();
+        
+        for (MapaTributoVO t: getMapa(sistema, agrupador)) {
+            result.put(t.getOrigId(), t);
+        }
+        
+        return result;
+    }
+    
+    @Deprecated
     public List<MapaTributoVO> getMapa(String sistema, String agrupador) throws Exception {
         List<MapaTributoVO> result = new ArrayList<>();
 
@@ -48,9 +61,9 @@ public class MapaTributacaoDAO {
                     + "	mp.agrupador,\n"
                     + "	mp.orig_id,\n"
                     + "	mp.orig_descricao,\n"
-                   // + "	mp.orig_cst,\n"
-                   // + "	mp.orig_aliquota,\n"
-                   // + "	mp.orig_reduzido,\n"
+                    + "	mp.orig_cst,\n"
+                    + "	mp.orig_aliquota,\n"
+                    + "	mp.orig_reduzido,\n"
                     + "	mp.id_aliquota,\n"
                     + "	a.descricao,\n"
                     + "	a.situacaotributaria,\n"
@@ -70,9 +83,9 @@ public class MapaTributacaoDAO {
                     vo.setAgrupador(rst.getString("agrupador"));
                     vo.setOrigId(rst.getString("orig_id"));
                     vo.setOrigDescricao(rst.getString("orig_descricao"));
-                    //vo.setOrigCst(rst.getInt("orig_cst"));
-                    //vo.setOrigAliquota(rst.getDouble("orig_aliquota"));
-                    //vo.setOrigReduzido(rst.getDouble("orig_reduzido"));
+                    vo.setOrigCst(rst.getInt("orig_cst"));
+                    vo.setOrigAliquota(rst.getDouble("orig_aliquota"));
+                    vo.setOrigReduzido(rst.getDouble("orig_reduzido"));
                     if (rst.getString("id_aliquota") != null) {
                         vo.setAliquota(
                             new Icms(

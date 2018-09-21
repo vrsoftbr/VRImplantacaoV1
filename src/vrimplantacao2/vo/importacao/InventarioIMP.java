@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package vrimplantacao2.vo.importacao;
 
 import java.util.Date;
@@ -13,15 +8,9 @@ import java.util.Date;
  */
 public class InventarioIMP {
 
-    private String importSistema;
-    private String importLoja;
-    private String importId;
-
     private String id;
-    private String idLoja;
     private String idProduto;
     private Date data = new Date();
-    private Date dataGeracao = new Date();
     private String descricao;
     private double precoVenda;
     private double quantidade;
@@ -29,18 +18,18 @@ public class InventarioIMP {
     private double custoSemImposto;
     private String idAliquotaCredito;
     private String idAliquotaDebito;
+    
+    private String cstCredito;
+    private double aliquotaCredito;
+    private double reduzidoCredito;
+    private String cstDebito;
+    private double aliquotaDebito;
+    private double reduzidoDebito;
+    
     private double pis;
     private double cofins;
     private double custoMedioComImposto;
     private double custoMedioSemImposto;
-
-    public String getIdLoja() {
-        return idLoja;
-    }
-
-    public void setIdLoja(String idLoja) {
-        this.idLoja = idLoja;
-    }
 
     public String getIdProduto() {
         return idProduto;
@@ -56,14 +45,6 @@ public class InventarioIMP {
 
     public void setData(Date data) {
         this.data = data;
-    }
-
-    public Date getDataGeracao() {
-        return dataGeracao;
-    }
-
-    public void setDataGeracao(Date dataGeracao) {
-        this.dataGeracao = dataGeracao;
     }
 
     public String getDescricao() {
@@ -154,30 +135,6 @@ public class InventarioIMP {
         this.custoMedioSemImposto = custoMedioSemImposto;
     }
 
-    public String getImportSistema() {
-        return importSistema;
-    }
-
-    public void setImportSistema(String importSistema) {
-        this.importSistema = importSistema;
-    }
-
-    public String getImportLoja() {
-        return importLoja;
-    }
-
-    public void setImportLoja(String importLoja) {
-        this.importLoja = importLoja;
-    }
-
-    public String getImportId() {
-        return importId;
-    }
-
-    public void setImportId(String importId) {
-        this.importId = importId;
-    }
-
     public String getId() {
         return id;
     }
@@ -185,4 +142,53 @@ public class InventarioIMP {
     public void setId(String id) {
         this.id = id;
     }
+
+    public String getCstCredito() {
+        return cstCredito;
+    }
+
+    public void setCstCredito(String cstCredito) {
+        this.cstCredito = cstCredito;
+    }
+
+    public double getAliquotaCredito() {
+        return aliquotaCredito;
+    }
+
+    public void setAliquotaCredito(double aliquotaCredito) {
+        this.aliquotaCredito = aliquotaCredito;
+    }
+
+    public double getReduzidoCredito() {
+        return reduzidoCredito;
+    }
+
+    public void setReduzidoCredito(double reduzidoCredito) {
+        this.reduzidoCredito = reduzidoCredito;
+    }
+
+    public String getCstDebito() {
+        return cstDebito;
+    }
+
+    public void setCstDebito(String cstDebito) {
+        this.cstDebito = cstDebito;
+    }
+
+    public double getAliquotaDebito() {
+        return aliquotaDebito;
+    }
+
+    public void setAliquotaDebito(double aliquotaDebito) {
+        this.aliquotaDebito = aliquotaDebito;
+    }
+
+    public double getReduzidoDebito() {
+        return reduzidoDebito;
+    }
+
+    public void setReduzidoDebito(double reduzidoDebito) {
+        this.reduzidoDebito = reduzidoDebito;
+    }
+    
 }

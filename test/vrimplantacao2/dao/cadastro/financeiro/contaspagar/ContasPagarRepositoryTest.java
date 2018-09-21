@@ -21,6 +21,7 @@ import vrimplantacao2.vo.cadastro.financeiro.ContaPagarAnteriorVO;
 import vrimplantacao2.vo.cadastro.financeiro.PagarOutrasDespesasVO;
 import vrimplantacao2.vo.cadastro.financeiro.PagarOutrasDespesasVencimentoVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
+import vrimplantacao2.vo.cadastro.fornecedor.FornecedorVO;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 
 /**
@@ -95,6 +96,7 @@ public class ContasPagarRepositoryTest {
     
     @Before
     public void init() throws Exception {
+        FornecedorVO.testing = true;
         fornecedorList = getFornecedorList();
         anteriorList = getAnteriorList();
         vencimentos = getVencimentos();

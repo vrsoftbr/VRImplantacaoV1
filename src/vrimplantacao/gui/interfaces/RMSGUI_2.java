@@ -192,7 +192,7 @@ public class RMSGUI_2 extends VRInternalFrame {
                         }
 
                         if (chkMercadologico.isSelected()) {
-                            importador.importarMercadologicoPorNiveis(true);
+                            importador.importarMercadologicoPorNiveis(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR);
                         }
 
                         if (chkProdutos.isSelected()) {

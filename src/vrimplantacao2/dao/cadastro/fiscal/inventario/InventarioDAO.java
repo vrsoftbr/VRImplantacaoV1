@@ -7,9 +7,12 @@ package vrimplantacao2.dao.cadastro.fiscal.inventario;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.fiscal.inventario.InventarioVO;
+import vrimplantacao2.vo.cadastro.fiscal.inventario.ProdutoInventario;
 
 /**
  *
@@ -25,7 +28,7 @@ public class InventarioDAO {
             sql.put("id_loja", vo.getIdLoja());
             sql.put("id_produto", vo.getIdProduto());
             sql.put("data", vo.getData());
-            sql.put("datageracao", vo.getData());
+            sql.put("datageracao", vo.getDatageracao());
             sql.put("descricao", vo.getDescricao());
             sql.put("precovenda", vo.getPrecoVenda());
             sql.put("quantidade", vo.getQuantidade());
@@ -66,52 +69,61 @@ public class InventarioDAO {
         }
     }
 
-    /*public MultiMap<String, InventarioAnteriorVO> getInventario(int idLojaVR, int idProduto, Date data) throws Exception {
-        MultiMap<String, InventarioAnteriorVO> result = new MultiMap<>();
+    public Map<String, ProdutoInventario> getProdutosInventario(String sistema, String lojaOrigem) throws Exception {
+        Map<String, ProdutoInventario> result = new HashMap<>();
+        
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT "
-                    + "id_loja, "
-                    + "id_produto, "
-                    + "data, "
-                    + "datageracao, "
-                    + "descricao, "
-                    + "precovenda, \n"
-                    + "quantidade, "
-                    + "custocomimposto, "
-                    + "custosemimposto, "
-                    + "id_aliquotacredito, \n"
-                    + "id_aliquotadebito, "
-                    + "pis, "
-                    + "cofins, "
-                    + "customediocomimposto, "
-                    + "customediosemimposto\n"
-                    + "FROM inventario\n"
-                    + "WHERE id_loja = " + idLojaVR + "\n"
-                    + "AND id_produto = " + idProduto + "\n"
-                    + "AND data = '" + data + "'"
+                    "select\n" +
+                    "	ant.impid,\n" +
+                    "	ant.codigoatual,\n" +
+                    "	p.descricaocompleta,\n" +
+                    "	pc.precovenda,\n" +
+                    "	pc.custocomimposto,\n" +
+                    "	pc.custosemimposto,\n" +
+                    "	pc.customediocomimposto,\n" +
+                    "	pc.customediosemimposto,\n" +
+                    "	pa.id_aliquotacredito,\n" +
+                    "	pa.id_aliquotadebito\n" +
+                    "from\n" +
+                    "	implantacao.codant_produto ant\n" +
+                    "	join loja l on\n" +
+                    "		l.id = 1\n" +
+                    "	join fornecedor f on\n" +
+                    "		l.id_fornecedor = f.id\n" +
+                    "	join produto p on\n" +
+                    "		ant.codigoatual = p.id\n" +
+                    "	join produtocomplemento pc on\n" +
+                    "		pc.id_produto = p.id and\n" +
+                    "		pc.id_loja = l.id\n" +
+                    "	join produtoaliquota pa on\n" +
+                    "		pa.id_produto = p.id and\n" +
+                    "		pa.id_estado = f.id_estado\n" +
+                    "where\n" +
+                    "	ant.impsistema = '" + sistema + "' and\n" +
+                    "	ant.imploja = '" + lojaOrigem + "'\n" +
+                    "order by\n" +
+                    "	impid"
             )) {
                 while (rst.next()) {
-                    InventarioAnteriorVO vo = new InventarioAnteriorVO();
-                    vo.setIdLoja(rst.getInt("id_loja"));
-                    vo.setIdProduto(rst.getInt("id_produto"));
-                    vo.setData(rst.getDate("data"));
-                    vo.setDatageracao(rst.getDate("datageracao"));
-                    vo.setDescricao(rst.getString("descricao"));
-                    vo.setPrecoVenda(rst.getDouble("precovenda"));
-                    vo.setQuantidade(rst.getDouble("quantidade"));
-                    vo.setCustoComImposto(rst.getDouble("custocomimposto"));
-                    vo.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                    vo.setIdAliquotaCredito(rst.getInt("id_aliquotacredito"));
-                    vo.setIdAliquotadebito(rst.getInt("id_aliquotadebito"));
-                    vo.setPis(rst.getInt("pis"));
-                    vo.setCofins(rst.getInt("cofins"));
-                    vo.setCustoMedioComImposto(rst.getDouble("customediocomimposto"));
-                    vo.setCustoMedioSemImposto(rst.getDouble("customediosemimposto"));
-                    result.put(vo, String.valueOf(vo.getIdLoja()), String.valueOf(vo.getIdProduto()), String.valueOf(vo.getData()));
+                    ProdutoInventario pi = new ProdutoInventario();
+                    
+                    pi.setIdProduto(rst.getInt("codigoatual"));
+                    pi.setDescricao(rst.getString("descricaocompleta"));
+                    pi.setPrecoVenda(rst.getDouble("precovenda"));
+                    pi.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    pi.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    pi.setCustoMedioComImposto(rst.getDouble("customediocomimposto"));
+                    pi.setCustoMedioSemImposto(rst.getDouble("customediosemimposto"));
+                    pi.setIdAliquotaCredito(rst.getInt("id_aliquotacredito"));
+                    pi.setIdAliquotaDebito(rst.getInt("id_aliquotadebito"));
+                    
+                    result.put(rst.getString("impid"), pi);
                 }
             }
         }
+        
         return result;
-    }*/
+    }
+
 }

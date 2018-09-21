@@ -50,8 +50,10 @@ public class FornecedorVO {
     
     private TipoFornecedor tipoFornecedor = TipoFornecedor.ATACADO;
     private TipoEmpresa tipoEmpresa = TipoEmpresa.LUCRO_REAL;
-    private TipoPagamento tipoPagamento = Parametros.get().getTipoPagamento();
+    private TipoPagamento tipoPagamento = testing ? new TipoPagamento(0, "TESTE") : Parametros.get().getTipoPagamento();
     private int idBanco;
+    
+    public static boolean testing = false;
     
     private final MultiMap<String, FornecedorContatoVO> contatos = new MultiMap<>(
         new Factory<FornecedorContatoVO>() {

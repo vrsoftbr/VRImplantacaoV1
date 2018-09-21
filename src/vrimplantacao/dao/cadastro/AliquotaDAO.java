@@ -8,6 +8,8 @@ import vrimplantacao.vo.interfaces.AliquotaVO;
 import vrframework.classe.Conexao;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
+import vrimplantacao2.utils.MathUtils;
+import vrimplantacao2.utils.multimap.MultiMap;
 
 public class AliquotaDAO {
 
@@ -220,6 +222,37 @@ public class AliquotaDAO {
         } catch (Exception ex) {
             Conexao.rollback();
             throw ex;
+        }
+        
+        return result;
+    }
+
+    public MultiMap<Comparable, Integer> getIdAliquotasPorCstAliqReduz() throws Exception {
+        MultiMap<Comparable, Integer> result = new MultiMap<>();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	id,\n" +
+                    "	situacaotributaria,\n" +
+                    "	porcentagem,\n" +
+                    "	reduzido\n" +
+                    "from\n" +
+                    "	aliquota\n" +
+                    "where\n" +
+                    "	id_situacaocadastro = 1\n" +
+                    "order by\n" +
+                    "	id"
+            )) {
+                while (rst.next()) {
+                    result.put(
+                        rst.getInt("id"),
+                        rst.getInt("situacaotributaria"),
+                        MathUtils.trunc(rst.getDouble("porcentagem"), 1),
+                        MathUtils.trunc(rst.getInt("reduzido"), 1)
+                    );
+                }
+            }
         }
         
         return result;

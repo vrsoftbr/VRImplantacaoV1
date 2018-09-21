@@ -37,7 +37,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
     public boolean i_balanca = false;
     public int v_contaRotativo;
     public int v_contaCheque;
-
+    private Date dataInventario;
+    
     @Override
     public String getSistema() {
         return "Avance";
@@ -668,7 +669,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<InventarioIMP> getInventario(Date dataInventario) throws Exception {
+    public List<InventarioIMP> getInventario() throws Exception {
         List<InventarioIMP> result = new ArrayList<>();
         String nomeTable = "";
 
@@ -703,11 +704,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                 )) {
                     while (rst.next()) {
                         InventarioIMP imp = new InventarioIMP();
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportSistema(getSistema());
                         imp.setId(getLojaOrigem() + "-" + rst.getString("dt_inv") + "-" + rst.getString("Codigo"));
                         imp.setData(dataInventario);
-                        imp.setDataGeracao(dataInventario);
                         imp.setIdProduto(rst.getString("Codigo"));
                         imp.setDescricao(rst.getString("DESCRICAO"));
                         imp.setCustoComImposto(rst.getDouble("CUSTO"));
@@ -727,7 +725,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
+    
     public List<ItemComboVO> getTipoDocumento() throws Exception {
         List<ItemComboVO> result = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
@@ -747,5 +745,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
+    
+    public void setDataInventario(Date dataInventario) {
+        this.dataInventario = dataInventario;
+    }
 }

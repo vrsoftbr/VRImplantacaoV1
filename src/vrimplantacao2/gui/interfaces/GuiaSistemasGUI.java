@@ -180,14 +180,14 @@ public class GuiaSistemasGUI extends VRInternalFrame {
                     importador.setLojaVR(idLojaVR);
 
                     if (tab.getSelectedIndex() == 0) {
+                        if (chkMercadologico.isSelected()) {
+                            importador.importarMercadologico();
+                        }
+
                         if (chkFamiliaProduto.isSelected()) {
                             importador.importarFamiliaProduto();
                         }
                         
-                        if (chkMercadologico.isSelected()) {
-                            importador.importarMercadologicoPorNiveis(false);
-                        }
-
                         if (chkProdutos.isSelected()) {
                             importador.importarProduto(chkManterBalanca.isSelected());
                         }

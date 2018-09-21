@@ -164,7 +164,7 @@ public class PomaresGUI extends VRInternalFrame {
                     if (tabs.getSelectedIndex() == 0) {
                         
                         if (chkMercadologico.isSelected()) {
-                            importador.importarMercadologicoPorNiveis(false);
+                            importador.importarMercadologicoPorNiveis();
                         }
                         if (chkProdutos.isSelected()) {
                             importador.importarProduto();

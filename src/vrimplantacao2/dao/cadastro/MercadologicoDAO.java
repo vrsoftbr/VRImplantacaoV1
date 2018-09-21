@@ -3,11 +3,15 @@ package vrimplantacao2.dao.cadastro;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.utils.multimap.KeyList;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -63,14 +67,19 @@ public class MercadologicoDAO {
             );
         }
     }
+    
+    public void salvar(List<MercadologicoIMP> mercadologicos) throws Exception {
+        salvar(mercadologicos, EnumSet.noneOf(OpcaoProduto.class));
+    }
 
     /**
      * Grava uma listagem de mercadológicos no VR.
      *
      * @param mercadologicos Lista de mercadológicos.
+     * @param opt
      * @throws Exception
      */
-    public void salvar(List<MercadologicoIMP> mercadologicos) throws Exception {
+    public void salvar(List<MercadologicoIMP> mercadologicos, Set<OpcaoProduto> opt) throws Exception {
         //Organizaria o mercadologico informado, deixando pronto para incluir;       
         MultiMap<String, MercadologicoAuxiliar> organizados = organizarMercadologico(mercadologicos);
 
@@ -79,7 +88,7 @@ public class MercadologicoDAO {
             //Cria a tabela;
             createTable();
 
-            int nivelMax = gravarCodigosAnteriores(organizados);
+            int nivelMax = gravarCodigosAnteriores(organizados, opt);
 
             try (Statement stm = Conexao.createStatement()) {
                 ProgressBar.setStatus("Gravando os mercadológicos...");
@@ -378,10 +387,12 @@ public class MercadologicoDAO {
      * @return O nível máximo de mercadológicos da listagem.
      * @throws Exception
      */
-    private int gravarCodigosAnteriores(MultiMap<String, MercadologicoAuxiliar> organizados) throws Exception {
+    private int gravarCodigosAnteriores(MultiMap<String, MercadologicoAuxiliar> organizados, Set<OpcaoProduto> opt) throws Exception {
         int result = 1;
         try (Statement stm = Conexao.createStatement()) {
-            stm.execute("delete from mercadologico where id > 0; delete from implantacao.codant_mercadologico;");
+            if (!opt.contains(OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR)) {
+                stm.execute("delete from mercadologico where id > 0; delete from implantacao.codant_mercadologico;");
+            }
             for (KeyList<String> key : organizados.keySet()) {
                 String[] chave = key.toArray();
                 MercadologicoAuxiliar descricao = organizados.get(chave);
@@ -801,9 +812,10 @@ public class MercadologicoDAO {
      * Grava uma listagem de mercadológicos no VR.
      *
      * @param mercadologicos Lista de mercadológicos.
+     * @param opt
      * @throws Exception
      */
-    public void salvarMerc1(List<MercadologicoIMP> mercadologicos) throws Exception {
+    public void salvarMerc1(List<MercadologicoIMP> mercadologicos, Set<OpcaoProduto> opt) throws Exception {
         //Organizaria o mercadologico informado, deixando pronto para incluir;       
         MultiMap<String, MercadologicoAuxiliar> organizados = organizarMercadologico(mercadologicos);
 
@@ -812,7 +824,7 @@ public class MercadologicoDAO {
             //Cria a tabela;
             createTable();
 
-            int nivelMax = gravarCodigosAnteriores(organizados);
+            int nivelMax = gravarCodigosAnteriores(organizados, opt);
 
             try (Statement stm = Conexao.createStatement()) {
                 ProgressBar.setStatus("Gravando os mercadológicos nivel 1...");
@@ -826,7 +838,7 @@ public class MercadologicoDAO {
                         vo = new MercadologicoVO();
                         vo.setDescricao(item.descricao);
                         vo.setNivel(item.nivel);
-                        String sql = null;
+                        String sql;
 
                         sql = "insert into mercadologico ("
                                 + "mercadologico1,"
@@ -851,7 +863,7 @@ public class MercadologicoDAO {
                                 + "mercadologico4,"
                                 + "mercadologico5;";
 
-                        System.out.println(sql);
+                        LOG.fine("SQL: " + sql);
                         
                         try (ResultSet rst = stm.executeQuery(sql)) {
                             rst.next();

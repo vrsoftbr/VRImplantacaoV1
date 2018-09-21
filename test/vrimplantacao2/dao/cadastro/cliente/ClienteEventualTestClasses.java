@@ -205,22 +205,22 @@ class ClienteEventualTestClasses {
         assertEquals(10, contato.getIdClienteEventual());
         assertEquals("TESTE2", contato.getNome());
         assertEquals("1936594564", contato.getTelefone());
-        assertEquals("", contato.getCelular());
+        assertEquals("0", contato.getCelular());
     }
     
     public static void assertContato3(ClienteEventualContatoVO contato) {
         assertEquals(3, contato.getId());
         assertEquals(10, contato.getIdClienteEventual());
         assertEquals("TESTE3", contato.getNome());
-        assertEquals("", contato.getTelefone());
-        assertEquals("", contato.getCelular());
+        assertEquals("0", contato.getTelefone());
+        assertEquals("0", contato.getCelular());
     }
     
     public static void assertContato4(ClienteEventualContatoVO contato) {
         assertEquals(4, contato.getId());
         assertEquals(10, contato.getIdClienteEventual());
         assertEquals("TESTE4", contato.getNome());
-        assertEquals("", contato.getTelefone());
+        assertEquals("0", contato.getTelefone());
         assertEquals("19998696369", contato.getCelular());
     }
 

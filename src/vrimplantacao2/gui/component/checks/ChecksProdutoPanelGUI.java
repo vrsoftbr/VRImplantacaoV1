@@ -42,6 +42,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkMercadologico.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_PRODUTO));
             chkProdMercadologico.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO));
             if (chkMercadologico.isVisible()) {
+                chkMercadologicoNaoExcluir.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR));
                 chkMercadologicoPorNivel.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL));
                 chkMercadologicoPorNivelReplicar.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR));
                 if (
@@ -151,6 +152,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 opt.contains(OpcaoProduto.COMPRADOR) ||
                 opt.contains(OpcaoProduto.COMPRADOR_PRODUTO) ||
                 opt.contains(OpcaoProduto.RECEITA_BALANCA) ||
+                opt.contains(OpcaoProduto.INVENTARIO) ||
                 opt.contains(OpcaoProduto.NUTRICIONAL)
         ) {
             chkAssociado.setVisible(opt.contains(OpcaoProduto.ASSOCIADO));
@@ -165,6 +167,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkReceitaFilizola.setVisible(opt.contains(OpcaoProduto.RECEITA_BALANCA));
             chkNutricionalToledo.setVisible(opt.contains(OpcaoProduto.NUTRICIONAL));
             chkNutricionalFilizola.setVisible(opt.contains(OpcaoProduto.NUTRICIONAL));
+            chkInventario.setVisible(opt.contains(OpcaoProduto.INVENTARIO));
             tabImportacao.add(pnlImpOutrosDados);
         }
         
@@ -201,6 +204,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         jLabel3 = new javax.swing.JLabel();
         chkMercadologicoPorNivel = new vrframework.bean.checkBox.VRCheckBox();
         chkMercadologicoPorNivelReplicar = new vrframework.bean.checkBox.VRCheckBox();
+        chkMercadologicoNaoExcluir = new vrframework.bean.checkBox.VRCheckBox();
         pnlOptProduto = new vrframework.bean.panel.VRPanel();
         chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
         btnMapaTribut = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
@@ -271,6 +275,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkReceitaFilizola = new vrframework.bean.checkBox.VRCheckBox();
         chkNutricionalToledo = new vrframework.bean.checkBox.VRCheckBox();
         chkNutricionalFilizola = new vrframework.bean.checkBox.VRCheckBox();
+        chkInventario = new vrframework.bean.checkBox.VRCheckBox();
 
         scrollParametros.setBorder(null);
         scrollParametros.setPreferredSize(new java.awt.Dimension(593, 219));
@@ -288,6 +293,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         org.openide.awt.Mnemonics.setLocalizedText(chkMercadologicoPorNivelReplicar, "Replicar Subníveis");
         chkMercadologicoPorNivelReplicar.setEnabled(true);
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkMercadologicoNaoExcluir, "Não Excluir ao importar");
+        chkMercadologicoNaoExcluir.setToolTipText("Não executa a rotina de exclusão dos mercadológicos anteriores durante a importação do mercadológico");
+        chkMercadologicoNaoExcluir.setEnabled(true);
+
         javax.swing.GroupLayout pnlOptMercadologicoLayout = new javax.swing.GroupLayout(pnlOptMercadologico);
         pnlOptMercadologico.setLayout(pnlOptMercadologicoLayout);
         pnlOptMercadologicoLayout.setHorizontalGroup(
@@ -299,7 +308,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addComponent(chkMercadologicoPorNivel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkMercadologicoPorNivelReplicar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(173, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkMercadologicoNaoExcluir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(34, Short.MAX_VALUE))
         );
         pnlOptMercadologicoLayout.setVerticalGroup(
             pnlOptMercadologicoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -308,7 +319,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addGroup(pnlOptMercadologicoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlOptMercadologicoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(chkMercadologicoPorNivelReplicar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(chkMercadologicoPorNivel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(chkMercadologicoPorNivel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(chkMercadologicoNaoExcluir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -812,6 +824,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkNutricionalFilizola, "Nutricional (Filizola)");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkInventario, "Inventário");
+
         javax.swing.GroupLayout pnlImpOutrosDadosLayout = new javax.swing.GroupLayout(pnlImpOutrosDados);
         pnlImpOutrosDados.setLayout(pnlImpOutrosDadosLayout);
         pnlImpOutrosDadosLayout.setHorizontalGroup(
@@ -823,7 +837,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                     .addGroup(pnlImpOutrosDadosLayout.createSequentialGroup()
                         .addComponent(chkNutricionalToledo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkNutricionalFilizola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(chkNutricionalFilizola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(chkInventario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(pnlImpOutrosDadosLayout.createSequentialGroup()
                         .addComponent(chkAssociado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -851,7 +867,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlImpOutrosDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkNutricionalToledo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkNutricionalFilizola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkNutricionalFilizola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkInventario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(6, 6, 6))
         );
 
@@ -893,10 +910,12 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkFamilia;
     public vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     public vrframework.bean.checkBox.VRCheckBox chkICMS;
+    public vrframework.bean.checkBox.VRCheckBox chkInventario;
     public vrframework.bean.checkBox.VRCheckBox chkInverterAssociado;
     public vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     public vrframework.bean.checkBox.VRCheckBox chkMargem;
     public vrframework.bean.checkBox.VRCheckBox chkMercadologico;
+    public vrframework.bean.checkBox.VRCheckBox chkMercadologicoNaoExcluir;
     public vrframework.bean.checkBox.VRCheckBox chkMercadologicoPorNivel;
     public vrframework.bean.checkBox.VRCheckBox chkMercadologicoPorNivelReplicar;
     public vrframework.bean.checkBox.VRCheckBox chkNatReceita;
@@ -1007,13 +1026,25 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             if (chkFamiliaProduto.isSelected()) {
                 importador.importarFamiliaProduto();
             }
+            
+            {
+                List<OpcaoProduto> opt = new ArrayList<>();
+                
+                if (chkMercadologicoPorNivelReplicar.isSelected()) {
+                    opt.add(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR);
+                }
+                
+                if (chkMercadologicoNaoExcluir.isSelected()) {
+                    opt.add(OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR);
+                }                
+                
+                if (chkMercadologico.isSelected()) {
+                    importador.importarMercadologico(opt.toArray(new OpcaoProduto[]{}));
+                }
 
-            if (chkMercadologico.isSelected()) {
-                importador.importarMercadologico();
-            }
-
-            if (chkMercadologicoPorNivel.isSelected()) {
-                importador.importarMercadologicoPorNiveis(chkMercadologicoPorNivelReplicar.isSelected());
+                if (chkMercadologicoPorNivel.isSelected()) {
+                    importador.importarMercadologicoPorNiveis(new OpcaoProduto[]{});
+                }
             }
 
             if (chkProdutos.isSelected()) {
@@ -1167,6 +1198,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
             if (chkOferta.isSelected()) {
                 importador.importarOfertas(new Date());
+            }
+            
+            if (chkInventario.isSelected()) {
+                importador.importarInventario();
             }
         }
     }

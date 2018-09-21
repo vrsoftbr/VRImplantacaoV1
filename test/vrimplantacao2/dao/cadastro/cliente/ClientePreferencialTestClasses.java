@@ -283,22 +283,22 @@ public class ClientePreferencialTestClasses {
         assertEquals(10, contato.getIdClientePreferencial());
         assertEquals("TESTE2", contato.getNome());
         assertEquals("1936594564", contato.getTelefone());
-        assertEquals("", contato.getCelular());
+        assertEquals("0", contato.getCelular());
     }
     
     public static void assertContato3(ClientePreferencialContatoVO contato) {
         assertEquals(3, contato.getId());
         assertEquals(10, contato.getIdClientePreferencial());
         assertEquals("TESTE3", contato.getNome());
-        assertEquals("", contato.getTelefone());
-        assertEquals("", contato.getCelular());
+        assertEquals("0", contato.getTelefone());
+        assertEquals("0", contato.getCelular());
     }
     
     public static void assertContato4(ClientePreferencialContatoVO contato) {
         assertEquals(4, contato.getId());
         assertEquals(10, contato.getIdClientePreferencial());
         assertEquals("TESTE4", contato.getNome());
-        assertEquals("", contato.getTelefone());
+        assertEquals("0", contato.getTelefone());
         assertEquals("19998696369", contato.getCelular());
     }
 

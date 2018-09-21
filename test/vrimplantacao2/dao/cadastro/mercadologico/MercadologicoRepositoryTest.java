@@ -7,6 +7,7 @@ package vrimplantacao2.dao.cadastro.mercadologico;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -16,6 +17,7 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoAnteriorVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
@@ -108,7 +110,7 @@ public class MercadologicoRepositoryTest {
             }
             
         };
-        repository.salvar(mercs);
+        repository.salvar(mercs, new HashSet<OpcaoProduto>());
         
         assertEquals(16, mercsGravados.size());
         MercadologicoVO m = mercsGravados.get(0);
