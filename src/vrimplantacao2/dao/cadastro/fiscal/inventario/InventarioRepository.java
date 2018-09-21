@@ -1,12 +1,13 @@
 package vrimplantacao2.dao.cadastro.fiscal.inventario;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.joda.time.DateTime;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
-import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoVO;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -53,7 +54,7 @@ public class InventarioRepository {
                 if (anterior == null) {
                     ProdutoInventario prod = produtos.get(imp.getIdProduto());
                     
-                    if (prod == null) {                        
+                    if (prod != null) {                        
                         InventarioVO vo = converterInventario(imp, prod);
                         
                         //Aliquota crédito
@@ -184,7 +185,11 @@ public class InventarioRepository {
         InventarioVO vo = new InventarioVO();
         
         vo.setIdProduto(pi.getIdProduto());
-        vo.setData(imp.getData());
+        Date dt = imp.getData() != null ? imp.getData() : new Date();
+        DateTime data = new DateTime(dt.getTime());
+        vo.setData(data.dayOfMonth().withMaximumValue().toDate());
+        vo.setDatageracao(dt);
+        
         vo.setIdLoja(provider.getLojaVR());
         vo.setDescricao(
                 (imp.getDescricao() == null || "".equals(imp.getDescricao().trim())) ?
@@ -216,6 +221,11 @@ public class InventarioRepository {
                 pi.getPrecoVenda() :
                 imp.getPrecoVenda()
         );
+        if (vo.getCustoSemImposto() == 0 && vo.getCustoComImposto() > 0) {
+            vo.setCustoSemImposto(vo.getCustoComImposto());
+        } else if (vo.getCustoComImposto() == 0 && vo.getCustoSemImposto() > 0) {
+            vo.setCustoComImposto(vo.getCustoSemImposto());
+        }
         vo.setQuantidade(imp.getQuantidade());
         vo.setPis(imp.getPis());
         vo.setCofins(imp.getCofins());

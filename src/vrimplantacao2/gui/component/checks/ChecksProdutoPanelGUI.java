@@ -152,6 +152,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 opt.contains(OpcaoProduto.COMPRADOR) ||
                 opt.contains(OpcaoProduto.COMPRADOR_PRODUTO) ||
                 opt.contains(OpcaoProduto.RECEITA_BALANCA) ||
+                opt.contains(OpcaoProduto.INVENTARIO) ||
                 opt.contains(OpcaoProduto.NUTRICIONAL)
         ) {
             chkAssociado.setVisible(opt.contains(OpcaoProduto.ASSOCIADO));

@@ -28,7 +28,7 @@ public class InventarioDAO {
             sql.put("id_loja", vo.getIdLoja());
             sql.put("id_produto", vo.getIdProduto());
             sql.put("data", vo.getData());
-            sql.put("datageracao", vo.getData());
+            sql.put("datageracao", vo.getDatageracao());
             sql.put("descricao", vo.getDescricao());
             sql.put("precovenda", vo.getPrecoVenda());
             sql.put("quantidade", vo.getQuantidade());

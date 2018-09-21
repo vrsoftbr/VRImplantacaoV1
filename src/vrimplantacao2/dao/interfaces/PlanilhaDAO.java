@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import static vrimplantacao2.dao.cadastro.produto.OpcaoProduto.INVENTARIO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.arquivo.Arquivo;
@@ -57,6 +58,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         Set<OpcaoProduto> result = super.getOpcoesDisponiveisProdutos();
         result.add(OpcaoProduto.PAUTA_FISCAL);
         result.add(OpcaoProduto.PAUTA_FISCAL_PRODUTO);
+        result.add(INVENTARIO);
         
         return result;
     }
