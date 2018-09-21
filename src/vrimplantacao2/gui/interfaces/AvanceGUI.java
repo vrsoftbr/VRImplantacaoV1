@@ -33,6 +33,17 @@ public class AvanceGUI extends VRInternalFrame {
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
 
+    private void carregarTipoDocumento() throws Exception {
+        cmbTipoDocRotativo.removeAllItems();
+        cmbTipoDocRotativo.setModel(new DefaultComboBoxModel());
+        cmbTipoDocCheque.removeAllItems();
+        cmbTipoDocCheque.setModel(new DefaultComboBoxModel());
+        for (ItemComboVO item : avanceDAO.getTipoDocumento()) {
+            cmbTipoDocRotativo.addItem(item);
+            cmbTipoDocCheque.addItem(item);
+        }
+    }
+    
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         conexaoMySQL.carregarParametros();
@@ -81,10 +92,11 @@ public class AvanceGUI extends VRInternalFrame {
                 gravarParametros();
                 carregarLojaVR();
                 carregarLojaCliente();
+                carregarTipoDocumento();
             }
         });
 
-        carregarParametros();
+        carregarParametros();        
 
         centralizarForm();
         this.setMaximum(false);
@@ -149,6 +161,9 @@ public class AvanceGUI extends VRInternalFrame {
                     Importador importador = new Importador(avanceDAO);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
+                    avanceDAO.i_balanca = chkTemArquivoBalanca.isSelected();
+                    avanceDAO.v_contaRotativo = ((ItemComboVO) cmbTipoDocRotativo.getSelectedItem()).id;
+                    avanceDAO.v_contaCheque = ((ItemComboVO) cmbTipoDocCheque.getSelectedItem()).id;
 
                     if (tabOperacoes.getSelectedIndex() == 0) {
 
@@ -320,6 +335,7 @@ public class AvanceGUI extends VRInternalFrame {
         jPanel3 = new javax.swing.JPanel();
         chkInventario = new vrframework.bean.checkBox.VRCheckBox();
         txtDataInventario = new org.jdesktop.swingx.JXDatePicker();
+        chkTemArquivoBalanca = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
@@ -328,6 +344,8 @@ public class AvanceGUI extends VRInternalFrame {
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
+        cmbTipoDocRotativo = new javax.swing.JComboBox();
+        cmbTipoDocCheque = new javax.swing.JComboBox();
         pnlLoja = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel1 = new javax.swing.JLabel();
@@ -455,6 +473,9 @@ public class AvanceGUI extends VRInternalFrame {
 
         tabProdutos.add(jPanel3);
 
+        chkTemArquivoBalanca.setText("Tem Arquivo Balanca");
+        tabProdutos.add(chkTemArquivoBalanca);
+
         tabImportacao.addTab("Produtos", tabProdutos);
 
         chkFornecedor.setText("Fornecedor");
@@ -486,7 +507,7 @@ public class AvanceGUI extends VRInternalFrame {
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(142, Short.MAX_VALUE))
+                .addContainerGap(176, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Forncedores", vRPanel2);
@@ -505,9 +526,15 @@ public class AvanceGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(335, Short.MAX_VALUE))
+                    .addGroup(vRPanel3Layout.createSequentialGroup()
+                        .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cmbTipoDocCheque, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cmbTipoDocRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(172, Short.MAX_VALUE))
         );
         vRPanel3Layout.setVerticalGroup(
             vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -515,10 +542,14 @@ public class AvanceGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbTipoDocRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(119, Short.MAX_VALUE))
+                .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbTipoDocCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(149, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", vRPanel3);
@@ -603,7 +634,7 @@ public class AvanceGUI extends VRInternalFrame {
                         .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(btnMapaTribut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(tabOperacoes, javax.swing.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
+                .addComponent(tabOperacoes)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -675,10 +706,13 @@ public class AvanceGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
+    private vrframework.bean.checkBox.VRCheckBox chkTemArquivoBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
     private vrframework.bean.checkBox.VRCheckBox chkValidade;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
+    private javax.swing.JComboBox cmbTipoDocCheque;
+    private javax.swing.JComboBox cmbTipoDocRotativo;
     private vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel conexaoMySQL;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel3;
