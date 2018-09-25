@@ -36,9 +36,10 @@ public class LoginGUI extends VRDialog {
         cboLoja.carregar();
         cboLoja.setId(Global.idLoja);
 
-        lblVersao.setText("Versão do banco " + Versao.getVersao());
-
         carregarEmpresa();
+        
+        Versao.carregar();
+        lblVersao.setText("Versão do banco " + Versao.getVersao());
 
         this.setModal(true);
     }
@@ -143,7 +144,8 @@ public class LoginGUI extends VRDialog {
             public void actionPerformed(ActionEvent e) {
                 try {
                     conectarEmpresa();
-
+                    Versao.carregar();
+                    lblVersao.setText("Versão do banco " + Versao.getVersao());
                 } catch (Exception ex) {
                     Util.exibirMensagemErro(ex, getTitle());
                 }

@@ -2,8 +2,10 @@ package vrimplantacao2.dao.cadastro.venda;
 
 import java.sql.Time;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -57,6 +59,8 @@ public class VendaRepository {
             provider.notificar("Vendas...Convertendo as vendas", (int) provider.getVendaImpSize());
             
             int produtoPadrao = Parametros.get().getItemVendaPadrao();
+            
+            List<VendaItemIMP> divergentes = new ArrayList<>();
 
             for ( Iterator<VendaIMP> iterator = provider.getVendaIMP(); iterator.hasNext(); ) {
                 
@@ -147,11 +151,7 @@ public class VendaRepository {
                                 impItem.getDescricaoReduzida()
                             )
                         );
-                        provider.gravarMapa(
-                                impItem.getProduto(),
-                                impItem.getCodigoBarras(),
-                                impItem.getDescricaoReduzida()
-                        );
+                        divergentes.add(impItem);
                     } else {                        
                         item.setId_produto(produto);
                     }
@@ -207,6 +207,22 @@ public class VendaRepository {
                 return true;
             } else {
                 provider.rollback();
+                
+                provider.begin();
+                try {
+                    for (VendaItemIMP impItem: divergentes) {
+                        provider.gravarMapa(
+                                impItem.getProduto(),
+                                impItem.getCodigoBarras(),
+                                impItem.getDescricaoReduzida()
+                        );
+                    }
+                    provider.commit();
+                } catch (Exception ex) {
+                    provider.rollback();
+                    LOG.log(Level.SEVERE, ex.getMessage(), ex);
+                }
+                
                 return false;
             }
             

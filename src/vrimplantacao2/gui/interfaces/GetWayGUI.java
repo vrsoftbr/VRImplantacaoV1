@@ -81,7 +81,7 @@ public class GetWayGUI extends VRInternalFrame {
         params.put(chkUsarMargemBruta.isSelected(), SISTEMA, "USAR_MARGEM_BRUTA");
         params.put(chkUsarQtdCotacaoProdFornecedor.isSelected(), SISTEMA, "USAR_QTD_COTACAO_NO_PRODFORN");
         params.put(chkAssociadoSomenteAtivos.isSelected(), SISTEMA, "ASSOCIADO_SOMENTE_ATIVO");
-        params.put((java.sql.Date)txtDataFimOferta.getDate(), SISTEMA, "DATA_FIM_OFERTA");
+        params.put((txtDataFimOferta.getDate() != null ? new java.sql.Date(txtDataFimOferta.getDate().getTime()) : null), SISTEMA, "DATA_FIM_OFERTA");
 
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
@@ -133,6 +133,8 @@ public class GetWayGUI extends VRInternalFrame {
 
         edtDtVendaIni.setFormats(new SimpleDateFormat("dd/MM/yyyy"));
         edtDtVendaFim.setFormats(new SimpleDateFormat("dd/MM/yyyy"));
+        txtDataFimOferta.setFormats(new SimpleDateFormat("dd/MM/yyyy"));
+        
         
         centralizarForm();
         this.setMaximum(false);

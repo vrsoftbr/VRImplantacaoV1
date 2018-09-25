@@ -36,8 +36,6 @@ public class Main {
             Conexao.abrirConexao(ipBanco, ipSecBanco, portaBanco, nomeBanco, usuarioBanco, senhaBanco);
 
             Global.idLoja = oProperties.getInt("system.numeroloja");
-            
-            Versao.carregar();
 
             SplashScreen.setStatus("Carregando interface...");
 

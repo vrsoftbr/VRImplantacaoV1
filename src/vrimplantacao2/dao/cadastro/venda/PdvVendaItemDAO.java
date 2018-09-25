@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
+import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.venda.PdvVendaItemVO;
@@ -57,9 +58,11 @@ public class PdvVendaItemDAO {
             sql.put("sequencia", item.getSequencia());
             sql.put("valorAcrescimoFixo", item.getValorAcrescimoFixo());
             sql.put("valorDescontoPromocao", item.getValorDescontoPromocao());
-            sql.put("oferta", item.isOferta());   
-            if (item.getTipoDesconto() != null) {
-                sql.put("tipoDesconto", item.getTipoDesconto().getId());
+            sql.put("oferta", item.isOferta());
+            if (Versao.menorQue(3, 18, 3)) {
+                if (item.getTipoDesconto() != null) {
+                    sql.put("tipoDesconto", item.getTipoDesconto().getId());
+                }
             }
             sql.put("custoComImposto", item.getCustoComImposto(), 0);
             sql.put("custoSemImposto", item.getCustoSemImposto(), 0);
