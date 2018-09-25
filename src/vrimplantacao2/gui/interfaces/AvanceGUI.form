@@ -63,7 +63,7 @@
                   <Component id="btnMapaTribut" max="32767" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="tabOperacoes" pref="256" max="32767" attributes="0"/>
+              <Component id="tabOperacoes" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pnlLoja" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -307,6 +307,11 @@
                     </Component>
                   </SubComponents>
                 </Container>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTemArquivoBalanca">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tem Arquivo Balanca"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="vRPanel2">
@@ -345,7 +350,7 @@
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkFContatos" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="142" max="32767" attributes="0"/>
+                          <EmptySpace pref="176" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -384,10 +389,19 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="cmbTipoDocCheque" min="-2" pref="159" max="-2" attributes="0"/>
+                                      <Component id="cmbTipoDocRotativo" min="-2" pref="159" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
                           </Group>
-                          <EmptySpace pref="335" max="32767" attributes="0"/>
+                          <EmptySpace pref="172" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -397,10 +411,16 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkCreditoRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="cmbTipoDocRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="119" max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkCheque" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="cmbTipoDocCheque" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="149" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -420,6 +440,10 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cheque"/>
                   </Properties>
+                </Component>
+                <Component class="javax.swing.JComboBox" name="cmbTipoDocRotativo">
+                </Component>
+                <Component class="javax.swing.JComboBox" name="cmbTipoDocCheque">
                 </Component>
               </SubComponents>
             </Container>

@@ -230,7 +230,7 @@ public class LojaDAO {
                 sql.append(" (SELECT " + i_loja.id + ", id_parametro, valor FROM parametrovalor WHERE id_loja = " + i_loja.idCopiarLoja + ")");
 
                 stm.execute(sql.toString());
-
+                
                 sql = new StringBuilder();
                 sql.append("INSERT INTO pdv.funcaoniveloperador (id_loja, id_funcao, id_tiponiveloperador)");
                 sql.append(" (SELECT " + i_loja.id + ", id_funcao, id_tiponiveloperador FROM pdv.funcaoniveloperador WHERE id_loja = " + i_loja.idCopiarLoja + ")");
@@ -364,18 +364,28 @@ public class LojaDAO {
 
                 stm.execute(sql.toString());
                 
+                sql =  new StringBuilder();
+                sql.append("insert into notasaidasequencia (id_loja, numerocontrole, serie) values (" + i_loja.id + ", 1, 1)");
+                stm.execute(sql.toString());
+                
                 sql = new StringBuilder();
-                sql.append(
-                        "insert into notasaidasequencia (id_loja, numerocontrole, serie) values (" + i_loja.id + ", 1, 1); \n " +
-                        "insert into tiposaidanotasaidasequencia (id_loja, id_tiposaida, id_notasaidasequencia)\n" +
-                        "select \n" +
-                        "	" + i_loja.id + ",\n" +
-                        "	id_tiposaida,\n" +
-                        "	" + i_loja.id +"\n" +
-                        "from \n" +
-                        "	tiposaidanotasaidasequencia\n" +
-                        "where\n" +
-                        "	id_notasaidasequencia not in (" + i_loja.id + ") and id_notasaidasequencia = 1");
+                sql.append("insert into tiposaidanotasaidasequencia (id_loja, id_tiposaida, id_notasaidasequencia) \n" +
+                            "select\n" +
+                                i_loja.id + ", \n" +
+                            "	t.id_tiposaida, \n" +
+                            "	(select id from notasaidasequencia where id_loja = " + i_loja.id + ") id  \n" +
+                            "from  \n" +
+                            "	tiposaidanotasaidasequencia t\n" +
+                            "where  \n" +
+                            "   t.id_notasaidasequencia in "
+                                + " (select\n" +
+                                        " min(n.id)\n" +
+                                   " from\n" +
+                                        " notasaidasequencia n\n" +
+                                   " join\n" +
+                                        " loja l on l.id = n.id_loja\n" +
+                                   " where\n" +
+                                        " l.id_situacaocadastro = 1)");
                 
                 stm.execute(sql.toString());
                 

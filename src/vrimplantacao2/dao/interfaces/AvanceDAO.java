@@ -6,8 +6,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoMySQL;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -30,6 +34,9 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    public boolean i_balanca = false;
+    public int v_contaRotativo;
+    public int v_contaCheque;
     private Date dataInventario;
     
     @Override
@@ -115,6 +122,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.codigo id,\n"
                     + "	p.cadastro datacadastro,\n"
                     + "	p.embalagem qtdcotacao,\n"
+                    + " ean.codbarra, \n"
+                    + " p.codbalanca, \n"
                     + "	CASE WHEN p.codbalanca != 0 THEN p.codbalanca ELSE ean.codbarra END ean,\n"
                     + "	CASE WHEN p.codbalanca != 0 THEN 1 ELSE ean.qtd_embalagem END qtdembalagem,\n"
                     + "	p.unidade,\n"
@@ -146,23 +155,53 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	LEFT JOIN codbarra ean ON p.codigo = ean.codigo\n"
                     + "	LEFT JOIN cadmer_estoque est ON p.codigo = est.codigo AND est.id_loja = " + getLojaOrigem() + "\n"
                     + "	LEFT JOIN ncm ON ncm.id = p.id_ncm\n"
-                    + "WHERE\n"
-                    + "	NOT ean.codbarra IS NULL\n"
                     + "ORDER BY 1"
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
+
+                    if ((rst.getString("codbalanca") != null)
+                            && (!rst.getString("codbalanca").trim().isEmpty())
+                            && (!"0".equals(rst.getString("codbalanca")))) {
+
+                        imp.setEan(rst.getString("codbalanca"));
+
+                        if (i_balanca) {
+                            ProdutoBalancaVO produtoBalanca;
+                            long codigoProduto;
+                            codigoProduto = Long.parseLong(Utils.formataNumero(imp.getEan().trim()));
+                            if (codigoProduto <= Integer.MAX_VALUE) {
+                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                            } else {
+                                produtoBalanca = null;
+                            }
+                            if (produtoBalanca != null) {
+                                imp.seteBalanca(true);
+                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rst.getInt("validade"));
+                            } else {
+                                imp.setValidade(0);
+                                imp.seteBalanca(false);
+                            }
+                        } else {
+
+                            imp.seteBalanca((rst.getInt("ebalanca") == 1));
+                            imp.setValidade(rst.getInt("validade"));
+
+                        }
+                    } else {
+                        imp.setEan(rst.getString("codbarra"));
+                        imp.seteBalanca(false);
+                        imp.setValidade(rst.getInt("validade"));
+                    }
+
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdcotacao"));
-                    imp.setEan(rst.getString("ean"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
-                    imp.seteBalanca(rst.getBoolean("ebalanca"));
-                    imp.setValidade(rst.getInt("validade"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoGondola(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
@@ -447,16 +486,15 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "c.cod_mun,\n"
                     + "c.id_pais,\n"
                     + "c.natureza_juridica,\n"
-                    + "e.endereco\n"
-                    + "FROM clientes c\n"
-                    + "LEFT JOIN clientes_enderecos e on e.cliente = c.codigo"
+                    + "c.endereco\n"
+                    + "FROM clientes c"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rst.getString("codigo"));
                     imp.setRazao(rst.getString("nome"));
                     imp.setFantasia(rst.getString("fantasia"));
-                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setEndereco((rst.getString("logr") + " " + rst.getString("endereco")).trim());
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("compl"));
                     imp.setBairro(rst.getString("bairro"));
@@ -545,7 +583,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM receb\n"
                     + "WHERE pagamento IS NULL\n"
                     + "AND codcli IS NOT NULL\n"
-                    + "AND id_conta <> 2"
+                    + "AND id_conta = " + v_contaRotativo
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -603,7 +641,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM receb ch\n"
                     + "LEFT JOIN bancos b ON b.id = ch.id_banco\n"
                     + "LEFT JOIN clientes c ON c.codigo = ch.codcli\n"
-                    + "WHERE ch.id_conta = 2\n"
+                    + "WHERE ch.id_conta = " + v_contaCheque + "\n"
                     + "AND pagamento IS NULL"
             )) {
                 while (rst.next()) {
@@ -687,9 +725,28 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
+    
+    public List<ItemComboVO> getTipoDocumento() throws Exception {
+        List<ItemComboVO> result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "id, "
+                    + "nome "
+                    + "from conta "
+                    + "order by id"
+            )) {
+                while (rst.next()) {
+                    result.add(new ItemComboVO(rst.getInt("id"),
+                            rst.getString("id") + " - "
+                            + rst.getString("nome")));
+                }
+            }
+        }
+        return result;
+    }
+    
     public void setDataInventario(Date dataInventario) {
         this.dataInventario = dataInventario;
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
     }
 }
