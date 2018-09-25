@@ -375,10 +375,17 @@ public class LojaDAO {
                             "	t.id_tiposaida, \n" +
                             "	(select id from notasaidasequencia where id_loja = " + i_loja.id + ") id  \n" +
                             "from  \n" +
-                            "	tiposaidanotasaidasequencia t \n" +
-                            "join notasaidasequencia n on n.id_loja = t.id_loja\n" +
+                            "	tiposaidanotasaidasequencia t\n" +
                             "where  \n" +
-                            "   t.id_notasaidasequencia = 1");
+                            "   t.id_notasaidasequencia in "
+                                + " (select\n" +
+                                        " min(n.id)\n" +
+                                   " from\n" +
+                                        " notasaidasequencia n\n" +
+                                   " join\n" +
+                                        " loja l on l.id = n.id_loja\n" +
+                                   " where\n" +
+                                        " l.id_situacaocadastro = 1)");
                 
                 stm.execute(sql.toString());
                 
