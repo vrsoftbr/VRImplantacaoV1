@@ -232,6 +232,9 @@ public class ClienteRepository {
                     if (opt.contains(OpcaoCliente.CNPJ)) {
                         atualizarClientePreferencial(vo, opt);
                     }
+                    if (opt.contains(OpcaoCliente.BLOQUEADO)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
                 }
                 notificar();
             }

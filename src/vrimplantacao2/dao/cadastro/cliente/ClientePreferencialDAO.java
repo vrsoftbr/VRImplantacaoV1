@@ -316,10 +316,12 @@ public class ClientePreferencialDAO {
                 if (opt.contains(OpcaoCliente.EMAIL)) {
                     sql.put("email", vo.getEmail());
                 }
+                if (opt.contains(OpcaoCliente.BLOQUEADO)) {
+                    sql.put("bloqueado", vo.isBloqueado());
+                }
 
                 sql.setWhere("id = " + vo.getId());
                 stm.execute(sql.getUpdate());
-                
             }
         }
     }
