@@ -183,6 +183,7 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.dias_validade as validade,\n"
                     + "    upper(p.unidade) as unidade,\n"
                     + "    p.qtd_unidade as qtdunidade,\n"
+                    + "    1 qtduni, \n"
                     + "    p.estoque as estoque,\n"
                     + "    p.estoque_minimo as estoquemin,\n"
                     + "    p.estoque_maximo as estoquemax,\n"
@@ -195,7 +196,8 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    a.cst_icms as csticms,\n"
                     + "    ncm.cst_pis as cstpiscredito,\n"
                     + "    ncm.cst_pis_saida as cstpisdebito,\n"
-                    + "    pi.cest\n"
+                    + "    pi.cest,\n"
+                    + "    pi.cod_natureza_financeira naturezareceita\n"
                     + "from\n"
                     + "    produto p\n"
                     + "left join\n"
@@ -255,7 +257,7 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
                         }
                     }
                     imp.setTipoEmbalagem(rs.getString("unidade"));
-                    imp.setQtdEmbalagem(rs.getInt("qtdunidade"));
+                    imp.setQtdEmbalagem(rs.getInt("qtduni"));
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMinimo(rs.getDouble("estoquemin"));
                     imp.setEstoqueMaximo(rs.getDouble("estoquemax"));
@@ -269,7 +271,8 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstCredito(rs.getInt("cstpiscredito"));
                     imp.setPiscofinsCstDebito(rs.getInt("cstpisdebito"));
                     imp.setCest(rs.getString("cest"));
-
+                    imp.setPiscofinsNaturezaReceita(rs.getInt("naturezareceita"));
+                        
                     result.add(imp);
                 }
             }
@@ -427,7 +430,8 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    c.cpfcnpj,\n"
                     + "    c.data_cadastro,\n"
                     + "    c.situacao,\n"
-                    + "    c.statusshop\n"
+                    + "    c.statusshop,\n"
+                    + "    c.credito_rotativo limite\n"
                     + "from\n"
                     + "    cliente c\n"
                     + "order by\n"
@@ -456,7 +460,12 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setInscricaoestadual(rs.getString("rg"));
                     imp.setCnpj(rs.getString("cpfcnpj"));
                     imp.setDataCadastro(rs.getDate("data_cadastro"));
-
+                    imp.setValorLimite(rs.getDouble("limite"));
+                    if(rs.getInt("situacao") == 3) {
+                        imp.setBloqueado(true);
+                    } else {
+                        imp.setBloqueado(false);
+                    }
                     result.add(imp);
                 }
             }
@@ -543,7 +552,7 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    cheque c\n"
                     + "where\n"
                     + "    loja = " + getLojaOrigem() + " and\n"
-                    + "    c.situacao = 1\n"
+                    + "    c.situacao in (1, 6)\n"
                     + "order by\n"
                     + "    c.data_venda")) {
                 while (rs.next()) {
