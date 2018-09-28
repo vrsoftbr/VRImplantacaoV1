@@ -227,128 +227,124 @@ public class RMSDAO extends InterfaceDAO {
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
-                    "    p.git_cod_item id,\n" +
-                    "    p.git_cod_item||p.git_digito codigosped,\n" +
-                    "    p.GIT_DAT_ENT_LIN datacadastro,\n" +
-                    "    p.GIT_EMB_FOR qtdembalagemcotacao,\n" +
-                    "    ean.EAN_COD_EAN ean,\n" +
-                    "    ean.EAN_EMB_VENDA qtdEmbalagem,\n" +
-                    "    ean.EAN_TPO_EMB_VENDA tipoEmbalagem,\n" +
-                    "    case when bal.balcol_codigo is null then 0 else 1 end e_balanca,\n" +
-                    "    coalesce(bal.BALCOL_VALIDADE, 0) validade,\n" +
-                    "    p.GIT_DESCRICAO descricaocompleta,\n" +
-                    "    p.GIT_DESC_REDUZ descricaoreduzida,\n" +
-                    "    p.GIT_DESCRICAO descricaogondola,\n" +
-                    "    p.GIT_SECAO merc1,\n" +
-                    "    p.GIT_GRUPO merc2,\n" +
-                    "    p.GIT_SUBGRUPO merc3,\n" +
-                    "    p.GIT_CATEGORIA merc4,\n" +
-                    "    coalesce((select fam_pai from AA1FITEM where fam_filho = p.git_cod_item and rownum = 1), (select fam_pai from AA1FITEM where fam_pai = p.git_cod_item and rownum = 1)) id_familia,\n" +
-                    "    coalesce(preco.id_situacaocadastral, 1) id_situacaocadastral,\n" +
-                    "    det.DET_PESO_VND pesoliquido,\n" +
-                    "    det.DET_PESO_TRF pesobruto,\n" +
-                    "    0 estoqueminimo,\n" +
-                    "    0 estoquemaximo,    \n" +
-                    "    est.GET_ESTOQUE estoque,\n" +
-                    "    p.GIT_MRG_LUCRO_1 margem,\n" +
-                    "    case when coalesce(preco.preco, 0) != 0 \n" +
-                    "    then preco.preco\n" +
-                    "    else coalesce(est.get_preco_venda,0) end precovenda,\n" +
-                    "    est.GET_CUS_ULT_ENT custocomimposto,\n" +
-                    "    est.GET_CUS_ULT_ENT custosemimposto,\n" +
-                    "    det.DET_CLASS_FIS ncm,\n" +
-                    "    det.DET_NCM_EXCECAO excecao,\n" +
-                    "    det.DET_CEST cest,\n" +
-                    "    trib.piscofins_debito,\n" +
-                    "    det.DET_NAT_REC nat_rec,\n" +
-                    "    trib.icms_cst,\n" +
-                    "    trib.icms_aliq,\n" +
-                    "    trib.icms_red,\n" +
-                    "    coalesce(\n" +
-                    "        atac.precoatac,\n" +
-                    "        (case when coalesce(preco.preco, 0) != 0 \n" +
-                    "        then preco.preco\n" +
-                    "        else coalesce(est.get_preco_venda,0) end)\n" +
-                    "    ) precoatac,\n" +
-                    "    fiscal.tfi_codigo_cst cstfiscal,\n" +
-                    "    fiscal.tfi_aliq_icm aliqicmfiscal,\n" +
-                    "    fiscal.tfi_base_reduz_icms icmredfiscal\n" +
+                    "	p.git_cod_item id,\n" +
+                    "	p.git_cod_item||p.git_digito codigosped,\n" +
+                    "	p.GIT_DAT_ENT_LIN datacadastro,\n" +
+                    "	p.GIT_EMB_FOR qtdembalagemcotacao,\n" +
+                    "	ean.EAN_COD_EAN ean,\n" +
+                    "	ean.EAN_EMB_VENDA qtdEmbalagem,\n" +
+                    "	ean.EAN_TPO_EMB_VENDA tipoEmbalagem,\n" +
+                    "	case when bal.balcol_codigo is null then 0 else 1 end e_balanca,\n" +
+                    "	coalesce(bal.BALCOL_VALIDADE, 0) validade,\n" +
+                    "	p.GIT_DESCRICAO descricaocompleta,\n" +
+                    "	p.GIT_DESC_REDUZ descricaoreduzida,\n" +
+                    "	p.GIT_DESCRICAO descricaogondola,\n" +
+                    "	p.GIT_SECAO merc1,\n" +
+                    "	p.GIT_GRUPO merc2,\n" +
+                    "	p.GIT_SUBGRUPO merc3,\n" +
+                    "	p.GIT_CATEGORIA merc4,\n" +
+                    "	coalesce((select fam_pai from AA1FITEM where fam_filho = p.git_cod_item and rownum = 1), (select fam_pai from AA1FITEM where fam_pai = p.git_cod_item and rownum = 1)) id_familia,\n" +
+                    "	coalesce(preco.id_situacaocadastral, 1) id_situacaocadastral,\n" +
+                    "	det.DET_PESO_VND pesoliquido,\n" +
+                    "	det.DET_PESO_TRF pesobruto,\n" +
+                    "	0 estoqueminimo,\n" +
+                    "	0 estoquemaximo,    \n" +
+                    "	est.GET_ESTOQUE estoque,\n" +
+                    "	p.GIT_MRG_LUCRO_1 margem,\n" +
+                    "	case when coalesce(preco.preco, 0) != 0 \n" +
+                    "	then preco.preco\n" +
+                    "	else coalesce(est.get_preco_venda,0) end precovenda,\n" +
+                    "	est.GET_CUS_ULT_ENT custocomimposto,\n" +
+                    "	est.GET_CUS_ULT_ENT custosemimposto,\n" +
+                    "	det.DET_CLASS_FIS ncm,\n" +
+                    "	det.DET_NCM_EXCECAO excecao,\n" +
+                    "	det.DET_CEST cest,\n" +
+                    "	trib.piscofins_debito,\n" +
+                    "	det.DET_NAT_REC nat_rec,\n" +
+                    "	trib.icms_cst,\n" +
+                    "	trib.icms_aliq,\n" +
+                    "	trib.icms_red,\n" +
+                    "	coalesce(\n" +
+                    "	    atac.precoatac,\n" +
+                    "	    (case when coalesce(preco.preco, 0) != 0 \n" +
+                    "	    then preco.preco\n" +
+                    "	    else coalesce(est.get_preco_venda,0) end)\n" +
+                    "	) precoatac,\n" +
+                    "  vwfis.Icms_Aliq_E,\n" +
+                    "  vwfis.icms_cst_e,\n" +
+                    "  vwfis.ICMS_RBC_E,\n" +
+                    "  vwfis.icms_aliq_s,\n" +
+                    "  vwfis.ICMS_RBC_S,\n" +
+                    "  vwfis.icms_cst_s,\n" +
+                    "  vwfis.Pis_Cst_E,\n" +
+                    "  vwfis.Pis_Cst_S,\n" +
+                    "  vwfis.Cofins_Cst_E,\n" +
+                    "  vwfis.cofins_cst_s\n" +
                     "from\n" +
-                    "    AA3CCEAN ean\n" +
+                    "	AA3CCEAN ean\n" +
                     "join AA3CITEM p on\n" +
-                    "        ean.EAN_COD_PRO_ALT = p.GIT_COD_ITEM || p.git_digito\n" +
+                    "	    ean.EAN_COD_PRO_ALT = p.GIT_COD_ITEM || p.git_digito\n" +
                     "left join AA2CLOJA loja on\n" +
-                    "        loja.loj_codigo || loja.loj_digito = " + SQLUtils.stringSQL(getLojaOrigem()) + "\n" +
+                    "	    loja.loj_codigo || loja.loj_digito = " + SQLUtils.stringSQL(getLojaOrigem()) + "\n" +
                     "left join AG1PBACO bal on\n" +
-                    "        bal.BALCOL_CODIGO = p.GIT_COD_ITEM and\n" +
-                    "        bal.BALCOL_DIGITO = p.GIT_DIGITO and\n" +
-                    "        bal.BALCOL_FILIAL = loja.loj_codigo || loja.loj_digito\n" +
+                    "	    bal.BALCOL_CODIGO = p.GIT_COD_ITEM and\n" +
+                    "	    bal.BALCOL_DIGITO = p.GIT_DIGITO and\n" +
+                    "	    bal.BALCOL_FILIAL = loja.loj_codigo || loja.loj_digito\n" +
                     "left join AA1DITEM det on\n" +
-                    "        p.GIT_COD_ITEM = det.DET_COD_ITEM\n" +
+                    "	    p.GIT_COD_ITEM = det.DET_COD_ITEM\n" +
                     "join AA2CESTQ est on\n" +
-                    "        est.GET_COD_PRODUTO = p.GIT_COD_ITEM || p.GIT_DIGITO and\n" +
-                    "        est.GET_COD_LOCAL = loja.LOJ_CODIGO || loja.LOJ_DIGITO\n" +
+                    "	    est.GET_COD_PRODUTO = p.GIT_COD_ITEM || p.GIT_DIGITO and\n" +
+                    "	    est.GET_COD_LOCAL = loja.LOJ_CODIGO || loja.LOJ_DIGITO\n" +
                     "left join (\n" +
-                    "        select\n" +
-                    "        PDV_FILIAL filial,\n" +
-                    "        PDV_ITEM id,\n" +
-                    "        PDV_ITEM_DIGITO digito,\n" +
-                    "        max(PDV_CUSTO) custo,\n" +
-                    "        max(cast((PDV_PRECO_NORMAL / PDV_EMB_VENDA_UN) as numeric(10,2))) preco,\n" +
-                    "        max(case when PDV_EXCLUIR = 'S' then 0 else 1 end) id_situacaocadastral\n" +
-                    "        from\n" +
-                    "        AG1PDVPD\n" +
-                    "        group by\n" +
-                    "        PDV_FILIAL,\n" +
-                    "        PDV_ITEM,\n" +
-                    "        PDV_ITEM_DIGITO\n" +
-                    "        ) preco on\n" +
-                    "        preco.filial = loja.LOJ_CODIGO and\n" +
-                    "        preco.id = p.GIT_COD_ITEM and\n" +
-                    "        preco.digito = p.GIT_DIGITO\n" +
+                    "	    select\n" +
+                    "	    PDV_FILIAL filial,\n" +
+                    "	    PDV_ITEM id,\n" +
+                    "	    PDV_ITEM_DIGITO digito,\n" +
+                    "	    max(PDV_CUSTO) custo,\n" +
+                    "	    max(cast((PDV_PRECO_NORMAL / PDV_EMB_VENDA_UN) as numeric(10,2))) preco,\n" +
+                    "	    max(case when PDV_EXCLUIR = 'S' then 0 else 1 end) id_situacaocadastral\n" +
+                    "	    from\n" +
+                    "	    AG1PDVPD\n" +
+                    "	    group by\n" +
+                    "	    PDV_FILIAL,\n" +
+                    "	    PDV_ITEM,\n" +
+                    "	    PDV_ITEM_DIGITO\n" +
+                    "	    ) preco on\n" +
+                    "	    preco.filial = loja.LOJ_CODIGO and\n" +
+                    "	    preco.id = p.GIT_COD_ITEM and\n" +
+                    "	    preco.digito = p.GIT_DIGITO\n" +
                     "left join (\n" +
-                    "        select distinct\n" +
-                    "        pdv.PDV_FILIAL filial,\n" +
-                    "        pdv.PDV_ITEM id,\n" +
-                    "        pdv.PDV_ITEM_DIGITO digito,\n" +
-                    "        pdv.PDV_SIT_TRIBUT icms_cst,\n" +
-                    "        pdv.PDV_TRIBUT icms_aliq,\n" +
-                    "        pdv.PDV_REDUCAO icms_red,\n" +
-                    "        pdv.PDV_CST_PIS piscofins_debito\n" +
-                    "        from\n" +
-                    "        AG1PDVPD pdv\n" +
-                    "        where pdv.PDV_EXCLUIR != 'S'\n" +
-                    "        ) trib on\n" +
-                    "        trib.filial = loja.LOJ_CODIGO and\n" +
-                    "        trib.id = p.GIT_COD_ITEM and\n" +
-                    "        trib.digito = p.GIT_DIGITO\n" +
+                    "	    select distinct\n" +
+                    "	    pdv.PDV_FILIAL filial,\n" +
+                    "	    pdv.PDV_ITEM id,\n" +
+                    "	    pdv.PDV_ITEM_DIGITO digito,\n" +
+                    "	    pdv.PDV_SIT_TRIBUT icms_cst,\n" +
+                    "	    pdv.PDV_TRIBUT icms_aliq,\n" +
+                    "	    pdv.PDV_REDUCAO icms_red,\n" +
+                    "	    pdv.PDV_CST_PIS piscofins_debito\n" +
+                    "	    from\n" +
+                    "	    AG1PDVPD pdv\n" +
+                    "	    where pdv.PDV_EXCLUIR != 'S'\n" +
+                    "	    ) trib on\n" +
+                    "	    trib.filial = loja.LOJ_CODIGO and\n" +
+                    "	    trib.id = p.GIT_COD_ITEM and\n" +
+                    "	    trib.digito = p.GIT_DIGITO\n" +
                     "left join (\n" +
-                    "        select distinct\n" +
-                    "        pdv.PDV_FILIAL filial,\n" +
-                    "        pdv.PDV_CODIGO_EAN13 ean,\n" +
-                    "        pdv.PDV_PRECO_NORMAL / pdv.PDV_EMB_VENDA_UN precoatac,\n" +
-                    "        pdv.PDV_TPO_EMB_VENDA tipoembalagem,\n" +
-                    "        pdv.PDV_EMB_VENDA qtd\n" +
-                    "        from\n" +
-                    "        AG1PDVPD pdv\n" +
-                    "        ) atac on\n" +
-                    "        atac.filial = loja.LOJ_CODIGO and\n" +
-                    "        atac.ean = ean.EAN_COD_EAN\n" +
+                    "	    select distinct\n" +
+                    "	    pdv.PDV_FILIAL filial,\n" +
+                    "	    pdv.PDV_CODIGO_EAN13 ean,\n" +
+                    "	    pdv.PDV_PRECO_NORMAL / pdv.PDV_EMB_VENDA_UN precoatac,\n" +
+                    "	    pdv.PDV_TPO_EMB_VENDA tipoembalagem,\n" +
+                    "	    pdv.PDV_EMB_VENDA qtd\n" +
+                    "	    from\n" +
+                    "	    AG1PDVPD pdv\n" +
+                    "	    ) atac on\n" +
+                    "	    atac.filial = loja.LOJ_CODIGO and\n" +
+                    "	    atac.ean = ean.EAN_COD_EAN\n" +
                     "left join\n" +
-                    "     (select \n" +
-                    "             fisc.tfi_FIGURA,\n" +
-                    "             fisc.tfi_codigo_cst,\n" +
-                    "             fisc.tfi_ALIQ_icm,\n" +
-                    "             fisc.tfi_base_reduz_icms\n" +
-                    "       FROM \n" +
-                    "            AA3TFISC FISC\n" +
-                    "       where \n" +
-                    "             fisc.tfi_ORIGEM = 'SP' and\n" +
-                    "             fisc.tfi_Cfop = 5102 and\n" +
-                    "             fisc.tfi_automacao = 'N') fiscal on\n" +
-                    "      fiscal.tfi_figura = p.git_nat_fiscal\n" +
+                    "            vw_fis_mxf_produtos vwfis on vwfis.codigo_produto = p.git_cod_item || p.git_digito\n" +
                     "order by \n" +
-                    "      p.git_cod_item"
+                    "	  p.git_cod_item"
             )) {
                 SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
                 while (rst.next()) {
@@ -384,12 +380,16 @@ public class RMSDAO extends InterfaceDAO {
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstDebito(rst.getInt("piscofins_debito"));
-                    imp.setPiscofinsCstCredito(0);
+                    imp.setPiscofinsCstDebito(rst.getInt("pis_cst_s"));
                     imp.setPiscofinsNaturezaReceita(rst.getInt("nat_rec"));
-                    imp.setIcmsCst(rst.getInt("cstfiscal"));
-                    imp.setIcmsAliq(rst.getDouble("aliqicmfiscal"));
-                    imp.setIcmsReducao(rst.getDouble("icmredfiscal"));
+                    //imp.setIcmsCst(rst.getInt("cstfiscal"));
+                    imp.setIcmsCstSaida(rst.getInt("icms_cst_s"));
+                    imp.setIcmsCstEntrada(rst.getInt("icms_cst_e"));
+                    //imp.setIcmsAliq(rst.getDouble("aliqicmfiscal"));
+                    imp.setIcmsAliqEntrada(rst.getDouble("icms_aliq_e"));
+                    imp.setIcmsAliqSaida(rst.getDouble("icms_aliq_s"));
+                    imp.setIcmsReducaoEntrada(rst.getDouble("icms_rbc_e"));
+                    imp.setIcmsReducaoSaida(rst.getDouble("icms_rbc_s"));
                     imp.setAtacadoPreco(rst.getDouble("precoatac"));
                     
                     result.add(imp);
