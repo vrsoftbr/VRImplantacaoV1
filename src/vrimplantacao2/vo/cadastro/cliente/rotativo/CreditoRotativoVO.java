@@ -56,7 +56,7 @@ public class CreditoRotativoVO {
     }
 
     public void setValor(double valor) {
-        this.valor = MathUtils.round(valor < 0 ? 0 : valor, 2, 99999999999D);
+        this.valor = MathUtils.round(valor < 0 ? 0 : valor, 2, 999999999D);
     }
 
     public void setLancamentoManual(boolean lancamentoManual) {

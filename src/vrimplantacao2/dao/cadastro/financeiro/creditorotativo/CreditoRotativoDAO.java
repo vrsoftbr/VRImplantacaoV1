@@ -1,7 +1,10 @@
 package vrimplantacao2.dao.cadastro.financeiro.creditorotativo;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoVO;
@@ -11,6 +14,8 @@ import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoVO;
  * @author Leandro
  */
 public class CreditoRotativoDAO {
+    
+    private static final Logger LOG = Logger.getLogger(CreditoRotativoDAO.class.getName());
 
     public void gravarRotativo(CreditoRotativoVO cred) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
@@ -39,11 +44,15 @@ public class CreditoRotativoDAO {
             sql.put("cpfdependente", cred.getCpfDependente(), 0);
             sql.put("dataexportacao", cred.getDataExportacao());
             sql.getReturning().add("id");
+            LOG.fine("SQL de gravação:\n" + sql.getInsert());
             try (ResultSet rst = stm.executeQuery(
                     sql.getInsert()
             )) {
                 rst.next();
                 cred.setId(rst.getInt("id"));
+            } catch (SQLException ex) {
+                LOG.log(Level.SEVERE, "SQL: " + sql.getInsert(), ex);
+                throw ex;
             }
         }
     }
