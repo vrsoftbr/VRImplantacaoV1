@@ -29,7 +29,7 @@ public class CefasDAO extends InterfaceDAO {
                     + "from \n"
                     + "    filial")) {
                 while (rs.next()) {
-                    result.add(new Estabelecimento(rs.getString("codfilial"), rs.getString("nomefantasia")));
+                    result.add(new Estabelecimento(rs.getString("id"), rs.getString("nomefantasia")));
                 }
             }
             return result;

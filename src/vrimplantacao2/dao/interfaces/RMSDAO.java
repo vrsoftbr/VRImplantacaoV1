@@ -31,10 +31,7 @@ import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemAnteriorVO
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
-import vrimplantacao2.vo.enums.TipoEstadoCivil;
-import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
-import vrimplantacao2.vo.importacao.ClienteContatoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
@@ -51,6 +48,12 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Leandro
  */
+
+/*
+* Guilherme
+* Para localizar tabelas do RMS, utilizar o sistema próprio deles, RMS Log Viewer, 
+* o mesmo gera os scripts e nomes da tabela.
+*/
 public class RMSDAO extends InterfaceDAO {
 
     @Override
