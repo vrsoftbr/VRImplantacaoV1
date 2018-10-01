@@ -222,8 +222,15 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rs.getString("id"));
                     imp.setEan(rs.getString("codigobarras"));
                     imp.setDescricaoCompleta(rs.getString("nomecompleto"));
-                    imp.setDescricaoReduzida(rs.getString("nomereduzido"));
-                    imp.setDescricaoGondola(rs.getString("nomereduzido"));
+                    
+                    if((rs.getString("nomereduzido") == null) && ("".equals(rs.getString("nomereduzido")))) {
+                        imp.setDescricaoReduzida(rs.getString("nomecompleto").substring(1, 22));
+                    } else {
+                        imp.setDescricaoReduzida(rs.getString("nomereduzido"));
+                    }
+                        
+                    imp.setDescricaoGondola(rs.getString("nomecompleto"));
+                    
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
@@ -480,7 +487,7 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "    dr.cod_cliente || '' || dr.num_ecf || '' || dr.num_cupom || '' || dr.valor as id,\n"
+                    + "    substring(dr.cod_cliente || '' || dr.num_ecf || '' || dr.num_cupom || '' || dr.valor from 1 for 10)  as id,\n"
                     + "    dr.cod_cliente,\n"
                     + "    c.cpfcnpj as cnpj,\n"
                     + "    c.rg,\n"
@@ -502,7 +509,8 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where\n"
                     + "    dr.loja = " + getLojaOrigem() + " and\n"
                     + "    dr.pago = 'N' and\n"
-                    + "    dr.num_ecf != 0\n"
+                    + "    dr.num_ecf != 0 and\n"
+                    + "    dr.data_cupom between '01.01.2018' and '30.09.2018'\n"
                     + "order by\n"
                     + "    dr.data_cupom")) {
                 while (rs.next()) {
