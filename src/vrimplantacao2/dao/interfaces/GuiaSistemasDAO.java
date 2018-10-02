@@ -438,10 +438,14 @@ public class GuiaSistemasDAO extends InterfaceDAO {
                     + "from tab_fin_contasrec \n"
                     + "where vfd_DataBaixa is null\n"
                     + "and vfd_CodFilial = " + getLojaOrigem()
+                    + "and ch.vfd_CodBanco is null\n"
+                    + "and ch.vfd_CodAgencia is null\n"
+                    + "and ch.vfd_NumConta is null\n"
+                    
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    imp.setId(getLojaOrigem() + rst.getString("vfd_Caixa") + rst.getString("vfd_Cupom") + rst.getString("vfd_CodSacado") + rst.getString("vfd_DataLancamento"));
+                    imp.setId(getLojaOrigem() + rst.getString("vfd_Caixa") + rst.getString("vfd_Cupom") + rst.getString("vfd_CodSacado") + rst.getString("vfd_DataLancamento"));                    
                     imp.setIdCliente(rst.getString("vfd_CodSacado"));
                     imp.setNumeroCupom(rst.getString("vfd_Cupom"));
                     imp.setDataEmissao(rst.getDate("vfd_DataLancamento"));
