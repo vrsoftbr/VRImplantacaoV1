@@ -43,6 +43,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 
 public class FMDAO extends InterfaceDAO {
@@ -79,9 +80,44 @@ public class FMDAO extends InterfaceDAO {
     }
 
     @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	distinct(familia) familia\n" +
+                    "from\n" +
+                    "	fm.mercadorias\n" +
+                    "where \n" +
+                    "	familia <> '' and\n" +
+                    "    char_length(secao) > 4\n" +
+                    "order by\n" +
+                    "	familia"
+            )) {
+                while (rst.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("familia"));
+                    imp.setDescricao(rst.getString("familia"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    
+
+    @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         Set<OpcaoProduto> opt = new HashSet<>();
         opt.addAll(OpcaoProduto.getMercadologico());
+        opt.addAll(OpcaoProduto.getFamilia());
         return opt;
     }
     
