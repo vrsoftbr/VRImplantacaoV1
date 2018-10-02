@@ -300,7 +300,8 @@ public enum OpcaoProduto {
     public static Set<OpcaoProduto> getMercadologico() {
         return new HashSet<>(Arrays.asList(
                 MERCADOLOGICO,
-                MERCADOLOGICO_PRODUTO
+                MERCADOLOGICO_PRODUTO,
+                MERCADOLOGICO_NAO_EXCLUIR
         ));
     }
 

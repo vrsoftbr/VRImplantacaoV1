@@ -5,9 +5,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.VRException;
@@ -37,10 +39,54 @@ import vrimplantacao.vo.vrimplantacao.ProdutoComplementoVO;
 import vrimplantacao.vo.vrimplantacao.ProdutoVO;
 import vrimplantacao.vo.vrimplantacao.ReceberChequeVO;
 import vrimplantacao.vo.vrimplantacao.ReceberCreditoRotativoVO;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
 
-public class FMDAO {
+public class FMDAO extends InterfaceDAO {
 
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n" +
+                    "	codigo, \n" +
+                    "	secao\n" +
+                    "from \n" +
+                    "	fm.secoes\n" +
+                    "where \n" +
+                    "	secao <> ''\n" +
+                    "	and char_length(secao) > 1\n" +
+                    "order by \n" +
+                    "	codigo"
+            )) {
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setMerc1ID(rst.getString("codigo"));
+                    imp.setMerc1Descricao(rst.getString("secao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        Set<OpcaoProduto> opt = new HashSet<>();
+        opt.addAll(OpcaoProduto.getMercadologico());
+        return opt;
+    }
+    
+    
+    
     //CARREGAMENTOS
     
     public Map<Long, ProdutoVO> carregarCodigoBarrasEmBranco() throws Exception {
@@ -1407,5 +1453,14 @@ public class FMDAO {
             }
         }
         return retorno;
+    }
+
+    @Override
+    public String getSistema() {
+        return "FM";
+    }
+
+    public Iterable<Estabelecimento> getLojas() {
+        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
     }
 }
