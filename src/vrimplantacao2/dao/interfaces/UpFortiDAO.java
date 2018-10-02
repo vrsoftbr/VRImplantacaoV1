@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -26,9 +27,15 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class UpFortiDAO extends InterfaceDAO {
 
+    public String lojaMesmoID;
+    
     @Override
     public String getSistema() {
-        return "UpForti";
+        if ((lojaMesmoID != null) && (!lojaMesmoID.trim().isEmpty())) {
+            return "UpForti" + lojaMesmoID;
+        } else {
+            return "UpForti";
+        }
     }
 
     @Override
@@ -287,6 +294,7 @@ public class UpFortiDAO extends InterfaceDAO {
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -331,10 +339,55 @@ public class UpFortiDAO extends InterfaceDAO {
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id_cliente"));
+                    imp.setRazao(rst.getString("nome"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setDataCadastro(rst.getDate("data_cad"));
+                    imp.setInscricaoestadual(rst.getString("ie"));
+                    imp.setEndereco(rst.getString("rua"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("compl"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipioIBGE(rst.getInt("ibge_municipio"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUfIBGE(rst.getInt("ibge_uf"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setDataNascimento(rst.getDate("data_nasc"));
+                    imp.setValorLimite(rst.getDouble("valor_limite"));
+                    imp.setPermiteCreditoRotativo(true);
+                    imp.setPermiteCheque(true);
+                    imp.setObservacao(rst.getString("obs"));
+                    imp.setObservacao2(rst.getString("obs2"));
+                    imp.setTelefone(rst.getString("fone"));
+                    imp.setEmail(rst.getString("email"));
+
+                    if ((rst.getString("fone2") != null)
+                            && (!rst.getString("fone2").trim().isEmpty())) {
+                        imp.addContato(
+                                "1",
+                                "TELEFONE 2",
+                                rst.getString("fone2"),
+                                null,
+                                null
+                        );
+                    }
+                    if ((rst.getString("fone3") != null)
+                            && (!rst.getString("fone3").trim().isEmpty())) {
+                        imp.addContato(
+                                "2",
+                                "TELEFONE 3",
+                                rst.getString("fone3"),
+                                null,
+                                null
+                        );
+                    }
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -346,8 +399,8 @@ public class UpFortiDAO extends InterfaceDAO {
                     + "id_carteira,\n"
                     + "id_caixa,\n"
                     + "cod_origem as cupom,\n"
-                    + "data,\n"
-                    + "data_cad,\n"
+                    + "data as emissao,\n"
+                    + "(data + 30) as vencimento,\n"
                     + "valor,\n"
                     + "juros,\n"
                     + "desconto,\n"
@@ -361,9 +414,38 @@ public class UpFortiDAO extends InterfaceDAO {
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id_carteira"));
+                    imp.setIdCliente(rst.getString("id_cliente"));
+                    imp.setEcf(rst.getString("id_caixa"));
+                    imp.setNumeroCupom(rst.getString("cupom"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setJuros(rst.getDouble("juros"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setParcela(rst.getInt("parcela"));
+                    imp.setObservacao(rst.getString("historico"));
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
+    }
+    
+    public List<Estabelecimento> getLojas() throws Exception {
+        List<Estabelecimento> lojas = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "id_empresa as id, \n"
+                    + "nome\n"
+                    + "from empresa\n"
+                    + "order by id_empresa"
+            )) {
+                while (rs.next()) {
+                    lojas.add(new Estabelecimento(rs.getString("id"), rs.getString("nome")));
+                }
+            }
+        }
+        return lojas;
     }
 }
