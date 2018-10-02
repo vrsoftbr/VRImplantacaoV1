@@ -35,11 +35,11 @@ public class UpFortiGUI extends VRInternalFrame {
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
-        txtHostFirebird.setText(params.getWithNull("192.168.0.200", NOME_SISTEMA, "HOST"));
-        txtBancoDadosFirebird.setArquivo(params.getWithNull("dados", NOME_SISTEMA, "DATABASE"));
-        txtPortaFirebird.setText(params.getWithNull("5432", NOME_SISTEMA, "PORTA"));
+        txtHostFirebird.setText(params.getWithNull("localhost", NOME_SISTEMA, "HOST"));
+        txtBancoDadosFirebird.setArquivo(params.getWithNull("", NOME_SISTEMA, "DATABASE"));
+        txtPortaFirebird.setText(params.getWithNull("3050", NOME_SISTEMA, "PORTA"));
         txtUsuarioFirebird.setText(params.getWithNull("sysdba", NOME_SISTEMA, "USUARIO"));
-        txtSenhaFirebird.setText(params.getWithNull("L$5a7*(B", NOME_SISTEMA, "SENHA"));
+        txtSenhaFirebird.setText(params.getWithNull("masterkey", NOME_SISTEMA, "SENHA"));
         vLojaCliente = params.get(NOME_SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(NOME_SISTEMA, "LOJA_VR");
         vTipoVenda = params.getInt(NOME_SISTEMA, "TIPO_VENDA");

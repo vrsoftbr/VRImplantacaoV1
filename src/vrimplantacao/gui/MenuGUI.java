@@ -182,6 +182,7 @@ import vrimplantacao2.gui.interfaces.SysmoFirebirdGUI;
 import vrimplantacao2.gui.interfaces.SysmoPostgresGUI;
 import vrimplantacao2.gui.interfaces.TopSystemGUI2;
 import vrimplantacao2.gui.interfaces.UniplusGUI;
+import vrimplantacao2.gui.interfaces.UpFortiGUI;
 import vrimplantacao2.gui.interfaces.WShopGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
 
@@ -551,6 +552,8 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSri = new javax.swing.JMenuItem();
         mnuCadastraFacil = new javax.swing.JMenuItem();
         mnuIntellicon = new javax.swing.JMenuItem();
+        jMenu15 = new javax.swing.JMenu();
+        mnuUpForti = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1145,6 +1148,18 @@ public final class MenuGUI extends VRMdiFrame {
         jMenu5.add(mnuIntellicon);
 
         jMenu2.add(jMenu5);
+
+        jMenu15.setText("Firebird / Interbase 2");
+
+        mnuUpForti.setText("UpForti");
+        mnuUpForti.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuUpFortiActionPerformed(evt);
+            }
+        });
+        jMenu15.add(mnuUpForti);
+
+        jMenu2.add(jMenu15);
 
         jMenu6.setText("SQL Server");
 
@@ -3942,6 +3957,11 @@ public final class MenuGUI extends VRMdiFrame {
         UniplusGUI.exibir(this);
     }//GEN-LAST:event_mnuUniplusActionPerformed
 
+    private void mnuUpFortiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuUpFortiActionPerformed
+        // TODO add your handling code here:
+        UpFortiGUI.exibir(this);
+    }//GEN-LAST:event_mnuUpFortiActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -3950,6 +3970,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu jMenu12;
     private javax.swing.JMenu jMenu13;
     private javax.swing.JMenu jMenu14;
+    private javax.swing.JMenu jMenu15;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
@@ -4135,6 +4156,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSysmoPostgres;
     private javax.swing.JMenuItem mnuTsti;
     private javax.swing.JMenuItem mnuUniplus;
+    private javax.swing.JMenuItem mnuUpForti;
     private javax.swing.JMenuItem mnuVisualComercio;
     private javax.swing.JMenuItem mnuWebsaq;
     private javax.swing.JMenuItem mnuWmByFile;

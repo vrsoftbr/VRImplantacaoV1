@@ -300,6 +300,21 @@
                         </MenuItem>
                       </SubComponents>
                     </Menu>
+                    <Menu class="javax.swing.JMenu" name="jMenu15">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Firebird / Interbase 2"/>
+                      </Properties>
+                      <SubComponents>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuUpForti">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="UpForti"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuUpFortiActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                      </SubComponents>
+                    </Menu>
                     <Menu class="javax.swing.JMenu" name="jMenu6">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="SQL Server"/>
