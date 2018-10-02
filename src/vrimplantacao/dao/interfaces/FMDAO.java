@@ -7,45 +7,32 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
-import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.VRException;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.ClientePreferencialDAO;
-import vrimplantacao.dao.cadastro.FamiliaProdutoDAO;
 import vrimplantacao.dao.cadastro.FornecedorDAO;
-import vrimplantacao.dao.cadastro.LojaDAO;
-import vrimplantacao.dao.cadastro.MercadologicoDAO;
 import vrimplantacao.dao.cadastro.PlanoDAO;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
-import vrimplantacao.dao.cadastro.ProdutoDAO;
 import vrimplantacao.dao.cadastro.ReceberChequeDAO;
 import vrimplantacao.dao.cadastro.ReceberCreditoRotativoDAO;
 import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao.vo.vrimplantacao.ClientePreferencialVO;
-import vrimplantacao.vo.vrimplantacao.CodigoAnteriorVO;
-import vrimplantacao.vo.vrimplantacao.EstadoVO;
-import vrimplantacao.vo.vrimplantacao.FamiliaProdutoVO;
 import vrimplantacao.vo.vrimplantacao.FornecedorVO;
-import vrimplantacao.vo.vrimplantacao.MercadologicoVO;
-import vrimplantacao.vo.vrimplantacao.ProdutoAliquotaVO;
-import vrimplantacao.vo.vrimplantacao.ProdutoAutomacaoVO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
-import vrimplantacao.vo.vrimplantacao.ProdutoComplementoVO;
-import vrimplantacao.vo.vrimplantacao.ProdutoVO;
 import vrimplantacao.vo.vrimplantacao.ReceberChequeVO;
 import vrimplantacao.vo.vrimplantacao.ReceberCreditoRotativoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -223,10 +210,62 @@ public class FMDAO extends InterfaceDAO {
         
         return result;
     }
-    
-    
-    
-    
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	 f.Codigo id,\n" +
+                    "    f.Nome razao,\n" +
+                    "    f.CNPJ cnpj,\n" +
+                    "    f.IE,\n" +
+                    "    f.Endereco,\n" +
+                    "    f.Numero,\n" +
+                    "    f.Complemento,\n" +
+                    "    f.Bairro,\n" +
+                    "    f.CodMunicipio,\n" +
+                    "    f.CEP,\n" +
+                    "    f.Fone1,\n" +
+                    "    f.Fone2,\n" +
+                    "    f.DataCadastro,\n" +
+                    "    f.Observacoes,\n" +
+                    "    f.Contato\n" +
+                    "from\n" +
+                    "	fm.fornecedores f\n" +
+                    "order by\n" +
+                    "	f.Codigo"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("razao"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("IE"));
+                    imp.setEndereco(rst.getString("Endereco"));
+                    imp.setNumero(rst.getString("Numero"));
+                    imp.setComplemento(rst.getString("Complemento"));
+                    imp.setBairro(rst.getString("Bairro"));
+                    imp.setIbge_municipio(rst.getInt("CodMunicipio"));
+                    imp.setCep(rst.getString("CEP"));
+                    imp.setTel_principal(rst.getString("Fone1"));
+                    imp.setDatacadastro(rst.getDate("DataCadastro"));
+                    imp.setObservacao(rst.getString("Observacoes"));
+                    imp.addContato(rst.getString("Contato"), rst.getString("Fone2"), "", TipoContato.COMERCIAL, "");
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
 
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
@@ -254,439 +293,6 @@ public class FMDAO extends InterfaceDAO {
         opt.remove(OpcaoProduto.MARGEM);
         opt.remove(OpcaoProduto.NATUREZA_RECEITA);
         return opt;
-    }
-    
-    
-    
-    //CARREGAMENTOS
-    
-    public Map<Long, ProdutoVO> carregarCodigoBarrasEmBranco() throws Exception {
-        StringBuilder sql = null;
-        Statement stmPostgres = null;
-        ResultSet rst;
-        Map<Long, ProdutoVO> vProduto = new HashMap<>();
-        int qtdeEmbalagem;
-        double idProduto = 0;
-        long codigobarras = -1;
-
-        try {
-            stmPostgres = Conexao.createStatement();
-            sql = new StringBuilder();
-            sql.append("select id, id_tipoembalagem ");
-            sql.append(" from produto p ");
-            sql.append(" where not exists(select pa.id from produtoautomacao pa where pa.id_produto = p.id) ");
-            rst = stmPostgres.executeQuery(sql.toString());
-
-            while (rst.next()) {
-                idProduto = Double.parseDouble(rst.getString("id"));
-
-                if ((rst.getInt("id_tipoembalagem") == 4) || (idProduto <= 9999)) {
-                    codigobarras = Utils.gerarEan13((int) idProduto, false);
-                } else {
-                    codigobarras = Utils.gerarEan13((int) idProduto, true);
-                }
-
-                qtdeEmbalagem = 1;
-
-                ProdutoVO oProduto = new ProdutoVO();
-                oProduto.id = (int) idProduto;
-                ProdutoAutomacaoVO oAutomacao = new ProdutoAutomacaoVO();
-                oAutomacao.idTipoEmbalagem = rst.getInt("id_tipoembalagem");
-                oAutomacao.codigoBarras = codigobarras;
-                oAutomacao.qtdEmbalagem = qtdeEmbalagem;
-                oProduto.vAutomacao.add(oAutomacao);
-                vProduto.put(codigobarras, oProduto);
-            }
-            return vProduto;
-        } catch (Exception ex) {
-            throw ex;
-        }
-    }
-    
-    private List<FamiliaProdutoVO> carregarFamiliaProduto() throws Exception {
-        List<FamiliaProdutoVO> vResult = new ArrayList<>();
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select distinct(familia) as familia from fm.mercadorias\n"
-                    + "where familia <> ''\n"
-                    + "and char_length(secao) > 4\n"
-                    + "order by familia;"
-            )) {
-                while (rst.next()) {
-                    FamiliaProdutoVO vo = new FamiliaProdutoVO();
-                    vo.setDescricao(rst.getString("familia").trim());
-                    vResult.add(vo);
-                }
-            }
-        }
-        return vResult;
-    }
-    
-    private List<MercadologicoVO> carregarMercadologico(int nivel) throws Exception {
-        List<MercadologicoVO> vResult = new ArrayList<>();
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select codigo, secao\n"
-                    + "from fm.secoes\n"
-                    + "where secao <> ''\n"
-                    + "and char_length(secao) > 1\n"
-                    + "order by codigo;"
-            )) {
-                while (rst.next()) {
-                    MercadologicoVO vo = new MercadologicoVO();
-                    vo.setDescricao(rst.getString("secao"));
-                    if (nivel == 1) {
-                        vo.setMercadologico1(rst.getInt("codigo"));
-                    } else if (nivel == 2) {
-                        vo.setMercadologico1(rst.getInt("codigo"));
-                        vo.setMercadologico2(1);
-                    } else if (nivel == 3) {
-                        vo.setMercadologico1(rst.getInt("codigo"));
-                        vo.setMercadologico2(1);
-                        vo.setMercadologico3(1);
-                    }
-                    vo.setNivel(nivel);
-                    vResult.add(vo);
-                }
-            }
-        }
-        return vResult;
-    }
-    
-    public Map<Double, ProdutoVO> carregarProduto(int idLoja) throws Exception {
-        Map<Double, ProdutoVO> vResult = new HashMap<>();
-        long codigoBarra = -2;
-        
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "SELECT P.CODIGO, P.DATACADASTRO, P.NOME, P.CODBARRAS, "
-                    + "P.CUSTO, P.VENDA, P.ML, P.SECAO, P.UM,\n"
-                    + "P.CSTICMS, P.ALIICMS,P.CLASFISCAL, P.CSTPIS, "
-                    + "P.CSTCOFINS, P.NCM, P.CEST, P.FAMILIA, P.PESO\n"
-                    + "FROM fm.MERCADORIAS P ORDER BY P.CODIGO"
-            )) {
-                int contator = 1;
-                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
-                vrimplantacao2.dao.cadastro.produto.NcmDAO ncmDAO = new vrimplantacao2.dao.cadastro.produto.NcmDAO();
-                
-                while (rst.next()) {
-                    ProdutoVO oProduto = new ProdutoVO();
-                    CodigoAnteriorVO oCodigoAnterior = new CodigoAnteriorVO();
-                    ProdutoAutomacaoVO oAutomacao = new ProdutoAutomacaoVO();
-                    ProdutoComplementoVO oComplemento = new ProdutoComplementoVO();
-                    ProdutoAliquotaVO oAliquota = new ProdutoAliquotaVO();
-                    
-                    oProduto.getvCodigoAnterior().add(oCodigoAnterior);
-                    oProduto.getvAutomacao().add(oAutomacao);
-                    oProduto.getvComplemento().add(oComplemento);
-                    oProduto.getvAliquota().add(oAliquota);
-                    
-                    oProduto.setId(Integer.parseInt(Utils.formataNumero(rst.getString("CODIGO"))));
-                    oProduto.setDescricaoCompleta((rst.getString("NOME") == null ? "" : rst.getString("NOME").trim()));
-                    oProduto.setDescricaoReduzida(oProduto.getDescricaoCompleta());
-                    oProduto.setDescricaoGondola(oProduto.getDescricaoCompleta());
-                    oComplemento.setIdSituacaoCadastro(1 );
-                    oComplemento.setIdLoja(idLoja);
-                    
-                    if ((rst.getString("familia") != null) &&
-                            (!rst.getString("familia").trim().isEmpty())) {
-                        oProduto.setIdFamiliaProduto(new FamiliaProdutoDAO().getIdByDescricao(Utils.acertarTexto(rst.getString("familia").trim())));
-                    } else {
-                        oProduto.setIdFamiliaProduto(-1);
-                    }
-                    
-                    if ((rst.getString("secao") != null) &&
-                            (!rst.getString("secao").trim().isEmpty())) {
-                        MercadologicoVO oMercadologico = new MercadologicoDAO().getMercadologicoByDescricao(Utils.acertarTexto(rst.getString("secao")));
-                        oProduto.setMercadologico1(oMercadologico.mercadologico1);
-                        oProduto.setMercadologico2(oMercadologico.mercadologico2);
-                        oProduto.setMercadologico3(oMercadologico.mercadologico3);
-                    } else {
-                        oProduto.setMercadologico1(0);
-                        oProduto.setMercadologico2(0);
-                        oProduto.setMercadologico3(0);
-                    }
-                    
-                    if ((rst.getString("ncm") != null)
-                            && (!rst.getString("ncm").isEmpty())
-                            && (rst.getString("ncm").trim().length() > 5)) {
-                        
-                        vrimplantacao2.vo.enums.NcmVO oNcm = ncmDAO.getNcm(rst.getString("ncm").trim());
-                        
-                        if (oNcm == null) {
-                            oProduto.setNcm1(402);
-                            oProduto.setNcm2(99);
-                            oProduto.setNcm3(0);
-                        } else {
-                            oProduto.setNcm1(oNcm.getNcm1());
-                            oProduto.setNcm2(oNcm.getNcm2());
-                            oProduto.setNcm3(oNcm.getNcm3());
-                        }
-                    } else {
-                        oProduto.setNcm1(402);
-                        oProduto.setNcm2(99);
-                        oProduto.setNcm3(0);
-                    }
-                    
-                    if ((rst.getString("CEST") != null)
-                            && (!rst.getString("CEST").trim().isEmpty())) {
-                        
-                        if (rst.getString("CEST").trim().length() == 5) {
-                            
-                            oProduto.setCest1(Integer.parseInt(rst.getString("CEST").trim().substring(0, 1)));
-                            oProduto.setCest2(Integer.parseInt(rst.getString("CEST").trim().substring(1, 3)));
-                            oProduto.setCest3(Integer.parseInt(rst.getString("CEST").trim().substring(3, 5)));
-                            
-                        } else if (rst.getString("CEST").trim().length() == 6) {
-                            
-                            oProduto.setCest1(Integer.parseInt(rst.getString("CEST").trim().substring(0, 1)));
-                            oProduto.setCest2(Integer.parseInt(rst.getString("CEST").trim().substring(1, 4)));
-                            oProduto.setCest3(Integer.parseInt(rst.getString("CEST").trim().substring(4, 6)));
-                            
-                        } else if (rst.getString("CEST").trim().length() == 7) {
-                            
-                            oProduto.setCest1(Integer.parseInt(rst.getString("CEST").trim().substring(0, 2)));
-                            oProduto.setCest2(Integer.parseInt(rst.getString("CEST").trim().substring(2, 5)));
-                            oProduto.setCest3(Integer.parseInt(rst.getString("CEST").trim().substring(5, 7)));
-                        }
-                    } else {
-                        oProduto.setCest1(-1);
-                        oProduto.setCest2(-1);
-                        oProduto.setCest3(-1);
-                    }
-
-                    //<editor-fold defaultstate="collapsed" desc="PRODUTOS DE BALANÇA E EMBALAGEM">
-                    //Tratando o id da balança.
-                    if ((rst.getString("CODBARRAS") != null)
-                            && (!rst.getString("CODBARRAS").trim().isEmpty())) {
-                        codigoBarra = Utils.stringToLong(Utils.formataNumero(rst.getString("CODBARRAS").trim()));
-                        
-                        if (codigoBarra == 1) {
-                            System.out.println(codigoBarra);
-                        }
-                        
-                        ProdutoBalancaVO produtoBalanca = null;
-                        if (codigoBarra > 0 && codigoBarra <= 999999) {
-                            produtoBalanca = produtosBalanca.get((int) codigoBarra);
-                            
-                            if (produtoBalanca != null) {
-                                oAutomacao.setCodigoBarras(-1);
-                                oProduto.setValidade(produtoBalanca.getValidade() >= 1 ? produtoBalanca.getValidade() : 0);
-                                
-                                if ("P".equals(produtoBalanca.getPesavel())) {
-                                    oAutomacao.setIdTipoEmbalagem(4);
-                                    oProduto.setPesavel(false);
-                                } else {
-                                    oAutomacao.setIdTipoEmbalagem(0);
-                                    oProduto.setPesavel(true);
-                                }
-                                
-                                oProduto.eBalanca = true;
-                                oProduto.setIdTipoEmbalagem(oAutomacao.getIdTipoEmbalagem());
-                                oCodigoAnterior.setBarras(codigoBarra);
-                                oCodigoAnterior.setCodigobalanca(produtoBalanca.getCodigo());
-                                oCodigoAnterior.setE_balanca(true);
-                            } else {
-                                if ((rst.getString("UM") != null) && (!rst.getString("UM").trim().isEmpty())) {
-                                    oProduto.setIdTipoEmbalagem(Utils.converteTipoEmbalagem(rst.getString("UM").trim()));
-                                    oAutomacao.setIdTipoEmbalagem(oProduto.getIdTipoEmbalagem());
-                                } else {
-                                    oAutomacao.setIdTipoEmbalagem(0);
-                                    oProduto.setIdTipoEmbalagem(oAutomacao.getIdTipoEmbalagem());
-                                }
-                                
-                                if (codigoBarra > 999999) {
-                                    oAutomacao.setCodigoBarras(codigoBarra);
-                                } else {
-                                    oAutomacao.setCodigoBarras(-1);
-                                }
-                                
-                                oProduto.eBalanca = false;
-                                oProduto.setValidade(0);
-                                oProduto.setPesavel(false);
-                                oCodigoAnterior.setBarras(codigoBarra);
-                                oCodigoAnterior.setCodigobalanca(0);
-                                oCodigoAnterior.setE_balanca(false);
-                            }
-                        } else {
-                            if (codigoBarra > 999999) {
-                                oAutomacao.setCodigoBarras(codigoBarra);
-                            } else {
-                                oAutomacao.setCodigoBarras(-2);
-                            }
-                            
-                            if ((rst.getString("UM") != null) && (!rst.getString("UM").trim().isEmpty())) {
-                                oProduto.setIdTipoEmbalagem(Utils.converteTipoEmbalagem(rst.getString("UM").trim()));
-                                oAutomacao.setIdTipoEmbalagem(oProduto.getIdTipoEmbalagem());
-                            } else {
-                                oAutomacao.setIdTipoEmbalagem(0);
-                                oProduto.setIdTipoEmbalagem(oAutomacao.getIdTipoEmbalagem());
-                            }
-                            
-                            oProduto.eBalanca = false;
-                            oProduto.setValidade(0);
-                            oProduto.setPesavel(false);
-                            oCodigoAnterior.setBarras(-2);
-                            oCodigoAnterior.setCodigobalanca(0);
-                            oCodigoAnterior.setE_balanca(false);
-                        }
-                    } else {
-                        codigoBarra = -2;
-                        if ((rst.getString("UM") != null) && (!rst.getString("UM").trim().isEmpty())) {
-                            oProduto.setIdTipoEmbalagem(Utils.converteTipoEmbalagem(rst.getString("UM").trim()));
-                            oAutomacao.setIdTipoEmbalagem(oProduto.getIdTipoEmbalagem());
-                        } else {
-                            oAutomacao.setIdTipoEmbalagem(0);
-                            oProduto.setIdTipoEmbalagem(oAutomacao.getIdTipoEmbalagem());
-                        }
-                        
-                        oProduto.eBalanca = false;
-                        oProduto.setValidade(0);
-                        oProduto.setPesavel(false);
-                        oCodigoAnterior.setBarras(-2);
-                        oCodigoAnterior.setCodigobalanca(0);
-                        oCodigoAnterior.setE_balanca(false);
-                    }
-                    //</editor-fold>
-
-                    oProduto.setMargem(rst.getDouble("ML"));
-                    oProduto.setQtdEmbalagem(1);
-                    oProduto.setIdComprador(1);
-                    oProduto.setIdFornecedorFabricante(1);
-                    oProduto.setSugestaoPedido(true);
-                    oProduto.setAceitaMultiplicacaoPdv(true);
-                    oProduto.setSazonal(false);
-                    oProduto.setFabricacaoPropria(false);
-                    oProduto.setConsignado(false);
-                    oProduto.setDdv(0);
-                    oProduto.setPermiteTroca(true);
-                    oProduto.setVendaControlada(false);
-                    oProduto.setVendaPdv(true);
-                    oProduto.setConferido(true);
-                    oProduto.setPermiteQuebra(true);
-                    
-                    if ((rst.getString("CSTPIS") != null) &&
-                            (!rst.getString("CSTPIS").trim().isEmpty())) {
-                        oProduto.setIdTipoPisCofinsDebito(Utils.retornarPisCofinsDebito(Integer.parseInt(rst.getString("CSTPIS").substring(0, 2))));
-                        oCodigoAnterior.setPiscofinsdebito(Integer.parseInt(rst.getString("CSTPIS").trim().substring(0, 2)));
-                    } else {
-                        oProduto.setIdTipoPisCofinsDebito(1);
-                        oCodigoAnterior.setPiscofinsdebito(-1);
-                    }
-                    
-                    if ((rst.getString("CSTCOFINS") != null) &&
-                            (!rst.getString("CSTCOFINS").trim().isEmpty())) {
-                        oProduto.setIdTipoPisCofinsCredito(Utils.retornarPisCofinsCredito(Integer.parseInt(rst.getString("CSTCOFINS").substring(0, 2))));
-                        oCodigoAnterior.setPiscofinscredito(Integer.parseInt(rst.getString("CSTCOFINS").trim().substring(0, 2)));
-                    } else {
-                        oProduto.setIdTipoPisCofinsCredito(13);
-                        oCodigoAnterior.setPiscofinscredito(-1);
-                    }
-                    
-                    oProduto.setTipoNaturezaReceita(Utils.retornarTipoNaturezaReceita(oProduto.getIdTipoPisCofins(), ""));
-                    
-                    oComplemento.setPrecoVenda(rst.getDouble("VENDA"));
-                    oComplemento.setPrecoDiaSeguinte(oComplemento.getPrecoVenda());
-                    oComplemento.setCustoComImposto(rst.getDouble("CUSTO"));
-                    oComplemento.setCustoSemImposto(oComplemento.getCustoComImposto());
-                    
-                    EstadoVO uf = Parametros.get().getUfPadrao();
-                    oAliquota.setIdEstado(uf.getId());
-                    if ((rst.getString("CSTICMS") != null) &&
-                            (!rst.getString("CSTICMS").trim().isEmpty())) {
-                        oAliquota.setIdAliquotaDebito(Utils.getAliquotaICMS(uf.getSigla(), Integer.parseInt(rst.getString("CSTICMS").trim().substring(0, 2)), rst.getDouble("ALIICMS"), 0, false));
-                        oAliquota.setIdAliquotaCredito(Utils.getAliquotaICMS(uf.getSigla(), Integer.parseInt(rst.getString("CSTICMS").trim().substring(0, 2)), rst.getDouble("ALIICMS"), 0, false));
-                        oAliquota.setIdAliquotaDebitoForaEstado(Utils.getAliquotaICMS(uf.getSigla(), Integer.parseInt(rst.getString("CSTICMS").trim().substring(0, 2)), rst.getDouble("ALIICMS"), 0, false));
-                        oAliquota.setIdAliquotaCreditoForaEstado(Utils.getAliquotaICMS(uf.getSigla(), Integer.parseInt(rst.getString("CSTICMS").trim().substring(0, 2)), rst.getDouble("ALIICMS"), 0, false));
-                        oAliquota.setIdAliquotaDebitoForaEstadoNF(Utils.getAliquotaICMS(uf.getSigla(), Integer.parseInt(rst.getString("CSTICMS").trim().substring(0, 2)), rst.getDouble("ALIICMS"), 0, false));
-                        oAliquota.setIdAliquotaConsumidor(Utils.getAliquotaICMS(uf.getSigla(), Integer.parseInt(rst.getString("CSTICMS").trim().substring(0, 2)), rst.getDouble("ALIICMS"), 0, true));
-                        oCodigoAnterior.setRef_icmsdebito(rst.getString("CSTICMS").trim().substring(0, 2));
-                    } else {
-                        oAliquota.setIdAliquotaDebito(Utils.getAliquotaICMS(uf.getSigla(), 0, 0, 0, false));
-                        oAliquota.setIdAliquotaCredito(Utils.getAliquotaICMS(uf.getSigla(), 0, 0, 0, false));
-                        oAliquota.setIdAliquotaDebitoForaEstado(Utils.getAliquotaICMS(uf.getSigla(), 0, 0, 0, false));
-                        oAliquota.setIdAliquotaCreditoForaEstado(Utils.getAliquotaICMS(uf.getSigla(), 0, 0, 0, false));
-                        oAliquota.setIdAliquotaDebitoForaEstadoNF(Utils.getAliquotaICMS(uf.getSigla(), 0, 0, 0, false));
-                        oAliquota.setIdAliquotaConsumidor(Utils.getAliquotaICMS(uf.getSigla(), 0, 0, 0, true));
-                        oCodigoAnterior.setRef_icmsdebito("");
-                    }
-                    
-                    oCodigoAnterior.setCodigoanterior(oProduto.getId());
-                    
-                    if ((rst.getString("codbarras") != null)
-                            && (!rst.getString("codbarras").trim().isEmpty())) {
-                        oCodigoAnterior.setBarras(Long.parseLong(Utils.formataNumero(rst.getString("codbarras"))));
-                    } else {
-                        oCodigoAnterior.barras = -2;
-                    }
-                    
-                    oCodigoAnterior.setCustosemimposto(rst.getDouble("CUSTO"));
-                    oCodigoAnterior.setCustocomimposto(rst.getDouble("CUSTO"));
-                    oCodigoAnterior.setMargem(rst.getDouble("ML"));
-                    oCodigoAnterior.setPrecovenda(rst.getDouble("VENDA"));
-                    oCodigoAnterior.setNcm(rst.getString("NCM"));
-                    oCodigoAnterior.setCest(rst.getString("CEST"));
-                    
-                    ProgressBar.setStatus("Carregando dados...Produto..." + contator + "...");
-                    contator++;
-                    vResult.put(oProduto.getId(), oProduto);
-                }
-            }
-            return vResult;
-        } catch (Exception ex) {
-            throw ex;
-        }
-    }
-    
-    public List<ProdutoVO> carregarCustoProduto(int idLoja, int idLojaCliente) throws Exception {
-        List<ProdutoVO> vResult = new ArrayList<>();
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "SELECT CODIGO, CUSTO "
-                            + "FROM MERCADORIAS"
-            )) {
-                while (rst.next()) {
-                    ProdutoVO oProduto = new ProdutoVO();
-                    ProdutoComplementoVO oComplemento = new ProdutoComplementoVO();
-                    CodigoAnteriorVO oAnterior = new CodigoAnteriorVO();
-                    
-                    oProduto.setId(rst.getInt("CODIGO"));
-                    oComplemento.setCustoComImposto(rst.getDouble("CUSTO"));
-                    oComplemento.setCustoSemImposto(oComplemento.getCustoComImposto());
-                    oProduto.vComplemento.add(oComplemento);
-                    oAnterior.setCustocomimposto(oComplemento.getCustoComImposto());
-                    oAnterior.setCustosemimposto(oComplemento.getCustoComImposto());
-                    oProduto.vCodigoAnterior.add(oAnterior);
-                    vResult.add(oProduto);
-                }
-            }
-            return vResult;            
-        }
-    }
-    
-    public List<ProdutoVO> carregarPrecoProduto(int idLoja, int id_lojaCliente) throws Exception {
-        List<ProdutoVO> vResult = new ArrayList<>();
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "SELECT CODIGO, VENDA "
-                            + "FROM MERCADORIAS"
-            )) {
-                while (rst.next()) {
-                    ProdutoVO oProduto = new ProdutoVO();
-                    ProdutoComplementoVO oComplemento = new ProdutoComplementoVO();                    
-                    CodigoAnteriorVO oAnterior = new CodigoAnteriorVO();
-                    oProduto.setId(rst.getInt("CODIGO"));
-                    oComplemento.setIdLoja(idLoja);
-                    oComplemento.setPrecoVenda(rst.getDouble("VENDA"));
-                    oComplemento.setPrecoDiaSeguinte(oComplemento.getPrecoVenda());
-                    oProduto.vComplemento.add(oComplemento);
-                    oAnterior.setPrecovenda(oComplemento.getPrecoVenda());
-                    oProduto.vCodigoAnterior.add(oAnterior);
-                    vResult.add(oProduto);
-                }
-            }
-        }
-        return vResult;
     }
     
     private List<ClientePreferencialVO> carregarCliente(int idLoja, int idLOjaCliente) throws Exception {
@@ -1380,152 +986,6 @@ public class FMDAO extends InterfaceDAO {
             ProgressBar.setStatus("Carregando dados...Produtos de Balanca...");
             List<ProdutoBalancaVO> vProdutoBalanca = new ProdutoBalancaDAO().carregar(arquivo, opcao);
             new ProdutoBalancaDAO().salvar(vProdutoBalanca);
-        } catch (Exception ex) {
-            throw ex;
-        }
-    }
-    
-    public void importarFamiliaProduto() throws Exception {
-        List<FamiliaProdutoVO> vResult = new ArrayList<>();
-        try {
-            ProgressBar.setStatus("Carregando dados...Familia Produto...");
-            vResult = carregarFamiliaProduto();
-            if (!vResult.isEmpty()) {
-                FamiliaProdutoDAO familiaProd = new FamiliaProdutoDAO();
-                familiaProd.gerarCodigo = true;
-                familiaProd.salvar(vResult);
-            }
-        } catch (Exception ex) {
-            throw ex;
-        }
-    }
-    
-    public void importarMercadologico() throws Exception {
-        List<MercadologicoVO> vResult = new ArrayList<>();
-        try {
-            ProgressBar.setStatus("Carregando dados...Mercadologico...");
-            vResult = carregarMercadologico(1);
-            new MercadologicoDAO().salvar(vResult, true);
-
-            vResult = carregarMercadologico(2);
-            new MercadologicoDAO().salvar(vResult, false);
-
-            vResult = carregarMercadologico(3);
-            new MercadologicoDAO().salvar(vResult, false);
-
-            new MercadologicoDAO().salvarMax();
-        } catch (Exception ex) {
-            throw ex;
-        }
-    }
-    
-    public void importarProduto(int idLoja) throws Exception {        
-        List<ProdutoVO> vProdutoNovo = new ArrayList<>();
-        ProdutoDAO produto = new ProdutoDAO();        
-        try {
-            
-            ProgressBar.setStatus("Carregando dados...Produto...");
-            Map<Double, ProdutoVO> vProdutoFM = carregarProduto(idLoja);            
-            List<LojaVO> vLoja = new LojaDAO().carregar();            
-            ProgressBar.setMaximum(vProdutoFM.size());
-            
-            for (Double keyId : vProdutoFM.keySet()) {                
-                ProdutoVO oProduto = vProdutoFM.get(keyId);                
-                oProduto.idProdutoVasilhame = -1;
-                oProduto.excecao = 0;
-                oProduto.idTipoMercadoria = -1;                
-                vProdutoNovo.add(oProduto);                
-                ProgressBar.next();
-            }
-            
-            produto.implantacaoExterna = true;
-            produto.usarMercadoligicoProduto = true;
-            produto.salvar(vProdutoNovo, idLoja, vLoja);            
-        } catch (Exception ex) {            
-            throw ex;
-        }
-    }
-    
-    public void importarProdutoManterBalanca(int idLojaVR) throws Exception {
-
-        ProgressBar.setStatus("Carregando dados...Produtos manter código balanca.....");
-
-        Map<Double, ProdutoVO> aux = new LinkedHashMap<>();
-        for (ProdutoVO vo : carregarProduto(idLojaVR).values()) {
-            Double id = vo.getIdDouble() > 0 ? vo.getIdDouble() : vo.getId();
-            aux.put(id, vo);
-        }
-
-        List<LojaVO> vLoja = new LojaDAO().carregar();
-
-        ProgressBar.setMaximum(aux.size());
-
-        List<ProdutoVO> balanca = new ArrayList<>();
-        List<ProdutoVO> normais = new ArrayList<>();
-        for (ProdutoVO prod : aux.values()) {
-            if (prod.eBalanca) {
-                balanca.add(prod);
-            } else {
-                normais.add(prod);
-            }
-        }
-
-        ProdutoDAO produto = new ProdutoDAO();
-        produto.implantacaoExterna = true;
-        produto.usarMercadoligicoProduto = true;
-        produto.usarCodigoBalancaComoID = true;
-
-        ProgressBar.setStatus("Carregando dados...Produtos de balança...");
-        ProgressBar.setMaximum(balanca.size());
-        produto.salvar(balanca, idLojaVR, vLoja);
-
-        ProgressBar.setStatus("Carregando dados...Produtos normais...");
-        ProgressBar.setMaximum(normais.size());
-        produto.salvar(normais, idLojaVR, vLoja);
-    }
-    
-    public void importarCustoProduto(int idLoja) throws Exception {
-        List<ProdutoVO> vResult = new ArrayList<>();
-        try {
-            ProgressBar.setStatus("Carregando dados...Custo Produto..."+idLoja+"...");
-            vResult = carregarCustoProduto(idLoja, idLoja);
-            if (!vResult.isEmpty()) {
-                new ProdutoDAO().alterarCustoProduto(vResult, idLoja);
-            }
-        } catch (Exception ex) {
-            throw ex;
-        }
-    }
-    
-    public void importarPrecoProduto(int idLoja) throws Exception {
-        List<ProdutoVO> vResult = new ArrayList<>();
-        try {
-            ProgressBar.setStatus("Carregando dados...Preço Produto..."+idLoja+"...");
-            vResult = carregarPrecoProduto(idLoja, idLoja);
-            if (!vResult.isEmpty()) {
-                new ProdutoDAO().alterarPrecoProduto(vResult, idLoja);
-            }
-        } catch (Exception ex) {
-            throw ex;
-        }
-    }
-    
-    public void importarCodigoBarraEmBranco() throws Exception {
-        List<ProdutoVO> vProdutoNovo = new ArrayList<>();
-        ProdutoDAO produto = new ProdutoDAO();
-
-        try {
-            ProgressBar.setStatus("Carregando dados...Produtos...Codigo Barras...");
-            Map<Long, ProdutoVO> vCodigoBarra = carregarCodigoBarrasEmBranco();
-            ProgressBar.setMaximum(vCodigoBarra.size());
-
-            for (Long keyId : vCodigoBarra.keySet()) {
-                ProdutoVO oProduto = vCodigoBarra.get(keyId);
-                vProdutoNovo.add(oProduto);
-                ProgressBar.next();
-            }
-
-            produto.addCodigoBarrasEmBranco(vProdutoNovo);
         } catch (Exception ex) {
             throw ex;
         }

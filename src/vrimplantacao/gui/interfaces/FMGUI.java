@@ -10,6 +10,7 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.dao.interfaces.FMDAO;
 import vrimplantacao.dao.interfaces.FM_ClickDAO;
 import vrimplantacao.vo.loja.LojaVO;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.parametro.Parametros;
@@ -113,6 +114,13 @@ public class FMGUI extends VRInternalFrame implements ConexaoEvent {
 
                     if (tabs.getSelectedIndex() == 0) {
                         tabProdutos.executarImportacao();
+                    } else if (tabs.getSelectedIndex() == 1) {
+                        if (chkFornecedor.isSelected()) {
+                            importador.importarFornecedor(OpcaoFornecedor.DADOS, OpcaoFornecedor.CONTATOS);
+                        }
+                        if (chkFornecedorContato.isSelected()) {
+                            importador.atualizarFornecedor(OpcaoFornecedor.CONTATOS);
+                        }
                     }
                     
                     gravarParametros();
@@ -140,6 +148,9 @@ public class FMGUI extends VRInternalFrame implements ConexaoEvent {
         conexao = new vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel();
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
+        tabFornecedor = new vrframework.bean.panel.VRPanel();
+        chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkFornecedorContato = new vrframework.bean.checkBox.VRCheckBox();
 
         setTitle("Importação FM Sistemas");
         setToolTipText("");
@@ -184,6 +195,33 @@ public class FMGUI extends VRInternalFrame implements ConexaoEvent {
 
         tabs.addTab("Produtos", tabProdutos);
 
+        chkFornecedor.setText("Fornecedor");
+
+        chkFornecedorContato.setText("Contatos");
+
+        javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
+        tabFornecedor.setLayout(tabFornecedorLayout);
+        tabFornecedorLayout.setHorizontalGroup(
+            tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabFornecedorLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkFornecedorContato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(471, Short.MAX_VALUE))
+        );
+        tabFornecedorLayout.setVerticalGroup(
+            tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabFornecedorLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkFornecedorContato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(274, Short.MAX_VALUE))
+        );
+
+        tabs.addTab("Fornecedor", tabFornecedor);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -226,9 +264,12 @@ public class FMGUI extends VRInternalFrame implements ConexaoEvent {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkFornecedorContato;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel conexao;
     private javax.swing.JLabel jLabel1;
+    private vrframework.bean.panel.VRPanel tabFornecedor;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private vrframework.bean.panel.VRPanel vRPanel3;
