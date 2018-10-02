@@ -230,6 +230,18 @@ public enum OpcaoProduto {
     public static Set<OpcaoProduto> getAll() {
         return new HashSet<>(Arrays.asList(OpcaoProduto.values()));
     }
+    
+    public static Set<OpcaoProduto> getProduto() {
+        Set<OpcaoProduto> result = new HashSet<>();
+        
+        result.add(IMPORTAR_MANTER_BALANCA);
+        result.add(PRODUTOS);
+        result.add(EAN);
+        result.add(EAN_EM_BRANCO);
+        result.add(IMPORTAR_MANTER_BALANCA);
+
+        return result;
+    }
 
     public static Set<OpcaoProduto> getPadrao() {
         Set<OpcaoProduto> result = new HashSet<>();

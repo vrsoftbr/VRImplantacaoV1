@@ -4,12 +4,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.VRException;
@@ -45,8 +47,11 @@ import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 public class FMDAO extends InterfaceDAO {
+    
+    private static final Logger LOG = Logger.getLogger(FMDAO.class.getName());
 
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
@@ -110,6 +115,116 @@ public class FMDAO extends InterfaceDAO {
         
         return result;
     }
+
+    @Override
+    public List<ProdutoIMP> getProdutos() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            Map<Integer, Double> estoque = new HashMap<>();
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	e.CodMercadoria id_produto,\n" +
+                    "	coalesce(e.estoque, 0) estoque\n" +
+                    "from\n" +
+                    "	fm.estoque e    \n" +
+                    "	join (select\n" +
+                    "		max(es.Codigo) Codigo,\n" +
+                    "		es.codMercadoria\n" +
+                    "	from\n" +
+                    "		fm.estoque es\n" +
+                    "		join (select \n" +
+                    "			CodMercadoria, \n" +
+                    "			max(data) data\n" +
+                    "		from \n" +
+                    "			fm.estoque \n" +
+                    "		group by \n" +
+                    "			codMercadoria) ids on\n" +
+                    "			es.codmercadoria = ids.codmercadoria and\n" +
+                    "			es.data = ids.data\n" +
+                    "	group by\n" +
+                    "		es.codMercadoria) est on\n" +
+                    "		e.Codigo = est.Codigo"
+            )) {
+                while (rst.next()) {
+                    estoque.put(rst.getInt("id_produto"), rst.getDouble("estoque"));
+                }
+            }
+            
+            LOG.fine("Número de estoque encontrado: " + estoque.size());
+            
+            Map<String, String> mercadologicos = new HashMap<>();
+            for (MercadologicoIMP mp: getMercadologicos()) {
+                mercadologicos.put(mp.getMerc1Descricao(), mp.getMerc1ID());
+            }
+            
+            LOG.fine("Número de mercadológicos mapeados: " + mercadologicos.size());
+            
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	 p.Codigo id,\n" +
+                    "    p.DataCadastro datacadastro,\n" +
+                    "    p.CodBarras ean,\n" +
+                    "    p.UM unidade,\n" +
+                    "    p.Validade,\n" +
+                    "    p.Nome descricaocompleta,\n" +
+                    "    p.Secao merc1,\n" +
+                    "    p.Familia id_familia,\n" +
+                    "    p.Peso,\n" +
+                    "    p.EstoqueMin,\n" +
+                    "    p.Custo,\n" +
+                    "    p.Venda preco,\n" +
+                    "    p.NCM,\n" +
+                    "    p.CEST,\n" +
+                    "    substring(p.cstPIS, 1, 2) piscofins_saida,\n" +
+                    "    substring(p.cstICMS, 1, 2) icms_cst,\n" +
+                    "    p.AliICMS icms_aliquota,\n" +
+                    "    p.AliRedBaseCalcICMS icms_reduzido\n" +
+                    "from\n" +
+                    "	fm.mercadorias p\n" +
+                    "order by\n" +
+                    "	p.Codigo"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    Double est = estoque.get(rst.getInt("id"));
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.setTipoEmbalagem(rst.getString("unidade"));
+                    imp.setValidade(rst.getInt("Validade"));
+                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoGondola(rst.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rst.getString("descricaocompleta"));
+                    imp.setCodMercadologico1(mercadologicos.get(rst.getString("merc1")));
+                    imp.setIdFamiliaProduto(rst.getString("id_familia"));
+                    imp.setPesoBruto(rst.getDouble("Peso"));
+                    imp.setPesoLiquido(rst.getDouble("Peso"));
+                    imp.setEstoqueMinimo(rst.getDouble("EstoqueMin"));
+                    imp.setEstoque(est != null ? est : 0D);
+                    imp.setCustoComImposto(rst.getDouble("Custo"));
+                    imp.setCustoSemImposto(rst.getDouble("Custo"));
+                    imp.setPrecovenda(rst.getDouble("preco"));
+                    imp.setNcm(rst.getString("NCM"));
+                    imp.setCest(rst.getString("CEST"));
+                    imp.setPiscofinsCstDebito(rst.getString("piscofins_saida"));
+                    imp.setIcmsCst(rst.getInt("icms_cst"));
+                    imp.setIcmsAliq(rst.getDouble("icms_aliquota"));
+                    imp.setIcmsReducao(rst.getDouble("icms_reduzido"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    
     
     
 
@@ -118,6 +233,26 @@ public class FMDAO extends InterfaceDAO {
         Set<OpcaoProduto> opt = new HashSet<>();
         opt.addAll(OpcaoProduto.getMercadologico());
         opt.addAll(OpcaoProduto.getFamilia());
+        opt.addAll(OpcaoProduto.getProduto());
+        opt.addAll(OpcaoProduto.getComplementos());
+        opt.addAll(Arrays.asList(
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.PIS_COFINS
+        ));
+        opt.addAll(Arrays.asList(
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.VALIDADE
+        ));
+        opt.remove(OpcaoProduto.MARGEM);
+        opt.remove(OpcaoProduto.NATUREZA_RECEITA);
         return opt;
     }
     
