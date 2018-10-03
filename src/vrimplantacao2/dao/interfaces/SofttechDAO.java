@@ -12,6 +12,7 @@ import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 
 /**
  *
@@ -63,12 +64,37 @@ public class SofttechDAO extends InterfaceDAO {
     }
 
     @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select codigo, descricao from public.produtosfamilia where codigo != 1"
+            )) {
+                while (rst.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("codigo"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         Set<OpcaoProduto> opt = new HashSet<>();
         
         opt.addAll(Arrays.asList(
                 OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
-                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO
         ));
         opt.addAll(OpcaoProduto.getFamilia());
         
