@@ -33,8 +33,7 @@ public class FMGUI extends VRInternalFrame implements ConexaoEvent {
         conexao.port = ("3306");
         
         conexao.setSistema(SISTEMA);
-        conexao.setOnConectar(this);
-        
+        conexao.setOnConectar(this);        
         conexao.carregarParametros();
         
         tabProdutos.setOpcoesDisponiveis(fmDao);

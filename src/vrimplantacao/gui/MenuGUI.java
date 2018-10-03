@@ -178,6 +178,7 @@ import vrimplantacao2.gui.interfaces.SiacGUI;
 import vrimplantacao2.gui.interfaces.RMSAutomaHelpGUI;
 import vrimplantacao2.gui.interfaces.SiaCriareByFileGUI;
 import vrimplantacao2.gui.interfaces.SoftcomGUI;
+import vrimplantacao2.gui.interfaces.SofttechGUI;
 import vrimplantacao2.gui.interfaces.SriGUI;
 import vrimplantacao2.gui.interfaces.SysmoFirebirdGUI;
 import vrimplantacao2.gui.interfaces.SysmoPostgresGUI;
@@ -612,6 +613,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAlterDataWShop = new javax.swing.JMenuItem();
         mnuMarket = new javax.swing.JMenuItem();
         mnuUniplus = new javax.swing.JMenuItem();
+        mnuSofttech = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -1609,6 +1611,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuUniplus);
+
+        mnuSofttech.setText("Softtech");
+        mnuSofttech.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSofttechActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuSofttech);
 
         jMenu2.add(jMenu8);
 
@@ -3956,6 +3966,10 @@ public final class MenuGUI extends VRMdiFrame {
         CefasGUI.exibir(this);
     }//GEN-LAST:event_mnuCefasActionPerformed
 
+    private void mnuSofttechActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSofttechActionPerformed
+        SofttechGUI.exibir(this);
+    }//GEN-LAST:event_mnuSofttechActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -4142,6 +4156,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu mnuSistema;
     private javax.swing.JMenuItem mnuSistemaLogin;
     private javax.swing.JMenuItem mnuSoftcom;
+    private javax.swing.JMenuItem mnuSofttech;
     private javax.swing.JMenuItem mnuSolidus;
     private javax.swing.JMenu mnuSqlServer2;
     private javax.swing.JMenuItem mnuSri;
