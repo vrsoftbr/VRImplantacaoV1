@@ -39,12 +39,11 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 opt.contains(OpcaoProduto.FAMILIA) ||
                 opt.contains(OpcaoProduto.FAMILIA_PRODUTO)
         ) {
-            chkMercadologico.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_PRODUTO));
-            chkProdMercadologico.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO));
+            chkMercadologico.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO) || opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL));
+            chkProdMercadologico.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_PRODUTO));
+            chkMercadologicoPorNivelReplicar.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR));
             if (chkMercadologico.isVisible()) {
-                chkMercadologicoNaoExcluir.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR));
-                chkMercadologicoPorNivel.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL));
-                chkMercadologicoPorNivelReplicar.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR));
+                chkMercadologicoNaoExcluir.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR));                
                 if (
                         opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL) ||
                         opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR) ||
@@ -203,7 +202,6 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         tabParametros = new vrframework.bean.panel.VRPanel();
         pnlOptMercadologico = new vrframework.bean.panel.VRPanel();
         jLabel3 = new javax.swing.JLabel();
-        chkMercadologicoPorNivel = new vrframework.bean.checkBox.VRCheckBox();
         chkMercadologicoPorNivelReplicar = new vrframework.bean.checkBox.VRCheckBox();
         chkMercadologicoNaoExcluir = new vrframework.bean.checkBox.VRCheckBox();
         pnlOptProduto = new vrframework.bean.panel.VRPanel();
@@ -288,9 +286,6 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         org.openide.awt.Mnemonics.setLocalizedText(jLabel3, "MERCADOLÓGICO");
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkMercadologicoPorNivel, "Mercadologico Por Nível");
-        chkMercadologicoPorNivel.setEnabled(true);
-
         org.openide.awt.Mnemonics.setLocalizedText(chkMercadologicoPorNivelReplicar, "Replicar Subníveis");
         chkMercadologicoPorNivelReplicar.setEnabled(true);
 
@@ -305,24 +300,21 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             .addGroup(pnlOptMercadologicoLayout.createSequentialGroup()
                 .addGap(5, 5, 5)
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(5, 5, 5)
-                .addComponent(chkMercadologicoPorNivel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkMercadologicoPorNivelReplicar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkMercadologicoNaoExcluir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(34, Short.MAX_VALUE))
+                .addContainerGap(172, Short.MAX_VALUE))
         );
         pnlOptMercadologicoLayout.setVerticalGroup(
             pnlOptMercadologicoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlOptMercadologicoLayout.createSequentialGroup()
                 .addGap(5, 5, 5)
-                .addGroup(pnlOptMercadologicoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(pnlOptMercadologicoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(pnlOptMercadologicoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(chkMercadologicoPorNivelReplicar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(chkMercadologicoPorNivel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(chkMercadologicoNaoExcluir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(chkMercadologicoNaoExcluir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -917,7 +909,6 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkMargem;
     public vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     public vrframework.bean.checkBox.VRCheckBox chkMercadologicoNaoExcluir;
-    public vrframework.bean.checkBox.VRCheckBox chkMercadologicoPorNivel;
     public vrframework.bean.checkBox.VRCheckBox chkMercadologicoPorNivelReplicar;
     public vrframework.bean.checkBox.VRCheckBox chkNatReceita;
     public vrframework.bean.checkBox.VRCheckBox chkNcm;
@@ -988,7 +979,6 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
     public void gravarParametros(Parametros parametros, String... params) {        
         
-        parametros.put(chkMercadologicoPorNivel.isSelected(), concat(params, "MERCADOLOGICO_POR_NIVEL"));
         parametros.put(chkMercadologicoPorNivelReplicar.isSelected(), concat(params, "MERCADOLOGICO_POR_NIVEL_REPLICAR" ));
         parametros.put(chkManterBalanca.isSelected(), concat(params, "MANTER_PLU_BALANCA" ));
         parametros.put(chkInverterAssociado.isSelected(), concat(params, "INVERTER_ASSOCIADO" ));
@@ -1005,7 +995,6 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
     public void carregarParametros(Parametros parametros, String... params) {
         
-        chkMercadologicoPorNivel.setSelected(parametros.getBool(concat(params, "MERCADOLOGICO_POR_NIVEL" )));
         chkMercadologicoPorNivelReplicar.setSelected(parametros.getBool(concat(params, "MERCADOLOGICO_POR_NIVEL_REPLICAR" )));
         chkManterBalanca.setSelected(parametros.getBool(concat(params, "MANTER_PLU_BALANCA" )));
         chkInverterAssociado.setSelected(parametros.getBool(concat(params, "INVERTER_ASSOCIADO" )));
@@ -1040,11 +1029,11 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }                
                 
                 if (chkMercadologico.isSelected()) {
-                    importador.importarMercadologico(opt.toArray(new OpcaoProduto[]{}));
-                }
-
-                if (chkMercadologicoPorNivel.isSelected()) {
-                    importador.importarMercadologicoPorNiveis(new OpcaoProduto[]{});
+                    if (ChecksProdutoPanelGUI.this.opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL)) {
+                        importador.importarMercadologicoPorNiveis(opt.toArray(new OpcaoProduto[]{}));
+                    } else {
+                        importador.importarMercadologico(opt.toArray(new OpcaoProduto[]{}));                    
+                    }
                 }
             }
 
