@@ -9,6 +9,7 @@ import vrframework.remote.ItemComboVO;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.SofttechDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
@@ -119,6 +120,13 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
                     
                     if (tabs.getSelectedIndex() == 0) {
                         tabProdutos.executarImportacao();
+                    } else if (tabs.getSelectedIndex() == 1) {
+                        if (chkFornecedor.isSelected()) {
+                            importador.importarFornecedor(OpcaoFornecedor.DADOS, OpcaoFornecedor.CONTATOS);
+                        }
+                        if (chkFornecedorContato.isSelected()) {
+                            importador.atualizarFornecedor(OpcaoFornecedor.CONTATOS);
+                        }
                     }
                     gravarParametros();
                     
@@ -162,6 +170,10 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
+        tabFornecedorCliente = new vrframework.bean.panel.VRPanel();
+        pnlFornecedores = new vrframework.bean.panel.VRPanel();
+        chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkFornecedorContato = new vrframework.bean.checkBox.VRCheckBox();
         vRLabel1 = new vrframework.bean.label.VRLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
         conexao = new vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel();
@@ -220,6 +232,48 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
 
         tabs.addTab("Produtos", tabProdutos);
 
+        pnlFornecedores.setBorder(javax.swing.BorderFactory.createTitledBorder("Fornecedor"));
+
+        chkFornecedor.setText("Dados");
+
+        chkFornecedorContato.setText("Contatos");
+
+        javax.swing.GroupLayout pnlFornecedoresLayout = new javax.swing.GroupLayout(pnlFornecedores);
+        pnlFornecedores.setLayout(pnlFornecedoresLayout);
+        pnlFornecedoresLayout.setHorizontalGroup(
+            pnlFornecedoresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlFornecedoresLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkFornecedorContato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(410, Short.MAX_VALUE))
+        );
+        pnlFornecedoresLayout.setVerticalGroup(
+            pnlFornecedoresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(chkFornecedorContato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+
+        javax.swing.GroupLayout tabFornecedorClienteLayout = new javax.swing.GroupLayout(tabFornecedorCliente);
+        tabFornecedorCliente.setLayout(tabFornecedorClienteLayout);
+        tabFornecedorClienteLayout.setHorizontalGroup(
+            tabFornecedorClienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabFornecedorClienteLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlFornecedores, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        tabFornecedorClienteLayout.setVerticalGroup(
+            tabFornecedorClienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabFornecedorClienteLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(246, Short.MAX_VALUE))
+        );
+
+        tabs.addTab("Fornecedor e Cliente", tabFornecedorCliente);
+
         vRLabel1.setText("Loja (Cliente):");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -277,9 +331,13 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private javax.swing.ButtonGroup buttonGroup1;
+    private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkFornecedorContato;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel conexao;
+    private vrframework.bean.panel.VRPanel pnlFornecedores;
+    private vrframework.bean.panel.VRPanel tabFornecedorCliente;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private vrframework.bean.consultaContaContabil.VRConsultaContaContabil vRConsultaContaContabil1;

@@ -17,6 +17,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -210,6 +211,62 @@ public class SofttechDAO extends InterfaceDAO {
         
         return result;
     }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	f.codigo id,\n" +
+                    "	f.razaosocial,\n" +
+                    "	f.nomefantasia,\n" +
+                    "	f.cpfcgc cnpj,\n" +
+                    "	f.inscricaoidentidade ie,\n" +
+                    "	(f.desativado = 0) ativo,\n" +
+                    "	f.endereco,\n" +
+                    "	f.bairro,\n" +
+                    "	f.cidade,\n" +
+                    "	f.estado,\n" +
+                    "	f.cep,\n" +
+                    "	coalesce(f.ddd, '') || f.telefone1 telefone1,\n" +
+                    "	coalesce(f.ddd, '') || f.telefone2 telefone2,\n" +
+                    "	f.observacao\n" +
+                    "from\n" +
+                    "	fornecedores f\n" +
+                    "order by\n" +
+                    "	id"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razaosocial"));
+                    imp.setFantasia(rst.getString("nomefantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("ie"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setTel_principal(rst.getString("telefone1"));
+                    imp.addTelefone("TELEFONE", rst.getString("telefone2"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    
 
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
