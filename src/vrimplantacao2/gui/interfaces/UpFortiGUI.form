@@ -248,8 +248,8 @@
                           <Component id="chkTipoEmbalagem" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="chkFamilia" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="55" max="32767" attributes="0"/>
-                      <Component id="btnMapaTrib" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="26" max="32767" attributes="0"/>
+                      <Component id="btnMapaTrib" min="-2" pref="56" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -414,11 +414,8 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace pref="492" max="32767" attributes="0"/>
+                      <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="532" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -427,9 +424,7 @@
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="180" max="32767" attributes="0"/>
+                      <EmptySpace pref="211" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -445,11 +440,6 @@
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFornecedorActionPerformed"/>
               </Events>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoFornecedor">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Produto Fornecedor"/>
-              </Properties>
             </Component>
           </SubComponents>
         </Container>
@@ -485,14 +475,8 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <EmptySpace min="21" pref="21" max="-2" attributes="0"/>
-                                  <Component id="chkIMportarCodCliente" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace pref="430" max="32767" attributes="0"/>
+                          <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="489" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -501,9 +485,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkIMportarCodCliente" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="144" max="32767" attributes="0"/>
+                          <EmptySpace pref="183" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -519,11 +501,6 @@
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkClientePreferencialActionPerformed"/>
                   </Events>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIMportarCodCliente">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Iimportar C&#xf3;digo do Cliente"/>
-                  </Properties>
                 </Component>
               </SubComponents>
             </Container>
@@ -560,43 +537,6 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkRotativo">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cr&#xe9;dito Rotativo"/>
-                  </Properties>
-                </Component>
-              </SubComponents>
-            </Container>
-            <Container class="vrframework.bean.panel.VRPanel" name="vRPanel1">
-              <Constraints>
-                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="Cheque">
-                    <Property name="tabTitle" type="java.lang.String" value="Cheque"/>
-                  </JTabbedPaneConstraints>
-                </Constraint>
-              </Constraints>
-
-              <Layout>
-                <DimensionLayout dim="0">
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="545" max="32767" attributes="0"/>
-                      </Group>
-                  </Group>
-                </DimensionLayout>
-                <DimensionLayout dim="1">
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="175" max="32767" attributes="0"/>
-                      </Group>
-                  </Group>
-                </DimensionLayout>
-              </Layout>
-              <SubComponents>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCheque">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Cheque"/>
                   </Properties>
                 </Component>
               </SubComponents>

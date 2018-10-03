@@ -1,5 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
@@ -18,6 +19,8 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
 public class UpFortiGUI extends VRInternalFrame {
@@ -75,27 +78,32 @@ public class UpFortiGUI extends VRInternalFrame {
 
         carregarParametros();
 
-        /*btnMapaTribbtnMapaTribbtnMapaTribbtnMapaTribbtnMapaTrib.setProvider(new MapaTributacaoButtonProvider() {
-         @Override
-         public MapaTributoProvider getProvider() {
-         return dao;
-         }
+        btnMapaTrib.setProvider(new MapaTributacaoButtonProvider() {
+            @Override
+            public MapaTributoProvider getProvider() {
+                return dao;
+            }
 
-         @Override
-         public String getSistema() {
-         return NOME_SISTEMA;
-         }
+            @Override
+            public String getSistema() {
+                if (!txtLojaMesmoID.getText().trim().isEmpty()) {
+                    return NOME_SISTEMA + " - " + txtLojaMesmoID.getText();
+                } else {
+                    return NOME_SISTEMA;
+                }
+            }
 
-         @Override
-         public String getLoja() {
-         return vLojaCliente;
-         }
+            @Override
+            public String getLoja() {
+                return vLojaCliente;
+            }
 
-         @Override
-         public Frame getFrame() {
-         return mdiFrame;
-         }
-         });*/
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
+            }
+        });
+
         centralizarForm();
         this.setMaximum(false);
     }
@@ -257,23 +265,17 @@ public class UpFortiGUI extends VRInternalFrame {
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
-                        if (chkProdutoFornecedor.isSelected()) {
-                            importador.importarProdutoFornecedor();
-                        }
                     } else if (tab.getSelectedIndex() == 2) {
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(
-                                    OpcaoCliente.DADOS, 
-                                    OpcaoCliente.CONTATOS, 
-                                    OpcaoCliente.VALOR_LIMITE, 
+                                    OpcaoCliente.DADOS,
+                                    OpcaoCliente.CONTATOS,
+                                    OpcaoCliente.VALOR_LIMITE,
                                     OpcaoCliente.SITUACAO_CADASTRO,
                                     OpcaoCliente.EMAIL);
                         }
                         if (chkRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
-                        }
-                        if (chkCheque.isSelected()) {
-                            importador.importarCheque();
                         }
                     } else if (tab.getSelectedIndex() == 3) {
                         if (cbxUnifProdutos.isSelected()) {
@@ -357,15 +359,11 @@ public class UpFortiGUI extends VRInternalFrame {
         chkEstoqueMaximo = new vrframework.bean.checkBox.VRCheckBox();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         tabCliente = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabClienteDados = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
-        chkIMportarCodCliente = new vrframework.bean.checkBox.VRCheckBox();
         tablCreditoRotativo = new javax.swing.JPanel();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
-        vRPanel1 = new vrframework.bean.panel.VRPanel();
-        chkCheque = new vrframework.bean.checkBox.VRCheckBox();
         tabUnificacao = new vrframework.bean.panel.VRPanel();
         cbxUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
@@ -598,8 +596,8 @@ public class UpFortiGUI extends VRInternalFrame {
                 .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkTipoEmbalagem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFamilia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 55, Short.MAX_VALUE)
-                .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -615,27 +613,21 @@ public class UpFortiGUI extends VRInternalFrame {
             }
         });
 
-        chkProdutoFornecedor.setText("Produto Fornecedor");
-
         javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
         tabFornecedor.setLayout(tabFornecedorLayout);
         tabFornecedorLayout.setHorizontalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(492, Short.MAX_VALUE))
+                .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(532, Short.MAX_VALUE))
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(180, Short.MAX_VALUE))
+                .addContainerGap(211, Short.MAX_VALUE))
         );
 
         tab.addTab("Fornecedores", tabFornecedor);
@@ -650,29 +642,21 @@ public class UpFortiGUI extends VRInternalFrame {
             }
         });
 
-        chkIMportarCodCliente.setText("Iimportar Código do Cliente");
-
         javax.swing.GroupLayout tabClienteDadosLayout = new javax.swing.GroupLayout(tabClienteDados);
         tabClienteDados.setLayout(tabClienteDadosLayout);
         tabClienteDadosLayout.setHorizontalGroup(
             tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabClienteDadosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(tabClienteDadosLayout.createSequentialGroup()
-                        .addGap(21, 21, 21)
-                        .addComponent(chkIMportarCodCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(430, Short.MAX_VALUE))
+                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(489, Short.MAX_VALUE))
         );
         tabClienteDadosLayout.setVerticalGroup(
             tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabClienteDadosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkIMportarCodCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(144, Short.MAX_VALUE))
+                .addContainerGap(183, Short.MAX_VALUE))
         );
 
         tabCliente.addTab("Dados", tabClienteDados);
@@ -697,27 +681,6 @@ public class UpFortiGUI extends VRInternalFrame {
         );
 
         tabCliente.addTab("Crédito Rotativo", tablCreditoRotativo);
-
-        chkCheque.setText("Cheque");
-
-        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
-        vRPanel1.setLayout(vRPanel1Layout);
-        vRPanel1Layout.setHorizontalGroup(
-            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(545, Short.MAX_VALUE))
-        );
-        vRPanel1Layout.setVerticalGroup(
-            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(175, Short.MAX_VALUE))
-        );
-
-        tabCliente.addTab("Cheque", vRPanel1);
 
         tab.addTab("Clientes", tabCliente);
 
@@ -980,16 +943,13 @@ public class UpFortiGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox cbxUnifCliPreferencial;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifFornecedores;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutos;
-    private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkEstoqueMaximo;
     private vrframework.bean.checkBox.VRCheckBox chkEstoqueMinimo;
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
-    private vrframework.bean.checkBox.VRCheckBox chkIMportarCodCliente;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
-    private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbCotacao;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
@@ -1035,7 +995,6 @@ public class UpFortiGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel6;
     private vrframework.bean.label.VRLabel vRLabel7;
     private vrframework.bean.label.VRLabel vRLabel8;
-    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane1;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;

@@ -13,19 +13,21 @@ import java.util.List;
 import java.util.Map;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  *
  * @author lucasrafael
  */
-public class UpFortiDAO extends InterfaceDAO {
+public class UpFortiDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public String lojaMesmoID;
     
@@ -77,7 +79,7 @@ public class UpFortiDAO extends InterfaceDAO {
                     if (merc1 != null) {
                         merc1.addFilho(
                                 rst.getString("merc2"),
-                                rst.getString("merc2_descricao")
+                                rst.getString("merc2_desc")
                         );
                     }
                 }
@@ -102,7 +104,7 @@ public class UpFortiDAO extends InterfaceDAO {
                         if (merc2 != null) {
                             merc2.addFilho(
                                     rst.getString("merc3"),
-                                    rst.getString("merc3_descricao")
+                                    rst.getString("merc3_desc")
                             );
                         }
                     }
@@ -171,8 +173,8 @@ public class UpFortiDAO extends InterfaceDAO {
                     imp.setEstoqueMaximo(rst.getDouble("estmaximo"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstDebito(rst.getInt("pis_cst"));
-                    imp.setPiscofinsCstCredito(rst.getInt("cofins_cst"));
+                    imp.setPiscofinsCstDebito(rst.getString("pis_cst"));
+                    imp.setPiscofinsCstCredito(rst.getString("cofins_cst"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("nat_rec_cofins"));
                     imp.setIcmsDebitoId(rst.getString("tipo_aliquota"));
                     imp.setIcmsCreditoId(rst.getString("tipo_aliquota"));
@@ -448,4 +450,19 @@ public class UpFortiDAO extends InterfaceDAO {
         }
         return lojas;
     }
+    
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select distinct(tipo_aliquota) from produtos where tipo_aliquota is not null and tipo_aliquota <> ''")) {
+                while (rs.next()) {
+                    result.add(new MapaTributoIMP(rs.getString("tipo_aliquota"), rs.getString("tipo_aliquota")));
+                }
+            }
+        }
+        return result;
+    }
+    
 }
