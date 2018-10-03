@@ -113,5 +113,5 @@ public class ProdutoComplementoVO {
     public void setSituacaoCadastro(SituacaoCadastro situacaoCadastro) {
         this.situacaoCadastro = situacaoCadastro != null ? situacaoCadastro : SituacaoCadastro.ATIVO;
     }
-    
+
 }

@@ -10,10 +10,14 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -213,7 +217,7 @@ public class GuiaSistemasDAO extends InterfaceDAO {
         }
         return vResult;
     }
-
+    
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> vResult = new ArrayList<>();
@@ -432,13 +436,16 @@ public class GuiaSistemasDAO extends InterfaceDAO {
                     + "vfd_VlrDocumento, "
                     + "vfd_VlrJuros \n"
                     + "from tab_fin_contasrec \n"
-                    + "where vfd_TipoSacado = 'C'\n"
-                    + "and vfd_DataBaixa is null\n"
+                    + "where vfd_DataBaixa is null\n"
                     + "and vfd_CodFilial = " + getLojaOrigem()
+                    + "and ch.vfd_CodBanco is null\n"
+                    + "and ch.vfd_CodAgencia is null\n"
+                    + "and ch.vfd_NumConta is null\n"
+                    
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    imp.setId(rst.getString("vfd_Caixa") + rst.getString("vfd_Cupom") + rst.getString("vfd_DataLancamento"));
+                    imp.setId(getLojaOrigem() + rst.getString("vfd_Caixa") + rst.getString("vfd_Cupom") + rst.getString("vfd_CodSacado") + rst.getString("vfd_DataLancamento"));                    
                     imp.setIdCliente(rst.getString("vfd_CodSacado"));
                     imp.setNumeroCupom(rst.getString("vfd_Cupom"));
                     imp.setDataEmissao(rst.getDate("vfd_DataLancamento"));
@@ -451,5 +458,115 @@ public class GuiaSistemasDAO extends InterfaceDAO {
             }
         }
         return vResult;
+    }
+    
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> vResult = new ArrayList<>();
+        try (Statement stm  = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "cli.vfd_NomeCliente,\n"
+                    + "cli.vfd_CPF,\n"
+                    + "cli.vfd_RG,\n"
+                    + "cli.vfd_DDD+vfd_fone as telefone,\n"
+                    + "ch.vfd_CodFilial,\n"
+                    + "ch.vfd_Caixa,\n"
+                    + "ch.vfd_Cupom,\n"
+                    + "ch.vfd_NumDocumento,\n"
+                    + "ch.vfd_DataLancamento,\n"
+                    + "ch.vfd_DataVencimento,\n"
+                    + "ch.vfd_NumeroParcela,\n"
+                    + "ch.vfd_CodSacado,\n"
+                    + "ch.vfd_VlrTotal,\n"
+                    + "ch.vfd_CodBanco,\n"
+                    + "ch.vfd_CodAgencia,\n"
+                    + "ch.vfd_NumConta\n"
+                    + "from View_FinanceiroContasRec ch\n"
+                    + "left join tab_clientes cli on cli.vfd_CodCliente = ch.vfd_CodSacado\n"
+                    + "where ch.vfd_codfilial = " + getLojaOrigem() + "\n"
+                    + "and ch.vfd_DataBaixa is null\n"
+                    + "and ch.vfd_CodBanco is not null\n"
+                    + "and ch.vfd_CodAgencia is not null\n"
+                    + "and ch.vfd_NumConta is not null\n"
+                    + "and ch.vfd_NumDocumento is not null"
+            )) {
+                while (rst.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    imp.setId(getLojaOrigem() + rst.getString("vfd_Caixa") + rst.getString("vfd_Cupom") + rst.getString("vfd_CodSacado") + rst.getString("vfd_DataLancamento"));
+                    imp.setNumeroCheque(rst.getString("vfd_NumDocumento"));
+                    imp.setBanco(Utils.stringToInt(rst.getString("vfd_CodBanco")));
+                    imp.setAgencia(rst.getString("vfd_CodAgencia"));
+                    imp.setConta(rst.getString("vfd_NumConta"));
+                    imp.setDate(rst.getDate("vfd_DataLancamento"));
+                    imp.setDataDeposito(rst.getDate("vfd_DataVencimento"));
+                    imp.setValor(rst.getDouble("vfd_VlrTotal"));
+                    imp.setCpf(rst.getString("vfd_CPF"));
+                    imp.setRg(rst.getString("vfd_RG"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setNome(rst.getString("vfd_NomeCliente"));
+                    imp.setObservacao("IMPORTADO VR");
+                    imp.setAlinea(0);
+                    vResult.add(imp);                    
+                }
+            }
+        }
+        return vResult;
+    }
+    
+    @Override
+    public List<ConveniadoIMP> getConveniado() throws Exception {
+        List<ConveniadoIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "vfd_codCliente, "
+                    + "vfd_nomecliente, "
+                    + "vfd_tipopessoa, "
+                    + "vfd_rg, "
+                    + "vfd_cpf, "
+                    + "vfd_nomepdv, "
+                    + "vfd_sexo, "
+                    + "vfd_cidade, "
+                    + "vfd_estadocivil, "
+                    + "vfd_estado, "
+                    + "vfd_endereco, "
+                    + "vfd_numero, "
+                    + "vfd_complemento, "
+                    + "vfd_cep, "
+                    + "vfd_ddd, "
+                    + "vfd_fone, "
+                    + "vfd_bairro, "
+                    + "vfd_datanascimento, "
+                    + "vfd_renda, "
+                    + "vfd_situacao, "
+                    + "vfd_datacadastro, "
+                    + "vfd_limitecheque, "
+                    + "vfd_email,"
+                    + "vfd_dddcelular, "
+                    + "vfd_celular, "
+                    + "vfd_limitecredito, "
+                    + "vfd_observacoes, "
+                    + "vfd_CodEmpresa, "
+                    + "vfd_LimiteConvenio, "
+                    + "vfd_CodFilial "
+                    + "from tab_clientes\n"
+                    + "where vfd_CodFilial = " + getLojaOrigem()
+            )) {
+                while (rst.next()) {
+                    ConveniadoIMP imp = new ConveniadoIMP();
+                    imp.setId(rst.getString("vfd_codCliente"));
+                    imp.setCnpj(rst.getString("vfd_cpf"));
+                    imp.setNome(rst.getString("vfd_nomecliente"));
+                    imp.setIdEmpresa(rst.getString("vfd_CodEmpresa"));
+                    imp.setBloqueado(false);
+                    imp.setConvenioLimite(rst.getDouble("vfd_LimiteConvenio"));
+                    imp.setConvenioDesconto(0);    
+                    imp.setLojaCadastro("10");
+                    vResult.add(imp);
+                }
+            }
+            return vResult;
+        }        
     }
 }
