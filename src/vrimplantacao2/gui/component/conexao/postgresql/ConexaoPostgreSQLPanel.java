@@ -229,6 +229,8 @@ public class ConexaoPostgreSQLPanel extends javax.swing.JPanel {
         } else {
             conexao.abrirConexao(txtStrConexao.getText(), txtUsuario.getText(), txtSenha.getText());
         }
+        
+        atualizarParametros();
 
         if (onConectar != null) {
             onConectar.executar();

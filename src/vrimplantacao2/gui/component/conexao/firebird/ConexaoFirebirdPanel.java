@@ -229,6 +229,8 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
             conexao.abrirConexao(txtStrConexao.getText(), txtUsuario.getText(), txtSenha.getText());
         }
 
+        atualizarParametros();
+        
         if (onConectar != null) {
             onConectar.executar();
         }
