@@ -47,7 +47,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 chkMercadologicoPorNivelReplicar.setVisible(opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR));
                 if (
                         opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL) ||
-                        opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR)
+                        opt.contains(OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR) ||
+                        opt.contains(OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR)
                 ) {
                     tabParametros.add(pnlOptMercadologico);
                 }

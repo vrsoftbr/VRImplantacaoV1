@@ -148,6 +148,7 @@ import vrimplantacao2.gui.interfaces.AvanceGUI;
 import vrimplantacao2.gui.interfaces.TstiGUI;
 import vrimplantacao2.gui.interfaces.CPlusGUI;
 import vrimplantacao2.gui.interfaces.CadastraFacilGUI;
+import vrimplantacao2.gui.interfaces.CefasGUI;
 import vrimplantacao2.gui.interfaces.CissGUI;
 import vrimplantacao2.gui.interfaces.DtComGUI;
 import vrimplantacao2.gui.interfaces.FaciliteGUI;
@@ -602,6 +603,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuCPGestor = new javax.swing.JMenuItem();
         mnuWmsi = new javax.swing.JMenuItem();
         mnuWmsi1 = new javax.swing.JMenuItem();
+        mnuCefas = new javax.swing.JMenuItem();
         jMenu8 = new javax.swing.JMenu();
         jMenuItemControlWare = new javax.swing.JMenuItem();
         mnuFlatan = new javax.swing.JMenuItem();
@@ -1530,6 +1532,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu7.add(mnuWmsi1);
+
+        mnuCefas.setText("Cefas / Concretize V2");
+        mnuCefas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuCefasActionPerformed(evt);
+            }
+        });
+        jMenu7.add(mnuCefas);
 
         jMenu2.add(jMenu7);
 
@@ -3962,6 +3972,10 @@ public final class MenuGUI extends VRMdiFrame {
         UpFortiGUI.exibir(this);
     }//GEN-LAST:event_mnuUpFortiActionPerformed
 
+    private void mnuCefasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCefasActionPerformed
+        CefasGUI.exibir(this);
+    }//GEN-LAST:event_mnuCefasActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -4083,6 +4097,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu mnuCache;
     private javax.swing.JMenuItem mnuCadastraFacil;
     private javax.swing.JMenu mnuCaixa;
+    private javax.swing.JMenuItem mnuCefas;
     private javax.swing.JMenuItem mnuCodigoBarrasAtacado;
     private javax.swing.JMenuItem mnuControll;
     private javax.swing.JMenuItem mnuCplus;

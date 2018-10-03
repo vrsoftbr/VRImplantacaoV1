@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -22,6 +24,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean v_usar_arquivoBalanca;
+    public String idAtacado = "0";
     
     @Override
     public String getSistema() {
@@ -180,6 +183,78 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
     }
     
     @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n" +
+                    "	codigo,\n" +
+                    "	precopauta1,\n" +
+                    "	quantidadepauta1\n" +
+                    "from\n" +
+                    "	produto\n" +
+                    "where\n" +
+                    "	precopauta1 != 0 and\n" +
+                    "	quantidadepauta1 > 0"
+            )) {
+                while (rst.next()) {
+
+                    int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("codigo"));
+
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("codigo"));
+                    imp.setEan(idAtacado + String.valueOf(codigoAtual));
+                    imp.setQtdEmbalagem(rst.getInt("quantidadepauta1"));
+                    result.add(imp);
+                }
+            }
+            return result;
+        }
+    }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+
+        if (opt == OpcaoProduto.ATACADO) {
+            List<ProdutoIMP> result = new ArrayList<>();
+            try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n" +
+                        "	codigo,\n" +
+                        "	codigo ean,\n" +
+                        "	precopauta1 precoatacado,\n" +
+                        "	quantidadepauta1 qtdembalagem,\n" +
+                        "       preco\n" +
+                        "from\n" +
+                        "	produto\n" +
+                        "where\n" +
+                        "	precopauta1 != 0 and\n" +
+                        "	quantidadepauta1 > 0"
+                )) {
+                    while (rst.next()) {
+                        
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("codigo"));
+                        
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("codigo"));
+                        imp.setEan(idAtacado + String.valueOf(codigoAtual));
+                        imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                        imp.setAtacadoPreco(rst.getDouble("precoatacado"));
+                        imp.setPrecovenda(rst.getDouble("preco"));
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+        return null;
+    }
+    
+    @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -213,7 +288,7 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
     
-    @Override
+    /*@Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -241,7 +316,7 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
-    }
+    }*/
     
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
@@ -323,36 +398,6 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     imp.setDatacadastro(rs.getDate("datacadastro"));
                     imp.setAtivo(rs.getInt("inativo") == 0 ? true : false);
-                    
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-    
-    public List<ProdutoIMP> getEANsAtacados() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	codigo,\n" +
-                    "	ean,\n" +
-                    "	precopauta1,\n" +
-                    "	quantidadepauta1\n" +
-                    "from\n" +
-                    "	produto\n" +
-                    "where\n" +
-                    "	precopauta1 != 0 and\n" +
-                    "	quantidadepauta1 != 0")) {
-                while(rs.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rs.getString("codigo"));
-                    imp.setPrecovenda(rs.getDouble("precopauta1"));
-                    imp.setEan(rs.getString("ean"));
-                    imp.setQtdEmbalagem(rs.getInt("quantidadepauta1"));
                     
                     result.add(imp);
                 }

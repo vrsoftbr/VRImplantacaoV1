@@ -1592,7 +1592,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static class VendaIterator implements Iterator<VendaIMP> {
 
-        private final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
         private Statement stm = ConexaoSqlServer.getConexao().createStatement();
         private ResultSet rst;
@@ -1728,8 +1728,6 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
-        private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
-
         private Statement stm = ConexaoSqlServer.getConexao().createStatement();
         private ResultSet rst;
         private String sql;
@@ -1855,7 +1853,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    left join ALIQUOTA_ICMS ic on pr.codaliq = ic.codaliq\n"
                     + "where\n"
                     + "    cx.tipolancto = '' and\n"
-                    + "    (cx.data between convert(date, '" + FORMAT.format(dataInicio) + "', 23) and convert(date, '" + FORMAT.format(dataTermino) + "', 23)) and\n"
+                    + "    (cx.data between convert(date, '" + VendaIterator.FORMAT.format(dataInicio) + "', 23) and convert(date, '" + VendaIterator.FORMAT.format(dataTermino) + "', 23)) and\n"
                     + "    cx.codloja = " + idLojaCliente + " and\n"
                     + "    cx.atualizado = 'S' and\n"
                     + "    (cx.flgrupo = 'S' or cx.flgrupo = 'N')";

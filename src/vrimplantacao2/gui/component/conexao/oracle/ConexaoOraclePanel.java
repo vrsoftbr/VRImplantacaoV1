@@ -231,6 +231,8 @@ public class ConexaoOraclePanel extends javax.swing.JPanel {
             conexao.abrirConexao(txtStrConexao.getText(), txtUsuario.getText(), txtSenha.getText());
         }
 
+        atualizarParametros();
+        
         if (onConectar != null) {
             onConectar.executar();
         }
@@ -238,11 +240,11 @@ public class ConexaoOraclePanel extends javax.swing.JPanel {
     
     public void carregarParametros() {
         Parametros params = Parametros.get();
-        txtHost.setText(params.getWithNull(host, sistema, "HOST"));
-        txtDatabase.setText(params.getWithNull(database, sistema, "DATABASE"));
-        txtPorta.setText(params.getWithNull(port, sistema, "PORTA"));
-        txtUsuario.setText(params.getWithNull(user, sistema, "USUARIO"));
-        txtSenha.setText(params.getWithNull(pass, sistema, "SENHA"));
+        txtHost.setText(params.getWithNull(host, sistema, "ORACLE", "HOST"));
+        txtDatabase.setText(params.getWithNull(database, sistema, "ORACLE", "DATABASE"));
+        txtPorta.setText(params.getWithNull(port, sistema, "ORACLE", "PORTA"));
+        txtUsuario.setText(params.getWithNull(user, sistema, "ORACLE", "USUARIO"));
+        txtSenha.setText(params.getWithNull(pass, sistema, "ORACLE", "SENHA"));
     }
     public String pass = "root";
     public String user = "root";
@@ -252,11 +254,11 @@ public class ConexaoOraclePanel extends javax.swing.JPanel {
     
     public void atualizarParametros() {
         Parametros params = Parametros.get();
-        params.put(txtHost.getText(), sistema, "HOST");
-        params.put(txtDatabase.getText(), sistema, "DATABASE");
-        params.put(txtPorta.getText(), sistema, "PORTA");
-        params.put(txtUsuario.getText(), sistema, "USUARIO");
-        params.put(txtSenha.getText(), sistema, "SENHA");
+        params.put(txtHost.getText(), sistema, "ORACLE", "HOST");
+        params.put(txtDatabase.getText(), sistema, "ORACLE", "DATABASE");
+        params.put(txtPorta.getText(), sistema, "ORACLE", "PORTA");
+        params.put(txtUsuario.getText(), sistema, "ORACLE", "USUARIO");
+        params.put(txtSenha.getText(), sistema, "ORACLE", "SENHA");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

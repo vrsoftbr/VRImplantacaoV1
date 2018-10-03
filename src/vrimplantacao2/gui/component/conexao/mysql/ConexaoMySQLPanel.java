@@ -231,6 +231,8 @@ public class ConexaoMySQLPanel extends javax.swing.JPanel {
             conexao.abrirConexao(txtStrConexao.getText(), txtUsuario.getText(), txtSenha.getText());
         }
 
+        atualizarParametros();
+        
         if (onConectar != null) {
             onConectar.executar();
         }
@@ -238,11 +240,11 @@ public class ConexaoMySQLPanel extends javax.swing.JPanel {
     
     public void carregarParametros() {
         Parametros params = Parametros.get();
-        txtHost.setText(params.getWithNull(host, sistema, "HOST"));
-        txtDatabase.setText(params.getWithNull(database, sistema, "DATABASE"));
-        txtPorta.setText(params.getWithNull(port, sistema, "PORTA"));
-        txtUsuario.setText(params.getWithNull(user, sistema, "USUARIO"));
-        txtSenha.setText(params.getWithNull(pass, sistema, "SENHA"));
+        txtHost.setText(params.getWithNull(host, sistema, "MYSQL", "HOST"));
+        txtDatabase.setText(params.getWithNull(database, sistema, "MYSQL", "DATABASE"));
+        txtPorta.setText(params.getWithNull(port, sistema, "MYSQL", "PORTA"));
+        txtUsuario.setText(params.getWithNull(user, sistema, "MYSQL", "USUARIO"));
+        txtSenha.setText(params.getWithNull(pass, sistema, "MYSQL", "SENHA"));
     }
     public String pass = "root";
     public String user = "root";
@@ -252,11 +254,11 @@ public class ConexaoMySQLPanel extends javax.swing.JPanel {
     
     public void atualizarParametros() {
         Parametros params = Parametros.get();
-        params.put(txtHost.getText(), sistema, "HOST");
-        params.put(txtDatabase.getText(), sistema, "DATABASE");
-        params.put(txtPorta.getText(), sistema, "PORTA");
-        params.put(txtUsuario.getText(), sistema, "USUARIO");
-        params.put(txtSenha.getText(), sistema, "SENHA");
+        params.put(txtHost.getText(), sistema, "MYSQL", "HOST");
+        params.put(txtDatabase.getText(), sistema, "MYSQL", "DATABASE");
+        params.put(txtPorta.getText(), sistema, "MYSQL", "PORTA");
+        params.put(txtUsuario.getText(), sistema, "MYSQL", "USUARIO");
+        params.put(txtSenha.getText(), sistema, "MYSQL", "SENHA");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
