@@ -536,7 +536,7 @@ public class UniplusGUI extends VRInternalFrame {
 
         chkAtacado.setText("Atacado");
 
-        lblAtacadoID.setText("ID para atacado");
+        lblAtacadoID.setText("ID Atacado");
 
         javax.swing.GroupLayout tabDadosLayout = new javax.swing.GroupLayout(tabDados);
         tabDados.setLayout(tabDadosLayout);

@@ -11,6 +11,7 @@ import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -94,53 +95,56 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	p.codigo,\n" +
-                    "	p.ean,\n" +
-                    "	p.inativo,\n" +
-                    "	p.nome as descricaocompleta,\n" +
-                    "	p.nomeecf as descricaoreduzida,\n" +
-                    "	p.nome as descricaogondola,\n" +
-                    "	p.datacadastro,\n" +
-                    "	p.unidademedida as unidade,\n" +
-                    "	1 qtdembalagem,\n" +
-                    "	p.custoindireto custooperacional,\n" +
-                    "	p.precocusto,\n" +
-                    "	p.lucrobruto as margembruta,\n" +
-                    "	p.percentuallucroajustado as margem,\n" +
-                    "   case when p.precocusto = 0.000000 then\n" +
-                    "   0 else\n" +
-                    "   round((((p.preco / case when p.precocusto = 0.000000 then 1 else p.precocusto end) - 1) * 100), 2) end as margemcalculada,\n" +
-                    "	p.percentualmarkup,\n" +
-                    "	p.preco as precovenda,\n" +
-                    "	p.quantidademinima,\n" +
-                    "	p.quantidademaxima,\n" +
-                    "	e.quantidade,\n" +
-                    "	p.tributacao,\n" +
-                    "	p.situacaotributaria as cst,\n" +
-                    "	p.cstpis,\n" +
-                    "	p.cstcofins,\n" +
-                    "	p.cstpisentrada,\n" +
-                    "	p.icmsentrada as icmscredito,\n" +
-                    "	p.icmssaida as icmsdebito,\n" +
-                    "	p.aliquotaicmsinterna,\n" +
-                    "	p.pesavel,\n" +
-                    "	p.ncm,\n" +
-                    "	p.idcest,\n" +
-                    "	cest.codigo as cest,\n" +
-                    "	p.cstpisentrada,\n" +
-                    "	p.cstcofinsentrada,\n" +
-                    "	p.idfamilia,\n" +
-                    "	p.idhierarquia as merc1,\n" +
-                    "	p.idhierarquia as merc2,\n" +
-                    "	p.idhierarquia as merc3\n" +
-                    "from\n" +
-                    "	produto p\n" +
-                    "left join\n" +
-                    "	saldoestoque e on e.idproduto = p.id and e.codigoproduto = p.codigo\n" +
-                    "left join\n" +
+                    "select \n" +
+                    "	p.codigo, \n" +
+                    "	p.ean, \n" +
+                    "	p.inativo, \n" +
+                    "	p.nome as descricaocompleta, \n" +
+                    "	p.nomeecf as descricaoreduzida, \n" +
+                    "	p.nome as descricaogondola, \n" +
+                    "	p.datacadastro, \n" +
+                    "	p.unidademedida as unidade, \n" +
+                    "	1 qtdembalagem, \n" +
+                    "	p.custoindireto custooperacional, \n" +
+                    "	p.precocusto, \n" +
+                    "	p.lucrobruto as margembruta, \n" +
+                    "	p.percentuallucroajustado as margem, \n" +
+                    "        case when p.precocusto = 0.000000 then \n" +
+                    "        0 else \n" +
+                    "        round((((p.preco / case when p.precocusto = 0.000000 then 1 else p.precocusto end) - 1) * 100), 2) end as margemcalculada, \n" +
+                    "	p.percentualmarkup, \n" +
+                    "	p.preco as precovenda, \n" +
+                    "	p.quantidademinima, \n" +
+                    "	p.quantidademaxima, \n" +
+                    "	e.quantidade, \n" +
+                    "	p.tributacao, \n" +
+                    "	p.situacaotributaria as cst, \n" +
+                    "	p.cstpis, \n" +
+                    "	p.cstcofins, \n" +
+                    "	p.cstpisentrada, \n" +
+                    "	p.icmsentrada as icmscredito, \n" +
+                    "	p.icmssaida as icmsdebito, \n" +
+                    "	p.aliquotaicmsinterna, \n" +
+                    "	p.pesavel, \n" +
+                    "	p.ncm, \n" +
+                    "	p.idcest, \n" +
+                    "	cest.codigo as cest, \n" +
+                    "	p.cstpisentrada, \n" +
+                    "	p.cstcofinsentrada, \n" +
+                    "	p.idfamilia, \n" +
+                    "	p.idhierarquia as merc1, \n" +
+                    "	p.idhierarquia as merc2, \n" +
+                    "	p.idhierarquia as merc3,\n" +
+                    "	r.codigo naturezareceita\n" +
+                    " from \n" +
+                    "	produto p \n" +
+                    " left join \n" +
+                    "	saldoestoque e on e.idproduto = p.id and e.codigoproduto = p.codigo \n" +
+                    " left join \n" +
                     "	cest on cest.id = p.idcest\n" +
-                    "order by\n" +
+                    "left join\n" +
+                    "	receitasemcontribuicao r on p.idreceitasemcontribuicao = r.id\n" +
+                    " order by \n" +
                     "	p.codigo::integer")) {
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -174,6 +178,7 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
+                    imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
                     
                     result.add(imp);
                 }
@@ -405,4 +410,75 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+    
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	e.codigo,\n" +
+                    "	e.nome,\n" +
+                    "	e.razaosocial,\n" +
+                    "	e.tipopessoa,\n" +
+                    "	e.cnpjcpf,\n" +
+                    "	e.inscricaoestadual,\n" +
+                    "	e.rg,\n" +
+                    "	e.endereco,\n" +
+                    "	e.numeroendereco,\n" +
+                    "	e.complemento,\n" +
+                    "	e.bairro,\n" +
+                    "	c.codigo municipioibge,\n" +
+                    "	c.nome municipio,\n" +
+                    "   es.codigoibge estadoibge,\n" +
+                    "   es.codigo estado,\n" +
+                    "	e.cep,\n" +
+                    "	e.telefone,\n" +
+                    "	e.celular,\n" +
+                    "	e.fax,\n" +
+                    "	e.email,\n" +
+                    "	e.nascimento,\n" +
+                    "	e.limitecredito,\n" +
+                    "	e.datacadastro,\n" +
+                    "	e.inativo\n" +
+                    "from \n" +
+                    "	entidade e\n" +
+                    "left join\n" +
+                    "	cidade c on c.id = e.idcidade\n" +
+                    "left join\n" +
+                    "	estado es on c.idestado = es.id\n" +
+                    "where\n" +
+                    "	e.cliente = 1\n" +
+                    "order by\n" +
+                    "	e.codigo::integer")) {
+                while(rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rs.getString("codigo"));
+                    imp.setRazao(rs.getString("nome"));
+                    imp.setCnpj(rs.getString("cnpjcpf"));
+                    imp.setInscricaoestadual(rs.getString("inscricaoestadual"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numeroendereco"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("municipio"));
+                    imp.setMunicipioIBGE(rs.getInt("municipioibge"));
+                    imp.setUf(rs.getString("estado"));
+                    imp.setUfIBGE(rs.getInt("estadoibge"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setCelular(rs.getString("celular"));
+                    imp.setFax(rs.getString("fax"));
+                    imp.setEmail(rs.getString("email"));
+                    imp.setDataNascimento(rs.getDate("nascimento"));
+                    imp.setValorLimite(rs.getDouble("limitecredito"));
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+                    imp.setAtivo(rs.getInt("inativo") == 0 ? true : false);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    } 
 }
