@@ -16,6 +16,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -303,6 +304,90 @@ public class SofttechDAO extends InterfaceDAO {
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
                     imp.setCustoTabela(rst.getDouble("custotabelado"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	c.codigo id,\n" +
+                    "	c.cpfcgc cnpj,\n" +
+                    "	c.inscricaoidentidade ie,\n" +
+                    "	c.nome razao,\n" +
+                    "	c.nomeempresa fantasia,\n" +
+                    "	c.desativado = 0 ativo,\n" +
+                    "	c.bloqueado,\n" +
+                    "	c.endereco,\n" +
+                    "	c.bairro,\n" +
+                    "	c.cidade,\n" +
+                    "	c.estado,\n" +
+                    "	c.cep,\n" +
+                    "	c.datanascimento,\n" +
+                    "	c.datacadastro,\n" +
+                    "	c.empresa,\n" +
+                    "	c.cargo,\n" +
+                    "	c.renda salario,\n" +
+                    "	c.limitecredito,\n" +
+                    "	c.observacao,\n" +
+                    "	c.dialimite diavencimento,\n" +
+                    "	coalesce(c.ddd,'') || c.telefone1 telefone1,\n" +
+                    "	coalesce(c.ddd,'') || c.telefone2 telefone2,\n" +
+                    "	coalesce(c.ddd,'') || c.celcontato celular,\n" +
+                    "	c.email,\n" +
+                    "	c.enderecocob,\n" +
+                    "	c.bairrocob,\n" +
+                    "	c.cidadecob,\n" +
+                    "	c.estadocob,\n" +
+                    "	c.cepcob,\n" +
+                    "	coalesce(c.dddcob,'') || c.telefonecob telefonecob\n" +
+                    "from\n" +
+                    "	clientes c\n" +
+                    "order by\n" +
+                    "	c.codigo"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("ie"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setBloqueado(rst.getBoolean("bloqueado"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setDataNascimento(rst.getDate("datanascimento"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setEmpresa(rst.getString("empresa"));
+                    imp.setCargo(rst.getString("cargo"));
+                    imp.setSalario(rst.getDouble("salario"));
+                    imp.setValorLimite(rst.getDouble("limitecredito"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setDiaVencimento(rst.getInt("diavencimento"));
+                    imp.setTelefone(rst.getString("telefone1"));
+                    imp.addTelefone("TELEFONE 2", rst.getString("telefone2"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setCobrancaEndereco(rst.getString("enderecocob"));
+                    imp.setCobrancaBairro(rst.getString("bairrocob"));
+                    imp.setCobrancaMunicipio(rst.getString("cidadecob"));
+                    imp.setCobrancaUf(rst.getString("estadocob"));
+                    imp.setCobrancaCep(rst.getString("cepcob"));
+                    imp.setCobrancaTelefone(rst.getString("telefonecob"));
                     
                     result.add(imp);
                 }
