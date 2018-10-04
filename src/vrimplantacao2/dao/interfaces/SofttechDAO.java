@@ -18,6 +18,7 @@ import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -163,7 +164,13 @@ public class SofttechDAO extends InterfaceDAO {
                     "			codigo id_produto,\n" +
                     "			codigosweda ean\n" +
                     "		from\n" +
-                    "			produtos) ean on\n" +
+                    "			produtos\n" +
+                    "		union\n" +
+                    "		select distinct\n" +
+                    "			pro_id id_produto,\n" +
+                    "			codigo_barras ean\n" +
+                    "		from\n" +
+                    "			fornecedores_codbarras) ean on\n" +
                     "		p.codigo = ean.id_produto\n" +
                     "order by\n" +
                     "	id"
@@ -257,6 +264,45 @@ public class SofttechDAO extends InterfaceDAO {
                     imp.setTel_principal(rst.getString("telefone1"));
                     imp.addTelefone("TELEFONE", rst.getString("telefone2"));
                     imp.setObservacao(rst.getString("observacao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	pf.fornecedor id_fornecedor,\n" +
+                    "	pf.codigo id_produto,\n" +
+                    "	pf.dataultcompra dataalteracao,\n" +
+                    "	pf.valorultcompra custotabelado,\n" +
+                    "	coalesce(fc.codigo_barras, pf.codigo::varchar) codigoexterno\n" +
+                    "from\n" +
+                    "	produtosfornecedores pf\n" +
+                    "	left join fornecedores_codbarras fc on\n" +
+                    "		pf.codigo = fc.pro_id and\n" +
+                    "		pf.fornecedor = fc.for_id\n" +
+                    "order by\n" +
+                    "	id_fornecedor, id_produto"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setIdProduto(rst.getString("id_produto"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setCustoTabela(rst.getDouble("custotabelado"));
+                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
                     
                     result.add(imp);
                 }
