@@ -10,6 +10,7 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.SofttechDAO;
@@ -131,6 +132,9 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
+                        if (chkContasPagar.isSelected()) {
+                            importador.importarContasPagar(OpcaoContaPagar.NOVOS);
+                        }
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
                         }
@@ -188,6 +192,7 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkFornecedorContato = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkContasPagar = new vrframework.bean.checkBox.VRCheckBox();
         pnlClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -258,6 +263,8 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkProdutoFornecedor.setText("Produto Fornecedor");
 
+        chkContasPagar.setText("Contas à pagar");
+
         javax.swing.GroupLayout pnlFornecedoresLayout = new javax.swing.GroupLayout(pnlFornecedores);
         pnlFornecedores.setLayout(pnlFornecedoresLayout);
         pnlFornecedoresLayout.setHorizontalGroup(
@@ -269,13 +276,16 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
                 .addComponent(chkFornecedorContato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(289, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(190, Short.MAX_VALUE))
         );
         pnlFornecedoresLayout.setVerticalGroup(
             pnlFornecedoresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addComponent(chkFornecedorContato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(chkContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pnlClientes.setBorder(javax.swing.BorderFactory.createTitledBorder("Clientes"));
@@ -392,6 +402,7 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.ButtonGroup buttonGroup1;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
+    private vrframework.bean.checkBox.VRCheckBox chkContasPagar;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedorContato;

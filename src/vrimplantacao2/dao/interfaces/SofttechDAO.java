@@ -17,6 +17,8 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -396,8 +398,77 @@ public class SofttechDAO extends InterfaceDAO {
         
         return result;
     }
-    
-    
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    ""
+            )) {
+                while (rst.next()) {
+                    
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	cp.codigo id,\n" +
+                    "	cp.fornecedor id_fornecedor,\n" +
+                    "	cp.documento,\n" +
+                    "	cp.data,\n" +
+                    "	cp.valor,\n" +
+                    "	cp.datapg is null finalizado,\n" +
+                    "	cp.observacoes,\n" +
+                    "	cp.origem,\n" +
+                    "	cp.descricao,\n" +
+                    "	cp.vencimento,\n" +
+                    "	cp.valor valorpg\n" +
+                    "from\n" +
+                    "	contaspagar cp\n" +
+                    "order by\n" +
+                    "	id"
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setNumeroDocumento(rst.getString("documento"));
+                    imp.setDataEmissao(rst.getDate("data"));
+                    imp.setDataEntrada(rst.getDate("data"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setFinalizada(rst.getBoolean("finalizado"));
+                    String obs = "";
+                    if (rst.getString("descricao") != null) {
+                        obs += "DESCR: " + rst.getString("descricao");
+                    }
+                    if (rst.getString("origem") != null) {
+                        obs += "ORIGEM: " + rst.getString("origem");
+                    }
+                    if (rst.getString("observacoes") != null) {
+                        obs += "OBS: " + rst.getString("observacoes");
+                    }
+                    imp.setObservacao(obs);
+                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valorpg"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
 
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
