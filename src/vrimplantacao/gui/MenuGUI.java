@@ -171,6 +171,7 @@ import vrimplantacao2.gui.interfaces.IntelliconGUI;
 import vrimplantacao2.gui.interfaces.InventerGUI;
 import vrimplantacao2.gui.interfaces.JM2OnlineGUI;
 import vrimplantacao2.gui.interfaces.KcmsGUI;
+import vrimplantacao2.gui.interfaces.LyncisGUI;
 import vrimplantacao2.gui.interfaces.MarketGUI;
 import vrimplantacao2.gui.interfaces.PlanilhaVrGUI;
 import vrimplantacao2.gui.interfaces.PwsGUI;
@@ -617,6 +618,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuMarket = new javax.swing.JMenuItem();
         mnuUniplus = new javax.swing.JMenuItem();
         mnuSofttech = new javax.swing.JMenuItem();
+        mnuLyncis = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -1634,6 +1636,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuSofttech);
+
+        mnuLyncis.setText("Lyncis");
+        mnuLyncis.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuLyncisActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuLyncis);
 
         jMenu2.add(jMenu8);
 
@@ -3990,6 +4000,10 @@ public final class MenuGUI extends VRMdiFrame {
         SofttechGUI.exibir(this);
     }//GEN-LAST:event_mnuSofttechActionPerformed
 
+    private void mnuLyncisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuLyncisActionPerformed
+        LyncisGUI.exibir(this);
+    }//GEN-LAST:event_mnuLyncisActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -4149,6 +4163,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuKcms;
     private javax.swing.JMenuItem mnuLinner;
     private javax.swing.JMenuItem mnuLogus;
+    private javax.swing.JMenuItem mnuLyncis;
     private javax.swing.JMenuItem mnuMSIInfor;
     private javax.swing.JMenuItem mnuMapeamentoMercadologico;
     private javax.swing.JMenuItem mnuMarket;
