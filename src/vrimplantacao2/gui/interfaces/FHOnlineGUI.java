@@ -185,10 +185,11 @@ public class FHOnlineGUI extends VRInternalFrame {
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
                     importador.setLojaVR(idLojaVR);
+                    dao.i_arquivoBalanca = chkTemArquivoBalanca.isSelected();
 
                     if (tab.getSelectedIndex() == 0) {
                         if (chkMercadologico.isSelected()) {
-                            importador.importarMercadologicoPorNiveis();
+                            importador.importarMercadologico();
                         }
 
                         if (chkProdutos.isSelected()) {
@@ -345,6 +346,7 @@ public class FHOnlineGUI extends VRInternalFrame {
         chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
         chkMercadologico = new vrframework.bean.checkBox.VRCheckBox();
         chkProdMercadologico = new vrframework.bean.checkBox.VRCheckBox();
+        chkTemArquivoBalanca = new vrframework.bean.checkBox.VRCheckBox();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -505,6 +507,8 @@ public class FHOnlineGUI extends VRInternalFrame {
 
         chkProdMercadologico.setText("Prod. Mercadologico");
 
+        chkTemArquivoBalanca.setText("Tem Arquivo Balanca");
+
         javax.swing.GroupLayout tabDadosLayout = new javax.swing.GroupLayout(tabDados);
         tabDados.setLayout(tabDadosLayout);
         tabDadosLayout.setHorizontalGroup(
@@ -534,7 +538,10 @@ public class FHOnlineGUI extends VRInternalFrame {
                         .addComponent(chkT1Preco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(5, 5, 5)
                         .addComponent(chkT1Estoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkProdMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(tabDadosLayout.createSequentialGroup()
+                        .addComponent(chkProdMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkTemArquivoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(tabDadosLayout.createSequentialGroup()
                         .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(tabDadosLayout.createSequentialGroup()
@@ -594,7 +601,9 @@ public class FHOnlineGUI extends VRInternalFrame {
                     .addComponent(chkTipoEmbalagemEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkT1AtivoInativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkProdMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkProdMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkTemArquivoBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
                 .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -970,6 +979,7 @@ public class FHOnlineGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkT1NatReceita;
     private vrframework.bean.checkBox.VRCheckBox chkT1PisCofins;
     private vrframework.bean.checkBox.VRCheckBox chkT1Preco;
+    private vrframework.bean.checkBox.VRCheckBox chkTemArquivoBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagem;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
     private javax.swing.JComboBox cmbLojaOrigem;
