@@ -27,7 +27,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="vRPanel3" max="32767" attributes="0"/>
-                  <Component id="tabs" max="32767" attributes="0"/>
+                  <Component id="tabs" pref="0" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Component id="vRToolBarPadrao3" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -466,9 +466,9 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
+                      <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -477,8 +477,10 @@
                               <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
                               <Component id="chkPagamentoRotativo" min="-2" max="-2" attributes="0"/>
+                              <Component id="vRLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="cmbPlanoContaCR" alignment="0" max="32767" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="312" max="32767" attributes="0"/>
+                          <EmptySpace pref="308" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -498,7 +500,11 @@
                               </Group>
                               <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="81" max="32767" attributes="0"/>
+                          <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
+                          <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="cmbPlanoContaCR" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="39" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -558,6 +564,18 @@
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkPagamentoRotativoActionPerformed"/>
                   </Events>
+                </Component>
+                <Component class="vrframework.bean.label.VRLabel" name="vRLabel1">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Plano Contas Cr&#xe9;dito Rotativo"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JComboBox" name="cmbPlanoContaCR">
+                  <Properties>
+                    <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+                      <StringArray count="0"/>
+                    </Property>
+                  </Properties>
                 </Component>
               </SubComponents>
             </Container>

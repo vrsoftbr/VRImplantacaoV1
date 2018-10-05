@@ -465,7 +465,7 @@
             </Component>
             <Component class="vrframework.bean.label.VRLabel" name="lblAtacadoID">
               <Properties>
-                <Property name="text" type="java.lang.String" value="ID para atacado"/>
+                <Property name="text" type="java.lang.String" value="ID Atacado"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="txtIDAtacado">

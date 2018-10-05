@@ -22,6 +22,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.CefasDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.cadastro.PlanoContasVO;
 
 public class CefasGUI extends VRInternalFrame {
     
@@ -31,6 +32,7 @@ public class CefasGUI extends VRInternalFrame {
     
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
+    private String vPlanoContas = "";
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -67,6 +69,11 @@ public class CefasGUI extends VRInternalFrame {
         if (vr != null) {
             params.put(vr.id, SISTEMA, "LOJA_VR");
             vLojaVR = vr.id;
+        }
+        PlanoContasVO planoContaCR = (PlanoContasVO) cmbPlanoContaCR.getSelectedItem();
+        if(planoContaCR != null) {
+            params.put(planoContaCR.vid, SISTEMA, "PLANO_CONTAS_CREDITOR_ROTATIVO");
+            vPlanoContas = planoContaCR.vid;
         }
         params.salvar();
     }
@@ -123,6 +130,7 @@ public class CefasGUI extends VRInternalFrame {
         
         carregarLojaVR();
         carregarLojaCliente();
+        carregarPlanoContasCreditoRotativo();
     }
     
     public void carregarLojaVR() throws Exception {
@@ -153,6 +161,20 @@ public class CefasGUI extends VRInternalFrame {
         cmbLojaOrigem.setSelectedIndex(index);
     }
     
+    public void carregarPlanoContasCreditoRotativo() throws Exception {
+        cmbPlanoContaCR.setModel(new DefaultComboBoxModel());
+        int cont = 0;
+        int index = 0;
+        for(PlanoContasVO plano : cefasDAO.getPlanoContas()) {
+            cmbPlanoContaCR.addItem(plano);
+            if(vPlanoContas != null && vPlanoContas.equals(plano.vid)) {
+                index = cont;
+            }
+            cont++;
+        }
+        cmbPlanoContaCR.setSelectedIndex(index);
+    }
+    
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
             i_mdiFrame.setWaitCursor();            
@@ -179,7 +201,8 @@ public class CefasGUI extends VRInternalFrame {
                     ProgressBar.setCancel(true);
                     
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
-                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;                                        
+                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                    cefasDAO.vPlanoContas = ((PlanoContasVO) cmbPlanoContaCR.getSelectedItem()).vid;
                     
                     Importador importador = new Importador(cefasDAO);
                     importador.setLojaOrigem(idLojaCliente);
@@ -410,6 +433,8 @@ public class CefasGUI extends VRInternalFrame {
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
         chkPagamentoRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        vRLabel1 = new vrframework.bean.label.VRLabel();
+        cmbPlanoContaCR = new javax.swing.JComboBox();
         vRPanel8 = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -712,21 +737,25 @@ public class CefasGUI extends VRInternalFrame {
             }
         });
 
+        vRLabel1.setText("Plano Contas Crédito Rotativo");
+
         javax.swing.GroupLayout vRPanel9Layout = new javax.swing.GroupLayout(vRPanel9);
         vRPanel9.setLayout(vRPanel9Layout);
         vRPanel9Layout.setHorizontalGroup(
             vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel9Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(vRPanel9Layout.createSequentialGroup()
                         .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkPagamentoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(312, Short.MAX_VALUE))
+                    .addComponent(chkPagamentoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbPlanoContaCR, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(308, Short.MAX_VALUE))
         );
         vRPanel9Layout.setVerticalGroup(
             vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -742,7 +771,11 @@ public class CefasGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkPagamentoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(81, Short.MAX_VALUE))
+                .addGap(14, 14, 14)
+                .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cmbPlanoContaCR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(39, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Clientes", vRPanel9);
@@ -1105,7 +1138,7 @@ public class CefasGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
@@ -1289,6 +1322,7 @@ public class CefasGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkValidade;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
+    private javax.swing.JComboBox cmbPlanoContaCR;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel4;
@@ -1303,6 +1337,7 @@ public class CefasGUI extends VRInternalFrame {
     private javax.swing.JTextField txtStrConexao;
     private vrframework.bean.textField.VRTextField txtUsuario;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
+    private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.label.VRLabel vRLabel20;
     private vrframework.bean.label.VRLabel vRLabel21;
     private vrframework.bean.label.VRLabel vRLabel23;

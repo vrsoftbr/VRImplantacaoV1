@@ -151,6 +151,7 @@ import vrimplantacao2.gui.interfaces.CadastraFacilGUI;
 import vrimplantacao2.gui.interfaces.CefasGUI;
 import vrimplantacao2.gui.interfaces.CissGUI;
 import vrimplantacao2.gui.interfaces.DtComGUI;
+import vrimplantacao2.gui.interfaces.FHOnlineGUI;
 import vrimplantacao2.gui.interfaces.FaciliteGUI;
 import vrimplantacao2.gui.interfaces.FenixGUI;
 import vrimplantacao2.gui.interfaces.FortGUI;
@@ -589,6 +590,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuIcommerce = new javax.swing.JMenuItem();
         mnuSqlServer2 = new javax.swing.JMenu();
         mnuKcms = new javax.swing.JMenuItem();
+        mnuFHOnline = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1418,6 +1420,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuKcms);
+
+        mnuFHOnline.setText("FHOnline");
+        mnuFHOnline.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuFHOnlineActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuFHOnline);
 
         jMenu2.add(mnuSqlServer2);
 
@@ -3990,6 +4000,11 @@ public final class MenuGUI extends VRMdiFrame {
         SofttechGUI.exibir(this);
     }//GEN-LAST:event_mnuSofttechActionPerformed
 
+    private void mnuFHOnlineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuFHOnlineActionPerformed
+        // TODO add your handling code here:
+        FHOnlineGUI.exibir(this);
+    }//GEN-LAST:event_mnuFHOnlineActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -4121,6 +4136,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuEmporio;
     private javax.swing.JMenuItem mnuEsSystem;
     private javax.swing.JMenuItem mnuFG;
+    private javax.swing.JMenuItem mnuFHOnline;
     private javax.swing.JMenuItem mnuFabTech;
     private javax.swing.JMenuItem mnuFabTech1;
     private javax.swing.JMenuItem mnuFacilite;
