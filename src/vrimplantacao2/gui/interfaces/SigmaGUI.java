@@ -176,7 +176,10 @@ public class SigmaGUI extends VRInternalFrame {
                         }
 
                         if (chkMercadologico.isSelected()) {
-                            importador.importarMercadologico();
+                            importador.importarMercadologicoPorNiveis(
+                                    OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                                    OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR
+                            );
                         }
 
                         if (chkProdutos.isSelected()) {

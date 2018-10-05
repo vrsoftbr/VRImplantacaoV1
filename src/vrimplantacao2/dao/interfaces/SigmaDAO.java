@@ -3,10 +3,13 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -14,7 +17,6 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
-import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -25,11 +27,43 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class SigmaDAO extends InterfaceDAO {
 
     @Override
-    public List<MercadologicoIMP> getMercadologicos() throws Exception {
-        List<MercadologicoIMP> result = new ArrayList<>();
-
+    public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
+        Map<String, MercadologicoNivelIMP> n1 = new LinkedHashMap<>();
+        
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            
             try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    cod_grupo,\n" +
+                    "    descricao\n" +
+                    "from\n" +
+                    "    grupo\n" +
+                    "order by\n" +
+                    "    1"
+            )) {
+                while (rst.next()) {
+                    n1.put(
+                            rst.getString("cod_grupo"), 
+                            new MercadologicoNivelIMP(
+                                    rst.getString("cod_grupo"),
+                                    rst.getString("descricao")
+                            )
+                    );
+                }
+            }
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct\n" +
+                    "    p.cod_grupo mercadologico1,\n" +
+                    "    g.descricao desc_mercadologico1,\n" +
+                    "    coalesce(p.cod_subgrupo, '') mercadologico2,\n" +
+                    "    sg.descricao desc_mercadologico2\n" +
+                    "from\n" +
+                    "    PRODUTO p\n" +
+                    "    join grupo g on\n" +
+                    "        p.cod_grupo = g.cod_grupo\n" +
+                    "    join grupo_sub sg on\n" +
+                    "        p.cod_subgrupo = sg.cod_gruposub\n" +
+                    "union\n" +
                     "select\n" +
                     "    g.cod_grupo mercadologico1,\n" +
                     "    g.descricao desc_mercadologico1,\n" +
@@ -37,25 +71,25 @@ public class SigmaDAO extends InterfaceDAO {
                     "    sb.descricao desc_mercadologico2\n" +
                     "from\n" +
                     "    grupo g\n" +
-                    "    left join grupo_sub sb on\n" +
-                    "        sb.cod_grupo = g.cod_grupo"
+                    "    join grupo_sub sb on\n" +
+                    "        sb.cod_grupo = g.cod_grupo\n" +
+                    "order by\n" +
+                    "    1, 3"
             )) {
                 while (rst.next()) {
-                    MercadologicoIMP imp = new MercadologicoIMP();
-
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setMerc1ID(rst.getString("mercadologico1"));
-                    imp.setMerc1Descricao(rst.getString("desc_mercadologico1"));
-                    imp.setMerc2ID(rst.getString("mercadologico2"));
-                    imp.setMerc2Descricao(rst.getString("desc_mercadologico2"));
-
-                    result.add(imp);
+                    MercadologicoNivelIMP imp = n1.get(rst.getString("mercadologico1"));
+                    
+                    if (!"".equals(rst.getString("mercadologico2"))) {
+                        imp.addFilho(
+                                rst.getString("mercadologico2"),
+                                rst.getString("desc_mercadologico2")
+                        );
+                    }
                 }
             }
         }
 
-        return result;
+        return new ArrayList<>(n1.values());
     }
 
     @Override
@@ -105,8 +139,8 @@ public class SigmaDAO extends InterfaceDAO {
                     "    p.descricao descricaoCompleta,\n" +
                     "    coalesce(p.descricao_abreviada, p.descricao) descricaoReduzida,\n" +
                     "    p.descricao descricaoGondola,\n" +
-                    "    p.cod_grupo codMercadologico1,\n" +
-                    "    p.cod_subgrupo codMercadologico2,\n" +
+                    "    g.cod_grupo codMercadologico1,\n" +
+                    "    sg.cod_gruposub codMercadologico2,\n" +
                     "    p.cod_familia idFamiliaProduto,\n" +
                     "    p.peso_bruto pesoBruto,\n" +
                     "    p.peso_liquido pesoLiquido, \n" +
@@ -139,6 +173,10 @@ public class SigmaDAO extends InterfaceDAO {
                     "        p.cod_tp_aliq_piscofins = pis_cred.codigo\n" +
                     "    left join classificacao_fiscal icms on\n" +
                     "        p.cod_classificacao = icms.cod_classificacao\n" +
+                    "    left join grupo g on\n" +
+                    "        p.cod_grupo = g.cod_grupo\n" +
+                    "    left join grupo_sub sg on\n" +
+                    "        p.cod_subgrupo = sg.cod_gruposub\n" +
                     "order by\n" +
                     "    p.cod_produto"
             )) {
