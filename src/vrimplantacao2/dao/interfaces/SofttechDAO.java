@@ -154,24 +154,28 @@ public class SofttechDAO extends InterfaceDAO {
                     "	p.natureza_rec_pis,\n" +
                     "	p.situacaotrib icms_cst,\n" +
                     "	p.tipotributacao,\n" +
-                    "	p.tributacao icms_aliq\n" +
+                    "	p.tributacao icms_aliq,\n" +
+                    "	ean.ean_fornecedor\n" +
                     "from\n" +
                     "	produtos p\n" +
                     "	join (select\n" +
                     "			codigo id_produto,\n" +
-                    "			codigoean ean\n" +
+                    "			codigoean ean,\n" +
+                    "			false ean_fornecedor\n" +
                     "		from \n" +
                     "			produtosean\n" +
                     "		union\n" +
                     "		select\n" +
                     "			codigo id_produto,\n" +
-                    "			codigosweda ean\n" +
+                    "			codigosweda ean,\n" +
+                    "			false ean_fornecedor\n" +
                     "		from\n" +
                     "			produtos\n" +
                     "		union\n" +
                     "		select distinct\n" +
                     "			pro_id id_produto,\n" +
-                    "			codigo_barras ean\n" +
+                    "			codigo_barras ean,\n" +
+                    "			true ean_fornecedor\n" +
                     "		from\n" +
                     "			fornecedores_codbarras) ean on\n" +
                     "		p.codigo = ean.id_produto\n" +
@@ -179,6 +183,12 @@ public class SofttechDAO extends InterfaceDAO {
                     "	id"
             )) {
                 while (rst.next()) {
+                    if (rst.getBoolean("ean_fornecedor")) {
+                        long ean = Utils.stringToLong(rst.getString("ean"));
+                        if (ean <= 999999) {
+                            continue;
+                        }
+                    }
                     ProdutoIMP imp = new ProdutoIMP();
                     
                     imp.setImportSistema(getSistema());

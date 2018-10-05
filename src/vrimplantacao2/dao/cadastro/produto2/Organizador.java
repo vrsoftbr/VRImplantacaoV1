@@ -227,7 +227,8 @@ public class Organizador {
             String[] chave = new String[]{produto.getImportSistema(), produto.getImportLoja(), produto.getImportId(), produto.getEan()};
             
             long ean = Utils.stringToLong(produto.getEan());
-            if (ean >= 1 && ean <= 999999 && produto.isBalanca()) {
+            String un = produto.getTipoEmbalagem();
+            if (ean >= 1 && ean <= 999999 && (produto.isBalanca() || "KG".equals(un != null ? un.toUpperCase() : "UN"))) {
                 balanca.put(produto, chave);
             } else {
                 normais.put(produto, chave);
