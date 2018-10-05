@@ -180,7 +180,6 @@ public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "to_char(pro.pro_datacad, 'YYYY-MM-DD') pro_datacad,\n"
                     + "pro.pro_cod_associado,\n"
                     + "pro.pro_unidade_uso,\n"
-                    + "pro.pro_unid_medida,\n"
                     + "pre.PRE_PRECO_BASE precovenda,\n"
                     + "cus.cusl_ult_custo_aquisicao custo,\n"
                     + "fam.fam_cod_tribut_entrada as codtribut,\n"
@@ -363,65 +362,70 @@ public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
         List<FornecedorIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "distinct\n"
-                    + "f.pes_codigo,\n"
-                    + "f.for_ativo,\n"
-                    + "f.for_exclusao,\n"
-                    + "f.for_periodo_visita,\n"
-                    + "f.for_prazo_entrega,\n"
-                    + "f.for_fantasia,\n"
-                    + "f.for_indprodrural,\n"
-                    + "f.for_supersimples,\n"
-                    + "f.FOR_DISTRIBUIDOR,\n"
-                    + "f.FOR_MICRO_ST,\n"
-                    + "p.pes_nome,\n"
-                    + "p.pes_complemento,\n"
-                    + "p.pes_ddd_celular,\n"
-                    + "p.pes_telefone,\n"
-                    + "p.pes_email,\n"
-                    + "p.pes_celular,\n"
-                    + "p.pes_rua,\n"
-                    + "r.rua_codigo,\n"
-                    + "r.rua_nome,\n"
-                    + "p.pes_cep,\n"
-                    + "r.rua_cep,\n"
-                    + "p.pes_cidade,\n"
-                    + "c.CID_CODIGO,\n"
-                    + "c.CID_NOME,\n"
-                    + "c.COD_IBGE,\n"
-                    + "p.pes_bairro,\n"
-                    + "b.BAI_CODIGO,\n"
-                    + "b.BAI_NOME,\n"
-                    + "p.pes_uf,\n"
-                    + "p.pes_renda,\n"
-                    + "p.pes_ddd,\n"
-                    + "p.pes_ddd2,\n"
-                    + "p.pes_telefone2,\n"
-                    + "p.pes_ddd_fax,\n"
-                    + "p.pes_nro_fax,\n"
-                    + "p.pes_numero,\n"
-                    + "p.pes_cgc_cpf, \n"
-                    + "d.CGCS_INSCRICAO_ESTADUAL,\n"
-                    + "d.CGCS_INSCRICAO_MUNICIPAL,\n"
-                    + "d.CGCS_INSC_RURAL,\n"
-                    + "p.pes_ddd3,\n"
-                    + "p.pes_telefone3,\n"
-                    + "p.pes_ddd4,\n"
-                    + "p.pes_telefone4,\n"
-                    + "p.PES_OBSERVACAO,\n"
-                    + "p.PES_OBSERVACOES\n"
-                    + "from TAB_FORNECEDOR f \n"
-                    + "inner join tab_pessoa p on p.pes_codigo = f.pes_codigo\n"
-                    + "left join tab_cgcs d on d.PES_CODIGO = p.PES_CODIGO\n"
-                    + "left join tab_rua r on r.RUA_CODIGO = p.PES_RUA\n"
-                    + "left join tab_bairro b on b.BAI_CODIGO = p.PES_BAIRRO\n"
-                    + "left join tab_cidade c on c.CID_CODIGO = p.PES_CIDADE \n"
-                    + "where b.BAI_CODIGO = r.BAI_CODIGO \n"
-                    + "and c.CID_CODIGO = r.CID_CODIGO\n"
-                    + "and r.BAI_CODIGO = b.BAI_CODIGO\n"
-                    + "and r.CID_CODIGO = c.CID_CODIGO\n"
-                    + "order by pes_codigo"
+                    "select distinct\n" +
+                    "	f.pes_codigo,\n" +
+                    "	f.for_ativo,\n" +
+                    "	f.for_exclusao,\n" +
+                    "	f.for_periodo_visita,\n" +
+                    "	f.for_prazo_entrega,\n" +
+                    "	f.for_fantasia,\n" +
+                    "	f.for_indprodrural,\n" +
+                    "	f.for_supersimples,\n" +
+                    "	f.FOR_DISTRIBUIDOR,\n" +
+                    "	f.FOR_MICRO_ST,\n" +
+                    "	p.pes_nome,\n" +
+                    "	p.pes_complemento,\n" +
+                    "	p.pes_ddd_celular,\n" +
+                    "	p.pes_telefone,\n" +
+                    "	p.pes_email,\n" +
+                    "	p.pes_celular,\n" +
+                    "	p.pes_rua,\n" +
+                    "	r.rua_codigo,\n" +
+                    "	r.rua_nome,\n" +
+                    "	p.pes_cep,\n" +
+                    "	r.rua_cep,\n" +
+                    "	p.pes_cidade,\n" +
+                    "	c.CID_CODIGO,\n" +
+                    "	c.CID_NOME,\n" +
+                    "	c.COD_IBGE,\n" +
+                    "	p.pes_bairro,\n" +
+                    "	b.BAI_CODIGO,\n" +
+                    "	b.BAI_NOME,\n" +
+                    "	p.pes_uf,\n" +
+                    "	p.pes_renda,\n" +
+                    "	p.pes_ddd,\n" +
+                    "	p.pes_ddd2,\n" +
+                    "	p.pes_telefone2,\n" +
+                    "	p.pes_ddd_fax,\n" +
+                    "	p.pes_nro_fax,\n" +
+                    "	p.pes_numero,\n" +
+                    "	p.pes_cgc_cpf, \n" +
+                    "	d.CGCS_INSCRICAO_ESTADUAL,\n" +
+                    "	d.CGCS_INSCRICAO_MUNICIPAL,\n" +
+                    "	d.CGCS_INSC_RURAL,\n" +
+                    "	p.pes_ddd3,\n" +
+                    "	p.pes_telefone3,\n" +
+                    "	p.pes_ddd4,\n" +
+                    "	p.pes_telefone4\n" +
+                    "from \n" +
+                    "	TAB_FORNECEDOR f \n" +
+                    "	inner join tab_pessoa p on\n" +
+                    "		p.pes_codigo = f.pes_codigo\n" +
+                    "	left join tab_cgcs d on\n" +
+                    "		d.PES_CODIGO = p.PES_CODIGO\n" +
+                    "	left join tab_rua r on\n" +
+                    "		r.RUA_CODIGO = p.PES_RUA\n" +
+                    "	left join tab_bairro b on\n" +
+                    "		b.BAI_CODIGO = p.PES_BAIRRO\n" +
+                    "	left join tab_cidade c on\n" +
+                    "		c.CID_CODIGO = p.PES_CIDADE \n" +
+                    "where \n" +
+                    "	b.BAI_CODIGO = r.BAI_CODIGO \n" +
+                    "	and c.CID_CODIGO = r.CID_CODIGO\n" +
+                    "	and r.BAI_CODIGO = b.BAI_CODIGO\n" +
+                    "	and r.CID_CODIGO = c.CID_CODIGO\n" +
+                    "order by\n" +
+                    "	pes_codigo"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -442,7 +446,6 @@ public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(rst.getString("cid_nome"));
                     imp.setUf(rst.getString("pes_uf"));
                     imp.setTel_principal((rst.getString("pes_ddd") == null ? "" : rst.getString("pes_ddd").trim()) + rst.getString("pes_telefone"));
-                    imp.setObservacao(rst.getString("PES_OBSERVACAO"));
 
                     if ((rst.getString("for_periodo_visita") != null)
                             && (!rst.getString("for_periodo_visita").trim().isEmpty())) {
@@ -565,66 +568,70 @@ public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ClienteIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "c.PES_CODIGO,\n"
-                    + "c.CLI_CPF,\n"
-                    + "c.cli_rg,\n"
-                    + "c.CLI_CID_NATURALIDADE,\n"
-                    + "c.CLI_UF_NATURALIDADE,\n"
-                    + "c.cli_pai,\n"
-                    + "c.cli_mae,\n"
-                    + "c.cli_sexo,\n"
-                    + "c.CLI_ESTADO_CIVIL,\n"
-                    + "c.CLI_CONJUGE,\n"
-                    + "c.CLI_RENDA_MENSAL,\n"
-                    + "c.PROF_CODIGO,\n"
-                    + "c.cli_ativo,\n"
-                    + "c.cli_contato,\n"
-                    + "c.CLI_OBSERVACAO,\n"
-                    + "c.CLI_INS_MUNICIPAL,\n"
-                    + "c.CLI_LIMITE_CREDITO,\n"
-                    + "c.CLI_FANTASIA,\n"
-                    + "p.pes_complemento,\n"
-                    + "p.pes_ddd_celular,\n"
-                    + "p.pes_telefone,\n"
-                    + "p.pes_email,\n"
-                    + "p.pes_celular,\n"
-                    + "p.pes_rua,\n"
-                    + "r.rua_codigo,\n"
-                    + "r.rua_nome,\n"
-                    + "p.pes_cep,\n"
-                    + "r.rua_cep,\n"
-                    + "p.pes_cidade,\n"
-                    + "cid.CID_CODIGO,\n"
-                    + "cid.CID_NOME,\n"
-                    + "cid.COD_IBGE,\n"
-                    + "p.pes_bairro,\n"
-                    + "b.BAI_CODIGO,\n"
-                    + "b.BAI_NOME,\n"
-                    + "p.pes_uf,\n"
-                    + "p.pes_ddd,\n"
-                    + "p.pes_ddd2,\n"
-                    + "p.pes_telefone2,\n"
-                    + "p.pes_ddd_fax,\n"
-                    + "p.pes_nro_fax,\n"
-                    + "p.pes_numero,\n"
-                    + "p.pes_ddd3,\n"
-                    + "p.pes_telefone3,\n"
-                    + "p.pes_ddd4,\n"
-                    + "p.pes_telefone4,\n"
-                    + "p.PES_OBSERVACAO,\n"
-                    + "p.PES_OBSERVACOES,\n"
-                    + "p.pes_nome "
-                    + "from TAB_CLIENTE c\n"
-                    + "inner join tab_pessoa p on p.pes_codigo = c.pes_codigo\n"
-                    + "left join tab_rua r on r.RUA_CODIGO = p.PES_RUA\n"
-                    + "left join tab_bairro b on b.BAI_CODIGO = p.PES_BAIRRO\n"
-                    + "left join tab_cidade cid on cid.CID_CODIGO = p.PES_CIDADE \n"
-                    + "where b.BAI_CODIGO = r.BAI_CODIGO \n"
-                    + "and cid.CID_CODIGO = r.CID_CODIGO\n"
-                    + "and r.BAI_CODIGO = b.BAI_CODIGO\n"
-                    + "and r.CID_CODIGO = cid.CID_CODIGO\n"
-                    + "order by p.PES_CODIGO"
+                    "select \n" +
+                    "	c.PES_CODIGO,\n" +
+                    "	c.CLI_CPF,\n" +
+                    "	c.cli_rg,\n" +
+                    "	c.CLI_CID_NATURALIDADE,\n" +
+                    "	c.CLI_UF_NATURALIDADE,\n" +
+                    "	c.cli_pai,\n" +
+                    "	c.cli_mae,\n" +
+                    "	c.cli_sexo,\n" +
+                    "	c.CLI_ESTADO_CIVIL,\n" +
+                    "	c.CLI_CONJUGE,\n" +
+                    "	c.CLI_RENDA_MENSAL,\n" +
+                    "	c.PROF_CODIGO,\n" +
+                    "	c.cli_ativo,\n" +
+                    "	c.cli_contato,\n" +
+                    "	c.CLI_OBSERVACAO,\n" +
+                    "	c.CLI_INS_MUNICIPAL,\n" +
+                    "	c.CLI_LIMITE_CREDITO,\n" +
+                    "	p.pes_complemento,\n" +
+                    "	p.pes_ddd_celular,\n" +
+                    "	p.pes_telefone,\n" +
+                    "	p.pes_email,\n" +
+                    "	p.pes_celular,\n" +
+                    "	p.pes_rua,\n" +
+                    "	r.rua_codigo,\n" +
+                    "	r.rua_nome,\n" +
+                    "	p.pes_cep,\n" +
+                    "	r.rua_cep,\n" +
+                    "	p.pes_cidade,\n" +
+                    "	cid.CID_CODIGO,\n" +
+                    "	cid.CID_NOME,\n" +
+                    "	cid.COD_IBGE,\n" +
+                    "	p.pes_bairro,\n" +
+                    "	b.BAI_CODIGO,\n" +
+                    "	b.BAI_NOME,\n" +
+                    "	p.pes_uf,\n" +
+                    "	p.pes_ddd,\n" +
+                    "	p.pes_ddd2,\n" +
+                    "	p.pes_telefone2,\n" +
+                    "	p.pes_ddd_fax,\n" +
+                    "	p.pes_nro_fax,\n" +
+                    "	p.pes_numero,\n" +
+                    "	p.pes_ddd3,\n" +
+                    "	p.pes_telefone3,\n" +
+                    "	p.pes_ddd4,\n" +
+                    "	p.pes_telefone4,\n" +
+                    "  p.pes_nome\n" +
+                    "from\n" +
+                    "  TAB_CLIENTE c\n" +
+                    "  inner join tab_pessoa p on\n" +
+                    "    p.pes_codigo = c.pes_codigo\n" +
+                    "  left join tab_rua r on\n" +
+                    "    r.RUA_CODIGO = p.PES_RUA\n" +
+                    "  left join tab_bairro b on\n" +
+                    "    b.BAI_CODIGO = p.PES_BAIRRO\n" +
+                    "  left join tab_cidade cid on\n" +
+                    "    cid.CID_CODIGO = p.PES_CIDADE \n" +
+                    "where\n" +
+                    "  b.BAI_CODIGO = r.BAI_CODIGO \n" +
+                    "  and cid.CID_CODIGO = r.CID_CODIGO\n" +
+                    "  and r.BAI_CODIGO = b.BAI_CODIGO\n" +
+                    "  and r.CID_CODIGO = cid.CID_CODIGO\n" +
+                    "order by\n" +
+                    "  p.PES_CODIGO"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -633,7 +640,7 @@ public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setInscricaoestadual(rst.getString("cli_rg"));
                     imp.setInscricaoMunicipal(rst.getString("CLI_INS_MUNICIPAL"));
                     imp.setRazao(rst.getString("pes_nome"));
-                    imp.setFantasia(rst.getString("CLI_FANTASIA"));
+                    imp.setFantasia(rst.getString("pes_nome"));
                     imp.setEndereco(rst.getString("rua_nome"));
                     imp.setNumero(rst.getString("pes_numero"));
                     imp.setComplemento(rst.getString("pes_complemento"));
@@ -655,9 +662,7 @@ public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setAtivo("A".equals(rst.getString("cli_ativo")));
                     imp.setObservacao(rst.getString("CLI_OBSERVACAO"));
                     imp.setValorLimite(rst.getDouble("CLI_LIMITE_CREDITO"));
-                    imp.setObservacao(rst.getString("PES_OBSERVACAO"));
-                    imp.setObservacao2(rst.getString("PES_OBSERVACOES")
-                            + (rst.getString("cli_contato") == null ? "" : "CONTATO " + rst.getString("cli_contato").trim()));
+                    imp.setObservacao2((rst.getString("cli_contato") == null ? "" : "CONTATO " + rst.getString("cli_contato").trim()));
 
                     if ((rst.getString("pes_nro_fax") != null)
                             && (!rst.getString("pes_nro_fax").trim().isEmpty())) {

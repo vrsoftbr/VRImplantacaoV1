@@ -187,8 +187,8 @@ public class WmsiGUI extends VRInternalFrame {
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     //idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
                     idLojaCliente = txtLojaOrigem.getText();
-                    wmsiDAO.v_tipoDocumentoRotativo = String.valueOf(((ItemComboVO) cmbTipoDocRotativo.getSelectedItem()).id);
-                    wmsiDAO.v_tipoDocumentoCheque = String.valueOf(((ItemComboVO) cmbTipoDocCheque.getSelectedItem()).id);
+                    wmsiDAO.v_tipoDocumentoRotativo = cmbTipoDocRotativo.getSelectedItem() == null ? "" : String.valueOf(((ItemComboVO) cmbTipoDocRotativo.getSelectedItem()).id);
+                    wmsiDAO.v_tipoDocumentoCheque = cmbTipoDocCheque.getSelectedItem() == null ? "" : String.valueOf(((ItemComboVO) cmbTipoDocCheque.getSelectedItem()).id);
                     Importador importador = new Importador(wmsiDAO);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
