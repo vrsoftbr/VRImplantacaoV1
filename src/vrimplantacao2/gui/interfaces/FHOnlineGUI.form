@@ -169,7 +169,11 @@
                               <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                               <Component id="chkT1Estoque" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="chkProdMercadologico" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Component id="chkProdMercadologico" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="chkTemArquivoBalanca" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" attributes="0">
@@ -245,7 +249,10 @@
                           <Component id="chkT1AtivoInativo" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="chkProdMercadologico" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="chkProdMercadologico" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkTemArquivoBalanca" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace pref="46" max="32767" attributes="0"/>
                       <Component id="btnMapaTrib" min="-2" pref="45" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -386,6 +393,11 @@
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdMercadologico">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Prod. Mercadologico"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTemArquivoBalanca">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Tem Arquivo Balanca"/>
               </Properties>
             </Component>
           </SubComponents>

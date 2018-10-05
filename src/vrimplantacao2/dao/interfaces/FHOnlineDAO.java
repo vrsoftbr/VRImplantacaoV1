@@ -59,7 +59,7 @@ public class FHOnlineDAO extends InterfaceDAO {
                     imp.setMerc2ID("1");
                     imp.setMerc2Descricao(rst.getString("desc_merc"));
                     imp.setMerc3ID("1");
-                    imp.setMerc3Descricao(rst.getString("desc_merc1"));
+                    imp.setMerc3Descricao(rst.getString("desc_merc"));
                     result.add(imp);
                 }
             }
@@ -111,7 +111,6 @@ public class FHOnlineDAO extends InterfaceDAO {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
-                    imp.setEan(rst.getString("codigobarras"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.seteBalanca((rst.getInt("balanca") == 1));
@@ -136,7 +135,12 @@ public class FHOnlineDAO extends InterfaceDAO {
                     imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_natureza_receita"));
                     imp.setIcmsCst(rst.getInt("icms_cst"));
                     imp.setIcmsAliq(rst.getDouble("icms_aliquota"));
-                    imp.setIcmsReducao(rst.getDouble("icms_reduzido"));
+                    
+                    if (rst.getInt("icms_cst") == 0) {
+                        imp.setIcmsReducao(0);
+                    } else {
+                        imp.setIcmsReducao(rst.getDouble("icms_reduzido"));
+                    }
 
                     if ((rst.getString("codigobarras") != null)
                             && (!rst.getString("codigobarras").trim().isEmpty())) {
@@ -156,9 +160,11 @@ public class FHOnlineDAO extends InterfaceDAO {
                                 }
 
                                 if (produtoBalanca != null) {
+                                    imp.setEan(String.valueOf(codigoProduto));
                                     imp.seteBalanca(true);
                                     imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
                                 } else {
+                                    imp.setEan(rst.getString("codigobarras"));
                                     imp.setValidade(0);
                                     imp.seteBalanca(false);
                                 }
@@ -217,7 +223,7 @@ public class FHOnlineDAO extends InterfaceDAO {
                     + "CONVERT(date, f.[Data do cadastro forn], 23) as datacadastro,\n"
                     + "f.[Fax forn] as fax,\n"
                     + "f.[Celular] as celular,\n"
-                    + "f.[Email] as email,\n"
+                    + "f.[Email] as email\n"
                     + "from Fornecedores f\n"
                     + "where f.[Cod empresa] = " + getLojaOrigem() + "\n"
             )) {
@@ -300,7 +306,8 @@ public class FHOnlineDAO extends InterfaceDAO {
                     + "[Cod produto] as id_produto, \n"
                     + "[Cod fornecedor] as id_fornecedor,\n"
                     + "[Qtde embalagem] as qtdembalagem\n"
-                    + "from Produtos"
+                    + "from Produtos\n"
+                    + "where [Cod empresa] = " + getLojaOrigem()
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
