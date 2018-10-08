@@ -19,6 +19,7 @@ public class ConexaoPostgres {
     private String senha = "";
     private String strCon = "";
     private boolean usandoString = false;
+    public static String CHARSET = "UTF8";
 
     public void abrirConexao(String i_ip, int i_porta, String i_database, String i_usuario, String i_senha) throws Exception {
         abrirConexao(i_ip, "", i_porta, i_database, i_usuario, i_senha);
@@ -53,7 +54,7 @@ public class ConexaoPostgres {
             Properties props = new Properties();
             props.put("user", i_usuario);
             props.put("password", i_senha);
-            props.put("charSet", "UTF8");
+            props.put("charSet", CHARSET);
             //props.put("allowEncodingChanges", "true");
             con = DriverManager.getConnection("jdbc:postgresql://" + i_ip + ":" + i_porta + "/" + i_database, props);
         } catch (Exception ex) {

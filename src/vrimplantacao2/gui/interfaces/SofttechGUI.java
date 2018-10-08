@@ -53,9 +53,9 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
         initComponents();
         
         conexao.host = ("localhost");
-        conexao.database = ("softtech");
-        conexao.user = ("postgres");
-        conexao.pass = ("postgres");
+        conexao.database = ("fs-gerencial");
+        conexao.user = ("fantastsoft");
+        conexao.pass = ("fan_951753");
         conexao.port = ("5432");
         
         conexao.setSistema(SofttechDAO.NOME_SISTEMA);

@@ -33,6 +33,10 @@ public class SofttechDAO extends InterfaceDAO {
     public static final String NOME_SISTEMA = "Softtech";
     private static final Logger LOG = Logger.getLogger(SofttechDAO.class.getName());
 
+    public SofttechDAO() {
+        ConexaoPostgres.CHARSET = "WIN1252";
+    }
+
     @Override
     public String getSistema() {
         return NOME_SISTEMA;
