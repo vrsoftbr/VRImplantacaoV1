@@ -4,7 +4,10 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import vrimplantacao.classe.ConexaoOracle;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.cadastro.PlanoContasVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -23,6 +26,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class CefasDAO extends InterfaceDAO {
 
     public String vPlanoContas;
+    public boolean vBalanca = false;
 
     @Override
     public String getSistema() {
@@ -160,6 +164,7 @@ public class CefasDAO extends InterfaceDAO {
                     + "    pre.numregiao = 1\n"
                     + "order by\n"
                     + "    p.codprod")) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportSistema(getSistema());
@@ -197,6 +202,30 @@ public class CefasDAO extends InterfaceDAO {
                         imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
                     } else {
                         imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
+                    }
+                    if((rs.getString("codigobarras") != null) && 
+                            (rs.getString("codigobarras").length() <= 6) && 
+                                ("KG".equals(rs.getString("unidade").trim()))) {
+                        if(vBalanca) {
+                            ProdutoBalancaVO produtoBalanca;
+                            long codigoProduto;
+                            codigoProduto = Long.parseLong(imp.getEan().trim());
+                            if (codigoProduto <= Integer.MAX_VALUE) {
+                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                            } else {
+                                produtoBalanca = null;
+                            }
+                            if (produtoBalanca != null) {
+                                imp.seteBalanca(true);
+                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rs.getInt("validade"));
+                            } else {
+                                imp.setValidade(0);
+                                imp.seteBalanca(false);
+                            }
+                        } else {
+                            imp.seteBalanca((rs.getInt("e_balanca") == 1));
+                            imp.setValidade(rs.getInt("validade"));
+                        }  
                     }
                 }
             }
