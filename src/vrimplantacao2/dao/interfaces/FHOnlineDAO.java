@@ -133,13 +133,22 @@ public class FHOnlineDAO extends InterfaceDAO {
                     imp.setPiscofinsCstDebito(rst.getString("piscofins_cst_debito"));
                     imp.setPiscofinsCstCredito(rst.getString("piscofins_cst_credito"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_natureza_receita"));
-                    imp.setIcmsCst(rst.getInt("icms_cst"));
-                    imp.setIcmsAliq(rst.getDouble("icms_aliquota"));
-                    
+                    imp.setIcmsCstSaida(rst.getInt("icms_cst"));
+                    imp.setIcmsAliqSaida(rst.getDouble("icms_aliquota"));
+
                     if (rst.getInt("icms_cst") == 0) {
-                        imp.setIcmsReducao(0);
+                        imp.setIcmsReducaoSaida(0);
                     } else {
-                        imp.setIcmsReducao(rst.getDouble("icms_reduzido"));
+                        imp.setIcmsReducaoSaida(rst.getDouble("icms_reduzido"));
+                    }
+
+                    imp.setIcmsCstEntrada(rst.getInt("icms_cst"));
+                    imp.setIcmsAliqEntrada(rst.getDouble("icms_aliquota"));
+
+                    if (rst.getInt("icms_cst") == 0) {
+                        imp.setIcmsReducaoEntrada(0);
+                    } else {
+                        imp.setIcmsReducaoEntrada(rst.getDouble("icms_reduzido"));
                     }
 
                     if ((rst.getString("codigobarras") != null)
@@ -184,6 +193,40 @@ public class FHOnlineDAO extends InterfaceDAO {
                             imp.seteBalanca(false);
                         }
                     }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "p.[Cod produto] as id,"
+                    + "p.[Codigo referencia] as ean, "
+                    + "p.[Sigla unidade] as unidade "
+                    + "from produtos p "
+                    + "union all "
+                    + "select "
+                    + "p.[Cod produto] as id,"
+                    + "p.[Codigo referencia] as ean, "
+                    + "p.[Sigla unidade] as unidade "
+                    + "from produtos p "
+                    + "where [Cod produto] like '789%' "
+                    + "and len([Cod produto]) >= 7"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.setTipoEmbalagem(rst.getString("unidade"));
+                    imp.setQtdEmbalagem(1);
                     result.add(imp);
                 }
             }
