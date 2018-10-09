@@ -160,38 +160,46 @@ public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "pro.pro_codigo,\n"
-                    + "bar.CODP_CODIGO,\n"
-                    + "bar.CODP_VALIDADE,\n"
-                    + "bal.CODBALANCA,\n"
-                    + "bal.DESCRICAO descricaobalanca,\n"
-                    + "bal.PRECOBALANCA,\n"
-                    + "bal.VALIDADE,\n"
-                    + "pro.fam_codigo,\n"
-                    + "pro.pro_nome,\n"
-                    + "pro.pro_desc_reduzida,\n"
-                    + "pro.pro_ref_fabricante,\n"
-                    + "pro.pro_cod_fabricante,\n"
-                    + "pro.pro_dias_validade,\n"
-                    + "pro.pro_exclusao,\n"
-                    + "pro.nbm_codigo,\n"
-                    + "fam.CEST,\n"
-                    + "to_char(pro.pro_datacad, 'YYYY-MM-DD') pro_datacad,\n"
-                    + "pro.pro_cod_associado,\n"
-                    + "pro.pro_unidade_uso,\n"
-                    + "pre.PRE_PRECO_BASE precovenda,\n"
-                    + "cus.cusl_ult_custo_aquisicao custo,\n"
-                    + "fam.fam_cod_tribut_entrada as codtribut,\n"
-                    + "tri.TRI_CST csticms,\n"
-                    + "tri.tri_nome as nometribut\n"
-                    + "from TAB_PRODUTO pro\n"
-                    + "left join tab_preco_produto pre on pre.pro_codigo = pro.pro_codigo\n"
-                    + "left join TAB_CODPROD bar on bar.pro_codigo = pro.PRO_CODIGO\n"
-                    + "left join TAB_CUSLOJAS cus on cus.PRO_CODIGO = pro.PRO_CODIGO\n"
-                    + "left join TAB_FAMILIA fam on fam.fam_codigo = pro.fam_codigo\n"
-                    + "left join TAB_TRIBUTACAO tri on tri.TRI_CODIGO = fam.fam_cod_tribut_entrada\n"
-                    + "left join V_GERA_PLUTOLEDO bal on bal.pro_codigo = pro.pro_codigo "
+                    "select\n" +
+                    "	pro.pro_codigo,\n" +
+                    "	bar.CODP_CODIGO,\n" +
+                    "	bar.CODP_VALIDADE,\n" +
+                    "	bal.CODBALANCA,\n" +
+                    "	bal.DESCRICAO descricaobalanca,\n" +
+                    "	bal.PRECOBALANCA,\n" +
+                    "	bal.VALIDADE,\n" +
+                    "	pro.fam_codigo,\n" +
+                    "	pro.pro_nome,\n" +
+                    "	pro.pro_desc_reduzida,\n" +
+                    "	pro.pro_ref_fabricante,\n" +
+                    "	pro.pro_cod_fabricante,\n" +
+                    "	pro.pro_dias_validade,\n" +
+                    "	pro.pro_exclusao,\n" +
+                    "	pro.nbm_codigo,\n" +
+                    "	fam.CEST,\n" +
+                    "	to_char(pro.pro_datacad, 'YYYY-MM-DD') pro_datacad,\n" +
+                    "	pro.pro_cod_associado,\n" +
+                    "	pro.pro_unidade_uso,\n" +
+                    "	pre.PRE_PRECO_BASE precovenda,\n" +
+                    "	cus.cusl_ult_custo_aquisicao custo,\n" +
+                    "	fam.fam_cod_tribut_entrada as codtribut,\n" +
+                    "	tri.TRI_CST csticms,\n" +
+                    "	tri.tri_nome as nometribut,\n" +
+                    "	fam.efd_sit_pis_cofins piscofins\n" +
+                    "from\n" +
+                    "	TAB_PRODUTO pro\n" +
+                    "	left join tab_preco_produto pre on\n" +
+                    "		pre.pro_codigo = pro.pro_codigo\n" +
+                    "	left join TAB_CODPROD bar on\n" +
+                    "		bar.pro_codigo = pro.PRO_CODIGO\n" +
+                    "	left join TAB_CUSLOJAS cus on\n" +
+                    "		cus.PRO_CODIGO = pro.PRO_CODIGO\n" +
+                    "	left join TAB_FAMILIA fam on\n" +
+                    "		fam.fam_codigo = pro.fam_codigo\n" +
+                    "	left join TAB_TRIBUTACAO tri on\n" +
+                    "		tri.TRI_CODIGO = fam.fam_cod_tribut_entrada\n" +
+                    "	left join V_GERA_PLUTOLEDO bal on\n" +
+                    "		bal.pro_codigo = pro.pro_codigo"
             )) {
                 while (rst.next()) {
 
@@ -244,6 +252,8 @@ public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFamiliaProduto(rst.getString("fam_codigo"));
                     imp.setIcmsDebitoId(rst.getString("codtribut"));
                     imp.setIcmsCreditoId(rst.getString("codtribut"));
+                    imp.setPiscofinsCstDebito(rst.getString("piscofins"));
+                    
                     vResult.add(imp);
                 }
             }
@@ -325,35 +335,8 @@ public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
                     return vResult;
                 }
             }
-        } else if (opcao == OpcaoProduto.PIS_COFINS) {
-            List<ProdutoIMP> vResult = new ArrayList<>();
-            try (Statement stm = ConexaoOracle.createStatement()) {
-                try (ResultSet rst = stm.executeQuery(
-                        "select PRO_CODIGO, DESCSITUACAO, sitpis \n"
-                        + "from V_SITUACAOPRODUTO "
-                        + "where CODLOJA = " + getLojaOrigem()
-                )) {
-                    while (rst.next()) {
-                        ProdutoIMP imp = new ProdutoIMP();
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("PRO_CODIGO"));
-                        if (rst.getString("sitpis").contains("Isento")) {
-                            imp.setPiscofinsCstDebito(7);
-                            imp.setPiscofinsCstCredito(71);
-                        } else if (rst.getString("sitpis").contains("Trib")) {
-                            imp.setPiscofinsCstDebito(1);
-                            imp.setPiscofinsCstCredito(50);
-                        } else {
-                            imp.setPiscofinsCstDebito(7);
-                            imp.setPiscofinsCstCredito(71);
-                        }
-                        vResult.add(imp);
-                    }
-                    return vResult;
-                }
-            }
         }
+        
         return null;
     }
 
