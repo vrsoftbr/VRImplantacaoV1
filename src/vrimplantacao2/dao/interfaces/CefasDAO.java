@@ -62,7 +62,7 @@ public class CefasDAO extends InterfaceDAO {
                     + "    s.codsec merc2,\n"
                     + "    s.secao descmerc2,\n"
                     + "    coalesce(cast(c.codcateg as integer), 1) merc3,\n"
-                    + "    decode(c.categoria, '', s.secao, c.categoria) descmer3,\n"
+                    + "    decode(c.categoria, '', s.secao, c.categoria) descmerc3,\n"
                     + "    coalesce(cast(sc.codsubcateg as integer), 1) merc4,\n"
                     + "    decode(sc.subcategoria, '', decode(c.categoria, '', s.secao, c.categoria), sc.subcategoria) descmerc4\n"
                     + "from\n"
@@ -80,6 +80,8 @@ public class CefasDAO extends InterfaceDAO {
                     + "    d.departamento, s.secao, c.categoria, sc.subcategoria")) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
                     imp.setMerc1ID(rs.getString("merc1"));
                     imp.setMerc1Descricao(rs.getString("descmerc1"));
                     imp.setMerc2ID(rs.getString("merc2"));
@@ -193,12 +195,13 @@ public class CefasDAO extends InterfaceDAO {
                     imp.setPiscofinsCstDebito(rs.getString("pissaida"));
                     imp.setIcmsAliqSaida(rs.getDouble("icmsdebito"));
                     imp.setIcmsAliqEntrada(rs.getDouble("icmsdebito"));
-                    imp.setIcmsAliq(rs.getDouble("icmsdebito"));
                     imp.setIcmsCstSaida(rs.getInt("cst"));
+                    imp.setIcmsCstEntrada(rs.getInt("cst"));
                     imp.setIcmsReducaoSaida(rs.getInt("redicms"));
+                    imp.setIcmsReducaoEntrada(rs.getInt("redicms"));
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
-                    if (rs.getDate("dtexclusao") == null) {
+                    if (rs.getDate("excluido") == null) {
                         imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
                     } else {
                         imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
@@ -223,10 +226,11 @@ public class CefasDAO extends InterfaceDAO {
                                 imp.seteBalanca(false);
                             }
                         } else {
-                            imp.seteBalanca((rs.getInt("e_balanca") == 1));
                             imp.setValidade(rs.getInt("validade"));
                         }  
                     }
+                    
+                    result.add(imp);
                 }
             }
         }
@@ -462,7 +466,7 @@ public class CefasDAO extends InterfaceDAO {
                     + "    c.codcob = cob.codcob and\n"
                     + "    c.codcli = cli.codcli and\n"
                     + "    status = 'A' and\n"
-                    + "    c.vpago = 0 and\n"
+                    + "    c.vpago is null and\n"
                     + "    cob.codcob = '" + vPlanoContas + "' \n"
                     + "order by\n"
                     + "    c.dtvenc")) {
