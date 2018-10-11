@@ -1,15 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoOracle;
@@ -17,7 +17,6 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoFornecedor;
@@ -31,6 +30,8 @@ import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
+    
+    private static final Logger LOG = Logger.getLogger(WmsiDAO.class.getName());
 
     public String v_tipoDocumentoRotativo;
     public String v_tipoDocumentoCheque;
@@ -155,106 +156,173 @@ public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
         return vResult;
     }
 
+    private static class ProdutoBalanca {
+        String id_produto;
+        String ean;
+        int qtdembalagem;
+        int validade;
+        boolean unitarioPesavel;
+
+        public ProdutoBalanca(String id_produto, String ean, int qtdembalagem, int validade, boolean unitarioPesavel) {
+            this.id_produto = id_produto;
+            this.ean = ean;
+            this.qtdembalagem = qtdembalagem;
+            this.validade = validade;
+            this.unitarioPesavel = unitarioPesavel;
+        }        
+    }
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
+            Map<String, ProdutoBalanca> balanca = new HashMap<>();
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
-                    "	pro.pro_codigo,\n" +
-                    "	bar.CODP_CODIGO,\n" +
-                    "	bar.CODP_VALIDADE,\n" +
-                    "	bal.CODBALANCA,\n" +
-                    "	bal.DESCRICAO descricaobalanca,\n" +
-                    "	bal.PRECOBALANCA,\n" +
-                    "	bal.VALIDADE,\n" +
-                    "	pro.fam_codigo,\n" +
-                    "	pro.pro_nome,\n" +
-                    "	pro.pro_desc_reduzida,\n" +
-                    "	pro.pro_ref_fabricante,\n" +
-                    "	pro.pro_cod_fabricante,\n" +
-                    "	pro.pro_dias_validade,\n" +
-                    "	pro.pro_exclusao,\n" +
-                    "	pro.nbm_codigo,\n" +
-                    "	fam.CEST,\n" +
-                    "	to_char(pro.pro_datacad, 'YYYY-MM-DD') pro_datacad,\n" +
-                    "	pro.pro_cod_associado,\n" +
-                    "	pro.pro_unidade_uso,\n" +
-                    "	pre.PRE_PRECO_BASE precovenda,\n" +
-                    "	cus.cusl_ult_custo_aquisicao custo,\n" +
-                    "	fam.fam_cod_tribut_entrada as codtribut,\n" +
-                    "	tri.TRI_CST csticms,\n" +
-                    "	tri.tri_nome as nometribut,\n" +
-                    "	fam.efd_sit_pis_cofins piscofins\n" +
+                    "  ean.pro_codigo codigointerno,\n" +
+                    "  cast(trim(to_char(substr(ean.codp_codigo, 1, 12), '0000000000000')) as numeric) plu,\n" +
+                    "  ean.codp_embalagem_entra qtdemb_cotacao,\n" +
+                    "  coalesce(nullif(ean.codp_validade,'N'), '0') validade,\n" +
+                    "  case f.fam_pesavel when '0' then 'UN' else 'KG' end unidade,\n" +
+                    "  p.pro_nome descricao\n" +
                     "from\n" +
-                    "	TAB_PRODUTO pro\n" +
-                    "	left join tab_preco_produto pre on\n" +
-                    "		pre.pro_codigo = pro.pro_codigo\n" +
-                    "	left join TAB_CODPROD bar on\n" +
-                    "		bar.pro_codigo = pro.PRO_CODIGO\n" +
-                    "	left join TAB_CUSLOJAS cus on\n" +
-                    "		cus.PRO_CODIGO = pro.PRO_CODIGO\n" +
-                    "	left join TAB_FAMILIA fam on\n" +
-                    "		fam.fam_codigo = pro.fam_codigo\n" +
-                    "	left join TAB_TRIBUTACAO tri on\n" +
-                    "		tri.TRI_CODIGO = fam.fam_cod_tribut_entrada\n" +
-                    "	left join V_GERA_PLUTOLEDO bal on\n" +
-                    "		bal.pro_codigo = pro.pro_codigo"
+                    "  TAB_CODPROD ean\n" +
+                    "  join tab_produto p on\n" +
+                    "       p.pro_codigo = ean.pro_codigo\n" +
+                    "  join tab_familia f on\n" +
+                    "       p.fam_codigo = f.fam_codigo\n" +
+                    "  left join tab_preco_produto pr on\n" +
+                    "       pr.pro_codigo = p.pro_codigo\n" +
+                    "where\n" +
+                    "  f.fam_pesavel = '1' and\n" +
+                    "  ean.codp_revenda = 'S' and\n" +
+                    "  ean.codp_tipo = 'E' and\n" +
+                    "  ean.codp_exclusao != 'S' and\n" +
+                    "  ean.rec_codigo is null and\n" +
+                    "  pr.pre_preco_base > 0 and\n" +
+                    "  p.pro_exclusao != 'S'\n" +
+                    "order by \n" +
+                    "  plu"
             )) {
                 while (rst.next()) {
+                    balanca.put(
+                            rst.getString("codigointerno"),
+                            new ProdutoBalanca(
+                                    rst.getString("codigointerno"),
+                                    rst.getString("plu"),
+                                    rst.getInt("qtdemb_cotacao"),
+                                    Utils.stringToInt(rst.getString("validade")),
+                                    "UN".equals(rst.getString("unidade"))
+                            )
+                    );
+                }
+            }            
+            LOG.fine("Produtos de balança: " + balanca.size());
+            
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "  pro.pro_codigo id,\n" +
+                    "  to_char(pro.pro_datacad, 'YYYY-MM-DD') datacadastro,\n" +
+                    "  to_char(pro.pro_data_altera, 'YYYY-MM-DD') dataalteracao,  \n" +
+                    "  bar.ean,\n" +
+                    "  bar.qtd_embalagem_cotacao,\n" +
+                    "  bar.qtd_embalagem,\n" +
+                    "  coalesce(nullif(bar.validade, 'N'), '0') validade,\n" +
+                    "  pro.fam_codigo id_familia,\n" +
+                    "  pro.pro_nome descricaocompleta,\n" +
+                    "  pro.pro_desc_reduzida descricaoreduzida,\n" +
+                    "  pro.pro_ref_fabricante,\n" +
+                    "  pro.pro_cod_fabricante,\n" +
+                    "  pro.pro_dias_validade validade_2,\n" +
+                    "  case upper(pro.pro_exclusao) when 'S' then 0 else 1 end situacaocadastro,\n" +
+                    "  case pro.pro_ativocompra when '0' then 1 else 0 end descontinuado,\n" +
+                    "  pro.nbm_codigo ncm,\n" +
+                    "  fam.CEST,\n" +
+                    "  pro.pro_cod_associado,\n" +
+                    "  case f.fam_pesavel when '1' then 'KG' when '0' then 'UN' else pro.pro_unidade_uso end unidade,\n" +
+                    "  pre.PRE_PRECO_BASE precovenda,\n" +
+                    "  cus.cusl_ult_custo_aquisicao custo,\n" +
+                    "  fam.fam_cod_tribut_entrada as codtribut,\n" +
+                    "  tri.TRI_CST csticms,\n" +
+                    "  tri.tri_nome as nometribut,\n" +
+                    "  fam.efd_sit_pis_cofins piscofins\n" +
+                    "from\n" +
+                    "  TAB_PRODUTO pro\n" +
+                    "  left join tab_familia f on\n" +
+                    "       pro.fam_codigo = f.fam_codigo\n" +
+                    "  left join tab_preco_produto pre on\n" +
+                    "    pre.pro_codigo = pro.pro_codigo\n" +
+                    "  left join (\n" +
+                    "		select\n" +
+                    "		  PRO_CODIGO id_produto,\n" +
+                    "		  CODP_CODIGO ean,\n" +
+                    "		  coalesce(ean.codp_embalagem_entra, 1) qtd_embalagem_cotacao,\n" +
+                    "		  coalesce(ean.codp_embalagem_sai, 1) qtd_embalagem,\n" +
+                    "		  ean.codp_validade validade\n" +
+                    "		from\n" +
+                    "		  TAB_CODPROD ean\n" +
+                    "		where\n" +
+                    "		  not codp_formato in ('BALANCA', 'FORNECEDOR')\n" +
+                    "		  and codp_exclusao != 'S'\n" +
+                    "	) bar on\n" +
+                    "    bar.id_produto = pro.PRO_CODIGO\n" +
+                    "  left join TAB_CUSLOJAS cus on\n" +
+                    "    cus.PRO_CODIGO = pro.PRO_CODIGO\n" +
+                    "  left join TAB_FAMILIA fam on\n" +
+                    "    fam.fam_codigo = pro.fam_codigo\n" +
+                    "  left join TAB_TRIBUTACAO tri on\n" +
+                    "    tri.TRI_CODIGO = fam.fam_cod_tribut_entrada\n" +
+                    "  left join V_GERA_PLUTOLEDO bal on\n" +
+                    "    bal.pro_codigo = pro.pro_codigo\n" +
+                    "order by\n" +
+                    "  pro.pro_codigo"
+            )) {
+                Set<String> mapeadosBalanca = new HashSet<>();
+                while (rst.next()) {
+                    
+                    if (!mapeadosBalanca.contains(rst.getString("id"))) {
 
-                    ProdutoIMP imp = new ProdutoIMP();
+                        ProdutoIMP imp = new ProdutoIMP();
 
-                    if ((rst.getString("CODBALANCA") != null)
-                            && (!rst.getString("CODBALANCA").trim().isEmpty())) {
-
-                        if ((rst.getString("CODP_CODIGO") != null)
-                                && (!rst.getString("CODP_CODIGO").trim().isEmpty())) {
-
-                            if (rst.getString("CODBALANCA").equals(rst.getString("CODP_CODIGO"))) {
-                                imp.seteBalanca(true);
-                            } else {
-                                imp.seteBalanca(false);
-                            }
-                        } else {
-                            imp.seteBalanca(false);
-                        }
-                    } else {
-                        imp.seteBalanca(false);
-                    }
-
-                    if ((rst.getString("pro_unidade_uso") != null)
-                            && (!rst.getString("pro_unidade_uso").trim().isEmpty())) {
-                        if ((rst.getString("pro_unidade_uso").contains("QUIL"))
-                                || (rst.getString("pro_unidade_uso").contains("KG"))) {
-                            imp.setTipoEmbalagem("KG");
-                        } else {
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportId(rst.getString("id"));
+                        imp.setDataCadastro(rst.getDate("datacadastro"));
+                        imp.setDataAlteracao(rst.getDate("dataalteracao"));
+                        ProdutoBalanca bal = balanca.get(rst.getString("id"));
+                        if (bal != null) {
+                            mapeadosBalanca.add(rst.getString("id"));
+                            imp.seteBalanca(true);
+                            imp.setValidade(bal.validade);
+                            imp.setEan(bal.ean);
+                            imp.setQtdEmbalagem(bal.qtdembalagem);
+                            imp.setTipoEmbalagem(bal.unitarioPesavel ? "UN" : "KG");
+                        } else {                            
+                            imp.setEan(rst.getString("ean"));
                             imp.setTipoEmbalagem("UN");
                         }
-                    } else {
-                        imp.setTipoEmbalagem("UN");
-                    }
+                        imp.setQtdEmbalagemCotacao(rst.getInt("qtd_embalagem_cotacao"));
+                        imp.setQtdEmbalagem(rst.getInt("qtd_embalagem"));
+                        imp.setValidade(Utils.stringToInt(rst.getString("validade")));
+                        imp.setIdFamiliaProduto(rst.getString("id_familia"));
+                        imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                        imp.setDescricaoGondola(rst.getString("descricaocompleta"));
+                        imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                        imp.setFornecedorFabricante(rst.getString("pro_cod_fabricante"));
+                        imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
+                        imp.setDescontinuado(rst.getBoolean("descontinuado"));
+                        imp.setNcm(rst.getString("ncm"));
+                        imp.setCest(rst.getString("CEST"));                                        
+                        imp.setPrecovenda(rst.getDouble("precovenda"));
+                        imp.setCustoComImposto(rst.getDouble("custo"));
+                        imp.setCustoSemImposto(rst.getDouble("custo"));
+                        imp.setIcmsDebitoId(rst.getString("codtribut"));
+                        imp.setIcmsCreditoId(rst.getString("codtribut"));
+                        imp.setPiscofinsCstDebito(rst.getString("piscofins"));
 
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("pro_codigo"));
-                    imp.setEan(Utils.formataNumero(rst.getString("CODP_CODIGO")));
-                    imp.setDescricaoCompleta(rst.getString("pro_nome"));
-                    imp.setDescricaoReduzida(rst.getString("pro_desc_reduzida"));
-                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    imp.setNcm(rst.getString("nbm_codigo"));
-                    imp.setCest(rst.getString("CEST"));
-                    imp.setDataCadastro(rst.getDate("pro_datacad"));
-                    imp.setPrecovenda(rst.getDouble("precovenda"));
-                    imp.setCustoComImposto(rst.getDouble("custo"));
-                    imp.setCustoSemImposto(imp.getCustoComImposto());
-                    imp.setValidade(rst.getInt("VALIDADE"));
-                    imp.setIdFamiliaProduto(rst.getString("fam_codigo"));
-                    imp.setIcmsDebitoId(rst.getString("codtribut"));
-                    imp.setIcmsCreditoId(rst.getString("codtribut"));
-                    imp.setPiscofinsCstDebito(rst.getString("piscofins"));
+                        vResult.add(imp);
                     
-                    vResult.add(imp);
+                    }
                 }
             }
         }
@@ -311,25 +379,6 @@ public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setCodMercadologico1(rst.getString("cod_merc1"));
                         imp.setCodMercadologico2(rst.getString("cod_merc2"));
                         imp.setCodMercadologico3(rst.getString("cod_merc3"));
-                        vResult.add(imp);
-                    }
-                    return vResult;
-                }
-            }
-        } else if (opcao == OpcaoProduto.ATIVO) {
-            List<ProdutoIMP> vResult = new ArrayList<>();
-            try (Statement stm = ConexaoOracle.createStatement()) {
-                try (ResultSet rst = stm.executeQuery(
-                        "select PRO_CODIGO, DESCSITUACAO, sitpis \n"
-                        + "from V_SITUACAOPRODUTO "
-                        + "where CODLOJA = " + getLojaOrigem()
-                )) {
-                    while (rst.next()) {
-                        ProdutoIMP imp = new ProdutoIMP();
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("PRO_CODIGO"));
-                        imp.setSituacaoCadastro(rst.getString("DESCSITUACAO").contains("Ativo") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                         vResult.add(imp);
                     }
                     return vResult;
