@@ -26,10 +26,11 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean v_usar_arquivoBalanca;
     public String idAtacado = "0";
+    public String lojaID;
     
     @Override
     public String getSistema() {
-       return "Uniplus";
+       return "Uniplus" + lojaID;
     }
 
     @Override
@@ -187,6 +188,7 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
     
+    //Modificado a quantidade do atacado para importação especifica
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -195,12 +197,11 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select \n" +
                     "	codigo,\n" +
                     "	precopauta1,\n" +
-                    "	quantidadepauta1\n" +
+                    "	10 quantidadepauta1\n" +
                     "from\n" +
                     "	produto\n" +
                     "where\n" +
-                    "	precopauta1 != 0 and\n" +
-                    "	quantidadepauta1 > 0"
+                    "	precopauta1 != 0\n"
             )) {
                 while (rst.next()) {
 
@@ -230,13 +231,12 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
                         "	codigo,\n" +
                         "	codigo ean,\n" +
                         "	precopauta1 precoatacado,\n" +
-                        "	quantidadepauta1 qtdembalagem,\n" +
+                        "	10 qtdembalagem,\n" +
                         "       preco\n" +
                         "from\n" +
                         "	produto\n" +
                         "where\n" +
-                        "	precopauta1 != 0 and\n" +
-                        "	quantidadepauta1 > 0"
+                        "	precopauta1 != 0\n"
                 )) {
                     while (rst.next()) {
                         

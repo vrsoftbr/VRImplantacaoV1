@@ -14,8 +14,11 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -128,6 +131,19 @@ public class FHOnlineDAO extends InterfaceDAO {
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setPrecovenda(rst.getDouble("precovenda"));
+
+                    if ((rst.getString("ativo") != null)
+                            && (!rst.getString("ativo").trim().isEmpty())) {
+
+                        if ("S".equals(rst.getString("ativo").trim())) {
+                            imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+                        } else {
+                            imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
+                        }
+                    } else {
+                        imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+                    }
+
                     imp.setSituacaoCadastro("S".equals(rst.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setNcm(rst.getString("ncm"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofins_cst_debito"));
@@ -235,6 +251,77 @@ public class FHOnlineDAO extends InterfaceDAO {
     }
 
     @Override
+    public List<ProdutoIMP> getEANsAtacado() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "a.[Cod produto] as id_produto, \n"
+                    + "a.[Preço venda] as precoatacado,\n"
+                    + "p.[Preço venda] as preconormal,\n"
+                    + "a.[Qtde minima] as qtde \n"
+                    + "from [Itens lista preco] a\n"
+                    + "inner join Produtos p on p.[Cod produto] = a.[Cod produto]\n"
+                    + "where a.[Cod lista] = 2\n"
+                    + "and a.[Qtde minima] > 1\n"
+                    + "and a.[Preço venda] > 0 \n"
+                    + "and p.[Cod empresa] = " + getLojaOrigem()
+            )) {
+                while (rst.next()) {
+                    int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("id_produto"));
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id_produto"));
+                    imp.setEan("999999" + String.valueOf(codigoAtual));
+                    imp.setPrecovenda(rst.getDouble("preconormal"));
+                    imp.setAtacadoPreco(rst.getDouble("precoatacado"));
+                    imp.setQtdEmbalagem(rst.getInt("qtde"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        if (opt == OpcaoProduto.ATACADO) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "a.[Cod produto] as id_produto, \n"
+                        + "a.[Preço venda] as precoatacado,\n"
+                        + "p.[Preço venda] as preconormal,\n"
+                        + "a.[Qtde minima] as qtde \n"
+                        + "from [Itens lista preco] a\n"
+                        + "inner join Produtos p on p.[Cod produto] = a.[Cod produto]\n"
+                        + "where a.[Cod lista] = 2\n"
+                        + "and a.[Qtde minima] > 1\n"
+                        + "and a.[Preço venda] > 0 \n"
+                        + "and p.[Cod empresa] = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("id_produto"));
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id_produto"));
+                        imp.setEan("999999" + String.valueOf(codigoAtual));
+                        imp.setPrecovenda(rst.getDouble("preconormal"));
+                        imp.setAtacadoPreco(rst.getDouble("precoatacado"));
+                        imp.setQtdEmbalagem(rst.getInt("qtde"));
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
@@ -269,6 +356,7 @@ public class FHOnlineDAO extends InterfaceDAO {
                     + "f.[Email] as email\n"
                     + "from Fornecedores f\n"
                     + "where f.[Cod empresa] = " + getLojaOrigem() + "\n"
+                    + "and f.[Tipo cad forn] = 1 "
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -359,6 +447,96 @@ public class FHOnlineDAO extends InterfaceDAO {
                     imp.setIdProduto(rst.getString("id_produto"));
                     imp.setIdFornecedor(rst.getString("id_fornecedor"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "f.[Cod fornecedor] as id,\n"
+                    + "f.[Nome fornecedor] as razao,\n"
+                    + "f.[Nome fantasia] as fantasia,\n"
+                    + "f.[Cpf] as cpf,\n"
+                    + "f.[Cnpj] as cnpj,\n"
+                    + "f.[Rg] as ie_rg,\n"
+                    + "f.[Insc municipal] as insc_municipal,\n"
+                    + "case f.[Status fornecedor] when 'Ativo' then 'S' else 'N' end ativo,\n"
+                    + "f.[Endereço fornecedor] as endereco,\n"
+                    + "f.[Num endereco] as numero,\n"
+                    + "f.[Complemento] as complemento,\n"
+                    + "f.[Bairro] as bairro,\n"
+                    + "f.[Cidade] as municipio,\n"
+                    + "f.[Uf] as uf,\n"
+                    + "f.[Cep] as cep,\n"
+                    + "f.[Endereço cobranca] as cob_endereco,\n"
+                    + "f.[Num endereco cobranca] as cob_numero,\n"
+                    + "f.[Complemento cobranca] as cob_complemento,\n"
+                    + "f.[Bairro cobranca] as cob_bairro,\n"
+                    + "f.[Cidade cobranca] as cob_municipio,\n"
+                    + "f.[Uf cobranca] as cob_uf,\n"
+                    + "f.[Cep cobranca] as cob_cep,\n"
+                    + "f.[Tel forn] as tel_principal,\n"
+                    + "CONVERT(date, f.[Data do cadastro forn], 23) as datacadastro,\n"
+                    + "f.[Fax forn] as fax,\n"
+                    + "f.[Celular] as celular,\n"
+                    + "f.[Email] as email,\n"
+                    + "f.[Bloqueado] as bloqueado, \n"
+                    + "f.[Limite de credito] as valorlimite \n"
+                    + "from Fornecedores f\n"
+                    + "where f.[Cod empresa] = " + getLojaOrigem() + "\n"
+                    + "and f.[Tipo cad forn] = 0 "
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+
+                    if ((rst.getString("cnpj") != null)
+                            && (!rst.getString("cnpj").trim().isEmpty())) {
+                        imp.setCnpj(rst.getString("cnpj"));
+                    } else {
+                        imp.setCnpj(rst.getString("cpf"));
+                    }
+
+                    imp.setInscricaoestadual(rst.getString("ie_rg"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setCobrancaEndereco(rst.getString("cob_endereco"));
+                    imp.setCobrancaNumero(rst.getString("cob_numero"));
+                    imp.setCobrancaComplemento(rst.getString("cob_complemento"));
+                    imp.setCobrancaBairro(rst.getString("cob_bairro"));
+                    imp.setCobrancaMunicipio(rst.getString("cob_municipio"));
+                    imp.setCobrancaUf(rst.getString("cob_uf"));
+                    imp.setCobrancaCep(rst.getString("cob_cep"));
+                    imp.setTelefone(rst.getString("tel_principal"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setFax(rst.getString("fax"));
+                    imp.setBloqueado(rst.getInt("bloqueado") == 1);
+                    imp.setValorLimite(rst.getDouble("valorlimite"));
+
+                    if (imp.isBloqueado()) {
+                        imp.setPermiteCheque(false);
+                        imp.setPermiteCreditoRotativo(false);
+                    } else {
+                        imp.setPermiteCheque(true);
+                        imp.setPermiteCreditoRotativo(true);
+                    }
+
                     result.add(imp);
                 }
             }

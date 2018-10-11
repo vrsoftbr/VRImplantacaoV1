@@ -19,6 +19,8 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.AliquotaCgaVO;
 import vrimplantacao.vo.vrimplantacao.OfertaVO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
@@ -29,50 +31,21 @@ import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
-public class CgaDAO extends InterfaceDAO {
+public class CgaDAO extends InterfaceDAO implements MapaTributoProvider {
+
+    public String id_loja;
 
     @Override
     public String getSistema() {
-        return "Cga";
-    }
-
-    private List<AliquotaCgaVO> carregarAliquotaCga() throws Exception {
-        List<AliquotaCgaVO> vResult = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select ret016.\"ALIQCod\", ret016.\"ALIQDesc\",ret016.\"ALIQNFPerc\",\n"
-                    + "ret016.\"ALIQRedNF\", ret016.\"ALIQPerc\", ret016.\"ALIQBema\"\n"
-                    + "from ret016"
-            )) {
-                while (rst.next()) {
-                    AliquotaCgaVO vo = new AliquotaCgaVO();
-                    vo.setCodigo(rst.getInt("ALIQCod"));
-                    vo.setAliquotadescricao(Utils.acertarTexto(rst.getString("ALIQDesc")));
-                    vo.setAliquotaNFperc(rst.getDouble("ALIQNFPerc"));
-                    vo.setAliquotaNFred(rst.getDouble("ALIQRedNF"));
-                    vo.setAliquotaperc(rst.getDouble("ALIQPerc"));
-                    vo.setCodigoaliquota(Utils.acertarTexto(rst.getString("ALIQBema")));
-                    vResult.add(vo);
-                }
-            }
-        }
-        return vResult;
-    }
-
-    public void importarAliquotaCGA() throws Exception {
-        List<AliquotaCgaVO> vResult = new ArrayList<>();
-        try {
-            ProgressBar.setStatus("Carregando dados...Aliquotas Sistema CGA...");
-            vResult = carregarAliquotaCga();
-            if (!vResult.isEmpty()) {
-                new AliquotaCgaDAO().salvar(vResult);
-            }
-        } catch (Exception ex) {
-            throw ex;
+        if ((id_loja != null) && (!id_loja.trim().isEmpty())) {
+            return "Cga" + id_loja;
+        } else {
+            return "Cga";
         }
     }
 
@@ -132,8 +105,6 @@ public class CgaDAO extends InterfaceDAO {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> vResult = new ArrayList<>();
-        int cstSaida = 0, cstEntrada = 0;
-        String codigoAliquotaCga;
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select ret051.\"PRODCod\", ret051.\"PRODNome\",\n"
@@ -152,25 +123,25 @@ public class CgaDAO extends InterfaceDAO {
                     + "left join ret016 al1 on al1.\"ALIQCod\" = ret051.\"ALIQCod\"\n"
                     + "left join ret016 al2 on al2.\"ALIQCod\" = ret051.aliqcred\n"
                     + "where cast(ret051.\"PRODCod\" as numeric(14,0)) > 0\n"
-                    + "union all\n"
-                    + "select ret051.\"PRODCod\", ret051.\"PRODNome\",\n"
-                    + "ret051.\"PRODNomeRed\", ret051.\"PRODEtq\", ret051.\"PRODCadast\", ret051.\"PRODCusto\",\n"
-                    + "ret051.\"PRODMargem\", ret051.\"PRODVenda\", ret051.\"GRUCod\",\n"
-                    + "ret051.\"SUBGCod\", ret051.prodai, ret051.\"SECCod\",\n"
-                    + "ean.\"BARCod\" ean, ret051.clasfisccod, ret051.ncm,\n"
-                    + "ret051.prodstcofinsent, ret051.prodstcofins, ret051.\"SUBCod\",\n"
-                    + "ret051.prodsdo, prodqtemb, ret051.\"ALIQCod\", ret051.\"TABBCod\" cstSaida,\n"
-                    + "al1.\"ALIQNFPerc\" aliqDebito, al1.\"ALIQRedNF\" redDebito, ret051.aliqcred,\n"
-                    + "ret051.tabbcred cstEntrada, al2.\"ALIQNFPerc\" aliqCredito, al2.\"ALIQRedNF\" redCredito,\n"
-                    + "ret041.clasfisccod ncm, ret041.clasfisccest CODCEST, ret051.\"PRODUnid\"\n"
-                    + "from RET051\n"
-                    + "left join ret041 on ret041.clasfisccod = ret051.clasfisccod\n"
-                    + "left join RET053 on RET053.\"PRODCod\" = ret051.\"PRODCod\"\n"
-                    + "left join ret016 al1 on al1.\"ALIQCod\" = ret051.\"ALIQCod\"\n"
-                    + "left join ret016 al2 on al2.\"ALIQCod\" = ret051.aliqcred\n"
-                    + "left join ret052 ean on ean.\"PRODCod\" = ret051.\"PRODCod\"\n"
-                    + "where cast(ret051.\"PRODCod\" as numeric(14,0)) > 0\n"
-                    + "and cast(ean.\"BARCod\" as numeric(14,0)) > 999999"
+            /*+ "union all\n"
+             + "select ret051.\"PRODCod\", ret051.\"PRODNome\",\n"
+             + "ret051.\"PRODNomeRed\", ret051.\"PRODEtq\", ret051.\"PRODCadast\", ret051.\"PRODCusto\",\n"
+             + "ret051.\"PRODMargem\", ret051.\"PRODVenda\", ret051.\"GRUCod\",\n"
+             + "ret051.\"SUBGCod\", ret051.prodai, ret051.\"SECCod\",\n"
+             + "ean.\"BARCod\" ean, ret051.clasfisccod, ret051.ncm,\n"
+             + "ret051.prodstcofinsent, ret051.prodstcofins, ret051.\"SUBCod\",\n"
+             + "ret051.prodsdo, prodqtemb, ret051.\"ALIQCod\", ret051.\"TABBCod\" cstSaida,\n"
+             + "al1.\"ALIQNFPerc\" aliqDebito, al1.\"ALIQRedNF\" redDebito, ret051.aliqcred,\n"
+             + "ret051.tabbcred cstEntrada, al2.\"ALIQNFPerc\" aliqCredito, al2.\"ALIQRedNF\" redCredito,\n"
+             + "ret041.clasfisccod ncm, ret041.clasfisccest CODCEST, ret051.\"PRODUnid\"\n"
+             + "from RET051\n"
+             + "left join ret041 on ret041.clasfisccod = ret051.clasfisccod\n"
+             + "left join RET053 on RET053.\"PRODCod\" = ret051.\"PRODCod\"\n"
+             + "left join ret016 al1 on al1.\"ALIQCod\" = ret051.\"ALIQCod\"\n"
+             + "left join ret016 al2 on al2.\"ALIQCod\" = ret051.aliqcred\n"
+             + "left join ret052 ean on ean.\"PRODCod\" = ret051.\"PRODCod\"\n"
+             + "where cast(ret051.\"PRODCod\" as numeric(14,0)) > 0\n"
+             + "and cast(ean.\"BARCod\" as numeric(14,0)) > 999999"*/
             )) {
                 int contador = 1;
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
@@ -178,7 +149,7 @@ public class CgaDAO extends InterfaceDAO {
                     ProdutoIMP imp = new ProdutoIMP();
                     ProdutoBalancaVO produtoBalanca;
                     imp.setImportId(rst.getString("PRODCod"));
-                    
+
                     long codigoProduto;
                     codigoProduto = Long.parseLong(imp.getImportId());
                     if (codigoProduto <= Integer.MAX_VALUE) {
@@ -186,7 +157,7 @@ public class CgaDAO extends InterfaceDAO {
                     } else {
                         produtoBalanca = null;
                     }
-                    
+
                     if (produtoBalanca != null) {
                         imp.seteBalanca(true);
                         imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
@@ -194,9 +165,9 @@ public class CgaDAO extends InterfaceDAO {
                         imp.setValidade(0);
                         imp.seteBalanca(false);
                     }
-                    
+
                     imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());                    
+                    imp.setImportSistema(getSistema());
                     imp.setEan(rst.getString("ean"));
                     imp.setDescricaoCompleta(rst.getString("PRODNome"));
                     imp.setDescricaoReduzida(rst.getString("PRODNomeRed"));
@@ -215,332 +186,53 @@ public class CgaDAO extends InterfaceDAO {
                     imp.setCest(rst.getString("CODCEST"));
                     imp.setQtdEmbalagem(rst.getInt("prodqtemb") == 0 ? 1 : rst.getInt("prodqtemb"));
                     imp.setTipoEmbalagem(rst.getString("PRODUnid"));
+
                     if ((rst.getString("prodai") != null)
                             && (!rst.getString("prodai").trim().isEmpty())) {
                         imp.setSituacaoCadastro(rst.getString("prodai").contains("A") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     } else {
                         imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
                     }
+
                     imp.setPiscofinsCstDebito(Integer.parseInt(Utils.formataNumero(rst.getString("prodstcofins"))));
                     imp.setPiscofinsCstCredito(Integer.parseInt(Utils.formataNumero(rst.getString("prodstcofinsent"))));
-
-                    if ((rst.getString("cstSaida") != null)
-                            && (!rst.getString("cstSaida").trim().isEmpty())) {
-
-                        if ((rst.getDouble("aliqDebito") == 0)
-                                && (rst.getDouble("redDebito") == 0)) {
-
-                            codigoAliquotaCga = new AliquotaCgaDAO().getCodigoAliquota(rst.getInt("ALIQCod"));
-                            if (!codigoAliquotaCga.contains("I")
-                                    && (!codigoAliquotaCga.contains("F"))
-                                    && (!codigoAliquotaCga.contains("N"))) {
-
-                                if (rst.getInt("cstSaida") == 20) {
-
-                                    if ((rst.getDouble("aliqDebito") > 0)
-                                            && (rst.getDouble("redDebito") == 0)) {
-                                        codigoAliquotaCga = new AliquotaCgaDAO().getCodigoAliquota(rst.getInt("ALIQCod"));
-
-                                        if (!codigoAliquotaCga.contains("I")
-                                                && (!codigoAliquotaCga.contains("F"))
-                                                && (!codigoAliquotaCga.contains("N"))) {
-                                            cstSaida = 0;
-                                        } else {
-                                            if (codigoAliquotaCga.contains("I")) {
-                                                cstSaida = 40;
-                                            } else if (codigoAliquotaCga.contains("F")) {
-                                                cstSaida = 60;
-                                            } else if (codigoAliquotaCga.contains("N")) {
-                                                cstSaida = 41;
-                                            }
-                                        }
-                                    } else {
-                                        codigoAliquotaCga = new AliquotaCgaDAO().getCodigoAliquota(rst.getInt("ALIQCod"));
-
-                                        if (!codigoAliquotaCga.contains("I")
-                                                && (!codigoAliquotaCga.contains("F"))
-                                                && (!codigoAliquotaCga.contains("N"))) {
-                                            cstSaida = 90;
-                                        } else {
-                                            if (codigoAliquotaCga.contains("I")) {
-                                                cstSaida = 40;
-                                            } else if (codigoAliquotaCga.contains("F")) {
-                                                cstSaida = 60;
-                                            } else if (codigoAliquotaCga.contains("N")) {
-                                                cstSaida = 41;
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    if (rst.getDouble("redDebito") > 0) {
-                                        cstSaida = 20;
-                                    } else {
-                                        cstSaida = 0;
-                                    }
-                                }
-                            } else {
-                                if (codigoAliquotaCga.contains("I")) {
-                                    cstSaida = 40;
-                                } else if (codigoAliquotaCga.contains("F")) {
-                                    cstSaida = 60;
-                                } else if (codigoAliquotaCga.contains("N")) {
-                                    cstSaida = 41;
-                                }
-                            }
-                        } else {
-
-                            if (rst.getInt("cstSaida") == 20) {
-
-                                if ((rst.getDouble("aliqDebito") > 0)
-                                        && (rst.getDouble("redDebito") == 0)) {
-                                    codigoAliquotaCga = new AliquotaCgaDAO().getCodigoAliquota(rst.getInt("ALIQCod"));
-
-                                    if (!codigoAliquotaCga.contains("I")
-                                            && (!codigoAliquotaCga.contains("F"))
-                                            && (!codigoAliquotaCga.contains("N"))) {
-                                        cstSaida = 0;
-                                    } else {
-                                        if (codigoAliquotaCga.contains("I")) {
-                                            cstSaida = 40;
-                                        } else if (codigoAliquotaCga.contains("F")) {
-                                            cstSaida = 60;
-                                        } else if (codigoAliquotaCga.contains("N")) {
-                                            cstSaida = 41;
-                                        }
-                                    }
-                                } else if ((rst.getDouble("aliqDebito") > 0)
-                                        && (rst.getDouble("redDebito") > 0)) {
-
-                                    cstSaida = rst.getInt("cstSaida");
-                                } else {
-                                    codigoAliquotaCga = new AliquotaCgaDAO().getCodigoAliquota(rst.getInt("ALIQCod"));
-
-                                    if (!codigoAliquotaCga.contains("I")
-                                            && (!codigoAliquotaCga.contains("F"))
-                                            && (!codigoAliquotaCga.contains("N"))) {
-                                        cstSaida = 90;
-                                    } else {
-                                        if (codigoAliquotaCga.contains("I")) {
-                                            cstSaida = 40;
-                                        } else if (codigoAliquotaCga.contains("F")) {
-                                            cstSaida = 60;
-                                        } else if (codigoAliquotaCga.contains("N")) {
-                                            cstSaida = 41;
-                                        }
-                                    }
-                                }
-                            } else {
-
-                                codigoAliquotaCga = new AliquotaCgaDAO().getCodigoAliquota(rst.getInt("ALIQCod"));
-                                if (!codigoAliquotaCga.contains("I")
-                                        && (!codigoAliquotaCga.contains("F"))
-                                        && (!codigoAliquotaCga.contains("N"))) {
-
-                                    if (rst.getDouble("redDebito") > 0) {
-                                        cstSaida = 20;
-                                    } else {
-                                        cstSaida = rst.getInt("cstSaida");
-                                    }
-                                } else {
-                                    if (codigoAliquotaCga.contains("I")) {
-                                        cstSaida = 40;
-                                    } else if (codigoAliquotaCga.contains("F")) {
-                                        cstSaida = 60;
-                                    } else if (codigoAliquotaCga.contains("N")) {
-                                        cstSaida = 41;
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-
-                        codigoAliquotaCga = new AliquotaCgaDAO().getCodigoAliquota(rst.getInt("ALIQCod"));
-                        if (!codigoAliquotaCga.contains("I")
-                                && (!codigoAliquotaCga.contains("F"))
-                                && (!codigoAliquotaCga.contains("N"))) {
-
-                            if (rst.getDouble("redDebito") > 0) {
-                                cstSaida = 20;
-                            } else {
-                                cstSaida = 0;
-                            }
-                        } else {
-                            if (codigoAliquotaCga.contains("I")) {
-                                cstSaida = 40;
-                            } else if (codigoAliquotaCga.contains("F")) {
-                                cstSaida = 60;
-                            } else if (codigoAliquotaCga.contains("N")) {
-                                cstSaida = 41;
-                            }
-                        }
-                    }
-
-                    if ((rst.getString("cstEntrada") != null)
-                            && (!rst.getString("cstEntrada").trim().isEmpty())) {
-
-                        if ((rst.getDouble("aliqCredito") == 0)
-                                && (rst.getDouble("redCredito") == 0)) {
-
-                            codigoAliquotaCga = new AliquotaCgaDAO().getCodigoAliquota(rst.getInt("aliqcred"));
-
-                            if (!codigoAliquotaCga.contains("I")
-                                    && (!codigoAliquotaCga.contains("F"))
-                                    && (!codigoAliquotaCga.contains("N"))) {
-
-                                if (rst.getInt("cstEntrada") == 20) {
-
-                                    if ((rst.getDouble("aliqCredito") > 0)
-                                            && (rst.getDouble("redCredito") == 0)) {
-
-                                        codigoAliquotaCga = new AliquotaCgaDAO().getCodigoAliquota(rst.getInt("aliqcred"));
-
-                                        if (!codigoAliquotaCga.contains("I")
-                                                && (!codigoAliquotaCga.contains("F"))
-                                                && (!codigoAliquotaCga.contains("N"))) {
-                                            cstEntrada = 0;
-                                        } else {
-                                            if (codigoAliquotaCga.contains("I")) {
-                                                cstEntrada = 40;
-                                            } else if (codigoAliquotaCga.contains("F")) {
-                                                cstEntrada = 60;
-                                            } else if (codigoAliquotaCga.contains("N")) {
-                                                cstEntrada = 41;
-                                            }
-                                        }
-                                    } else {
-                                        codigoAliquotaCga = new AliquotaCgaDAO().getCodigoAliquota(rst.getInt("aliqcred"));
-
-                                        if (!codigoAliquotaCga.contains("I")
-                                                && (!codigoAliquotaCga.contains("F"))
-                                                && (!codigoAliquotaCga.contains("N"))) {
-                                            cstEntrada = 90;
-                                        } else {
-                                            if (codigoAliquotaCga.contains("I")) {
-                                                cstEntrada = 40;
-                                            } else if (codigoAliquotaCga.contains("F")) {
-                                                cstEntrada = 60;
-                                            } else if (codigoAliquotaCga.contains("N")) {
-                                                cstEntrada = 41;
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    if (rst.getDouble("redCredito") > 0) {
-                                        cstEntrada = 20;
-                                    } else {
-                                        cstEntrada = 0;
-                                    }
-                                }
-                            } else {
-                                if (codigoAliquotaCga.contains("I")) {
-                                    cstEntrada = 40;
-                                } else if (codigoAliquotaCga.contains("F")) {
-                                    cstEntrada = 60;
-                                } else if (codigoAliquotaCga.contains("N")) {
-                                    cstEntrada = 41;
-                                }
-                            }
-                        } else {
-
-                            if (rst.getInt("cstEntrada") == 20) {
-
-                                if ((rst.getDouble("aliqCredito") > 0)
-                                        && (rst.getDouble("redCredito") == 0)) {
-                                    codigoAliquotaCga = new AliquotaCgaDAO().getCodigoAliquota(rst.getInt("aliqcred"));
-
-                                    if (!codigoAliquotaCga.contains("I")
-                                            && (!codigoAliquotaCga.contains("F"))
-                                            && (!codigoAliquotaCga.contains("N"))) {
-                                        cstEntrada = 0;
-                                    } else {
-                                        if (codigoAliquotaCga.contains("I")) {
-                                            cstEntrada = 40;
-                                        } else if (codigoAliquotaCga.contains("F")) {
-                                            cstEntrada = 60;
-                                        } else if (codigoAliquotaCga.contains("N")) {
-                                            cstEntrada = 41;
-                                        }
-                                    }
-                                } else if ((rst.getDouble("aliqCredito") > 0)
-                                        && (rst.getDouble("redCredito") > 0)) {
-
-                                    cstEntrada = rst.getInt("cstEntrada");
-                                } else {
-                                    codigoAliquotaCga = new AliquotaCgaDAO().getCodigoAliquota(rst.getInt("aliqcred"));
-
-                                    if (!codigoAliquotaCga.contains("I")
-                                            && (!codigoAliquotaCga.contains("F"))
-                                            && (!codigoAliquotaCga.contains("N"))) {
-                                        cstEntrada = 90;
-                                    } else {
-                                        if (codigoAliquotaCga.contains("I")) {
-                                            cstEntrada = 40;
-                                        } else if (codigoAliquotaCga.contains("F")) {
-                                            cstEntrada = 60;
-                                        } else if (codigoAliquotaCga.contains("N")) {
-                                            cstEntrada = 41;
-                                        }
-                                    }
-                                }
-                            } else {
-
-                                codigoAliquotaCga = new AliquotaCgaDAO().getCodigoAliquota(rst.getInt("aliqcred"));
-                                if (!codigoAliquotaCga.contains("I")
-                                        && (!codigoAliquotaCga.contains("F"))
-                                        && (!codigoAliquotaCga.contains("N"))) {
-
-                                    if (rst.getDouble("redCredito") > 0) {
-                                        cstEntrada = 20;
-                                    } else {
-                                        cstEntrada = rst.getInt("cstEntrada");
-                                    }
-                                } else {
-                                    if (codigoAliquotaCga.contains("I")) {
-                                        cstEntrada = 40;
-                                    } else if (codigoAliquotaCga.contains("F")) {
-                                        cstEntrada = 60;
-                                    } else if (codigoAliquotaCga.contains("N")) {
-                                        cstEntrada = 41;
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-
-                        codigoAliquotaCga = new AliquotaCgaDAO().getCodigoAliquota(rst.getInt("aliqcred"));
-                        if (!codigoAliquotaCga.contains("I")
-                                && (!codigoAliquotaCga.contains("F"))
-                                && (!codigoAliquotaCga.contains("N"))) {
-
-                            if (rst.getDouble("redCredito") > 0) {
-                                cstEntrada = 20;
-                            } else {
-                                cstEntrada = 0;
-                            }
-                        } else {
-                            if (codigoAliquotaCga.contains("I")) {
-                                cstEntrada = 40;
-                            } else if (codigoAliquotaCga.contains("F")) {
-                                cstEntrada = 60;
-                            } else if (codigoAliquotaCga.contains("N")) {
-                                cstEntrada = 41;
-                            }
-                        }
-                    }
-
-                    imp.setIcmsCstSaida(cstSaida);
-                    imp.setIcmsCstEntrada(cstEntrada);
-                    imp.setIcmsAliqSaida(rst.getDouble("aliqDebito"));
-                    imp.setIcmsAliqEntrada(rst.getDouble("aliqCredito"));
-                    imp.setIcmsReducaoSaida(rst.getDouble("redDebito"));
-                    imp.setIcmsReducaoEntrada(rst.getDouble("redCredito"));
+                    imp.setIcmsDebitoId(rst.getString("ALIQCod"));
+                    imp.setIcmsCreditoId(rst.getString("ALIQCRED"));
 
                     vResult.add(imp);
                     contador++;
-                    ProgressBar.setStatus("Carregando dados..."+contador);
+                    ProgressBar.setStatus("Carregando dados..." + contador);
                 }
             }
-        }        
+        }
+        return vResult;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "ret052.\"BARCod\",\n"
+                    + "ret052.\"PRODCod\",\n"
+                    + "ret052.barunbxa,\n"
+                    + "ret051.\"PRODUnid\"\n"
+                    + "from RET052\n"
+                    + "inner join ret051 on ret051.\"PRODCod\" = ret052.\"PRODCod\""
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("PRODCod"));
+                    imp.setEan(rst.getString("BARCod"));
+                    imp.setQtdEmbalagem(rst.getInt("barunbxa"));
+                    imp.setTipoEmbalagem(rst.getString("PRODUnid"));
+                    vResult.add(imp);
+                }
+            }
+        }
         return vResult;
     }
 
@@ -549,39 +241,39 @@ public class CgaDAO extends InterfaceDAO {
         List<FornecedorIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    ret007.\"FORCod\",\n" +
-                    "    ret007.\"FORRazao\",\n" +
-                    "    ret007.\"FORFant\",\n" +
-                    "    ret007.\"FOREnd\",\n" +
-                    "    ret007.\"FORCep\",\n" +
-                    "    ret501.cidibge,\n" +
-                    "    ret501.\"CIDNome\",\n" +
-                    "    ret501.ciduf,\n" +
-                    "    ret007.\"FORBairro\",\n" +
-                    "    ret007.fornumero,\n" +
-                    "    ret007.forcomplemento,\n" +
-                    "    coalesce(nullif(coalesce(trim(ret007.forcnpj),''),''),\n" +
-                    "    nullif(coalesce(trim(ret007.forcpf),''),'')) forcnpjcpf,\n" +
-                    "    ret007.forie,\n" +
-                    "    ret007.forativo,\n" +
-                    "    ret007.\"FORFone1\",\n" +
-                    "    ret007.\"FORFone2\",\n" +
-                    "    ret007.\"FORFax\",\n" +
-                    "    ret007.\"FORContato\",\n" +
-                    "    ret007.\"FORBco\",\n" +
-                    "    ret007.\"FORAg\",\n" +
-                    "    ret007.\"FORCta\",\n" +
-                    "    ret007.\"FOREmail\",\n" +
-                    "    ret007.forobs,\n" +
-                    "    ret007.forinclusao,\n" +
-                    "    ret007.\"FORRep\",\n" +
-                    "    ret007.\"FORRepF1\",\n" +
-                    "    ret007.\"FORRepF2\",\n" +
-                    "    ret007.forrepemail\n" +
-                    "from\n" +
-                    "    ret007\n" +
-                    "    left join ret501 on ret501.\"CIDCod\" = ret007.\"CIDCod\""
+                    "select\n"
+                    + "    ret007.\"FORCod\",\n"
+                    + "    ret007.\"FORRazao\",\n"
+                    + "    ret007.\"FORFant\",\n"
+                    + "    ret007.\"FOREnd\",\n"
+                    + "    ret007.\"FORCep\",\n"
+                    + "    ret501.cidibge,\n"
+                    + "    ret501.\"CIDNome\",\n"
+                    + "    ret501.ciduf,\n"
+                    + "    ret007.\"FORBairro\",\n"
+                    + "    ret007.fornumero,\n"
+                    + "    ret007.forcomplemento,\n"
+                    + "    coalesce(nullif(coalesce(trim(ret007.forcnpj),''),''),\n"
+                    + "    nullif(coalesce(trim(ret007.forcpf),''),'')) forcnpjcpf,\n"
+                    + "    ret007.forie,\n"
+                    + "    ret007.forativo,\n"
+                    + "    ret007.\"FORFone1\",\n"
+                    + "    ret007.\"FORFone2\",\n"
+                    + "    ret007.\"FORFax\",\n"
+                    + "    ret007.\"FORContato\",\n"
+                    + "    ret007.\"FORBco\",\n"
+                    + "    ret007.\"FORAg\",\n"
+                    + "    ret007.\"FORCta\",\n"
+                    + "    ret007.\"FOREmail\",\n"
+                    + "    ret007.forobs,\n"
+                    + "    ret007.forinclusao,\n"
+                    + "    ret007.\"FORRep\",\n"
+                    + "    ret007.\"FORRepF1\",\n"
+                    + "    ret007.\"FORRepF2\",\n"
+                    + "    ret007.forrepemail\n"
+                    + "from\n"
+                    + "    ret007\n"
+                    + "    left join ret501 on ret501.\"CIDCod\" = ret007.\"CIDCod\""
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -662,7 +354,7 @@ public class CgaDAO extends InterfaceDAO {
                     imp.setIdProduto(rst.getString("prodcod"));
                     imp.setCodigoExterno(rst.getString("codfabricante"));
                     vResult.add(imp);
-                    ProgressBar.setStatus("Carregando dados..."+contador);
+                    ProgressBar.setStatus("Carregando dados..." + contador);
                     contador++;
                 }
             }
@@ -686,7 +378,7 @@ public class CgaDAO extends InterfaceDAO {
                     + "ret028.\"CLICPRenda\", ret028.\"CLITrabFone\", ret028.cliativo, ret028.clilimcc\n"
                     + "from ret028\n"
                     + "left join RET501 on RET501.\"CIDCod\"  = ret028.\"CIDCod\" "
-            )) {                
+            )) {
                 int contador = 1;
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -766,7 +458,7 @@ public class CgaDAO extends InterfaceDAO {
                     } else {
                         imp.setAtivo(true);
                     }
-                    
+
                     if ((rst.getString("CLICred") != null)
                             && (!rst.getString("CLICred").trim().isEmpty())) {
                         if ("S".equals(rst.getString("CLICred").trim())) {
@@ -810,7 +502,7 @@ public class CgaDAO extends InterfaceDAO {
                                 null,
                                 null
                         );
-                    }                    
+                    }
                     vResult.add(imp);
                     ProgressBar.setStatus("Carregando dados..." + contador);
                     contador++;
@@ -819,7 +511,7 @@ public class CgaDAO extends InterfaceDAO {
             }
         }
     }
-    
+
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> vResult = new ArrayList<>();
@@ -846,7 +538,7 @@ public class CgaDAO extends InterfaceDAO {
         }
         return vResult;
     }
-    
+
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> vResult = new ArrayList<>();
@@ -876,20 +568,20 @@ public class CgaDAO extends InterfaceDAO {
                     imp.setDataDeposito(rst.getDate("CHQVcto"));
                     vResult.add(imp);
                 }
-            }            
+            }
         }
         return vResult;
     }
-    
+
     public void importarOfertas(int idLojaVR, int idLojaCliente, String impLoja) throws Exception {
         ProgressBar.setStatus("Carregando dados das ofertas");
-        List<OfertaVO> ofertas = carregarOfertas(idLojaVR, idLojaCliente);        
+        List<OfertaVO> ofertas = carregarOfertas(idLojaVR, idLojaCliente);
         new OfertaDAO().salvar(ofertas, idLojaVR, impLoja);
     }
-    
-    public List<OfertaVO> carregarOfertas(int idLojaVR, int idLojaCliente) throws Exception{
+
+    public List<OfertaVO> carregarOfertas(int idLojaVR, int idLojaCliente) throws Exception {
         List<OfertaVO> ofertas = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -909,10 +601,10 @@ public class CgaDAO extends InterfaceDAO {
                     ofertas.add(vo);
                 }
             }
-        }        
+        }
         return ofertas;
     }
-    
+
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> vResult = new ArrayList<>();
@@ -933,8 +625,8 @@ public class CgaDAO extends InterfaceDAO {
                     + "    p.\"FORCod\"||' - '||p.\"PAGDoc\"||' - '||p.\"PAGParc\""
             )) {
                 while (rst.next()) {
-                    observacao = "";                    
-                    
+                    observacao = "";
+
                     if ((rst.getString("PAGDoc") != null)
                             && (!rst.getString("PAGDoc").trim().isEmpty())) {
                         observacao = "DOC. " + rst.getString("PAGDoc").trim() + " ";
@@ -951,7 +643,7 @@ public class CgaDAO extends InterfaceDAO {
                             && (!rst.getString("pagobs").trim().isEmpty())) {
                         observacao = observacao + "OBS." + rst.getString("pagobs") + " ";
                     }
-                    
+
                     ContaPagarIMP imp = new ContaPagarIMP();
                     imp.setId(rst.getString("id"));
                     imp.setIdFornecedor(rst.getString("FORCod"));
@@ -968,5 +660,46 @@ public class CgaDAO extends InterfaceDAO {
             }
         }
         return vResult;
+    }
+
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "ret016.\"ALIQCod\",\n"
+                    + "ret016.\"ALIQDesc\",\n"
+                    + "ret016.\"ALIQNFPerc\",\n"
+                    + "ret016.\"ALIQRedNF\",\n"
+                    + "ret016.\"ALIQPerc\"\n"
+                    + "from ret016\n"
+                    + "order by ret016.\"ALIQCod\" asc"
+            )) {
+                while (rs.next()) {
+                    result.add(new MapaTributoIMP(rs.getString("ALIQCod"), rs.getString("ALIQDesc")));
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<Estabelecimento> getLojas() throws Exception {
+        List<Estabelecimento> lojas = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "ret000.\"Codigo\",\n"
+                    + "ret000.\"Fantasia\",\n"
+                    + "ret000.\"CNPJ\"\n"
+                    + "from ret000\n"
+                    + "order by ret000.\"Codigo\""
+            )) {
+                while (rs.next()) {
+                    lojas.add(new Estabelecimento(rs.getString("Codigo"), rs.getString("Fantasia")));
+                }
+            }
+        }
+        return lojas;
     }
 }

@@ -10,6 +10,7 @@ import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -38,7 +39,18 @@ public class LyncisDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<MapaTributoIMP> result = new ArrayList();
+
+        try (Statement stmt = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stmt.executeQuery(
+                    "select id, descritivo from tributacao"
+            )) {
+                while (rs.next()) {
+                    result.add(new MapaTributoIMP(rs.getString("id"), rs.getString("descritivo")));
+                }
+            }
+        }
+        return result;
     }
 
     public List<Estabelecimento> getLojas() throws Exception {
@@ -153,6 +165,7 @@ public class LyncisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    (select t.icms from tributacao t where t.id = pl.idtributacao) icmsdebito,\n"
                     + "    (select t.situacao_tributaria from tributacao t where t.id = pl.idtributacao) cstdebito,\n"
                     + "    (select t.reducao from tributacao t where t.id = pl.idtributacao) reducaoicms,\n"
+                    + "    (select pt.idpis from produto_tributacao pt where pt.idproduto = p.id) cstpis,\n"
                     + "    p.validade\n"
                     + "from\n"
                     + "    produto p\n"
@@ -174,7 +187,7 @@ public class LyncisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where\n"
                     + "    pe.estoque = 1 and\n"
                     + "    e.id = " + getLojaOrigem() + "\n"
-                    + "    --p.situacao in (0)\n"
+                    + "    --p.situacao in (0) 0: Normal; 1: Excluído; 2: Fora de Linha\n"
                     + "order by\n"
                     + "	 p.id")) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
@@ -208,7 +221,10 @@ public class LyncisDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsAliqSaidaForaEstado(rs.getDouble("icmsdebito"));
                     imp.setIcmsAliqSaidaForaEstadoNF(rs.getDouble("icmsdebito"));
                     imp.setIcmsCstSaida(rs.getInt("cstdebito"));
+                    imp.setIcmsCstEntrada(rs.getInt("cstdebito"));
                     imp.setIcmsReducaoSaida(rs.getDouble("reducaoicms"));
+                    imp.setIcmsReducaoEntrada(rs.getDouble("reducaoicms"));
+                    imp.setPiscofinsCstDebito(rs.getString("cstpis"));
                     imp.setValidade(rs.getInt("validade"));
 
                     if (v_usar_arquivoBalanca) {
@@ -235,6 +251,8 @@ public class LyncisDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setValidade(rs.getInt("validade"));
                         }
                     }
+                    imp.setSituacaoCadastro(rs.getInt("situacao") == 1 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
+                    
                     result.add(imp);
                 }
             }
