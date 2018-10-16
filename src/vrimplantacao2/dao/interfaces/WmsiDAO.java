@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
-import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -20,6 +19,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoFornecedor;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -36,6 +36,8 @@ public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
     public String v_tipoDocumentoRotativo;
     public String v_tipoDocumentoCheque;
 
+    public String DATA_FORMAT = "yyyy-MM-dd";
+    
     @Override
     public String getSistema() {
         return "Wmsi";
@@ -80,9 +82,22 @@ public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+    
+    public static class TipoDocumento {
+        public String id;
+        public String descricao;
+        public TipoDocumento(String id, String descricao) {
+            this.id = id;
+            this.descricao = descricao;
+        }
+        @Override
+        public String toString() {
+            return id + " - " + descricao;
+        }
+    }
 
-    public List<ItemComboVO> getTipoDocumento() throws Exception {
-        List<ItemComboVO> result = new ArrayList<>();
+    public List<TipoDocumento> getTipoDocumento() throws Exception {
+        List<TipoDocumento> result = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
@@ -92,9 +107,12 @@ public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by tipd_codigo"
             )) {
                 while (rst.next()) {
-                    result.add(new ItemComboVO(rst.getInt("tipd_codigo"),
-                            rst.getString("tipd_codigo") + " - "
-                            + rst.getString("tipd_descricao")));
+                    result.add(
+                            new TipoDocumento(
+                                    rst.getString("tipd_codigo"),
+                                    rst.getString("tipd_descricao")
+                            )
+                    );
                 }
             }
         }
@@ -748,11 +766,69 @@ public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            String sql = "select\n" +
+                    "	c.seq_rectitulo id,\n" +
+                    "	c.rec_cli_cgc_cpf cnpj,\n" +
+                    "	c.rec_numero numero_cheque,\n" +
+                    "	c.rec_banco banco,\n" +
+                    "	c.rec_agencia agencia,\n" +
+                    "	c.rec_conta conta,\n" +
+                    "	c.rec_data_cadastro data,\n" +
+                    "	c.seq_nota_fiscal,\n" +
+                    "	cl.cli_rg rg,\n" +
+                    "	coalesce(p.pes_ddd,'') ddd,\n" +
+                    "	coalesce(p.pes_telefone,'') telefone,\n" +
+                    "	p.pes_nome nome\n" +
+                    "from \n" +
+                    "	TAB_RECTITULO c\n" +
+                    "	left join tab_cliente cl on c.rec_pes_codigo = cl.PES_CODIGO\n" +
+                    "	left join tab_pessoa p on p.pes_codigo = cl.pes_codigo\n" +
+                    "where\n" +
+                    "	c.rec_loja_codigo = '" + getLojaOrigem() + "'\n" +
+                    "	and c.TIPD_CODIGO in ('" + v_tipoDocumentoCheque + "')\n" +
+                    "	and c.rec_valor_pago is null\n" +
+                    "order by\n" +
+                    "	c.seq_rectitulo";
+            LOG.fine(sql);
+            try (ResultSet rst = stm.executeQuery(sql)) {
+                SimpleDateFormat format = new SimpleDateFormat(DATA_FORMAT);
+                while (rst.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setCpf(rst.getString("cnpj"));
+                    imp.setNumeroCheque(rst.getString("numero_cheque"));
+                    imp.setBanco(Utils.stringToInt(rst.getString("banco")));
+                    imp.setAgencia(rst.getString("agencia"));
+                    imp.setConta(rst.getString("conta"));
+                    imp.setDate(format.parse(rst.getString("data")));
+                    imp.setNumeroCupom(rst.getString("seq_nota_fiscal"));
+                    imp.setRg(rst.getString("rg"));
+                    imp.setTelefone(rst.getString("ddd") + rst.getString("telefone"));
+                    imp.setNome(rst.getString("nome"));                    
+                    
+                    vResult.add(imp);
+                    LOG.finest(
+                            "ID" + rst.getString("SEQ_RECTITULO") + "\n"
+                            + "NOTA " + rst.getString("REC_NOTA") + "\n"
+                            + "DATAEMISSAO " + rst.getString("DATAEMISSAO") + "\n"
+                            + "DATAVENCIMENTO " + rst.getString("DATAVENCIMENTO") + "\n"
+                            + "PESSOA " + rst.getString("REC_PES_CODIGO") + "\n"
+                            + "VALOR " + rst.getString("REC_VALOR"));
+                }
+            }
+        }
+        return vResult;
+    }
+
+    @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select \n"
+            String sql = "select \n"
                     + "SEQ_RECTITULO, TIPD_CODIGO, REC_NUMERO,\n"
                     + "REC_DATA as DATAEMISSAO,\n"
                     + "REC_DATA_VENCIMENTO as DATAVENCIMENTO,\n"
@@ -761,11 +837,12 @@ public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "REC_DESCONTO, \n"
                     + "REC_NOTA\n"
                     + "from TAB_RECTITULO \n"
-                    //+ "where TIPD_CODIGO in (" + v_tipoDocumentoRotativo + ")\n"
-                    + "where REC_LOJA_CODIGO = '" + getLojaOrigem() + "'\n"
-                    + "and rec_valor_pago is null"
-            )) {
-                SimpleDateFormat format = new SimpleDateFormat("yy/MM/dd");
+                    + "where TIPD_CODIGO in ('" + v_tipoDocumentoRotativo + "')\n"
+                    + "and REC_LOJA_CODIGO = '" + getLojaOrigem() + "'\n"
+                    + "and rec_valor_pago is null";
+            LOG.fine(sql);
+            try (ResultSet rst = stm.executeQuery(sql)) {
+                SimpleDateFormat format = new SimpleDateFormat(DATA_FORMAT);
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rst.getString("SEQ_RECTITULO"));
@@ -775,7 +852,7 @@ public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdCliente(rst.getString("REC_PES_CODIGO"));
                     imp.setValor(rst.getDouble("REC_VALOR"));
                     vResult.add(imp);
-                    System.out.println(
+                   LOG.finest(
                             "ID" + rst.getString("SEQ_RECTITULO") + "\n"
                             + "NOTA " + rst.getString("REC_NOTA") + "\n"
                             + "DATAEMISSAO " + rst.getString("DATAEMISSAO") + "\n"
