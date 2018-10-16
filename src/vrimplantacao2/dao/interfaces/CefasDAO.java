@@ -147,7 +147,8 @@ public class CefasDAO extends InterfaceDAO {
                     + "    t.perbasered redicms,\n"
                     + "    e.qtest estoque,\n"
                     + "    e.qtestmin estoqueminimo,\n"
-                    + "    dtexclusao excluido --campo null nao excluido, campo not null excluido\n"
+                    + "    dtexclusao excluido, --campo null nao excluido, campo not null excluido\n"
+                    + "    p.codfornecprinc fornprincipal\n"        
                     + "from\n"
                     + "    produto p \n"
                     + "left join\n"
@@ -245,7 +246,7 @@ public class CefasDAO extends InterfaceDAO {
                             imp.setValidade(rs.getInt("validade"));
                         }  
                     }
-                    
+                    imp.setFornecedorFabricante(rs.getString("fornprincipal"));
                     result.add(imp);
                 }
             }
@@ -606,31 +607,30 @@ public class CefasDAO extends InterfaceDAO {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        String id = rst.getString("id");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
                         next.setId(id);
-                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("coo")));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
-                        next.setData(rst.getDate("data"));
-                        next.setIdClientePreferencial(rst.getString("idclientepreferencial"));
+                        next.setData(rst.getDate("dtemissao"));
+                        next.setIdClientePreferencial(rst.getString("idcliente"));
                         String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
                         String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horatermino");
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
                         next.setCancelado(rst.getBoolean("cancelado"));
-                        next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
-                        next.setCpf(rst.getString("cpf"));
-                        next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setSubTotalImpressora(rst.getDouble("vltotal"));
+                        next.setCpf(rst.getString("cpfcnpj"));
+                        next.setValorDesconto(rst.getDouble("vldesconto"));
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setNumeroSerie(rst.getString("numeroserie"));
                         next.setModeloImpressora(rst.getString("modelo"));
-                        next.setNomeCliente(rst.getString("nomecliente"));
+                        next.setNomeCliente(rst.getString("razaosocial"));
                         String endereco
                                 = Utils.acertarTexto(rst.getString("endereco")) + ","
                                 + Utils.acertarTexto(rst.getString("numero")) + ","
-                                + Utils.acertarTexto(rst.getString("complemento")) + ","
                                 + Utils.acertarTexto(rst.getString("bairro")) + ","
                                 + Utils.acertarTexto(rst.getString("cidade")) + "-"
                                 + Utils.acertarTexto(rst.getString("estado")) + ","
@@ -711,24 +711,19 @@ public class CefasDAO extends InterfaceDAO {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
 
                         next.setId(rst.getString("id"));
-                        next.setVenda(id);
-                        next.setProduto(rst.getString("produto"));
+                        next.setVenda(rst.getString("coo"));
+                        next.setProduto(rst.getString("idproduto"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setTotalBruto(rst.getDouble("total"));
+                        next.setTotalBruto(rst.getDouble("valortotal"));
                         next.setValorDesconto(rst.getDouble("desconto"));
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setCancelado(rst.getBoolean("cancelado"));
-                        next.setCodigoBarras(rst.getString("codigobarras"));
+                        next.setCodigoBarras(rst.getString("ean"));
                         next.setUnidadeMedida(rst.getString("unidade"));
                         
-                        String trib = rst.getString("codaliq_venda");
-                        if (trib == null || "".equals(trib)) {
-                            trib = rst.getString("codaliq_produto");
-                        }
                     }
                 }
             } catch (Exception ex) {
@@ -745,7 +740,9 @@ public class CefasDAO extends InterfaceDAO {
                     "    m.numped pedido,\n" +
                     "    m.dtmov dtemissao,\n" +
                     "    m.codprod idproduto,\n" +
+                    "    p.descricao, \n" +
                     "    m.codbarra ean,\n" +
+                    "    m.unorig unidade,\n" +
                     "    m.seq sequencia,\n" +
                     "    m.qtorig quantidadeoriginal,\n" +
                     "    m.qt quantidade,\n" +
@@ -754,6 +751,8 @@ public class CefasDAO extends InterfaceDAO {
                     "    m.custocontant custoacumulado,\n" +
                     "    m.custofin custofinal,\n" +
                     "    m.ptabela,\n" +
+                    "    round(m.qt * m.ptabela, 2) valortotal, \n" +
+                    "    m.vldesc desconto, \n" +
                     "    m.punit,\n" +
                     "    m.punitcont,\n" +
                     "    m.sittribut cst,\n" +
@@ -769,12 +768,15 @@ public class CefasDAO extends InterfaceDAO {
                     "    tributacao t on m.codtribut = t.codtribut\n" +
                     "join\n" +
                     "    nfsaid nf on m.numped = nf.numped\n" +
+                    "join " +
+                    "    produto p ON m.codprod = p.codprod\n" +
                     "where \n" +
                     "    to_char(m.dtmov, 'yyyy-MM-dd') between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "' and\n" +
                     "    nf.especie = 'CE'\n" +
                     "order by\n" +
                     "    m.dtmov";
-            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            LOG.log(Level.FINE, "SQL da venda: " + sql)
+                    ;
             rst = stm.executeQuery(sql);
         }
 

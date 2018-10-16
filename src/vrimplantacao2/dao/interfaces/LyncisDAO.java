@@ -297,6 +297,7 @@ public class LyncisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    f.id,\n"
                     + "    f.descritivo razaosocial,\n"
                     + "    f.ie,\n"
+                    + "    f.cnpj,\n"
                     + "    f.observacao,\n"
                     + "    f.fantasia,\n"
                     + "    f.situacao,\n"
@@ -346,6 +347,7 @@ public class LyncisDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
                     imp.setRazao(rs.getString("razaosocial"));
+                    imp.setCnpj_cpf(rs.getString("cnpj"));
                     imp.setIe_rg(rs.getString("ie"));
                     imp.setAtivo(rs.getInt("situacao") == 2 ? false : true);
                     if (rs.getString("observacao") != null && !"".equals(rs.getString("observacao"))) {

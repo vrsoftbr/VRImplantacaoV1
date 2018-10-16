@@ -210,7 +210,11 @@
                                       </Group>
                                   </Group>
                               </Group>
-                              <Component id="chkTemBalanca" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Component id="chkTemBalanca" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="chkFornFabr" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
                           <EmptySpace pref="45" max="32767" attributes="0"/>
                       </Group>
@@ -296,7 +300,10 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="chkQtdEmbCotacao" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkTemBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                                  <Component id="chkTemBalanca" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkFornFabr" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
                           <EmptySpace pref="28" max="32767" attributes="0"/>
                       </Group>
@@ -452,6 +459,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTemBalanca">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Tem Balan&#xe7;a"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornFabr">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Fabricante"/>
                   </Properties>
                 </Component>
               </SubComponents>
