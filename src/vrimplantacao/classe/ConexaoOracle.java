@@ -156,4 +156,14 @@ public class ConexaoOracle {
             stm.close();
         }
     }
+
+    public static Connection getNewConnection(String host, int port, String database, String user, String pass) throws Exception {
+        Class.forName("oracle.jdbc.driver.OracleDriver");
+
+        try {
+            return DriverManager.getConnection("jdbc:oracle:thin:@" + host + ":" + port + ":" + database, user, pass);
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
 }

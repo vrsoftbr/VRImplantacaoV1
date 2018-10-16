@@ -50,7 +50,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 
 /*
-* Guilherme
+* @Guilherme
 * Para localizar tabelas do RMS, utilizar o sistema próprio deles, RMS Log Viewer, 
 * o mesmo gera os scripts e nomes da tabela.
 */
@@ -345,7 +345,7 @@ public class RMSDAO extends InterfaceDAO {
                     "	    atac.filial = loja.LOJ_CODIGO and\n" +
                     "	    atac.ean = ean.EAN_COD_EAN\n" +
                     "left join\n" +
-                    "            vw_fis_mxf_produtos vwfis on vwfis.codigo_produto = p.git_cod_item || p.git_digito\n" +
+                    "       vw_fis_mxf_produtos vwfis on vwfis.codigo_produto = p.git_cod_item || p.git_digito\n" +
                     "order by \n" +
                     "	  p.git_cod_item"
             )) {
