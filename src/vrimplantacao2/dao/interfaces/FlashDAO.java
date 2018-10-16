@@ -14,6 +14,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -175,7 +176,7 @@ public class FlashDAO extends InterfaceDAO {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("codigo"));
+                    imp.setImportId(rst.getString("cnpjcpf"));
                     imp.setCnpj_cpf(rst.getString("cnpjcpf"));
                     imp.setIe_rg(rst.getString("ie"));
                     imp.setRazao(rst.getString("razao"));
@@ -272,6 +273,34 @@ public class FlashDAO extends InterfaceDAO {
                                 rst.getString("emailpessoal").toLowerCase()
                         );
                     }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "cnpjcpf as idfornecedor,\n"
+                    + "codigoproduto as idproduto,\n"
+                    + "codigofornecedor as codigoexterno,\n"
+                    + "datainclusao as datalateracao\n"
+                    + "from fornecimento\n"
+                    + "order by cnpjcpf"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setDataAlteracao(rst.getDate("datalateracao"));
                     result.add(imp);
                 }
             }
