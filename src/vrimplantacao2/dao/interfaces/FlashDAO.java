@@ -12,6 +12,7 @@ import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -248,6 +249,153 @@ public class FlashDAO extends InterfaceDAO {
                                 rst.getString("telfax"),
                                 null,
                                 TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("emailcomercial") != null)
+                            && (!rst.getString("emailcomercial").trim().isEmpty())) {
+                        imp.addContato(
+                                "EMAIL COM",
+                                null,
+                                null,
+                                TipoContato.NFE,
+                                rst.getString("emailcomercial").toLowerCase()
+                        );
+                    }
+                    if ((rst.getString("emailpessoal") != null)
+                            && (!rst.getString("emailpessoal").trim().isEmpty())) {
+                        imp.addContato(
+                                "EMAIL PES",
+                                null,
+                                null,
+                                TipoContato.NFE,
+                                rst.getString("emailpessoal").toLowerCase()
+                        );
+                    }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "c.codigo,\n"
+                    + "c.cnpjcpf,\n"
+                    + "c.pessoainscricao as ie,\n"
+                    + "c.fisicojuridico,\n"
+                    + "c.pessoadescricao as razao,\n"
+                    + "c.pessoafantasia as fantasia,\n"
+                    + "c.datainclusao,\n"
+                    + "c.pessoarepresentante as representante,\n"
+                    + "c.enderecorua,\n"
+                    + "c.endereconumero,\n"
+                    + "c.enderecoreferencia,\n"
+                    + "c.enderecocep,\n"
+                    + "c.enderecobairro,\n"
+                    + "c.enderecocidade,\n"
+                    + "c.enderecoestado,\n"
+                    + "c.enderecocodigomunicipio,\n"
+                    + "c.cobrancarua,\n"
+                    + "c.cobrancanumero,\n"
+                    + "c.cobrancareferencia,\n"
+                    + "c.cobrancacep,\n"
+                    + "c.cobrancabairro,\n"
+                    + "c.cobrancacidade,\n"
+                    + "c.cobrancaestado,\n"
+                    + "c.cobrancacodigomunicipio,\n"
+                    + "c.entregarua,\n"
+                    + "c.entreganumero,\n"
+                    + "c.entregabairro,\n"
+                    + "c.entregacidade,\n"
+                    + "c.entregacep,\n"
+                    + "c.entregaestado,\n"
+                    + "c.entregacodigomunicipio,\n"
+                    + "c.entregareferencia,\n"
+                    + "c.emailcomercial,\n"
+                    + "c.emailpessoal,\n"
+                    + "c.telresidencia1,\n"
+                    + "c.telresidencia2,\n"
+                    + "c.telcomercial1,\n"
+                    + "c.telcomercial2,\n"
+                    + "c.telcelular,\n"
+                    + "c.telfax,\n"
+                    + "c.ativo,\n"
+                    + "c.clientelimite,\n"
+                    + "c.clientelimiteutilizado,\n"
+                    + "c.clienteempresa,\n"
+                    + "c.clienteadmissao,\n"
+                    + "c.pessoasexo,\n"
+                    + "c.pessoanascimento\n"
+                    + "from pessoa c\n"
+                    + "where c.pessoacliente = 'S'\n"
+                    + "and c.codigofilial = '" + getLojaOrigem() + "'\n"
+                    + "order by c.codigo"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("codigo"));
+                    imp.setCnpj(rst.getString("cnpjcpf"));
+                    imp.setInscricaoestadual(rst.getString("ie"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setDataCadastro(rst.getDate("datainclusao"));
+                    imp.setEndereco(rst.getString("enderecorua"));
+                    imp.setNumero(rst.getString("endereconumero"));
+                    imp.setCep(rst.getString("enderecocep"));
+                    imp.setBairro(rst.getString("enderecobairro"));
+                    imp.setMunicipio(rst.getString("enderecocidade"));
+                    imp.setMunicipioIBGE(rst.getInt("enderecocodigomunicipio"));
+                    imp.setUf(rst.getString("enderecoestado"));
+                    imp.setCobrancaEndereco(rst.getString("cobrancarua"));
+                    imp.setCobrancaNumero(rst.getString("cobrancanumero"));
+                    imp.setCobrancaCep(rst.getString("cobrancacep"));
+                    imp.setCobrancaBairro(rst.getString("cobrancabairro"));
+                    imp.setCobrancaMunicipio(rst.getString("cobrancacidade"));
+                    imp.setCobrancaMunicipioIBGE(rst.getInt("cobrancacodigomunicipio"));
+                    imp.setCobrancaUf(rst.getString("cobrancaestado"));
+                    imp.setAtivo("S".equals(rst.getString("ativo")));
+                    imp.setEmpresa(rst.getString("clienteempresa"));
+                    imp.setDataAdmissao(rst.getDate("clienteadmissao"));
+                    imp.setDataNascimento(rst.getDate("pessoanascimento"));
+                    imp.setValorLimite(rst.getDouble("clientelimite"));
+                    imp.setTelefone(rst.getString("telresidencia1"));
+                    imp.setFax(rst.getString("telfax"));
+                    imp.setCelular(rst.getString("telcelular"));
+                    imp.setEmail(rst.getString("emailpessoal").toLowerCase());
+
+                    if ((rst.getString("telresidencia2") != null)
+                            && (!rst.getString("telresidencia2").trim().isEmpty())) {
+                        imp.addContato(
+                                "1",
+                                "TEL RES 2",
+                                rst.getString("telresidencia2"),
+                                null,
+                                null
+                        );
+                    }
+                    if ((rst.getString("telcomercial1") != null)
+                            && (!rst.getString("telcomercial1").trim().isEmpty())) {
+                        imp.addContato(
+                                "1",
+                                "TEL COM 1",
+                                rst.getString("telcomercial1"),
+                                null,
+                                null
+                        );
+                    }
+                    if ((rst.getString("telcomercial2") != null)
+                            && (!rst.getString("telcomercial2").trim().isEmpty())) {
+                        imp.addContato(
+                                "1",
+                                "TEL COM 2",
+                                rst.getString("telcomercial2"),
+                                null,
                                 null
                         );
                     }
