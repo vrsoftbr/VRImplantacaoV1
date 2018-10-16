@@ -607,7 +607,7 @@ public class CefasDAO extends InterfaceDAO {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("id");
+                        String id = rst.getString("pedido");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
@@ -616,8 +616,8 @@ public class CefasDAO extends InterfaceDAO {
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
                         next.setData(rst.getDate("dtemissao"));
                         next.setIdClientePreferencial(rst.getString("idcliente"));
-                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
-                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horatermino");
+                        String horaInicio = timestampDate.format(rst.getDate("dtemissao")) + " " + rst.getString("horainicio");
+                        String horaTermino = timestampDate.format(rst.getDate("dtemissao")) + " " + rst.getString("horatermino");
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
                         next.setCancelado(rst.getBoolean("cancelado"));
@@ -625,8 +625,6 @@ public class CefasDAO extends InterfaceDAO {
                         next.setCpf(rst.getString("cpfcnpj"));
                         next.setValorDesconto(rst.getDouble("vldesconto"));
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        next.setNumeroSerie(rst.getString("numeroserie"));
-                        next.setModeloImpressora(rst.getString("modelo"));
                         next.setNomeCliente(rst.getString("razaosocial"));
                         String endereco
                                 = Utils.acertarTexto(rst.getString("endereco")) + ","
@@ -655,6 +653,8 @@ public class CefasDAO extends InterfaceDAO {
                     "    n.dtsaida,\n" +
                     "    n.codcli idcliente,\n" +
                     "    c.cliente razaosocial,\n" +
+                    "    to_char(n.dtemissao, 'HH24:MI:SS') horainicio,\n" +
+                    "    to_char(n.dtsaida, 'HH24:MI:SS') horatermino,\n" +
                     "    c.cpfcnpj,\n" +
                     "    c.ie,\n" +
                     "    c.endereco,\n" +
@@ -713,7 +713,7 @@ public class CefasDAO extends InterfaceDAO {
                         next = new VendaItemIMP();
 
                         next.setId(rst.getString("id"));
-                        next.setVenda(rst.getString("coo"));
+                        next.setVenda(rst.getString("pedido"));
                         next.setProduto(rst.getString("idproduto"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
@@ -723,7 +723,9 @@ public class CefasDAO extends InterfaceDAO {
                         next.setCancelado(rst.getBoolean("cancelado"));
                         next.setCodigoBarras(rst.getString("ean"));
                         next.setUnidadeMedida(rst.getString("unidade"));
-                        
+                        next.setIcmsCst(rst.getInt("cst"));
+                        next.setIcmsAliq(rst.getDouble("aliqicms"));
+                        next.setIcmsReduzido(rst.getDouble("icmsred"));
                     }
                 }
             } catch (Exception ex) {
