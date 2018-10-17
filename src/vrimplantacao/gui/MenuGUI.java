@@ -142,6 +142,7 @@ import vrimplantacao2.gui.interfaces.SDInformaticaGUI;
 import vrimplantacao2.gui.interfaces.CPGestorGUI;
 import vrimplantacao.gui.interfaces.AlterarProdutoPdvVendaItemGUI;
 import vrimplantacao2.gui.component.sqleditor.SQLEditor;
+import vrimplantacao2.gui.interfaces.AlphaSysGUI;
 import vrimplantacao2.gui.interfaces.AsefeGUI;
 import vrimplantacao2.gui.interfaces.AutoSystemGUI;
 import vrimplantacao2.gui.interfaces.AvanceGUI;
@@ -558,6 +559,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuIntellicon = new javax.swing.JMenuItem();
         jMenu15 = new javax.swing.JMenu();
         mnuUpForti = new javax.swing.JMenuItem();
+        mnuAlphaSys = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1166,6 +1168,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu15.add(mnuUpForti);
+
+        mnuAlphaSys.setText("AlphaSys");
+        mnuAlphaSys.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAlphaSysActionPerformed(evt);
+            }
+        });
+        jMenu15.add(mnuAlphaSys);
 
         jMenu2.add(jMenu15);
 
@@ -4019,6 +4029,10 @@ public final class MenuGUI extends VRMdiFrame {
         FHOnlineGUI.exibir(this);
     }//GEN-LAST:event_mnuFHOnlineActionPerformed
 
+    private void mnuAlphaSysActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAlphaSysActionPerformed
+        AlphaSysGUI.exibir(this);
+    }//GEN-LAST:event_mnuAlphaSysActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4128,6 +4142,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuAcertarIdsProdutos;
     private javax.swing.JMenu mnuAjuda;
     private javax.swing.JMenuItem mnuAjudaSobre;
+    private javax.swing.JMenuItem mnuAlphaSys;
     private javax.swing.JMenuItem mnuAlterDataWShop;
     private javax.swing.JMenuItem mnuApollo;
     private javax.swing.JMenuItem mnuAsefe;
