@@ -686,6 +686,9 @@ public class FornecedorDAO {
                 if (opt.contains(OpcaoFornecedor.BANCO_PADRAO)) {
                     sql.put("id_banco", vo.getIdBanco());
                 }
+                if(opt.contains(OpcaoFornecedor.CEP)) {
+                    sql.put("cep", vo.getCep());
+                }
                 sql.setWhere("id = " + vo.getId());
                 stm.execute(sql.getUpdate());
             }

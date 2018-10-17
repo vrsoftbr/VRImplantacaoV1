@@ -52,7 +52,9 @@ public enum OpcaoCliente {
     FANTASIA,
     CNPJ,
     EMAIL,
-    BLOQUEADO;    
+    BLOQUEADO,
+    CEP,
+    COMPLEMENTO;    
     
     private static final Logger LOG = Logger.getLogger(OpcaoCliente.class.getName());
     private List<ClienteIMP> listaEspecial;

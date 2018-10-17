@@ -319,6 +319,12 @@ public class ClientePreferencialDAO {
                 if (opt.contains(OpcaoCliente.BLOQUEADO)) {
                     sql.put("bloqueado", vo.isBloqueado());
                 }
+                if (opt.contains(OpcaoCliente.CEP)) {
+                    sql.put("cep", vo.getCep());
+                }
+                if(opt.contains(OpcaoCliente.COMPLEMENTO)) {
+                    sql.put("complemento", vo.getComplemento());
+                }
 
                 sql.setWhere("id = " + vo.getId());
                 stm.execute(sql.getUpdate());
