@@ -251,13 +251,14 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
     public String database = "database";
     public String host = "localhost";
     
-    public void atualizarParametros() {
+    public void atualizarParametros() throws Exception {
         Parametros params = Parametros.get();
         params.put(txtHost.getText(), sistema, "FIREBIRD", "HOST");
         params.put(txtDatabase.getArquivo(), sistema, "FIREBIRD", "DATABASE");
         params.put(txtPorta.getText(), sistema, "FIREBIRD", "PORTA");
         params.put(txtUsuario.getText(), sistema, "FIREBIRD", "USUARIO");
         params.put(txtSenha.getText(), sistema, "FIREBIRD", "SENHA");
+        params.salvar();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
