@@ -828,37 +828,94 @@ public class WmsiDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
-            String sql = "select \n"
-                    + "SEQ_RECTITULO, TIPD_CODIGO, REC_NUMERO,\n"
-                    + "REC_DATA as DATAEMISSAO,\n"
-                    + "REC_DATA_VENCIMENTO as DATAVENCIMENTO,\n"
-                    + "REC_PES_CODIGO,\n"
-                    + "REC_VALOR, \n"
-                    + "REC_DESCONTO, \n"
-                    + "REC_NOTA\n"
-                    + "from TAB_RECTITULO \n"
-                    + "where TIPD_CODIGO in ('" + v_tipoDocumentoRotativo + "')\n"
-                    + "and REC_LOJA_CODIGO = '" + getLojaOrigem() + "'\n"
-                    + "and rec_valor_pago is null";
+            String sql = "SELECT \n" +
+                "    id_compra id,\n" +
+                "    datacompra dataemissao,\n" +
+                "    cupom,\n" +
+                "    pdv,\n" +
+                "    valor,\n" +
+                "    datacompra datavencimento,\n" +
+                "    codcliente id_cliente,\n" +
+                "    valor_pago,\n" +
+                "    saldo_devedor\n" +
+                "from\n" +
+                "	(select \n" +
+                "		c.seq_comc_documento as id_compra,\n" +
+                "		c.comc_loja,\n" +
+                "		trunc(comc_data) as datacompra,\n" +
+                "		c.comc_pdv as pdv,\n" +
+                "		c.comc_cupom_fiscal as cupom,\n" +
+                "		comc_documento as documento,\n" +
+                "		comc_empresa as codempresa,\n" +
+                "		c.comc_cli_codigo as codcliente,\n" +
+                "		p.pes_nome as nomecliente,\n" +
+                "		comc_valor as valor,\n" +
+                "		nvl(pkg_conta_corr_cliente.fcn_calculajuros(seq_comc_documento), 0) as valor_juros,\n" +
+                "		nvl(pkg_cliente.fcn_soma_itens_cliente(seq_comc_documento), 0) as valor_itens,\n" +
+                "		comc_valor +\n" +
+                "		nvl(pkg_conta_corr_cliente.fcn_calculajuros(seq_comc_documento), 0) as valor_total_juros,\n" +
+                "		comc_valor +\n" +
+                "		nvl(pkg_cliente.fcn_soma_itens_cliente(seq_comc_documento), 0) as valor_total_itens,\n" +
+                "		nvl(pkg_conta_corr_cliente.fcn_pegavalorpago(seq_comc_documento), 0) as valor_pago,\n" +
+                "		comc_valor -\n" +
+                "		nvl(pkg_conta_corr_cliente.fcn_pegavalorpago(seq_comc_documento), 0) as saldo_devedor,\n" +
+                "		comc_valor +\n" +
+                "		nvl(pkg_conta_corr_cliente.fcn_calculajuros(seq_comc_documento), 0) -\n" +
+                "		nvl(pkg_conta_corr_cliente.fcn_pegavalorpago(seq_comc_documento), 0) as saldo_devedor_juros,\n" +
+                "		pkg_conta_corr_cliente.fcn_pegadatapgccorrente(seq_comc_documento) as data_pagto,\n" +
+                "		decode(pkg_conta_corr_cliente.fcn_ver_cupom_pago(seq_comc_documento),\n" +
+                "		      1,\n" +
+                "		      'PAGO',\n" +
+                "		      'ABERTO') as situacao,\n" +
+                "		comc_usu_incluiu as usuario,\n" +
+                "		tipd_codigo,\n" +
+                "		decode(tipd_codigo, '0002', 'COMPRA') as tipomov,\n" +
+                "		pkg_conta_corr_cliente.fcn_verificacontasatrasadas(seq_comc_documento) as atrasada,\n" +
+                "		nvl(pkg_conta_corr_cliente.fcn_pega_ultimo_valorpago(seq_comc_documento), 0) as ultimo_valor_pago,\n" +
+                "		pkg_conta_corr_cliente.fcn_contadiasatraso(seq_comc_documento) as dias_atraso,\n" +
+                "		pkg_conta_corr_cliente.fcn_pega_sit_cliente(p.pes_codigo) as sitcliente,\n" +
+                "		comc_seq_lotchq_parcial\n" +
+                "	from\n" +
+                "		tab_comclientes c, \n" +
+                "		tab_pessoa p, \n" +
+                "		tab_clicodigo cli\n" +
+                "	where\n" +
+                "		p.pes_codigo = c.comc_cli_codigo\n" +
+                "		and cli.pes_codigo=c.comc_cli_codigo\n" +
+                "		and c.tipd_codigo not in ('0182', '0215')\n" +
+                "		and nvl(comc_exclusao, 'N') <> 'S'\n" +
+                "		and comc_valor <> 0\n" +
+                "		and nvl(CLIC_CORRENTE,'0') = '1'\n" +
+                "	order by\n" +
+                "		c.comc_data desc) V_CONTACORRENTECLIENTE \n" +
+                "WHERE\n" +
+                "    V_CONTACORRENTECLIENTE.\"CODCLIENTE\" = V_CONTACORRENTECLIENTE.\"CODEMPRESA\"\n" +
+                "    and v_contacorrentecliente.comc_loja = '" + getLojaOrigem() + "'\n" +
+                "    AND V_CONTACORRENTECLIENTE.\"DATACOMPRA\" >  TO_DATE('1900-01-01 23:59:59','YYYY-MM-DD HH24:MI:SS')  \n" +
+                "    AND V_CONTACORRENTECLIENTE.\"SITUACAO\" <> 'PAGO'";
             LOG.fine(sql);
             try (ResultSet rst = stm.executeQuery(sql)) {
                 SimpleDateFormat format = new SimpleDateFormat(DATA_FORMAT);
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    imp.setId(rst.getString("SEQ_RECTITULO"));
-                    imp.setNumeroCupom(rst.getString("REC_NOTA"));
-                    imp.setDataEmissao(format.parse(rst.getString("DATAEMISSAO")));
-                    imp.setDataVencimento(format.parse(rst.getString("DATAVENCIMENTO")));
-                    imp.setIdCliente(rst.getString("REC_PES_CODIGO"));
-                    imp.setValor(rst.getDouble("REC_VALOR"));
+                    imp.setId(rst.getString("id"));
+                    imp.setNumeroCupom(rst.getString("cupom"));
+                    imp.setEcf(rst.getString("pdv"));
+                    imp.setDataEmissao(format.parse(rst.getString("dataemissao")));
+                    imp.setDataVencimento(format.parse(rst.getString("datavencimento")));
+                    imp.setIdCliente(rst.getString("id_cliente"));
+                    imp.setValor(rst.getDouble("valor"));
+                    if (rst.getDouble("valor_pago") > 0) {
+                        imp.addPagamento(rst.getString("id"), rst.getDouble("valor_pago"), 0, 0, imp.getDataEmissao(), "");
+                    }
                     vResult.add(imp);
                    LOG.finest(
-                            "ID" + rst.getString("SEQ_RECTITULO") + "\n"
-                            + "NOTA " + rst.getString("REC_NOTA") + "\n"
-                            + "DATAEMISSAO " + rst.getString("DATAEMISSAO") + "\n"
-                            + "DATAVENCIMENTO " + rst.getString("DATAVENCIMENTO") + "\n"
-                            + "PESSOA " + rst.getString("REC_PES_CODIGO") + "\n"
-                            + "VALOR " + rst.getString("REC_VALOR"));
+                            "ID" + rst.getString("id") + "\n"
+                            + "NOTA " + rst.getString("cupom") + "\n"
+                            + "DATAEMISSAO " + rst.getString("dataemissao") + "\n"
+                            + "DATAVENCIMENTO " + rst.getString("datavencimento") + "\n"
+                            + "PESSOA " + rst.getString("id_cliente") + "\n"
+                            + "VALOR " + rst.getString("valor"));
                 }
             }
         }
