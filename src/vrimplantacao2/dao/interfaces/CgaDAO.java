@@ -109,12 +109,13 @@ public class CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "ret051.\"PRODNomeRed\", ret051.\"PRODEtq\", ret051.\"PRODCadast\", ret051.\"PRODCusto\",\n"
                     + "ret051.\"PRODMargem\", ret051.\"PRODVenda\", ret051.\"GRUCod\",\n"
                     + "ret051.\"SUBGCod\", ret051.prodai, ret051.\"SECCod\",\n"
-                    + "ret051.\"PRODBARCod\" ean, ret051.clasfisccod, \n"
+                    + "ret051.\"PRODBARCod\" ean, ret051.clasfisccod, ret051.natreccod,\n"
                     + "ret051.prodstcofinsent, ret051.prodstcofins, ret051.\"SUBCod\",\n"
                     + "ret051.prodsdo, prodqtemb, ret051.\"ALIQCod\", ret051.\"TABBCod\" cstSaida,\n"
                     + "al1.\"ALIQNFPerc\" aliqDebito, al1.\"ALIQRedNF\" redDebito, ret051.aliqcred,\n"
                     + "ret051.tabbcred cstEntrada, al2.\"ALIQNFPerc\" aliqCredito, al2.\"ALIQRedNF\" redCredito,\n"
-                    + "ret041.clasfisccod ncm, ret041.clasfisccest CODCEST, ret051.\"PRODUnid\"\n"
+                    + "ret041.clasfisccod ncm, ret041.clasfisccest CODCEST, ret051.\"PRODUnid\", \n"
+                    + "ret051.prodcustofinal, ret051.prodcustofinalvenda\n "
                     + "from RET051\n"
                     + "left join ret041 on ret041.clasfisccod = ret051.clasfisccod\n"
                     + "left join RET053 on RET053.\"PRODCod\" = ret051.\"PRODCod\"\n"
@@ -172,7 +173,7 @@ public class CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoGondola(rst.getString("PRODEtq"));
                     imp.setDataCadastro(rst.getDate("PRODCadast"));
                     imp.setMargem(rst.getDouble("PRODMargem"));
-                    imp.setCustoComImposto(rst.getDouble("PRODCusto"));
+                    imp.setCustoComImposto(rst.getDouble("prodcustofinal"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setPrecovenda(rst.getDouble("PRODVenda"));
                     imp.setEstoque(rst.getDouble("prodsdo"));
@@ -194,6 +195,7 @@ public class CgaDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setPiscofinsCstDebito(Integer.parseInt(Utils.formataNumero(rst.getString("prodstcofins"))));
                     imp.setPiscofinsCstCredito(Integer.parseInt(Utils.formataNumero(rst.getString("prodstcofinsent"))));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("natreccod"));
                     imp.setIcmsDebitoId(rst.getString("ALIQCod"));
                     imp.setIcmsCreditoId(rst.getString("ALIQCRED"));
 
@@ -264,6 +266,7 @@ public class CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    ret007.\"FORCta\",\n"
                     + "    ret007.\"FOREmail\",\n"
                     + "    ret007.forobs,\n"
+                    + "    ret007.forobsmemo,\n"
                     + "    ret007.forinclusao,\n"
                     + "    ret007.\"FORRep\",\n"
                     + "    ret007.\"FORRepF1\",\n"
@@ -293,7 +296,7 @@ public class CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setAtivo(true);
                     imp.setTel_principal(rst.getString("FORFone1"));
                     imp.setDatacadastro(rst.getDate("forinclusao"));
-                    imp.setObservacao(rst.getString("forobs"));
+                    imp.setObservacao(rst.getString("forobsmemo"));
                     if ((rst.getString("FORFone2") != null)
                             && (!rst.getString("FORFone2").trim().isEmpty())) {
                         imp.addContato(
