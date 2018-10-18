@@ -3,6 +3,7 @@ package vrimplantacao2.gui.interfaces;
 import javax.swing.DefaultComboBoxModel;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
+import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoFirebird;
@@ -10,6 +11,7 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.interfaces.AlphaSysDAO;
+import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.parametro.Parametros;
 
@@ -30,6 +32,8 @@ public class AlphaSysGUI extends VRInternalFrame implements ConexaoEvent {
         super(i_mdiFrame);
         this.dao = new AlphaSysDAO();
         initComponents();
+        
+        chkProdutos.setOpcoesDisponiveis(dao);
         
         conexao.setSistema(SISTEMA);
         conexao.host = "localhost";
@@ -204,7 +208,35 @@ public class AlphaSysGUI extends VRInternalFrame implements ConexaoEvent {
     // End of variables declaration//GEN-END:variables
 
     private void importarTabelas() {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+        Thread thread = new Thread() {
+            int idLojaVR;
+            String idLojaCliente;
+            @Override
+            public void run() {
+                try {
+                    ProgressBar.show();
+                    ProgressBar.setCancel(true);
+                    
+                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
+                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;                                        
+                    
+                    Importador importador = new Importador(dao);
+                    importador.setLojaOrigem(idLojaCliente);
+                    importador.setLojaVR(idLojaVR);
+                    chkProdutos.setImportador(importador);
+                    
+                    chkProdutos.executarImportacao();
+                                       
+                    ProgressBar.dispose();
+                    Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
+                } catch (Exception ex) {
+                    ProgressBar.dispose();
+                    Util.exibirMensagemErro(ex, getTitle());
+                }
+            }
+        };
+
+        thread.start();
     }
 
     private void carregarParametros() {
@@ -212,6 +244,7 @@ public class AlphaSysGUI extends VRInternalFrame implements ConexaoEvent {
         Parametros params = Parametros.get();
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
+        chkProdutos.carregarParametros(params, SISTEMA);
     }
     
     private void gravarParametros() throws Exception {
@@ -226,6 +259,7 @@ public class AlphaSysGUI extends VRInternalFrame implements ConexaoEvent {
             params.put(vr.id, SISTEMA, "LOJA_VR");
             vLojaVR = vr.id;
         }
+        chkProdutos.gravarParametros(params, SISTEMA);
         params.salvar();
     }
 
