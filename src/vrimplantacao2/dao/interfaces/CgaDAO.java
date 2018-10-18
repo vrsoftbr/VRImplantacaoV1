@@ -109,7 +109,7 @@ public class CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "ret051.\"PRODNomeRed\", ret051.\"PRODEtq\", ret051.\"PRODCadast\", ret051.\"PRODCusto\",\n"
                     + "ret051.\"PRODMargem\", ret051.\"PRODVenda\", ret051.\"GRUCod\",\n"
                     + "ret051.\"SUBGCod\", ret051.prodai, ret051.\"SECCod\",\n"
-                    + "ret051.\"PRODBARCod\" ean, ret051.clasfisccod, ret051.ncm,\n"
+                    + "ret051.\"PRODBARCod\" ean, ret051.clasfisccod, \n"
                     + "ret051.prodstcofinsent, ret051.prodstcofins, ret051.\"SUBCod\",\n"
                     + "ret051.prodsdo, prodqtemb, ret051.\"ALIQCod\", ret051.\"TABBCod\" cstSaida,\n"
                     + "al1.\"ALIQNFPerc\" aliqDebito, al1.\"ALIQRedNF\" redDebito, ret051.aliqcred,\n"
@@ -120,7 +120,7 @@ public class CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join RET053 on RET053.\"PRODCod\" = ret051.\"PRODCod\"\n"
                     + "left join ret016 al1 on al1.\"ALIQCod\" = ret051.\"ALIQCod\"\n"
                     + "left join ret016 al2 on al2.\"ALIQCod\" = ret051.aliqcred\n"
-                    + "where cast(ret051.\"PRODCod\" as numeric(14,0)) > 0\n"
+                    + "order by ret051.\"PRODCod\""
             /*+ "union all\n"
              + "select ret051.\"PRODCod\", ret051.\"PRODNome\",\n"
              + "ret051.\"PRODNomeRed\", ret051.\"PRODEtq\", ret051.\"PRODCadast\", ret051.\"PRODCusto\",\n"
@@ -694,7 +694,7 @@ public class CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by ret000.\"Codigo\""
             )) {
                 while (rs.next()) {
-                    lojas.add(new Estabelecimento(rs.getString("Codigo"), rs.getString("Fantasia")));
+                    lojas.add(new Estabelecimento(rs.getString("Codigo").trim(), rs.getString("Fantasia").trim()));
                 }
             }
         }

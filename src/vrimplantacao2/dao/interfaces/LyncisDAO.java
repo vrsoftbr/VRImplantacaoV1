@@ -166,9 +166,12 @@ public class LyncisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    (select t.situacao_tributaria from tributacao t where t.id = pl.idtributacao) cstdebito,\n"
                     + "    (select t.reducao from tributacao t where t.id = pl.idtributacao) reducaoicms,\n"
                     + "    (select pt.idpis from produto_tributacao pt where pt.idproduto = p.id) cstpis,\n"
-                    + "    p.validade\n"
+                    + "    p.validade,\n"
+                    + "    vw.idgrupo_tributacao tribgrupo\n"        
                     + "from\n"
                     + "    produto p\n"
+                    + "join\n" 
+                    + "	  vw_produto_tributacao vw on p.id = vw.idproduto\n"        
                     + "join \n"
                     + "    produto_loja pl on p.id = pl.produto\n"
                     + "left join \n"
@@ -216,15 +219,18 @@ public class LyncisDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rs.getDate("datahorac"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
-                    imp.setIcmsAliqSaida(rs.getDouble("icmsdebito"));
-                    imp.setIcmsAliqEntrada(rs.getDouble("icmsdebito"));
-                    imp.setIcmsAliqSaidaForaEstado(rs.getDouble("icmsdebito"));
-                    imp.setIcmsAliqSaidaForaEstadoNF(rs.getDouble("icmsdebito"));
-                    imp.setIcmsCstSaida(rs.getInt("cstdebito"));
-                    imp.setIcmsCstEntrada(rs.getInt("cstdebito"));
-                    imp.setIcmsReducaoSaida(rs.getDouble("reducaoicms"));
-                    imp.setIcmsReducaoEntrada(rs.getDouble("reducaoicms"));
                     imp.setPiscofinsCstDebito(rs.getString("cstpis"));
+                    
+                    if(rs.getInt("tribgrupo") == 1) {
+                        imp.setIcmsAliqSaida(18);
+                        imp.setIcmsCstSaida(10);
+                        imp.setIcmsReducaoSaida(0);
+                    } else {
+                        imp.setIcmsAliqSaida(18);
+                        imp.setIcmsCstSaida(0);
+                        imp.setIcmsReducaoSaida(0);
+                    }
+                    
                     imp.setValidade(rs.getInt("validade"));
 
                     if (v_usar_arquivoBalanca) {
@@ -357,13 +363,14 @@ public class LyncisDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDatacadastro(rs.getDate("datahorac"));
                     imp.setPrazoVisita(rs.getInt("visita"));
                     imp.setPrazoEntrega(rs.getInt("prazo_entrega"));
-                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setEndereco(rs.getString("logradouro") + " " + rs.getString("endereco"));
                     imp.setBairro(rs.getString("bairro"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setMunicipio(rs.getString("municipio"));
                     imp.setIbge_municipio(rs.getInt("municipioibge"));
                     imp.setComplemento(rs.getString("complemento"));
                     imp.setUf(rs.getString("estado"));
+                    imp.setCep(rs.getString("cep"));
                     if (rs.getString("contato") != null && !"".equals(rs.getString("contato"))) {
                         imp.addContato("1", rs.getString("contato"), null, null, TipoContato.COMERCIAL, rs.getString("email"));
                     }
@@ -399,8 +406,10 @@ public class LyncisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    e.endereco,\n"
                     + "    e.logradouro,\n"
                     + "    e.bairro,\n"
-                    + "    e.numero,\n"
+                    + "    e.numero,\n"       
                     + "    e.cidade municipioibge,\n"
+                    + "    e.cep,\n" 
+                    + "    e.complemento,\n"        
                     + "    ci.descritivo municipio,\n"
                     + "    ci.estado,\n"
                     + "    t.telefones,\n"
@@ -451,6 +460,8 @@ public class LyncisDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    e.bairro,\n"
                     + "    e.numero,\n"
                     + "    e.cidade municipioibge,\n"
+                    + "    e.cep,\n" 
+                    + "    e.complemento,\n"        
                     + "    ci.descritivo municipio,\n"
                     + "    ci.estado,\n"
                     + "    t.telefones telefone,\n"
@@ -499,9 +510,11 @@ public class LyncisDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSexo("F".equals(rs.getString("sexo").trim()) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
                     imp.setDataCadastro(rs.getDate("datahorac"));
                     imp.setDataNascimento(rs.getDate("datanascimento"));
-                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setEndereco(rs.getString("logradouro") + " " + rs.getString("endereco"));
                     imp.setBairro(rs.getString("bairro"));
                     imp.setNumero(rs.getString("numero"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setComplemento(rs.getString("complemento"));
                     imp.setMunicipio(rs.getString("municipio"));
                     imp.setMunicipioIBGE(rs.getInt("municipioibge"));
                     imp.setUf(rs.getString("estado"));

@@ -607,7 +607,7 @@ public class CefasDAO extends InterfaceDAO {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("pedido");
+                        String id = rst.getString("id");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
@@ -624,11 +624,9 @@ public class CefasDAO extends InterfaceDAO {
                         next.setSubTotalImpressora(rst.getDouble("vltotal"));
                         next.setCpf(rst.getString("cpfcnpj"));
                         next.setValorDesconto(rst.getDouble("vldesconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setNomeCliente(rst.getString("razaosocial"));
                         String endereco
                                 = Utils.acertarTexto(rst.getString("endereco")) + ","
-                                + Utils.acertarTexto(rst.getString("numero")) + ","
                                 + Utils.acertarTexto(rst.getString("bairro")) + ","
                                 + Utils.acertarTexto(rst.getString("cidade")) + "-"
                                 + Utils.acertarTexto(rst.getString("estado")) + ","
@@ -660,15 +658,19 @@ public class CefasDAO extends InterfaceDAO {
                     "    c.endereco,\n" +
                     "    c.bairro,\n" +
                     "    c.cidade,\n" +
+                    "    ci.estado, \n" +
                     "    c.cep,\n" +
                     "    n.vloutras,\n" +
                     "    n.vldesconto,\n" +
                     "    n.vltotal,\n" +
-                    "    n.obs\n" +
+                    "    n.obs,\n" +
+                    "    case when dtcancel is not null then 1 else 0 end cancelado\n" +
                     "from \n" +
                     "    nfsaid n\n" +
                     "left join\n" +
                     "    cliente c on n.codcli = c.codcli\n" +
+                    "left join\n" +
+"                        cidade ci on c.codmunicipio = ci.codmunicipio\n" +
                     "where \n" +
                     "    n.especie = 'CE' and\n" +
                     "    TO_CHAR (n.dtemissao, 'yyyy-MM-dd') between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "' \n" +
@@ -696,7 +698,6 @@ public class CefasDAO extends InterfaceDAO {
         public void remove() {
             throw new UnsupportedOperationException("Not supported.");
         }
-
     }
 
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
@@ -713,14 +714,13 @@ public class CefasDAO extends InterfaceDAO {
                         next = new VendaItemIMP();
 
                         next.setId(rst.getString("id"));
-                        next.setVenda(rst.getString("pedido"));
+                        next.setVenda(rst.getString("coo"));
                         next.setProduto(rst.getString("idproduto"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setTotalBruto(rst.getDouble("valortotal"));
                         next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
+                        //next.setCancelado(rst.getBoolean("cancelado"));
                         next.setCodigoBarras(rst.getString("ean"));
                         next.setUnidadeMedida(rst.getString("unidade"));
                         next.setIcmsCst(rst.getInt("cst"));
@@ -769,7 +769,7 @@ public class CefasDAO extends InterfaceDAO {
                     "left join\n" +
                     "    tributacao t on m.codtribut = t.codtribut\n" +
                     "join\n" +
-                    "    nfsaid nf on m.numped = nf.numped\n" +
+                    "    nfsaid nf on m.numvenda = nf.numvenda\n" +
                     "join " +
                     "    produto p ON m.codprod = p.codprod\n" +
                     "where \n" +

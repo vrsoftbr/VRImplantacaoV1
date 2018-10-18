@@ -235,6 +235,12 @@ public class ClienteRepository {
                     if (opt.contains(OpcaoCliente.BLOQUEADO)) {
                         atualizarClientePreferencial(vo, opt);
                     }
+                    if (opt.contains(OpcaoCliente.CEP)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if(opt.contains(OpcaoCliente.COMPLEMENTO)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
                 }
                 notificar();
             }

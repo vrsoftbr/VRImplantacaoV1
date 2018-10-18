@@ -28,7 +28,7 @@ import vrimplantacao2.parametro.Parametros;
 
 public class CgaGUI extends VRInternalFrame {
 
-    private static final String SISTEMA = "CGA";
+    private static final String SISTEMA = "Cga";
     private static final String SERVIDOR_SQL = "Firebird";
     private static CgaGUI instance;
 
@@ -38,7 +38,7 @@ public class CgaGUI extends VRInternalFrame {
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         txtHost.setText(params.get(SISTEMA, "HOST"));
-        txtDatabase.setArquivo(params.get(SISTEMA, "DATABASE"));
+        txtDatabase.setText(params.get(SISTEMA, "DATABASE"));
         txtPorta.setText(params.get(SISTEMA, "PORTA"));
         txtUsuario.setText(params.get(SISTEMA, "USUARIO"));
         txtSenha.setText(params.get(SISTEMA, "SENHA"));
@@ -49,7 +49,7 @@ public class CgaGUI extends VRInternalFrame {
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         params.put(txtHost.getText(), SISTEMA, "HOST");
-        params.put(txtDatabase.getArquivo(), SISTEMA, "DATABASE");
+        params.put(txtDatabase.getText(), SISTEMA, "DATABASE");
         params.put(txtPorta.getText(), SISTEMA, "PORTA");
         params.put(txtUsuario.getText(), SISTEMA, "USUARIO");
         params.put(txtSenha.getText(), SISTEMA, "SENHA");
@@ -118,7 +118,7 @@ public class CgaGUI extends VRInternalFrame {
             if (txtPorta.getText().isEmpty()) {
                 throw new VRException("Favor informar a porta do banco de dados " + SERVIDOR_SQL + "!");
             }
-            if (txtDatabase.getArquivo().isEmpty()) {
+            if (txtDatabase.getText().isEmpty()) {
                 throw new VRException("Favor informar nome do banco de dados " + SERVIDOR_SQL + "!");
             }
         }
@@ -131,7 +131,7 @@ public class CgaGUI extends VRInternalFrame {
 
         if (tabsConn.getSelectedIndex() == 0) {
             connFirebird.abrirConexao(txtHost.getText(), txtPorta.getInt(),
-                    txtDatabase.getArquivo(), txtUsuario.getText(), txtSenha.getText());
+                    txtDatabase.getText(), txtUsuario.getText(), txtSenha.getText());
         }
 
         btnMapaTrib.setEnabled(true);
@@ -195,7 +195,7 @@ public class CgaGUI extends VRInternalFrame {
                     ProgressBar.setCancel(true);
 
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
-                    idLojaCliente = txtLojaID.getText();
+                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
 
                     Importador importador = new Importador(cgaDAO);
                     importador.setLojaOrigem(idLojaCliente);
@@ -264,9 +264,6 @@ public class CgaGUI extends VRInternalFrame {
                             }
                             if (chkValidade.isSelected()) {
                                 opcoes.add(OpcaoProduto.VALIDADE);
-                            }
-                            if (chkAtacado.isSelected()) {
-                                opcoes.add(OpcaoProduto.ATACADO);
                             }
                             if (chkFamilia.isSelected()) {
                                 opcoes.add(OpcaoProduto.FAMILIA);
@@ -388,7 +385,6 @@ public class CgaGUI extends VRInternalFrame {
         chkT1DescGondola = new vrframework.bean.checkBox.VRCheckBox();
         chkT1ProdMercadologico = new vrframework.bean.checkBox.VRCheckBox();
         chkValidade = new vrframework.bean.checkBox.VRCheckBox();
-        chkAtacado = new vrframework.bean.checkBox.VRCheckBox();
         chkFamilia = new vrframework.bean.checkBox.VRCheckBox();
         chkTipoEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
@@ -419,7 +415,6 @@ public class CgaGUI extends VRInternalFrame {
         vRLabel24 = new vrframework.bean.label.VRLabel();
         vRLabel25 = new vrframework.bean.label.VRLabel();
         vRTextField1 = new vrframework.bean.textField.VRTextField();
-        txtDatabase = new vrframework.bean.fileChooser.VRFileChooser();
         vRLabel20 = new vrframework.bean.label.VRLabel();
         txtUsuario = new vrframework.bean.textField.VRTextField();
         vRLabel21 = new vrframework.bean.label.VRLabel();
@@ -429,6 +424,7 @@ public class CgaGUI extends VRInternalFrame {
         btnConectar = new javax.swing.JToggleButton();
         cmbLojaOrigem = new javax.swing.JComboBox();
         vRLabel1 = new vrframework.bean.label.VRLabel();
+        txtDatabase = new vrframework.bean.textField.VRTextField();
         vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
 
         vRTextArea1.setColumns(20);
@@ -533,8 +529,6 @@ public class CgaGUI extends VRInternalFrame {
             }
         });
 
-        chkAtacado.setText("Atacado");
-
         chkFamilia.setText("Família");
 
         chkTipoEmbalagemEAN.setText("Tipo Emb. EAN");
@@ -601,8 +595,7 @@ public class CgaGUI extends VRInternalFrame {
                         .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chkOfertas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkFamilia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkValidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(chkValidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(98, Short.MAX_VALUE))
         );
         vRPanel7Layout.setVerticalGroup(
@@ -618,9 +611,6 @@ public class CgaGUI extends VRInternalFrame {
                         .addGap(46, 46, 46)
                         .addComponent(chkT1PisCofins, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(vRPanel7Layout.createSequentialGroup()
-                        .addGap(138, 138, 138)
-                        .addComponent(chkQtdEmbalagemEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(vRPanel7Layout.createSequentialGroup()
                         .addGap(23, 23, 23)
                         .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(chkCustoSemImposto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -632,11 +622,9 @@ public class CgaGUI extends VRInternalFrame {
                         .addGap(46, 46, 46)
                         .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(chkT1DescCompleta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(chkT1DescReduzida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkFamilia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkT1DescReduzida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkT1DescGondola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -666,7 +654,9 @@ public class CgaGUI extends VRInternalFrame {
                                 .addComponent(chkT1AtivoInativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chkTipoEmbalagemEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(chkTipoEmbalagemEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(chkQtdEmbalagemEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(btnMapaTrib, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)))))
         );
 
@@ -706,9 +696,8 @@ public class CgaGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(474, Short.MAX_VALUE))
         );
         vRPanel9Layout.setVerticalGroup(
@@ -885,6 +874,12 @@ public class CgaGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtHost, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(vRLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -895,34 +890,36 @@ public class CgaGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(vRLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, 205, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addComponent(txtDatabase, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+                                .addGap(6, 6, 6)))))
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addComponent(txtLojaID, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnConectar, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel4Layout.createSequentialGroup()
                                 .addComponent(vRLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(72, 72, 72)
-                                .addComponent(vRLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addGap(25, 25, 25))
+                                .addComponent(vRLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel4Layout.createSequentialGroup()
                                 .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(vRTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(21, 21, 21))
+                                .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 10, Short.MAX_VALUE))
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addComponent(txtLojaID, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel4Layout.createSequentialGroup()
+                                        .addGap(126, 126, 126)
+                                        .addComponent(vRTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel4Layout.createSequentialGroup()
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnConectar, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap())))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -940,9 +937,11 @@ public class CgaGUI extends VRInternalFrame {
                                 .addComponent(vRLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(txtPorta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addGap(1, 1, 1)
+                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(txtPorta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -956,7 +955,7 @@ public class CgaGUI extends VRInternalFrame {
                     .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtLojaID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnConectar))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         tabsConn.addTab("Dados da conexão", jPanel4);
@@ -994,7 +993,7 @@ public class CgaGUI extends VRInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vRPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
+                .addComponent(vRPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1095,7 +1094,6 @@ public class CgaGUI extends VRInternalFrame {
     private javax.swing.JToggleButton btnConectar;
     private vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTrib;
     private vrframework.bean.button.VRButton btnMigrar;
-    private vrframework.bean.checkBox.VRCheckBox chkAtacado;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkCustoComImposto;
@@ -1139,7 +1137,7 @@ public class CgaGUI extends VRInternalFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private javax.swing.JTabbedPane tabsConn;
-    private vrframework.bean.fileChooser.VRFileChooser txtDatabase;
+    private vrframework.bean.textField.VRTextField txtDatabase;
     private vrframework.bean.textField.VRTextField txtHost;
     private vrframework.bean.textField.VRTextField txtLojaID;
     private vrframework.bean.textField.VRTextField txtPorta;

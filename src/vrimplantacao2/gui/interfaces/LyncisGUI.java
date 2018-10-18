@@ -270,6 +270,14 @@ public class LyncisGUI extends VRInternalFrame {
                             opcoes.add(OpcaoFornecedor.CNPJ_CPF);
                         }
                         
+                        if(chkCep.isSelected()) {
+                            opcoes.add(OpcaoFornecedor.CEP);
+                        }
+                        
+                        if(chkEndereco.isSelected()) {
+                            opcoes.add(OpcaoFornecedor.ENDERECO);
+                        }
+                        
                         if (!opcoes.isEmpty()) {
                             importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
                         }
@@ -287,6 +295,14 @@ public class LyncisGUI extends VRInternalFrame {
                         
                         if (chkLimite.isSelected()) {
                             importador.atualizarClientePreferencial(OpcaoCliente.VALOR_LIMITE);
+                        }
+                        
+                        if (chkCepCliente.isSelected()) {
+                            importador.atualizarClientePreferencial(OpcaoCliente.CEP);
+                        }
+                        
+                        if (chkComplemento.isSelected()) {
+                            importador.atualizarClientePreferencial(OpcaoCliente.COMPLEMENTO);
                         }
                         
                          if(chkRotativo.isSelected()){
@@ -386,11 +402,15 @@ public class LyncisGUI extends VRInternalFrame {
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkCnpjFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkCep = new vrframework.bean.checkBox.VRCheckBox();
+        chkEndereco = new vrframework.bean.checkBox.VRCheckBox();
         tabCliente = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabClienteDados = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         chkLimite = new vrframework.bean.checkBox.VRCheckBox();
+        chkCepCliente = new vrframework.bean.checkBox.VRCheckBox();
+        chkComplemento = new vrframework.bean.checkBox.VRCheckBox();
         tablCreditoRotativo = new javax.swing.JPanel();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
@@ -686,6 +706,10 @@ public class LyncisGUI extends VRInternalFrame {
 
         chkCnpjFornecedor.setText("CNPJ");
 
+        chkCep.setText("CEP");
+
+        chkEndereco.setText("Endereço");
+
         javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
         tabFornecedor.setLayout(tabFornecedorLayout);
         tabFornecedorLayout.setHorizontalGroup(
@@ -694,11 +718,14 @@ public class LyncisGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tabFornecedorLayout.createSequentialGroup()
-                        .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(52, 52, 52)
-                        .addComponent(chkCnpjFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(309, Short.MAX_VALUE))
+                        .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkCep, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkCnpjFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(273, Short.MAX_VALUE))
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -706,10 +733,14 @@ public class LyncisGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCnpjFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(4, 4, 4)
+                .addComponent(chkCnpjFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(chkCep, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(155, Short.MAX_VALUE))
         );
 
         tab.addTab("Fornecedores", tabFornecedor);
@@ -734,6 +765,10 @@ public class LyncisGUI extends VRInternalFrame {
 
         chkLimite.setText("Limite");
 
+        chkCepCliente.setText("CEP");
+
+        chkComplemento.setText("Complemento");
+
         javax.swing.GroupLayout tabClienteDadosLayout = new javax.swing.GroupLayout(tabClienteDados);
         tabClienteDados.setLayout(tabClienteDadosLayout);
         tabClienteDadosLayout.setHorizontalGroup(
@@ -741,12 +776,16 @@ public class LyncisGUI extends VRInternalFrame {
             .addGroup(tabClienteDadosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkCepCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(tabClienteDadosLayout.createSequentialGroup()
-                        .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
-                        .addComponent(chkLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(298, Short.MAX_VALUE))
+                        .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(260, Short.MAX_VALUE))
         );
         tabClienteDadosLayout.setVerticalGroup(
             tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -756,8 +795,12 @@ public class LyncisGUI extends VRInternalFrame {
                     .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkCepCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(154, Short.MAX_VALUE))
         );
 
         tabCliente.addTab("Dados", tabClienteDados);
@@ -1069,10 +1112,14 @@ public class LyncisGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox cbxUnifFornecedores;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutoForn;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutos;
+    private vrframework.bean.checkBox.VRCheckBox chkCep;
+    private vrframework.bean.checkBox.VRCheckBox chkCepCliente;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkCnpjFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkComplemento;
+    private vrframework.bean.checkBox.VRCheckBox chkEndereco;
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
     private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
