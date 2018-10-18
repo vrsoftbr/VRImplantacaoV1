@@ -190,6 +190,7 @@ import vrimplantacao2.gui.interfaces.UniplusGUI;
 import vrimplantacao2.gui.interfaces.UpFortiGUI;
 import vrimplantacao2.gui.interfaces.WShopGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
+import vrimplantacao2.gui.interfaces.ZpfGUI;
 
 public final class MenuGUI extends VRMdiFrame {
 
@@ -560,6 +561,7 @@ public final class MenuGUI extends VRMdiFrame {
         jMenu15 = new javax.swing.JMenu();
         mnuUpForti = new javax.swing.JMenuItem();
         mnuAlphaSys = new javax.swing.JMenuItem();
+        mnuZpf = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1176,6 +1178,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu15.add(mnuAlphaSys);
+
+        mnuZpf.setText("ZPF Sistema");
+        mnuZpf.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuZpfActionPerformed(evt);
+            }
+        });
+        jMenu15.add(mnuZpf);
 
         jMenu2.add(jMenu15);
 
@@ -4033,6 +4043,10 @@ public final class MenuGUI extends VRMdiFrame {
         AlphaSysGUI.exibir(this);
     }//GEN-LAST:event_mnuAlphaSysActionPerformed
 
+    private void mnuZpfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuZpfActionPerformed
+        ZpfGUI.exibir(this);
+    }//GEN-LAST:event_mnuZpfActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4239,6 +4253,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuWmByFile;
     private javax.swing.JMenuItem mnuWmsi;
     private javax.swing.JMenuItem mnuWmsi1;
+    private javax.swing.JMenuItem mnuZpf;
     private javax.swing.JMenuItem mnupdvvendaitem;
     private vrframework.bean.toolBar.VRToolBar tlbAtalho;
     private vrframework.bean.toolBar.VRToolBar tlbFixo;
