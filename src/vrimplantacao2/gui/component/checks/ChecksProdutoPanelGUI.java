@@ -1,5 +1,6 @@
 package vrimplantacao2.gui.component.checks;
 
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -9,6 +10,8 @@ import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
@@ -109,7 +112,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkPisCofins.setVisible(opt.contains(OpcaoProduto.PIS_COFINS));
             chkNatReceita.setVisible(opt.contains(OpcaoProduto.NATUREZA_RECEITA));
             chkICMS.setVisible(opt.contains(OpcaoProduto.ICMS));
-            btnMapaTribut.setVisible(chkICMS.isVisible());            
+            btnMapaTribut.setVisible(chkICMS.isVisible());
             chkNcm.setVisible(opt.contains(OpcaoProduto.NCM));
             chkCest.setVisible(opt.contains(OpcaoProduto.CEST));
             chkPautaFiscal.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL_PRODUTO));
@@ -177,6 +180,11 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
     public Set<OpcaoProduto> getOpcoesDisponiveis() {
         return opt;
+    }
+    
+    public void setProvider(MapaTributacaoButtonProvider provider) {
+        btnMapaTribut.setProvider(provider);
+        btnMapaTribut.setEnabled(provider != null);
     }
     
     /**
@@ -310,11 +318,11 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             pnlOptMercadologicoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlOptMercadologicoLayout.createSequentialGroup()
                 .addGap(5, 5, 5)
-                .addGroup(pnlOptMercadologicoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnlOptMercadologicoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlOptMercadologicoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(chkMercadologicoPorNivelReplicar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(chkMercadologicoNaoExcluir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(chkMercadologicoNaoExcluir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -873,7 +881,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnMapaTributActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaTributActionPerformed
-
+        
     }//GEN-LAST:event_btnMapaTributActionPerformed
 
     private void rdbPautaEanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbPautaEanActionPerformed
