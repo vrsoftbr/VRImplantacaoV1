@@ -704,7 +704,6 @@ public final class MenuGUI extends VRMdiFrame {
         mnuPlanilhaVr = new javax.swing.JMenuItem();
         mnuAcertarIdsProdutos = new javax.swing.JMenuItem();
         jMenuItemVRPdv = new javax.swing.JMenuItem();
-        jMenuItem13 = new javax.swing.JMenuItem();
         mnuSistema = new javax.swing.JMenu();
         mnuSistemaLogin = new javax.swing.JMenuItem();
         mnuFerramentas = new javax.swing.JMenu();
@@ -2265,14 +2264,6 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuInterface.add(jMenuItemVRPdv);
 
-        jMenuItem13.setText("Integração VR para VR");
-        jMenuItem13.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem13ActionPerformed(evt);
-            }
-        });
-        mnuInterface.add(jMenuItem13);
-
         mnuMenu.add(mnuInterface);
 
         mnuSistema.setText("Sistema");
@@ -3159,22 +3150,6 @@ public final class MenuGUI extends VRMdiFrame {
             this.setDefaultCursor();
         }
     }//GEN-LAST:event_jMenuItemSicsActionPerformed
-
-    private void jMenuItem13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem13ActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formMigracaoVR == null || formMigracaoVR.isClosed()) {
-                formMigracaoVR = new VRSoftwareGUI(this);
-            }
-
-            formMigracaoVR.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
-    }//GEN-LAST:event_jMenuItem13ActionPerformed
 
     private void jMenuItemSimSoftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSimSoftActionPerformed
         try {
@@ -4069,7 +4044,6 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
     private javax.swing.JMenuItem jMenuItem12;
-    private javax.swing.JMenuItem jMenuItem13;
     private javax.swing.JMenuItem jMenuItem14;
     private javax.swing.JMenuItem jMenuItem15;
     private javax.swing.JMenuItem jMenuItem16;
