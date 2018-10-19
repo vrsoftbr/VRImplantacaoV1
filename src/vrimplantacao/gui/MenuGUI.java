@@ -186,6 +186,7 @@ import vrimplantacao2.gui.interfaces.SriGUI;
 import vrimplantacao2.gui.interfaces.SysmoFirebirdGUI;
 import vrimplantacao2.gui.interfaces.SysmoPostgresGUI;
 import vrimplantacao2.gui.interfaces.TopSystemGUI2;
+import vrimplantacao2.gui.interfaces.UmPontoDoisGUI;
 import vrimplantacao2.gui.interfaces.UniplusGUI;
 import vrimplantacao2.gui.interfaces.UpFortiGUI;
 import vrimplantacao2.gui.interfaces.WShopGUI;
@@ -640,6 +641,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuTsti = new javax.swing.JMenuItem();
         mnuAvance = new javax.swing.JMenuItem();
         mnuHipcom = new javax.swing.JMenuItem();
+        mnuUmPontoDois = new javax.swing.JMenuItem();
         mnuOrion = new javax.swing.JMenu();
         jMenuItemOrion = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -1795,6 +1797,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu9.add(mnuHipcom);
+
+        mnuUmPontoDois.setText("1.2 Informatica");
+        mnuUmPontoDois.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuUmPontoDoisActionPerformed(evt);
+            }
+        });
+        jMenu9.add(mnuUmPontoDois);
 
         jMenu2.add(jMenu9);
 
@@ -4008,6 +4018,10 @@ public final class MenuGUI extends VRMdiFrame {
         AlphaSysGUI.exibir(this);
     }//GEN-LAST:event_mnuAlphaSysActionPerformed
 
+    private void mnuUmPontoDoisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuUmPontoDoisActionPerformed
+        UmPontoDoisGUI.exibir(this);
+    }//GEN-LAST:event_mnuUmPontoDoisActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4206,6 +4220,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSysmoFirebird;
     private javax.swing.JMenuItem mnuSysmoPostgres;
     private javax.swing.JMenuItem mnuTsti;
+    private javax.swing.JMenuItem mnuUmPontoDois;
     private javax.swing.JMenuItem mnuUniplus;
     private javax.swing.JMenuItem mnuUpForti;
     private javax.swing.JMenuItem mnuVisualComercio;
