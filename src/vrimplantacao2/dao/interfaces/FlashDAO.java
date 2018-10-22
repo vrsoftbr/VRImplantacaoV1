@@ -23,9 +23,15 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class FlashDAO extends InterfaceDAO {
 
+    public String id_loja;
+    
     @Override
     public String getSistema() {
-        return "Flash";
+        if ((id_loja != null) && (!id_loja.trim().isEmpty())) {
+            return "Flash" + id_loja;
+        } else {
+            return "Flash";
+        }
     }
 
     @Override
