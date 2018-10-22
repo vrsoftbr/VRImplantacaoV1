@@ -484,7 +484,7 @@ public class CefasDAO extends InterfaceDAO {
                     + "    c.codcob = cob.codcob and\n"
                     + "    c.codcli = cli.codcli and\n"
                     + "    status = 'A' and\n"
-                    + "    c.vpago is null and\n"
+                    + "    c.vpago = 0 and\n"
                     + "    cob.codcob = '" + vPlanoContas + "' \n"
                     + "order by\n"
                     + "    c.dtvenc")) {
@@ -513,28 +513,50 @@ public class CefasDAO extends InterfaceDAO {
         List<ChequeIMP> result = new ArrayList<>();
         try(Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                      "SELECT c.numvenda ID, c.numnota coo, c.prest parcela, c.codcli idcliente, c.vljuro,\n" +
-                    "         cli.cpfcnpj, COALESCE (cli.fantasia, cli.cliente) razao, c.numcx ecf,\n" +
-                    "         TO_CHAR (c.dtemissao, 'yyyy-MM-dd') dtemissao,\n" +
-                    "         TO_CHAR (c.dtvenc, 'yyyy-MM-dd') dtvencimento, c.valor, cob.codcob,\n" +
-                    "         cob.descricao, c.obs, c.obs2, c.numch cheque, c.numag agencia, c.numbco banco, c.numconta conta\n" +
-                    "    FROM creceber c, cobranca cob, cliente cli\n" +
-                    "   WHERE c.codcob = cob.codcob\n" +
-                    "     AND c.codcli = cli.codcli\n" +
-                    "     AND status = 'A'\n" +
-                    "     AND c.vpago = 0\n" +
-                    "     AND cob.codcob = '" + vPlanoContas + "'\n" +
-                    "     AND c.valor > 0\n" +
-                    "ORDER BY c.dtvenc")) {
+                    "SELECT \n" +
+                    "	c.numvenda id, \n" +
+                    "	c.numnota coo, \n" +
+                    "	c.prest parcela, \n" +
+                    "	c.codcli idcliente, \n" +
+                    "	c.vljuro,\n" +
+                    "	cli.cpfcnpj, \n" +
+                    "	COALESCE (cli.fantasia, cli.cliente) razao, \n" +
+                    "   cli.telefone,\n" +        
+                    "	c.numcx ecf,\n" +
+                    "	TO_CHAR (c.dtemissao, 'yyyy-MM-dd') dtemissao, \n" +
+                    "	TO_CHAR (c.dtvenc, 'yyyy-MM-dd') dtvencimento, \n" +
+                    "	c.valor, \n" +
+                    "	cob.codcob, \n" +
+                    "	cob.descricao, \n" +
+                    "	c.obs, \n" +
+                    "	c.obs2, \n" +
+                    "	c.numch cheque, \n" +
+                    "	c.numag agencia, \n" +
+                    "	c.numbco banco, \n" +
+                    "	c.numconta conta \n" +
+                    "FROM \n" +
+                    "	creceber c, \n" +
+                    "	cobranca cob, \n" +
+                    "	cliente cli\n" +
+                    "WHERE \n" +
+                    "	c.codcob = cob.codcob AND \n" +
+                    "	c.codcli = cli.codcli AND \n" +
+                    "	status = 'A' AND \n" +
+                    "	c.vpago = 0 AND \n" +
+                    "	cob.codcob in ('CH', 'CHP', 'CHT') AND \n" +
+                    "	c.valor > 0\n" +
+                    "ORDER BY \n" +
+                    "	c.dtvenc")) {
                 while(rs.next()) {
                     ChequeIMP imp = new ChequeIMP();
                     imp.setId(rs.getString("id"));
                     imp.setCpf(rs.getString("cpfcnpj"));
                     imp.setNumeroCheque(rs.getString("cheque"));
                     imp.setNome(rs.getString("razao"));
+                    imp.setTelefone(rs.getString("telefone"));
                     imp.setAgencia(rs.getString("agencia"));
                     imp.setConta(rs.getString("conta"));
-                    imp.setBanco(rs.getInt("banco"));
+                    imp.setBanco(Utils.stringToInt(rs.getString("banco")));
                     imp.setNumeroCupom(rs.getString("coo"));
                     imp.setValorJuros(rs.getDouble("vljuro"));
                     imp.setValor(rs.getDouble("valor"));
