@@ -12,6 +12,8 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -228,6 +230,77 @@ public class ZpfDAO extends InterfaceDAO implements MapaTributoProvider {
                             rst.getDouble("porc_icms"),
                             0
                     ));
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    f.codigo id,\n" +
+                    "    f.razao_social razao,  \n" +
+                    "    f.nome_fantasia fantasia,\n" +
+                    "    f.cnpj,                  \n" +
+                    "    f.inscricao_estadual ie,  \n" +
+                    "    f.inscricao_suframa suframa,  \n" +
+                    "    f.inscricao_municipal,  \n" +
+                    "    case coalesce(upper(f.inativo),'N') when 'S' then 0 else 1 end situacaocadastro,\n" +
+                    "    f.endereco,\n" +
+                    "    f.numero,   \n" +
+                    "    f.complemento,\n" +
+                    "    f.bairro,\n" +
+                    "    cd.cod_municipio municipio_ibge,\n" +
+                    "    cd.cod_estado estado_ibge,\n" +
+                    "    f.cep,  \n" +
+                    "    f.fone,\n" +
+                    "    f.contato,\n" +
+                    "    f.fax,\n" +
+                    "    f.email,\n" +
+                    "    f.celular,\n" +
+                    "    f.data_inclusao datacadastro,\n" +
+                    "    f.data_ultima_alteracao dataalteracao,\n" +
+                    "    f.observacao\n" +
+                    "from\n" +
+                    "    fornecedores f\n" +
+                    "    left join cidades cd on f.cidade = cd.codigo\n" +
+                    "order by\n" +
+                    "    f.codigo"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("ie"));
+                    imp.setSuframa(rst.getString("suframa"));
+                    imp.setInsc_municipal(rst.getString("inscricao_municipal"));
+                    imp.setAtivo(rst.getBoolean("situacaocadastro"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setIbge_municipio(rst.getInt("municipio_ibge"));
+                    imp.setIbge_uf(rst.getInt("estado_ibge"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setTel_principal(rst.getString("fone"));
+                    imp.addTelefone("FAX", rst.getString("fax"));
+                    imp.addEmail("E-MAIL", rst.getString("email"), TipoContato.COMERCIAL);
+                    imp.addCelular("CELULAR", rst.getString("celular"));
+                    imp.setDatacadastro(rst.getDate("datacadastro"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    
+                    result.add(imp);
                 }
             }
         }

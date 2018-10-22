@@ -11,6 +11,8 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.ZpfDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
@@ -138,6 +140,13 @@ public class ZpfGUI extends VRInternalFrame implements ConexaoEvent {
         jLabel2 = new javax.swing.JLabel();
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
         chkProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
+        pnlFornecedorClientes = new vrframework.bean.panel.VRPanel();
+        pnlForn = new vrframework.bean.panel.VRPanel();
+        chkFornecedorDados = new vrframework.bean.checkBox.VRCheckBox();
+        pnlClientes = new vrframework.bean.panel.VRPanel();
+        chkClientesPreferenciais = new vrframework.bean.checkBox.VRCheckBox();
+        chkClientesEventuais = new vrframework.bean.checkBox.VRCheckBox();
+        chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         jLabel1 = new javax.swing.JLabel();
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
         btnMigrar = new vrframework.bean.button.VRButton();
@@ -149,6 +158,80 @@ public class ZpfGUI extends VRInternalFrame implements ConexaoEvent {
         org.openide.awt.Mnemonics.setLocalizedText(jLabel2, "Loja Origem");
 
         tabs.addTab("Produtos", chkProdutos);
+
+        pnlForn.setBorder(javax.swing.BorderFactory.createTitledBorder("Fornecedores"));
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkFornecedorDados, "Dados");
+
+        javax.swing.GroupLayout pnlFornLayout = new javax.swing.GroupLayout(pnlForn);
+        pnlForn.setLayout(pnlFornLayout);
+        pnlFornLayout.setHorizontalGroup(
+            pnlFornLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlFornLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkFornecedorDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        pnlFornLayout.setVerticalGroup(
+            pnlFornLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlFornLayout.createSequentialGroup()
+                .addComponent(chkFornecedorDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 7, Short.MAX_VALUE))
+        );
+
+        pnlClientes.setBorder(javax.swing.BorderFactory.createTitledBorder("Clientes"));
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkClientesPreferenciais, "Clientes Preferenciais");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkClientesEventuais, "Clientes Eventuais");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkCreditoRotativo, "Crédito Rotativo");
+
+        javax.swing.GroupLayout pnlClientesLayout = new javax.swing.GroupLayout(pnlClientes);
+        pnlClientes.setLayout(pnlClientesLayout);
+        pnlClientesLayout.setHorizontalGroup(
+            pnlClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlClientesLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlClientesLayout.createSequentialGroup()
+                        .addComponent(chkClientesPreferenciais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkClientesEventuais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(182, Short.MAX_VALUE))
+        );
+        pnlClientesLayout.setVerticalGroup(
+            pnlClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlClientesLayout.createSequentialGroup()
+                .addComponent(chkClientesPreferenciais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addComponent(chkClientesEventuais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+
+        javax.swing.GroupLayout pnlFornecedorClientesLayout = new javax.swing.GroupLayout(pnlFornecedorClientes);
+        pnlFornecedorClientes.setLayout(pnlFornecedorClientesLayout);
+        pnlFornecedorClientesLayout.setHorizontalGroup(
+            pnlFornecedorClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlFornecedorClientesLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlFornecedorClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pnlForn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnlClientes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        pnlFornecedorClientesLayout.setVerticalGroup(
+            pnlFornecedorClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlFornecedorClientesLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlClientes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(108, Short.MAX_VALUE))
+        );
+
+        tabs.addTab("Fornecedor e Clientes", pnlFornecedorClientes);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, "Loja:");
 
@@ -171,7 +254,7 @@ public class ZpfGUI extends VRInternalFrame implements ConexaoEvent {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(conexao, javax.swing.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
+                    .addComponent(conexao, javax.swing.GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -221,12 +304,19 @@ public class ZpfGUI extends VRInternalFrame implements ConexaoEvent {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkClientesEventuais;
+    private vrframework.bean.checkBox.VRCheckBox chkClientesPreferenciais;
+    private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
+    private vrframework.bean.checkBox.VRCheckBox chkFornecedorDados;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI chkProdutos;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel conexao;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private vrframework.bean.panel.VRPanel pnlClientes;
+    private vrframework.bean.panel.VRPanel pnlForn;
+    private vrframework.bean.panel.VRPanel pnlFornecedorClientes;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     // End of variables declaration//GEN-END:variables
 
@@ -247,6 +337,18 @@ public class ZpfGUI extends VRInternalFrame implements ConexaoEvent {
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
                     chkProdutos.setImportador(importador);
+                    if (chkFornecedorDados.isSelected()) {
+                        importador.importarFornecedor(OpcaoFornecedor.DADOS, OpcaoFornecedor.CONTATOS);
+                    }
+                    if (chkClientesPreferenciais.isSelected()) {
+                        importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
+                    }
+                    if (chkClientesEventuais.isSelected()) {
+                        importador.importarClienteEventual(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
+                    }
+                    if (chkCreditoRotativo.isSelected()) {
+                        importador.importarCreditoRotativo();
+                    }
                     
                     chkProdutos.executarImportacao();
                                        

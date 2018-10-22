@@ -133,6 +133,22 @@ public class FMGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkCheque.isSelected()) {
                             importador.importarCheque();
                         }
+                    } else if (tabs.getSelectedIndex() == 2) {
+                        if (chkUnifProdutos.isSelected()) {
+                            importador.unificarProdutos();
+                        }
+                        if (chkUnifFornecedor.isSelected()) {
+                            importador.unificarFornecedor();
+                        }
+                        if (chkUnifProdutoFornecedor.isSelected()) {
+                            importador.unificarProdutoFornecedor();
+                        }                        
+                        if (chkUnifClientePreferencial.isSelected()) {
+                            importador.unificarClientePreferencial();
+                        }                        
+                        if (chkClientesEventuais.isSelected()) {
+                            importador.unificarClienteEventual();
+                        }
                     }
                     
                     gravarParametros();
@@ -169,6 +185,12 @@ public class FMGUI extends VRInternalFrame implements ConexaoEvent {
         chkClientesEventuais = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
+        tabUnificacao = new vrframework.bean.panel.VRPanel();
+        chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
+        chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkUnifProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
+        chkUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
 
         setTitle("Importação FM Sistemas");
         setToolTipText("");
@@ -299,6 +321,48 @@ public class FMGUI extends VRInternalFrame implements ConexaoEvent {
 
         tabs.addTab("Fornecedor e Cliente", tabFornecedor);
 
+        chkUnifProdutos.setText("Produtos (Somente com EAN válido)");
+
+        chkUnifFornecedor.setText("Fornecedor (Somente com CPF/CNPJ)");
+
+        chkUnifProdutoFornecedor.setText("Produto Fornecedor (Somente com CPF/CNPJ)");
+
+        chkUnifClientePreferencial.setText("Cliente Preferencial (Somente com CPF/CNPJ)");
+
+        chkUnifClienteEventual.setText("Cliente Eventual (Somente com CPF/CNPJ)");
+
+        javax.swing.GroupLayout tabUnificacaoLayout = new javax.swing.GroupLayout(tabUnificacao);
+        tabUnificacao.setLayout(tabUnificacaoLayout);
+        tabUnificacaoLayout.setHorizontalGroup(
+            tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabUnificacaoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUnifFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(305, Short.MAX_VALUE))
+        );
+        tabUnificacaoLayout.setVerticalGroup(
+            tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabUnificacaoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkUnifFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(209, Short.MAX_VALUE))
+        );
+
+        tabs.addTab("Unificação", tabUnificacao);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -347,6 +411,11 @@ public class FMGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedorContato;
+    private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
+    private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
+    private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel conexao;
     private javax.swing.JLabel jLabel1;
@@ -354,6 +423,7 @@ public class FMGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.panel.VRPanel pnlFornecedores;
     private vrframework.bean.panel.VRPanel tabFornecedor;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
+    private vrframework.bean.panel.VRPanel tabUnificacao;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private vrframework.bean.panel.VRPanel vRPanel3;
     // End of variables declaration//GEN-END:variables
