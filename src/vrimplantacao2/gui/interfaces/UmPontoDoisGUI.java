@@ -1,7 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import org.openide.util.Exceptions;
@@ -16,15 +15,12 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.UmPontoDoisDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoView;
 import vrimplantacao2.parametro.Parametros;
-import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
-import vrimplantacao2.vo.enums.OpcaoFiscal;
 
 public class UmPontoDoisGUI extends VRInternalFrame implements ConexaoEvent {
 
@@ -70,10 +66,10 @@ public class UmPontoDoisGUI extends VRInternalFrame implements ConexaoEvent {
         this.title = "Importação " + SISTEMA;
 
         conexaoMySQL.host = "localhost";
-        conexaoMySQL.database = "dbIpcom";
+        conexaoMySQL.database = "comercio";
         conexaoMySQL.port = "3306";
         conexaoMySQL.user = "root";
-        conexaoMySQL.pass = "infor";
+        conexaoMySQL.pass = "ADMIN";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
@@ -145,6 +141,8 @@ public class UmPontoDoisGUI extends VRInternalFrame implements ConexaoEvent {
                     Importador importador = new Importador(umPontoDoisDAO);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
+                    
+                    umPontoDoisDAO.usaBalanca = chkTemBalanca.isSelected();
 
                     if (tabOperacoes.getSelectedIndex() == 0) {
 
@@ -159,12 +157,6 @@ public class UmPontoDoisGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkProdutos.isSelected()) {
                             importador.importarProduto(chkManterBalanca.isSelected());
                         }
-                        if (chkPautaFiscal.isSelected()) {
-                            importador.importarPautaFiscal(OpcaoFiscal.NOVOS);
-                        }
-                        if (chkPComprador.isSelected()) {
-                            importador.importarComprador();
-                        }             
 
                         {
                             List<OpcaoProduto> opcoes = new ArrayList<>();
@@ -222,9 +214,6 @@ public class UmPontoDoisGUI extends VRInternalFrame implements ConexaoEvent {
                             if (chkQtdEmbalagemEAN.isSelected()) {
                                 opcoes.add(OpcaoProduto.QTD_EMBALAGEM_EAN);
                             }
-                            if (chkPautaFiscalProduto.isSelected()) {
-                                opcoes.add(OpcaoProduto.EXCECAO);
-                            }
                             if (chkPSitCadastro.isSelected()) {
                                 opcoes.add(OpcaoProduto.ATIVO);
                             }
@@ -233,12 +222,6 @@ public class UmPontoDoisGUI extends VRInternalFrame implements ConexaoEvent {
                             }
                             if (chkPVendaPdv.isSelected()) {
                                 opcoes.add(OpcaoProduto.VENDA_PDV);
-                            }
-                            if (chkPSugestaoCotacao.isSelected()) {
-                                opcoes.add(OpcaoProduto.SUGESTAO_COTACAO);
-                            }
-                            if (chkPProdComprador.isSelected()) {
-                                opcoes.add(OpcaoProduto.COMPRADOR_PRODUTO);
                             }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
@@ -250,36 +233,6 @@ public class UmPontoDoisGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkEANemBranco.isSelected()) {
                             importador.importarEANemBranco();
                         }                        
-                        
-                        {
-                            List<OpcaoNutricional> opcoes = new ArrayList<>();
-                            if (chkNutricionalFilizola.isSelected()) {
-                                opcoes.add(OpcaoNutricional.FILIZOLA);
-                            }
-                            if (chkNutricionalToledo.isSelected()) {
-                                opcoes.add(OpcaoNutricional.TOLEDO);
-                            }
-                            if (!opcoes.isEmpty()) {
-                                importador.importarNutricional(opcoes.toArray(new OpcaoNutricional[] {}));
-                            }                            
-                        }
-                        
-                        {
-                            List<OpcaoReceitaBalanca> opcoes = new ArrayList<>();
-                            if (chkPReceitaFilizola.isSelected()) {
-                                opcoes.add(OpcaoReceitaBalanca.FILIZOLA);
-                            }
-                            if (chkPReceitaToledo.isSelected()) {
-                                opcoes.add(OpcaoReceitaBalanca.TOLEDO);
-                            }
-                            if (!opcoes.isEmpty()) {
-                                importador.importarReceitaBalanca(opcoes.toArray(new OpcaoReceitaBalanca[] {}));
-                            }                            
-                        }
-                        
-                        if (chkOferta.isSelected()) {
-                            importador.importarOfertas(new Date());
-                        }
                         
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
@@ -372,6 +325,7 @@ public class UmPontoDoisGUI extends VRInternalFrame implements ConexaoEvent {
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         chkProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
+        chkTemBalanca = new vrframework.bean.checkBox.VRCheckBox();
         chkCusto = new vrframework.bean.checkBox.VRCheckBox();
         chkCustoSemImposto = new vrframework.bean.checkBox.VRCheckBox();
         chkCustoComImposto = new vrframework.bean.checkBox.VRCheckBox();
@@ -392,20 +346,10 @@ public class UmPontoDoisGUI extends VRInternalFrame implements ConexaoEvent {
         chkTipoEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkMargem = new vrframework.bean.checkBox.VRCheckBox();
-        chkNutricionalFilizola = new vrframework.bean.checkBox.VRCheckBox();
-        chkNutricionalToledo = new vrframework.bean.checkBox.VRCheckBox();
-        btnMapaTribut = new vrframework.bean.button.VRButton();
-        chkPautaFiscal = new vrframework.bean.checkBox.VRCheckBox();
-        chkPautaFiscalProduto = new vrframework.bean.checkBox.VRCheckBox();
         chkPSitCadastro = new vrframework.bean.checkBox.VRCheckBox();
         chkPDescontinuado = new vrframework.bean.checkBox.VRCheckBox();
         chkPVendaPdv = new vrframework.bean.checkBox.VRCheckBox();
-        chkPSugestaoCotacao = new vrframework.bean.checkBox.VRCheckBox();
-        chkPComprador = new vrframework.bean.checkBox.VRCheckBox();
-        chkPProdComprador = new vrframework.bean.checkBox.VRCheckBox();
-        chkPReceitaFilizola = new vrframework.bean.checkBox.VRCheckBox();
-        chkPReceitaToledo = new vrframework.bean.checkBox.VRCheckBox();
-        chkOferta = new vrframework.bean.checkBox.VRCheckBox();
+        btnMapaTribut = new vrframework.bean.button.VRButton();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         jPanel3 = new javax.swing.JPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -421,6 +365,7 @@ public class UmPontoDoisGUI extends VRInternalFrame implements ConexaoEvent {
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteTipoInscricao = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         pnlLoja = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel1 = new javax.swing.JLabel();
@@ -477,6 +422,9 @@ public class UmPontoDoisGUI extends VRInternalFrame implements ConexaoEvent {
         );
 
         tabProdutos.add(vRPanel1);
+
+        chkTemBalanca.setText("Tem Balança");
+        tabProdutos.add(chkTemBalanca);
 
         chkCusto.setText("Custo");
         tabProdutos.add(chkCusto);
@@ -539,27 +487,6 @@ public class UmPontoDoisGUI extends VRInternalFrame implements ConexaoEvent {
         chkMargem.setText("Margem");
         tabProdutos.add(chkMargem);
 
-        chkNutricionalFilizola.setText("Nutricional (Filizola)");
-        tabProdutos.add(chkNutricionalFilizola);
-
-        chkNutricionalToledo.setText("Nutricional (Toledo)");
-        tabProdutos.add(chkNutricionalToledo);
-
-        btnMapaTribut.setText("Mapa de Tribut.");
-        btnMapaTribut.setEnabled(false);
-        btnMapaTribut.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnMapaTributActionPerformed(evt);
-            }
-        });
-        tabProdutos.add(btnMapaTribut);
-
-        chkPautaFiscal.setText("Pauta Fiscal");
-        tabProdutos.add(chkPautaFiscal);
-
-        chkPautaFiscalProduto.setText("Pauta Fiscal X Produto");
-        tabProdutos.add(chkPautaFiscalProduto);
-
         chkPSitCadastro.setText("Sit. Cadastro");
         tabProdutos.add(chkPSitCadastro);
 
@@ -569,23 +496,14 @@ public class UmPontoDoisGUI extends VRInternalFrame implements ConexaoEvent {
         chkPVendaPdv.setText("Venda (PDV)");
         tabProdutos.add(chkPVendaPdv);
 
-        chkPSugestaoCotacao.setText("Sugestão Cotação");
-        tabProdutos.add(chkPSugestaoCotacao);
-
-        chkPComprador.setText("Comprador");
-        tabProdutos.add(chkPComprador);
-
-        chkPProdComprador.setText("Produto Comprador");
-        tabProdutos.add(chkPProdComprador);
-
-        chkPReceitaFilizola.setText("Receita (Filizola)");
-        tabProdutos.add(chkPReceitaFilizola);
-
-        chkPReceitaToledo.setText("Receita (Toledo)");
-        tabProdutos.add(chkPReceitaToledo);
-
-        chkOferta.setText("Oferta");
-        tabProdutos.add(chkOferta);
+        btnMapaTribut.setText("Mapa de Tribut.");
+        btnMapaTribut.setEnabled(false);
+        btnMapaTribut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMapaTributActionPerformed(evt);
+            }
+        });
+        tabProdutos.add(btnMapaTribut);
 
         tabImportacao.addTab("Produtos", tabProdutos);
 
@@ -628,7 +546,7 @@ public class UmPontoDoisGUI extends VRInternalFrame implements ConexaoEvent {
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
                 .addGap(74, 74, 74))
         );
 
@@ -666,12 +584,13 @@ public class UmPontoDoisGUI extends VRInternalFrame implements ConexaoEvent {
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(171, Short.MAX_VALUE))
+                .addContainerGap(102, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
 
         tabOperacoes.addTab("Importação", tabImportacao);
+        tabOperacoes.addTab("Balança", vRImportaArquivBalancaPanel1);
 
         btnMigrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
         btnMigrar.setText("Migrar");
@@ -809,25 +728,16 @@ public class UmPontoDoisGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkNatReceita;
-    private vrframework.bean.checkBox.VRCheckBox chkNutricionalFilizola;
-    private vrframework.bean.checkBox.VRCheckBox chkNutricionalToledo;
-    private vrframework.bean.checkBox.VRCheckBox chkOferta;
-    private vrframework.bean.checkBox.VRCheckBox chkPComprador;
     private vrframework.bean.checkBox.VRCheckBox chkPDescontinuado;
-    private vrframework.bean.checkBox.VRCheckBox chkPProdComprador;
-    private vrframework.bean.checkBox.VRCheckBox chkPReceitaFilizola;
-    private vrframework.bean.checkBox.VRCheckBox chkPReceitaToledo;
     private vrframework.bean.checkBox.VRCheckBox chkPSitCadastro;
-    private vrframework.bean.checkBox.VRCheckBox chkPSugestaoCotacao;
     private vrframework.bean.checkBox.VRCheckBox chkPVendaPdv;
-    private vrframework.bean.checkBox.VRCheckBox chkPautaFiscal;
-    private vrframework.bean.checkBox.VRCheckBox chkPautaFiscalProduto;
     private vrframework.bean.checkBox.VRCheckBox chkPisCofins;
     private vrframework.bean.checkBox.VRCheckBox chkPreco;
     private vrframework.bean.checkBox.VRCheckBox chkProdMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
+    private vrframework.bean.checkBox.VRCheckBox chkTemBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
     private vrframework.bean.checkBox.VRCheckBox chkValidade;
     private javax.swing.JComboBox cmbLojaOrigem;
@@ -843,6 +753,7 @@ public class UmPontoDoisGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JTabbedPane tabOperacoes;
     private javax.swing.JPanel tabProdutos;
     private javax.swing.JTabbedPane tabs;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.panel.VRPanel vRPanel1;
     // End of variables declaration//GEN-END:variables

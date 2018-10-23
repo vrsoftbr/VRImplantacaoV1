@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoOracle;
@@ -30,7 +31,9 @@ import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -41,6 +44,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -225,6 +229,139 @@ public class RMSDAO extends InterfaceDAO {
     }
 
     @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT\n" +
+                    "    distinct\n" +
+                    "    substr(to_char(100000000+det_class_fis),2,8) AS ncm,\n" +
+                    "    Case When Git_Cod_Pauta > 0 Then 'F' Else 'P' End As Tipo_Iva,\n" +
+                    "    trim(CASE WHEN GIT_COD_PAUTA > 0 THEN nvl(fis_pauta.pauta ,0) ELSE nvl(ent_fis.tfis_aliq_str,0) END) AS iva,\n" +
+                    "    ent_fis.tfis_codigo_fis_dest AS icms_cst_e,\n" +
+                    "    sai_fis.tfis_codigo_fis_dest AS icms_cst_s,\n" +
+                    "    Ent_Fis.Tfis_Aliq_Icm As Icms_Aliq_E,\n" +
+                    "    --Sai_Fis.Tfis_Aliq_Icm As Icms_Aliq_S,\n" +
+                    "    case when sai_fis.tfis_codigo_fis_dest = 60 then ent_fis.TFIS_ALIQ_ICM else sai_fis.TFIS_ALIQ_ICM end  AS icms_aliq_s,\n" +
+                    "    ENT_FIS.TFIS_BASE_REDUZ as ICMS_RBC_E,\n" +
+                    "    --Sai_Fis.Tfis_Base_Reduz As Icms_Rbc_S,\n" +
+                    "    case when SUBSTR(GIT_DESCRICAO,1,9)  = 'SALSICHA ' then ENT_FIS.TFIS_BASE_REDUZ\n" +
+                    "         when SUBSTR(GIT_DESCRICAO,1,10) = 'MORTADELA ' then ENT_FIS.TFIS_BASE_REDUZ\n" +
+                    "         when SUBSTR(GIT_DESCRICAO,1,9)  = 'LINGUICA ' then ENT_FIS.TFIS_BASE_REDUZ\n" +
+                    "         when SUBSTR(GIT_DESCRICAO,1,6)  = 'LINGUA' then ENT_FIS.TFIS_BASE_REDUZ\n" +
+                    "         when SUBSTR(GIT_DESCRICAO,1,6)  = 'ACUCAR' then ENT_FIS.TFIS_BASE_REDUZ\n" +
+                    "         when SUBSTR(GIT_DESCRICAO,1,8)  = 'MANTEIGA' AND substr(to_char(100000000+det_class_fis),2,8) = '04051000' then ENT_FIS.TFIS_BASE_REDUZ\n" +
+                    "         when SUBSTR(GIT_DESCRICAO,1,11)  = 'APRESUNTADO' and SUBSTR(TO_CHAR(100000000+DET_CLASS_FIS),2,8) = '16024900' then ENT_FIS.TFIS_BASE_REDUZ\n" +
+                    "         When Substr(Git_Descricao,1,4)  = 'SUCO' And Substr(To_Char(100000000+Det_Class_Fis),2,8) = '20091900' Then Ent_Fis.Tfis_Base_Reduz\n" +
+                    "         When Substr(Git_Descricao,1,4)  = 'PAIO' And Substr(To_Char(100000000+Det_Class_Fis),2,8) = '16010000' Then Ent_Fis.Tfis_Base_Reduz\n" +
+                    "         When Substr(To_Char(100000000+Det_Class_Fis),2,8) = '15171000' Then Ent_Fis.Tfis_Base_Reduz\n" +
+                    "         When Substr(To_Char(100000000+Det_Class_Fis),2,8) = '16041310' Then Ent_Fis.Tfis_Base_Reduz\n" +
+                    "         When Substr(To_Char(100000000+Det_Class_Fis),2,8) = '09012100' Then Ent_Fis.Tfis_Base_Reduz\n" +
+                    "         When Substr(To_Char(100000000+Det_Class_Fis),2,8) = '04022120' Then Ent_Fis.Tfis_Base_Reduz\n" +
+                    "         When Substr(To_Char(100000000+Det_Class_Fis),2,8) = '15179010' Then Ent_Fis.Tfis_Base_Reduz\n" +
+                    "         When Substr(To_Char(100000000+Det_Class_Fis),2,8) = '15141910' Then Ent_Fis.Tfis_Base_Reduz\n" +
+                    "         When Substr(To_Char(100000000+Det_Class_Fis),2,8) = '15121911' Then Ent_Fis.Tfis_Base_Reduz\n" +
+                    "         When Substr(To_Char(100000000+Det_Class_Fis),2,8) = '15152910' Then Ent_Fis.Tfis_Base_Reduz\n" +
+                    "         When Substr(To_Char(100000000+Det_Class_Fis),2,8) = '15079011' Then Ent_Fis.Tfis_Base_Reduz\n" +
+                    "         When Substr(To_Char(100000000+Det_Class_Fis),2,8) = '19059010' Then Ent_Fis.Tfis_Base_Reduz\n" +
+                    "         When Substr(To_Char(100000000+Det_Class_Fis),2,8) = '22090000' Then Ent_Fis.Tfis_Base_Reduz\n" +
+                    "         When Substr(To_Char(100000000+Det_Class_Fis),2,8) = '04022110' Then Ent_Fis.Tfis_Base_Reduz\n" +
+                    "         When Substr(Git_Descricao,1,4)  = 'ALHO' And Substr(To_Char(100000000+Det_Class_Fis),2,8) = '20059900' Then Ent_Fis.Tfis_Base_Reduz\n" +
+                    "         When Substr(To_Char(100000000+Det_Class_Fis),2,8) = '19059090' AND Ent_Fis.Tfis_Base_Reduz = 41.67 Then Ent_Fis.Tfis_Base_Reduz\n" +
+                    "          else SAI_FIS.TFIS_BASE_REDUZ end as ICMS_RBC_S,\n" +
+                    "    ent_fis.TFIS_ORIGEM uforigem,\n" +
+                    "    ent_fis.TFIS_DESTINO ufdestino\n" +
+                    "  FROM \n" +
+                    "    aa3citem,\n" +
+                    "    aa1ditem,\n" +
+                    "    aa2tfisc ent_fis,\n" +
+                    "    aa2tfisc sai_fis,\n" +
+                    "    (SELECT git_cod_item produto,\n" +
+                    "      PC_FIS_PIS.F_PIS_TABE(git_cod_item, dateto_rms7(sysdate),1102,'  ',' ',0,'  ',' ',0) ent_fispis,\n" +
+                    "      PC_FIS_PIS.F_PIS_TABE(git_cod_item, dateto_rms7(sysdate),5102,'  ',' ',0,'  ',' ',0) sai_fispis\n" +
+                    "    FROM aa3citem\n" +
+                    "    WHERE git_cod_item > 0\n" +
+                    "    ) fis_pis,\n" +
+                    "    (SELECT git_cod_item produto,to_number(substr(tab_conteudo,1,15))/1000000 Pauta\n" +
+                    "    FROM aa3citem,AA2CTABE\n" +
+                    "    WHERE git_cod_item > 0\n" +
+                    "    AND SUBSTR(TAB_ACESSO,4,1) = ' '\n" +
+                    "    and rtrim(tab_acesso) = substr(to_char(1000+git_cod_pauta),2,3)\n" +
+                    "    and TAB_CODIGO = 201\n" +
+                    "    ) fis_pauta\n" +
+                    "  WHERE git_cod_item            > 0\n" +
+                    "  AND det_cod_item              = git_cod_item\n" +
+                    "  AND fis_pis.produto (+)       = git_cod_item\n" +
+                    "  AND fis_pauta.produto (+)     = git_cod_item\n" +
+                    "  AND ent_fis.TFIS_ORIGEM       = GIT_ESTADO\n" +
+                    "  AND ent_fis.TFIS_DESTINO      = GIT_ESTADO\n" +
+                    "  AND ent_fis.TFIS_CODIGO       = 112\n" +
+                    "  AND ent_fis.TFIS_FIGURA       = GIT_NAT_fISCAL\n" +
+                    "  AND ent_fis.TFIS_AUTOMACAO    = 'S'\n" +
+                    "  AND sai_fis.TFIS_ORIGEM       = GIT_ESTADO\n" +
+                    "  AND sai_fis.TFIS_DESTINO      = GIT_ESTADO\n" +
+                    "  AND sai_fis.TFIS_CODIGO       = 512\n" +
+                    "  AND sai_fis.TFIS_FIGURA       = GIT_NAT_fISCAL\n" +
+                    "  AND sai_fis.TFIS_AUTOMACAO    = 'S'\n" +
+                    "  AND CASE WHEN GIT_COD_PAUTA > 0 THEN nvl(fis_pauta.pauta ,0) ELSE nvl(ent_fis.tfis_aliq_str,0) END != 0\n" +
+                    "  ORDER BY \n" +
+                    "        substr(to_char(100000000+det_class_fis),2,8)")) {
+                while(rs.next()) {
+                    PautaFiscalIMP imp = new PautaFiscalIMP();
+                    imp.setId(formatPautaFiscalId(
+                            rs.getString("uforigem"), 
+                            rs.getString("ncm"), 
+                            rs.getDouble("iva"), 
+                            rs.getDouble("icms_aliq_s"), 
+                            rs.getDouble("icms_aliq_e"),
+                            rs.getDouble("icms_rbc_s"),
+                            rs.getDouble("icms_rbc_e")));
+                    imp.setNcm(rs.getString("ncm"));
+                    imp.setUf(rs.getString("uforigem"));
+                    if ("P".equals(rs.getString("tipo_iva"))) {
+                        imp.setTipoIva(TipoIva.PERCENTUAL);
+                        imp.setIva(rs.getDouble("iva"));
+                    } else {
+                        imp.setTipoIva(TipoIva.VALOR);
+                        imp.setIva(rs.getDouble("iva"));
+                    }
+                    
+                    if (rs.getInt("icms_cst_s") == 60) {
+                        imp.setAliquotaDebito(0, rs.getDouble("icms_aliq_s"), 0);
+                    } else {
+                        imp.setAliquotaDebito(rs.getInt("icms_cst_s"), rs.getDouble("icms_aliq_s"), rs.getDouble("icms_rbc_s"));
+                    }
+                    
+                    if (rs.getInt("icms_cst_e") == 60) {
+                        imp.setAliquotaCredito(0, rs.getDouble("icms_aliq_e"), 0);
+                    } else {
+                        imp.setAliquotaCredito(rs.getInt("icms_cst_e"), rs.getDouble("icms_aliq_e"), rs.getDouble("icms_rbc_e"));
+                    }
+                    
+                    if (rs.getInt("icms_cst_s") == 60) {
+                        imp.setAliquotaDebitoForaEstado(0, rs.getDouble("icms_aliq_s"), 0);
+                    } else {
+                        imp.setAliquotaDebitoForaEstado(rs.getInt("icms_cst_s"), rs.getDouble("icms_aliq_s"), rs.getDouble("icms_rbc_s"));
+                    }
+                    
+                    if (rs.getInt("icms_cst_e") == 60) {
+                        imp.setAliquotaCreditoForaEstado(0, rs.getDouble("icms_aliq_e"), 0);
+                    } else {
+                        imp.setAliquotaCreditoForaEstado(rs.getInt("icms_cst_e"), rs.getDouble("icms_aliq_e"), rs.getDouble("icms_rbc_e"));
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    private String formatPautaFiscalId(String uf, String ncm, double v_iva, double IcmsSaida, double IcmsEntrada, double IcmsRedSaida, double IcmsRedEntrada ) {
+        return String.format("%s-%s-%.2f-%.2f-%.2f-%.2f-%.2f", uf, ncm, v_iva, IcmsSaida, IcmsEntrada, IcmsRedSaida, IcmsRedEntrada);
+    }
+    
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
@@ -282,7 +419,9 @@ public class RMSDAO extends InterfaceDAO {
                     "  vwfis.Pis_Cst_E,\n" +
                     "  vwfis.Pis_Cst_S,\n" +
                     "  vwfis.Cofins_Cst_E,\n" +
-                    "  vwfis.cofins_cst_s\n" +
+                    "  vwfis.cofins_cst_s,\n" +
+                    "  vwfis.iva, \n" +
+                    "  vwfis.tipo_iva\n " +        
                     "from\n" +
                     "	AA3CCEAN ean\n" +
                     "join AA3CITEM p on\n" +
@@ -394,6 +533,15 @@ public class RMSDAO extends InterfaceDAO {
                     imp.setIcmsReducaoEntrada(rst.getDouble("icms_rbc_e"));
                     imp.setIcmsReducaoSaida(rst.getDouble("icms_rbc_s"));
                     imp.setAtacadoPreco(rst.getDouble("precoatac"));
+                    
+                    imp.setPautaFiscalId(formatPautaFiscalId(
+                            "SP", 
+                            rst.getString("ncm"), 
+                            rst.getDouble("iva"), 
+                            rst.getInt("icms_aliq_s"),
+                            rst.getInt("icms_aliq_e"),
+                            rst.getDouble("icms_rbc_s"), 
+                            rst.getDouble("icms_rbc_e")));
                     
                     result.add(imp);
                 }
