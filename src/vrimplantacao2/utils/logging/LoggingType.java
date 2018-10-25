@@ -46,27 +46,23 @@ public enum LoggingType {
         }
     },
     FILE {
-        private Handler handler;
         @Override
-        public Handler getHandler() {
-            try {
-                if (handler != null) {
-                    handler.flush();  
-                } else {
-                    File f = new File("c:/vr/implantacao/log");
-                    if (!f.exists()) {
-                        f.mkdir();
-                    }
-                    handler = new FileHandler("c:/vr/implantacao/log/LOG " + DATE_FORMAT.format(new Date()) + ".log", true);                  
-                    handler.setFormatter(new SimpleFormatter() {
-
-                        @Override
-                        public String getHead(Handler h) {
-                            return "------> ";
-                        }
-                        
-                    });
+        public Handler getHandler() {            
+            try {                
+                File f = new File("c:/vr/implantacao/log");
+                if (!f.exists()) {
+                    f.mkdir();
                 }
+                Handler handler = new FileHandler("c:/vr/implantacao/log/LOG " + DATE_FORMAT.format(new Date()) + ".log", true);                  
+                handler.setFormatter(new SimpleFormatter() {
+
+                    @Override
+                    public String getHead(Handler h) {
+                        return "------> ";
+                    }
+
+                });
+                    
                 return handler;
             } catch (IOException | SecurityException ex) {
                 LOG.log(Level.SEVERE, "Erro ao gerar o arquivo de log", ex);

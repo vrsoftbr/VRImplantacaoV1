@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -118,6 +119,8 @@ public final class Parametros implements Iterable<Parametro>{
             
             loggers.put(log.getNome(), log);            
         }
+        
+        LogManager.getLogManager().reset();
         
         for (LoggingConfig log: loggers.values()) {
             Logger logger = Logger.getLogger(log.getNome());            
