@@ -157,7 +157,7 @@ public class Organizador {
             validos.clear();
             invalidos.clear();
         }
-        
+        LOG.fine("QTDs Balanca: " + balanca.size() + "|Normais: " + normais.size());
         for (ProdutoIMP produto : balanca.values()) {
             String[] chave = new String[]{produto.getImportSistema(), produto.getImportLoja(), produto.getImportId(), produto.getEan()};
             result.put(produto, chave);
@@ -227,8 +227,8 @@ public class Organizador {
             String[] chave = new String[]{produto.getImportSistema(), produto.getImportLoja(), produto.getImportId(), produto.getEan()};
             
             long ean = Utils.stringToLong(produto.getEan());
-            String un = produto.getTipoEmbalagem();
-            if (ean >= 1 && ean <= 999999 && (produto.isBalanca() || "KG".equals(un != null ? un.toUpperCase() : "UN"))) {
+            String un = Utils.acertarTexto(produto.getTipoEmbalagem(), 2);
+            if (ean >= 1 && ean <= 999999 && (produto.isBalanca() || ("KG".equals(un != null ? un.toUpperCase() : "UN")))) {
                 balanca.put(produto, chave);
             } else {
                 normais.put(produto, chave);
