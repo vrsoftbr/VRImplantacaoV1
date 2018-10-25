@@ -155,6 +155,7 @@ import vrimplantacao2.gui.interfaces.DtComGUI;
 import vrimplantacao2.gui.interfaces.FHOnlineGUI;
 import vrimplantacao2.gui.interfaces.FaciliteGUI;
 import vrimplantacao2.gui.interfaces.FenixGUI;
+import vrimplantacao2.gui.interfaces.FlashGUI;
 import vrimplantacao2.gui.interfaces.FortGUI;
 import vrimplantacao2.gui.interfaces.FortiGUI;
 import vrimplantacao2.gui.interfaces.HipcomGUI;
@@ -563,6 +564,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuUpForti = new javax.swing.JMenuItem();
         mnuAlphaSys = new javax.swing.JMenuItem();
         mnuZpf = new javax.swing.JMenuItem();
+        mnuFlash = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1187,6 +1189,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu15.add(mnuZpf);
+
+        mnuFlash.setText("Flash");
+        mnuFlash.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuFlashActionPerformed(evt);
+            }
+        });
+        jMenu15.add(mnuFlash);
 
         jMenu2.add(jMenu15);
 
@@ -4036,6 +4046,11 @@ public final class MenuGUI extends VRMdiFrame {
         ZpfGUI.exibir(this);
     }//GEN-LAST:event_mnuZpfActionPerformed
 
+    private void mnuFlashActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuFlashActionPerformed
+        // TODO add your handling code here:
+        FlashGUI.exibir(this);
+    }//GEN-LAST:event_mnuFlashActionPerformed
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -4176,6 +4191,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuFarm2000;
     private javax.swing.JMenuItem mnuFenix;
     private javax.swing.JMenu mnuFerramentas;
+    private javax.swing.JMenuItem mnuFlash;
     private javax.swing.JMenuItem mnuFlatan;
     private javax.swing.JMenuItem mnuFort;
     private javax.swing.JMenuItem mnuForti;

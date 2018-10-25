@@ -13,6 +13,7 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -402,7 +403,7 @@ public class FlashDAO extends InterfaceDAO {
                     imp.setTelefone(rst.getString("telresidencia1"));
                     imp.setFax(rst.getString("telfax"));
                     imp.setCelular(rst.getString("telcelular"));
-                    imp.setEmail(rst.getString("emailpessoal").toLowerCase());
+                    imp.setEmail(rst.getString("emailpessoal"));
 
                     if ((rst.getString("telresidencia2") != null)
                             && (!rst.getString("telresidencia2").trim().isEmpty())) {
@@ -441,6 +442,42 @@ public class FlashDAO extends InterfaceDAO {
         return result;
     }
 
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "r.codigotitulo,\n"
+                    + "r.parcela,\n"
+                    + "r.documento,\n"
+                    + "r.vencimento, \n"
+                    + "r.dataemissao, \n"
+                    + "r.valortitulo, \n"
+                    + "r.historico,\n"
+                    + "c.codigo\n"
+                    + "from receitas r\n"
+                    + "inner join pessoa c on c.cnpjcpf = r.cnpjcpf\n"
+                    + "where r.codigofilial = '"+getLojaOrigem()+"'\n"
+                    + "and r.status = 'N'"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("codigotitulo"));
+                    imp.setIdCliente(rst.getString("codigo"));
+                    imp.setParcela(rst.getInt("parcela"));
+                    imp.setNumeroCupom(rst.getString("documento"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setValor(rst.getDouble("valortitulo"));
+                    imp.setObservacao(rst.getString("historico"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> lojas = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {

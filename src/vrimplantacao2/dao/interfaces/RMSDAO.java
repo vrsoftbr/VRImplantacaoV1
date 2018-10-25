@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoOracle;
@@ -30,7 +31,9 @@ import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -41,6 +44,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -225,6 +229,75 @@ public class RMSDAO extends InterfaceDAO {
     }
 
     @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "      distinct\n" +
+                    "      ncm || icms_aliq_e || icms_rbc_e || icms_aliq_s || icms_rbc_s || iva id, \n" +
+                    "      ncm,\n" +
+                    "      tipo_iva,\n" +
+                    "      iva,\n" +
+                    "      icms_aliq_e,\n" +
+                    "      icms_cst_e,\n" +
+                    "      icms_rbc_e,\n" +
+                    "      icms_aliq_s,\n" +
+                    "      icms_cst_s,\n" +
+                    "      icms_rbc_s\n" +
+                    "from \n" +
+                    "      vw_fis_mxf_produtos \n" +
+                    "where \n" +
+                    "      iva != 0\n" +
+                    "order by\n" +
+                    "      ncm, iva")) {
+                while(rs.next()) {
+                    PautaFiscalIMP imp = new PautaFiscalIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    
+                    imp.setNcm(rs.getString("ncm"));
+                    imp.setUf("SP");
+                    if ("P".equals(rs.getString("tipo_iva"))) {
+                        imp.setTipoIva(TipoIva.PERCENTUAL);
+                        imp.setIva(rs.getDouble("iva"));
+                    } else {
+                        imp.setTipoIva(TipoIva.VALOR);
+                        imp.setIva(rs.getDouble("iva"));
+                    }
+                    
+                    if (rs.getInt("icms_cst_s") == 60) {
+                        imp.setAliquotaDebito(0, rs.getDouble("icms_aliq_s"), 0);
+                    } else {
+                        imp.setAliquotaDebito(rs.getInt("icms_cst_s"), rs.getDouble("icms_aliq_s"), rs.getDouble("icms_rbc_s"));
+                    }
+                    
+                    if (rs.getInt("icms_cst_e") == 60) {
+                        imp.setAliquotaCredito(0, rs.getDouble("icms_aliq_e"), 0);
+                    } else {
+                        imp.setAliquotaCredito(rs.getInt("icms_cst_e"), rs.getDouble("icms_aliq_e"), rs.getDouble("icms_rbc_e"));
+                    }
+                    
+                    if (rs.getInt("icms_cst_s") == 60) {
+                        imp.setAliquotaDebitoForaEstado(0, rs.getDouble("icms_aliq_s"), 0);
+                    } else {
+                        imp.setAliquotaDebitoForaEstado(rs.getInt("icms_cst_s"), rs.getDouble("icms_aliq_s"), rs.getDouble("icms_rbc_s"));
+                    }
+                    
+                    if (rs.getInt("icms_cst_e") == 60) {
+                        imp.setAliquotaCreditoForaEstado(0, rs.getDouble("icms_aliq_e"), 0);
+                    } else {
+                        imp.setAliquotaCreditoForaEstado(rs.getInt("icms_cst_e"), rs.getDouble("icms_aliq_e"), rs.getDouble("icms_rbc_e"));
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
@@ -282,7 +355,10 @@ public class RMSDAO extends InterfaceDAO {
                     "  vwfis.Pis_Cst_E,\n" +
                     "  vwfis.Pis_Cst_S,\n" +
                     "  vwfis.Cofins_Cst_E,\n" +
-                    "  vwfis.cofins_cst_s\n" +
+                    "  vwfis.cofins_cst_s,\n" +
+                    "  vwfis.iva,\n" +
+                    "  vwfis.tipo_iva,\n" +
+                    "  replace(det.DET_CLASS_FIS || vwfis.Icms_Aliq_E || vwfis.ICMS_RBC_E || vwfis.icms_aliq_s || vwfis.ICMS_RBC_S || vwfis.iva, '.', ',') idpautafiscal\n" +
                     "from\n" +
                     "	AA3CCEAN ean\n" +
                     "join AA3CITEM p on\n" +
@@ -395,6 +471,7 @@ public class RMSDAO extends InterfaceDAO {
                     imp.setIcmsReducaoSaida(rst.getDouble("icms_rbc_s"));
                     imp.setAtacadoPreco(rst.getDouble("precoatac"));
                     
+                    imp.setPautaFiscalId(rst.getString("idpautafiscal"));           
                     result.add(imp);
                 }
             }
