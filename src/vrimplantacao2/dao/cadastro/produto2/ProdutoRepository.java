@@ -82,7 +82,7 @@ public class ProdutoRepository {
 
     public void salvar(List<ProdutoIMP> produtos) throws Exception {
         LOG.finest("Abrindo a transação");
-        begin();
+        begin();        
         try {
             /**
              * Organizando a listagem de dados antes de efetuar a gravação.
@@ -96,79 +96,96 @@ public class ProdutoRepository {
 
             setNotify("Gravando os produtos...", organizados.size());
             for (KeyList<String> keys : organizados.keySet()) {
-                ProdutoIMP imp = organizados.get(keys);
-
-                //<editor-fold defaultstate="collapsed" desc="Preparando variáveis">
-                int id;
-                long ean;
-                String strID;
-                boolean eBalanca;
-                TipoEmbalagem unidade;
-                {
-                    SetUpVariaveisTO to = setUpVariaveis(imp);
-                    ean = to.ean;
-                    strID = to.strID;
-                    eBalanca = to.eBalanca;
-                    unidade = to.unidade;
-                }
-                //</editor-fold>
-
-                ProdutoAnteriorVO anterior = provider.anterior().get(keys.get(0), keys.get(1), keys.get(2));
-                if (anterior == null) {
+                StringBuilder rep = new StringBuilder();
+                try {
+                    ProdutoIMP imp = organizados.get(keys);
                     
-                    if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_RESETAR_BALANCA)) {
-                        try {
-                            int idValido = Integer.parseInt(strID);
-                            if (eBalanca || idValido < 10000) {
-                                strID = "-1";
+                    rep
+                            .append("00|")
+                            .append(imp.getImportId()).append("|")
+                            .append(imp.getEan()).append("|")
+                            .append(imp.getTipoEmbalagem()).append("|")
+                            .append(imp.isBalanca() ? "PESAVEL" : "UNITARIO").append("|")
+                            .append(imp.getDescricaoCompleta()).append("|");
+
+                    //<editor-fold defaultstate="collapsed" desc="Preparando variáveis">
+                    int id;
+                    long ean;
+                    String strID;
+                    boolean eBalanca;
+                    TipoEmbalagem unidade;
+                    {
+                        SetUpVariaveisTO to = setUpVariaveis(imp);
+                        ean = to.ean;
+                        strID = to.strID;
+                        eBalanca = to.eBalanca;
+                        unidade = to.unidade;
+                    }
+                    //</editor-fold>
+
+                    ProdutoAnteriorVO anterior = provider.anterior().get(keys.get(0), keys.get(1), keys.get(2));
+                    if (anterior == null) {
+                        rep.append("01|Produto não importado anteriormente");
+                        if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_RESETAR_BALANCA)) {
+                            try {
+                                int idValido = Integer.parseInt(strID);
+                                if (eBalanca || idValido < 10000) {
+                                    strID = "-1";
+                                }
+                            } catch (NumberFormatException e) {
+                                //Se não for um numero inteiro, não faz nada pois um
+                                //novo id será gerado para ele.
                             }
-                        } catch (NumberFormatException e) {
-                            //Se não for um numero inteiro, não faz nada pois um
-                            //novo id será gerado para ele.
+                        } else if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA) && eBalanca) {
+                            strID = String.valueOf(ean);
                         }
-                    } else if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA) && eBalanca) {
-                        strID = String.valueOf(ean);
+
+                        id = idStack.obterID(strID, eBalanca);
+
+                        ProdutoVO prod = converterIMP(imp, id, ean, unidade, eBalanca);
+
+                        anterior = converterImpEmAnterior(imp);
+                        anterior.setCodigoAtual(prod);
+                        ProdutoComplementoVO complemento = converterComplemento(imp);
+                        complemento.setProduto(prod);
+                        ProdutoAliquotaVO aliquota = converterAliquota(imp);
+                        aliquota.setProduto(prod);
+
+                        provider.salvar(prod);
+                        provider.anterior().salvar(anterior);
+                        provider.complemento().salvar(complemento, false);
+                        provider.aliquota().salvar(aliquota);
+                    } else if (anterior.getCodigoAtual() != null) {
+                        id = anterior.getCodigoAtual().getId();
+                        rep.append("01|Produto importado anteriormente (").append("codigoatual:").append(id).append("\n");
+                    } else {
+                        rep.append("01|Produto sem código atual no VR");
+                        continue;
                     }
 
-                    id = idStack.obterID(strID, eBalanca);
-
-                    ProdutoVO prod = converterIMP(imp, id, ean, unidade, eBalanca);
-
-                    anterior = converterImpEmAnterior(imp);
-                    anterior.setCodigoAtual(prod);
-                    ProdutoComplementoVO complemento = converterComplemento(imp);
-                    complemento.setProduto(prod);
-                    ProdutoAliquotaVO aliquota = converterAliquota(imp);
-                    aliquota.setProduto(prod);
-
-                    provider.salvar(prod);
-                    provider.anterior().salvar(anterior);
-                    provider.complemento().salvar(complemento, false);
-                    provider.aliquota().salvar(aliquota);
-                } else if (anterior.getCodigoAtual() != null) {
-                    id = anterior.getCodigoAtual().getId();
-                } else {
-                    continue;
-                }
-
-                if (eBalanca) {
-                    ean = id;
-                }
-
-                if (id > 0 && ean > 0) { //ID e EAN válidos
-                    if (!provider.automacao().cadastrado(ean)) {
-                        ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
-                        automacao.setProduto(anterior.getCodigoAtual());
-                        provider.automacao().salvar(automacao);
+                    if (eBalanca) {
+                        ean = id;
                     }
-                }
 
-                if (!provider.eanAnterior().cadastrado(imp.getImportId(), imp.getEan())) {
-                    ProdutoAnteriorEanVO eanAnterior = converterAnteriorEAN(imp);
-                    provider.eanAnterior().salvar(eanAnterior);
-                }
+                    if (id > 0 && ean > 0) { //ID e EAN válidos
+                        if (!provider.automacao().cadastrado(ean)) {
+                            ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
+                            automacao.setProduto(anterior.getCodigoAtual());
+                            provider.automacao().salvar(automacao);
+                        }
+                    }
 
-                notificar();
+                    if (!provider.eanAnterior().cadastrado(imp.getImportId(), imp.getEan())) {
+                        ProdutoAnteriorEanVO eanAnterior = converterAnteriorEAN(imp);
+                        provider.eanAnterior().salvar(eanAnterior);
+                    }
+
+                    notificar();                    
+                    LOG.finer("Produto importado: " + rep.toString());
+                } catch (Exception ex) {
+                    LOG.log(Level.SEVERE, "Erro ao importar o produto\n" + rep.toString(), ex);
+                    throw ex;
+                }
             }
 
             for (LojaVO loja : provider.getLojas()) {

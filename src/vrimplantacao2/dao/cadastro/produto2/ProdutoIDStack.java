@@ -1,6 +1,7 @@
 package vrimplantacao2.dao.cadastro.produto2;
 
 import java.util.Set;
+import java.util.logging.Logger;
 import vrimplantacao2.utils.collection.IDStack;
 
 /**
@@ -8,6 +9,8 @@ import vrimplantacao2.utils.collection.IDStack;
  * @author Leandro
  */
 public class ProdutoIDStack {
+    
+    private static final Logger LOG = Logger.getLogger(ProdutoIDStack.class.getName());
 
     private IDStack balanca;
     private IDStack normais;
@@ -54,47 +57,57 @@ public class ProdutoIDStack {
      * @return ID convertido em {@link Integer} se for válido ou um novo ID;
      */
     public int obterID(String strID, boolean eBalanca) {
-
-        boolean gerarID = false;
-        int id = -1;
+        StringBuilder rep = new StringBuilder();
         try {
-            //Tenta converter o ID em número.
-            long temp = Long.parseLong(strID);
-            //Caso o ID seja menor que 1 ou maior que 999999, então um novo id é gerado.
-            if (temp >= 1 && temp <= 999999) {
-                id = (int) temp;
-                //Caso o ID já esteja cadastrado, então um novo ID é gerado.
-                if (cadastrados.contains(id)) {
+            boolean gerarID = false;
+            int id = -1;
+            try {
+                //Tenta converter o ID em número.
+                long temp = Long.parseLong(strID);
+                //Caso o ID seja menor que 1 ou maior que 999999, então um novo id é gerado.
+                if (temp >= 1 && temp <= 999999) {
+                    id = (int) temp;
+                    //Caso o ID já esteja cadastrado, então um novo ID é gerado.
+                    if (cadastrados.contains(id)) {
+                        gerarID = true;
+                        rep.append("01|Id existente");
+                    }                
+                } else {
                     gerarID = true;
-                }                
-            } else {
+                    rep.append("01|Id fora do intervalo permitido");
+                }
+            } catch (NumberFormatException e) {
+                //se não for possível converter, gera um novo ID.
                 gerarID = true;
+                rep.append("01|Id inválido");
             }
-        } catch (NumberFormatException e) {
-            //se não for possível converter, gera um novo ID.
-            gerarID = true;
-        }
-        
-        if (gerarID) {
-            if (eBalanca) {
-                id = (int) balanca.pop();
-                normais.remove((long) id);
-                cadastrados.add(id);
+
+            if (gerarID) {
+                if (eBalanca) {
+                    id = (int) balanca.pop();
+                    normais.remove((long) id);
+                    cadastrados.add(id);
+                } else {
+                    id = (int) normais.pop();
+                    balanca.remove((long) id);
+                    cadastrados.add(id);
+                }
+                rep.append("02|IdAnterior: ").append(strID).append(" idGerado: ").append(id);
             } else {
-                id = (int) normais.pop();
-                balanca.remove((long) id);
+                if (id < 10000) {
+                    balanca.remove((long) id);
+                } else {
+                    normais.remove((long) id);
+                }
                 cadastrados.add(id);
+                rep.append("02|Id ").append(id).append(" disponível");
             }
-        } else {
-            if (id < 10000) {
-                balanca.remove((long) id);
-            } else {
-                normais.remove((long) id);
-            }
-            cadastrados.add(id);  
+            LOG.finest(rep.toString());
+            return id;
+        } catch (Exception ex) {
+            LOG.severe(rep.toString());
+            throw ex;
         }
-        
-        return id;
     }
 
 }

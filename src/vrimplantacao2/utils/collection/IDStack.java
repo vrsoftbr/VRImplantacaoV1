@@ -82,25 +82,38 @@ public class IDStack {
      * @exception RuntimeException Caso a pilha esteja vazia retorna este erro.
      */
     public long pop() {
-        if (stacks.isEmpty()) {
+        StringBuilder rep = new StringBuilder();
+        try {
+            if (stacks.isEmpty()) {
+                throw new RuntimeException("Pilha de IDs vazia.");
+            }
+            SortedSet<Long> stack = null;
+            rep.append("00|Qtd.Stacks: ").append(stacks.size()).append("\r\n");
+            for (Long key: stacks.keySet()) {
+                SortedSet<Long> aux = stacks.get(key);
+                rep.append("01|key:").append(key);
+                if (!aux.isEmpty()) {
+                    stack = aux;
+                    rep.append("|ENCONTRADO\r\n");
+                    break;
+                }
+                rep.append("|NAO ENCONTRADO\r\n");
+            }
+            if (stack != null) {
+                long id = stack.last();
+                if (stack.remove(id)) {
+                    size--;
+                }
+                rep.append("02|ID retornado:").append(id);
+                LOG.finest(rep.toString());
+                return id;
+            }
             throw new RuntimeException("Pilha de IDs vazia.");
+        } catch (RuntimeException ex) {
+            rep.append("\r\n").append(stacks.toString());
+            LOG.severe(rep.toString());
+            throw ex;
         }
-        SortedSet<Long> stack = null;
-        for (Long key: stacks.keySet()) {
-            SortedSet<Long> aux = stacks.get(key);
-            if (!aux.isEmpty()) {
-                stack = aux;
-                break;
-            }
-        }
-        if (stack != null) {
-            long id = stack.last();
-            if (stack.remove(id)) {
-                size--;
-            }
-            return id;
-        }
-        throw new RuntimeException("Pilha de IDs vazia.");
     }
     
     /**

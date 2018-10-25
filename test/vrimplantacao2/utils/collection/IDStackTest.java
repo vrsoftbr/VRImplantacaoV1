@@ -171,5 +171,14 @@ public class IDStackTest {
         System.out.println("IDStack." + desc + "();");
     }
     
-    
+    @Test
+    public void testBalanca() {
+        getDesc("testBalanca()");
+        IDStack stack = new IDStack();
+        for (int i=1; i < 10000; i++) {
+            stack.add(i);
+        }
+        long id = stack.pop();
+        assertEquals(1L, id);
+    }
 }
