@@ -163,9 +163,9 @@ public class UmPontoDoisDAO extends InterfaceDAO implements MapaTributoProvider 
                     "select \n"
                     + "	prdcod, \n"
                     + "	prdean \n"
-                    + "from \n"
+                  + "from \n"
                     + "	cadastrodeprodutos \n"
-                    + "where \n"
+                  + "where \n"
                     + "	prdean <> prdcodbarras and\n"
                     + "	prdean <> ''")) {
                 while (rs.next()) {
@@ -213,11 +213,11 @@ public class UmPontoDoisDAO extends InterfaceDAO implements MapaTributoProvider 
                     "	ForFax fax,\n" +
                     "	ForCel celular,\n" +
                     "	case when ForDtaCad = '1000-01-01' then null else ForDtaCad end datacadastro\n" +
-                    " from\n" +
+                    "from\n" +
                     "	fornecedores f\n" +
                     "left join \n" +
                     "	cidades c on f.ForCidCod = c.CidCod\n" +
-                    " order by\n" +
+                    "order by\n" +
                     "	ForCod")){
                 while(rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -293,7 +293,7 @@ public class UmPontoDoisDAO extends InterfaceDAO implements MapaTributoProvider 
                     "select \n"
                     + "	empcod id,\n"
                     + "	empnomfan fantasia\n"
-                    + "from \n"
+                  + "from \n"
                     + "	empresa")) {
                 while (rs.next()) {
                     result.add(new Estabelecimento(rs.getString("id"), rs.getString("fantasia")));
@@ -315,9 +315,9 @@ public class UmPontoDoisDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	grpprddsc descmerc2,\n"
                     + "	GrpPrdCod merc3,\n"
                     + "	grpprddsc descmerc3\n"
-                    + "from \n"
+                  + "from \n"
                     + "	grupodeprodutos\n"
-                    + "order by \n"
+                  + "order by \n"
                     + "	GrpPrdCod")) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -367,11 +367,11 @@ public class UmPontoDoisDAO extends InterfaceDAO implements MapaTributoProvider 
                     + " PrdValidade validade,\n"
                     + " PrdValidade2,\n"
                     + " case when grpprdcod = 62 then 1 else 0 end balanca\n "
-                    + "from \n"
+                  + "from \n"
                     + "	cadastrodeprodutos c \n"
-                    + "left join\n"
+                  + "left join\n"
                     + "	cfop cf on cf.CfopSeq = c.PrdCfopSeq\n"
-                    + "order by\n"
+                  + "order by\n"
                     + "	PrdCod")) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rs.next()) {

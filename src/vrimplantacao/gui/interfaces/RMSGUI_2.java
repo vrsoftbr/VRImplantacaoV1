@@ -13,6 +13,7 @@ import vrframework.classe.VRException;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.dao.cadastro.LojaDAO;
+import vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
@@ -124,6 +125,9 @@ public class RMSGUI_2 extends VRInternalFrame {
         
         carregarLojaVR();
         carregarLojaCliente();
+        
+        vRImportaArquivBalancaPanel1.setLoja(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+        vRImportaArquivBalancaPanel1.setSistema(SISTEMA);
     }
     
     public void carregarLojaVR() throws Exception {
@@ -468,6 +472,23 @@ public class RMSGUI_2 extends VRInternalFrame {
 
         setTitle("Importação RMS");
         setToolTipText("");
+        addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+                formInternalFrameOpened(evt);
+            }
+        });
 
         vRToolBarPadrao3.setRollover(true);
         vRToolBarPadrao3.setVisibleImportar(true);
@@ -1264,6 +1285,10 @@ public class RMSGUI_2 extends VRInternalFrame {
     private void chkFContasAPagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFContasAPagarActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFContasAPagarActionPerformed
+
+    private void formInternalFrameOpened(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameOpened
+        
+    }//GEN-LAST:event_formInternalFrameOpened
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
