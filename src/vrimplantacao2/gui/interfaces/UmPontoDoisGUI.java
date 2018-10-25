@@ -151,7 +151,7 @@ public class UmPontoDoisGUI extends VRInternalFrame implements ConexaoEvent {
                         }
 
                         if (chkMercadologico.isSelected()) {
-                            importador.importarMercadologicoPorNiveis();
+                            importador.importarMercadologico();
                         }
 
                         if (chkProdutos.isSelected()) {
