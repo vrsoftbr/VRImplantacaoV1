@@ -1,8 +1,11 @@
 package vrimplantacao.dao.interfaces;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
@@ -14,6 +17,8 @@ import vrimplantacao.dao.cadastro.VendaDAO;
 import vrimplantacao.vo.vrimplantacao.VendasVO;
 
 public class PlanilhaVendasDAO {
+    
+    private static final Logger LOG = Logger.getLogger(PlanilhaVendasDAO.class.getName());
 
     public void migrarVendas(String i_arquivo, int i_idLojaDestino)
             throws Exception {
@@ -153,6 +158,7 @@ public class PlanilhaVendasDAO {
             Sheet[] sheets = arquivo.getSheets();
 
             try {
+                SimpleDateFormat format = new SimpleDateFormat(data);
                 for (int sh = 0; sh < sheets.length; sh++) {
                     Sheet sheet = arquivo.getSheet(sh);
                     linha = 0;
@@ -164,7 +170,8 @@ public class PlanilhaVendasDAO {
                             continue;
                         }
 
-                        Cell cellCodBarras = sheet.getCell(0, i);
+                        Cell cellData = sheet.getCell(0, i);
+                        Cell cellCodBarras = sheet.getCell(1, i);
                         Cell cellQuantidade = sheet.getCell(2, i);
                         Cell cellValorTotal = sheet.getCell(3, i);
                         Cell cellCustoProduto = sheet.getCell(5, i);
@@ -192,19 +199,36 @@ public class PlanilhaVendasDAO {
                         } else {
                             valorTotal = 0;
                         }
+                        
+                        Date dt;
+                        if ((cellData.getContents() != null)
+                                && (!cellData.getContents().trim().isEmpty())
+                                && (!cellData.getContents().contains("NULL"))) {
+                            dt = format.parse(cellData.getContents());
+                        } else {
+                            dt = format.getCalendar().getTime();
+                        }
 
                         idProduto = new ProdutoDAO().getIdByCodAntEan(cellCodBarras.getContents());
                         if (idProduto != -1) {
                             VendasVO oVenda = new VendasVO();
                             oVenda.id_loja = idLoja;
                             oVenda.id_produto = idProduto;
-                            oVenda.data = data;
+                            oVenda.data = format.format(dt);
                             oVenda.precovenda = (valorTotal / quantidade);
                             oVenda.quantidade = quantidade;
                             oVenda.valortotal = valorTotal;
                             oVenda.custocomimposto = (custo / quantidade);
                             oVenda.custosemimposto = (custo / quantidade);
                             vVendas.add(oVenda);
+                        } else {
+                            LOG.warning("Produto não localizado (" +
+                                    cellCodBarras.getContents() + "," +
+                                    cellData.getContents() + "," +
+                                    cellQuantidade.getContents() + "," +
+                                    cellValorTotal.getContents() + "," +
+                                    cellCustoProduto.getContents()                                    
+                                    + ")");
                         }
                     }
                 }
