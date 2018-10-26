@@ -64,7 +64,7 @@ public class UmPontoDoisDAO extends InterfaceDAO implements MapaTributoProvider 
                 while(rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rs.getString("id"));
-                    imp.setRazao(rs.getString("razao"));
+                    imp.setRazao(rs.getString("nome"));
                     imp.setFantasia(rs.getString("fantasia"));
                     if("F".equals(rs.getString("tipo"))) {
                         imp.setCnpj(rs.getString("cpf"));
@@ -136,6 +136,7 @@ public class UmPontoDoisDAO extends InterfaceDAO implements MapaTributoProvider 
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rs.getString("idconta"));
                     imp.setNumeroCupom(rs.getString("pedido"));
+                    imp.setIdCliente(rs.getString("idcliente"));
                     if("F".equals(rs.getString("tipo"))) {
                         imp.setCnpjCliente(rs.getString("clicpf"));
                     } else {
@@ -412,7 +413,8 @@ public class UmPontoDoisDAO extends InterfaceDAO implements MapaTributoProvider 
                             codigoProduto = Long.parseLong(imp.getImportId());
                             if (codigoProduto <= Integer.MAX_VALUE) {
                                 produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                                //imp.setEan(imp.getImportId());
+                                imp.setImportId(rs.getString("id"));
+                                imp.setEan(imp.getImportId());
                             } else {
                                 produtoBalanca = null;
                             }

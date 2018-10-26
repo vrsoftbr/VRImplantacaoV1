@@ -537,7 +537,7 @@ public class ClienteRepository {
         vo.setNomeConjuge(imp.getNomeConjuge());
         vo.setNomePai(imp.getNomePai());
         vo.setNomeMae(imp.getNomeMae());
-        vo.setObservacao("IMPORTACAO VR - " + imp.getObservacao());
+        vo.setObservacao("IMPORTACAO VR" + imp.getObservacao() == null ? "" : " - " + imp.getObservacao());
         vo.setObservacao2(imp.getObservacao2());
         vo.setVencimentoCreditoRotativo(imp.getDiaVencimento());
         vo.setPermiteCreditoRotativo(imp.isPermiteCreditoRotativo());
