@@ -458,7 +458,7 @@
                           <Component id="txtDelimitadorForn" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="tabsForn" pref="320" max="32767" attributes="0"/>
+                      <Component id="tabsForn" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -717,7 +717,7 @@
           <SubComponents>
             <Component class="vrframework.bean.label.VRLabel" name="vRLabel5">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Arquivo da venda"/>
+                <Property name="text" type="java.lang.String" value="Arquivo da venda (pdv.venda) ou hist&#xf3;rico de venda (public.venda)"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="txtVendaDelimitador">

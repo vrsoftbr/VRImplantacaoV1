@@ -488,13 +488,13 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                     .addComponent(txtFornecedorFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtDelimitadorForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabsForn, javax.swing.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
+                .addComponent(tabsForn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         tabModel.addTab("Fornecedores", tabFornecedor);
 
-        org.openide.awt.Mnemonics.setLocalizedText(vRLabel5, "Arquivo da venda");
+        org.openide.awt.Mnemonics.setLocalizedText(vRLabel5, "Arquivo da venda (pdv.venda) ou histórico de venda (public.venda)");
 
         txtVendaDelimitador.setText("^");
 
