@@ -457,8 +457,8 @@
                           <Component id="txtFornecedorFile" min="-2" max="-2" attributes="0"/>
                           <Component id="txtDelimitadorForn" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="109" max="32767" attributes="0"/>
-                      <Component id="tabsForn" min="-2" pref="209" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="tabsForn" pref="320" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -508,7 +508,7 @@
                               <Component id="chkFornContatos" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkFornProdutoFornecedor" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="100" max="32767" attributes="0"/>
+                              <EmptySpace pref="211" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -560,7 +560,7 @@
                               <Component id="chkFornUnificar" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkFornUnificarProd" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="123" max="32767" attributes="0"/>
+                              <EmptySpace pref="234" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -607,7 +607,7 @@
                               <Component id="btnFornContatos" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnFornDados" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="118" max="32767" attributes="0"/>
+                              <EmptySpace pref="229" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -655,10 +655,11 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="txtVendaItemFile" alignment="0" pref="625" max="32767" attributes="0"/>
+                          <Component id="txtVendaHistFile" alignment="1" max="32767" attributes="0"/>
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="chkPdvVendas" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkHistVenda" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="vRLabel12" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
@@ -670,11 +671,14 @@
                                   </Group>
                                   <Component id="vRLabel5" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="vRLabel11" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="chkHistVenda" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="chkPorEanHistorico" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
-                          <Component id="txtVendaItemFile" alignment="0" pref="625" max="32767" attributes="0"/>
-                          <Component id="txtVendaHistFile" alignment="1" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -699,10 +703,13 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="txtVendaItemFile" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="chkHistVenda" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="chkHistVenda" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkPorEanHistorico" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="chkPdvVendas" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="200" max="32767" attributes="0"/>
+                      <EmptySpace pref="208" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -750,6 +757,11 @@
             <Component class="vrframework.bean.label.VRLabel" name="vRLabel13">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Str. Quote"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPorEanHistorico">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Importar por EAN (Hist&#xf3;rico de Venda)"/>
               </Properties>
             </Component>
           </SubComponents>
@@ -1169,6 +1181,77 @@
                 </Container>
               </SubComponents>
             </Container>
+          </SubComponents>
+        </Container>
+        <Container class="vrframework.bean.panel.VRPanel" name="tabParametro">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Par&#xe2;metros">
+                <Property name="tabTitle" type="java.lang.String" value="Par&#xe2;metros"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                          <Component id="vRLabel16" pref="150" max="32767" attributes="0"/>
+                          <Component id="txtFormatoData" max="32767" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                          <Component id="vRLabel17" alignment="1" max="32767" attributes="0"/>
+                          <Component id="txtFormatoDataCompleta" alignment="1" min="-2" pref="150" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="329" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" attributes="0">
+                              <Component id="vRLabel17" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="txtFormatoDataCompleta" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" attributes="0">
+                              <Component id="vRLabel16" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="txtFormatoData" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <EmptySpace pref="343" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Component class="javax.swing.JTextField" name="txtFormatoData">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="yyyy-MM-dd"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.label.VRLabel" name="vRLabel16">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Formato de Data"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="txtFormatoDataCompleta">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="yyyy-MM-dd hh:mm:ss.SSS"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.label.VRLabel" name="vRLabel17">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Formato de Data Completa"/>
+              </Properties>
+            </Component>
           </SubComponents>
         </Container>
       </SubComponents>

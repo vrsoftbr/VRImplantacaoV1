@@ -9,6 +9,7 @@ import vrimplantacao2.utils.MathUtils;
  */
 public class VendaHistoricoIMP {
     
+    private String ean;
     private String idProduto;
     private Date data;
     private double precoVenda = 0;
@@ -24,6 +25,14 @@ public class VendaHistoricoIMP {
     private boolean oferta = false;
     private boolean cupomFiscal = false;
 
+    public String getEan() {
+        return ean;
+    }
+
+    public void setEan(String ean) {
+        this.ean = ean;
+    }
+    
     public String getIdProduto() {
         return idProduto;
     }

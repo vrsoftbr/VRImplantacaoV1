@@ -1,6 +1,9 @@
 package vrimplantacao2.dao.interfaces;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -13,7 +16,9 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import static vrimplantacao2.dao.cadastro.produto.OpcaoProduto.INVENTARIO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
+import vrimplantacao2.dao.cadastro.venda.VendaHistoricoIMP;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.arquivo.Arquivo;
 import vrimplantacao2.utils.arquivo.ArquivoFactory;
 import vrimplantacao2.utils.arquivo.LinhaArquivo;
@@ -51,6 +56,15 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     private String arquivo;
     private String sistema = "PLANILHA";
     private Map<String, String> opcoes = new LinkedHashMap<>();
+    private SimpleDateFormat formatData = new SimpleDateFormat(Parametros.get().getWithNull("yyyy-MM-dd", "IMPORTACAO", "PLANILHA", "FORMATO_DATA"));
+    private SimpleDateFormat formatDataCompleta = new SimpleDateFormat(Parametros.get().getWithNull("yyyy-MM-dd hh:mm:ss.SSS", "IMPORTACAO", "PLANILHA", "FORMATO_DATA_COMPLETA"));
+    
+    public void setFormatoData(String format) {
+        this.formatData = new SimpleDateFormat(format);
+    }
+    public void setFormatoDataCompleta(String format) {
+        this.formatDataCompleta = new SimpleDateFormat(format);
+    }
 
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
@@ -599,6 +613,37 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<VendaHistoricoIMP> getHistoricoVenda() throws Exception {
+        List<VendaHistoricoIMP> result = new ArrayList<>();
+        
+        Arquivo arq = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+        
+        for (LinhaArquivo linha: arq) {
+            VendaHistoricoIMP imp = new VendaHistoricoIMP();
+            
+            imp.setIdProduto(linha.getString("id_produto"));
+            imp.setEan(linha.getString("ean"));
+            imp.setData(linha.getData("data"));
+            imp.setPrecoVenda(linha.getDouble("preco"));
+            imp.setQuantidade(linha.getDouble("qtd"));
+            imp.setCustoComImposto(linha.getDouble("custocomimposto"));
+            imp.setCustoSemImposto(linha.getDouble("custosemimposto"));
+            imp.setPisCofinsCredito(linha.getDouble("piscofins_credito"));
+            imp.setPisCofinsDebito(linha.getDouble("piscofins_debito"));
+            imp.setOperacional(linha.getDouble("operacional"));
+            imp.setIcmsCredito(linha.getDouble("icms_credito"));
+            imp.setIcmsDebito(linha.getDouble("icms_debito"));
+            imp.setValorTotal(linha.getDouble("valor_total"));
+            imp.setOferta(linha.getBoolean("oferta"));
+            imp.setCupomFiscal(linha.getBoolean("cupom"));
+                        
+            result.add(imp);
+        }
+        
+        return result;
+    }
+
+    @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         
         String delimiter = ";";
@@ -815,6 +860,14 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    private Date getData(String format) throws ParseException {
+        return formatData.parse(format);
+    }
+    
+    private Date getDataCompleta(String format) throws ParseException {
+        return formatData.parse(format);
+    }
+    
     @Override
     public List<InventarioIMP> getInventario() throws Exception {
         List<InventarioIMP> result = new ArrayList<>();
@@ -828,7 +881,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             
             imp.setId(linha.getString("id"));
             imp.setIdProduto(linha.getString("id_produto"));
-            imp.setData(linha.getData("data"));
+            imp.setData(getData(linha.getString("data")));
             imp.setDescricao(linha.getString("descricao"));
             imp.setPrecoVenda(linha.getDouble("preco"));
             imp.setQuantidade(linha.getDouble("quantidade"));

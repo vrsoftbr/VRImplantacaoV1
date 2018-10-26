@@ -385,9 +385,10 @@ public class Importador {
     /**
      * Importa o histórico de vendas do cliente.
      *
+     * @param utilizarEAN
      * @throws Exception
      */
-    public void importarHistoricoVendas() throws Exception {
+    public void importarHistoricoVendas(boolean utilizarEAN) throws Exception {
         ProgressBar.setStatus("Preenchendo as vendas...");
         VendaHistoricoRepository repository = new VendaHistoricoRepository(
                 new VendaHistoricoDAO(),
@@ -396,7 +397,7 @@ public class Importador {
         repository.setImportSistema(getSistema());
         repository.setImportLoja(getLojaOrigem());
         repository.setIdLojaVR(getLojaVR());
-        repository.importar(getInterfaceDAO().getHistoricoVenda());
+        repository.importar(getInterfaceDAO().getHistoricoVenda(), utilizarEAN);
     }
 
     /**
