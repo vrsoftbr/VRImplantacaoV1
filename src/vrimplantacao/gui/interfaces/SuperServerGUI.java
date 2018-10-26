@@ -231,7 +231,7 @@ public class SuperServerGUI extends VRInternalFrame {
                     }
                     
                     if (chkHistoricoVendas.isSelected()) {
-                        importador.importarHistoricoVendas();
+                        importador.importarHistoricoVendas(false);
                     }
                     
                     System.gc();
