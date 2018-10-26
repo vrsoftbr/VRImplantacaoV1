@@ -75,6 +75,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
     public boolean usarQtdEmbDoProduto = false;
     public boolean usaMargemLiquidaPraticada = false;
     private boolean desconsiderarSetorBalanca = false;
+    private boolean pesquisarKGnaDescricao;
 
     public void setUsarQtdEmbDoProduto(boolean usarQtdEmbDoProduto) {
         this.usarQtdEmbDoProduto = usarQtdEmbDoProduto;
@@ -376,15 +377,21 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.seteBalanca(true);
                             imp.setTipoEmbalagem("KG");
                         } else {
-                            imp.setTipoEmbalagem("UN");
-                            imp.seteBalanca(false);
+                            String desc = Utils.acertarTexto(imp.getDescricaoCompleta());
+                            if (pesquisarKGnaDescricao && desc.contains("KG") && !desc.matches(".*[0-9](\\s)*K?G")) {
+                                imp.seteBalanca(true);
+                                imp.setTipoEmbalagem("KG");
+                            } else {
+                                imp.setTipoEmbalagem("UN");
+                                imp.seteBalanca(false);
+                            }
                         }                        
                         imp.setValidade(rst.getInt("VALIDADE"));
                         if(imp.isBalanca()) {
                             qtdBalanca++;
                         } else {
                             qtdNormal++;
-                        }
+                        }                        
                     } else if (v_usar_arquivoBalanca) {
                         ProdutoBalancaVO produtoBalanca;
                         long codigoProduto;
@@ -1381,6 +1388,10 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setDesconsiderarSetorBalanca(boolean desconsiderarSetorBalanca) {
         this.desconsiderarSetorBalanca = desconsiderarSetorBalanca;
+    }
+
+    public void setPesquisarKGnaDescricao(boolean pesquisarKGnaDescricao) {
+        this.pesquisarKGnaDescricao = pesquisarKGnaDescricao;
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {
