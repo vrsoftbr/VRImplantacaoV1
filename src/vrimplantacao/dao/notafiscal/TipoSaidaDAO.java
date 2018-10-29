@@ -29,7 +29,7 @@ public class TipoSaidaDAO {
         TipoSaidaVO oTipoSaida = new TipoSaidaVO();
         oTipoSaida.id = rst.getInt("id");
         oTipoSaida.descricao = rst.getString("descricao");
-        oTipoSaida.serie = rst.getString("serie");
+        //oTipoSaida.serie = rst.getString("serie");
         if (Versao.maiorQue(3,17,10)) {
             oTipoSaida.especie = rst.getString("especie");
         }
