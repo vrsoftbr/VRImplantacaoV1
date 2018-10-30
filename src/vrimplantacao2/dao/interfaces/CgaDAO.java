@@ -502,8 +502,7 @@ public class CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select ret010.\"CLICod\", ret010.\"CCTCupom\", ret010.cctecf, ret010.\"CCTData\",\n"
                     + "ret010.cctvcto, ret010.\"CCTDebito\", ret010.cctobs, ret010.\"CCTPgto\", ret010.\"CCTCod\"\n"
                     + "from ret010\n"
-                    + "where ret010.\"CCTPG\" = 'N'\n"
-                    + "and ret010.loja is not null"
+                    + "where ret010.\"CCTPG\" = 'N'"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
