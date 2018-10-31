@@ -266,7 +266,7 @@ public class TopSystemGUI2 extends VRInternalFrame {
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(
                                     OpcaoCliente.IMP_REINICIAR_NUMERACAO.addParametro("N_REINICIO", 1),
-                                    OpcaoCliente.DADOS,
+                                    OpcaoCliente.CONTATOS,
                                     OpcaoCliente.INSCRICAO_ESTADUAL,
                                     OpcaoCliente.PERMITE_CREDITOROTATIVO,
                                     OpcaoCliente.PERMITE_CHEQUE,
