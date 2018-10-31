@@ -3,6 +3,7 @@ package vrimplantacao2.dao.cadastro.venda;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
@@ -16,6 +17,8 @@ import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
  * @author Leandro
  */
 public class VendaHistoricoRepository {
+    
+    private static final Logger LOG = Logger.getLogger(VendaHistoricoRepository.class.getName());
     
     private final VendaHistoricoDAO dao;
     private final ProdutoAnteriorDAO anteriorDAO;
@@ -43,8 +46,6 @@ public class VendaHistoricoRepository {
         this.importLoja = importLoja;
     }
     
-    
-
     public VendaHistoricoRepository(VendaHistoricoDAO dao, ProdutoAnteriorDAO anteriorDAO) {
         this.dao = dao;
         this.anteriorDAO = anteriorDAO;
@@ -81,6 +82,7 @@ public class VendaHistoricoRepository {
                 codigoAnterior = anteriorDAO.getCodigoAnterior();
             }
             
+            boolean haDivergencia = false;
             int total = organizados.size(), cont1 = 0, cont2 = 0;
             for (VendaHistoricoIMP imp: organizados.values()) {
                 
@@ -96,6 +98,8 @@ public class VendaHistoricoRepository {
                         gravar = true;
                     } else {
                         gravar = false;
+                        LOG.warning("Produto: " + imp.getIdProduto() + " ean: " + imp.getEan() + " data: " + imp.getData() + " qtd: " + imp.getQuantidade() + " valor total: " + imp.getValorTotal() + " não encontrado");
+                        haDivergencia = true;
                     }
                 } else {
                     ProdutoAnteriorVO anterior = codigoAnterior.get(
@@ -110,6 +114,8 @@ public class VendaHistoricoRepository {
                         gravar = true;
                     } else {
                         gravar = false;
+                        LOG.warning("Produto: " + imp.getIdProduto() + " ean: " + imp.getEan() + " data: " + imp.getData() + " qtd: " + imp.getQuantidade() + " valor total: " + imp.getValorTotal() + " não encontrado");
+                        haDivergencia = true;
                     }
                 }
                 
@@ -146,6 +152,9 @@ public class VendaHistoricoRepository {
                     vo.setCupomfiscal(imp.isCupomFiscal());
                     
                     dao.salvar(vo);
+                } else {
+                    System.out.println("Produto: " + imp.getIdProduto() + " ean: " + imp.getEan() + " data: " + imp.getData() + " qtd: " + imp.getQuantidade() + " valor total: " + imp.getValorTotal() + " não gravado");
+                    LOG.fine("Produto: " + imp.getIdProduto() + " ean: " + imp.getEan() + " data: " + imp.getData() + " qtd: " + imp.getQuantidade() + " valor total: " + imp.getValorTotal() + " não gravado");
                 }
                 
                 cont1++;
@@ -156,7 +165,11 @@ public class VendaHistoricoRepository {
                 }
             }
             
-            Conexao.commit();
+            if (!haDivergencia) {
+                Conexao.commit();
+            } else {
+                throw new Exception("Há divergencias na importação");
+            }
         } catch (Exception e) {
             Conexao.rollback();
             throw e;
