@@ -128,10 +128,10 @@ public class HiperDAO extends InterfaceDAO {
                     + "e.codigo_barras,\n"
                     + "e.sigla_unidade_logistica,\n"
                     + "'1' as qtdembalagem,\n"
-                    + "p.nome, \n"
+                    + "p.nome as descricao, \n"
                     + "p.situacao,\n"
                     + "u.sigla as tipoembalagem,\n"
-                    + "p.id_hierarquia_produto as cod_mercadologico,\n"
+                    + "p.id_hierarquia_produto as mercadologico,\n"
                     + "cast(p.data_hora_cadastro as date) as datacadastro,\n"
                     + "p.preco_custo,\n"
                     + "p.preco_aquisicao,\n"
@@ -140,12 +140,12 @@ public class HiperDAO extends InterfaceDAO {
                     + "pis.nome as desc_pis,\n"
                     + "cofins.codigo_situacao_tributaria_cofins as cst_cofins,\n"
                     + "cofins.nome as desc_cofins,\n"
-                    + "p.id_ncm,\n"
-                    + "p.codigo_cest,\n"
+                    + "p.id_ncm as ncm,\n"
+                    + "p.codigo_cest as cest,\n"
                     + "p.dias_validade,\n"
                     + "p.markup_varejo,\n"
                     + "p.produto_integrado_balanca as balanca,\n"
-                    + "est.quantidade\n"
+                    + "est.quantidade as estoque\n"
                     + "from produto p\n"
                     + "inner join unidade_medida u on u.id_unidade_medida = p.id_unidade_medida\n"
                     + "left join produto_sinonimo e on e.id_produto = p.id_produto\n"
@@ -157,19 +157,56 @@ public class HiperDAO extends InterfaceDAO {
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId("id_produto");
+                    imp.setEan(rst.getString("codigo_barras"));
+                    imp.seteBalanca(rst.getInt("balanca") == 1);
+                    imp.setValidade(rst.getInt("dias_validade"));
+                    imp.setDescricaoCompleta(rst.getString("descricao"));
+                    imp.setDescricaoReduzida(imp.getDescricaoCompleta());
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+
+                    String merc = rst.getString("mercadologico") != null ? rst.getString("mercadologico") : "";
+                    String[] cods = merc.split("\\.");
+
+                    for (int i = 0; i < cods.length; i++) {
+                        switch (i) {
+                            case 0:
+                                imp.setCodMercadologico1(cods[i]);
+                                break;
+                            case 1:
+                                imp.setCodMercadologico2(cods[i]);
+                                break;
+                        }
+                    }
+
+                    imp.setCodMercadologico3("1");
+                    imp.setMargem(rst.getDouble("markup_varejo"));
+                    imp.setCustoComImposto(rst.getDouble("preco_custo"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setPrecovenda(rst.getDouble("preco_venda"));
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+                    imp.setPiscofinsCstDebito(rst.getString("cst_pis"));
+                    imp.setPiscofinsCstCredito(rst.getString("cst_cofins"));
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
-    
+
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "f.id_entidade,\n"
+                    + "f.id_entidade as id,\n"
                     + "f.nome as razao,\n"
                     + "j.nome_fantasia as fantasia,\n"
                     + "j.cnpj,\n"
@@ -200,6 +237,7 @@ public class HiperDAO extends InterfaceDAO {
                     + "f.complemento_cobranca,\n"
                     + "f.cep_cobranca,\n"
                     + "cc.id_ibge as cidade_ibge_cobranca,\n"
+                    + "cc.nome as cidade_cobranca, \n"
                     + "cc.uf as uf_cobranca,\n"
                     + "f.inativo,\n"
                     + "f.flag_funcionario,\n"
@@ -209,16 +247,44 @@ public class HiperDAO extends InterfaceDAO {
                     + "left join pessoa_fisica fi on fi.id_entidade = f.id_entidade\n"
                     + "left join cidade c on c.id_cidade = f.id_cidade\n"
                     + "left join cidade cc on cc.id_cidade = f.id_cidade_cobranca\n"
-                    + "where tipo_entidade = 2"
+                    + "where flag_fornecedor = 1"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("ie"));
+                    imp.setAtivo(rst.getInt("inativo") == 1);
+                    imp.setDatacadastro(rst.getDate("datacadastro"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero_endereco"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setIbge_municipio(rst.getInt("ibge_cidade"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setTel_principal(rst.getString("ddd1") + rst.getString("telefone1"));
+                    imp.setCob_endereco(rst.getString("endereco_cobranca"));
+                    imp.setCob_numero(rst.getString("numero_cobranca"));
+                    imp.setCob_bairro(rst.getString("bairro_cobranca"));
+                    imp.setCob_complemento(rst.getString("complemento_cobranca"));
+                    imp.setCob_cep(rst.getString("cep_cobranca"));
+                    imp.setCob_ibge_municipio(rst.getInt("cidade_ibge_cobranca"));
+                    imp.setCob_municipio(rst.getString("cidade_cobranca"));
+                    imp.setCob_uf(rst.getString("uf_cobranca"));
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
-    
+
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
@@ -232,9 +298,15 @@ public class HiperDAO extends InterfaceDAO {
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("id_produto"));
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 }
