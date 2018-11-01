@@ -24,9 +24,15 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class HiperDAO extends InterfaceDAO {
 
+    public String id_loja;
+    
     @Override
     public String getSistema() {
-        return "Hiper";
+        if ((id_loja != null) && (!id_loja.trim().isEmpty())) {
+            return "Hiper" + id_loja;
+        } else {
+            return "Hiper";
+        }
     }
 
     public List<Estabelecimento> getLojas() throws Exception {
