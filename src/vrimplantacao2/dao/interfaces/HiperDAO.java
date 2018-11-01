@@ -15,6 +15,7 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -167,9 +168,14 @@ public class HiperDAO extends InterfaceDAO {
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
+                    "select\n"
                     + "f.id_entidade,\n"
                     + "f.nome as razao,\n"
+                    + "j.nome_fantasia as fantasia,\n"
+                    + "j.cnpj,\n"
+                    + "j.ie,\n"
+                    + "fi.cpf,\n"
+                    + "fi.rg,\n"
                     + "cast(f.data_hora_cadastro as date) as datacadastro,\n"
                     + "f.logradouro as endereco,\n"
                     + "f.numero_endereco,\n"
@@ -199,12 +205,33 @@ public class HiperDAO extends InterfaceDAO {
                     + "f.flag_funcionario,\n"
                     + "f.flag_cliente\n"
                     + "from entidade f \n"
+                    + "left join pessoa_juridica j on j.id_entidade = f.id_entidade\n"
+                    + "left join pessoa_fisica fi on fi.id_entidade = f.id_entidade\n"
                     + "left join cidade c on c.id_cidade = f.id_cidade\n"
                     + "left join cidade cc on cc.id_cidade = f.id_cidade_cobranca\n"
                     + "where tipo_entidade = 2"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
+                }
+            }
+        }
+        return null;
+    }
+    
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "id_produto, \n"
+                    + "id_entidade as id_fornecedor,\n"
+                    + "(cast(id_entidade as varchar)+cast(id_produto as varchar)) as codigoexterno\n"
+                    + "from produto_fornecedor"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                 }
             }
         }
