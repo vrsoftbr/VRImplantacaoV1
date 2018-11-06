@@ -103,6 +103,7 @@ public class IntelliCashDAO extends InterfaceDAO {
 
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
+        double margem = 0;
         List<ProdutoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
@@ -129,7 +130,7 @@ public class IntelliCashDAO extends InterfaceDAO {
                     + "    p.estqmin estoqueMinimo,\n"
                     + "    p.estqmax estoqueMaximo,\n"
                     + "    (select qtde from getestqprod(p.id, emp.id)) estoque, \n"
-                    + "    p.mkp as margem,      \n"
+                    //+ "    p.mkp as margem,\n"
                     + "    c.custoatual custoSemImposto,\n"
                     + "    c.custoatual custoComImposto,\n"
                     + "    prc.vpreco precoVenda,\n"
@@ -186,7 +187,10 @@ public class IntelliCashDAO extends InterfaceDAO {
                     imp.setEstoqueMinimo(rst.getInt("estoqueMinimo"));
                     imp.setEstoqueMaximo(rst.getInt("estoqueMaximo"));
                     imp.setEstoque(rst.getDouble("estoque"));
-                    imp.setMargem(rst.getDouble("margem"));
+                    if(rst.getDouble("custocomimposto") != 0) {
+                        margem = (((rst.getDouble("precovenda") / rst.getDouble("custocomimposto")) - 1) * 100);
+                    }
+                    imp.setMargem(Utils.arredondar(margem, 2));
                     imp.setCustoSemImposto(rst.getDouble("custoSemImposto"));
                     imp.setCustoComImposto(rst.getDouble("custoComImposto"));
                     imp.setPrecovenda(rst.getDouble("precoVenda"));
@@ -344,7 +348,7 @@ public class IntelliCashDAO extends InterfaceDAO {
                     + "from\n"
                     + "    fornxcodprod"
             )) {
-                while (rst.next()) {
+                while (rst.next()) { 
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
 
                     imp.setImportSistema(getSistema());
@@ -355,6 +359,7 @@ public class IntelliCashDAO extends InterfaceDAO {
 
                     result.add(imp);
                 }
+               
             }
         }
 

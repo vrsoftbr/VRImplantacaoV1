@@ -204,9 +204,10 @@ public class CreditoRotativoRepository {
 
     public CreditoRotativoVO converterRotativo(CreditoRotativoIMP imp) {
         CreditoRotativoVO vo = new CreditoRotativoVO();
-        if (imp.getIdCliente() != null && imp.getIdCliente().matches("[0-9]*")) {
-            vo.setId_clientePreferencial(Integer.parseInt(imp.getIdCliente()));
-        }
+        
+        /*if (imp.getIdCliente() != null && imp.getIdCliente().matches("[0-9]*")) {
+             vo.setId_clientePreferencial(Integer.parseInt(imp.getIdCliente()));
+        }*/
         vo.setDataEmissao(imp.getDataEmissao());
         vo.setDataVencimento(imp.getDataVencimento());
         vo.setEcf(Utils.stringToInt(imp.getEcf()));
