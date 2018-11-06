@@ -14,6 +14,7 @@ import java.util.Map;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -25,7 +26,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class HiperDAO extends InterfaceDAO {
 
     public String id_loja;
-    
+
     @Override
     public String getSistema() {
         if ((id_loja != null) && (!id_loja.trim().isEmpty())) {
@@ -146,12 +147,17 @@ public class HiperDAO extends InterfaceDAO {
                     + "pis.nome as desc_pis,\n"
                     + "cofins.codigo_situacao_tributaria_cofins as cst_cofins,\n"
                     + "cofins.nome as desc_cofins,\n"
+                    + "nat.codigo_natureza_receita as naturezareceita,\n"
+                    + "nat2.codigo_natureza_receita as naturezareceita2,\n"
                     + "p.id_ncm as ncm,\n"
                     + "p.codigo_cest as cest,\n"
                     + "p.dias_validade,\n"
                     + "p.markup_varejo,\n"
                     + "p.produto_integrado_balanca as balanca,\n"
-                    + "est.quantidade as estoque\n"
+                    + "est.quantidade as estoque,\n"
+                    + "cst_icms.codigo_situacao_tributaria as cst_icms,\n"
+                    + "icm.aliquota_icms as aliq_icms,\n"
+                    + "icm.reducao_base_calculo as red_icms\n"
                     + "from produto p\n"
                     + "inner join unidade_medida u on u.id_unidade_medida = p.id_unidade_medida\n"
                     + "left join produto_sinonimo e on e.id_produto = p.id_produto\n"
@@ -159,6 +165,11 @@ public class HiperDAO extends InterfaceDAO {
                     + "left join situacao_tributaria_pis pis on pis.id_situacao_tributaria_pis = p.id_situacao_tributaria_pis\n"
                     + "left join situacao_tributaria_cofins cofins on cofins.id_situacao_tributaria_cofins = p.id_situacao_tributaria_cofins\n"
                     + "left join saldo_estoque est on est.id_produto = p.id_produto\n"
+                    + "left join natureza_receita_pis_cofins nat on nat.id_natureza_receita_pis_cofins = p.id_natureza_receita_pis\n"
+                    + "left join natureza_receita_pis_cofins nat2 on nat2.id_natureza_receita_pis_cofins = p.id_natureza_receita_cofins\n"
+                    + "left join view_hiperpdv_produto_tributacao_icms icm on icm.id_produto = p.id_produto\n"
+                    + "left join situacao_tributaria_icms cst_icms on cst_icms.id_situacao_tributaria_icms = icm.id_situacao_tributaria_icms\n"
+                    + "	and icm.uf_de = 'RJ' and icm.uf_para = 'RJ'\n"
                     + "order by id_produto"
             )) {
                 while (rst.next()) {
@@ -199,6 +210,13 @@ public class HiperDAO extends InterfaceDAO {
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("cst_pis"));
                     imp.setPiscofinsCstCredito(rst.getString("cst_cofins"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
+                    imp.setIcmsCstSaida(rst.getInt("cst_icms"));
+                    imp.setIcmsAliqSaida(rst.getDouble("aliq_icms"));
+                    imp.setIcmsReducaoSaida(rst.getDouble("red_icms"));
+                    imp.setIcmsCstEntrada(rst.getInt("cst_icms"));
+                    imp.setIcmsAliqEntrada(rst.getDouble("aliq_icms"));
+                    imp.setIcmsReducaoEntrada(rst.getDouble("red_icms"));
                     result.add(imp);
                 }
             }
@@ -309,6 +327,91 @@ public class HiperDAO extends InterfaceDAO {
                     imp.setIdProduto(rst.getString("id_produto"));
                     imp.setIdFornecedor(rst.getString("id_fornecedor"));
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "f.id_entidade as id,\n"
+                    + "f.nome as razao,\n"
+                    + "j.nome_fantasia as fantasia,\n"
+                    + "j.cnpj,\n"
+                    + "j.ie,\n"
+                    + "fi.cpf,\n"
+                    + "fi.rg,\n"
+                    + "cast(f.data_hora_cadastro as date) as datacadastro,\n"
+                    + "f.logradouro as endereco,\n"
+                    + "f.numero_endereco,\n"
+                    + "f.bairro,\n"
+                    + "f.complemento,\n"
+                    + "f.cep,\n"
+                    + "c.id_ibge as ibge_cidade,\n"
+                    + "c.nome as cidade,\n"
+                    + "c.uf,\n"
+                    + "f.site,\n"
+                    + "f.observacao,\n"
+                    + "f.fone_primario_ddd as ddd1,\n"
+                    + "f.fone_primario_numero as telefone1,\n"
+                    + "f.fone_primario_nome_contato as contato1,\n"
+                    + "f.fone_secundario_ddd as ddd2,\n"
+                    + "f.fone_secundario_numero as telefone2,\n"
+                    + "f.fone_secundario_nome_contato as contato2,\n"
+                    + "f.email,\n"
+                    + "f.logradouro_cobranca as endereco_cobranca,\n"
+                    + "f.numero_endereco_cobranca as numero_cobranca,\n"
+                    + "f.bairro_cobranca,\n"
+                    + "f.complemento_cobranca,\n"
+                    + "f.cep_cobranca,\n"
+                    + "cc.id_ibge as cidade_ibge_cobranca,\n"
+                    + "cc.nome as cidade_cobranca, \n"
+                    + "cc.uf as uf_cobranca,\n"
+                    + "f.inativo,\n"
+                    + "f.flag_funcionario,\n"
+                    + "f.flag_cliente,\n"
+                    + "f.limite_credito\n"
+                    + "from entidade f \n"
+                    + "left join pessoa_juridica j on j.id_entidade = f.id_entidade\n"
+                    + "left join pessoa_fisica fi on fi.id_entidade = f.id_entidade\n"
+                    + "left join cidade c on c.id_cidade = f.id_cidade\n"
+                    + "left join cidade cc on cc.id_cidade = f.id_cidade_cobranca\n"
+                    + "where flag_cliente = 1"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("ie"));
+                    imp.setAtivo(rst.getInt("inativo") == 1);
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero_endereco"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setMunicipioIBGE(rst.getInt("ibge_cidade"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setTelefone(rst.getString("ddd1") + rst.getString("telefone1"));
+                    imp.setCobrancaEndereco(rst.getString("endereco_cobranca"));
+                    imp.setCobrancaNumero(rst.getString("numero_cobranca"));
+                    imp.setCobrancaBairro(rst.getString("bairro_cobranca"));
+                    imp.setCobrancaComplemento(rst.getString("complemento_cobranca"));
+                    imp.setCobrancaCep(rst.getString("cep_cobranca"));
+                    imp.setCobrancaMunicipioIBGE(rst.getInt("cidade_ibge_cobranca"));
+                    imp.setCobrancaMunicipio(rst.getString("cidade_cobranca"));
+                    imp.setCobrancaUf(rst.getString("uf_cobranca"));
+                    imp.setValorLimite(rst.getDouble("limite_credito"));
                     result.add(imp);
                 }
             }
