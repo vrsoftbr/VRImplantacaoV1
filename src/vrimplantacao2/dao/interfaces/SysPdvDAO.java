@@ -242,50 +242,51 @@ public class SysPdvDAO extends InterfaceDAO {
             }
 
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n"
-                    + "    p.procod id,\n"
-                    + "    p.prodes descricaocompleta,\n"
-                    + "    p.prodesrdz descricaoreduzida,\n"
-                    + "    p.seccod merc1,\n"
-                    + "    p.grpcod merc2,\n"
-                    + "    p.sgrcod merc3,\n"
-                    + "    p.proestmin estoqueminimo,\n"
-                    + "    p.proestmax estoquemaximo,\n"
-                    + "    est.estatu estoque,\n"
-                    + "    p.proncm ncm,\n"
-                    + "    case when p.proforlin = 'S' then 0 else 1 end situacaocadastro,\n"
-                    + "    p.proprccst custocomimposto,\n"
-                    + "    p.proprccst custosemimposto,\n"
-                    + "    p.prodatcadinc datacadastro,\n"
-                    + "    p.proiteemb qtdembalagem,\n"
-                    + "    round(((proprcvdavar / case when p.proprccst = 0.00 then 1 else p.proprccst end) - 1) * (100),2) margem,\n"
-                    + "    p.promrg1 as margem2, \n"
-                    + "    proprcvdavar precovenda,\n"
-                    + "    items.procodsim id_familiaproduto,\n"
-                    + "    p.propesbrt pesobruto,\n"
-                    + "    p.propesliq pesoliquido,\n"
-                    + "    case p.propesvar\n"
-                    + "    when 'S' then 'KG'\n"
-                    + "    when 'P' then 'KG'\n"
-                    + "    else 'UN' end as tipoembalagem,\n"
-                    + "    p.prounid, \n"
-                    + "    case when p.proenvbal = 'S' then 1 else 0 end e_balanca,\n"
-                    + "    coalesce(p.provld, 0) validade,\n"
-                    + "    i.trbtabb icms_cst, \n"
-                    + "    i.trbalq icms_aliquota, \n"
-                    + "    i.trbred icms_reducao, \n"
-                    + "    p.procest cest,\n"
-                    + "    p.natcodigo piscofins_natrec\n"
-                    + "FROM \n"
-                    + "    produto p\n"
-                    + "    LEFT JOIN item_similares items ON \n"
-                    + "        items.procod = p.procod\n"
-                    + "    left join tributacao i on \n"
-                    + "        i.trbid = p.trbid\n"
-                    + "    left join estoque est on\n"
-                    + "        est.PROCOD = p.PROCOD\n"
-                    + "ORDER BY \n"
-                    + "    cast(replace(p.procod,',','') as bigint)"
+                    "SELECT\n" +
+                    "    p.procod id,\n" +
+                    "    p.prodes descricaocompleta,\n" +
+                    "    p.prodesrdz descricaoreduzida,\n" +
+                    "    p.seccod merc1,\n" +
+                    "    nullif(p.grpcod, '000') merc2,\n" +
+                    "    nullif(p.sgrcod, '000') merc3,\n" +
+                    "    p.proestmin estoqueminimo,\n" +
+                    "    p.proestmax estoquemaximo,\n" +
+                    "    est.estatu estoque,\n" +
+                    "    p.proncm ncm,\n" +
+                    "    case when p.proforlin = 'S' then 0 else 1 end situacaocadastro,\n" +
+                    "    p.proprccst custocomimposto,\n" +
+                    "    p.proprccst custosemimposto,\n" +
+                    "    p.prodatcadinc datacadastro,\n" +
+                    "    p.proiteemb qtdembalagem,\n" +
+                    "    round(((proprcvdavar / case when p.proprccst = 0.00 then 1 else p.proprccst end) - 1) * (100),2) margem,\n" +
+                    "    p.promrg1 as margem2, \n" +
+                    "    proprcvdavar precovenda,\n" +
+                    "    items.procodsim id_familiaproduto,\n" +
+                    "    p.propesbrt pesobruto,\n" +
+                    "    p.propesliq pesoliquido,\n" +
+                    "    case p.propesvar\n" +
+                    "    when 'S' then 'KG'\n" +
+                    "    when 'P' then 'KG'\n" +
+                    "    else 'UN' end as tipoembalagem,\n" +
+                    "    p.prounid, \n" +
+                    "    case when p.proenvbal = 'S' then 1 else 0 end e_balanca,\n" +
+                    "    coalesce(p.provld, 0) validade,\n" +
+                    "    i.trbtabb icms_cst, \n" +
+                    "    i.trbalq icms_aliquota, \n" +
+                    "    i.trbred icms_reducao, \n" +
+                    "    p.procest cest,\n" +
+                    "    p.natcodigo piscofins_natrec\n" +
+                    "FROM \n" +
+                    "    produto p\n" +
+                    "    LEFT JOIN item_similares items ON \n" +
+                    "        items.procod = p.procod\n" +
+                    "    left join tributacao i on \n" +
+                    "        i.trbid = p.trbid\n" +
+                    "    left join estoque est on\n" +
+                    "        est.PROCOD = p.PROCOD\n" +
+                    "--where p.procod = '07891000100103'\n" +
+                    "ORDER BY \n" +
+                    "    cast(replace(p.procod,',','') as bigint)"
             )) {
                 Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {

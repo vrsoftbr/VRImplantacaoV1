@@ -252,9 +252,6 @@ public enum OpcaoProduto {
         result.add(EAN);
         result.add(EAN_EM_BRANCO);
         result.add(IMPORTAR_MANTER_BALANCA);
-        result.add(MERCADOLOGICO_POR_NIVEL);
-        result.add(MERCADOLOGICO_POR_NIVEL_REPLICAR);
-        result.add(MERCADOLOGICO_NAO_EXCLUIR);
         result.addAll(getInfoAdicional());
         result.addAll(getComplementos());
         result.addAll(getTributos());

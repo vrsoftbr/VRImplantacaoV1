@@ -13,6 +13,8 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -307,7 +309,192 @@ public class ZpfDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
-    
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    c.codigo id,\n" +
+                    "    c.cpf_cnpj cnpj,\n" +
+                    "    c.inscricao_estadual,\n" +
+                    "    c.nome_razao_social razao,\n" +
+                    "    coalesce(c.nome_fantasia, c.nome_razao_social) fantasia,\n" +
+                    "    c.inativo,\n" +
+                    "    c.bloqueado,\n" +
+                    "    c.endereco,\n" +
+                    "    c.numero,\n" +
+                    "    c.complemento,\n" +
+                    "    c.bairro,\n" +
+                    "    cd.cod_municipio ibge_municipio,\n" +
+                    "    c.cep,\n" +
+                    "    c.estado_civil,\n" +
+                    "    c.data_nascimento,\n" +
+                    "    c.data_cadastro,\n" +
+                    "    c.local_trabalho,\n" +
+                    "    c.endereco_trabalho,\n" +
+                    "    cdtrb.cod_municipio ibge_municipio_trabalho,\n" +
+                    "    c.telefone_trabalho empresa_telefone,\n" +
+                    "    c.data_admissao,\n" +
+                    "    c.simples_nacional,\n" +
+                    "    c.produtor_rural,\n" +
+                    "    c.profissao,\n" +
+                    "    c.renda_mensal salario,\n" +
+                    "    c.limite_credito,\n" +
+                    "    c.limite_utilizado,\n" +
+                    "    c.nome_pai,\n" +
+                    "    c.nome_mae,\n" +
+                    "    c.pontuacao_inicial,\n" +
+                    "    c.fone,\n" +
+                    "    c.fax,\n" +
+                    "    c.endereco_cobranca,\n" +
+                    "    c.numero_cobranca,\n" +
+                    "    c.complemento_cobranca,\n" +
+                    "    c.bairro_cobranca,\n" +
+                    "    cdcob.cod_municipio ibge_municipio_cobranca,\n" +
+                    "    c.cep_cobranca,\n" +
+                    "    c.inscricao_municipal\n" +
+                    "from\n" +
+                    "    clientes c\n" +
+                    "    left join cidades cd on\n" +
+                    "        c.cidade = cd.codigo \n" +
+                    "    left join cidades cdtrb on\n" +
+                    "        c.cidade_trabalho = cdtrb.codigo \n" +
+                    "    left join cidades cdcob on\n" +
+                    "        c.cidade_cobranca = cdcob.codigo\n" +
+                    "order by\n" +
+                    "    c.codigo"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("inscricao_estadual"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setAtivo(!"S".equals(rst.getString("inativo")));
+                    imp.setBloqueado("S".equals(rst.getString("bloqueado")));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipioIBGE(rst.getInt("ibge_municipio"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setEstadoCivil(rst.getString("estado_civil"));
+                    imp.setDataNascimento(rst.getDate("data_nascimento"));
+                    imp.setDataCadastro(rst.getDate("data_cadastro"));
+                    imp.setEmpresa(rst.getString("local_trabalho"));
+                    imp.setEmpresaEndereco(rst.getString("endereco_trabalho"));
+                    imp.setEmpresaMunicipioIBGE(rst.getInt("ibge_municipio_trabalho"));
+                    imp.setEmpresaTelefone(rst.getString("empresa_telefone"));
+                    imp.setDataAdmissao(rst.getDate("data_admissao"));
+                    imp.setCargo(rst.getString("profissao"));
+                    imp.setSalario(rst.getDouble("salario"));
+                    imp.setNomePai(rst.getString("nome_pai"));
+                    imp.setNomeMae(rst.getString("nome_mae"));
+                    imp.setTelefone(rst.getString("fone"));
+                    imp.setFax(rst.getString("fax"));
+                    imp.setCobrancaEndereco(rst.getString("endereco_cobranca"));
+                    imp.setCobrancaNumero(rst.getString("numero_cobranca"));
+                    imp.setCobrancaComplemento(rst.getString("complemento_cobranca"));
+                    imp.setCobrancaBairro(rst.getString("bairro_cobranca"));
+                    imp.setCobrancaMunicipioIBGE(rst.getInt("ibge_municipio_cobranca"));
+                    imp.setCobrancaCep(rst.getString("cep_cobranca"));
+                    imp.setInscricaoMunicipal(rst.getString("inscricao_municipal"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "Select \n" +
+                    "    P.Empresa, \n" +
+                    "    P.Documento, \n" +
+                    "    P.Serie, \n" +
+                    "    P.Tipo_MOvto,\n" +
+                    "    r.data dataemissao,\n" +
+                    "    P.Parcela, \n" +
+                    "    P.Vencimento, \n" +
+                    "    P.Valor,\n" +
+                    "    coalesce(sum(b.valor_recebido+coalesce(b.Descontos,0)-coalesce(b.juros,0)),0) Valor_pago,\n" +
+                    "    R.cliente, \n" +
+                    "    c.cpf_cnpj,\n" +
+                    "    C.fisica_juridica\n" +
+                    "From\n" +
+                    "    Contas_Receber R\n" +
+                    "    Left Join Parcelas_Receber P on \n" +
+                    "        (p.empresa=r.empresa and p.documento=r.documento and p.serie=r.serie and p.tipo_movto=r.tipo_movto)\n" +
+                    "    Left Join baixas_parcelas_receber b on \n" +
+                    "        (p.empresa = b.empresa and p.documento=b.documento and p.serie=b.serie and p.tipo_movto=b.tipo_movto and p.parcela=b.parcela)\n" +
+                    "    INNER JOIN CLIENTES C ON (C.codigo = R.cliente)\n" +
+                    "where\n" +
+                    "    r.empresa = " + getLojaOrigem() + "\n" +
+                    "Group by\n" +
+                    "    P.Empresa, \n" +
+                    "    P.Documento, \n" +
+                    "    P.Serie, \n" +
+                    "    P.Tipo_Movto,  \n" +
+                    "    r.data,\n" +
+                    "    P.Parcela, \n" +
+                    "    P.Vencimento, \n" +
+                    "    P.Valor, \n" +
+                    "    R.cliente,        \n" +
+                    "    c.cpf_cnpj,\n" +
+                    "    C.fisica_juridica\n" +
+                    "having\n" +
+                    "    Round(coalesce(sum(b.valor_recebido+coalesce(b.Descontos,0)-coalesce(b.juros,0)),0),2) < Round(coalesce(p.valor,0),2)"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(
+                            rst.getString("Empresa") + "-" +
+                            rst.getString("Documento") + "-" +
+                            rst.getString("Serie") + "-" +
+                            rst.getString("Tipo_MOvto") + "-" +
+                            rst.getString("Parcela")
+                    );
+                    imp.setNumeroCupom(rst.getString("Documento"));
+                    imp.setObservacao("SERIE: " + rst.getString("serie") + " DOCUMENTO: " + rst.getString("documento"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setParcela(rst.getInt("Parcela"));
+                    imp.setDataVencimento(rst.getDate("Vencimento"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setIdCliente(rst.getString("cliente"));
+                    imp.setCnpjCliente(rst.getString("cpf_cnpj"));
+                    if (rst.getDouble("Valor_pago") > 0) {
+                        imp.addPagamento(
+                                rst.getString("Empresa") + "-" +
+                                rst.getString("Documento") + "-" +
+                                rst.getString("Serie") + "-" +
+                                rst.getString("Tipo_MOvto"),
+                                rst.getDouble("Valor_pago"),
+                                0,
+                                0,
+                                rst.getDate("dataemissao"),
+                                ""
+                        );
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
     
     
 }
