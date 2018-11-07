@@ -560,7 +560,7 @@ public class IntelliCashDAO extends InterfaceDAO {
         List<ChequeIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
+                   "select\n"
                     + "id,\n"
                     + "data,\n"
                     + "datadeposito,\n"
@@ -571,9 +571,9 @@ public class IntelliCashDAO extends InterfaceDAO {
                     + "numchq,\n"
                     + "emitente,\n"
                     + "cmc7\n"
-                    + "from cheques\n"
-                    + "where data >= '25.06.2018'\n"
-                    + "order by id"
+                 + "from cheques\n"
+                 + "where data >= '25.06.2018'\n"
+                 + "order by id"
             )) {
                 while (rst.next()) {
                     ChequeIMP imp = new ChequeIMP();
