@@ -34,9 +34,9 @@ public class ProdutoAutomacaoDAO {
         
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select codigobarras from produtoautomacaoloja where id_loja = 2\n" +
+                    "select codigobarras from produtoautomacaoloja where id_loja = " + idLoja + "\n" +
                     "union\n" +
-                    "select codigobarras from produtoautomacaodesconto where id_loja = 2\n" +
+                    "select codigobarras from produtoautomacaodesconto where id_loja = " + idLoja + "\n" +
                     "order by codigobarras"
             )) {
                 while (rst.next()) {

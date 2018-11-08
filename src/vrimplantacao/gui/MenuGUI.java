@@ -159,6 +159,7 @@ import vrimplantacao2.gui.interfaces.FlashGUI;
 import vrimplantacao2.gui.interfaces.FortGUI;
 import vrimplantacao2.gui.interfaces.FortiGUI;
 import vrimplantacao2.gui.interfaces.HipcomGUI;
+import vrimplantacao2.gui.interfaces.HiperGUI;
 import vrimplantacao2.gui.interfaces.ICommerceGUI;
 import vrimplantacao2.gui.interfaces.ScefGUI;
 import vrimplantacao2.gui.interfaces.SisMouraGUI;
@@ -599,6 +600,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSqlServer2 = new javax.swing.JMenu();
         mnuKcms = new javax.swing.JMenuItem();
         mnuFHOnline = new javax.swing.JMenuItem();
+        mnuHiper = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1461,6 +1463,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuFHOnline);
+
+        mnuHiper.setText("Hiper");
+        mnuHiper.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuHiperActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuHiper);
 
         jMenu2.add(mnuSqlServer2);
 
@@ -4051,6 +4061,11 @@ public final class MenuGUI extends VRMdiFrame {
         FlashGUI.exibir(this);
     }//GEN-LAST:event_mnuFlashActionPerformed
 
+    private void mnuHiperActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuHiperActionPerformed
+        // TODO add your handling code here:
+        HiperGUI.exibir(this);
+    }//GEN-LAST:event_mnuHiperActionPerformed
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -4196,6 +4211,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuFort;
     private javax.swing.JMenuItem mnuForti;
     private javax.swing.JMenuItem mnuHipcom;
+    private javax.swing.JMenuItem mnuHiper;
     private javax.swing.JMenuItem mnuHipicom;
     private javax.swing.JMenuItem mnuHostMundo;
     private javax.swing.JMenuItem mnuIcommerce;

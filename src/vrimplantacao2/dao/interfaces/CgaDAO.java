@@ -122,25 +122,6 @@ public class CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join ret016 al1 on al1.\"ALIQCod\" = ret051.\"ALIQCod\"\n"
                     + "left join ret016 al2 on al2.\"ALIQCod\" = ret051.aliqcred\n"
                     + "order by ret051.\"PRODCod\""
-            /*+ "union all\n"
-             + "select ret051.\"PRODCod\", ret051.\"PRODNome\",\n"
-             + "ret051.\"PRODNomeRed\", ret051.\"PRODEtq\", ret051.\"PRODCadast\", ret051.\"PRODCusto\",\n"
-             + "ret051.\"PRODMargem\", ret051.\"PRODVenda\", ret051.\"GRUCod\",\n"
-             + "ret051.\"SUBGCod\", ret051.prodai, ret051.\"SECCod\",\n"
-             + "ean.\"BARCod\" ean, ret051.clasfisccod, ret051.ncm,\n"
-             + "ret051.prodstcofinsent, ret051.prodstcofins, ret051.\"SUBCod\",\n"
-             + "ret051.prodsdo, prodqtemb, ret051.\"ALIQCod\", ret051.\"TABBCod\" cstSaida,\n"
-             + "al1.\"ALIQNFPerc\" aliqDebito, al1.\"ALIQRedNF\" redDebito, ret051.aliqcred,\n"
-             + "ret051.tabbcred cstEntrada, al2.\"ALIQNFPerc\" aliqCredito, al2.\"ALIQRedNF\" redCredito,\n"
-             + "ret041.clasfisccod ncm, ret041.clasfisccest CODCEST, ret051.\"PRODUnid\"\n"
-             + "from RET051\n"
-             + "left join ret041 on ret041.clasfisccod = ret051.clasfisccod\n"
-             + "left join RET053 on RET053.\"PRODCod\" = ret051.\"PRODCod\"\n"
-             + "left join ret016 al1 on al1.\"ALIQCod\" = ret051.\"ALIQCod\"\n"
-             + "left join ret016 al2 on al2.\"ALIQCod\" = ret051.aliqcred\n"
-             + "left join ret052 ean on ean.\"PRODCod\" = ret051.\"PRODCod\"\n"
-             + "where cast(ret051.\"PRODCod\" as numeric(14,0)) > 0\n"
-             + "and cast(ean.\"BARCod\" as numeric(14,0)) > 999999"*/
             )) {
                 int contador = 1;
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
@@ -521,8 +502,7 @@ public class CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select ret010.\"CLICod\", ret010.\"CCTCupom\", ret010.cctecf, ret010.\"CCTData\",\n"
                     + "ret010.cctvcto, ret010.\"CCTDebito\", ret010.cctobs, ret010.\"CCTPgto\", ret010.\"CCTCod\"\n"
                     + "from ret010\n"
-                    + "where ret010.\"CCTPG\" = 'N'\n"
-                    + "and ret010.loja is not null"
+                    + "where ret010.\"CCTPG\" = 'N'"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();

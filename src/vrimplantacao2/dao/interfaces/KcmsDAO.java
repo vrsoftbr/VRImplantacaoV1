@@ -20,7 +20,6 @@ import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.SituacaoCheque;
@@ -231,7 +230,7 @@ public class KcmsDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    P.CODCFOP_ENTRADA, \n" +
                     "    P.NAT_RECEITA_COFINS, \n" +
                     "    P.NAT_RECEITA_PIS, \n" +
-                    "	nat.cod_fis_natureza_receita_pis_cofins cod_natureza_receita,\n" +
+                    "	 nat.cod_fis_natureza_receita_pis_cofins cod_natureza_receita,\n" +
                     "    P.CODCSTPIS_ENTRADA, \n" +
                     "    P.CODCSTCOFINS_ENTRADA, \n" +
                     "    P.PERCCOFINS_ENTRADA, \n" +
