@@ -40,17 +40,10 @@ public class HiperDAO extends InterfaceDAO {
         List<Estabelecimento> lojas = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	loj_codigo id,\n"
-                    + "	loj_fantasia nome,\n"
-                    + "	loj_cnpj cnpj\n"
-                    + "from \n"
-                    + "	lojas\n"
-                    + "order by\n"
-                    + "	loj_codigo"
+                    "select id_filial, razao_social from filial order by id_filial"
             )) {
                 while (rs.next()) {
-                    lojas.add(new Estabelecimento(rs.getString("id"), rs.getString("nome")));
+                    lojas.add(new Estabelecimento(rs.getString("id_filial"), rs.getString("razao_social")));
                 }
             }
         }
@@ -176,7 +169,7 @@ public class HiperDAO extends InterfaceDAO {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId("id_produto");
+                    imp.setImportId(rst.getString("id_produto"));
                     imp.setEan(rst.getString("codigo_barras"));
                     imp.seteBalanca(rst.getInt("balanca") == 1);
                     imp.setValidade(rst.getInt("dias_validade"));
