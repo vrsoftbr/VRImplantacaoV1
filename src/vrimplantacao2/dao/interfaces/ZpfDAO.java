@@ -148,7 +148,7 @@ public class ZpfDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    case p.inativo when 'S' then 1 else 0 end descontinuado,\n" +
                     "    p.classificacao_fiscal ncm,\n" +
                     "    cest.cest,\n" +
-                    "    p.cst_pis_cf piscofins_cst_entrada,\n" +
+                    "    p.cst_pis_cf piscofins_cst_saida,\n" +
                     "    coalesce(sg.nat_rec, g.nat_rec) piscofins_natrec,\n" +
                     "    p.tributacao id_icms\n" +
                     "from\n" +
@@ -195,7 +195,7 @@ public class ZpfDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescontinuado(rst.getBoolean("descontinuado"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstCredito(rst.getString("piscofins_cst_entrada"));
+                    imp.setPiscofinsCstDebito(rst.getString("piscofins_cst_saida"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_natrec"));
                     imp.setIcmsDebitoId(rst.getString("id_icms"));
                     imp.setIcmsCreditoId(rst.getString("id_icms"));
@@ -319,7 +319,7 @@ public class ZpfDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select\n" +
                     "    c.codigo id,\n" +
                     "    c.cpf_cnpj cnpj,\n" +
-                    "    c.inscricao_estadual,\n" +
+                    "    coalesce(c.inscricao_estadual, c.rg) inscricao_estadual,\n" +
                     "    c.nome_razao_social razao,\n" +
                     "    coalesce(c.nome_fantasia, c.nome_razao_social) fantasia,\n" +
                     "    c.inativo,\n" +
@@ -404,6 +404,7 @@ public class ZpfDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCobrancaMunicipioIBGE(rst.getInt("ibge_municipio_cobranca"));
                     imp.setCobrancaCep(rst.getString("cep_cobranca"));
                     imp.setInscricaoMunicipal(rst.getString("inscricao_municipal"));
+                    imp.setValorLimite(rst.getDouble("limite_credito"));
                     
                     result.add(imp);
                 }

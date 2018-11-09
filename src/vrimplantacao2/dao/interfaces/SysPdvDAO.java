@@ -37,14 +37,19 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class SysPdvDAO extends InterfaceDAO {
 
     private TipoConexao tipoConexao;
+    private String complementoSistema = "";
 
     public void setTipoConexao(TipoConexao tipoConexao) {
         this.tipoConexao = tipoConexao;
     }
 
+    public void setComplementoSistema(String complementoSistema) {
+        this.complementoSistema = complementoSistema == null ? "" : complementoSistema.trim();
+    }
+
     @Override
     public String getSistema() {
-        return this.tipoConexao.getSistema();
+        return (!"".equals(complementoSistema) ? this.complementoSistema + "-" : "") + this.tipoConexao.getSistema();
     }
 
     @Override
@@ -284,9 +289,8 @@ public class SysPdvDAO extends InterfaceDAO {
                     "        i.trbid = p.trbid\n" +
                     "    left join estoque est on\n" +
                     "        est.PROCOD = p.PROCOD\n" +
-                    "--where p.procod = '07891000100103'\n" +
                     "ORDER BY \n" +
-                    "    cast(replace(p.procod,',','') as bigint)"
+                    "    p.procod"
             )) {
                 Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {

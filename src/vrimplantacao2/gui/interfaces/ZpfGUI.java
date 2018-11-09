@@ -1,6 +1,8 @@
 package vrimplantacao2.gui.interfaces;
 
 import java.awt.Frame;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
@@ -147,6 +149,8 @@ public class ZpfGUI extends VRInternalFrame implements ConexaoEvent {
         chkClientesPreferenciais = new vrframework.bean.checkBox.VRCheckBox();
         chkClientesEventuais = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        chkCPLimite = new vrframework.bean.checkBox.VRCheckBox();
+        chkCPInscEstadual = new vrframework.bean.checkBox.VRCheckBox();
         jLabel1 = new javax.swing.JLabel();
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
         btnMigrar = new vrframework.bean.button.VRButton();
@@ -187,6 +191,10 @@ public class ZpfGUI extends VRInternalFrame implements ConexaoEvent {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkCreditoRotativo, "Crédito Rotativo");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkCPLimite, "Limite");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkCPInscEstadual, "Insc. Estadual");
+
         javax.swing.GroupLayout pnlClientesLayout = new javax.swing.GroupLayout(pnlClientes);
         pnlClientes.setLayout(pnlClientesLayout);
         pnlClientesLayout.setHorizontalGroup(
@@ -198,13 +206,19 @@ public class ZpfGUI extends VRInternalFrame implements ConexaoEvent {
                         .addComponent(chkClientesPreferenciais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkClientesEventuais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCPLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCPInscEstadual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(182, Short.MAX_VALUE))
         );
         pnlClientesLayout.setVerticalGroup(
             pnlClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlClientesLayout.createSequentialGroup()
                 .addComponent(chkClientesPreferenciais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkCPLimite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkCPInscEstadual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addComponent(chkClientesEventuais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -228,7 +242,7 @@ public class ZpfGUI extends VRInternalFrame implements ConexaoEvent {
                 .addComponent(pnlForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlClientes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(108, Short.MAX_VALUE))
+                .addContainerGap(62, Short.MAX_VALUE))
         );
 
         tabs.addTab("Fornecedor e Clientes", pnlFornecedorClientes);
@@ -304,6 +318,8 @@ public class ZpfGUI extends VRInternalFrame implements ConexaoEvent {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkCPInscEstadual;
+    private vrframework.bean.checkBox.VRCheckBox chkCPLimite;
     private vrframework.bean.checkBox.VRCheckBox chkClientesEventuais;
     private vrframework.bean.checkBox.VRCheckBox chkClientesPreferenciais;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
@@ -343,6 +359,20 @@ public class ZpfGUI extends VRInternalFrame implements ConexaoEvent {
                     if (chkClientesPreferenciais.isSelected()) {
                         importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
                     }
+                    {
+                        List<OpcaoCliente> opt = new ArrayList<>();
+                        if (chkCPLimite.isSelected()) {
+                            opt.add(OpcaoCliente.VALOR_LIMITE);
+                        }
+                        if (chkCPInscEstadual.isSelected()) {
+                            opt.add(OpcaoCliente.INSCRICAO_ESTADUAL);
+                        }
+                        if (!opt.isEmpty()) {
+                            importador.atualizarClientePreferencial(opt.toArray(new OpcaoCliente[]{}));
+                        }
+                    }
+                    
+                    
                     if (chkClientesEventuais.isSelected()) {
                         importador.importarClienteEventual(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
                     }

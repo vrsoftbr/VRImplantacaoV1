@@ -34,8 +34,6 @@ public class SysPdvGUI extends VRInternalFrame {
     
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
-
-    
     
     private SysPdvDAO dao = new SysPdvDAO();
     
@@ -80,6 +78,7 @@ public class SysPdvGUI extends VRInternalFrame {
         conexaoSqlServer.carregarParametros();
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
+        txtComplNomeSistema.setText(params.get(SISTEMA, "COMPL_SISTEMA"));
     }
     
     private void gravarParametros() throws Exception {
@@ -88,6 +87,7 @@ public class SysPdvGUI extends VRInternalFrame {
             case 0: params.put("FIREBIRD", SISTEMA, "CONEXAO"); break;
             case 1: params.put("SQLSERVER", SISTEMA, "CONEXAO"); break;
         }
+        params.put(txtComplNomeSistema.getText(), SISTEMA, "COMPL_SISTEMA");
         conexaoFirebird.atualizarParametros();
         conexaoSqlServer.atualizarParametros();
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
@@ -162,6 +162,7 @@ public class SysPdvGUI extends VRInternalFrame {
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
+                    dao.setComplementoSistema(txtComplNomeSistema.getText());
                     
                     switch(tabsConexoes.getSelectedIndex()) {
                         case 0: dao.setTipoConexao(SysPdvDAO.TipoConexao.FIREBIRD); break;
@@ -373,6 +374,8 @@ public class SysPdvGUI extends VRInternalFrame {
         tabsConexoes = new javax.swing.JTabbedPane();
         conexaoFirebird = new vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel();
         conexaoSqlServer = new vrimplantacao2.gui.component.conexao.sqlserver.ConexaoSqlServerPanel();
+        txtComplNomeSistema = new vrframework.bean.textField.VRTextField();
+        jLabel3 = new javax.swing.JLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
 
@@ -590,7 +593,7 @@ public class SysPdvGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkFCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(92, Short.MAX_VALUE))
+                .addContainerGap(95, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Fornecedores", tabImpFornecedor);
@@ -642,7 +645,7 @@ public class SysPdvGUI extends VRInternalFrame {
                 .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(96, Short.MAX_VALUE))
+                .addContainerGap(95, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Clientes", tabClienteDados);
@@ -686,7 +689,7 @@ public class SysPdvGUI extends VRInternalFrame {
                 .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(74, Short.MAX_VALUE))
+                .addContainerGap(77, Short.MAX_VALUE))
         );
 
         tabs.addTab("Unificação", vRPanel2);
@@ -706,7 +709,7 @@ public class SysPdvGUI extends VRInternalFrame {
         );
         vRPanel4Layout.setVerticalGroup(
             vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 204, Short.MAX_VALUE)
+            .addGap(0, 199, Short.MAX_VALUE)
             .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(vRPanel4Layout.createSequentialGroup()
                     .addContainerGap()
@@ -722,6 +725,8 @@ public class SysPdvGUI extends VRInternalFrame {
         conexaoSqlServer.setSistema(SISTEMA);
         tabsConexoes.addTab("SQL Server", conexaoSqlServer);
 
+        jLabel3.setText("Compl. Nome Sistema");
+
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
         jLabel2.setText("Loja Cliente:");
@@ -736,10 +741,14 @@ public class SysPdvGUI extends VRInternalFrame {
                     .addComponent(tabsConexoes, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtComplNomeSistema, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel2)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, 332, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -748,10 +757,12 @@ public class SysPdvGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addComponent(tabsConexoes, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtComplNomeSistema, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(1, 1, 1)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -854,11 +865,13 @@ public class SysPdvGUI extends VRInternalFrame {
     private vrimplantacao2.gui.component.conexao.sqlserver.ConexaoSqlServerPanel conexaoSqlServer;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private vrframework.bean.panel.VRPanel tabClienteDados;
     private vrframework.bean.panel.VRPanel tabImpFornecedor;
     private vrframework.bean.panel.VRPanel tabImpProduto;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private javax.swing.JTabbedPane tabsConexoes;
+    private vrframework.bean.textField.VRTextField txtComplNomeSistema;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;

@@ -126,7 +126,7 @@
                       <Component id="pnlForn" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="pnlClientes" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="108" max="32767" attributes="0"/>
+                      <EmptySpace pref="62" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -189,6 +189,8 @@
                                   <Component id="chkClientesEventuais" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCPLimite" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCPInscEstadual" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="182" max="32767" attributes="0"/>
                       </Group>
@@ -198,6 +200,10 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <Component id="chkClientesPreferenciais" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkCPLimite" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkCPInscEstadual" alignment="0" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -219,6 +225,16 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCreditoRotativo">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cr&#xe9;dito Rotativo"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCPLimite">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Limite"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCPInscEstadual">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Insc. Estadual"/>
                   </Properties>
                 </Component>
               </SubComponents>
