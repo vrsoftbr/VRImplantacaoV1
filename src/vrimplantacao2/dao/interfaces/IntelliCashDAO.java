@@ -495,6 +495,12 @@ public class IntelliCashDAO extends InterfaceDAO {
                             }
                         }
                     }
+                    
+                    if(rst.getInt("situacao") == 2) {
+                        imp.setBloqueado(true);
+                    } else {
+                        imp.setBloqueado(false);
+                    }
                     result.add(imp);
                 }
             }

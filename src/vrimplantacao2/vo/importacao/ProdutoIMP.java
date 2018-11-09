@@ -89,6 +89,7 @@ public class ProdutoIMP {
     private String idComprador;
     
     private String uf;
+    private String codigoGIA;
     
     public String getImportSistema() {
         return importSistema;
