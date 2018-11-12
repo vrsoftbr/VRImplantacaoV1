@@ -26,7 +26,7 @@ public class HipcomVendaIterator extends MultiStatementIterator<VendaIMP> {
         return idLoja + "-" + TIMESTAMP_DATE.format(data) + "-" + ecf + "-" + numeroCupom;
     }
 
-    public HipcomVendaIterator(String idLojas, Date dataInicial, Date dataTermino) throws Exception {
+     public HipcomVendaIterator(String idLojas, Date dataInicial, Date dataTermino) throws Exception {
         super(
             new CustomNextBuilder(),
             new StatementBuilder() {
