@@ -15,6 +15,7 @@ import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -53,6 +54,8 @@ public class ZpfDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
                 OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
                 OpcaoProduto.PRODUTOS,
                 OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                 OpcaoProduto.IMPORTAR_RESETAR_BALANCA,
@@ -120,6 +123,36 @@ public class ZpfDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    codigo,\n" +
+                    "    descricao\n" +
+                    "from\n" +
+                    "    linha\n" +
+                    "order by\n" +
+                    "    codigo"
+            )) {
+                while (rst.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("codigo"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         
@@ -131,6 +164,7 @@ public class ZpfDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    p.data_ultima_alteracao dataalteracao,\n" +
                     "    case upper(p.balanca) when 'S' then p.codbalanca else coalesce(ean.codigo_barra, p.codbalanca) end ean,\n" +
                     "    case when coalesce(p.qtde_caixa, 1) <= 0 then 1 else coalesce(p.qtde_caixa, 1) end qtdembalagemcotacao,\n" +
+                    "    p.linha,\n" +
                     "    p.unidade,\n" +
                     "    p.balanca,\n" +
                     "    coalesce(p.validade, 0) validade,\n" +
@@ -183,6 +217,7 @@ public class ZpfDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoReduzida(rst.getString("descricaocompleta"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
+                    imp.setIdFamiliaProduto(rst.getString("linha"));
                     imp.setPesoBruto(rst.getDouble("peso_bruto"));
                     imp.setPesoLiquido(rst.getDouble("peso_liquido"));
                     imp.setEstoqueMaximo(rst.getDouble("estoque_maximo"));
