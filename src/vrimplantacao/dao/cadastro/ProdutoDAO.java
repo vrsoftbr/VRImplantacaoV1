@@ -36,6 +36,7 @@ import vrimplantacao.vo.vrimplantacao.ProdutoAutomacaoLojaVO;
 import vrimplantacao.vo.vrimplantacao.ProdutoAutomacaoVO;
 import vrimplantacao.vo.vrimplantacao.ProdutoComplementoVO;
 import vrimplantacao.vo.vrimplantacao.ProdutoVO;
+import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
@@ -749,12 +750,12 @@ public class ProdutoDAO {
                         sql.append("INSERT INTO produto (id, descricaocompleta, qtdembalagem, id_tipoembalagem, mercadologico1, mercadologico2, mercadologico3,");
                         sql.append(" mercadologico4, mercadologico5, id_comprador, id_familiaproduto, descricaoreduzida, pesoliquido, datacadastro,");
                         sql.append(" validade, pesobruto, tara, comprimentoembalagem, larguraembalagem, alturaembalagem, perda, margem, verificacustotabela,");
-                        sql.append(" descricaogondola, dataalteracao, id_produtovasilhame, ncm1, ncm2, ncm3, excecao, id_tipomercadoria, fabricacaopropria,");
-                        sql.append(" sugestaopedido, sugestaocotacao, aceitamultiplicacaopdv, id_fornecedorfabricante, id_divisaofornecedor, id_tipoproduto, id_tipopiscofins,");
+                        sql.append(" descricaogondola, dataalteracao, id_produtovasilhame, ncm1, ncm2, ncm3, excecao, id_tipomercadoria, " + (Versao.menorQue(3,17,10) ? "fabricacaopropria," : ""));
+                        sql.append(" sugestaopedido, sugestaocotacao, aceitamultiplicacaopdv, id_fornecedorfabricante, id_divisaofornecedor" + (Versao.menorQue(3,17,10) ? ", id_tipoproduto" : "") + ", id_tipopiscofins,");
                         sql.append(" id_tipopiscofinscredito, custofinal, percentualipi, percentualfrete, percentualencargo, percentualperda, percentualsubstituicao, pesavel,");
                         sql.append(" sazonal, consignado, ddv, permitetroca, temperatura, id_tipoorigemmercadoria, ipi, vendacontrolada, tiponaturezareceita,");
                         sql.append(" vendapdv, permitequebra, permiteperda, impostomedioimportado, impostomedionacional, impostomedioestadual, utilizatabelasubstituicaotributaria,");
-                        sql.append(" utilizavalidadeentrada, id_tipolocaltroca, id_tipocompra, codigoanp, numeroparcela, qtddiasminimovalidade, id_cest, id_normareposicao)");
+                        sql.append(" utilizavalidadeentrada, id_tipolocaltroca, id_tipocompra, codigoanp, numeroparcela, qtddiasminimovalidade, id_cest" + (Versao.menorQue(3,17,10) ? ", id_normareposicao" : "") + ")");
 
                         sql.append(" VALUES ");
                         sql.append(" (");
@@ -928,14 +929,18 @@ public class ProdutoDAO {
                         sql.append((i_produto.ncm2 == -1 ? null : i_produto.ncm2) + ",");
                         sql.append((i_produto.ncm3 == -1 ? null : i_produto.ncm3) + ",");
                         sql.append((i_produto.excecao == -1 ? null : i_produto.excecao) + ",");
-                        sql.append((i_produto.idTipoMercadoria == -1 ? null : i_produto.idTipoMercadoria) + ",");
-                        sql.append(i_produto.fabricacaoPropria + ",");
+                        sql.append((i_produto.idTipoMercadoria == -1 ? null : i_produto.idTipoMercadoria) + ",");                        
+                        if (Versao.menorQue(3,17,10)) {
+                            sql.append(i_produto.fabricacaoPropria + ",");
+                        }
                         sql.append(i_produto.sugestaoPedido + ",");
                         sql.append(i_produto.sugestaoCotacao + ",");
                         sql.append(i_produto.aceitaMultiplicacaoPdv + ",");
                         sql.append(i_produto.idFornecedorFabricante + ",");
-                        sql.append(i_produto.idDivisaoFornecedor + ",");
-                        sql.append(i_produto.idTipoProduto + ",");
+                        sql.append(i_produto.idDivisaoFornecedor + ",");                                               
+                        if (Versao.menorQue(3,17,10)) {
+                            sql.append(i_produto.idTipoProduto + ",");
+                        }
                         sql.append(i_produto.idTipoPisCofinsDebito + ",");
                         sql.append(i_produto.idTipoPisCofinsCredito + ",");
                         sql.append(i_produto.custoFinal + ",");
@@ -972,12 +977,15 @@ public class ProdutoDAO {
                                 && i_produto.getCest2() != -1
                                 && i_produto.getCest3() != -1) {
                             CestVO cest = cestDAO.getCestValido(i_produto.getCest1(), i_produto.getCest2(), i_produto.getCest3());
-                            sql.append(Utils.longIntSQL(cest.getId(), 0) + ",");
+                            sql.append(Utils.longIntSQL(cest.getId(), 0));
                         } else {
-                            sql.append("null,");
+                            sql.append("null");
                         }
 
-                        sql.append(Utils.longIntSQL(i_produto.getIdNormaReposicao(), -1) + ");");
+                        if (Versao.menorQue(3,17,10)) {
+                            sql.append(",").append(Utils.longIntSQL(i_produto.getIdNormaReposicao(), -1));
+                        }
+                        sql.append(");");
 
                         try {
                             stm.execute(sql.toString());
@@ -1160,8 +1168,7 @@ public class ProdutoDAO {
                                 sql.append("INSERT INTO implantacao.codigoanterior( ");
                                 sql.append("codigoanterior, codigoatual, barras, naturezareceita, ");
                                 sql.append("piscofinscredito, piscofinsdebito, ref_icmsdebito, estoque, e_balanca, ");
-                                sql.append("codigobalanca, custosemimposto, custocomimposto, margem, precovenda, referencia, ncm, id_loja, produto_novo, codigoauxiliar, "
-                                        + "codanterior) ");
+                                sql.append("codigobalanca, custosemimposto, custocomimposto, margem, precovenda, referencia, ncm, id_loja, produto_novo, codigoauxiliar) ");
                                 sql.append("VALUES ( ");
                                 if (oCodigoInterno.getCodigoAnteriorStr() != null) {
                                     sql.append(Utils.quoteSQL(oCodigoInterno.getCodigoAnteriorStr()) + ", ");
@@ -1185,9 +1192,7 @@ public class ProdutoDAO {
                                 sql.append((oCodigoInterno.referencia == -1 ? null : oCodigoInterno.referencia) + ", ");
                                 sql.append((oCodigoInterno.ncm.isEmpty() ? null : "'" + oCodigoInterno.ncm + "'") + ", ");
                                 sql.append(i_idLojaDestino + ", true, ");
-                                sql.append(Utils.quoteSQL(oCodigoInterno.getCodigoAuxiliar()) + ", "
-                                        + "'" + oCodigoInterno.getCodAnterior() + "'");
-
+                                sql.append(Utils.quoteSQL(oCodigoInterno.getCodigoAuxiliar()));
                                 sql.append(");");
 
                                 stm.execute(sql.toString());

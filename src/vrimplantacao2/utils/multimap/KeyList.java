@@ -30,9 +30,10 @@ public class KeyList<E extends Comparable> implements Comparable {
             for (int i = 0; i < comparacoes; i++) {
                 String strItem1 = this.get(i).toString();
                 String strItem2 = other.get(i).toString();
-                if (!"".equals(strItem1) && !"".equals(strItem2) && strItem1.matches("[\\d.]*") && strItem2.matches("[\\d.]*")) {
-                    double dblItem1 = Double.parseDouble(strItem1);
-                    double dblItem2 = Double.parseDouble(strItem2);
+
+                if (!"".equals(strItem1) && !"".equals(strItem2) && strItem1.matches("[0-9]{1,3}(((,)[0-9]{3})|[0-9])*((\\.)[0-9]+)?") && strItem2.matches("[0-9]{1,3}(((,)[0-9]{3})|[0-9])*((\\.)[0-9]+)?")) {
+                    double dblItem1 = Double.parseDouble(strItem1.replace(",", ""));
+                    double dblItem2 = Double.parseDouble(strItem2.replace(",", ""));
                     if (dblItem1 == dblItem2) {
                         result = strItem1.compareTo(strItem2);
                     } else {

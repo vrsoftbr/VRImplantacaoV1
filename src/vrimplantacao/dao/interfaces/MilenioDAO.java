@@ -12,6 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
@@ -52,6 +53,8 @@ import vrimplantacao2.utils.sql.SQLBuilder;
 
 public class MilenioDAO {
 
+    private static final Logger LOG = Logger.getLogger(MilenioDAO.class.getName());
+    
     List<DocumentoMilenio> docs;
     public static boolean utilizaREFPLU = false;
     
@@ -3704,7 +3707,7 @@ public class MilenioDAO {
             @Override
             public String getSQL(int idLojaVR, int idLojaCliente, boolean utilizarREFCODINT) {
                 String where = !utilizarREFCODINT ? "WHERE R.REFPLU <= 999999\n" : "WHERE CAST(REPLACE(REPLACE(R.REFCODINT,'~',''),'.','') AS BIGINT) <= 999999\n";
-                return 
+                String sql = 
                     "SELECT\n" +
                     "  R.*,\n" +
                     "  P.*,\n" +
@@ -3724,15 +3727,16 @@ public class MilenioDAO {
                     "LEFT JOIN [SysacME].[dbo].[CUSTO] C\n" +
                     "  ON C.REFPLU = E.REFPLU\n" +
                     //where +
-                    "ORDER BY r.REFDES ASC";
+                    "ORDER BY r.REFDES ASC";                
+                LOG.info("SQL: " + sql);
+                return sql;
             }
         },
         MAIOR_Q_999999 {
             @Override
             public String getSQL(int idLojaVR, int idLojaCliente, boolean utilizarREFCODINT) {
                 String where = !utilizarREFCODINT ? "WHERE R.REFPLU > 999999\n" : "WHERE CAST(REPLACE(REPLACE(R.REFCODINT,'~',''),'.','') AS BIGINT) > 999999\n";
-                return 
-                    "SELECT\n" +
+                String sql = "SELECT\n" +
                     "  *,\n" +
                     "  CASE WHEN ( R.refdatfimlin IS NULL OR R.refdatfimlin > (SELECT Max(abrdat) FROM   [SysacME].dbo.abertura) ) THEN 1 ELSE 0 END AS status\n" +
                     "FROM [SysacME].[dbo].REFERENCIA R\n" +
@@ -3741,12 +3745,15 @@ public class MilenioDAO {
                     "LEFT JOIN [SysacME].[dbo].EAN E\n" +
                     "  ON E.REFPLU = R.REFPLU\n" +
                     "LEFT JOIN [SysacME].[dbo].[PRECO] PR\n" +
-                    "  ON PR.PROCOD = R.PROCOD\n" +
+                    (MilenioDAO.utilizaREFPLU ? "  ON PR.REFPLU = R.REFPLU\n" : "  ON PR.PROCOD = R.PROCOD\n") +
                     "  AND PR.LOJCOD = " + idLojaCliente + "\n" +
                     "LEFT JOIN [SysacME].[dbo].[CUSTO] C\n" +
                     "  ON C.REFPLU = E.REFPLU\n" +
                     where +
                     "ORDER BY r.REFDES ASC";
+                LOG.info("SQL: " + sql);
+                return sql;
+                    
             }
         };
         
