@@ -18,6 +18,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -33,7 +34,7 @@ public class ZpfDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select e.codigo, e.codigo||' - '||e.razao_social descricao from empresa e order by e.codigo"
@@ -43,10 +44,10 @@ public class ZpfDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        
+
         return result;
     }
-    
+
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
@@ -89,24 +90,24 @@ public class ZpfDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
-        List<MercadologicoNivelIMP> result = new ArrayList<>();        
-        
+        List<MercadologicoNivelIMP> result = new ArrayList<>();
+
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select codigo, descricao from grupo order by 1"
             )) {
                 while (rst.next()) {
-                    MercadologicoNivelIMP imp = new MercadologicoNivelIMP();                    
+                    MercadologicoNivelIMP imp = new MercadologicoNivelIMP();
                     imp.setId(rst.getString("codigo"));
                     imp.setDescricao(rst.getString("descricao"));
-                    
+
                     addMercadologicoNivel2(imp);
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -125,83 +126,83 @@ public class ZpfDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    codigo,\n" +
-                    "    descricao\n" +
-                    "from\n" +
-                    "    linha\n" +
-                    "order by\n" +
-                    "    codigo"
+                    "select\n"
+                    + "    codigo,\n"
+                    + "    descricao\n"
+                    + "from\n"
+                    + "    linha\n"
+                    + "order by\n"
+                    + "    codigo"
             )) {
                 while (rst.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("codigo"));
                     imp.setDescricao(rst.getString("descricao"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    p.codigo id,\n" +
-                    "    p.data_inclusao datacadastro,\n" +
-                    "    p.data_ultima_alteracao dataalteracao,\n" +
-                    "    case upper(p.balanca) when 'S' then p.codbalanca else coalesce(ean.codigo_barra, p.codbalanca) end ean,\n" +
-                    "    case when coalesce(p.qtde_caixa, 1) <= 0 then 1 else coalesce(p.qtde_caixa, 1) end qtdembalagemcotacao,\n" +
-                    "    p.linha,\n" +
-                    "    p.unidade,\n" +
-                    "    p.balanca,\n" +
-                    "    coalesce(p.validade, 0) validade,\n" +
-                    "    p.descricao descricaocompleta,\n" +
-                    "    p.grupo merc1,\n" +
-                    "    p.subgrupo merc2,\n" +
-                    "    p.peso_bruto,\n" +
-                    "    p.peso_liquido,\n" +
-                    "    p.estoque_maximo,\n" +
-                    "    p.estoque_minimo,\n" +
-                    "    p.estoque_atual,\n" +
-                    "    p.valor_custo custosemimposto,\n" +
-                    "    p.valor_venda precovenda,\n" +
-                    "    case p.fora_linha when 'S' then 0 else 1 end situacaocadastro,\n" +
-                    "    case p.inativo when 'S' then 1 else 0 end descontinuado,\n" +
-                    "    p.classificacao_fiscal ncm,\n" +
-                    "    cest.cest,\n" +
-                    "    p.cst_pis_cf piscofins_cst_saida,\n" +
-                    "    coalesce(sg.nat_rec, g.nat_rec) piscofins_natrec,\n" +
-                    "    p.tributacao id_icms\n" +
-                    "from\n" +
-                    "    produtos p\n" +
-                    "    left join cod_barras ean on\n" +
-                    "        p.codigo = ean.produto\n" +
-                    "    left join cest on\n" +
-                    "        p.id_cest = cest.codigo\n" +
-                    "    left join grupo g on\n" +
-                    "        p.grupo = g.codigo\n" +
-                    "    left join subgrupo sg on\n" +
-                    "        p.subgrupo = sg.codigo\n" +
-                    "order by\n" +
-                    "    p.codigo"
+                    "select\n"
+                    + "    p.codigo id,\n"
+                    + "    p.data_inclusao datacadastro,\n"
+                    + "    p.data_ultima_alteracao dataalteracao,\n"
+                    + "    case upper(p.balanca) when 'S' then p.codbalanca else coalesce(ean.codigo_barra, p.codbalanca) end ean,\n"
+                    + "    case when coalesce(p.qtde_caixa, 1) <= 0 then 1 else coalesce(p.qtde_caixa, 1) end qtdembalagemcotacao,\n"
+                    + "    p.linha,\n"
+                    + "    p.unidade,\n"
+                    + "    p.balanca,\n"
+                    + "    coalesce(p.validade, 0) validade,\n"
+                    + "    p.descricao descricaocompleta,\n"
+                    + "    p.grupo merc1,\n"
+                    + "    p.subgrupo merc2,\n"
+                    + "    p.peso_bruto,\n"
+                    + "    p.peso_liquido,\n"
+                    + "    p.estoque_maximo,\n"
+                    + "    p.estoque_minimo,\n"
+                    + "    p.estoque_atual,\n"
+                    + "    p.valor_custo custosemimposto,\n"
+                    + "    p.valor_venda precovenda,\n"
+                    + "    case p.fora_linha when 'S' then 0 else 1 end situacaocadastro,\n"
+                    + "    case p.inativo when 'S' then 1 else 0 end descontinuado,\n"
+                    + "    p.classificacao_fiscal ncm,\n"
+                    + "    cest.cest,\n"
+                    + "    p.cst_pis_cf piscofins_cst_saida,\n"
+                    + "    coalesce(sg.nat_rec, g.nat_rec) piscofins_natrec,\n"
+                    + "    p.tributacao id_icms\n"
+                    + "from\n"
+                    + "    produtos p\n"
+                    + "    left join cod_barras ean on\n"
+                    + "        p.codigo = ean.produto\n"
+                    + "    left join cest on\n"
+                    + "        p.id_cest = cest.codigo\n"
+                    + "    left join grupo g on\n"
+                    + "        p.grupo = g.codigo\n"
+                    + "    left join subgrupo sg on\n"
+                    + "        p.subgrupo = sg.codigo\n"
+                    + "order by\n"
+                    + "    p.codigo"
             )) {
                 while (rst.next()) {
-                    
+
                     ProdutoIMP imp = new ProdutoIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
@@ -234,30 +235,30 @@ public class ZpfDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_natrec"));
                     imp.setIcmsDebitoId(rst.getString("id_icms"));
                     imp.setIcmsCreditoId(rst.getString("id_icms"));
-                    
+
                     result.add(imp);
-                    
+
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    codigo,\n" +
-                    "    descricao,\n" +
-                    "    porc_icms\n" +
-                    "from\n" +
-                    "    tributacao\n" +
-                    "order by\n" +
-                    "    codigo"
+                    "select\n"
+                    + "    codigo,\n"
+                    + "    descricao,\n"
+                    + "    porc_icms\n"
+                    + "from\n"
+                    + "    tributacao\n"
+                    + "order by\n"
+                    + "    codigo"
             )) {
                 while (rst.next()) {
                     result.add(new MapaTributoIMP(
@@ -270,49 +271,49 @@ public class ZpfDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    f.codigo id,\n" +
-                    "    f.razao_social razao,  \n" +
-                    "    f.nome_fantasia fantasia,\n" +
-                    "    f.cnpj,                  \n" +
-                    "    f.inscricao_estadual ie,  \n" +
-                    "    f.inscricao_suframa suframa,  \n" +
-                    "    f.inscricao_municipal,  \n" +
-                    "    case coalesce(upper(f.inativo),'N') when 'S' then 0 else 1 end situacaocadastro,\n" +
-                    "    f.endereco,\n" +
-                    "    f.numero,   \n" +
-                    "    f.complemento,\n" +
-                    "    f.bairro,\n" +
-                    "    cd.cod_municipio municipio_ibge,\n" +
-                    "    cd.cod_estado estado_ibge,\n" +
-                    "    f.cep,  \n" +
-                    "    f.fone,\n" +
-                    "    f.contato,\n" +
-                    "    f.fax,\n" +
-                    "    f.email,\n" +
-                    "    f.celular,\n" +
-                    "    f.data_inclusao datacadastro,\n" +
-                    "    f.data_ultima_alteracao dataalteracao,\n" +
-                    "    f.observacao\n" +
-                    "from\n" +
-                    "    fornecedores f\n" +
-                    "    left join cidades cd on f.cidade = cd.codigo\n" +
-                    "order by\n" +
-                    "    f.codigo"
+                    "select\n"
+                    + "    f.codigo id,\n"
+                    + "    f.razao_social razao,  \n"
+                    + "    f.nome_fantasia fantasia,\n"
+                    + "    f.cnpj,                  \n"
+                    + "    f.inscricao_estadual ie,  \n"
+                    + "    f.inscricao_suframa suframa,  \n"
+                    + "    f.inscricao_municipal,  \n"
+                    + "    case coalesce(upper(f.inativo),'N') when 'S' then 0 else 1 end situacaocadastro,\n"
+                    + "    f.endereco,\n"
+                    + "    f.numero,   \n"
+                    + "    f.complemento,\n"
+                    + "    f.bairro,\n"
+                    + "    cd.cod_municipio municipio_ibge,\n"
+                    + "    cd.cod_estado estado_ibge,\n"
+                    + "    f.cep,  \n"
+                    + "    f.fone,\n"
+                    + "    f.contato,\n"
+                    + "    f.fax,\n"
+                    + "    f.email,\n"
+                    + "    f.celular,\n"
+                    + "    f.data_inclusao datacadastro,\n"
+                    + "    f.data_ultima_alteracao dataalteracao,\n"
+                    + "    f.observacao\n"
+                    + "from\n"
+                    + "    fornecedores f\n"
+                    + "    left join cidades cd on f.cidade = cd.codigo\n"
+                    + "order by\n"
+                    + "    f.codigo"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
@@ -336,75 +337,101 @@ public class ZpfDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.addCelular("CELULAR", rst.getString("celular"));
                     imp.setDatacadastro(rst.getDate("datacadastro"));
                     imp.setObservacao(rst.getString("observacao"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "fornecedor,\n"
+                    + "produto,\n"
+                    + "codfornecedor\n"
+                    + "from produtos_fornecedores\n"
+                    + "order by fornecedor,  produto"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("produto"));
+                    imp.setIdFornecedor(rst.getString("fornecedor"));
+                    imp.setCodigoExterno(rst.getString("codfornecedor"));
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    c.codigo id,\n" +
-                    "    c.cpf_cnpj cnpj,\n" +
-                    "    coalesce(c.inscricao_estadual, c.rg) inscricao_estadual,\n" +
-                    "    c.nome_razao_social razao,\n" +
-                    "    coalesce(c.nome_fantasia, c.nome_razao_social) fantasia,\n" +
-                    "    c.inativo,\n" +
-                    "    c.bloqueado,\n" +
-                    "    c.endereco,\n" +
-                    "    c.numero,\n" +
-                    "    c.complemento,\n" +
-                    "    c.bairro,\n" +
-                    "    cd.cod_municipio ibge_municipio,\n" +
-                    "    c.cep,\n" +
-                    "    c.estado_civil,\n" +
-                    "    c.data_nascimento,\n" +
-                    "    c.data_cadastro,\n" +
-                    "    c.local_trabalho,\n" +
-                    "    c.endereco_trabalho,\n" +
-                    "    cdtrb.cod_municipio ibge_municipio_trabalho,\n" +
-                    "    c.telefone_trabalho empresa_telefone,\n" +
-                    "    c.data_admissao,\n" +
-                    "    c.simples_nacional,\n" +
-                    "    c.produtor_rural,\n" +
-                    "    c.profissao,\n" +
-                    "    c.renda_mensal salario,\n" +
-                    "    c.limite_credito,\n" +
-                    "    c.limite_utilizado,\n" +
-                    "    c.nome_pai,\n" +
-                    "    c.nome_mae,\n" +
-                    "    c.pontuacao_inicial,\n" +
-                    "    c.fone,\n" +
-                    "    c.fax,\n" +
-                    "    c.endereco_cobranca,\n" +
-                    "    c.numero_cobranca,\n" +
-                    "    c.complemento_cobranca,\n" +
-                    "    c.bairro_cobranca,\n" +
-                    "    cdcob.cod_municipio ibge_municipio_cobranca,\n" +
-                    "    c.cep_cobranca,\n" +
-                    "    c.inscricao_municipal\n" +
-                    "from\n" +
-                    "    clientes c\n" +
-                    "    left join cidades cd on\n" +
-                    "        c.cidade = cd.codigo \n" +
-                    "    left join cidades cdtrb on\n" +
-                    "        c.cidade_trabalho = cdtrb.codigo \n" +
-                    "    left join cidades cdcob on\n" +
-                    "        c.cidade_cobranca = cdcob.codigo\n" +
-                    "order by\n" +
-                    "    c.codigo"
+                    "select\n"
+                    + "    c.codigo id,\n"
+                    + "    c.cpf_cnpj cnpj,\n"
+                    + "    coalesce(c.inscricao_estadual, c.rg) inscricao_estadual,\n"
+                    + "    c.nome_razao_social razao,\n"
+                    + "    coalesce(c.nome_fantasia, c.nome_razao_social) fantasia,\n"
+                    + "    c.inativo,\n"
+                    + "    c.bloqueado,\n"
+                    + "    c.endereco,\n"
+                    + "    c.numero,\n"
+                    + "    c.complemento,\n"
+                    + "    c.bairro,\n"
+                    + "    cd.cod_municipio ibge_municipio,\n"
+                    + "    c.cep,\n"
+                    + "    c.estado_civil,\n"
+                    + "    c.data_nascimento,\n"
+                    + "    c.data_cadastro,\n"
+                    + "    c.local_trabalho,\n"
+                    + "    c.endereco_trabalho,\n"
+                    + "    cdtrb.cod_municipio ibge_municipio_trabalho,\n"
+                    + "    c.telefone_trabalho empresa_telefone,\n"
+                    + "    c.data_admissao,\n"
+                    + "    c.simples_nacional,\n"
+                    + "    c.produtor_rural,\n"
+                    + "    c.profissao,\n"
+                    + "    c.renda_mensal salario,\n"
+                    + "    c.limite_credito,\n"
+                    + "    c.limite_utilizado,\n"
+                    + "    c.nome_pai,\n"
+                    + "    c.nome_mae,\n"
+                    + "    c.pontuacao_inicial,\n"
+                    + "    c.fone,\n"
+                    + "    c.fax,\n"
+                    + "    c.endereco_cobranca,\n"
+                    + "    c.numero_cobranca,\n"
+                    + "    c.complemento_cobranca,\n"
+                    + "    c.bairro_cobranca,\n"
+                    + "    cdcob.cod_municipio ibge_municipio_cobranca,\n"
+                    + "    c.cep_cobranca,\n"
+                    + "    c.inscricao_municipal\n"
+                    + "from\n"
+                    + "    clientes c\n"
+                    + "    left join cidades cd on\n"
+                    + "        c.cidade = cd.codigo \n"
+                    + "    left join cidades cdtrb on\n"
+                    + "        c.cidade_trabalho = cdtrb.codigo \n"
+                    + "    left join cidades cdcob on\n"
+                    + "        c.cidade_cobranca = cdcob.codigo\n"
+                    + "order by\n"
+                    + "    c.codigo"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
-                    
+
                     imp.setId(rst.getString("id"));
                     imp.setCnpj(rst.getString("cnpj"));
                     imp.setInscricaoestadual(rst.getString("inscricao_estadual"));
@@ -440,67 +467,67 @@ public class ZpfDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCobrancaCep(rst.getString("cep_cobranca"));
                     imp.setInscricaoMunicipal(rst.getString("inscricao_municipal"));
                     imp.setValorLimite(rst.getDouble("limite_credito"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "Select \n" +
-                    "    P.Empresa, \n" +
-                    "    P.Documento, \n" +
-                    "    P.Serie, \n" +
-                    "    P.Tipo_MOvto,\n" +
-                    "    r.data dataemissao,\n" +
-                    "    P.Parcela, \n" +
-                    "    P.Vencimento, \n" +
-                    "    P.Valor,\n" +
-                    "    coalesce(sum(b.valor_recebido+coalesce(b.Descontos,0)-coalesce(b.juros,0)),0) Valor_pago,\n" +
-                    "    R.cliente, \n" +
-                    "    c.cpf_cnpj,\n" +
-                    "    C.fisica_juridica\n" +
-                    "From\n" +
-                    "    Contas_Receber R\n" +
-                    "    Left Join Parcelas_Receber P on \n" +
-                    "        (p.empresa=r.empresa and p.documento=r.documento and p.serie=r.serie and p.tipo_movto=r.tipo_movto)\n" +
-                    "    Left Join baixas_parcelas_receber b on \n" +
-                    "        (p.empresa = b.empresa and p.documento=b.documento and p.serie=b.serie and p.tipo_movto=b.tipo_movto and p.parcela=b.parcela)\n" +
-                    "    INNER JOIN CLIENTES C ON (C.codigo = R.cliente)\n" +
-                    "where\n" +
-                    "    r.empresa = " + getLojaOrigem() + "\n" +
-                    "Group by\n" +
-                    "    P.Empresa, \n" +
-                    "    P.Documento, \n" +
-                    "    P.Serie, \n" +
-                    "    P.Tipo_Movto,  \n" +
-                    "    r.data,\n" +
-                    "    P.Parcela, \n" +
-                    "    P.Vencimento, \n" +
-                    "    P.Valor, \n" +
-                    "    R.cliente,        \n" +
-                    "    c.cpf_cnpj,\n" +
-                    "    C.fisica_juridica\n" +
-                    "having\n" +
-                    "    Round(coalesce(sum(b.valor_recebido+coalesce(b.Descontos,0)-coalesce(b.juros,0)),0),2) < Round(coalesce(p.valor,0),2)"
+                    "Select \n"
+                    + "    P.Empresa, \n"
+                    + "    P.Documento, \n"
+                    + "    P.Serie, \n"
+                    + "    P.Tipo_MOvto,\n"
+                    + "    r.data dataemissao,\n"
+                    + "    P.Parcela, \n"
+                    + "    P.Vencimento, \n"
+                    + "    P.Valor,\n"
+                    + "    coalesce(sum(b.valor_recebido+coalesce(b.Descontos,0)-coalesce(b.juros,0)),0) Valor_pago,\n"
+                    + "    R.cliente, \n"
+                    + "    c.cpf_cnpj,\n"
+                    + "    C.fisica_juridica\n"
+                    + "From\n"
+                    + "    Contas_Receber R\n"
+                    + "    Left Join Parcelas_Receber P on \n"
+                    + "        (p.empresa=r.empresa and p.documento=r.documento and p.serie=r.serie and p.tipo_movto=r.tipo_movto)\n"
+                    + "    Left Join baixas_parcelas_receber b on \n"
+                    + "        (p.empresa = b.empresa and p.documento=b.documento and p.serie=b.serie and p.tipo_movto=b.tipo_movto and p.parcela=b.parcela)\n"
+                    + "    INNER JOIN CLIENTES C ON (C.codigo = R.cliente)\n"
+                    + "where\n"
+                    + "    r.empresa = " + getLojaOrigem() + "\n"
+                    + "Group by\n"
+                    + "    P.Empresa, \n"
+                    + "    P.Documento, \n"
+                    + "    P.Serie, \n"
+                    + "    P.Tipo_Movto,  \n"
+                    + "    r.data,\n"
+                    + "    P.Parcela, \n"
+                    + "    P.Vencimento, \n"
+                    + "    P.Valor, \n"
+                    + "    R.cliente,        \n"
+                    + "    c.cpf_cnpj,\n"
+                    + "    C.fisica_juridica\n"
+                    + "having\n"
+                    + "    Round(coalesce(sum(b.valor_recebido+coalesce(b.Descontos,0)-coalesce(b.juros,0)),0),2) < Round(coalesce(p.valor,0),2)"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    
+
                     imp.setId(
-                            rst.getString("Empresa") + "-" +
-                            rst.getString("Documento") + "-" +
-                            rst.getString("Serie") + "-" +
-                            rst.getString("Tipo_MOvto") + "-" +
-                            rst.getString("Parcela")
+                            rst.getString("Empresa") + "-"
+                            + rst.getString("Documento") + "-"
+                            + rst.getString("Serie") + "-"
+                            + rst.getString("Tipo_MOvto") + "-"
+                            + rst.getString("Parcela")
                     );
                     imp.setNumeroCupom(rst.getString("Documento"));
                     imp.setObservacao("SERIE: " + rst.getString("serie") + " DOCUMENTO: " + rst.getString("documento"));
@@ -512,10 +539,10 @@ public class ZpfDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCnpjCliente(rst.getString("cpf_cnpj"));
                     if (rst.getDouble("Valor_pago") > 0) {
                         imp.addPagamento(
-                                rst.getString("Empresa") + "-" +
-                                rst.getString("Documento") + "-" +
-                                rst.getString("Serie") + "-" +
-                                rst.getString("Tipo_MOvto"),
+                                rst.getString("Empresa") + "-"
+                                + rst.getString("Documento") + "-"
+                                + rst.getString("Serie") + "-"
+                                + rst.getString("Tipo_MOvto"),
                                 rst.getDouble("Valor_pago"),
                                 0,
                                 0,
@@ -523,14 +550,13 @@ public class ZpfDAO extends InterfaceDAO implements MapaTributoProvider {
                                 ""
                         );
                     }
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
-    
-    
+
 }
