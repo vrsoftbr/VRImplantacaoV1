@@ -410,7 +410,7 @@ public class GetWayGUI extends VRInternalFrame {
                         }
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.VALOR_LIMITE,
-                                    OpcaoCliente.SITUACAO_CADASTRO, OpcaoCliente.INSCRICAO_ESTADUAL, OpcaoCliente.OBSERVACOES2);
+                                    OpcaoCliente.SITUACAO_CADASTRO);
                         }
                         
                         {
