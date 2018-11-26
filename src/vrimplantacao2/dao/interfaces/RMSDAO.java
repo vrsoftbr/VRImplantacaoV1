@@ -1657,7 +1657,9 @@ public class RMSDAO extends InterfaceDAO {
                     "       vda.r60i_fil idloja,\n" +
                     "       vda.r60i_dta data,\n" +
                     "       vda.r60i_cxa caixa,\n" +
-                    "       vda.r60i_ecf_nro ecf,\n" +
+                    "       case when vda.r60i_ecf_nro = 8 then 25\n" +
+                    "       when vda.r60i_ecf_nro = 9 then 26\n" +
+                    "       else vda.r60i_ecf_nro end as ecf,\n" +
                     "       vda.r60i_cup coo,\n" +
                     "       '00:00:0000' horainicio,\n" +
                     "       '00:00:0000' horafim,\n" +
@@ -1821,8 +1823,10 @@ public class RMSDAO extends InterfaceDAO {
                     = "select\n" +
                     "       itm.r60i_cup coo,\n" +
                     "       itm.r60i_dta data,\n" +
-                    "       itm.r60i_ecf_nro ecf,\n" +
                     "       itm.r60i_cxa caixa,\n" +
+                    "       case when itm.r60i_ecf_nro = 8 then 25 \n" +
+                    "       when itm.r60i_ecf_nro = 9 then 26 \n" +
+                    "       else itm.r60i_ecf_nro end as ecf, \n" +
                     "       itm.R60i_Seq sequencia,\n" +
                     "       itm.r60i_ean ean,\n" +
                     "       p.git_descricao descricao,\n" +
@@ -1838,9 +1842,7 @@ public class RMSDAO extends InterfaceDAO {
                     "from\n" +
                     "       AA1FR60I_" + tabela_venda + " itm\n" +
                     "join\n" +
-                    "       AA3CCEAN ean on itm.r60i_ean = ean.ean_cod_ean\n" +
-                    "join\n" +
-                    "       AA3CITEM p on ean.EAN_COD_PRO_ALT = p.GIT_COD_ITEM || p.git_digito\n" +
+                    "       AA3CITEM p on itm.r60i_ite = p.git_cod_item\n" +
                     "order by\n" +
                     "       itm.r60i_cup, itm.r60i_seq";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
