@@ -28,6 +28,7 @@ import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.InventarioIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
@@ -321,6 +322,74 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFornecedor(rs.getString("cod_fornecedor"));
                     imp.setCodigoExterno(rs.getString("cod_fornecprod"));
 
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    private Date dataInventario;
+    public void setDataInventario(Date dataInventario) {
+        this.dataInventario = dataInventario;
+    }
+    
+    public final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd.MM.yyyy");
+    public Date getDataInventario() {
+        return dataInventario;
+    }
+    
+    @Override
+    public List<InventarioIMP> getInventario() throws Exception {
+        List<InventarioIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    est.data || est.cod_produto id,\n" +
+                    "    est.cod_produto id_produto,\n" +
+                    "    est.data,\n" +
+                    "    p.nome_produto descricao,\n" +
+                    "    upper(p.unidade) unidade,\n" +
+                    "    p.preco_1 precovenda,\n" +
+                    "    est.estoque quantidade,\n" +
+                    "    est.custo_medio custocomimposto,\n" +
+                    "    est.custo_medio custosemimposto,\n" +
+                    "    round((est.custo_medio * est.estoque), 2) custototal,\n" +
+                    "    p.cod_tributacao id_aliquota,\n" +        
+                    "    a.aliquota,\n" +
+                    "    a.cst_icms,\n" +
+                    "    n.cst_pis,\n" +
+                    "    n.cst_cofins,\n" +        
+                    "    n.cst_pis_saida\n" +
+                    "from\n" +
+                    "    produtovendido est\n" +
+                    "join \n" +
+                    "    produto p on (p.cod_produto = est.cod_produto)\n" +
+                    "join\n" +
+                    "    aliquotas a on (p.cod_tributacao = a.cod_tributacao)\n" +
+                    "join\n" +
+                    "    ncm_produto n on (n.pkcod = p.chave_ncm)\n" +
+                    "where\n" +
+                    "    est.data = " + FORMAT.format(getDataInventario()) + " and\n" +
+                    "    est.cod_produto >= 0 and\n" +
+                    "    est.estoque > 0")) {
+                while(rs.next()) {
+                    InventarioIMP imp = new InventarioIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setIdProduto(rs.getString("id_produto"));
+                    imp.setData(rs.getDate("data"));
+                    imp.setDescricao(rs.getString("descricao"));
+                    imp.setQuantidade(rs.getDouble("quantidade"));
+                    imp.setPrecoVenda(rs.getDouble("precovenda"));
+                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
+                    imp.setAliquotaCredito(rs.getDouble("aliquota"));
+                    imp.setCstCredito(rs.getString("cst_icms"));
+                    imp.setPis(rs.getDouble("cst_pis"));
+                    imp.setCofins(rs.getDouble("cst_cofins"));
+                    imp.setIdAliquotaCredito(rs.getString("id_aliquota"));
+                    imp.setIdAliquotaDebito(rs.getString("id_aliquota"));
+                    
                     result.add(imp);
                 }
             }
