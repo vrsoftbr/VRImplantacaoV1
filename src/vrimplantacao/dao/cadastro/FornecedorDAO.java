@@ -31,11 +31,12 @@ public class FornecedorDAO {
         cnpjExistente = carregarCnpj();
     }
     
-    public Integer getIdByCnpj(Long cnpj) throws Exception {
+    public int getIdByCnpj(long cnpj) throws Exception {
         if (cnpjExistente == null) {
             recarregarCnpj();
         }
-        return cnpjExistente.get(cnpj);
+        Integer i = cnpjExistente.get(cnpj);
+        return i != null ? i.intValue() : -1;
     }
 
     public Map<Long, Integer> carregarCnpj() throws Exception {
@@ -275,9 +276,9 @@ public class FornecedorDAO {
                 //Se o código anterior estiver na listagem, não executa.
                 if (!dao.existe(i_fornecedor.getCodigoanterior(), Global.idLojaFornecedor)) {
                     
-                    Integer idCnpj = getIdByCnpj(i_fornecedor.getCnpj());
+                    int idCnpj = getIdByCnpj(i_fornecedor.getCnpj());
                     
-                    if (idCnpj == null) {
+                    if (idCnpj == -1) {
                         //Incrementa o id
                         id++;
                         //Se o id já existir na lista, incrementa mais um
@@ -1052,23 +1053,6 @@ public class FornecedorDAO {
         stm.close();
 
         return oTipoFornecedor;
-    }
-    
-    public int getIdByCnpj(long i_cnpj) throws Exception {
-        Statement stm = null;
-        ResultSet rst = null;
-        StringBuilder sql = null;
-
-        stm = Conexao.createStatement();
-        sql = new StringBuilder();
-        sql.append("SELECT f.id FROM fornecedor f ");
-        sql.append("where f.cnpj = " + i_cnpj);
-        rst = stm.executeQuery(sql.toString());
-        if (rst.next()) {
-            return rst.getInt("id");
-        } else {
-            return -1;
-        }
     }
 
     public int getIdByCodAnt_Fornecedor(String i_sistema, String i_loja, String i_codigo) throws Exception {
