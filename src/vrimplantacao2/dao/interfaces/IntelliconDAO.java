@@ -383,8 +383,6 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrecoVenda(rs.getDouble("precovenda"));
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
-                    imp.setAliquotaCredito(rs.getDouble("aliquota"));
-                    imp.setCstCredito(rs.getString("cst_icms"));
                     imp.setPis(rs.getDouble("cst_pis"));
                     imp.setCofins(rs.getDouble("cst_cofins"));
                     imp.setIdAliquotaCredito(rs.getString("id_aliquota"));
