@@ -686,7 +686,7 @@ public class SysPdvDAO extends InterfaceDAO {
                     + "WHERE \n"
                     + "    (COALESCE(CTRVLRPAG,0) < CTRVLRNOM) AND \n"
                     + "    COALESCE(ctrvlrdev,0) > 0 and\n"
-                    + "    (COALESCE(FZDCOD,'000') IN ('004', '008'))"
+                    + "    (COALESCE(FZDCOD,'005') IN ('005'))"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();

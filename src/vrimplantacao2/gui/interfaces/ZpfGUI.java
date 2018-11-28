@@ -145,6 +145,7 @@ public class ZpfGUI extends VRInternalFrame implements ConexaoEvent {
         pnlFornecedorClientes = new vrframework.bean.panel.VRPanel();
         pnlForn = new vrframework.bean.panel.VRPanel();
         chkFornecedorDados = new vrframework.bean.checkBox.VRCheckBox();
+        chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         pnlClientes = new vrframework.bean.panel.VRPanel();
         chkClientesPreferenciais = new vrframework.bean.checkBox.VRCheckBox();
         chkClientesEventuais = new vrframework.bean.checkBox.VRCheckBox();
@@ -167,6 +168,8 @@ public class ZpfGUI extends VRInternalFrame implements ConexaoEvent {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkFornecedorDados, "Dados");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkProdutoFornecedor, "Produto Fornecedor");
+
         javax.swing.GroupLayout pnlFornLayout = new javax.swing.GroupLayout(pnlForn);
         pnlForn.setLayout(pnlFornLayout);
         pnlFornLayout.setHorizontalGroup(
@@ -174,12 +177,16 @@ public class ZpfGUI extends VRInternalFrame implements ConexaoEvent {
             .addGroup(pnlFornLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkFornecedorDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlFornLayout.setVerticalGroup(
             pnlFornLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlFornLayout.createSequentialGroup()
-                .addComponent(chkFornecedorDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnlFornLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkFornecedorDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(0, 7, Short.MAX_VALUE))
         );
 
@@ -324,6 +331,7 @@ public class ZpfGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkClientesPreferenciais;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedorDados;
+    private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI chkProdutos;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
@@ -355,6 +363,9 @@ public class ZpfGUI extends VRInternalFrame implements ConexaoEvent {
                     chkProdutos.setImportador(importador);
                     if (chkFornecedorDados.isSelected()) {
                         importador.importarFornecedor(OpcaoFornecedor.DADOS, OpcaoFornecedor.CONTATOS);
+                    }
+                    if (chkProdutoFornecedor.isSelected()) {
+                        importador.importarProdutoFornecedor();
                     }
                     if (chkClientesPreferenciais.isSelected()) {
                         importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);

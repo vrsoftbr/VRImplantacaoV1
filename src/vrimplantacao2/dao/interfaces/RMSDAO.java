@@ -2,16 +2,21 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.Date;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoOracle;
@@ -47,6 +52,8 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
@@ -60,6 +67,10 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 */
 public class RMSDAO extends InterfaceDAO {
 
+    private static final Logger LOG = Logger.getLogger(RMSDAO.class.getName());
+    public static String tabela_venda = "";
+    public static int digito;
+    
     @Override
     public String getSistema() {
         return "RMS";
@@ -854,59 +865,59 @@ public class RMSDAO extends InterfaceDAO {
         try(Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "SELECT \n" +
-                    "	TIP.tip_cgc_cpf Cgc_cpf, \n" +
-                    "   TIP.tip_codigo Codigo , \n" +
-                    "	TIP.tip_razao_social Razao_social, \n" +
-                    "   TIP.tip_nome_fantasia Nome_fantasia,  \n" +
-                    "	TIP.tip_endereco Endereco, \n" +
-                    "   TIP.tip_bairro Bairro, \n" +
-                    "   TIP.tip_cidade Cidade,  \n" +
-                    "	TIP.tip_estado Estado, \n" +
-                    "   TIP.tip_cep Cep, \n" +
-                    "   TIP.tip_natureza Natureza,  \n" +
-                    "	TIP.tip_data_cad Data_cad, \n" +
-                    "   TIP.tip_fax_ddd Fax_ddd, \n" +
-                    "   TIP.tip_fax_num Fax_num,  \n" +
-                    "	TIP.tip_fone_ddd Fone_ddd, \n" +
-                    "   TIP.tip_fone_num Fone_num, \n" +
-                    "   TIP.tip_fis_jur Fis_jur,  \n" +
-                    "	TIP.tip_insc_est_ident Insc_est_ident, \n" +
-                    "   TIP.tip_regiao  Regiao,  \n" +
-                    "	TIP.tip_divisao Divisao, \n" +
-                    "   TIP.tip_distrito Distrito, \n" +
-                    "   CLI.cli_contato Contato_principal,  \n" +
-                    "	CLI.cli_cod_vend Vendedor,  \n" +
-                    "	CLI.cli_situacao Status, \n" +
-                    "   CLI.cli_limite_cred,  \n" +
-                    "	Round(CLI.cli_limite_cred * (SELECT To_number(Substr(tab_conteudo, 1, 15) ) / 1000000  \n" +
+                    "	     TIP.tip_cgc_cpf Cgc_cpf, \n" +
+                    "        TIP.tip_codigo Codigo , \n" +
+                    "	     TIP.tip_razao_social Razao_social, \n" +
+                    "        TIP.tip_nome_fantasia Nome_fantasia,  \n" +
+                    "	     TIP.tip_endereco Endereco, \n" +
+                    "        TIP.tip_bairro Bairro, \n" +
+                    "        TIP.tip_cidade Cidade,  \n" +
+                    "	     TIP.tip_estado Estado, \n" +
+                    "        TIP.tip_cep Cep, \n" +
+                    "        TIP.tip_natureza Natureza,  \n" +
+                    "	     TIP.tip_data_cad Data_cad, \n" +
+                    "        TIP.tip_fax_ddd Fax_ddd, \n" +
+                    "        TIP.tip_fax_num Fax_num,  \n" +
+                    "        TIP.tip_fone_ddd Fone_ddd, \n" +
+                    "        TIP.tip_fone_num Fone_num, \n" +
+                    "        TIP.tip_fis_jur Fis_jur,  \n" +
+                    "	     TIP.tip_insc_est_ident Insc_est_ident, \n" +
+                    "        TIP.tip_regiao  Regiao,  \n" +
+                    "	     TIP.tip_divisao Divisao, \n" +
+                    "        TIP.tip_distrito Distrito, \n" +
+                    "        CLI.cli_contato Contato_principal,  \n" +
+                    "	     CLI.cli_cod_vend Vendedor,  \n" +
+                    "	     CLI.cli_situacao Status, \n" +
+                    "        CLI.cli_limite_cred,  \n" +
+                    "	     Round(CLI.cli_limite_cred * (SELECT To_number(Substr(tab_conteudo, 1, 15) ) / 1000000  \n" +
                     "				FROM   aa2ctabe WHERE  tab_codigo = (SELECT emp_ind_limite  \n" +
                     "				FROM   aa2cempr  \n" +
                     "				WHERE emp_codigo = TIP.tip_empresa) AND tab_acesso = Rpad( \n" +
                     "				To_char(SYSDATE, 'YYMMDD'), 10, ' ')), 2) Limite_cred,  \n" +
-                    "	Nvl(por_banco, 0) banco,  \n" +
-                    "	Decode(cli.cli_situacao, 'A', 'ATIVO',\n" +
-                    "	Decode(cli.cli_situacao, 'I', 'INATIVO',\n" +
-                    "	Decode(cli.cli_situacao, 'C', 'CANCELADO',\n" +
-                    "	Decode(cli.cli_situacao, 'S', 'SUSPENSO',\n" +
-                    "	'ATIVO'))))\n" +
-                    "	SIGLA_STATUS,\n" +
-                    "	Nvl(dtip_cod_municipio, 0) COD_MUNI\n" +
+                    "	     Nvl(por_banco, 0) banco,  \n" +
+                    "	     Decode(cli.cli_situacao, 'A', 'ATIVO',\n" +
+                    "	     Decode(cli.cli_situacao, 'I', 'INATIVO',\n" +
+                    "	     Decode(cli.cli_situacao, 'C', 'CANCELADO',\n" +
+                    "	     Decode(cli.cli_situacao, 'S', 'SUSPENSO',\n" +
+                    "	     'ATIVO'))))\n" +
+                    "	     SIGLA_STATUS,\n" +
+                    "	     Nvl(dtip_cod_municipio, 0) COD_MUNI\n" +
                     "FROM   \n" +
-                    "  aa2cclir CLI, \n" +
-                    "  aa2ctipo TIP, \n" +
-                    "  final_cliente FIN, \n" +
-                    "  aa1rport, \n" +
-                    "  aa1dtipo \n" +
+                    "      aa2cclir CLI, \n" +
+                    "      aa2ctipo TIP, \n" +
+                    "      final_cliente FIN, \n" +
+                    "      aa1rport, \n" +
+                    "      aa1dtipo \n" +
                     "WHERE  \n" +
-                    "	        TIP.tip_cgc_cpf >= 0 \n" +
-                    "   AND 	TIP.tip_codigo >= 0 \n" +
-                    "   AND 	TIP.tip_digito >= 0 \n" +
-                    "   AND 	TIP.tip_codigo = CLI.cli_codigo \n" +
-                    "   AND 	TIP.tip_digito = CLI.cli_digito \n" +
-                    "   AND 	FIN.cli_codigo(+) = CLI.cli_codigo \n" +
-                    "   AND 	por_portador (+) = cli.cli_port \n" +
-                    "   AND 	dtip_codigo (+) = tip_codigo\n" +
-                    "   and     tip.tip_loj_cli = 'C'")) {
+                    "		  TIP.tip_cgc_cpf >= 0 \n" +
+                    "       AND 	TIP.tip_codigo >= 0 \n" +
+                    "       AND 	TIP.tip_digito >= 0 \n" +
+                    "       AND 	TIP.tip_codigo = CLI.cli_codigo(+) \n" +
+                    "       AND 	TIP.tip_digito = CLI.cli_digito(+) \n" +
+                    "       AND 	FIN.cli_codigo(+) = CLI.cli_codigo \n" +
+                    "       AND 	por_portador (+) = cli.cli_port \n" +
+                    "       AND 	dtip_codigo (+) = tip_codigo\n" +
+                    "       and  tip.tip_loj_cli in ('C','R')")) {
                 SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
                 while(rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -933,7 +944,12 @@ public class RMSDAO extends InterfaceDAO {
                     if(rs.getString("Contato_principal") != null) {
                         imp.addContato("Contato Principal", rs.getString("Contato_principal"), null, null, null);
                     }
-                    imp.setAtivo("A".equals(rs.getString("Status").trim()) ? true : false);
+                    if(rs.getString("Status") != null && "".equals(rs.getString("Status"))) {
+                        imp.setAtivo("A".equals(rs.getString("Status").trim()) ? true : false);
+                    } else {
+                        imp.setAtivo(false);
+                    }
+                    
                     imp.setValorLimite(rs.getDouble("Limite_cred"));
                     
                     result.add(imp);
@@ -1560,4 +1576,296 @@ public class RMSDAO extends InterfaceDAO {
         return result;
     }
     
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
+
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
+
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new VendaIterator(getLojaOrigem().substring(0, getLojaOrigem().length() - 1), dataInicioVenda, dataTerminoVenda);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new VendaItemIterator(getLojaOrigem().substring(0, getLojaOrigem().length() - 1), dataInicioVenda, dataTerminoVenda);
+    }
+    
+    private static class VendaIterator implements Iterator<VendaIMP> {
+
+        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+        private Statement stm = ConexaoOracle.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaIMP next;
+        private Set<String> uk = new HashSet<>();
+
+        private void obterNext() {
+            try {
+                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+                SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaIMP();
+                        String id = rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        if (!uk.add(id)) {
+                            LOG.warning("Venda " + id + " já existe na listagem");
+                        }
+                        next.setId(id);
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("coo")));
+                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                        next.setData(format.parse(rst.getString("data")));
+                        next.setIdClientePreferencial(rst.getString("id_cliente"));
+                        String horaInicio = timestampDate.format(format.parse(rst.getString("data"))) + " " + rst.getString("horainicio");
+                        String horaTermino = timestampDate.format(format.parse(rst.getString("data"))) + " " + rst.getString("horafim");
+                        next.setHoraInicio(timestamp.parse(horaInicio));
+                        next.setHoraTermino(timestamp.parse(horaTermino));
+                        next.setCancelado("C".equals(rst.getString("situacao").trim()));
+                        next.setSubTotalImpressora(rst.getDouble("vltotal"));
+                        next.setCpf(rst.getString("cnpj"));
+                        next.setValorDesconto(rst.getDouble("vldesconto"));
+                        next.setNumeroSerie(rst.getString("seriecf"));
+                        next.setModeloImpressora(rst.getString("modeloecf"));
+                        next.setNomeCliente(rst.getString("razaosocial"));
+                        String endereco
+                                = Utils.acertarTexto(rst.getString("endereco")) + ","
+                                + Utils.acertarTexto(rst.getString("bairro")) + ","
+                                + Utils.acertarTexto(rst.getString("municipio")) + "-"
+                                + Utils.acertarTexto(rst.getString("uf")) + ","
+                                + Utils.acertarTexto(rst.getString("cep"));
+                        next.setEnderecoCliente(endereco);
+                        next.setChaveCfe(rst.getString("chave"));
+                    }
+                }
+            } catch (SQLException | ParseException ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            this.sql
+                    = "select \n" +
+                    "       vda.r60i_fil idloja,\n" +
+                    "       vda.r60i_dta data,\n" +
+                    "       vda.r60i_cxa caixa,\n" +
+                    "       case when vda.r60i_ecf_nro = 8 then 25\n" +
+                    "       when vda.r60i_ecf_nro = 9 then 26\n" +
+                    "       else vda.r60i_ecf_nro end as ecf,\n" +
+                    "       vda.r60i_cup coo,\n" +
+                    "       '00:00:0000' horainicio,\n" +
+                    "       '00:00:0000' horafim,\n" +
+                    "       sum(vda.r60i_vlr_ctb) vltotal,\n" +
+                    "       sum(vda.r60i_vlr_dsc) vldesconto,\n" +
+                    "       min(vda.r60i_sit) situacao,\n" +
+                    "       vda.r60i_ecf_mdl modeloecf,\n" +
+                    "       vda.r60i_ecf_ser seriecf,\n" +
+                    "       vda.r60i_chv_cel chave,\n" +
+                    "       tip.tip_codigo as id_cliente,\n" +
+                    "       tip.tip_cgc_cpf cnpj,\n" +
+                    "       tip.tip_razao_social razaosocial,\n" +
+                    "       tip.tip_endereco endereco,\n" +
+                    "       tip.tip_bairro bairro,\n" +
+                    "       tip.tip_cidade municipio,\n" +
+                    "       tip.tip_estado uf,\n" +
+                    "       tip.tip_cep cep\n" +
+                    "from \n" +
+                      " AA1FR60I_" + tabela_venda + " vda\n" +
+                    "left join\n" +
+                    "       aa2ctipo tip on vda.r60i_cgc_cpf = tip.tip_cgc_cpf\n" +
+                    "left join\n" +
+                    "       aa2cclir cli on tip.tip_codigo = cli.cli_codigo\n" +
+                    "where\n" +
+                    "       vda.r60i_fil = " + idLojaCliente + "\n" +
+                    "group by\n" +
+                    "       vda.r60i_fil,\n" +
+                    "       vda.r60i_dta,\n" +
+                    "       vda.r60i_cxa,\n" +
+                    "       vda.r60i_ecf_nro,\n" +
+                    "       vda.r60i_cup,\n" +
+                    "       vda.r60i_ecf_mdl,\n" +
+                    "       vda.r60i_ecf_ser,\n" +
+                    "       vda.r60i_chv_cel,\n" +
+                    "       tip.tip_codigo,\n" +
+                    "       tip.tip_cgc_cpf,\n" +
+                    "       tip.tip_razao_social,\n" +
+                    "       tip.tip_endereco,\n" +
+                    "       tip.tip_bairro,\n" +
+                    "       tip.tip_cidade,\n" +
+                    "       tip.tip_estado,\n" +
+                    "       tip.tip_cep";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+            System.out.println("Loja Digito: " + digito + "; Tabela: " + tabela_venda);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaIMP next() {
+            obterNext();
+            VendaIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+    }
+    
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+
+        private Statement stm = ConexaoOracle.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaItemIMP next;
+
+        private void obterNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaItemIMP();
+                        String id = rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        String id_venda = rst.getInt("sequencia") + "-" + rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+
+                        next.setId(id_venda);
+                        next.setVenda(id);
+                        next.setProduto(rst.getString("id_produto"));
+                        next.setDescricaoReduzida(rst.getString("descricao"));
+                        next.setPrecoVenda(rst.getDouble("vlunitario"));
+                        next.setQuantidade(rst.getDouble("qtd"));
+                        next.setTotalBruto(rst.getDouble("vltotal"));
+                        next.setValorDesconto(rst.getDouble("vldesconto"));
+                        next.setCancelado("C".equals(rst.getString("situacao").trim()));
+                        next.setCodigoBarras(rst.getString("ean"));
+                        next.setUnidadeMedida(rst.getString("embalagem"));
+                        
+                        String trib = rst.getString("tributacao");
+
+                        obterAliquota(next, trib);
+                    }
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        /**
+         * Método temporario, desenvolver um mapeamento eficiente da tributação.
+         *
+         * @param item
+         * @throws SQLException
+         */
+        public void obterAliquota(VendaItemIMP item, String icms) throws SQLException {
+            /*
+             0450       ALIQUOTA 4.5%
+             0700	ALIQUOTA 07%
+             1100       ALIQUOTA 11%
+             1200	ALIQUOTA 12%
+             1800	ALIQUOTA 18%
+             2500	ALIQUOTA 25%
+             I          ISENTO
+             F          SUBST TRIBUTARIA
+             */
+            int cst;
+            double aliq;
+            switch (icms) {
+                case "0450":
+                    cst = 0;
+                    aliq = 4.5;
+                    break;
+                case "1200":
+                    cst = 0;
+                    aliq = 12;
+                    break;
+                case "1800":
+                    cst = 0;
+                    aliq = 18;
+                    break;
+                case "2500":
+                    cst = 0;
+                    aliq = 25;
+                    break;
+                case "1100":
+                    cst = 0;
+                    aliq = 11;
+                    break;
+                case "F":
+                    cst = 60;
+                    aliq = 0;
+                    break;
+                default:
+                    cst = 40;
+                    aliq = 0;
+                    break;
+            }
+            item.setIcmsCst(cst);
+            item.setIcmsAliq(aliq);
+        }
+
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            this.sql
+                    = "select\n" +
+                    "       itm.r60i_cup coo,\n" +
+                    "       itm.r60i_dta data,\n" +
+                    "       itm.r60i_cxa caixa,\n" +
+                    "       case when itm.r60i_ecf_nro = 8 then 25 \n" +
+                    "       when itm.r60i_ecf_nro = 9 then 26 \n" +
+                    "       else itm.r60i_ecf_nro end as ecf, \n" +
+                    "       itm.R60i_Seq sequencia,\n" +
+                    "       itm.r60i_ean ean,\n" +
+                    "       p.git_descricao descricao,\n" +
+                    "       itm.r60i_ite id_produto,\n" +
+                    "       itm.r60i_emb_tpo embalagem,\n" +
+                    "       itm.r60i_sit situacao,\n" +
+                    "       itm.r60i_qtd qtd,\n" +
+                    "       itm.r60i_vlr_uni vlunitario,\n" +
+                    "       itm.r60i_vlr_ctb vltotal,\n" +
+                    "       itm.r60i_vlr_dsc vldesconto,\n" +
+                    "       itm.r60i_icm_trb tributacao,\n" +
+                    "       itm.r60i_icm_alq aliqicms\n" +
+                    "from\n" +
+                    "       AA1FR60I_" + tabela_venda + " itm\n" +
+                    "join\n" +
+                    "       AA3CITEM p on itm.r60i_ite = p.git_cod_item\n" +
+                    "order by\n" +
+                    "       itm.r60i_cup, itm.r60i_seq";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            obterNext();
+            VendaItemIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+    }
 }
