@@ -1996,20 +1996,30 @@ public class MilenioDAO {
 
             stm = ConexaoSqlServer.getConexao().createStatement();
 
-            sql = new StringBuilder();
-            sql.append("SELECT r.REFCODINT, f.AGECGCCPF, cf.FORCOD, cf.REFPLU, R.REFPLUDV, cf.CATQTDUND, cf.UNDCOD, cf.REFFOR ");
-            sql.append("FROM [SysacME].[dbo].[CATALOGO_FORNECEDOR]  cf ");
-            sql.append("inner join [SysacME].[dbo].[REFERENCIA] R ");            
-            sql.append("on R.REFPLU = cf.REFPLU ");            
-            sql.append("inner join [SysacME].[dbo].[V_FORNECEDOR] f ");
-            sql.append("on f.FORCOD = cf.FORCOD ");
-            sql.append("ORDER BY REFPLU ");
-
-            rst = stm.executeQuery(sql.toString());
+            rst = stm.executeQuery(
+                    "SELECT distinct\n" +
+                    "	r.REFCODINT, \n" +
+                    "	f.AGECGCCPF, \n" +
+                    "	f.agecod, \n" +
+                    "	cf.FORCOD, \n" +
+                    "	cf.REFPLU, \n" +
+                    "	R.REFCOD,\n" +
+                    "	R.REFPLUDV, \n" +
+                    "	cf.CATQTDUND, \n" +
+                    "	cf.UNDCOD, \n" +
+                    "	cf.REFFOR\n" +
+                    "FROM \n" +
+                    "	[SysacME].[dbo].[CATALOGO_FORNECEDOR]  cf \n" +
+                    "	inner join [SysacME].[dbo].[REFERENCIA] R\n" +
+                    "		on R.REFPLU = cf.REFPLU             \n" +
+                    "	inner join [SysacME].[dbo].[V_FORNECEDOR] f \n" +
+                    "		on f.FORCOD = cf.FORCOD \n" +
+                    "ORDER BY REFPLU"
+            );
 
             while (rst.next()) {
 
-                idFornecedor = rst.getInt("FORCOD");
+                idFornecedor = rst.getInt("agecod");
                 
                 //<editor-fold defaultstate="expanded" desc="Tratando o id do produto">
                 String strId;
