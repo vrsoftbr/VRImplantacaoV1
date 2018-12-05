@@ -152,6 +152,7 @@ public class RCNetGUI extends VRInternalFrame {
             String idLojaCliente;
             @Override
             public void run() {
+                
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);

@@ -1,6 +1,7 @@
 package vrimplantacao2.gui.interfaces;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -17,6 +18,7 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.parametro.Parametros;
 
@@ -288,6 +290,11 @@ public class IntelliCashGUI extends VRInternalFrame {
                         if (chkCheque.isSelected()) {
                             importador.importarCheque();
                         }
+                        if(chkPdvVendas.isSelected()) {
+                            dao.setDataInicioVenda(edtDtVendaIni.getDate());
+                            dao.setDataTerminoVenda(edtDtVendaFim.getDate());
+                            importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
+                        }
                     } else if (tab.getSelectedIndex() == 3) {
                         if (cbxUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -380,8 +387,14 @@ public class IntelliCashGUI extends VRInternalFrame {
         chkBloqueado = new vrframework.bean.checkBox.VRCheckBox();
         tablCreditoRotativo = new javax.swing.JPanel();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
-        vRPanel1 = new vrframework.bean.panel.VRPanel();
+        tabCheque = new vrframework.bean.panel.VRPanel();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
+        tabVenda = new vrframework.bean.panel.VRPanel();
+        pnlDadosDataVenda = new vrframework.bean.panel.VRPanel();
+        pnlPdvVendaDatas = new vrframework.bean.panel.VRPanel();
+        edtDtVendaIni = new org.jdesktop.swingx.JXDatePicker();
+        edtDtVendaFim = new org.jdesktop.swingx.JXDatePicker();
+        chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
         tabUnificacao = new vrframework.bean.panel.VRPanel();
         cbxUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
@@ -747,24 +760,100 @@ public class IntelliCashGUI extends VRInternalFrame {
 
         chkCheque.setText("Cheque");
 
-        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
-        vRPanel1.setLayout(vRPanel1Layout);
-        vRPanel1Layout.setHorizontalGroup(
-            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel1Layout.createSequentialGroup()
+        javax.swing.GroupLayout tabChequeLayout = new javax.swing.GroupLayout(tabCheque);
+        tabCheque.setLayout(tabChequeLayout);
+        tabChequeLayout.setHorizontalGroup(
+            tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabChequeLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(538, Short.MAX_VALUE))
         );
-        vRPanel1Layout.setVerticalGroup(
-            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel1Layout.createSequentialGroup()
+        tabChequeLayout.setVerticalGroup(
+            tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabChequeLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(175, Short.MAX_VALUE))
         );
 
-        tabCliente.addTab("Cheque", vRPanel1);
+        tabCliente.addTab("Cheque", tabCheque);
+
+        pnlDadosDataVenda.setBorder(javax.swing.BorderFactory.createTitledBorder("Importar Vendas (PDV)"));
+
+        edtDtVendaIni.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtDtVendaIniActionPerformed(evt);
+            }
+        });
+
+        edtDtVendaFim.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edtDtVendaFimActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlPdvVendaDatasLayout = new javax.swing.GroupLayout(pnlPdvVendaDatas);
+        pnlPdvVendaDatas.setLayout(pnlPdvVendaDatasLayout);
+        pnlPdvVendaDatasLayout.setHorizontalGroup(
+            pnlPdvVendaDatasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlPdvVendaDatasLayout.createSequentialGroup()
+                .addComponent(edtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        pnlPdvVendaDatasLayout.setVerticalGroup(
+            pnlPdvVendaDatasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlPdvVendaDatasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(edtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        chkPdvVendas.setEnabled(true);
+        chkPdvVendas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkPdvVendasActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlDadosDataVendaLayout = new javax.swing.GroupLayout(pnlDadosDataVenda);
+        pnlDadosDataVenda.setLayout(pnlDadosDataVendaLayout);
+        pnlDadosDataVendaLayout.setHorizontalGroup(
+            pnlDadosDataVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlDadosDataVendaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlPdvVendaDatas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        pnlDadosDataVendaLayout.setVerticalGroup(
+            pnlDadosDataVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDadosDataVendaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlDadosDataVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pnlPdvVendaDatas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout tabVendaLayout = new javax.swing.GroupLayout(tabVenda);
+        tabVenda.setLayout(tabVendaLayout);
+        tabVendaLayout.setHorizontalGroup(
+            tabVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabVendaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlDadosDataVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(300, Short.MAX_VALUE))
+        );
+        tabVendaLayout.setVerticalGroup(
+            tabVendaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabVendaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlDadosDataVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(126, Short.MAX_VALUE))
+        );
+
+        tabCliente.addTab("Venda", tabVenda);
 
         tab.addTab("Clientes", tabCliente);
 
@@ -1023,6 +1112,22 @@ public class IntelliCashGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkT1NatReceitaActionPerformed
 
+    private void edtDtVendaIniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtDtVendaIniActionPerformed
+        if (edtDtVendaIni.getDate() == null) {
+            edtDtVendaIni.setDate(new Date());
+        }
+    }//GEN-LAST:event_edtDtVendaIniActionPerformed
+
+    private void edtDtVendaFimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edtDtVendaFimActionPerformed
+        if (edtDtVendaFim.getDate() == null) {
+            edtDtVendaFim.setDate(new Date());
+        }
+    }//GEN-LAST:event_edtDtVendaFimActionPerformed
+
+    private void chkPdvVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkPdvVendasActionPerformed
+
+    }//GEN-LAST:event_chkPdvVendasActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectarFirebird;
     private vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTrib;
@@ -1043,6 +1148,7 @@ public class IntelliCashGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
+    private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbCotacao;
@@ -1065,14 +1171,20 @@ public class IntelliCashGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
+    private org.jdesktop.swingx.JXDatePicker edtDtVendaFim;
+    private org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrframework.bean.panel.VRPanel pnlConexao;
+    private vrframework.bean.panel.VRPanel pnlDadosDataVenda;
+    private vrframework.bean.panel.VRPanel pnlPdvVendaDatas;
     private vrframework.bean.tabbedPane.VRTabbedPane tab;
+    private vrframework.bean.panel.VRPanel tabCheque;
     private vrframework.bean.tabbedPane.VRTabbedPane tabCliente;
     private vrframework.bean.panel.VRPanel tabClienteDados;
     private vrframework.bean.panel.VRPanel tabDados;
     private vrframework.bean.panel.VRPanel tabFornecedor;
     private vrframework.bean.panel.VRPanel tabUnificacao;
+    private vrframework.bean.panel.VRPanel tabVenda;
     private javax.swing.JPanel tablCreditoRotativo;
     private vrframework.bean.fileChooser.VRFileChooser txtBancoDadosFirebird;
     private vrframework.bean.textField.VRTextField txtHostFirebird;
@@ -1089,7 +1201,6 @@ public class IntelliCashGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel6;
     private vrframework.bean.label.VRLabel vRLabel7;
     private vrframework.bean.label.VRLabel vRLabel8;
-    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane1;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
