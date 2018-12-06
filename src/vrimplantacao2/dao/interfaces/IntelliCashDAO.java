@@ -384,51 +384,84 @@ public class IntelliCashDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "    a.id id_agente,\n"
-                    + "    c.codigo id_cliente,\n"
-                    + "    a.nome,\n"
-                    + "    en.logradouro res_endereco,\n"
-                    + "    en.numero res_numero,\n"
-                    + "    en.complemento res_complemento,\n"
-                    + "    en.bairro res_bairro,\n"
-                    + "    cidibge.id res_cidade_ibge,\n"
-                    + "    cid.cidade res_cidade,\n"
-                    + "    cid.uf res_uf,\n"
-                    + "    en.cep res_cep,   \n"
-                    + "    a.doc cnpj,\n"
-                    + "    dcie.doc as inscricaoestadual,\n"
-                    + "    (select first 1 coalesce('('||ddd||')', '') || telefone from telefones where agente = a.id order by id desc) fone1,\n"
-                    + "    (select first 1 skip 1 coalesce('('||ddd||')', '') || telefone from telefones where agente = a.id order by id desc) fone2,\n"
-                    + "    (select first 1 skip 2 coalesce('('||ddd||')', '') || telefone from telefones where agente = a.id order by id desc) celular,\n"
-                    + "    c.diavenc prazodias,\n"
-                    + "    coalesce(c.cadastro, current_date) datacadastro,\n"
-                    + "    (select first 1 email from emails where agente = a.id) email,\n"
-                    + "    c.limite limitepreferencial,\n"
-                    + "    c.renda salario,\n"
-                    + "    c.situacao,\n"
-                    + "    tpcl.id tipo_cliente,\n"
-                    + "    tpcl.descricao,\n"
-                    + "    c.cadastro,\n"
-                    + "    cidibge.id,\n"
-                    + "    dcrg.doc as rg,\n"
-                    + "    f.pai,\n"
-                    + "    f.mae,\n"
-                    + "    ec.nascimento\n"
-                    + "from\n"
-                    + "    agentes a\n"
-                    + "    join clientes c on c.id = a.id\n"
-                    + "    left join filiacao f on f.id = a.id\n"
-                    + "    left join enderecos en on en.agente = a.id\n"
-                    + "    left join cidades cid on cid.id = en.cidade\n"
-                    + "    left join tiposclientes tpcl on tpcl.id = c.tipocliente\n"
-                    + "    left join cidadesibge cidibge on cidibge.id2 = cid.id\n"
-                    + "    left join docs dcie on dcie.codag = a.id and dcie.tipo = 66\n"
-                    + "    left join docs dcrg on dcrg.codag = a.id and dcrg.tipo = 67\n"
-                    + "    left join EC_EXPT_AGENTE ec on ec.id = a.id\n"
-                    + "order by\n"
-                    + "    a.id"
-            )) {
+                    "select\n" +
+                    "    a.id id_agente,\n" +
+                    "    c.codigo id_cliente,\n" +
+                    "    a.nome,\n" +
+                    "    en.logradouro res_endereco,\n" +
+                    "    en.numero res_numero,\n" +
+                    "    en.complemento res_complemento,\n" +
+                    "    en.bairro res_bairro,\n" +
+                    "    cidibge.id res_cidade_ibge,\n" +
+                    "    cid.cidade res_cidade,\n" +
+                    "    cid.uf res_uf,\n" +
+                    "    en.cep res_cep,   \n" +
+                    "    a.doc cnpj,\n" +
+                    "    dcie.doc as inscricaoestadual,\n" +
+                    "    (select first 1 coalesce('('||ddd||')', '') || telefone from telefones where agente = a.id order by id desc) fone1,\n" +
+                    "    (select first 1 skip 1 coalesce('('||ddd||')', '') || telefone from telefones where agente = a.id order by id desc) fone2,\n" +
+                    "    (select first 1 skip 2 coalesce('('||ddd||')', '') || telefone from telefones where agente = a.id order by id desc) celular,\n" +
+                    "    c.diavenc prazodias,\n" +
+                    "    coalesce(c.cadastro, current_date) datacadastro,\n" +
+                    "    (select first 1 email from emails where agente = a.id) email,\n" +
+                    "    c.limite limitepreferencial,\n" +
+                    "    c.renda salario,\n" +
+                    "    c.situacao,\n" +
+                    "    tpcl.id tipo_cliente,\n" +
+                    "    tpcl.descricao,\n" +
+                    "    c.cadastro,\n" +
+                    "    cidibge.id,\n" +
+                    "    dcrg.doc as rg,\n" +
+                    "    f.pai,\n" +
+                    "    f.mae,\n" +
+                    "    ec.nascimento\n" +
+                    "from\n" +
+                    "    agentes a\n" +
+                    "join clientes c on c.id = a.id\n" +
+                    "left join filiacao f on f.id = a.id\n" +
+                    "left join enderecos en on en.agente = a.id\n" +
+                    "left join cidades cid on cid.id = en.cidade\n" +
+                    "left join tiposclientes tpcl on tpcl.id = c.tipocliente\n" +
+                    "left join cidadesibge cidibge on cidibge.id2 = cid.id\n" +
+                    "left join docs dcie on dcie.codag = a.id and dcie.tipo = 66\n" +
+                    "left join docs dcrg on dcrg.codag = a.id and dcrg.tipo = 67\n" +
+                    "left join EC_EXPT_AGENTE ec on ec.id = a.id\n" +
+                    "union all\n" +
+                    "select\n" +
+                    "    fu.id id_agente,\n" +
+                    "    ec.id id_cliente,\n" +
+                    "    ec.nome,\n" +
+                    "    '' res_endereco,\n" +
+                    "    '' res_numero,\n" +
+                    "    '' res_complemento,\n" +
+                    "    '' res_bairro,\n" +
+                    "    '' res_cidade_ibge,\n" +
+                    "    '' res_cidade,\n" +
+                    "    '' res_uf,\n" +
+                    "    '' res_cep,\n" +
+                    "    ec.doc cnpj,\n" +
+                    "    '' as inscricaoestadual,\n" +
+                    "    '' fone1,\n" +
+                    "    '' fone2,\n" +
+                    "    '' celular,\n" +
+                    "    fu.diapg prazodias,\n" +
+                    "    coalesce(fu.admissao, current_date) datacadastro,\n" +
+                    "    '' email,\n" +
+                    "    fu.limitevales limitepreferencial,\n" +
+                    "    fu.salario salario,\n" +
+                    "    2 situacao,\n" +
+                    "    cast('' as varchar(20)) tipo_cliente,\n" +
+                    "    cast('' as varchar(20)) descricao,\n" +
+                    "    current_date cadastro,\n" +
+                    "    0 id,\n" +
+                    "    cast('' as varchar(30)) as rg,\n" +
+                    "    cast('' as varchar(200)) pai,\n" +
+                    "    cast('' as varchar(200)) mae,\n" +
+                    "    fu.datanasc nascimento\n" +
+                    "from\n" +
+                    "    funcionarios fu\n" +
+                    "left join ec_expt_agente ec on fu.id = ec.id\n" +
+                    "order by 1")) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
 
