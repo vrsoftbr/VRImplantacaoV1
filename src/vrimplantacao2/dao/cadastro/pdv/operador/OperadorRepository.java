@@ -47,7 +47,7 @@ public class OperadorRepository {
                 setNotificacao("Gravando operador...", operadores.size());
 
                 for (OperadorIMP imp : operadores) {
-                    OperadorVO anterior = anteriores.get(
+                    OperadorVO opGravado = anteriores.get(
                             String.valueOf(provider.getLojaVR()),
                             imp.getMatricula()
                     );
@@ -55,7 +55,7 @@ public class OperadorRepository {
                     OperadorVO operador = null;
 
                     // Se o operador não estiver cadastrado...executa
-                    if (anterior == null) {
+                    if (opGravado == null) {
                         int id = ids.obterID("A");
 
                         // Converte os dados
@@ -65,7 +65,7 @@ public class OperadorRepository {
                         // Grava os dados
                         gravarOperador(operador);
                         
-                        anteriores.put(operador, String.valueOf(provider.getLojaVR()), imp.getMatricula(), imp.getNome());
+                        anteriores.put(operador, String.valueOf(provider.getLojaVR()), imp.getMatricula());
                     }
                     notificar();
                 }

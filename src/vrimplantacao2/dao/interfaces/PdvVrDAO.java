@@ -85,81 +85,29 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
 
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    p.id,\n" +
-                    "    p.precovenda,\n" +
-                    "    p.descricaocompleta,\n" +
-                    "    p.descricaoreduzida,\n" +
-                    "    p.precovenda,\n" +
-                    "    p.id_aliquota,\n" +
-                    "    p.id_situacaocadastro,\n" +
-                    "    p.aceitamultiplicacaopdv,\n" +
-                    "    p.tipoembalagem,\n" +
-                    "    p.ncm,\n" +
-                    "    p.id_tipopiscofins,\n" +
-                    "    p.cest,\n" +
-                    "    a.situacaotributaria cstIcms,\n" +
-                    "    a.porcentagem,\n" +
-                    "    pis.cst cstPis,\n" +
-                    "    p.id_aliquota\n" +
-                    "from produto p\n" +
-                    "    left join aliquota a on a.id_aliquota = p.id_aliquota\n" +
-                    "    left join tipopiscofins pis on pis.id = p.id_tipopiscofins\n" +
-                    "order by p.id"
-            )) {
-                while (rst.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("id"));
-                    imp.setSituacaoCadastro(rst.getInt("id_situacaocadastro"));
-                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
-                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    imp.setPrecovenda(rst.getDouble("precovenda"));
-                    imp.setNcm(rst.getString("ncm"));
-                    imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstDebito(rst.getString("cstPis"));
-                    imp.setPiscofinsCstCredito(rst.getString("cstPis"));
-                    imp.setIcmsDebitoId(rst.getString("id_aliquota"));
-                    imp.setIcmsCreditoId(rst.getString("id_aliquota"));
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<ProdutoIMP> getEANs() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-
-            try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "p.id,\n"
-                    + "pa.codigobarras,\n"
-                    + "pa.qtdembalagem,\n"
-                    + "p.precovenda,\n"
-                    + "p.descricaocompleta,\n"
-                    + "p.descricaoreduzida,\n"
-                    + "p.precovenda,\n"
-                    + "p.id_aliquota,\n"
-                    + "p.id_situacaocadastro,\n"
-                    + "p.aceitamultiplicacaopdv,\n"
-                    + "p.tipoembalagem,\n"
-                    + "p.ncm,\n"
-                    + "p.id_tipopiscofins,\n"
-                    + "p.cest,\n"
-                    + "a.situacaotributaria cstIcms,\n"
-                    + "a.porcentagem,\n"
-                    + "pis.cst cstPis,\n"
-                    + "p.id_aliquota\n"
+                    + "    p.id,\n"
+                    + "    pa.codigobarras,\n"
+                    + "    pa.qtdembalagem,\n"
+                    + "    p.precovenda,\n"
+                    + "    p.descricaocompleta,\n"
+                    + "    p.descricaoreduzida,\n"
+                    + "    p.precovenda,\n"
+                    + "    p.id_aliquota,\n"
+                    + "    p.id_situacaocadastro,\n"
+                    + "    p.aceitamultiplicacaopdv,\n"
+                    + "    p.tipoembalagem,\n"
+                    + "    p.ncm,\n"
+                    + "    p.id_tipopiscofins,\n"
+                    + "    p.cest,\n"
+                    + "    a.situacaotributaria cstIcms,\n"
+                    + "    a.porcentagem,\n"
+                    + "    pis.cst cstPis,\n"
+                    + "    p.id_aliquota\n"
                     + "from produto p\n"
-                    + "left join produtoautomacao pa on pa.id_produto = p.id\n"
-                    + "left join aliquota a on a.id_aliquota = p.id_aliquota\n"
-                    + "left join tipopiscofins pis on pis.id = p.id_tipopiscofins\n"
+                    + "    left join produtoautomacao pa on pa.id_produto = p.id\n"
+                    + "    left join aliquota a on a.id_aliquota = p.id_aliquota\n"
+                    + "    left join tipopiscofins pis on pis.id = p.id_tipopiscofins\n"
                     + "order by p.id"
             )) {
                 while (rst.next()) {
@@ -168,9 +116,9 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("codigobarras"));
-                    imp.setSituacaoCadastro(rst.getInt("id_situacaocadastro"));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setSituacaoCadastro(rst.getInt("id_situacaocadastro"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -200,7 +148,6 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "id_tiponiveloperador,\n"
                     + "id_situacaocadastro\n"
                     + "from operador\n"
-                    + "where matricula <> 500001\n"
                     + "order by matricula"
             )) {
                 while (rst.next()) {
@@ -219,73 +166,7 @@ public class PdvVrDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
-    public List<AcumuladorIMP> getAcumuladores() throws Exception {
-        List<AcumuladorIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "id,\n"
-                    + "descricao\n"
-                    + "from acumulador\n"
-                    + "order by id"
-            )) {
-                while (rst.next()) {
-                    AcumuladorIMP imp = new AcumuladorIMP();
-                    imp.setId(rst.getInt("id"));
-                    imp.setDescricao(rst.getString("descricao"));
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    public List<AcumuladorLayoutIMP> getAcumuladorLayout() throws Exception {
-        List<AcumuladorLayoutIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "distinct\n"
-                    + "id_acumuladorlayout as id, ('IMPORTADO VR ACUMULADOR '||id_acumuladorlayout) as descricao\n"
-                    + "from acumuladorlayout"
-            )) {
-                while (rst.next()) {
-                    AcumuladorLayoutIMP imp = new AcumuladorLayoutIMP();
-                    imp.setId(rst.getString("id"));
-                    imp.setDescricao(rst.getString("descricao"));
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    public List<AcumuladorLayoutRetornoIMP> getAcumuladorLayoutRetorno() throws Exception {
-        List<AcumuladorLayoutRetornoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "id_acumuladorlayout,\n"
-                    + "id_acumulador,\n"
-                    + "retorno,\n"
-                    + "titulo\n"
-                    + "from acumuladorlayout"
-            )) {
-                while (rst.next()) {
-                    AcumuladorLayoutRetornoIMP imp = new AcumuladorLayoutRetornoIMP();
-                    imp.setIdAcumuladorLayout(rst.getString("id_acumuladorlayout"));
-                    imp.setIdAcumulador(rst.getString("id_acumulador"));
-                    imp.setRetorno(rst.getString("retorno"));
-                    imp.setTitulo(rst.getString("titulo"));
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    public List<PromocaoIMP> getProcomocoes() throws Exception {
+    public List<PromocaoIMP> getPromocoes() throws Exception {
         List<PromocaoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(

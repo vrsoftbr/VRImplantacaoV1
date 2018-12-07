@@ -43,8 +43,8 @@
           <Group type="102" attributes="0">
               <Component id="vRToolBarPadrao3" min="-2" pref="23" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="vRPanel6" pref="175" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <Component id="vRPanel6" pref="174" max="32767" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="tabs" min="-2" pref="263" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
@@ -59,6 +59,9 @@
         <Property name="rollover" type="boolean" value="true"/>
         <Property name="visibleImportar" type="boolean" value="true"/>
       </Properties>
+      <Events>
+        <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="vRToolBarPadrao3KeyPressed"/>
+      </Events>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new vrframework.bean.toolBarPadrao.VRToolBarPadrao(this)"/>
       </AuxValues>
@@ -162,20 +165,20 @@
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="chkT1Preco" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkProdutos" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkT1AtivoInativo" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace min="-2" pref="32" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkTipoEmbalagemEAN" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkT1EAN" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkT1EANemBranco" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkT1AtivoInativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkQtdEmbalagemEAN" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="chkT1DescCompleta" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkT1DescReduzida" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkT1DescGondola" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkTipoEmbalagemEAN" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkQtdEmbalagemEAN" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                               <Component id="btnMapaTribut" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -199,23 +202,23 @@
                                       <Component id="chkT1EANemBranco" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkT1Preco" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="chkT1AtivoInativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkTipoEmbalagemEAN" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
                               <Group type="102" attributes="0">
                                   <Component id="chkT1DescCompleta" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkT1DescReduzida" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="3" attributes="0">
-                                      <Component id="chkT1DescGondola" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkT1AtivoInativo" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  </Group>
+                                  <Component id="chkT1DescGondola" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <Component id="chkTipoEmbalagemEAN" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkQtdEmbalagemEAN" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="41" max="-2" attributes="0"/>
                           <Component id="btnMapaTribut" min="-2" pref="35" max="-2" attributes="0"/>
                           <EmptySpace pref="15" max="32767" attributes="0"/>
                       </Group>
@@ -367,7 +370,7 @@
                       <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="26" max="32767" attributes="0"/>
+                  <EmptySpace pref="29" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>

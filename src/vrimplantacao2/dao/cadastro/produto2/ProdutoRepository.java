@@ -237,10 +237,7 @@ public class ProdutoRepository {
                 
                 ProdutoVO produtoGravado = produtosGravados.get(Integer.parseInt(keys.get(2)));
                 
-                //ProdutoAnteriorVO anterior = provider.anterior().get(keys.get(0), keys.get(1), keys.get(2));
-                
                 ProdutoAnteriorVO anterior = null;
-
                 
                 if (produtoGravado == null) {
                     
