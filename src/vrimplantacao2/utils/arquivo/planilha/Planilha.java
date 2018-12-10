@@ -31,7 +31,15 @@ public class Planilha extends AbstractArquivo {
             DefaultLinha linha = new DefaultLinha();
             Cell[] columns = sheet.getRow(i);
             for (int j = 0; j < columns.length; j++) {
-                linha.putString(cabecalho.get(j), columns[j].getContents());
+                String contents = columns[j].getContents();
+                if (columns[j] instanceof jxl.ErrorCell) {
+                    linha.putString(cabecalho.get(j), "");
+                } else {
+                    linha.putString(cabecalho.get(j), contents);
+                }
+            }
+            for (int j = columns.length; j < cabecalho.size(); j++) {
+                linha.putString(cabecalho.get(j), "");
             }
             dados.add(linha);
         }         

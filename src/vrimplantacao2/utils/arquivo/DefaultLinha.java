@@ -111,6 +111,8 @@ public class DefaultLinha implements LinhaArquivo {
                     return DATA_FORMAT_SM.parse(string);
                 } else if (val.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}.*")){
                     return DATA_FORMAT_STAMP.parse(string);
+                } else if (val.matches("[0-9]{2}/[0-9]{2}/[0-9]{2,4}")) {
+                    return DATA_FORMAT.parse(string);
                 } else if (val.matches("[0-9]{2}/[0-9]{2}/[0-9]{2} [0-9]{2}:[0-9]{2}.*")){
                     return DATA_FORMAT_STAMP2.parse(string);
                 } else {
