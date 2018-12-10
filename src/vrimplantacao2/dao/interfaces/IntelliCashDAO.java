@@ -872,7 +872,6 @@ public class IntelliCashDAO extends InterfaceDAO {
                     "    i.custo,\n" +
                     "    i.valor,\n" +
                     "    i.numitem sequencia,\n" +
-                    "    i.emissao,\n" +
                     "    i.cancelado,\n" +
                     "    i.datahorasistema,\n" +
                     "    i.desconto,\n" +
