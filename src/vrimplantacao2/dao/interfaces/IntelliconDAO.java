@@ -347,7 +347,7 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select\n" +
                     "    est.data || est.cod_produto id,\n" +
                     "    est.cod_produto id_produto,\n" +
-                    "    est.data,\n" +
+                    "    cast('30.09.2018' as date) data,\n" +
                     "    p.nome_produto descricao,\n" +
                     "    upper(p.unidade) unidade,\n" +
                     "    p.preco_1 precovenda,\n" +
@@ -370,7 +370,7 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
                     "join\n" +
                     "    ncm_produto n on (n.pkcod = p.chave_ncm)\n" +
                     "where\n" +
-                    "    est.data = " + FORMAT.format(getDataInventario()) + " and\n" +
+                    "    est.data = '" + FORMAT.format(getDataInventario()) + "' and\n" +
                     "    est.cod_produto >= 0 and\n" +
                     "    est.estoque > 0")) {
                 while(rs.next()) {
