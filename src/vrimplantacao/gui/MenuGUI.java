@@ -175,6 +175,7 @@ import vrimplantacao2.gui.interfaces.IntelliconGUI;
 import vrimplantacao2.gui.interfaces.InventerGUI;
 import vrimplantacao2.gui.interfaces.JM2OnlineGUI;
 import vrimplantacao2.gui.interfaces.KcmsGUI;
+import vrimplantacao2.gui.interfaces.LinceGUI;
 import vrimplantacao2.gui.interfaces.LyncisGUI;
 import vrimplantacao2.gui.interfaces.MarketGUI;
 import vrimplantacao2.gui.interfaces.PlanilhaVrGUI;
@@ -601,6 +602,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuKcms = new javax.swing.JMenuItem();
         mnuFHOnline = new javax.swing.JMenuItem();
         mnuHiper = new javax.swing.JMenuItem();
+        mnuLince = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1471,6 +1473,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuHiper);
+
+        mnuLince.setText("Lince");
+        mnuLince.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuLinceActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuLince);
 
         jMenu2.add(mnuSqlServer2);
 
@@ -4066,6 +4076,10 @@ public final class MenuGUI extends VRMdiFrame {
         HiperGUI.exibir(this);
     }//GEN-LAST:event_mnuHiperActionPerformed
 
+    private void mnuLinceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuLinceActionPerformed
+        LinceGUI.exibir(this);
+    }//GEN-LAST:event_mnuLinceActionPerformed
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -4228,6 +4242,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu mnuJanela;
     private javax.swing.JMenuItem mnuJrf;
     private javax.swing.JMenuItem mnuKcms;
+    private javax.swing.JMenuItem mnuLince;
     private javax.swing.JMenuItem mnuLinner;
     private javax.swing.JMenuItem mnuLogus;
     private javax.swing.JMenuItem mnuLyncis;

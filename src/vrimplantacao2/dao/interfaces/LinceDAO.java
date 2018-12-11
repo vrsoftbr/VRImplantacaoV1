@@ -10,6 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -27,9 +28,11 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    public String complementoSistema = "";
+    
     @Override
     public String getSistema() {
-        return "Lince";
+        return "Lince" + ("".equals(complementoSistema) ? "" : " - " + complementoSistema);
     }
 
     @Override
@@ -402,5 +405,9 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
+    }
+
+    public Iterable<Estabelecimento> getLojas() {
+        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
     }
 }
