@@ -16,6 +16,7 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.interfaces.custom.solidus.Entidade;
+import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
@@ -515,8 +516,10 @@ public class SolidusDAO extends InterfaceDAO {
                     "    c.des_empresa_trab empresa,\n" +
                     "    c.dta_admissao_trab dataadmissao,\n" +
                     "    c.des_cargo cargo,\n" +
-                    "    c.val_renda salario,\n" +
-                    "    c.val_limite_conv limitecredito,\n" +
+                    "    cast(c.val_renda as numeric(11,2)) salario,\n" +
+                    "    case when\n" +
+                    "        char_length(cast(cast(c.val_limite_conv as bigint) as varchar(15))) = 10\n" +
+                    "    then 0 else c.val_limite_conv end limitecredito,\n" +
                     "    c.des_conjuge nomeconjuge,\n" +
                     "    c.des_pai nomepai,\n" +
                     "    c.des_mae nomemae,\n" +
