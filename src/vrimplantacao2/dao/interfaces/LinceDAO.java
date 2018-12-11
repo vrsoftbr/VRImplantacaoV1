@@ -8,9 +8,12 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -33,6 +36,16 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public String getSistema() {
         return "Lince" + ("".equals(complementoSistema) ? "" : " - " + complementoSistema);
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        Set<OpcaoProduto> s = new HashSet<>();
+        
+        s.addAll(OpcaoProduto.getMercadologico());
+        s.addAll(OpcaoProduto.getFamilia());
+        
+        return s;
     }
 
     @Override
@@ -407,7 +420,22 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    public Iterable<Estabelecimento> getLojas() {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    public List<Estabelecimento> getLojas() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select cod_loja, cnpj, nome_reduzido from loja order by 1"
+            )) {
+                while (rst.next()) {
+                    result.add(new Estabelecimento(
+                            rst.getString("cod_loja"),
+                            rst.getString("cnpj") + " - " + rst.getString("nome_reduzido")
+                    ));
+                }
+            }
+        }
+        
+        return result;
     }
 }
