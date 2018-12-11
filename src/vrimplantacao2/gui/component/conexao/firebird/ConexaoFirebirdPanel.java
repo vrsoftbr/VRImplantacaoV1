@@ -132,7 +132,7 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel26, "String de Conexão");
 
-        txtStrConexao.setText("jdbc:oracle:thin:@10.0.2.250:1521/orcl");
+        txtStrConexao.setText("jdbc:firebirdsql://host:port//opt/firebird/db.fdb");
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -199,7 +199,7 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
                 conexao.close();
             }
 
-            validarDadosAcessoMySQL();
+            validarDadosAcesso();
             btnConectar.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/chat/conectado.png")));
 
         } catch (Exception ex) {
@@ -208,21 +208,21 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_btnConectarActionPerformed
 
-    public void validarDadosAcessoMySQL() throws Exception {
-        if (txtHost.getText().isEmpty()) {
-            throw new VRException("Favor informar host do banco de dados Firebird!");
-        }
-        if (txtPorta.getText().isEmpty()) {
-            throw new VRException("Favor informar a porta do banco de dados Firebird!");
-        }
-        if (txtDatabase.getArquivo().isEmpty()) {
-            throw new VRException("Favor informar nome do banco de dados Firebird!");
-        }
-        if (txtUsuario.getText().isEmpty()) {
-            throw new VRException("Favor informar o usuário do banco de dados Firebird!");
-        }
-
+    public void validarDadosAcesso() throws Exception {
+        
         if (tabsCon.getSelectedIndex() == 0) {
+            if (txtHost.getText().isEmpty()) {
+                throw new VRException("Favor informar host do banco de dados Firebird!");
+            }
+            if (txtPorta.getText().isEmpty()) {
+                throw new VRException("Favor informar a porta do banco de dados Firebird!");
+            }
+            if (txtDatabase.getArquivo().isEmpty()) {
+                throw new VRException("Favor informar nome do banco de dados Firebird!");
+            }
+            if (txtUsuario.getText().isEmpty()) {
+                throw new VRException("Favor informar o usuário do banco de dados Firebird!");
+            }
             conexao.abrirConexao(txtHost.getText(), txtPorta.getInt(), 
                     txtDatabase.getArquivo(), txtUsuario.getText(), txtSenha.getText());
         } else {
@@ -243,6 +243,7 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
         txtPorta.setText(params.getWithNull(port, sistema, "FIREBIRD", "PORTA"));
         txtUsuario.setText(params.getWithNull(user, sistema, "FIREBIRD", "USUARIO"));
         txtSenha.setText(params.getWithNull(pass, sistema, "FIREBIRD", "SENHA"));
+        txtStrConexao.setText(params.getWithNull(stringConexao, sistema, "FIREBIRD", "STR_CONEXAO"));
     }
     
     public String pass = "masterkey";
@@ -250,6 +251,7 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
     public String port = "3050";
     public String database = "database";
     public String host = "localhost";
+    public String stringConexao = "jdbc:firebirdsql://host:port//opt/firebird/db.fdb";
     
     public void atualizarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -258,6 +260,7 @@ public class ConexaoFirebirdPanel extends javax.swing.JPanel {
         params.put(txtPorta.getText(), sistema, "FIREBIRD", "PORTA");
         params.put(txtUsuario.getText(), sistema, "FIREBIRD", "USUARIO");
         params.put(txtSenha.getText(), sistema, "FIREBIRD", "SENHA");
+        params.put(txtStrConexao.getText(), sistema, "FIREBIRD", "STR_CONEXAO");
         params.salvar();
     }
 

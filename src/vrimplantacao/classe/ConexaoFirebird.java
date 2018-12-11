@@ -41,7 +41,7 @@ public class ConexaoFirebird {
     }
     
     public void abrirConexao(String conString, String i_usuario, String i_senha) throws Exception {
-        Class.forName("com.mysql.jdbc.Driver");
+        Class.forName("org.firebirdsql.jdbc.FBDriver");
 
         usuario = i_usuario;
         senha = i_senha;

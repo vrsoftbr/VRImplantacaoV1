@@ -215,7 +215,7 @@
             </Component>
             <Component class="javax.swing.JTextField" name="txtStrConexao">
               <Properties>
-                <Property name="text" type="java.lang.String" value="jdbc:oracle:thin:@10.0.2.250:1521/orcl"/>
+                <Property name="text" type="java.lang.String" value="jdbc:firebirdsql://host:port//opt/firebird/db.fdb"/>
               </Properties>
             </Component>
           </SubComponents>

@@ -36,12 +36,12 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 public class CgaDAO extends InterfaceDAO implements MapaTributoProvider {
 
-    public String id_loja;
+    public String complSistema = "";
 
     @Override
     public String getSistema() {
-        if ((id_loja != null) && (!id_loja.trim().isEmpty())) {
-            return "Cga" + id_loja;
+        if ((complSistema != null) && (!complSistema.trim().isEmpty())) {
+            return "Cga" + complSistema;
         } else {
             return "Cga";
         }
