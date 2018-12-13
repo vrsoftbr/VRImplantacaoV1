@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -43,7 +44,28 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
         Set<OpcaoProduto> s = new HashSet<>();
         
         s.addAll(OpcaoProduto.getMercadologico());
-        s.addAll(OpcaoProduto.getFamilia());
+        s.add(OpcaoProduto.PRODUTOS);
+        s.add(OpcaoProduto.EAN);
+        s.add(OpcaoProduto.EAN_EM_BRANCO);
+        s.add(OpcaoProduto.DESC_COMPLETA);
+        s.add(OpcaoProduto.DESC_REDUZIDA);
+        s.add(OpcaoProduto.DESC_GONDOLA);
+        s.add(OpcaoProduto.TIPO_EMBALAGEM_EAN);
+        s.add(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO);
+        s.add(OpcaoProduto.VALIDADE);
+        s.add(OpcaoProduto.PESO_BRUTO);
+        s.add(OpcaoProduto.PESO_LIQUIDO);
+        s.add(OpcaoProduto.PESAVEL);
+        s.add(OpcaoProduto.ATIVO);
+        s.add(OpcaoProduto.PRECO);
+        s.add(OpcaoProduto.CUSTO);
+        s.add(OpcaoProduto.ESTOQUE_MAXIMO);
+        s.add(OpcaoProduto.ESTOQUE_MINIMO);
+        s.add(OpcaoProduto.ESTOQUE);
+        s.add(OpcaoProduto.NCM);
+        s.add(OpcaoProduto.CEST);
+        s.add(OpcaoProduto.PIS_COFINS);
+        s.add(OpcaoProduto.ICMS);
         
         return s;
     }
@@ -54,10 +76,29 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stmt = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stmt.executeQuery(
-                    "select id, descritivo from tributacao"
+                    "select distinct\n" +
+                    "	case p.flg_situacao_trib \n" +
+                    "	when 'T' then 0\n" +
+                    "	when 'F' then 60\n" +
+                    "	when 'N' then 41\n" +
+                    "	else 40\n" +
+                    "	end	icms_cst,\n" +
+                    "	case p.flg_situacao_trib\n" +
+                    "	when 'T' then coalesce(icms.percentual, 0)\n" +
+                    "	else 0\n" +
+                    "	end icms_aliquota\n" +
+                    "from \n" +
+                    "	produto p\n" +
+                    "	left join icms on icms.cod_icms = p.cod_icms and icms.cod_loja = 1\n" +
+                    "order by\n" +
+                    "	1, 2"
             )) {
                 while (rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("id"), rs.getString("descritivo")));
+                    String id = rs.getString("icms_cst") + "-" + String.format("%.2f", rs.getDouble("icms_aliquota"));
+                    result.add(new MapaTributoIMP(
+                            id,
+                            String.format("%03d", rs.getInt("icms_cst")) + "-" + String.format("%.2f", rs.getDouble("icms_aliquota"))
+                    ));
                 }
             }
         }
@@ -104,96 +145,110 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "p.COD_PROD,\n"
-                    + "p.CODIGO_BARRAS,\n"
-                    + "p.FLG_UNIDADE_VENDA,\n"
-                    + "p.DESCRICAO,\n"
-                    + "p.VALIDADE, \n"
-                    + "p.COD_DEPART, \n"
-                    + "p.COD_SUBDEPART, \n"
-                    + "p.COD_SECAO,\n"
-                    + "p.PESO_BRUTO,\n"
-                    + "p.PESO_LIQUIDO,\n"
-                    + "p.CHK_ATIVO,\n"
-                    + "p.VLR_PRECO,\n"
-                    + "p.VLR_ULTIMO_CUSTO,\n"
-                    + "p.QTDE_ESTOQUE_MINIMO,\n"
-                    + "p.QTDE_ESTOQUE_MAXIMO,\n"
-                    + "p.QTDE_ESTOQUE_LOJA,\n"
-                    + "p.FLG_SITUACAO_TRIB,\n"
-                    + "p.CST,\n"
-                    + "p.COD_ICMS, \n"
-                    + "icm.PERCENTUAL,\n"
-                    + "p.COD_PIS,\n"
-                    + "pis.DESCRICAO as desc_pis,\n"
-                    + "p.nat_rec_pis,\n"
-                    + "p.COD_COFINS,\n"
-                    + "cof.DESCRICAO as desc_cofins,\n"
-                    + "p.COD_NCM,\n"
-                    + "cest.CEST\n"
-                    + "from produto p\n"
-                    + "left join PRODUTO_COFINS cof on cof.COD_COFINS = p.COD_COFINS\n"
-                    + "left join PRODUTO_PIS pis on pis.COD_PIS = p.COD_PIS\n"
-                    + "left join PRODUTO_CEST cest on cest.id = p.id_cest\n"
-                    + "left join ICMS icm on icm.COD_ICMS = p.COD_ICMS\n"
-                    + "where p.COD_LOJA = " + getLojaOrigem()
+                    "select distinct\n" +
+                    "	p.COD_PROD id,\n" +
+                    "	p.DATA_MUDANCA_PRECO datacadastro,\n" +
+                    "	coalesce(p.DATA_MUDANCA, p.DATA_MUDANCA_PRECO) dataultimaalteracao,\n" +
+                    "	p.CODIGO_BARRAS ean,\n" +
+                    "	p.FLG_UNIDADE_VENDA unidade,\n" +
+                    "	p.VALIDADE validade,\n" +
+                    "	p.DESCRICAO descricao,\n" +
+                    "	p.COD_FORN,\n" +
+                    "	nullif(p.COD_DEPART, 0) merc1,\n" +
+                    "	nullif(p.COD_SUBDEPART, 0) merc2,\n" +
+                    "	nullif(p.COD_SECAO, 0) merc3,\n" +
+                    "	p.PESO_BRUTO peso_bruto,\n" +
+                    "	p.PESO_LIQUIDO peso_liquido,\n" +
+                    "	p.QTDE_ESTOQUE_MINIMO estoque_minimo,\n" +
+                    "	p.QTDE_ESTOQUE_MAXIMO estoque_maximo,\n" +
+                    "	p.QTDE_ESTOQUE_LOJA estoque,\n" +
+                    "	p.perc_margem margem,\n" +
+                    "	p.vlr_custo_receita custo,\n" +
+                    "	p.VLR_PRECO preco,\n" +
+                    "	case when p.CHK_ATIVO = 'T' then 1 else 0 end ativo,\n" +
+                    "	p.COD_NCM ncm,\n" +
+                    "	cest.CEST cest,\n" +
+                    "	p.COD_PIS piscofins_saida,\n" +
+                    "	p.nat_rec_pis piscofins_nat,\n" +
+                    "	case p.flg_situacao_trib \n" +
+                    "	when 'T' then 0\n" +
+                    "	when 'F' then 60\n" +
+                    "	when 'N' then 41\n" +
+                    "	else 40\n" +
+                    "	end	icms_cst,\n" +
+                    "	case p.flg_situacao_trib\n" +
+                    "	when 'T' then coalesce(icms.percentual, 0)\n" +
+                    "	else 0\n" +
+                    "	end icms_aliquota\n" +
+                    "from \n" +
+                    "	produto p\n" +
+                    "	left join (\n" +
+                    "		select\n" +
+                    "			p.cod_prod,\n" +
+                    "			p.codigo_barras ean\n" +
+                    "		from\n" +
+                    "			produto p\n" +
+                    "		union\n" +
+                    "		select\n" +
+                    "			p.cod_prod,\n" +
+                    "			nullif(coalesce(ltrim(rtrim(p.barras_embalagem)),''), '0') ean\n" +
+                    "		from\n" +
+                    "			produto p\n" +
+                    "		where\n" +
+                    "			nullif(coalesce(ltrim(rtrim(p.barras_embalagem)),''), '0') != ''\n" +
+                    "		union\n" +
+                    "		select\n" +
+                    "			cod_prod,\n" +
+                    "			codigo_barras ean\n" +
+                    "		from\n" +
+                    "			barras_vinculada b\n" +
+                    "		where\n" +
+                    "			b.cod_loja = " + getLojaOrigem() + "\n" +
+                    "	) ean on p.cod_prod = ean.cod_prod\n" +
+                    "	left join PRODUTO_CEST cest on cest.id = p.id_cest\n" +
+                    "	left join icms on icms.cod_icms = p.cod_icms and icms.cod_loja = " + getLojaOrigem() + "\n" +
+                    "where\n" +
+                    "	p.cod_loja = " + getLojaOrigem() + "\n" +
+                    "order by\n" +
+                    "	id"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("COD_PROD"));
-                    imp.setEan(rst.getString("CODIGO_BARRAS"));
-                    imp.setDescricaoCompleta(rst.getString("DESCRICAO"));
+                    imp.setImportId(rst.getString("id"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setDataAlteracao(rst.getDate("dataultimaalteracao"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.setTipoEmbalagem(rst.getString("unidade"));
+                    imp.setValidade(rst.getInt("validade"));
+                    if ("KG".equals(imp.getTipoEmbalagem()) && imp.getEan().contains("789000")) {
+                        imp.setEan(imp.getImportId());
+                    }
+                    imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    imp.setTipoEmbalagem(rst.getString("FLG_UNIDADE_VENDA"));
-                    imp.setValidade(rst.getInt("VALIDADE"));
-                    imp.setCodMercadologico1(rst.getString("COD_DEPART"));
-                    imp.setCodMercadologico2(rst.getString("COD_SUBDEPART"));
-                    imp.setCodMercadologico3(rst.getString("COD_SECAO"));
-                    imp.setPesoBruto(rst.getDouble("PESO_BRUTO"));
-                    imp.setPesoLiquido(rst.getDouble("PESO_LIQUIDO"));
-                    imp.setSituacaoCadastro("T".equals(rst.getString("CHK_ATIVO")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-                    imp.setPrecovenda(rst.getDouble("VLR_PRECO"));
-                    imp.setCustoComImposto(rst.getDouble("VLR_ULTIMO_CUSTO"));
+                    imp.setFornecedorFabricante(rst.getString("COD_FORN"));
+                    imp.setCodMercadologico1(rst.getString("merc1"));
+                    imp.setCodMercadologico2(rst.getString("merc2"));
+                    imp.setCodMercadologico3(rst.getString("merc3"));
+                    imp.setPesoBruto(rst.getDouble("peso_bruto"));
+                    imp.setPesoLiquido(rst.getDouble("peso_liquido"));
+                    imp.setEstoqueMinimo(rst.getDouble("estoque_minimo"));
+                    imp.setEstoqueMaximo(rst.getDouble("estoque_maximo"));
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setMargem(rst.getDouble("margem"));
+                    imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
-                    imp.setEstoqueMinimo(rst.getDouble("QTDE_ESTOQUE_MINIMO"));
-                    imp.setEstoqueMaximo(rst.getDouble("QTDE_ESTOQUE_MAXIMO"));
-                    imp.setEstoque(rst.getDouble("QTDE_ESTOQUE_LOJA"));
-                    imp.setNcm(rst.getString("COD_NCM"));
-                    imp.setCest(rst.getString("CEST"));
-                    imp.setPiscofinsCstDebito(rst.getString("COD_PIS"));
-                    imp.setPiscofinsCstCredito(rst.getString("COD_COFINS"));
-                    imp.setPiscofinsNaturezaReceita(rst.getString("nat_rec_pis"));
-                    imp.setIcmsDebitoId(rst.getString("COD_ICMS"));
-                    imp.setIcmsCreditoId(rst.getString("COD_ICMS"));
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<ProdutoIMP> getEANs() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "ean.CODIGO_BARRAS, ean.COD_PROD, p.FLG_UNIDADE_VENDA\n"
-                    + "from barras_vinculada ean\n"
-                    + "inner join PRODUTO p on p.COD_PROD = ean.COD_PROD\n"
-                    + "where ean.COD_LOJA = " + getLojaOrigem()
-            )) {
-                while (rst.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("COD_PROD"));
-                    imp.setEan(rst.getString("CODIGO_BARRAS"));
-                    imp.setTipoEmbalagem(rst.getString("FLG_UNIDADE_VENDA"));
+                    imp.setPrecovenda(rst.getDouble("preco"));
+                    imp.setSituacaoCadastro(rst.getInt("ativo") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+                    imp.setPiscofinsCstDebito(rst.getString("piscofins_saida"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_nat"));
+                    imp.setIcmsCst(Utils.stringToInt(rst.getString("icms_cst")));
+                    imp.setIcmsAliq(rst.getDouble("icms_aliquota"));
+                    
                     result.add(imp);
                 }
             }

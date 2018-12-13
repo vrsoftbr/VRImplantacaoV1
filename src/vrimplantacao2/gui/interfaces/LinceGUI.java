@@ -19,8 +19,7 @@ import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTrib
 import vrimplantacao2.parametro.Parametros;
 
 public class LinceGUI extends VRInternalFrame implements ConexaoEvent {
-
-    private static final String SISTEMA = "Hiper";
+    
     private static final String SERVIDOR_SQL = "SQL Server";
     private static LinceGUI instance;
 
@@ -32,23 +31,23 @@ public class LinceGUI extends VRInternalFrame implements ConexaoEvent {
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         conexao.carregarParametros();
-        txtLojaCompl.setText(params.get(SISTEMA, "LOJA_COMPL"));
-        vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
-        vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
+        txtLojaCompl.setText(params.get(dao.getSistema(), "LOJA_COMPL"));
+        vLojaCliente = params.get(dao.getSistema(), "LOJA_CLIENTE");
+        vLojaVR = params.getInt(dao.getSistema(), "LOJA_VR");
     }
 
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         conexao.atualizarParametros();
-        params.get(txtLojaCompl.getText(), SISTEMA, "LOJA_COMPL");
+        params.put(txtLojaCompl.getText(), dao.getSistema(), "LOJA_COMPL");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
-            params.put(cliente.cnpj, SISTEMA, "LOJA_CLIENTE");
+            params.put(cliente.cnpj, dao.getSistema(), "LOJA_CLIENTE");
             vLojaCliente = cliente.cnpj;
         }
         ItemComboVO vr = (ItemComboVO) cmbLojaVR.getSelectedItem();
         if (vr != null) {
-            params.put(vr.id, SISTEMA, "LOJA_VR");
+            params.put(vr.id, dao.getSistema(), "LOJA_VR");
             vLojaVR = vr.id;
         }
         params.salvar();
@@ -65,7 +64,9 @@ public class LinceGUI extends VRInternalFrame implements ConexaoEvent {
         super(i_mdiFrame);
         initComponents();
 
-        this.title = "Importação " + SISTEMA;
+        this.title = "Importação " + dao.getSistema();
+        
+        conexao.setOnConectar(this);
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
@@ -144,7 +145,7 @@ public class LinceGUI extends VRInternalFrame implements ConexaoEvent {
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;                    
                     dao.complementoSistema = txtLojaCompl.getText();
 
-                    System.out.println(SISTEMA + " - " + txtLojaCompl.getText());
+                    System.out.println(dao.getSistema() + " - " + txtLojaCompl.getText());
 
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
@@ -152,12 +153,11 @@ public class LinceGUI extends VRInternalFrame implements ConexaoEvent {
                     tabProdutos.setImportador(importador);
 
                     if (tab.getSelectedIndex() == 0) {
-                        
+                        tabProdutos.executarImportacao();
                     } else if (tab.getSelectedIndex() == 1) {
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
-
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
@@ -195,7 +195,7 @@ public class LinceGUI extends VRInternalFrame implements ConexaoEvent {
 
                     ProgressBar.dispose();
 
-                    Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
+                    Util.exibirMensagem("Importação " + dao.getSistema() + " realizada com sucesso!", getTitle());
                     
                 } catch (Exception ex) {
                     ProgressBar.dispose();
