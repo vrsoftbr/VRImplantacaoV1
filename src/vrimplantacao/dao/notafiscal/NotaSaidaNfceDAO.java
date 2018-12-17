@@ -5,7 +5,9 @@ import java.io.File;
 import java.io.StringWriter;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -17,10 +19,20 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import vrframework.classe.Conexao;
+import vrframework.classe.ProgressBar;
+import vrframework.classe.Util;
+import vrframework.classe.VRException;
 import vrimplantacao.classe.Global;
 import vrimplantacao.dao.LogTransacaoDAO;
 import vrimplantacao.dao.ParametroDAO;
+import vrimplantacao.dao.ParametroPdvDAO;
+import vrimplantacao.dao.cadastro.ProdutoDAO;
 import vrimplantacao.dao.estoque.EstoqueDAO;
+import vrimplantacao.gui.interfaces.rfd.ItensNaoExistentesController;
+import vrimplantacao.gui.interfaces.rfd.ProdutoMapa;
+import vrimplantacao.gui.interfaces.rfd.ProdutoMapa.TipoMapa;
+import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.Formulario;
 import vrimplantacao.vo.TipoBaixaReceita;
 import vrimplantacao.vo.TipoTransacao;
@@ -29,24 +41,12 @@ import vrimplantacao.vo.administrativo.TipoEntradaSaida;
 import vrimplantacao.vo.administrativo.TipoMovimentacao;
 import vrimplantacao.vo.estoque.TipoBaixaPerda;
 import vrimplantacao.vo.fiscal.ModeloNotaFiscal;
+import vrimplantacao.vo.interfaces.DivergenciaVO;
+import vrimplantacao.vo.interfaces.TipoDivergencia;
 import vrimplantacao.vo.venda.Finalizadora;
 import vrimplantacao.vo.venda.VendaFinalizadoraVO;
 import vrimplantacao.vo.venda.VendaItemVO;
 import vrimplantacao.vo.venda.VendaVO;
-import vrframework.classe.Conexao;
-import vrframework.classe.ProgressBar;
-//import vrframework.classe.Format;
-//import vrframework.classe.Texto;
-import vrframework.classe.VRException;
-import vrframework.classe.Util;
-import vrimplantacao.dao.ParametroPdvDAO;
-import vrimplantacao.dao.cadastro.ProdutoDAO;
-import vrimplantacao.gui.interfaces.rfd.ItensNaoExistentesController;
-import vrimplantacao.gui.interfaces.rfd.ProdutoMapa;
-import vrimplantacao.gui.interfaces.rfd.ProdutoMapa.TipoMapa;
-import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.interfaces.DivergenciaVO;
-import vrimplantacao.vo.interfaces.TipoDivergencia;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.utils.multimap.MultiMap;
 
@@ -103,6 +103,12 @@ public class NotaSaidaNfceDAO {
     }
     private final ProdutoAnteriorDAO daoV2 = new ProdutoAnteriorDAO(false);
 
+    
+    private final SimpleDateFormat xmlDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");    
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+    private final SimpleDateFormat timeStampFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private final SimpleDateFormat horaFormat = new SimpleDateFormat("HH:mm:ss");
+            
     public VendaVO importar(String i_xml, boolean verificarCodigoAnterior, boolean verificarCodigoBarras, boolean exibirDivergencias) throws Exception {
         //abre arquivo
         boolean importacaoV2 = isImportacaoV2();
@@ -168,11 +174,12 @@ public class NotaSaidaNfceDAO {
             int idLoja = getIdLoja(Long.parseLong(CNPJEmit.getTextContent()));
 
             //String data = Format.data(dhEmi.getTextContent(), "yyyy-MM-dd'T'HH:mm:ss", "dd/MM/yyyy");
-            String data = Util.formatData(dhEmi.getTextContent(), "yyyy-MM-dd'T'HH:mm:ss", "dd/MM/yyyy");
-            String dataEmissaoNfce = Util.formatData(dhEmi.getTextContent(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
-            String horaInicio = Util.formatData(dhEmi.getTextContent(), "yyyy-MM-dd'T'HH:mm:ss", "HH:mm:ss");
-            String horaTermino = horaInicio;
-
+            Date dataEmissao = xmlDateFormat.parse(dhEmi.getTextContent());
+            //String data = Util.formatData(dhEmi.getTextContent(), "yyyy-MM-dd'T'HH:mm:ss", "dd/MM/yyyy");
+            //String dataEmissaoNfce = Util.formatData(dhEmi.getTextContent(), "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd HH:mm:ss");
+            //String horaInicio = Util.formatData(dhEmi.getTextContent(), "yyyy-MM-dd'T'HH:mm:ss", "HH:mm:ss");
+            //String horaTermino = horaInicio;
+            
             double valorSubTotal = Double.parseDouble(vNF.getTextContent());
             double valorDesconto = Double.parseDouble(vDesc.getTextContent());
 
@@ -198,13 +205,12 @@ public class NotaSaidaNfceDAO {
 
             oVenda.idLoja = idLoja;
             oVenda.cnpjEmitente = Long.parseLong(CNPJEmit.getTextContent());
-            oVenda.dataHoraEmissaoNfce = dataEmissaoNfce;
-            oVenda.data = data;
+            oVenda.dataHoraEmissaoNfce = timeStampFormat.format(dataEmissao);
+            oVenda.data = simpleDateFormat.format(dataEmissao);
             oVenda.finalizado = true;
-            oVenda.horaInicio = horaInicio;
-            oVenda.horaTermino = horaTermino;
+            oVenda.horaInicio = horaFormat.format(dataEmissao);
+            oVenda.horaTermino = oVenda.horaInicio;
             oVenda.protocoloRecebimentoNfce = protocoloRecebimento;
-            oVenda.dataHoraEmissaoNfce = dataEmissaoNfce;
             oVenda.ecf = Integer.parseInt(serie.getTextContent());
             oVenda.subTotalImpressora = valorSubTotal;
             oVenda.idClientePreferencial = -1;
@@ -385,6 +391,7 @@ public class NotaSaidaNfceDAO {
             return oVenda;
 
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw ex;
         }
     }
