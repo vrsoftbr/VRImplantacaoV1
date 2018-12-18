@@ -598,6 +598,8 @@
                                           <Component id="chkOferta" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkMargem" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkTipoProduto" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                               </Group>
@@ -640,6 +642,7 @@
                               <Component id="chkAtacado" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkOferta" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkMargem" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkTipoProduto" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="32767" attributes="0"/>
                       </Group>
@@ -703,6 +706,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMargem">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Margem"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTipoProduto">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo Produto"/>
                   </Properties>
                 </Component>
               </SubComponents>

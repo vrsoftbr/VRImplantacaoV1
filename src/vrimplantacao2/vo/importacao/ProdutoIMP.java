@@ -4,6 +4,7 @@ import java.util.Date;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoProduto;
 
 public class ProdutoIMP {
     
@@ -90,6 +91,7 @@ public class ProdutoIMP {
     
     private String uf;
     private String codigoGIA;
+    private TipoProduto tipoProduto =  TipoProduto.MERCADORIA_REVENDA;
     
     public String getImportSistema() {
         return importSistema;
@@ -707,6 +709,30 @@ public class ProdutoIMP {
      */
     public void setIcmsReducaoSaidaForaEstadoNF(double icmsReducaoSaidaForaEstadoNF) {
         this.icmsReducaoSaidaForaEstadoNF = icmsReducaoSaidaForaEstadoNF;
+    }
+
+    public String getCodigoGIA() {
+        return codigoGIA;
+    }
+
+    public void setCodigoGIA(String codigoGIA) {
+        this.codigoGIA = codigoGIA;
+    }
+
+    public TipoProduto getTipoProduto() {
+        return tipoProduto;
+    }
+
+    public void setTipoProduto(TipoProduto tipoProduto) {
+        this.tipoProduto = tipoProduto;
+    }
+
+    public void setTipoProduto(String tipoProduto) {
+        this.tipoProduto = TipoProduto.getById(tipoProduto);
+    }
+    
+    public void setTipoProduto(int tipoProduto) {
+        this.tipoProduto = TipoProduto.getById(tipoProduto);
     }
     
 }

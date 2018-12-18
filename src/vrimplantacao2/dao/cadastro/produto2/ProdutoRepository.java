@@ -18,8 +18,8 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.MathUtils;
-import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.multimap.KeyList;
+import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorEanVO;
@@ -977,6 +977,7 @@ public class ProdutoRepository {
         complemento.setCustoComImposto(imp.getCustoComImposto());
         complemento.setDescontinuado(imp.isDescontinuado());
         complemento.setSituacaoCadastro(imp.getSituacaoCadastro());
+        complemento.setTipoProduto(imp.getTipoProduto());
 
         return complemento;
     }

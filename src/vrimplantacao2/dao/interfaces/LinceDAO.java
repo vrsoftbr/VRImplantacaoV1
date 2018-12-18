@@ -15,13 +15,13 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -66,6 +66,7 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
         s.add(OpcaoProduto.CEST);
         s.add(OpcaoProduto.PIS_COFINS);
         s.add(OpcaoProduto.ICMS);
+        s.add(OpcaoProduto.TIPO_PRODUTO);
         
         return s;
     }
@@ -136,8 +137,8 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
                     result.add(imp);
                 }
             }
-            return result;
         }
+        return result;
     }
 
     @Override
@@ -248,6 +249,7 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_nat"));
                     imp.setIcmsCst(Utils.stringToInt(rst.getString("icms_cst")));
                     imp.setIcmsAliq(rst.getDouble("icms_aliquota"));
+                    imp.setTipoProduto(rst.getString("tipo_produto"));
                     
                     result.add(imp);
                 }

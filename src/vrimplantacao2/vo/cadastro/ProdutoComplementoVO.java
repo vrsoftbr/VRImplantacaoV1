@@ -2,6 +2,7 @@ package vrimplantacao2.vo.cadastro;
 
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoProduto;
 
 public class ProdutoComplementoVO {
     
@@ -17,6 +18,7 @@ public class ProdutoComplementoVO {
     private double precoDiaSeguinte = 0;
     private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
     private boolean descontinuado = false;
+    private TipoProduto tipoProduto = TipoProduto.MERCADORIA_REVENDA;
 
     public void setId(int id) {
         this.id = id;
@@ -112,6 +114,14 @@ public class ProdutoComplementoVO {
 
     public void setSituacaoCadastro(SituacaoCadastro situacaoCadastro) {
         this.situacaoCadastro = situacaoCadastro != null ? situacaoCadastro : SituacaoCadastro.ATIVO;
+    }
+
+    public TipoProduto getTipoProduto() {
+        return tipoProduto;
+    }
+
+    public void setTipoProduto(TipoProduto tipoProduto) {
+        this.tipoProduto = tipoProduto == null ? TipoProduto.MERCADORIA_REVENDA : tipoProduto;
     }
 
 }
