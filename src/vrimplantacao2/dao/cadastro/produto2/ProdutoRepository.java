@@ -978,6 +978,7 @@ public class ProdutoRepository {
         complemento.setDescontinuado(imp.isDescontinuado());
         complemento.setSituacaoCadastro(imp.getSituacaoCadastro());
         complemento.setTipoProduto(imp.getTipoProduto());
+        complemento.setFabricacaoPropria(imp.isFabricacaoPropria());
 
         return complemento;
     }

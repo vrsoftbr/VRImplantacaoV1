@@ -92,6 +92,7 @@ public class ProdutoIMP {
     private String uf;
     private String codigoGIA;
     private TipoProduto tipoProduto =  TipoProduto.MERCADORIA_REVENDA;
+    private boolean fabricacaoPropria = false;
     
     public String getImportSistema() {
         return importSistema;
@@ -733,6 +734,14 @@ public class ProdutoIMP {
     
     public void setTipoProduto(int tipoProduto) {
         this.tipoProduto = TipoProduto.getById(tipoProduto);
+    }
+
+    public boolean isFabricacaoPropria() {
+        return fabricacaoPropria;
+    }
+
+    public void setFabricacaoPropria(boolean fabricacaoPropria) {
+        this.fabricacaoPropria = fabricacaoPropria;
     }
     
 }

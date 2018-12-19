@@ -18,6 +18,7 @@ public class ProdutoComplementoVO {
     private double precoDiaSeguinte = 0;
     private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
     private boolean descontinuado = false;
+    private boolean fabricacaoPropria = false;
     private TipoProduto tipoProduto = TipoProduto.MERCADORIA_REVENDA;
 
     public void setId(int id) {
@@ -122,6 +123,14 @@ public class ProdutoComplementoVO {
 
     public void setTipoProduto(TipoProduto tipoProduto) {
         this.tipoProduto = tipoProduto == null ? TipoProduto.MERCADORIA_REVENDA : tipoProduto;
+    }
+
+    public boolean isFabricacaoPropria() {
+        return fabricacaoPropria;
+    }
+
+    public void setFabricacaoPropria(boolean fabricacaoPropria) {
+        this.fabricacaoPropria = fabricacaoPropria;
     }
 
 }

@@ -95,7 +95,7 @@ public class ProdutoComplementoDAO {
                     sql.put("valoroutrassubstituicao", 0);
                     if (Versao.maiorQue(3,17,9)) {
                         sql.put("id_tipoproduto", vo.getTipoProduto().getId());
-                        sql.put("fabricacaopropria", false);
+                        sql.put("fabricacaopropria", vo.isFabricacaoPropria());
                     }
                     sql.getReturning().add("id");
 
@@ -159,6 +159,10 @@ public class ProdutoComplementoDAO {
                 sql.put("customediosemimpostoanterior", 0);
                 sql.put("id_tipopiscofinscredito", vo.getProduto().getPisCofinsCredito().getId());
                 sql.put("valoroutrassubstituicao", 0);
+                if (Versao.maiorQue(3,17,9)) {
+                    sql.put("id_tipoproduto", vo.getTipoProduto().getId());
+                    sql.put("fabricacaopropria", vo.isFabricacaoPropria());
+                }
                 sql.getReturning().add("id");
 
                 try (ResultSet rst = stm.executeQuery(
@@ -195,6 +199,9 @@ public class ProdutoComplementoDAO {
                 }
                 if (opt.contains(OpcaoProduto.TIPO_PRODUTO)) {
                     sql.put("id_tipoproduto", vo.getTipoProduto().getId());
+                }
+                if (opt.contains(OpcaoProduto.FABRICACAO_PROPRIA)) {
+                    sql.put("fabricacaopropria", vo.isFabricacaoPropria());
                 }
                 if (opt.contains(OpcaoProduto.CUSTO)) {
                     sql.put("custocomimposto", vo.getCustoComImposto());
@@ -264,6 +271,9 @@ public class ProdutoComplementoDAO {
             }
             if (opt.contains(OpcaoProduto.TIPO_PRODUTO)) {
                 sql.put("id_tipoproduto", complemento.getTipoProduto().getId());
+            }
+            if (opt.contains(OpcaoProduto.FABRICACAO_PROPRIA)) {
+                sql.put("fabricacaopropria", complemento.isFabricacaoPropria());
             }
             if ((opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO))
                     || (opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO))) {
