@@ -227,10 +227,9 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rst.getString("id"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDataAlteracao(rst.getDate("dataultimaalteracao"));
-                    imp.setEan(rst.getString("ean"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.setValidade(rst.getInt("validade"));
-                    if ("T".equals(rst.getString("chk_balanca"))) {
+                    if ("T".equals(rst.getString("chk_balanca")) || "KG".equals(imp.getTipoEmbalagem())) {
                         if ("T".equals(rst.getString("chk_balanca_kg"))) {
                             imp.seteBalanca("KG".equals(imp.getTipoEmbalagem()));
                         } else {
@@ -239,7 +238,8 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.seteBalanca(false);
                     }
-                    if (imp.isBalanca() && imp.getEan().contains("789000")) {
+                    imp.setEan(rst.getString("ean"));
+                    if (imp.getEan().equals("789000" + String.format("%06d", rst.getInt("id")))) {
                         imp.setEan(imp.getImportId());
                     }
                     imp.setDescricaoCompleta(rst.getString("descricao"));
