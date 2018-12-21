@@ -3,6 +3,8 @@ package vrimplantacao2.dao.cadastro.produto2;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
@@ -11,7 +13,6 @@ import vrframework.classe.Util;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.collection.IDStack;
-import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.ProdutoVO;
@@ -317,8 +318,8 @@ public class ProdutoDAO {
         }
     }
     
-    public MultiMap<Integer, ProdutoVO> getProdutos() throws Exception {
-        MultiMap<Integer, ProdutoVO> result = new MultiMap<>();
+    public Map<Integer, ProdutoVO> getProdutos() throws Exception {
+        Map<Integer, ProdutoVO> result = new HashMap<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
@@ -328,7 +329,7 @@ public class ProdutoDAO {
                 while (rst.next()) {
                     ProdutoVO vo = new ProdutoVO();
                     vo.setId(rst.getInt("id"));
-                    result.put(vo, rst.getInt("id"));
+                    result.put(rst.getInt("id"), vo);
                 }
             }
         }

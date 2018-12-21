@@ -213,7 +213,8 @@ public class ProdutoRepository {
             produtos.clear();
             System.gc();
 
-            MultiMap<Integer, ProdutoVO> produtosGravados = provider.getProdutos();
+            Map<Integer, ProdutoVO> produtosGravados = provider.getProdutos();
+            Map<Long, Integer> eansCadastrados = provider.getEansCadastrados();
 
             setNotify("Gravando os produtos Pdv VR...", organizados.size());
             for (KeyList<String> keys : organizados.keySet()) {
@@ -243,33 +244,33 @@ public class ProdutoRepository {
                     
                     id = Integer.parseInt(imp.getImportId());
 
-                    ProdutoVO prod = converterIMP(imp, id, ean, unidade, eBalanca);
+                    produtoGravado = converterIMP(imp, id, ean, unidade, eBalanca);
 
                     anterior = converterImpEmAnterior(imp);
-                    anterior.setCodigoAtual(prod);
+                    anterior.setCodigoAtual(produtoGravado);
                     ProdutoComplementoVO complemento = converterComplemento(imp);
-                    complemento.setProduto(prod);
+                    complemento.setProduto(produtoGravado);
                     ProdutoAliquotaVO aliquota = converterAliquota(imp);
-                    aliquota.setProduto(prod);
+                    aliquota.setProduto(produtoGravado);
 
-                    provider.salvar(prod);
+                    provider.salvar(produtoGravado);
                     provider.anterior().salvar(anterior);
                     provider.complemento().salvar(complemento, false);
                     provider.aliquota().salvar(aliquota);
                     
+                    produtosGravados.put(produtoGravado.getId(), produtoGravado);
+                }
+                if (!eansCadastrados.containsKey(ean)) {
                     if (Integer.parseInt(imp.getImportId()) > 0 && Long.parseLong(imp.getEan()) > 0) { //ID e EAN válidos
                         if (!provider.automacao().cadastrado(ean)) {
                             ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
-                            automacao.setProduto(prod);
+                            automacao.setProduto(produtoGravado);
                             provider.automacao().salvar(automacao);
+                            eansCadastrados.put(ean, produtoGravado.getId());
                         }
                     }
-
-                    if (!provider.eanAnterior().cadastrado(imp.getImportId(), imp.getEan())) {
-                        ProdutoAnteriorEanVO eanAnterior = converterAnteriorEAN(imp);
-                        provider.eanAnterior().salvar(eanAnterior);
-                    }
-                } 
+                }
+                
                 notificar();
             }
 

@@ -92,7 +92,7 @@ public class ProdutoRepositoryProvider {
         return opcoes;
     }
     
-    public MultiMap<Integer, ProdutoVO> getProdutos() throws Exception {
+    public Map<Integer, ProdutoVO> getProdutos() throws Exception {
         return produtoDAO.getProdutos();
     }
     
@@ -174,6 +174,10 @@ public class ProdutoRepositoryProvider {
      */
     public Map<String, Integer> getCompradores() throws Exception {
         return new CompradorAnteriorDAO().getCompradoresImportador(sistema, loja);
+    }
+
+    Map<Long, Integer> getEansCadastrados() {
+        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
     }
     
     public class Anterior {
