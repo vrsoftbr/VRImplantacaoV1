@@ -17,7 +17,6 @@ import vrframework.classe.VRException;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.LojaDAO;
-import vrimplantacao2.dao.interfaces.GetWayDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
@@ -26,6 +25,7 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
+import vrimplantacao2.dao.interfaces.GetWayDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
@@ -339,6 +339,7 @@ public class GetWayGUI extends VRInternalFrame {
                             }
                             if (chkTipoEmbalagemEAN.isSelected()) {
                                 opcoes.add(OpcaoProduto.TIPO_EMBALAGEM_EAN);
+                                opcoes.add(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO);
                             }
                             if (chkQtdEmbalagemEAN.isSelected()) {
                                 opcoes.add(OpcaoProduto.QTD_EMBALAGEM_EAN);

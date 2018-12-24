@@ -26,35 +26,35 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.BancoDAO;
 import vrimplantacao.dao.cadastro.FornecedorDAO;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
-import vrimplantacao2.dao.cadastro.devolucao.receber.ReceberDevolucaoDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.devolucao.receber.ReceberDevolucaoDAO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.cadastro.verba.receber.ReceberVerbaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.cadastro.financeiro.ReceberDevolucaoVO;
+import vrimplantacao2.vo.cadastro.financeiro.ReceberVerbaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
+import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
-import vrimplantacao2.vo.cadastro.financeiro.ReceberDevolucaoVO;
-import vrimplantacao2.vo.cadastro.financeiro.ReceberVerbaVO;
-import vrimplantacao2.vo.enums.TipoFornecedor;
-import vrimplantacao2.vo.importacao.AssociadoIMP;
-import vrimplantacao2.vo.importacao.MapaTributoIMP;
-import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -404,14 +404,17 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                         if (produtoBalanca != null) {
                             qtdBalanca++;
                             imp.seteBalanca(true);
+                            imp.setTipoEmbalagem("P".equals(produtoBalanca.getPesavel()) ? "KG" : "UN");
                             imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rst.getInt("VALIDADE"));
                         } else {
                             qtdNormal++;
                             imp.setValidade(0);
+                            imp.setTipoEmbalagem(rst.getString("unidade"));
                             imp.seteBalanca(false);
                         }
                     } else {
                         imp.seteBalanca((rst.getInt("e_balanca") == 1));
+                        imp.setTipoEmbalagem(rst.getString("unidade"));
                         imp.setValidade(rst.getInt("VALIDADE"));
                         if(imp.isBalanca()) {
                             qtdBalanca++;
