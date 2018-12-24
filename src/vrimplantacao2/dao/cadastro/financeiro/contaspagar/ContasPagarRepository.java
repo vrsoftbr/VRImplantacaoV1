@@ -45,6 +45,7 @@ public class ContasPagarRepository {
         
         provider.notificar("Contas à Pagar - Importando...", organizados.size());
         provider.begin();
+        int fornecedorLoja = provider.getFornecedorLoja();
         try {
             int cont = 0;
             for (ContaPagarIMP imp: organizados.values()) {            
@@ -72,6 +73,11 @@ public class ContasPagarRepository {
                                 ));
                         cont++;
                     }
+                }
+                
+                if (fornecedor == null && opt.contains(OpcaoContaPagar.IMPORTAR_SEM_FORNECEDOR)) {
+                    fornecedor = new FornecedorVO();
+                    fornecedor.setId(fornecedorLoja);
                 }
 
                 //Se for uma conta nova

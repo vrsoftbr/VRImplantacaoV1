@@ -20,6 +20,7 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -516,4 +517,58 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	l.lancamento,\n" +
+                    "	l.cod_forn,\n" +
+                    "	coalesce(l.documento, l.origem) documento,\n" +
+                    "	l.data,\n" +
+                    "	l.vencimento,\n" +
+                    "	l.vlr_valor valor,\n" +
+                    "	l.descricao,\n" +
+                    "	l.observacao,\n" +
+                    "	doc.descricao tipo_doc\n" +
+                    "from\n" +
+                    "	FIN_LANCAMENTO l\n" +
+                    "	left join fin_tipo_doc doc on\n" +
+                    "		l.COD_TIPO_DOC = doc.COD_TIPO_DOC and\n" +
+                    "		l.cod_loja = doc.cod_loja\n" +
+                    "where\n" +
+                    "	l.cod_loja = " + getLojaOrigem() + " and\n" +
+                    "	l.pagamento is null\n" +
+                    "order by\n" +
+                    "	l.data"
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    
+                    imp.setId(rst.getString("lancamento"));
+                    imp.setIdFornecedor(rst.getString("cod_forn"));
+                    imp.setDataEntrada(rst.getDate("data"));
+                    imp.setDataEmissao(rst.getDate("data"));
+                    imp.setDataHoraAlteracao(rst.getTimestamp("data"));
+                    imp.setNumeroDocumento(rst.getString("documento"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(
+                        "DESCRICAO: " + rst.getString("descricao") +
+                        "   OBSERVACAO: " + rst.getString("observacao") +
+                        "   TIPO DOC.: " + rst.getString("tipo_doc")
+                    );
+                    imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    
 }

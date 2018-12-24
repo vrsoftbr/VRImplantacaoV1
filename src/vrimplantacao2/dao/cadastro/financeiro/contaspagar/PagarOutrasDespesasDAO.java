@@ -57,5 +57,18 @@ public class PagarOutrasDespesasDAO {
         }
         */
     }
+
+    public int getFornecedorLoja(int lojaVR) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select id_fornecedor from loja where id = " + lojaVR
+            )) {
+                if (rst.next()) {
+                    return rst.getInt("id_fornecedor");
+                }
+            }
+        }
+        return 1;
+    }
     
 }

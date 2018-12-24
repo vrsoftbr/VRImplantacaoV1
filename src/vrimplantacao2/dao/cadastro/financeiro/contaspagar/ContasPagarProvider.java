@@ -106,6 +106,10 @@ public class ContasPagarProvider implements RepositoryProvider {
     public MultiMap<String, Void> getPagamentos() throws Exception {
         return this.vencimentoDAO.getPagamentos();
     }
+
+    public int getFornecedorLoja() throws Exception {
+        return this.despesaDAO.getFornecedorLoja(lojaVR);
+    }
     
     
 }
