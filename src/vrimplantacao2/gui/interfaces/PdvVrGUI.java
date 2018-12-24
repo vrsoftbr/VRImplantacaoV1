@@ -175,7 +175,7 @@ public class PdvVrGUI extends VRInternalFrame {
                     if (tabs.getSelectedIndex() == 0) {
 
                         if (chkProdutos.isSelected()) {
-                            importador.importarProdutoPdvVr();
+                            importador.importarProdutoPdvVr(OpcaoProduto.IMPORTAR_PDV_VR);
                         }
 
                         {

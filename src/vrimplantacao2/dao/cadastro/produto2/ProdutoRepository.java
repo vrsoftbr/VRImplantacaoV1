@@ -122,26 +122,52 @@ public class ProdutoRepository {
                         unidade = to.unidade;
                     }
                     //</editor-fold>
-
+                    
                     ProdutoAnteriorVO anterior = provider.anterior().get(keys.get(0), keys.get(1), keys.get(2));
                     if (anterior == null) {
                         rep.append("01|Produto não importado anteriormente");
-                        if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_RESETAR_BALANCA)) {
+                        
+                        if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_PDV_VR)) {
                             try {
-                                int idValido = Integer.parseInt(strID);
-                                if (eBalanca || idValido < 10000) {
-                                    strID = "-1";
+                                id = Integer.parseInt(strID);
+                                if (id < 1 || id > 999999) {
+                                    throw new NumberFormatException("ID fora do intervalo permitido");
                                 }
-                            } catch (NumberFormatException e) {
-                                //Se não for um numero inteiro, não faz nada pois um
-                                //novo id será gerado para ele.
+                                if (idStack.isIdCadastrado(id)) {
+                                    anterior = converterImpEmAnterior(imp);
+                                    ProdutoVO produtoVO = new ProdutoVO();
+                                    produtoVO.setId(id);
+                                    anterior.setCodigoAtual(produtoVO);
+                                    provider.anterior().salvar(anterior);
+                                    notificar();
+                                    continue;
+                                } else {
+                                    //Removo o ID da pilha de IDs disponíveis.
+                                    idStack.obterID(strID, eBalanca);
+                                }
+                            } catch (NumberFormatException ex) {
+                                LOG.log(Level.WARNING, "Id () do produto () não é válido, produto não importado", ex);
+                                notificar();
+                                continue;
                             }
-                        } else if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA) && eBalanca) {
-                            strID = String.valueOf(ean);
+                        } else {                                                    
+                            if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_RESETAR_BALANCA)) {
+                                try {
+                                    int idValido = Integer.parseInt(strID);
+                                    if (eBalanca || idValido < 10000) {
+                                        strID = "-1";
+                                    }
+                                } catch (NumberFormatException e) {
+                                    //Se não for um numero inteiro, não faz nada pois um
+                                    //novo id será gerado para ele.
+                                }
+                            } else if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA) && eBalanca) {
+                                strID = String.valueOf(ean);
+                            }
+                            
+                            id = idStack.obterID(strID, eBalanca);
                         }
-
-                        id = idStack.obterID(strID, eBalanca);
-
+                        
                         ProdutoVO prod = converterIMP(imp, id, ean, unidade, eBalanca);
 
                         anterior = converterImpEmAnterior(imp);
@@ -180,7 +206,7 @@ public class ProdutoRepository {
                         provider.eanAnterior().salvar(eanAnterior);
                     }
 
-                    notificar();                    
+                    notificar();
                     LOG.finer("Produto importado: " + rep.toString());
                 } catch (Exception ex) {
                     LOG.log(Level.SEVERE, "Erro ao importar o produto\n" + rep.toString(), ex);

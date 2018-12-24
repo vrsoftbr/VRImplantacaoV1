@@ -109,5 +109,9 @@ public class ProdutoIDStack {
             throw ex;
         }
     }
+    
+    public boolean isIdCadastrado(int id) {
+        return cadastrados.contains(id);
+    }
 
 }
