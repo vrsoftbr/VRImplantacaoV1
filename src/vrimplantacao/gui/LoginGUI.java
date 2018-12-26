@@ -52,7 +52,7 @@ public class LoginGUI extends VRDialog {
 
         oUsuario = new UsuarioDAO().autenticar(txtUsuario.getText(), txtSenha.getText(), cboLoja.getId());
 
-        new PropertiesDAO().carregarConfiguracao(new Properties(Util.getRoot() + "vr/vr.properties"));
+        new PropertiesDAO().carregarConfiguracao(new Properties(Util.getRoot() + "vr/implantacao/vrimplantacao.properties"));
 
         LojaVO oLoja = new LojaDAO().carregar(cboLoja.getId());
 
@@ -79,7 +79,7 @@ public class LoginGUI extends VRDialog {
 
         mdiFrame = form;
 
-        Properties oProperties = new Properties(Util.getRoot() + "vr/vr.properties");
+        Properties oProperties = new Properties(Util.getRoot() + "vr/implantacao/vrimplantacao.properties");
 
         if (chkLembrar.isSelected() && !oProperties.getString("system.usuario").equals(txtUsuario.getText())) {
             oProperties.setPropertie("system.usuario", txtUsuario.getText());
@@ -91,6 +91,7 @@ public class LoginGUI extends VRDialog {
         this.dispose();
 
         form.requestFocus();
+        form.verificarLite();
     }
 
     public void setUsuario(String i_usuario) throws Exception {

@@ -28,6 +28,7 @@ public class LinceGUI extends VRInternalFrame implements ConexaoEvent {
 
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
+    private boolean lite;
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -212,13 +213,29 @@ public class LinceGUI extends VRInternalFrame implements ConexaoEvent {
     }
 
     public static void exibir(VRMdiFrame i_mdiFrame) {
+        exibir(i_mdiFrame, false);
+    }
+    
+    public static void exibir(VRMdiFrame i_mdiFrame, boolean lite) {
         try {
             i_mdiFrame.setWaitCursor();
+            
             if (instance == null || instance.isClosed()) {
                 instance = new LinceGUI(i_mdiFrame);
             }
-
+            
+            instance.lite = lite;            
+            if (lite) {
+                instance.cmbLojaOrigem.setEnabled(false);
+                instance.cmbLojaVR.setEnabled(false);
+                instance.txtLojaCompl.setEnabled(false);
+                instance.tab.remove(instance.tabUnificacao);
+                instance.dao.setLite(true);
+                instance.tabProdutos.setOpcoesDisponiveis(instance.dao);
+                instance.chkValorLimite.setVisible(false);
+            }
             instance.setVisible(true);
+            
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Erro ao abrir");
         } finally {

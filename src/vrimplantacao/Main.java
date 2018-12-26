@@ -1,5 +1,8 @@
 package vrimplantacao;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.Properties;
 import vrframework.classe.SplashScreen;
@@ -7,11 +10,24 @@ import vrframework.classe.Util;
 import vrimplantacao.classe.Global;
 import vrimplantacao.dao.PropertiesDAO;
 import vrimplantacao.gui.LoginGUI;
-import vrimplantacao2.parametro.Versao;
+import vrimplantacao2.parametro.Parametros;
 
 public class Main {
 
+    private static final Logger LOG = Logger.getLogger(Main.class.getName());
+    
     public static void main(String[] args) {
+        
+        Map<String, String> params = new HashMap<>();
+        for (String arg: args) {
+            String[] st = arg.split("=");
+            if (st.length == 1) {
+                params.put(st[0], "");
+            } else if (st.length > 1) {
+                params.put(st[0], st[1]);
+            }
+        }
+
         try {
             Util.setLookAndFeel();
             new PropertiesDAO().verficarConfiguracao();
@@ -51,6 +67,10 @@ public class Main {
             }
 
             SplashScreen.dispose();
+            
+            if (params.containsKey("-lite")) {
+                Parametros.get().put(params.get("-lite"), "-lite");
+            }
 
             form.setVisible(true);
 
@@ -58,5 +78,5 @@ public class Main {
             SplashScreen.dispose();
             Util.exibirMensagemErro(ex, "Atenção");
         }
-    }
+    }    
 }

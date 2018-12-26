@@ -96,6 +96,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkSituacaoCadastro.setVisible(opt.contains(OpcaoProduto.ATIVO));
             chkDescontinuado.setVisible(opt.contains(OpcaoProduto.DESCONTINUADO));
             chkAtacado.setVisible(opt.contains(OpcaoProduto.ATACADO));
+            chkMargem.setVisible(opt.contains(OpcaoProduto.MARGEM));
             chkOferta.setVisible(opt.contains(OpcaoProduto.OFERTA));
             chkTipoProduto.setVisible(opt.contains(OpcaoProduto.TIPO_PRODUTO));
             chkFabricacaoPropria.setVisible(opt.contains(OpcaoProduto.FABRICACAO_PROPRIA));

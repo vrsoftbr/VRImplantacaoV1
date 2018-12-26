@@ -35,6 +35,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public String complementoSistema = "";
+    private boolean lite = false;
     
     @Override
     public String getSistema() {
@@ -45,31 +46,40 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         Set<OpcaoProduto> s = new HashSet<>();
         
-        s.addAll(OpcaoProduto.getMercadologico());
-        s.add(OpcaoProduto.PRODUTOS);
-        s.add(OpcaoProduto.EAN);
-        s.add(OpcaoProduto.EAN_EM_BRANCO);
-        s.add(OpcaoProduto.DESC_COMPLETA);
-        s.add(OpcaoProduto.DESC_REDUZIDA);
-        s.add(OpcaoProduto.DESC_GONDOLA);
-        s.add(OpcaoProduto.TIPO_EMBALAGEM_EAN);
-        s.add(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO);
-        s.add(OpcaoProduto.VALIDADE);
-        s.add(OpcaoProduto.PESO_BRUTO);
-        s.add(OpcaoProduto.PESO_LIQUIDO);
-        s.add(OpcaoProduto.PESAVEL);
-        s.add(OpcaoProduto.ATIVO);
-        s.add(OpcaoProduto.PRECO);
-        s.add(OpcaoProduto.CUSTO);
-        s.add(OpcaoProduto.ESTOQUE_MAXIMO);
-        s.add(OpcaoProduto.ESTOQUE_MINIMO);
-        s.add(OpcaoProduto.ESTOQUE);
-        s.add(OpcaoProduto.NCM);
-        s.add(OpcaoProduto.CEST);
-        s.add(OpcaoProduto.PIS_COFINS);
-        s.add(OpcaoProduto.ICMS);
-        s.add(OpcaoProduto.TIPO_PRODUTO);
-        s.add(OpcaoProduto.FABRICACAO_PROPRIA);
+        if (!lite) {
+            s.addAll(OpcaoProduto.getMercadologico());
+            s.add(OpcaoProduto.PRODUTOS);
+            s.add(OpcaoProduto.EAN);
+            s.add(OpcaoProduto.EAN_EM_BRANCO);
+            s.add(OpcaoProduto.DESC_COMPLETA);
+            s.add(OpcaoProduto.DESC_REDUZIDA);
+            s.add(OpcaoProduto.DESC_GONDOLA);
+            s.add(OpcaoProduto.TIPO_EMBALAGEM_EAN);
+            s.add(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO);
+            s.add(OpcaoProduto.VALIDADE);
+            s.add(OpcaoProduto.PESO_BRUTO);
+            s.add(OpcaoProduto.PESO_LIQUIDO);
+            s.add(OpcaoProduto.PESAVEL);
+            s.add(OpcaoProduto.ATIVO);
+            s.add(OpcaoProduto.PRECO);
+            s.add(OpcaoProduto.CUSTO);
+            s.add(OpcaoProduto.ESTOQUE_MAXIMO);
+            s.add(OpcaoProduto.ESTOQUE_MINIMO);
+            s.add(OpcaoProduto.ESTOQUE);
+            s.add(OpcaoProduto.NCM);
+            s.add(OpcaoProduto.CEST);
+            s.add(OpcaoProduto.PIS_COFINS);
+            s.add(OpcaoProduto.ICMS);
+            s.add(OpcaoProduto.TIPO_PRODUTO);
+            s.add(OpcaoProduto.FABRICACAO_PROPRIA);
+        } else {
+            s.add(OpcaoProduto.PRODUTOS);
+            s.add(OpcaoProduto.EAN);
+            s.add(OpcaoProduto.EAN_EM_BRANCO);
+            s.add(OpcaoProduto.PRECO);
+            s.add(OpcaoProduto.CUSTO);
+            s.add(OpcaoProduto.ESTOQUE);
+        }
         
         return s;
     }
@@ -568,6 +578,10 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         
         return result;
+    }
+
+    public void setLite(boolean lite) {
+        this.lite = lite;
     }
     
     
