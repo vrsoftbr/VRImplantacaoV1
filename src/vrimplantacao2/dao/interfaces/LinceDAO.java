@@ -7,7 +7,9 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +38,11 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public String complementoSistema = "";
     private boolean lite = false;
+    private Date dataInicialOutrasDespesas = null;
+
+    public void setDataInicialOutrasDespesas(Date dataInicialOutrasDespesas) {
+        this.dataInicialOutrasDespesas = dataInicialOutrasDespesas;
+    }
     
     @Override
     public String getSistema() {
@@ -551,6 +558,7 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		l.cod_loja = doc.cod_loja\n" +
                     "where\n" +
                     "	l.cod_loja = " + getLojaOrigem() + " and\n" +
+                    (dataInicialOutrasDespesas == null ? "" : " l.vencimento >= '" + new SimpleDateFormat("yyyy-MM-dd").format(dataInicialOutrasDespesas) + "' and\n") +
                     "	l.pagamento is null\n" +
                     "order by\n" +
                     "	l.data"

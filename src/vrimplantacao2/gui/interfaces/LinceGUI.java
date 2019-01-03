@@ -1,6 +1,7 @@
 package vrimplantacao2.gui.interfaces;
 
 import java.awt.Frame;
+import java.util.Date;
 import javax.swing.DefaultComboBoxModel;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
@@ -36,6 +37,7 @@ public class LinceGUI extends VRInternalFrame implements ConexaoEvent {
         txtLojaCompl.setText(params.get(dao.getSistema(), "LOJA_COMPL"));
         vLojaCliente = params.get(dao.getSistema(), "LOJA_CLIENTE");
         vLojaVR = params.getInt(dao.getSistema(), "LOJA_VR");
+        txtDtInicioOutrasDespesas.setDate(params.getDate(dao.getSistema(), "DT_INICIO_OUTRAS_DESPESAS"));
     }
 
     private void gravarParametros() throws Exception {
@@ -52,6 +54,7 @@ public class LinceGUI extends VRInternalFrame implements ConexaoEvent {
             params.put(vr.id, dao.getSistema(), "LOJA_VR");
             vLojaVR = vr.id;
         }
+        params.put(txtDtInicioOutrasDespesas.getDate(), dao.getSistema(), "DT_INICIO_OUTRAS_DESPESAS");
         params.salvar();
     }
 
@@ -65,6 +68,8 @@ public class LinceGUI extends VRInternalFrame implements ConexaoEvent {
     private LinceGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
+        
+        txtDtInicioOutrasDespesas.setFormats("dd/MM/yyyy");
 
         this.title = "Importação " + dao.getSistema();
         
@@ -164,6 +169,7 @@ public class LinceGUI extends VRInternalFrame implements ConexaoEvent {
                             importador.importarProdutoFornecedor();
                         }
                         if (chkContasPagar.isSelected()) {
+                            dao.setDataInicialOutrasDespesas(txtDtInicioOutrasDespesas.getDate());
                             importador.importarContasPagar(OpcaoContaPagar.NOVOS, OpcaoContaPagar.IMPORTAR_SEM_FORNECEDOR);
                         }
                     } else if (tab.getSelectedIndex() == 2) {
@@ -260,6 +266,7 @@ public class LinceGUI extends VRInternalFrame implements ConexaoEvent {
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkContasPagar = new vrframework.bean.checkBox.VRCheckBox();
+        txtDtInicioOutrasDespesas = new org.jdesktop.swingx.JXDatePicker();
         tabCliente = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabClienteDados = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -364,6 +371,8 @@ public class LinceGUI extends VRInternalFrame implements ConexaoEvent {
             }
         });
 
+        txtDtInicioOutrasDespesas.setEnabled(false);
+
         javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
         tabFornecedor.setLayout(tabFornecedorLayout);
         tabFornecedorLayout.setHorizontalGroup(
@@ -373,8 +382,11 @@ public class LinceGUI extends VRInternalFrame implements ConexaoEvent {
                 .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(467, Short.MAX_VALUE))
+                    .addGroup(tabFornecedorLayout.createSequentialGroup()
+                        .addComponent(chkContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtDtInicioOutrasDespesas, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(352, Short.MAX_VALUE))
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -384,8 +396,10 @@ public class LinceGUI extends VRInternalFrame implements ConexaoEvent {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(130, Short.MAX_VALUE))
+                .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtDtInicioOutrasDespesas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(128, Short.MAX_VALUE))
         );
 
         tab.addTab("Fornecedores", tabFornecedor);
@@ -558,6 +572,11 @@ public class LinceGUI extends VRInternalFrame implements ConexaoEvent {
     private void btnMigrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMigrarActionPerformed
         try {
             this.setWaitCursor();
+            if (chkContasPagar.isSelected()) {
+                if (txtDtInicioOutrasDespesas.getDate() == null) {
+                    throw new Exception("Informe a data inicial das contas a pagar!");
+                }
+            }
             importarTabelas();
 
         } catch (Exception ex) {
@@ -589,7 +608,10 @@ public class LinceGUI extends VRInternalFrame implements ConexaoEvent {
     }//GEN-LAST:event_txtLojaComplKeyReleased
 
     private void chkContasPagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkContasPagarActionPerformed
-        // TODO add your handling code here:
+        txtDtInicioOutrasDespesas.setEnabled(chkContasPagar.isSelected());
+        if (txtDtInicioOutrasDespesas.getDate() == null) {
+            txtDtInicioOutrasDespesas.setDate(new Date());
+        }
     }//GEN-LAST:event_chkContasPagarActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -618,6 +640,7 @@ public class LinceGUI extends VRInternalFrame implements ConexaoEvent {
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.panel.VRPanel tabUnificacao;
     private javax.swing.JPanel tablCreditoRotativo;
+    private org.jdesktop.swingx.JXDatePicker txtDtInicioOutrasDespesas;
     private vrframework.bean.textField.VRTextField txtLojaCompl;
     private vrframework.bean.consultaContaContabil.VRConsultaContaContabil vRConsultaContaContabil1;
     private vrframework.bean.label.VRLabel vRLabel1;
