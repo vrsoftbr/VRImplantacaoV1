@@ -4312,8 +4312,8 @@ public final class MenuGUI extends VRMdiFrame {
     }
 
     public void verificarLite() {
-        String param = Parametros.get().get("-lite");
-        if (param != null) {            
+        String param = Parametros.lite;
+        if (param != null && !"".equals(param)) {
             mnuMenu.setVisible(false);
             
             if ("lince".equals(param)) {

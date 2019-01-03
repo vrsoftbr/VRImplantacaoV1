@@ -45,6 +45,7 @@ public final class Parametros implements Iterable<Parametro>{
     private static final String IMPORTAR_BANCO_IMPLANTACAO = "IMPORTAR_BANCO_IMPLANTACAO";
     private static final String ITEM_VENDA_PADRAO = "ITEM_VENDA_PADRAO";
     private static final SimpleDateFormat DATA_FORMAT= new SimpleDateFormat("yyyy-MM-dd");
+    public static String lite;
     
     private final ParametroImportacaoDAO dao = new ParametroImportacaoDAO();
     private final MultiMap<String, String> params = new MultiMap<>();

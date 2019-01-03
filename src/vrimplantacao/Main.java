@@ -69,7 +69,7 @@ public class Main {
             SplashScreen.dispose();
             
             if (params.containsKey("-lite")) {
-                Parametros.get().put(params.get("-lite"), "-lite");
+                Parametros.lite = params.get("-lite");
             }
 
             form.setVisible(true);
