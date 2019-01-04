@@ -36,7 +36,8 @@ public enum OpcaoFornecedor {
     OBSERVACAO,
     BANCO_PADRAO,
     COMPLEMENTO,
-    CEP;
+    CEP, 
+    EMAIL, CONTATO_NOME, TIPO_CONTATO, CELULAR;
     
     private List<FornecedorIMP> listaEspecial;
 

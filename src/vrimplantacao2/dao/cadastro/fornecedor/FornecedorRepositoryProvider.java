@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
-import vrimplantacao2.vo.cadastro.fornecedor.ProdutoFornecedorVO;
 import vrimplantacao2.dao.cadastro.local.MunicipioDAO;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -12,6 +11,7 @@ import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorContatoVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorPagamentoVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorVO;
+import vrimplantacao2.vo.cadastro.fornecedor.ProdutoFornecedorVO;
 import vrimplantacao2.vo.cadastro.local.MunicipioVO;
 
 /**
@@ -113,7 +113,7 @@ public class FornecedorRepositoryProvider {
         return new FornecedorIDStack();
     }
 
-    public MultiMap<String, Void> getContatos() throws Exception {
+    public MultiMap<String, Integer> getContatos() throws Exception {
         return fornecedorContatoDAO.getContatos();
     }
     
@@ -147,5 +147,9 @@ public class FornecedorRepositoryProvider {
 
     public void resetCnpjCpf() throws Exception {
         fornecedorDAO.resetCnpjCpf(getSistema(), getLojaOrigem());
+    }
+
+    public void atualizarContato(FornecedorContatoVO contato, Set<OpcaoFornecedor> opt) throws Exception {
+        fornecedorContatoDAO.atualizar(contato, opt);
     }
 }

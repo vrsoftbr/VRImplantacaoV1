@@ -1,6 +1,5 @@
 package vrimplantacao2.dao.cadastro.fornecedor;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -29,6 +28,7 @@ import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 public class FornecedorRepository {
 
     private FornecedorRepositoryProvider provider;
+    private MultiMap<String, Integer> contatos;
 
     public FornecedorRepository(FornecedorRepositoryProvider provider) {
         this.provider = provider;
@@ -46,8 +46,9 @@ public class FornecedorRepository {
             MultiMap<String, FornecedorAnteriorVO> anteriores = provider.getAnteriores();
             Map<Long, FornecedorVO> cnpjExistentes = provider.getCnpjExistentes();
             FornecedorIDStack ids = provider.getIdsExistentes();
-            MultiMap<String, Void> contatos = provider.getContatos();
+            this.contatos = provider.getContatos();
             MultiMap<String, Void> pagamentos = provider.getPagamentos();
+            HashSet opt = new HashSet(Arrays.asList(new OpcaoFornecedor[]{ OpcaoFornecedor.CONTATOS }));
 
             provider.setStatus("Fornecedores - Gravando...");
             provider.setMaximum(filtrados.size());
@@ -94,7 +95,7 @@ public class FornecedorRepository {
                 }
 
                 if (vo != null) {
-                    processarContatos(imp, vo, contatos);
+                    processarContatos(imp, vo, opt);
 
                     for (Integer condicao : imp.getCondicoesPagamentos()) {
                         provider.gravarCondicaoPagamento(vo.getId(), condicao);
@@ -126,7 +127,7 @@ public class FornecedorRepository {
             provider.begin();
 
             MultiMap<String, FornecedorAnteriorVO> anteriores = provider.getAnteriores();
-            MultiMap<String, Void> contatos = provider.getContatos();
+            this.contatos = provider.getContatos();
             MultiMap<String, Void> pagamentos = provider.getPagamentos();
 
             provider.setStatus("Fornecedores - Gravando...");
@@ -160,31 +161,8 @@ public class FornecedorRepository {
                         vo.setCnpj(anterior.getCodigoAtual().getId());
                     }
 
-                    if (opt.contains(OpcaoFornecedor.TELEFONE)
-                            || (opt.contains(OpcaoFornecedor.TIPO_INSCRICAO))
-                            || (opt.contains(OpcaoFornecedor.RAZAO_SOCIAL))
-                            || (opt.contains(OpcaoFornecedor.NOME_FANTASIA))
-                            || (opt.contains(OpcaoFornecedor.ENDERECO))
-                            || (opt.contains(OpcaoFornecedor.BAIRRO))
-                            || (opt.contains(OpcaoFornecedor.SITUACAO_CADASTRO))
-                            || (opt.contains(OpcaoFornecedor.TIPO_EMPRESA))
-                            || (opt.contains(OpcaoFornecedor.CNPJ_CPF))
-                            || (opt.contains(OpcaoFornecedor.INSCRICAO_ESTADUAL))
-                            || (opt.contains(OpcaoFornecedor.BAIRRO))
-                            || (opt.contains(OpcaoFornecedor.MUNICIPIO))
-                            || (opt.contains(OpcaoFornecedor.TIPO_FORNECEDOR))
-                            || (opt.contains(OpcaoFornecedor.TIPO_EMPRESA))
-                            || (opt.contains(OpcaoFornecedor.TIPO_PAGAMENTO))
-                            || (opt.contains(OpcaoFornecedor.OBSERVACAO))
-                            || (opt.contains(OpcaoFornecedor.BANCO_PADRAO))
-                            || (opt.contains(OpcaoFornecedor.COMPLEMENTO))
-                            || (opt.contains(OpcaoFornecedor.CEP))) {
-                        atualizarFornecedor(vo, opt);
-                    }
-
-                    if (opt.contains(OpcaoFornecedor.CONTATOS)) {
-                        processarContatos(imp, vo, contatos);
-                    }
+                    atualizarFornecedor(vo, opt);
+                    processarContatos(imp, vo, opt);
 
                     if (opt.contains(OpcaoFornecedor.CONDICAO_PAGAMENTO2)) {
                         processarPagamentos(imp, vo, pagamentos);
@@ -257,7 +235,8 @@ public class FornecedorRepository {
             MultiMap<String, FornecedorAnteriorVO> anteriores = provider.getAnteriores();
             Map<Long, FornecedorVO> cnpjExistentes = provider.getCnpjExistentes();
             FornecedorIDStack ids = provider.getIdsExistentes();
-            MultiMap<String, Void> contatos = provider.getContatos();
+            this.contatos = provider.getContatos();
+            HashSet opt = new HashSet(Arrays.asList(new OpcaoFornecedor[]{ OpcaoFornecedor.CONTATOS }));
 
             provider.setStatus("Fornecedores - Gravando...");
             provider.setMaximum(filtrados.size());
@@ -306,7 +285,7 @@ public class FornecedorRepository {
                 }
 
                 if (vo != null) {
-                    processarContatos(imp, vo, contatos);
+                    processarContatos(imp, vo, opt);
 
                     for (Integer condicao : imp.getCondicoesPagamentos()) {
                         provider.gravarCondicaoPagamento(vo.getId(), condicao);
@@ -327,11 +306,12 @@ public class FornecedorRepository {
         }
     }
 
-    public void processarContatos(FornecedorIMP imp, FornecedorVO vo, MultiMap<String, Void> contatos) throws Exception {
+    public void processarContatos(FornecedorIMP imp, FornecedorVO vo, Set<OpcaoFornecedor> opt) throws Exception {
         for (FornecedorContatoIMP impCont : imp.getContatos().values()) {
             //Converte o IMP em VO
             FornecedorContatoVO contato = converterContatoFornecedor(impCont);
             contato.setFornecedor(vo);
+            
             //Se houver algum contato cadastrado com essa assinatura,
             //Não executa a rotina
             if (!contatos.containsKey(
@@ -341,15 +321,26 @@ public class FornecedorRepository {
                     contato.getCelular(),
                     contato.getEmail()
             )) {
-                gravarFornecedorContato(contato);
-                contatos.put(
-                        null,
+                if (opt.contains(OpcaoFornecedor.CONTATOS)) {
+                    gravarFornecedorContato(contato);
+                    contatos.put(
+                            contato.getId(),
+                            String.valueOf(contato.getFornecedor().getId()),
+                            contato.getNome(),
+                            contato.getTelefone(),
+                            contato.getCelular(),
+                            contato.getEmail()
+                    );
+                }
+            } else {
+                contato.setId(contatos.get(
                         String.valueOf(contato.getFornecedor().getId()),
                         contato.getNome(),
                         contato.getTelefone(),
                         contato.getCelular(),
                         contato.getEmail()
-                );
+                ));
+                provider.atualizarContato(contato, opt);
             }
         }
     }
