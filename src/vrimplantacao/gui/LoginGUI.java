@@ -19,6 +19,7 @@ import vrimplantacao.dao.cadastro.UsuarioDAO;
 import vrimplantacao.vo.loja.FornecedorVO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao.vo.loja.UsuarioVO;
+import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.parametro.Versao;
 
 public class LoginGUI extends VRDialog {
@@ -50,7 +51,12 @@ public class LoginGUI extends VRDialog {
             throw new VRException("Informe a loja!");
         }
 
-        oUsuario = new UsuarioDAO().autenticar(txtUsuario.getText(), txtSenha.getText(), cboLoja.getId());
+        if (Parametros.lite != null && !"".equals(Parametros.lite)) {
+            oUsuario = new UsuarioVO();
+            oUsuario.setNome("VR LITE");
+        } else {
+            oUsuario = new UsuarioDAO().autenticar(txtUsuario.getText(), txtSenha.getText(), cboLoja.getId());
+        }
 
         new PropertiesDAO().carregarConfiguracao(new Properties(Util.getRoot() + "vr/implantacao/vrimplantacao.properties"));
 
