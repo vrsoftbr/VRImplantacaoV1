@@ -52,8 +52,12 @@ public class LoginGUI extends VRDialog {
         }
 
         if (Parametros.lite != null && !"".equals(Parametros.lite)) {
-            oUsuario = new UsuarioVO();
-            oUsuario.setNome("VR LITE");
+            if (txtUsuario.getText().equals("LITE") && txtSenha.getText().equals("VRLITE")) {
+                oUsuario = new UsuarioVO();
+                oUsuario.setNome("VR LITE");
+            } else {
+                throw new VRException("Usuário e/ou senha inválido(s)");
+            }
         } else {
             oUsuario = new UsuarioDAO().autenticar(txtUsuario.getText(), txtSenha.getText(), cboLoja.getId());
         }
