@@ -83,9 +83,6 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
             s.add(OpcaoProduto.PRODUTOS);
             s.add(OpcaoProduto.EAN);
             s.add(OpcaoProduto.EAN_EM_BRANCO);
-            s.add(OpcaoProduto.PRECO);
-            s.add(OpcaoProduto.CUSTO);
-            s.add(OpcaoProduto.ESTOQUE);
         }
         
         return s;
