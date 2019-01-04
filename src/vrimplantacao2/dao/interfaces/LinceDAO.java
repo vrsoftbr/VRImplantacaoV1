@@ -339,47 +339,22 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setUf(rst.getString("UF"));
                     imp.setTel_principal(rst.getString("TELEFONE"));
                     imp.setObservacao(rst.getString("OBS"));
-
-                    if ((rst.getString("FAX") != null)
-                            && (!rst.getString("FAX").trim().isEmpty())) {
-                        imp.addContato(
-                                "FAX",
-                                rst.getString("FAX"),
-                                null,
-                                TipoContato.COMERCIAL,
-                                null
-                        );
-                    }
-                    if ((rst.getString("EMAIL") != null)
-                            && (!rst.getString("EMAIL").trim().isEmpty())) {
-                        imp.addContato(
-                                null,
-                                null,
-                                null,
-                                TipoContato.NFE,
-                                rst.getString("EMAIL").toLowerCase()
-                        );
-                    }
-                    if ((rst.getString("TEL_CONTATO") != null)
-                            && (!rst.getString("TEL_CONTATO").trim().isEmpty())) {
-                        imp.addContato(
-                                rst.getString("CONTATO"),
-                                rst.getString("TEL_CONTATO"),
-                                null,
-                                TipoContato.COMERCIAL,
-                                null
-                        );
-                    }
-                    if ((rst.getString("TEL_REPRESENTANTE") != null)
-                            && (!rst.getString("TEL_REPRESENTANTE").trim().isEmpty())) {
-                        imp.addContato(
-                                rst.getString("REPRESENTANTE"),
-                                rst.getString("TEL_REPRESENTANTE"),
-                                null,
-                                TipoContato.COMERCIAL,
-                                null
-                        );
-                    }
+                    imp.addTelefone("FAX", rst.getString("FAX"));
+                    imp.addEmail("NFE", rst.getString("EMAIL"), TipoContato.NFE);
+                    imp.addContato(
+                            rst.getString("CONTATO"),
+                            rst.getString("TEL_CONTATO"),
+                            null,
+                            TipoContato.COMERCIAL,
+                            null
+                    );
+                    imp.addContato(
+                            rst.getString("REPRESENTANTE"),
+                            rst.getString("TEL_REPRESENTANTE"),
+                            null,
+                            TipoContato.COMERCIAL,
+                            null
+                    );
                     result.add(imp);
                 }
             }

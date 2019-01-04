@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.ProdutoVO;
@@ -26,6 +27,8 @@ import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
  * @author Leandro
  */
 public class FornecedorRepository {
+    
+    private static final Logger LOG = Logger.getLogger(FornecedorRepository.class.getName());
 
     private FornecedorRepositoryProvider provider;
     private MultiMap<String, Integer> contatos;
@@ -308,6 +311,7 @@ public class FornecedorRepository {
 
     public void processarContatos(FornecedorIMP imp, FornecedorVO vo, Set<OpcaoFornecedor> opt) throws Exception {
         for (FornecedorContatoIMP impCont : imp.getContatos().values()) {
+            StringBuilder log = new StringBuilder("|Fornecedor|").append(imp.getImportId()).append("|");
             //Converte o IMP em VO
             FornecedorContatoVO contato = converterContatoFornecedor(impCont);
             contato.setFornecedor(vo);
@@ -321,6 +325,7 @@ public class FornecedorRepository {
                     contato.getCelular(),
                     contato.getEmail()
             )) {
+                log.append("contato não existe||");
                 if (opt.contains(OpcaoFornecedor.CONTATOS)) {
                     gravarFornecedorContato(contato);
                     contatos.put(
@@ -331,6 +336,7 @@ public class FornecedorRepository {
                             contato.getCelular(),
                             contato.getEmail()
                     );
+                    log.append("inserido|");
                 }
             } else {
                 contato.setId(contatos.get(
@@ -340,8 +346,11 @@ public class FornecedorRepository {
                         contato.getCelular(),
                         contato.getEmail()
                 ));
+                log.append("contato existe|").append(contato.getId()).append("|");
                 provider.atualizarContato(contato, opt);
+                log.append("atualizado|");
             }
+            LOG.fine(log.toString());
         }
     }
 

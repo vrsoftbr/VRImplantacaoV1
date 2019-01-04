@@ -3,12 +3,15 @@ package vrimplantacao2.dao.cadastro.fornecedor;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Set;
+import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorContatoVO;
 
-public class FornecedorContatoDAO {    
+public class FornecedorContatoDAO {
+    
+    private static final Logger LOG = Logger.getLogger(FornecedorContatoDAO.class.getName());
     
     public void salvar(FornecedorContatoVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
@@ -21,8 +24,10 @@ public class FornecedorContatoDAO {
             sql.put("email", vo.getEmail());
             sql.put("celular", vo.getCelular());
             sql.getReturning().add("id");
+            String strSQL = sql.getInsert();
 
-            try (ResultSet rst = stm.executeQuery(sql.getInsert())) {
+            LOG.fine("SQL: " + strSQL);
+            try (ResultSet rst = stm.executeQuery(strSQL)) {
                 if (rst.next()) {
                     vo.setId(rst.getInt("id"));
                 }
@@ -82,8 +87,13 @@ public class FornecedorContatoDAO {
                 sql.put("celular", vo.getCelular());
             }
             sql.setWhere("id = " + vo.getId());
+            String strSQL = sql.getUpdate();
+                        
             if (!sql.isEmpty()) {
-                stm.execute(sql.getUpdate());
+                stm.execute(strSQL);
+                LOG.fine("|SQL|executado|SQL: " + strSQL);
+            } else {
+                LOG.fine("|SQL|não executado|SQL: " + strSQL);
             }
         }
     }

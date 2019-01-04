@@ -173,6 +173,9 @@ public class LinceGUI extends VRInternalFrame implements ConexaoEvent {
                         }
                         {
                             List<OpcaoFornecedor> opcoes = new ArrayList<>();
+                            if (chkContatos.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.CONTATOS);
+                            }
                             if (chkRazaoSocial.isSelected()) {
                                 opcoes.add(OpcaoFornecedor.RAZAO_SOCIAL);
                             }
