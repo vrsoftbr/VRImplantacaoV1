@@ -115,12 +115,20 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                           <Component id="jLabel1" min="-2" pref="132" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="btnMapaTribut" alignment="0" min="-2" pref="235" max="-2" attributes="0"/>
-                              <Component id="chkManterBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="btnMapaTribut" alignment="0" min="-2" pref="235" max="-2" attributes="0"/>
+                                      <Component id="chkManterBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="chkNaoTransformarEANemUN" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
-                          <EmptySpace min="0" pref="188" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="139" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -129,15 +137,19 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="jLabel1" max="32767" attributes="0"/>
+                                  <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
                                   <Component id="chkManterBalanca" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="btnMapaTribut" min="-2" pref="31" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="11" max="32767" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkNaoTransformarEANemUN" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
-                              <Component id="jLabel1" max="32767" attributes="0"/>
                           </Group>
-                          <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -168,6 +180,15 @@
                     <Property name="text" type="java.lang.String" value="PRODUTOS"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                       <Dimension value="[132, 14]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNaoTransformarEANemUN">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="N&#xe3;o transformar produtos com EAN v&#xe1;lido em unit&#xe1;rio"/>
+                    <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;Em alguns sistemas o produto pode ser vendido tanto pelo EAN13 quanto na balan&#xe7;a.&lt;br&gt;&#xa;Isso para o VR pode causar problemas, por essa raz&#xe3;o o VRImplanta&#xe7;&#xe3;o trata esse&lt;br&gt;&#xa;produto com EAN e o converte em unit&#xe1;rio.&lt;br&gt;&#xa;&lt;br&gt;&#xa;&lt;b&gt;Ao marcar esta op&#xe7;&#xe3;o, o sistema ignora o EAN e fixa o que for passado como unidade.&lt;/b&gt;&#xa;&lt;/html&gt;"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
                     </Property>
                   </Properties>
                 </Component>

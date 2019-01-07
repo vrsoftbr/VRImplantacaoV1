@@ -48,6 +48,8 @@ public class ProdutoRepository {
     private final ProdutoRepositoryProvider provider;
     private static final SimpleDateFormat DATA_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
+    private boolean naoTransformarEANemUN = false;
+    
     public ProdutoRepository(ProdutoRepositoryProvider provider) {
         this.provider = provider;
     }
@@ -93,6 +95,10 @@ public class ProdutoRepository {
             System.gc();
 
             ProdutoIDStack idStack = provider.getIDStack();
+            
+            if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN)) {
+                this.naoTransformarEANemUN = true;
+            }
 
             setNotify("Gravando os produtos...", organizados.size());
             for (KeyList<String> keys : organizados.keySet()) {
@@ -226,92 +232,6 @@ public class ProdutoRepository {
             throw e;
         }
     }
-
-    public void salvarPdvVr(List<ProdutoIMP> produtos) throws Exception {
-        LOG.finest("Abrindo a transação");
-        begin();
-        try {
-            /**
-             * Organizando a listagem de dados antes de efetuar a gravação.
-             */
-            System.gc();
-            MultiMap<String, ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
-            produtos.clear();
-            System.gc();
-
-            Map<Integer, ProdutoVO> produtosGravados = provider.getProdutos();
-            Map<Long, Integer> eansCadastrados = provider.getEansCadastrados();
-
-            setNotify("Gravando os produtos Pdv VR...", organizados.size());
-            for (KeyList<String> keys : organizados.keySet()) {
-                ProdutoIMP imp = organizados.get(keys);
-
-                //<editor-fold defaultstate="collapsed" desc="Preparando variáveis">
-                int id;
-                long ean;
-                String strID;
-                boolean eBalanca;
-                TipoEmbalagem unidade;
-                {
-                    SetUpVariaveisTO to = setUpVariaveis(imp);
-                    ean = to.ean;
-                    strID = to.strID;
-                    eBalanca = to.eBalanca;
-                    unidade = to.unidade;
-                }
-                //</editor-fold>
-
-                
-                ProdutoVO produtoGravado = produtosGravados.get(Integer.parseInt(keys.get(2)));
-                
-                ProdutoAnteriorVO anterior = null;
-                
-                if (produtoGravado == null) {
-                    
-                    id = Integer.parseInt(imp.getImportId());
-
-                    produtoGravado = converterIMP(imp, id, ean, unidade, eBalanca);
-
-                    anterior = converterImpEmAnterior(imp);
-                    anterior.setCodigoAtual(produtoGravado);
-                    ProdutoComplementoVO complemento = converterComplemento(imp);
-                    complemento.setProduto(produtoGravado);
-                    ProdutoAliquotaVO aliquota = converterAliquota(imp);
-                    aliquota.setProduto(produtoGravado);
-
-                    provider.salvar(produtoGravado);
-                    provider.anterior().salvar(anterior);
-                    provider.complemento().salvar(complemento, false);
-                    provider.aliquota().salvar(aliquota);
-                    
-                    produtosGravados.put(produtoGravado.getId(), produtoGravado);
-                }
-                if (!eansCadastrados.containsKey(ean)) {
-                    if (Integer.parseInt(imp.getImportId()) > 0 && Long.parseLong(imp.getEan()) > 0) { //ID e EAN válidos
-                        if (!provider.automacao().cadastrado(ean)) {
-                            ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
-                            automacao.setProduto(produtoGravado);
-                            provider.automacao().salvar(automacao);
-                            eansCadastrados.put(ean, produtoGravado.getId());
-                        }
-                    }
-                }
-                
-                notificar();
-            }
-
-            for (LojaVO loja : provider.getLojas()) {
-                if (loja.getId() != getLojaVR()) {
-                    provider.complemento().copiarProdutoComplemento(getLojaVR(), loja.getId());
-                }
-            }
-            commit();
-        } catch (Exception e) {
-            rollback();
-            LOG.log(Level.SEVERE, "Erro ao importar os produtos", e);
-            throw e;
-        }
-    }
     
     public void atualizar(List<ProdutoIMP> produtos, OpcaoProduto... opcoes) throws Exception {
 
@@ -320,6 +240,9 @@ public class ProdutoRepository {
         Set<OpcaoProduto> optComLista = new LinkedHashSet<>();
         Set<OpcaoProduto> optSimples = new LinkedHashSet<>();
         for (OpcaoProduto opt : opcoes) {
+            if (opt == OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN) {
+                this.naoTransformarEANemUN = true;
+            }
             if (opt.getListaEspecial() != null && !opt.getListaEspecial().isEmpty()) {
                 optComLista.add(opt);
             } else {
@@ -479,6 +402,9 @@ public class ProdutoRepository {
             ProdutoIDStack idStack = provider.getIDStack();
 
             boolean unificarProdutoBalanca = provider.getOpcoes().contains(OpcaoProduto.UNIFICAR_PRODUTO_BALANCA);
+            if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN)) {
+                this.naoTransformarEANemUN = true;
+            }
 
             setNotify("Gravando os produtos...", organizados.size());
             for (KeyList<String> keys : organizados.keySet()) {
@@ -618,6 +544,9 @@ public class ProdutoRepository {
             ProdutoIDStack idStack = provider.getIDStack();
 
             boolean unificarProdutoBalanca = provider.getOpcoes().contains(OpcaoProduto.UNIFICAR_PRODUTO_BALANCA);
+            if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN)) {
+                this.naoTransformarEANemUN = true;
+            }
 
             setNotify("Gravando os produtos 2...", organizados.size());
             for (KeyList<String> keys : organizados.keySet()) {
@@ -1488,7 +1417,7 @@ public class ProdutoRepository {
 
         //<editor-fold defaultstate="collapsed" desc="Tratando EAN">  
         if (to.eBalanca || to.unidade == TipoEmbalagem.KG) {
-            if (to.ean > 999999) {
+            if (to.ean > 999999 && !naoTransformarEANemUN) {
                 to.eBalanca = false;
                 to.unidade = TipoEmbalagem.UN;
             } else {

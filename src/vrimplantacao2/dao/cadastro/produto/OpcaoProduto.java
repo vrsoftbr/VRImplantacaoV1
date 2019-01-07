@@ -234,8 +234,37 @@ public enum OpcaoProduto {
             return "Fabricação Própria";
         }
     },
-    FAMILIA_PRODUTO, PRODUTOS, EAN, EAN_EM_BRANCO, MERCADOLOGICO_PRODUTO, RECEITA_BALANCA, NUTRICIONAL, COMPRADOR, MAPA_TRIBUTACAO,
-    IMPORTAR_RESETAR_BALANCA, IMPORTAR_GERAR_SUBNIVEL_MERC, IMPORTAR_MANTER_BALANCA, UNIFICAR_PRODUTO_BALANCA, OFERTA, PAUTA_FISCAL, ASSOCIADO, MERCADOLOGICO_POR_NIVEL_REPLICAR, MERCADOLOGICO_POR_NIVEL, MERCADOLOGICO_NAO_EXCLUIR, INVENTARIO, PESO_BRUTO, PESO_LIQUIDO, IMPORTAR_PDV_VR;
+    FAMILIA_PRODUTO, 
+    PRODUTOS, 
+    EAN, 
+    EAN_EM_BRANCO, 
+    MERCADOLOGICO_PRODUTO, 
+    RECEITA_BALANCA, 
+    NUTRICIONAL, 
+    COMPRADOR, 
+    MAPA_TRIBUTACAO,
+    IMPORTAR_RESETAR_BALANCA, 
+    IMPORTAR_GERAR_SUBNIVEL_MERC, 
+    IMPORTAR_MANTER_BALANCA, 
+    UNIFICAR_PRODUTO_BALANCA, 
+    OFERTA, 
+    PAUTA_FISCAL, 
+    ASSOCIADO, 
+    MERCADOLOGICO_POR_NIVEL_REPLICAR, 
+    MERCADOLOGICO_POR_NIVEL, 
+    MERCADOLOGICO_NAO_EXCLUIR, 
+    INVENTARIO, 
+    PESO_BRUTO, 
+    PESO_LIQUIDO, 
+    IMPORTAR_PDV_VR,
+    /**
+        Em alguns sistemas o produto pode ser vendido tanto pelo EAN13 quanto na balança.
+        Isso para o VR pode causar problemas, por essa razão o VRImplantação trata esse
+        produto com EAN e o converte em unitário.<br>
+        <br>
+        <b>Ao marcar esta opção, o sistema ignora o EAN e fixa o que for passado como unidade.</b>
+     */
+    IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN;
 
     public static Set<OpcaoProduto> getAll() {
         return new HashSet<>(Arrays.asList(OpcaoProduto.values()));
@@ -244,6 +273,7 @@ public enum OpcaoProduto {
     public static Set<OpcaoProduto> getProduto() {
         Set<OpcaoProduto> result = new HashSet<>();
         
+        result.add(IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN);
         result.add(IMPORTAR_MANTER_BALANCA);
         result.add(PRODUTOS);
         result.add(EAN);

@@ -33,6 +33,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         tabParametros.removeAll();
                 
         chkManterBalanca.setVisible(opt.contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA));
+        chkNaoTransformarEANemUN.setVisible(opt.contains(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN));
                 
         if (
                 opt.contains(OpcaoProduto.MERCADOLOGICO_PRODUTO) ||
@@ -219,6 +220,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
         btnMapaTribut = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
         jLabel1 = new javax.swing.JLabel();
+        chkNaoTransformarEANemUN = new vrframework.bean.checkBox.VRCheckBox();
         pnlOptAssociado = new vrframework.bean.panel.VRPanel();
         jLabel2 = new javax.swing.JLabel();
         chkInverterAssociado = new vrframework.bean.checkBox.VRCheckBox();
@@ -348,6 +350,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, "PRODUTOS");
         jLabel1.setPreferredSize(new java.awt.Dimension(132, 14));
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkNaoTransformarEANemUN, "Não transformar produtos com EAN válido em unitário");
+        chkNaoTransformarEANemUN.setToolTipText("<html>\nEm alguns sistemas o produto pode ser vendido tanto pelo EAN13 quanto na balança.<br>\nIsso para o VR pode causar problemas, por essa razão o VRImplantação trata esse<br>\nproduto com EAN e o converte em unitário.<br>\n<br>\n<b>Ao marcar esta opção, o sistema ignora o EAN e fixa o que for passado como unidade.</b>\n</html>");
+        chkNaoTransformarEANemUN.setEnabled(true);
+
         javax.swing.GroupLayout pnlOptProdutoLayout = new javax.swing.GroupLayout(pnlOptProduto);
         pnlOptProduto.setLayout(pnlOptProdutoLayout);
         pnlOptProdutoLayout.setHorizontalGroup(
@@ -355,11 +361,16 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             .addGroup(pnlOptProdutoLayout.createSequentialGroup()
                 .addGap(5, 5, 5)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(5, 5, 5)
                 .addGroup(pnlOptProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnMapaTribut, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 188, Short.MAX_VALUE))
+                    .addGroup(pnlOptProdutoLayout.createSequentialGroup()
+                        .addGap(5, 5, 5)
+                        .addGroup(pnlOptProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnMapaTribut, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(pnlOptProdutoLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(chkNaoTransformarEANemUN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(0, 139, Short.MAX_VALUE))
         );
         pnlOptProdutoLayout.setVerticalGroup(
             pnlOptProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -367,12 +378,15 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addGap(5, 5, 5)
                 .addGroup(pnlOptProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlOptProdutoLayout.createSequentialGroup()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(5, 5, 5))
+                    .addGroup(pnlOptProdutoLayout.createSequentialGroup()
                         .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnMapaTribut, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 11, Short.MAX_VALUE))
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(5, 5, 5))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkNaoTransformarEANemUN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
 
         tabParametros.add(pnlOptProduto);
@@ -934,6 +948,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     public vrframework.bean.checkBox.VRCheckBox chkMercadologicoNaoExcluir;
     public vrframework.bean.checkBox.VRCheckBox chkMercadologicoPorNivelReplicar;
+    public vrframework.bean.checkBox.VRCheckBox chkNaoTransformarEANemUN;
     public vrframework.bean.checkBox.VRCheckBox chkNatReceita;
     public vrframework.bean.checkBox.VRCheckBox chkNcm;
     public vrframework.bean.checkBox.VRCheckBox chkNutricionalFilizola;
@@ -1063,8 +1078,16 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             }
 
             if (chkProdutos.isSelected()) {
-                importador.importarProduto(chkManterBalanca.isSelected());
+                List<OpcaoProduto> opt = new ArrayList<>();
+                if (chkNaoTransformarEANemUN.isSelected()) {
+                    opt.add(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN);
+                }
+                if (chkManterBalanca.isSelected()) {
+                    opt.add(OpcaoProduto.IMPORTAR_MANTER_BALANCA);
+                }                
+                importador.importarProduto(opt.toArray(new OpcaoProduto[]{}));
             }
+            
             if (chkPautaFiscal.isSelected()) {
                 
                 List<OpcaoFiscal> opcoes = new ArrayList<>();
@@ -1179,6 +1202,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
                 if (chkFabricacaoPropria.isSelected()) {
                     opcoes.add(OpcaoProduto.FABRICACAO_PROPRIA);
+                }
+                if (chkNaoTransformarEANemUN.isSelected()) {
+                    opt.add(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN);
                 }
                 if (!opcoes.isEmpty()) {
                     importador.atualizarProdutos(opcoes);
