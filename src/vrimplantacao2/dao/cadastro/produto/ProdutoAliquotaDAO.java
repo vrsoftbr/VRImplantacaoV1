@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import vrframework.classe.Conexao;
+import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.ProdutoAliquotaVO;
@@ -26,6 +27,9 @@ public class ProdutoAliquotaDAO {
                 sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
                 sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
                 sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
+                if (!Versao.menorQue(3,18,3)) {
+                    sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
+                }
 
                 sql.getReturning().add("id");
 
@@ -56,6 +60,9 @@ public class ProdutoAliquotaDAO {
             sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
             sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
             sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
+            if (!Versao.menorQue(3,18,3)) {
+                sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
+            }
 
             sql.getReturning().add("id");
 
@@ -82,11 +89,17 @@ public class ProdutoAliquotaDAO {
                     sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
                     sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
                     sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
+                    if (!Versao.menorQue(3,18,3)) {
+                        sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
+                    }
                 } else if (opt.contains(OpcaoProduto.ICMS_FORNECEDOR)) {
                     sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCredito().getId());
                 } else if (opt.contains(OpcaoProduto.ICMS_ENTRADA)) {
                     sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
                     sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
+                    if (!Versao.menorQue(3,18,3)) {
+                        sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
+                    }
                 } else if (opt.contains(OpcaoProduto.ICMS_SAIDA)) {
                     sql.put("id_aliquotadebito", vo.getAliquotaDebito().getId());
                     sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
@@ -116,6 +129,9 @@ public class ProdutoAliquotaDAO {
                 sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
                 sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
                 sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
+                if (!Versao.menorQue(3,18,3)) {
+                    sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
+                }
             } else if (opt.contains(OpcaoProduto.ICMS_FORNECEDOR)) {
                 sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
                 sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoFornecedor()); //Caso especifico para importação do Arius (Cliente Ameripan)                
@@ -129,6 +145,9 @@ public class ProdutoAliquotaDAO {
             } else if (opt.contains(OpcaoProduto.ICMS_ENTRADA)) {
                 sql.put("id_aliquotacredito", vo.getAliquotaCredito().getId());
                 sql.put("id_aliquotacreditoforaestado", vo.getAliquotaCreditoForaEstado().getId());
+                if (!Versao.menorQue(3,18,3)) {
+                    sql.put("id_aliquotacreditocusto", vo.getAliquotaCredito().getId());
+                }
             } else if (opt.contains(OpcaoProduto.ICMS_SAIDA)) {
                 sql.put("id_aliquotadebito", vo.getAliquotaDebito().getId());
                 sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());

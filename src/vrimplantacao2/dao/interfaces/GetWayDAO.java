@@ -76,6 +76,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
     public boolean usaMargemLiquidaPraticada = false;
     private boolean desconsiderarSetorBalanca = false;
     private boolean pesquisarKGnaDescricao;
+    private boolean utilizarIdIcmsNaEntrada = false;
 
     public void setUsarQtdEmbDoProduto(boolean usarQtdEmbDoProduto) {
         this.usarQtdEmbDoProduto = usarQtdEmbDoProduto;
@@ -365,39 +366,41 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_natrec"));
 
                     imp.setIcmsDebitoId(rst.getString("icms_saida_id"));
-
-                    imp.setIcmsCstEntrada(Utils.stringToInt(rst.getString("icms_cst_entrada")));
-                    imp.setIcmsAliqEntrada(Utils.stringToDouble(rst.getString("icms_aliquota_entrada")));
-                    imp.setIcmsReducaoEntrada(Utils.stringToDouble(rst.getString("icms_reduzido_entrada")));
-
-                    if (imp.getIcmsCstEntrada() != 20) {
-                        imp.setIcmsReducaoEntrada(0);
-                    }
-                    if (imp.getIcmsCstEntrada() != 0
-                            && imp.getIcmsCstEntrada() != 10
-                            && imp.getIcmsCstEntrada() != 20
-                            && imp.getIcmsCstEntrada() != 70) {
-                        imp.setIcmsAliqEntrada(0);
-                        imp.setIcmsReducaoEntrada(0);
-                    }
-
-                    String str = (imp.getImportId() + " - ICMS Entrada: "
-                            + imp.getIcmsCstEntrada() + " - "
-                            + MathUtils.trunc(imp.getIcmsAliqEntrada(), 2) + " - "
-                            + MathUtils.trunc(imp.getIcmsReducaoEntrada(), 1));
-
-                    if (!icms.containsKey(
-                            imp.getIcmsCstEntrada(),
-                            MathUtils.trunc(imp.getIcmsAliqEntrada(), 2),
-                            MathUtils.trunc(imp.getIcmsReducaoEntrada(), 1)
-                    )) {
+                    if (this.utilizarIdIcmsNaEntrada) {
                         imp.setIcmsCreditoId(imp.getIcmsDebitoId());
                     } else {
-                        imp.setIcmsCreditoId(null);
-                        str += " - Encontrou";
-                    }
+                        imp.setIcmsCstEntrada(Utils.stringToInt(rst.getString("icms_cst_entrada")));
+                        imp.setIcmsAliqEntrada(Utils.stringToDouble(rst.getString("icms_aliquota_entrada")));
+                        imp.setIcmsReducaoEntrada(Utils.stringToDouble(rst.getString("icms_reduzido_entrada")));
 
-                    LOG.finest(str);
+                        if (imp.getIcmsCstEntrada() != 20) {
+                            imp.setIcmsReducaoEntrada(0);
+                        }
+                        if (imp.getIcmsCstEntrada() != 0
+                                && imp.getIcmsCstEntrada() != 10
+                                && imp.getIcmsCstEntrada() != 20
+                                && imp.getIcmsCstEntrada() != 70) {
+                            imp.setIcmsAliqEntrada(0);
+                            imp.setIcmsReducaoEntrada(0);
+                        }
+
+                        String str = (imp.getImportId() + " - ICMS Entrada: "
+                                + imp.getIcmsCstEntrada() + " - "
+                                + MathUtils.trunc(imp.getIcmsAliqEntrada(), 2) + " - "
+                                + MathUtils.trunc(imp.getIcmsReducaoEntrada(), 1));
+
+                        if (!icms.containsKey(
+                                imp.getIcmsCstEntrada(),
+                                MathUtils.trunc(imp.getIcmsAliqEntrada(), 2),
+                                MathUtils.trunc(imp.getIcmsReducaoEntrada(), 1)
+                        )) {
+                            imp.setIcmsCreditoId(imp.getIcmsDebitoId());
+                        } else {
+                            imp.setIcmsCreditoId(null);
+                            str += " - Encontrou";
+                        }
+                        LOG.finest(str);
+                    }
 
                     if (desconsiderarSetorBalanca) {
                         String st = Utils.acertarTexto(rst.getString("unidade"), 2);
@@ -1386,6 +1389,15 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setPesquisarKGnaDescricao(boolean pesquisarKGnaDescricao) {
         this.pesquisarKGnaDescricao = pesquisarKGnaDescricao;
+    }
+
+    /**
+     * Caso seja true, a aplicação copia o id do icms fixado na saída, para a 
+     * entrada dos produtos também.
+     * @param utilizarIdIcmsNaEntrada 
+     */
+    public void setUtilizarIdIcmsNaEntrada(boolean utilizarIdIcmsNaEntrada) {
+        this.utilizarIdIcmsNaEntrada = utilizarIdIcmsNaEntrada;
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {
