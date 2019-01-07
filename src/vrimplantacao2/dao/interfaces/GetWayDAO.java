@@ -77,6 +77,11 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
     private boolean desconsiderarSetorBalanca = false;
     private boolean pesquisarKGnaDescricao;
     private boolean utilizarIdIcmsNaEntrada = false;
+    private boolean utilizarEmbalagemDeCompra = false;
+
+    public void setUtilizarEmbalagemDeCompra(boolean utilizarEmbalagemDeCompra) {
+        this.utilizarEmbalagemDeCompra = utilizarEmbalagemDeCompra;
+    }
 
     public void setUsarQtdEmbDoProduto(boolean usarQtdEmbDoProduto) {
         this.usarQtdEmbDoProduto = usarQtdEmbDoProduto;
@@ -251,7 +256,9 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	ean.ean,\n" +
                     "	case when prod.qtd_emb < 1 then 1 else prod.qtd_emb end qtdembalagemcotacao,\n" +
                     "	ean.qtdembalagem,\n" +
+                    "	ean.qtdembalagem,\n" +
                     "	prod.unidade,\n" +
+                    "	prod.unidade_comp,\n" +
                     "	case when prod.codsetor is null then 0 else 1 end e_balanca,\n" +
                     "	prod.validade,\n" +
                     "	prod.descricao descricaocompleta,\n" +
@@ -445,7 +452,11 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                         }
                     } else {
                         imp.seteBalanca((rst.getInt("e_balanca") == 1));
-                        imp.setTipoEmbalagem(rst.getString("unidade"));
+                        if (this.utilizarEmbalagemDeCompra) {
+                            imp.setTipoEmbalagem(rst.getString("unidade_comp"));
+                        } else {
+                            imp.setTipoEmbalagem(rst.getString("unidade"));
+                        }
                         imp.setValidade(rst.getInt("VALIDADE"));
                         if(imp.isBalanca()) {
                             qtdBalanca++;
