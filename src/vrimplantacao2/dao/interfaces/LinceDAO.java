@@ -254,7 +254,7 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.seteBalanca(false);
                     }
                     imp.setEan(rst.getString("ean"));
-                    if (imp.getEan().equals("789000" + String.format("%06d", rst.getInt("id")))) {
+                    if (imp.getEan().startsWith("789000" + String.format("%06d", rst.getInt("id")))) {
                         imp.setEan(imp.getImportId());
                     }
                     imp.setDescricaoCompleta(rst.getString("descricao"));
