@@ -256,7 +256,6 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	ean.ean,\n" +
                     "	case when prod.qtd_emb < 1 then 1 else prod.qtd_emb end qtdembalagemcotacao,\n" +
                     "	ean.qtdembalagem,\n" +
-                    "	ean.qtdembalagem,\n" +
                     "	prod.unidade,\n" +
                     "	prod.unidade_comp,\n" +
                     "	case when prod.codsetor is null then 0 else 1 end e_balanca,\n" +
@@ -452,17 +451,17 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                         }
                     } else {
                         imp.seteBalanca((rst.getInt("e_balanca") == 1));
-                        if (this.utilizarEmbalagemDeCompra) {
-                            imp.setTipoEmbalagem(rst.getString("unidade_comp"));
-                        } else {
-                            imp.setTipoEmbalagem(rst.getString("unidade"));
-                        }
+                        imp.setTipoEmbalagem(rst.getString("unidade"));
                         imp.setValidade(rst.getInt("VALIDADE"));
                         if(imp.isBalanca()) {
                             qtdBalanca++;
                         } else {
                             qtdNormal++;
                         }
+                    }
+                    
+                    if (this.utilizarEmbalagemDeCompra) {
+                        imp.setTipoEmbalagem(rst.getString("unidade_comp"));
                     }
 
                     vResult.add(imp);
