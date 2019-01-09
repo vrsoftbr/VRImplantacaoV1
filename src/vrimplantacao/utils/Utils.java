@@ -448,7 +448,30 @@ public class Utils {
             throw ex;
         }
     }
+    
+    public List<String> lerArquivo(String file) throws Exception {
 
+        List<String> vDadosArquivo = new ArrayList<>();
+
+        BufferedReader br = null;
+        String linha = "";
+
+        try {
+
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+
+            while ((linha = br.readLine()) != null) {
+
+                vDadosArquivo.add(linha);
+            }
+
+            return vDadosArquivo;
+
+        } catch (Exception ex) {
+
+            throw ex;
+        }
+    }
     /**
      * Determina se o valor informado é um cnpj/cpf válido.
      *

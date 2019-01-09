@@ -5,7 +5,9 @@
  */
 package vrimplantacao2.dao.interfaces;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -37,6 +39,24 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
  * @author lucasrafael
  */
 public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvider {
+
+    public void criarCabTabela(String i_arquivo, String v_arquivoCab) throws Exception {
+        Utils util = new Utils();
+        File f = new File(v_arquivoCab);
+        FileWriter fw = new FileWriter(f);
+        BufferedWriter bw = new BufferedWriter(fw);
+        List<String> vDados = util.lerArquivo(i_arquivo);
+
+        try {
+            for (int i = 0; i < vDados.size(); i++) {
+                bw.write(vDados.get(i).substring(0, vDados.get(i).indexOf("@") + 1));
+            }
+            bw.flush();
+            bw.close();
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
 
     public String v_pahtFileXls;
 
@@ -112,8 +132,8 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                     Cell cellCstPisDebito = sheet.getCell(121, i);
                     Cell cellCest = sheet.getCell(196, i);
 
-                    if ((cellData.getContents() != null) &&
-                            (!cellData.getContents().trim().isEmpty())) {
+                    if ((cellData.getContents() != null)
+                            && (!cellData.getContents().trim().isEmpty())) {
                         dataCadastro = new java.sql.Date(fmt.parse(cellData.getContents()).getTime());
                     } else {
                         dataCadastro = new Date(new java.util.Date().getTime());
@@ -161,22 +181,22 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
 
         if (opt == OpcaoProduto.PRECO) {
             try {
-                
+
                 for (int sh = 0; sh < sheets.length; sh++) {
                     Sheet sheet = arquivo.getSheet(sh);
                     linha = 0;
-                    
+
                     for (int i = 0; i < sheet.getRows(); i++) {
                         linha++;
                         if (linha == 1) {
                             continue;
                         }
-                        
+
                         Cell cellIdProduto = sheet.getCell(0, i);
                         Cell cellPreco = sheet.getCell(8, i);
 
                         strPreco = "";
-                        
+
                         if (cellPreco.getContents().length() == 9) {
                             for (int j = 0; j < cellPreco.getContents().length(); j++) {
                                 if (j == 1) {
@@ -204,7 +224,7 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                         } else {
                             strPreco = cellPreco.getContents();
                         }
-                        
+
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
@@ -218,26 +238,26 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                 throw ex;
             }
         }
-        
+
         if (opt == OpcaoProduto.CUSTO) {
 
             try {
-                
+
                 for (int sh = 0; sh < sheets.length; sh++) {
                     Sheet sheet = arquivo.getSheet(sh);
                     linha = 0;
-                    
+
                     for (int i = 0; i < sheet.getRows(); i++) {
                         linha++;
                         if (linha == 1) {
                             continue;
                         }
-                        
+
                         Cell cellIdProduto = sheet.getCell(0, i);
                         Cell cellCusto = sheet.getCell(6, i);
 
                         strCusto = "";
-                        
+
                         if (cellCusto.getContents().length() == 9) {
                             for (int j = 0; j < cellCusto.getContents().length(); j++) {
                                 if (j == 1) {
@@ -265,7 +285,7 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                         } else {
                             strCusto = cellCusto.getContents();
                         }
-                        
+
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
@@ -280,26 +300,26 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                 throw ex;
             }
         }
-        
+
         if (opt == OpcaoProduto.ESTOQUE) {
-            
+
             try {
-                
+
                 for (int sh = 0; sh < sheets.length; sh++) {
                     Sheet sheet = arquivo.getSheet(sh);
                     linha = 0;
-                    
+
                     for (int i = 0; i < sheet.getRows(); i++) {
                         linha++;
                         if (linha == 1) {
                             continue;
                         }
-                        
+
                         Cell cellIdProduto = sheet.getCell(0, i);
                         Cell cellEstoque = sheet.getCell(2, i);
 
                         strEstoque = "";
-                        
+
                         if (cellEstoque.getContents().length() == 9) {
                             for (int j = 0; j < cellEstoque.getContents().length(); j++) {
                                 if (j == 1) {
@@ -327,7 +347,7 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                         } else {
                             strEstoque = cellEstoque.getContents();
                         }
-                        
+
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
@@ -343,7 +363,7 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
         }
         return null;
     }
-    
+
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -644,8 +664,8 @@ public class SiaCriareByFileDAO extends InterfaceDAO implements MapaTributoProvi
                     Cell cellIdEmpresa = sheet.getCell(90, i);
                     Cell cellSite = sheet.getCell(110, i);
 
-                    if (("C".equals(cellTipo.getContents())) ||
-                            "A".equals(cellTipo.getContents())) {
+                    if (("C".equals(cellTipo.getContents()))
+                            || "A".equals(cellTipo.getContents())) {
 
                         dataCadastro = new Date(new java.util.Date().getTime());
 

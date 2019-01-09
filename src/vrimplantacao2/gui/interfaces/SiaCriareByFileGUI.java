@@ -93,6 +93,26 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
         }
     }
 
+    public void criarCabecalho() throws Exception {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    ProgressBar.show();
+                    ProgressBar.setCancel(true);
+                    siaDAO.criarCabTabela(txtArquivoOrigem.getArquivo(), txtArquivoDestino.getText());
+                    ProgressBar.dispose();
+                    Util.exibirMensagem("Criação de cabeçalho realizada com sucesso!", getTitle());                    
+                } catch (Exception ex) {
+                    Exceptions.printStackTrace(ex);
+                    ProgressBar.dispose();
+                    Util.exibirMensagemErro(ex, getTitle());
+                }
+            }
+        };
+        thread.start();
+    }
+    
     public void importarTabelas() throws Exception {
         Thread thread = new Thread() {
             int idLojaVR;
@@ -300,6 +320,13 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
         chkUnifProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel1 = new vrframework.bean.panel.VRPanel();
+        vRPanel4 = new vrframework.bean.panel.VRPanel();
+        vRLabel1 = new vrframework.bean.label.VRLabel();
+        txtArquivoOrigem = new vrframework.bean.fileChooser.VRFileChooser();
+        vRLabel2 = new vrframework.bean.label.VRLabel();
+        txtArquivoDestino = new vrframework.bean.textField.VRTextField();
+        btnCriarCab = new vrframework.bean.button.VRButton();
         vRPanel6 = new vrframework.bean.panel.VRPanel();
         tabsConn = new javax.swing.JTabbedPane();
         jPanel4 = new javax.swing.JPanel();
@@ -686,6 +713,69 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
 
         tabs.addTab("Unificação", vRPanel2);
 
+        vRPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Criar Cabeçalho"));
+
+        vRLabel1.setText("Arquivo Origem");
+
+        vRLabel2.setText("Arquivo Destino");
+
+        btnCriarCab.setText("Criar");
+        btnCriarCab.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCriarCabActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout vRPanel4Layout = new javax.swing.GroupLayout(vRPanel4);
+        vRPanel4.setLayout(vRPanel4Layout);
+        vRPanel4Layout.setHorizontalGroup(
+            vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtArquivoOrigem, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtArquivoDestino, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnCriarCab, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(161, Short.MAX_VALUE))
+        );
+        vRPanel4Layout.setVerticalGroup(
+            vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtArquivoOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(vRPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtArquivoDestino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnCriarCab, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(13, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
+        vRPanel1.setLayout(vRPanel1Layout);
+        vRPanel1Layout.setHorizontalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        vRPanel1Layout.setVerticalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(72, Short.MAX_VALUE))
+        );
+
+        tabs.addTab("Ferramentas", vRPanel1);
+
         vRPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Origem - Arquivo .xls"));
         vRPanel6.setPreferredSize(new java.awt.Dimension(350, 350));
 
@@ -853,8 +943,22 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
         }
     }//GEN-LAST:event_btnMapaTributActionPerformed
 
+    private void btnCriarCabActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCriarCabActionPerformed
+        // TODO add your handling code here:
+        try {
+            this.setWaitCursor();
+            criarCabecalho();
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, getTitle());
+        } finally {
+            this.setDefaultCursor();
+        }
+        
+    }//GEN-LAST:event_btnCriarCabActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
+    private vrframework.bean.button.VRButton btnCriarCab;
     private vrframework.bean.button.VRButton btnMapaTribut;
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkAtacado;
@@ -898,12 +1002,18 @@ public class SiaCriareByFileGUI extends VRInternalFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private javax.swing.JTabbedPane tabsConn;
+    private vrframework.bean.textField.VRTextField txtArquivoDestino;
+    private vrframework.bean.fileChooser.VRFileChooser txtArquivoOrigem;
     private vrframework.bean.textField.VRTextField txtDatabase;
     private vrframework.bean.textField.VRTextField txtLojaCliente;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
+    private vrframework.bean.label.VRLabel vRLabel1;
+    private vrframework.bean.label.VRLabel vRLabel2;
     private vrframework.bean.label.VRLabel vRLabel25;
+    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
+    private vrframework.bean.panel.VRPanel vRPanel4;
     private vrframework.bean.panel.VRPanel vRPanel6;
     private vrframework.bean.panel.VRPanel vRPanel7;
     private vrframework.bean.panel.VRPanel vRPanel8;
