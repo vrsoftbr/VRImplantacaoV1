@@ -14,6 +14,8 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  *
@@ -95,5 +97,100 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
             }
             return result;
         }
+    }
+
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+        ConexaoDBF.abrirConexao(i_arquivo);
+
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "m1.CODGRUPO as merc1, m1.DESCRICAO as desc_merc1, "
+                    + "m2.CODCAT as merc2, m2.DESCRICAO as desc_merc2, "
+                    + "m3.CODFAM as merc3, m3.DESCRICAO as desc_merc3 "
+                    + "from produtos p "
+                    + "left join grupos m1 on m1.CODGRUPO = p.GRUPO "
+                    + "left join categorias m2 on m2.CODCAT = p.CATEGORIA "
+                    + "left join familias m3 on m3.CODFAM = p.FAMILIA "
+                    + "order by m1.CODGRUPO, m2.CODCAT, m3.CODFAM"
+            )) {
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setMerc1ID(rst.getString("merc1"));
+                    imp.setMerc1Descricao(rst.getString("desc_merc1"));
+                    imp.setMerc2ID(rst.getString("merc2"));
+                    imp.setMerc2Descricao(rst.getString("desc_merc2"));
+                    imp.setMerc3ID(rst.getString("merc3"));
+                    imp.setMerc3Descricao(rst.getString("desc_merc3"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        ConexaoDBF.abrirConexao(i_arquivo);
+
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "CODITEM "
+                    //+ "GRUPO, "
+                    /*+ "DESCRICAO, "
+                    + "ABREVIA, "
+                    + "(CUSTO / 1000) as CUSTO, "
+                    + "(UNITARIO / 1000) as PRECO, "
+                    + "BALANCA, "
+                    + "ALIQUOTASA as ICMS, "
+                    + "UNIDADE, "
+                    + "FAMILIA, "
+                    + "CODBARRA, "
+                    + "NCM, "
+                    + "CATEGORIA, "
+                    + "ATIVO, "
+                    + "PESO_LIQUI, "
+                    + "PESO_BRUTO, "
+                    + "(QTDEMBALAG / 1000) as QTDEMB, "
+                    + "PIS, "
+                    + "COFINS, "
+                    + "MARKDOWN, "
+                    + "CEST "*/
+                    + "from produtos "
+                    + "order by CODITEM"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("CODITEM"));
+                    /*imp.setEan(rst.getString("CODBARRA"));
+                    imp.setDescricaoCompleta(rst.getString("DESCRICAO"));
+                    imp.setDescricaoReduzida(rst.getString("ABREVIA"));
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setTipoEmbalagem(rst.getString("UNIDADE"));
+                    imp.setQtdEmbalagem(rst.getInt("QTDEMB"));
+                    imp.seteBalanca("S".equals(rst.getString("BALANCA")));
+                    imp.setMargem(rst.getDouble("MARKDOWN"));
+                    imp.setPrecovenda(rst.getDouble("PRECO"));
+                    imp.setCustoComImposto(rst.getDouble("CUSTO"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setNcm(rst.getString("NCM"));
+                    imp.setCest(rst.getString("CEST"));
+                    imp.setPiscofinsCstDebito(rst.getString("PIS"));
+                    imp.setPiscofinsCstCredito(rst.getString("COFINS"));
+                    imp.setIcmsDebitoId(rst.getString("ICMS"));
+                    imp.setIcmsCreditoId(rst.getString("ICMS"));*/
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 }
