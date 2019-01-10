@@ -164,6 +164,7 @@ import vrimplantacao2.gui.interfaces.SatecfeGUI;
 import vrimplantacao2.gui.interfaces.ScefGUI;
 import vrimplantacao2.gui.interfaces.ShiGUI;
 import vrimplantacao2.gui.interfaces.SiaCriareByFileGUI;
+import vrimplantacao2.gui.interfaces.SiaCriareDbfGUI;
 import vrimplantacao2.gui.interfaces.SiacGUI;
 import vrimplantacao2.gui.interfaces.SifatGUI;
 import vrimplantacao2.gui.interfaces.SigmaGUI;
@@ -659,6 +660,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuEsSystem = new javax.swing.JMenuItem();
         mnuMSIInfor = new javax.swing.JMenuItem();
         mnuDtCom = new javax.swing.JMenuItem();
+        mnuSiaCriareDbf = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuCache = new javax.swing.JMenu();
@@ -1920,6 +1922,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuOrion.add(mnuDtCom);
+
+        mnuSiaCriareDbf.setText("SiaCriare (versão Dbf)");
+        mnuSiaCriareDbf.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSiaCriareDbfActionPerformed(evt);
+            }
+        });
+        mnuOrion.add(mnuSiaCriareDbf);
 
         jMenu2.add(mnuOrion);
 
@@ -4079,7 +4089,10 @@ public final class MenuGUI extends VRMdiFrame {
         LinceGUI.exibir(this);
     }//GEN-LAST:event_mnuLinceActionPerformed
 
-
+    private void mnuSiaCriareDbfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSiaCriareDbfActionPerformed
+        // TODO add your handling code here:
+        SiaCriareDbfGUI.exibir(this);
+    }//GEN-LAST:event_mnuSiaCriareDbfActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4267,6 +4280,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuScef;
     private javax.swing.JMenuItem mnuScripts;
     private javax.swing.JMenuItem mnuSiaCriareByFile;
+    private javax.swing.JMenuItem mnuSiaCriareDbf;
     private javax.swing.JMenuItem mnuSicom;
     private javax.swing.JMenuItem mnuSifat;
     private javax.swing.JMenuItem mnuSigma;
