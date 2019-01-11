@@ -15,6 +15,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -301,5 +302,48 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
             }
         }
         return result;
+    }
+    
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        ConexaoDBF.abrirConexao(i_arquivo);
+        
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "CODIGOCLI, "
+                    + "NOMECLI, "
+                    + "BAIRROCLI, "
+                    + "CIDADECLI, "
+                    + "ESTADOCLI, "
+                    + "CEPCLI, "
+                    + "FONECLI, "
+                    + "FAXCLI, "
+                    + "CPFCGC, "
+                    + "IDENINSC, "
+                    + "EMAIL, "
+                    + "ENDERCLI, "
+                    + "BANCO, "
+                    + "CONTA, "
+                    + "AGENCIA, "
+                    + "ATIVO, "
+                    + "RAZAO, "
+                    + "ID_CIDADE, "
+                    + "NUMERO "
+                    + "from clientes "
+                    + "where TIPO = 'F'"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("CODIGOCLI"));
+                    imp.setRazao(rst.getString("RAZAO"));
+                    imp.setFantasia(rst.getString("NOMECLI"));
+                }
+            }
+        }
+        return null;
     }
 }
