@@ -11,9 +11,9 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
-import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
+import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.cadastro.venda.VendaHistoricoIMP;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
@@ -37,6 +37,7 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.InventarioIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.NotaFiscalIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.OperadorIMP;
@@ -503,4 +504,14 @@ public abstract class InterfaceDAO {
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return OpcaoProduto.getPadrao();
     }
+    
+    /**
+     * Retorna uma lista com as notas fiscais a serem importadas.
+     * @return Lista com as notas fiscais a serem importadas.
+     * @throws Exception 
+     */
+    public List<NotaFiscalIMP> getNotasFiscais() throws Exception {
+        return new ArrayList<>();
+    }
+    
 }

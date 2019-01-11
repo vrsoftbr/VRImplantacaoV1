@@ -16,7 +16,6 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.interfaces.custom.solidus.Entidade;
-import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
@@ -28,6 +27,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.NotaFiscalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -35,7 +35,12 @@ import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
- *
+ * Senha para acessar a aplicação<br>
+ * Usuário: master<br>
+ * Senha: 1<br>
+ * <br>
+ * Aparentemente eles criptografam a senha transformando no código númerico do 
+ * charset utilizado, incrementando 1 e gravando a letra de volta.
  * @author Leandro
  */
 public class SolidusDAO extends InterfaceDAO {
@@ -47,6 +52,7 @@ public class SolidusDAO extends InterfaceDAO {
     private Date rotativoDtaFim = null;
     private Date contasDtaInicio = null;
     private Date contasDtaFim = null;
+    private Date notasDataInicio = null;
     private List<Entidade> entidadesCheques;
     private List<Entidade> entidadesCreditoRotativo;
     private List<Entidade> entidadesContas;
@@ -842,6 +848,10 @@ public class SolidusDAO extends InterfaceDAO {
         
         return builder.toString();
     }
+
+    public void setNotasDataInicio(Date notasDataInicio) {
+        this.notasDataInicio = notasDataInicio;
+    }
     
     private static class VendaIterator implements Iterator<VendaIMP> {
         
@@ -1075,5 +1085,10 @@ public class SolidusDAO extends InterfaceDAO {
         }
         
     }
+
+    @Override
+    public List<NotaFiscalIMP> getNotasFiscais() throws Exception {
+        return super.getNotasFiscais();
+    }    
     
 }
