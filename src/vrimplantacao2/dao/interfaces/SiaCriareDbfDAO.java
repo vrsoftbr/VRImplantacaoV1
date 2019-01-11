@@ -9,8 +9,10 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -141,52 +143,159 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
-                    + "CODITEM "
-                    //+ "GRUPO, "
-                    /*+ "DESCRICAO, "
-                    + "ABREVIA, "
-                    + "(CUSTO / 1000) as CUSTO, "
-                    + "(UNITARIO / 1000) as PRECO, "
-                    + "BALANCA, "
-                    + "ALIQUOTASA as ICMS, "
-                    + "UNIDADE, "
-                    + "FAMILIA, "
-                    + "CODBARRA, "
-                    + "NCM, "
-                    + "CATEGORIA, "
-                    + "ATIVO, "
-                    + "PESO_LIQUI, "
-                    + "PESO_BRUTO, "
-                    + "(QTDEMBALAG / 1000) as QTDEMB, "
-                    + "PIS, "
-                    + "COFINS, "
-                    + "MARKDOWN, "
-                    + "CEST "*/
-                    + "from produtos "
-                    + "order by CODITEM"
+                    + "p.CODITEM, "
+                    + "p.GRUPO, "
+                    + "p.DESCRICAO, "
+                    + "p.ABREVIA, "
+                    + "p.CUSTO, "
+                    + "p.UNITARIO, "
+                    + "p.BALANCA, "
+                    + "p.ALIQUOTASA as ICMS, "
+                    + "p.UNIDADE, "
+                    + "p.FAMILIA, "
+                    + "p.CODBARRA, "
+                    + "p.NCM, "
+                    + "p.CATEGORIA, "
+                    + "p.ATIVO, "
+                    + "p.PESO_LIQUI, "
+                    + "p.PESO_BRUTO, "
+                    + "(p.QTDEMBALAG / 1000) as QTDEMB, "
+                    + "p.PIS, "
+                    + "p.COFINS, "
+                    + "p.MARKDOWN, "
+                    + "p.CEST "
+                    + "from produtos p"
+            )) {
+                int cont = 0;
+                while (rst.next()) {
+                    if (rst.getString("CODITEM") != null) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("CODITEM"));
+                        imp.setEan(rst.getString("CODBARRA"));
+                        imp.setDescricaoCompleta(rst.getString("DESCRICAO"));
+                        imp.setDescricaoReduzida(rst.getString("ABREVIA"));
+                        imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                        imp.setTipoEmbalagem(rst.getString("UNIDADE"));
+                        imp.setQtdEmbalagem(rst.getInt("QTDEMB"));
+                        imp.seteBalanca("S".equals(rst.getString("BALANCA")));
+                        imp.setIdFamiliaProduto(rst.getString("FAMILIA"));
+                        imp.setMargem(rst.getDouble("MARKDOWN"));
+                        imp.setPrecovenda(rst.getDouble("UNITARIO") / 1000);
+                        imp.setCustoComImposto(rst.getDouble("CUSTO") / 1000);
+                        imp.setCustoSemImposto(imp.getCustoComImposto());
+                        imp.setNcm(rst.getString("NCM"));
+                        imp.setCest(rst.getString("CEST"));
+                        imp.setPiscofinsCstDebito(rst.getString("PIS"));
+                        imp.setPiscofinsCstCredito(rst.getString("COFINS"));
+                        imp.setIcmsDebitoId(rst.getString("ICMS"));
+                        imp.setIcmsCreditoId(rst.getString("ICMS"));
+                        result.add(imp);
+
+                        cont++;
+
+                        ProgressBar.setStatus(String.valueOf(cont));
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        ConexaoDBF.abrirConexao(i_arquivo);
+
+        if (opt == OpcaoProduto.PRECO) {
+            try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select "
+                        + "ID_PRODUTO, "
+                        + "UNITARIO "
+                        + "from estoque "
+                        + "where ID_EMPRESA = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("ID_PRODUTO"));
+                        imp.setPrecovenda(rst.getDouble("UNITARIO") / 1000);
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+
+        if (opt == OpcaoProduto.CUSTO) {
+            try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select "
+                        + "ID_PRODUTO, "
+                        + "CUSTO "
+                        + "from estoque "
+                        + "where ID_EMPRESA = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("ID_PRODUTO"));
+                        imp.setCustoComImposto(rst.getDouble("CUSTO") / 1000);
+                        imp.setCustoSemImposto(imp.getCustoComImposto());
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+
+        if (opt == OpcaoProduto.ESTOQUE) {
+            try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select "
+                        + "ID_PRODUTO, "
+                        + "QTD "
+                        + "from estoque "
+                        + "where ID_EMPRESA = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("ID_PRODUTO"));
+                        imp.setEstoque(rst.getDouble("QTD") / 1000);
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        ConexaoDBF.abrirConexao(i_arquivo);
+
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "CODEAN, "
+                    + "CODPROD "
+                    + "from codigos_ean"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("CODITEM"));
-                    /*imp.setEan(rst.getString("CODBARRA"));
-                    imp.setDescricaoCompleta(rst.getString("DESCRICAO"));
-                    imp.setDescricaoReduzida(rst.getString("ABREVIA"));
-                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    imp.setTipoEmbalagem(rst.getString("UNIDADE"));
-                    imp.setQtdEmbalagem(rst.getInt("QTDEMB"));
-                    imp.seteBalanca("S".equals(rst.getString("BALANCA")));
-                    imp.setMargem(rst.getDouble("MARKDOWN"));
-                    imp.setPrecovenda(rst.getDouble("PRECO"));
-                    imp.setCustoComImposto(rst.getDouble("CUSTO"));
-                    imp.setCustoSemImposto(imp.getCustoComImposto());
-                    imp.setNcm(rst.getString("NCM"));
-                    imp.setCest(rst.getString("CEST"));
-                    imp.setPiscofinsCstDebito(rst.getString("PIS"));
-                    imp.setPiscofinsCstCredito(rst.getString("COFINS"));
-                    imp.setIcmsDebitoId(rst.getString("ICMS"));
-                    imp.setIcmsCreditoId(rst.getString("ICMS"));*/
+                    imp.setImportId(rst.getString("CODPROD"));
+                    imp.setEan(rst.getString("CODEAN"));
                     result.add(imp);
                 }
             }
