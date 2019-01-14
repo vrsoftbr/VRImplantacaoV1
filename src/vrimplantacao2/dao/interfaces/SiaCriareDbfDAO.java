@@ -469,6 +469,8 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setCargo(rst.getString("CARGO"));
                     imp.setSalario(rst.getDouble("RENDA_TITU"));
                     imp.setValorLimite(rst.getDouble("LIMITE_CRE"));
+                    imp.setPermiteCheque(true);
+                    imp.setPermiteCreditoRotativo(true);
                     result.add(imp);
                 }
             }
