@@ -63,6 +63,7 @@ public class SigmaDAO extends InterfaceDAO {
                     OpcaoProduto.NCM,
                     OpcaoProduto.CEST,
                     OpcaoProduto.PIS_COFINS,
+                    OpcaoProduto.NATUREZA_RECEITA,
                     OpcaoProduto.ICMS,
                     OpcaoProduto.NUTRICIONAL
                 }
