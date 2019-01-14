@@ -19,6 +19,7 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -350,7 +351,7 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setBairro(rst.getString("BAIRROCLI"));
                     imp.setMunicipio(rst.getString("CIDADECLI"));
                     imp.setUf(rst.getString("ESTADOCLI"));
-                    imp.setIdBanco(rst.getInt("BANCO"));
+                    //imp.setIdBanco(rst.getInt("BANCO"));
                     imp.setTel_principal(rst.getString("FONECLI"));
                     if ((rst.getString("FAXCLI") != null)
                             && (!rst.getString("FAXCLI").trim().isEmpty())) {
@@ -372,6 +373,35 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
                                 rst.getString("EMAIL").toLowerCase()
                         );
                     }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        ConexaoDBF.abrirConexao(i_arquivo);
+
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "ID_PRODUTO, "
+                    + "ID_FORNECE, "
+                    + "NOTA as CODEXTERNO, "
+                    + "ULTIMACOMP as DATAALTERACAO "
+                    + "from produtos_fornecedores"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("ID_PRODUTO"));
+                    imp.setIdFornecedor(rst.getString("ID_FORNECE"));
+                    imp.setCodigoExterno(rst.getString("CODEXTERNO"));
+                    imp.setDataAlteracao(rst.getDate("DATAALTERACAO"));
                     result.add(imp);
                 }
             }
