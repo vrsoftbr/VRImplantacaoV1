@@ -15,6 +15,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -348,6 +349,7 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setAtivo("S".equals(rst.getString("ATIVO")));
                     imp.setEndereco(rst.getString("ENDERCLI"));
                     imp.setNumero(rst.getString("NUMERO"));
+                    imp.setCep(rst.getString("CEPCLI"));
                     imp.setBairro(rst.getString("BAIRROCLI"));
                     imp.setMunicipio(rst.getString("CIDADECLI"));
                     imp.setUf(rst.getString("ESTADOCLI"));
@@ -401,6 +403,72 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setIdFornecedor(rst.getString("ID_FORNECE"));
                     imp.setCodigoExterno(rst.getString("CODEXTERNO"));
                     imp.setDataAlteracao(rst.getDate("DATAALTERACAO"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        ConexaoDBF.abrirConexao(i_arquivo);
+
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "CODIGOCLI, "
+                    + "NOMECLI, "
+                    + "BAIRROCLI, "
+                    + "CIDADECLI, "
+                    + "ESTADOCLI, "
+                    + "CEPCLI, "
+                    + "FONECLI, "
+                    + "FAXCLI, "
+                    + "CPFCGC, "
+                    + "IDENINSC, "
+                    + "EMAIL, "
+                    + "ENDERCLI, "
+                    + "BANCO, "
+                    + "CONTA, "
+                    + "AGENCIA, "
+                    + "ATIVO, "
+                    + "RAZAO, "
+                    + "ID_CIDADE, "
+                    + "NUMERO,"
+                    + "NOMEPAI, "
+                    + "NOMEMAE,"
+                    + "OBSERVACAO, "
+                    + "CARGO, "
+                    + "RENDA_TITU, "
+                    + "LIMITE_CRE "
+                    + "from clientes "
+                    + "where TIPO = 'C'"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("CODIGOCLI"));
+                    imp.setRazao(rst.getString("RAZAO"));
+                    imp.setFantasia(rst.getString("NOMECLI"));
+                    imp.setCnpj(rst.getString("CPFCGC"));
+                    imp.setInscricaoestadual(rst.getString("IDENINSC"));
+                    imp.setAtivo("S".equals(rst.getString("ATIVO")));
+                    imp.setEndereco(rst.getString("ENDERCLI"));
+                    imp.setNumero(rst.getString("NUMERO"));
+                    imp.setCep(rst.getString("CEPCLI"));
+                    imp.setBairro(rst.getString("BAIRROCLI"));
+                    imp.setMunicipio(rst.getString("CIDADECLI"));
+                    imp.setUf(rst.getString("ESTADOCLI"));
+                    imp.setTelefone(rst.getString("FONECLI"));
+                    imp.setFax(rst.getString("FAXCLI"));
+                    imp.setEmail(rst.getString("EMAIL"));
+                    imp.setObservacao(rst.getString("OBSERVACAO"));
+                    imp.setNomePai(rst.getString("NOMEPAI"));
+                    imp.setNomeMae(rst.getString("NOMEMAE"));
+                    imp.setCargo(rst.getString("CARGO"));
+                    imp.setSalario(rst.getDouble("RENDA_TITU"));
+                    imp.setValorLimite(rst.getDouble("LIMITE_CRE"));
                     result.add(imp);
                 }
             }
