@@ -14,6 +14,7 @@ import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -303,12 +304,12 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
         }
         return result;
     }
-    
+
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
         ConexaoDBF.abrirConexao(i_arquivo);
-        
+
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
@@ -341,9 +342,40 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setImportId(rst.getString("CODIGOCLI"));
                     imp.setRazao(rst.getString("RAZAO"));
                     imp.setFantasia(rst.getString("NOMECLI"));
+                    imp.setCnpj_cpf(rst.getString("CPFCGC"));
+                    imp.setIe_rg(rst.getString("IDENINSC"));
+                    imp.setAtivo("S".equals(rst.getString("ATIVO")));
+                    imp.setEndereco(rst.getString("ENDERCLI"));
+                    imp.setNumero(rst.getString("NUMERO"));
+                    imp.setBairro(rst.getString("BAIRROCLI"));
+                    imp.setMunicipio(rst.getString("CIDADECLI"));
+                    imp.setUf(rst.getString("ESTADOCLI"));
+                    imp.setIdBanco(rst.getInt("BANCO"));
+                    imp.setTel_principal(rst.getString("FONECLI"));
+                    if ((rst.getString("FAXCLI") != null)
+                            && (!rst.getString("FAXCLI").trim().isEmpty())) {
+                        imp.addContato(
+                                "FAX",
+                                rst.getString("FAXCLI"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("EMAIL") != null)
+                            && (!rst.getString("EMAIL").trim().isEmpty())) {
+                        imp.addContato(
+                                "EMAIL",
+                                null,
+                                null,
+                                TipoContato.NFE,
+                                rst.getString("EMAIL").toLowerCase()
+                        );
+                    }
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 }
