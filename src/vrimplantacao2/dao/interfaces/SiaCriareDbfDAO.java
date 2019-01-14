@@ -351,7 +351,6 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setBairro(rst.getString("BAIRROCLI"));
                     imp.setMunicipio(rst.getString("CIDADECLI"));
                     imp.setUf(rst.getString("ESTADOCLI"));
-                    //imp.setIdBanco(rst.getInt("BANCO"));
                     imp.setTel_principal(rst.getString("FONECLI"));
                     if ((rst.getString("FAXCLI") != null)
                             && (!rst.getString("FAXCLI").trim().isEmpty())) {
