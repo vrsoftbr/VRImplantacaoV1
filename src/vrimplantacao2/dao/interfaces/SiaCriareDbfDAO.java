@@ -5,21 +5,33 @@
  */
 package vrimplantacao2.dao.interfaces;
 
+import java.io.File;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.WorkbookSettings;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -30,6 +42,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public String i_arquivo;
+    public String v_pahtFileXls;
 
     @Override
     public String getSistema() {
@@ -476,5 +489,134 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
             }
         }
         return result;
+    }
+    
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        java.sql.Date dataEmissao, dataVencimento;
+        DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
+        WorkbookSettings settings = new WorkbookSettings();
+        Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls), settings);
+        Sheet[] sheets = arquivo.getSheets();
+        int linha;
+
+        try {
+
+            for (int sh = 0; sh < sheets.length; sh++) {
+                Sheet sheet = arquivo.getSheet(sh);
+                linha = 0;
+
+                for (int i = 0; i < sheet.getRows(); i++) {
+                    linha++;
+                    if (linha == 1) {
+                        continue;
+                    }
+
+                    Cell cellIdVenda = sheet.getCell(0, i);
+                    Cell cellCodCliente = sheet.getCell(2, i);
+                    Cell cellEmissao = sheet.getCell(4, i);
+                    Cell cellVencimento = sheet.getCell(5, i);
+                    Cell cellValor = sheet.getCell(6, i);
+                    Cell cellHistorico = sheet.getCell(7, i);
+                    Cell cellJuros = sheet.getCell(14, i);
+                    Cell cellCaixa = sheet.getCell(23, i);
+                    Cell cellCupom = sheet.getCell(24, i);
+
+                    System.out.println(linha + " " + cellEmissao.getContents() + " " + cellVencimento.getContents());
+                    
+                    if ((cellEmissao.getContents() != null)
+                            && (!cellEmissao.getContents().trim().isEmpty())) {
+                        dataEmissao = new java.sql.Date(fmt.parse(cellEmissao.getContents()).getTime());
+                    } else {
+                        dataEmissao = new Date(new java.util.Date().getTime());
+                    }
+
+                    if ((cellVencimento.getContents() != null)
+                            && (!cellVencimento.getContents().trim().isEmpty())) {
+                        dataVencimento = new java.sql.Date(fmt.parse(cellVencimento.getContents()).getTime());
+                    } else {
+                        dataVencimento = new Date(new java.util.Date().getTime());
+                    }
+
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(cellIdVenda.getContents());
+                    imp.setIdCliente(cellCodCliente.getContents());
+                    imp.setDataEmissao(dataEmissao);
+                    imp.setDataVencimento(dataVencimento);
+                    imp.setValor(Double.parseDouble(cellValor.getContents()));
+                    imp.setJuros(Double.parseDouble(cellJuros.getContents()));
+                    imp.setNumeroCupom(cellCupom.getContents());
+                    imp.setEcf(cellCaixa.getContents());
+                    imp.setObservacao(cellHistorico.getContents());
+                    result.add(imp);
+                }
+            }
+            return result;
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+    
+    @Override
+    public List<OfertaIMP> getOfertas(java.util.Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        java.sql.Date dataFimOferta, dataInicioOferta;
+        DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
+        WorkbookSettings settings = new WorkbookSettings();
+        Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls + "//estoques.xls"), settings);
+        Sheet[] sheets = arquivo.getSheets();
+        int linha;
+        Calendar c = Calendar.getInstance();
+
+        try {
+
+            for (int sh = 0; sh < sheets.length; sh++) {
+                Sheet sheet = arquivo.getSheet(sh);
+                linha = 0;
+
+                for (int i = 0; i < sheet.getRows(); i++) {
+                    linha++;
+                    if (linha == 1) {
+                        continue;
+                    }
+
+                    Cell cellIdProduto = sheet.getCell(0, i);
+                    Cell cellPrecoOferta = sheet.getCell(9, i);
+                    Cell cellFimOferta = sheet.getCell(21, i);
+                    Cell cellInicioOferta = sheet.getCell(20, i);
+
+                    if ((cellInicioOferta.getContents() != null)
+                            && (!cellInicioOferta.getContents().trim().isEmpty())
+                            && (!cellInicioOferta.getContents().contains("-"))
+                            && (cellFimOferta.getContents() != null)
+                            && (!cellFimOferta.getContents().trim().isEmpty())
+                            && (!cellFimOferta.getContents().contains("-"))) {
+
+                        if ((cellFimOferta.getContents() != null)
+                                && (!cellFimOferta.getContents().trim().isEmpty())) {
+                            dataFimOferta = new java.sql.Date(fmt.parse(cellFimOferta.getContents()).getTime());
+                        } else {
+                            dataFimOferta = new Date(new java.util.Date().getTime());
+                        }
+
+                        dataInicioOferta = new Date(new java.util.Date().getTime());
+
+                        if (dataFimOferta.after(dataInicioOferta)) {
+                            OfertaIMP imp = new OfertaIMP();
+                            imp.setTipoOferta(TipoOfertaVO.CAPA);
+                            imp.setIdProduto(cellIdProduto.getContents());
+                            imp.setPrecoOferta(Double.parseDouble(cellPrecoOferta.getContents()));
+                            imp.setDataInicio(dataInicioOferta);
+                            imp.setDataFim(dataFimOferta);
+                            result.add(imp);
+                        }
+                    }
+                }
+            }
+            return result;
+        } catch (Exception ex) {
+            throw ex;
+        }
     }
 }
