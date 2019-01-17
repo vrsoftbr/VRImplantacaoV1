@@ -497,7 +497,7 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
         java.sql.Date dataEmissao, dataVencimento;
         DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
         WorkbookSettings settings = new WorkbookSettings();
-        Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls), settings);
+        Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls + "//creceber.xls"), settings);
         Sheet[] sheets = arquivo.getSheets();
         int linha;
 
@@ -582,9 +582,9 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
                     }
 
                     Cell cellIdProduto = sheet.getCell(0, i);
-                    Cell cellPrecoOferta = sheet.getCell(9, i);
-                    Cell cellFimOferta = sheet.getCell(21, i);
+                    Cell cellPrecoOferta = sheet.getCell(7, i);
                     Cell cellInicioOferta = sheet.getCell(20, i);
+                    Cell cellFimOferta = sheet.getCell(21, i);                    
 
                     if ((cellInicioOferta.getContents() != null)
                             && (!cellInicioOferta.getContents().trim().isEmpty())
