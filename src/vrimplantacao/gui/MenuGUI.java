@@ -112,6 +112,7 @@ import vrimplantacao2.gui.interfaces.AutoSystemGUI;
 import vrimplantacao2.gui.interfaces.AvanceGUI;
 import vrimplantacao2.gui.interfaces.BaseGUI;
 import vrimplantacao2.gui.interfaces.BrainSoftGUI;
+import vrimplantacao2.gui.interfaces.CFSoftSiaECFGUI;
 import vrimplantacao2.gui.interfaces.CPGestorGUI;
 import vrimplantacao2.gui.interfaces.CPlusGUI;
 import vrimplantacao2.gui.interfaces.CadastraFacilGUI;
@@ -566,6 +567,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAlphaSys = new javax.swing.JMenuItem();
         mnuZpf = new javax.swing.JMenuItem();
         mnuFlash = new javax.swing.JMenuItem();
+        mnuCFSoftSiaECF = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1200,6 +1202,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu15.add(mnuFlash);
+
+        mnuCFSoftSiaECF.setText("CFSoft/SiaECF");
+        mnuCFSoftSiaECF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuCFSoftSiaECFActionPerformed(evt);
+            }
+        });
+        jMenu15.add(mnuCFSoftSiaECF);
 
         jMenu2.add(jMenu15);
 
@@ -4079,6 +4089,10 @@ public final class MenuGUI extends VRMdiFrame {
         LinceGUI.exibir(this);
     }//GEN-LAST:event_mnuLinceActionPerformed
 
+    private void mnuCFSoftSiaECFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCFSoftSiaECFActionPerformed
+        CFSoftSiaECFGUI.exibir(this);
+    }//GEN-LAST:event_mnuCFSoftSiaECFActionPerformed
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -4198,6 +4212,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuAvance;
     private javax.swing.JMenuItem mnuBase;
     private javax.swing.JMenuItem mnuBrainSoft;
+    private javax.swing.JMenuItem mnuCFSoftSiaECF;
     private javax.swing.JMenuItem mnuCPGestor;
     private javax.swing.JMenu mnuCache;
     private javax.swing.JMenuItem mnuCadastraFacil;
