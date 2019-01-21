@@ -447,6 +447,10 @@ public class ProdutoIMP {
         this.piscofinsNaturezaReceita = Utils.stringToInt(piscofinsNaturezaReceita);
     }
 
+    public void setIcmsCst(String icmsCst) {
+        this.setIcmsCst(Utils.stringToInt(icmsCst));
+    }
+    
     public void setIcmsCst(int icmsCst) {
         this.icmsCstEntrada = icmsCst;
         this.icmsCstSaida = icmsCst;

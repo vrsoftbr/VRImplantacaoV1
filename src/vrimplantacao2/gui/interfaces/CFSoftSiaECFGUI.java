@@ -259,8 +259,8 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
         cmbLojaOrigem = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
-        tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         vRTabbedPane2 = new vrframework.bean.tabbedPane.VRTabbedPane();
+        tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabImpFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -329,7 +329,7 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
 
         jLabel2.setText("Loja Origem");
 
-        tabs.addTab("Produtos", tabProdutos);
+        vRTabbedPane2.addTab("Produtos", tabProdutos);
 
         tabImpFornecedor.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
