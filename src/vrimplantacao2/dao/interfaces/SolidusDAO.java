@@ -5,18 +5,22 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.interfaces.custom.solidus.Entidade;
-import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
@@ -27,7 +31,9 @@ import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.NotaFiscalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -35,10 +41,15 @@ import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
- *
+ * Senha para acessar a aplicação<br>
+ * Usuário: master<br>
+ * Senha: 1<br>
+ * <br>
+ * Aparentemente eles criptografam a senha transformando no código númerico do 
+ * charset utilizado, incrementando 1 e gravando a letra de volta.
  * @author Leandro
  */
-public class SolidusDAO extends InterfaceDAO {
+public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     
     private static final Logger LOG = Logger.getLogger(SolidusDAO.class.getName());
     
@@ -47,9 +58,16 @@ public class SolidusDAO extends InterfaceDAO {
     private Date rotativoDtaFim = null;
     private Date contasDtaInicio = null;
     private Date contasDtaFim = null;
+    private Date notasDataInicio = null;
     private List<Entidade> entidadesCheques;
     private List<Entidade> entidadesCreditoRotativo;
     private List<Entidade> entidadesContas;
+    
+    private boolean removerDigitoProdutoBalanca = false;
+
+    public void setRemoverDigitoProdutoBalanca(boolean removerDigitoProdutoBalanca) {
+        this.removerDigitoProdutoBalanca = removerDigitoProdutoBalanca;
+    }
 
     public Date getVendasDataInicio() {
         return vendasDataInicio;
@@ -104,6 +122,77 @@ public class SolidusDAO extends InterfaceDAO {
         }
         
         return result;
+    }
+
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    t.cod_tributacao id,\n" +
+                    "    t.des_tributacao descricao,\n" +
+                    "    t.cod_sit_tributaria cst,\n" +
+                    "    t.val_icms aliquota,\n" +
+                    "    t.val_reducao_base_calculo reducao\n" +
+                    "from\n" +
+                    "    TAB_TRIBUTACAO t\n" +
+                    "order by\n" +
+                    "    t.cod_sit_tributaria,\n" +
+                    "    t.val_icms,\n" +
+                    "    t.val_reducao_base_calculo"
+            )) {
+                while (rst.next()) {
+                    result.add(new MapaTributoIMP(
+                            rst.getString("id"),
+                            rst.getString("descricao"),
+                            rst.getInt("cst"),
+                            rst.getDouble("aliquota"),
+                            rst.getDouble("reducao")
+                    ));
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(new OpcaoProduto[]{
+            OpcaoProduto.MERCADOLOGICO,
+            OpcaoProduto.MERCADOLOGICO_PRODUTO,
+            OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+            OpcaoProduto.FAMILIA_PRODUTO,
+            OpcaoProduto.FAMILIA,
+            OpcaoProduto.PRODUTOS,
+            OpcaoProduto.EAN,
+            OpcaoProduto.EAN_EM_BRANCO,
+            OpcaoProduto.PRECO,
+            OpcaoProduto.CUSTO,
+            OpcaoProduto.ESTOQUE,
+            OpcaoProduto.DATA_CADASTRO,
+            OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+            OpcaoProduto.QTD_EMBALAGEM_EAN,
+            OpcaoProduto.TIPO_EMBALAGEM_EAN,
+            OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.PESAVEL,
+            OpcaoProduto.VALIDADE,
+            OpcaoProduto.DESC_COMPLETA,
+            OpcaoProduto.DESC_REDUZIDA,
+            OpcaoProduto.DESC_GONDOLA,
+            OpcaoProduto.FABRICANTE,
+            OpcaoProduto.ESTOQUE_MINIMO,
+            OpcaoProduto.MARGEM,
+            OpcaoProduto.ATIVO,
+            OpcaoProduto.NCM,
+            OpcaoProduto.CEST,
+            OpcaoProduto.PIS_COFINS,
+            OpcaoProduto.NATUREZA_RECEITA,
+            OpcaoProduto.ICMS,
+            OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC
+        }));
     }
 
     @Override
@@ -217,7 +306,9 @@ public class SolidusDAO extends InterfaceDAO {
                     "    trib.val_reducao_base_calculo icms_saida_reducao,\n" +
                     "    tribent.cod_sit_tributaria icms_entrada_cst,\n" +
                     "    tribent.val_icms icms_entrada_aliq,\n" +
-                    "    tribent.val_reducao_base_calculo icms_entrada_reducao\n" +
+                    "    tribent.val_reducao_base_calculo icms_entrada_reducao,\n" +
+                    "    pl.cod_tributacao,\n" +
+                    "    pl.cod_trib_entrada\n" +
                     "from\n" +
                     "    tab_produto p\n" +
                     "    join tab_loja loja on loja.cod_loja = " + getLojaOrigem() + "\n" +
@@ -259,11 +350,11 @@ public class SolidusDAO extends InterfaceDAO {
                     "        pl.cod_tributacao = trib.cod_tributacao\n" +
                     "    left join tab_tributacao tribent on\n" +
                     "        pl.cod_trib_entrada = tribent.cod_tributacao\n" +
-                    "where \n" +
-                    "    (not p.des_produto  like 'MP %' or\n" +
-                    "    not p.des_produto  like 'EMB %' or\n" +
-                    "    not p.des_produto  like 'USO %')\n" +
-                    "    and pl.inativo != 'S'\n" +
+                    //"where \n" +
+                    //"    (not p.des_produto  like 'MP %' or\n" +
+                    //"    not p.des_produto  like 'EMB %' or\n" +
+                    //"    not p.des_produto  like 'USO %')\n" +
+                    //"    and pl.inativo != 'S'\n" +
                     "order by\n" +
                     "    id"
             )) {
@@ -279,7 +370,15 @@ public class SolidusDAO extends InterfaceDAO {
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagemcotacao"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.seteBalanca(rst.getBoolean("ebalanca"));
+                    if ("KG".equals(imp.getTipoEmbalagem())) {
+                        imp.seteBalanca(true);
+                    }
                     imp.setValidade(rst.getInt("validade"));
+                    if (imp.isBalanca() && removerDigitoProdutoBalanca) {
+                        String ean = Utils.stringLong(imp.getEan());
+                        ean = ean.substring(0, ean.length() - 2);
+                        imp.setEan(ean);
+                    }
                     imp.setDescricaoCompleta(rst.getString("decricaocompleta"));
                     imp.setDescricaoGondola(rst.getString("decricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
@@ -842,6 +941,10 @@ public class SolidusDAO extends InterfaceDAO {
         
         return builder.toString();
     }
+
+    public void setNotasDataInicio(Date notasDataInicio) {
+        this.notasDataInicio = notasDataInicio;
+    }
     
     private static class VendaIterator implements Iterator<VendaIMP> {
         
@@ -1075,5 +1178,10 @@ public class SolidusDAO extends InterfaceDAO {
         }
         
     }
+
+    @Override
+    public List<NotaFiscalIMP> getNotasFiscais() throws Exception {
+        return super.getNotasFiscais();
+    }    
     
 }

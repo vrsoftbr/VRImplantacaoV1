@@ -47,6 +47,9 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
 import vrimplantacao2.dao.cadastro.fornecedor.ProdutoFornecedorDAO;
 import vrimplantacao2.dao.cadastro.mercadologico.MercadologicoRepository;
+import vrimplantacao2.dao.cadastro.notafiscal.NotaFiscalRepository;
+import vrimplantacao2.dao.cadastro.notafiscal.NotaFiscalRepositoryProvider;
+import vrimplantacao2.dao.cadastro.notafiscal.OpcaoNotaFiscal;
 import vrimplantacao2.dao.cadastro.nutricional.NutricionalRepository;
 import vrimplantacao2.dao.cadastro.nutricional.NutricionalRepositoryProvider;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
@@ -94,6 +97,7 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.InventarioIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.NotaFiscalIMP;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.OperadorIMP;
@@ -995,6 +999,24 @@ public class Importador {
         );
         AssociadoRepository rep = new AssociadoRepository(provider);
         rep.importarAssociado(associados, opt);
+    }
+
+    /**
+     * Efetua a importação de notas fiscais no sistema.
+     * @param opcoes Opções de importação de notas fiscais.
+     * @throws Exception 
+     */
+    public void importarNotas(OpcaoNotaFiscal... opcoes) throws Exception {
+        ProgressBar.setStatus("Carregando notas fiscais...");
+        HashSet<OpcaoNotaFiscal> opt = new HashSet<>(Arrays.asList(opcoes));
+        List<NotaFiscalIMP> notas = getInterfaceDAO().getNotasFiscais();
+        NotaFiscalRepositoryProvider provider = new NotaFiscalRepositoryProvider(                
+                getSistema(),
+                getLojaOrigem(),
+                getLojaVR()
+        );
+        NotaFiscalRepository repository = new NotaFiscalRepository(provider);
+        repository.importar(opt);
     }
     
 }
