@@ -8,6 +8,8 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -269,6 +271,94 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     imp.setIdFornecedor(getCodigo("1", rst.getString("id_fornecedor")));
                     imp.setIdProduto(getCodigo("1", rst.getString("id_produto")));
                     imp.setCodigoExterno(rst.getString("codigo"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientesPreferenciais() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    c.cod_emp,\n" +
+                    "    c.codigo,\n" +
+                    "    c.cnpj_cpf,\n" +
+                    "    c.insc_est,\n" +
+                    "    coalesce(nullif(trim(c.razao),''), c.fantasia) razao,\n" +
+                    "    c.fantasia,\n" +
+                    "    c.status,\n" +
+                    "    c.endereco,\n" +
+                    "    c.num,\n" +
+                    "    c.comp,\n" +
+                    "    c.bairro,\n" +
+                    "    c.cidade,\n" +
+                    "    c.uf,\n" +
+                    "    c.cep,\n" +
+                    "    c.estado_civil,\n" +
+                    "    c.dta_cad,\n" +
+                    "    c.nascimento,\n" +
+                    "    upper(c.sexo) sexo,\n" +
+                    "    c.trabalho,\n" +
+                    "    c.profissao,\n" +
+                    "    c.salario,\n" +
+                    "    c.limite,\n" +
+                    "    c.conjugue,\n" +
+                    "    c.pai,\n" +
+                    "    c.mae,\n" +
+                    "    c.obs,\n" +
+                    "    c.obs2,\n" +
+                    "    c.contato,\n" +
+                    "    c.e_mail,\n" +
+                    "    c.fone,\n" +
+                    "    c.fax,\n" +
+                    "    c.site\n" +
+                    "from\n" +
+                    "    cliente c\n" +
+                    "where\n" +
+                    "    c.codigo > 0\n" +
+                    "order by\n" +
+                    "    c.codigo"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(getCodigo(rst.getString("cod_emp"), rst.getString("codigo")));
+                    imp.setCnpj(rst.getString("cnpj_cpf"));
+                    imp.setInscricaoestadual(rst.getString("insc_est"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setAtivo(rst.getInt("status") == 1);
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("num"));
+                    imp.setComplemento(rst.getString("comp"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setEstadoCivil(rst.getString("estado_civil"));
+                    imp.setDataCadastro(rst.getDate("dta_cad"));
+                    imp.setDataNascimento(rst.getDate("nascimento"));
+                    imp.setSexo("F".equals(rst.getString("sexo")) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                    imp.setEmpresa(rst.getString("trabalho"));
+                    imp.setCargo(rst.getString("profissao"));
+                    imp.setSalario(rst.getDouble("salario"));
+                    imp.setValorLimite(rst.getDouble("limite"));
+                    imp.setNomeConjuge(rst.getString("conjugue"));
+                    imp.setNomePai(rst.getString("pai"));
+                    imp.setNomeMae(rst.getString("mae"));
+                    imp.setObservacao(rst.getString("obs"));
+                    imp.setObservacao2(rst.getString("obs2"));
+                    imp.addContato("A", "CONTATO", rst.getString("contato"), "", "");
+                    imp.addEmail(rst.getString("e_mail"), TipoContato.COMERCIAL);
+                    imp.setTelefone(rst.getString("fone"));
+                    imp.addTelefone("FAX", rst.getString("fax"));
                     
                     result.add(imp);
                 }
