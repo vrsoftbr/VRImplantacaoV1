@@ -10,6 +10,7 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -359,6 +360,53 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     imp.addEmail(rst.getString("e_mail"), TipoContato.COMERCIAL);
                     imp.setTelefone(rst.getString("fone"));
                     imp.addTelefone("FAX", rst.getString("fax"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    d.emp,\n" +
+                    "    d.codigo,\n" +
+                    "    d.duplicata,\n" +
+                    "    d.ecf,\n" +
+                    "    d.vlr_parcela,\n" +
+                    "    d.obs,\n" +
+                    "    d.cod_cliente,\n" +
+                    "    c.cnpj_cpf,\n" +
+                    "    d.vencimento\n" +
+                    "from\n" +
+                    "    duplicata d\n" +
+                    "    join cliente c on\n" +
+                    "        d.emp = c.cod_emp and\n" +
+                    "        d.cod_cliente = c.codigo\n" +
+                    "where\n" +
+                    "    d.cod_cliente != 0 and\n" +
+                    "    d.dtpago is null\n" +
+                    "order by\n" +
+                    "    1, 2"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(getCodigo(rst.getString("emp"), rst.getString("codigo")));
+                    imp.setNumeroCupom(rst.getString("duplicata"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setValor(rst.getDouble("vlr_parcela"));
+                    imp.setObservacao(rst.getString("obs"));
+                    imp.setIdCliente(rst.getString("cod_cliente"));
+                    imp.setCnpjCliente(rst.getString("cnpj_cpf"));
+                    imp.setDataEmissao(rst.getDate("vencimento"));
                     
                     result.add(imp);
                 }
