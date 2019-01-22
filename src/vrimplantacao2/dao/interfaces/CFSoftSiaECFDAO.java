@@ -5,13 +5,14 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
-import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -73,23 +74,6 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     imp.setMerc1Descricao(rst.getString("mercadologico"));
                     
                     result.add(imp);
-                }
-            }
-        }
-        
-        return result;
-    }
-
-    @Override
-    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
-        List<FamiliaProdutoIMP> result = new ArrayList<>();
-        
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    ""
-            )) {
-                while (rst.next()) {
-                
                 }
             }
         }
@@ -392,7 +376,9 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     "        d.cod_cliente = c.codigo\n" +
                     "where\n" +
                     "    d.cod_cliente != 0 and\n" +
-                    "    d.dtpago is null\n" +
+                    "    d.dtpago is null and\n" +
+                    "    not d.codigo in (select duplicata from cheque) and\n" +
+                    "    d.vlr_parcela > 0\n" +
                     "order by\n" +
                     "    1, 2"
             )) {
@@ -404,9 +390,67 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     imp.setEcf(rst.getString("ecf"));
                     imp.setValor(rst.getDouble("vlr_parcela"));
                     imp.setObservacao(rst.getString("obs"));
-                    imp.setIdCliente(rst.getString("cod_cliente"));
+                    imp.setIdCliente(getCodigo(rst.getString("emp"), rst.getString("cod_cliente")));
                     imp.setCnpjCliente(rst.getString("cnpj_cpf"));
                     imp.setDataEmissao(rst.getDate("vencimento"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    ch.codigo,\n" +
+                    "    c.cnpj_cpf,\n" +
+                    "    ch.numero,\n" +
+                    "    ch.banco,\n" +
+                    "    ch.agencia,\n" +
+                    "    ch.conta,\n" +
+                    "    ch.emissao,\n" +
+                    "    dp.duplicata,\n" +
+                    "    dp.ecf,\n" +
+                    "    c.insc_est,\n" +
+                    "    ch.valor,\n" +
+                    "    c.fone,\n" +
+                    "    c.razao\n" +
+                    "from\n" +
+                    "    cheque ch\n" +
+                    "    join duplicata dp on\n" +
+                    "        ch.duplicata = dp.codigo\n" +
+                    "    join cliente c on\n" +
+                    "        ch.cliente = c.codigo\n" +
+                    "where\n" +
+                    "   dp.dtpago is null and\n" +
+                    "   ch.cliente > 0 and\n" +
+                    "   ch.valor > 0\n" +
+                    "order by\n" +
+                    "    ch.codigo"
+            )) {
+                while (rst.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    
+                    imp.setId(rst.getString("codigo"));
+                    imp.setCpf(rst.getString("cnpj_cpf"));
+                    imp.setNumeroCheque(rst.getString("numero"));
+                    imp.setBanco(Utils.stringToInt(rst.getString("banco")));
+                    imp.setAgencia(rst.getString("agencia"));
+                    imp.setConta(rst.getString("conta"));
+                    imp.setDate(rst.getDate("emissao"));
+                    imp.setNumeroCupom(rst.getString("duplicata"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setRg(rst.getString("insc_est"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setTelefone(rst.getString("fone"));
+                    imp.setNome(rst.getString("razao"));
                     
                     result.add(imp);
                 }
