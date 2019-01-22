@@ -120,6 +120,7 @@ import vrimplantacao2.gui.interfaces.CefasGUI;
 import vrimplantacao2.gui.interfaces.CgaGUI;
 import vrimplantacao2.gui.interfaces.CissGUI;
 import vrimplantacao2.gui.interfaces.ContechGUI;
+import vrimplantacao2.gui.interfaces.DataSyncGUI;
 import vrimplantacao2.gui.interfaces.DestroGUI;
 import vrimplantacao2.gui.interfaces.DtComGUI;
 import vrimplantacao2.gui.interfaces.EmporioGUI;
@@ -604,6 +605,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuFHOnline = new javax.swing.JMenuItem();
         mnuHiper = new javax.swing.JMenuItem();
         mnuLince = new javax.swing.JMenuItem();
+        mnuDataSync = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1490,6 +1492,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuLince);
+
+        mnuDataSync.setText("DataSync");
+        mnuDataSync.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuDataSyncActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuDataSync);
 
         jMenu2.add(mnuSqlServer2);
 
@@ -4093,6 +4103,10 @@ public final class MenuGUI extends VRMdiFrame {
         CFSoftSiaECFGUI.exibir(this);
     }//GEN-LAST:event_mnuCFSoftSiaECFActionPerformed
 
+    private void mnuDataSyncActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuDataSyncActionPerformed
+        DataSyncGUI.exibir(this);
+    }//GEN-LAST:event_mnuDataSyncActionPerformed
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -4222,6 +4236,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuControll;
     private javax.swing.JMenuItem mnuCplus;
     private javax.swing.JMenu mnuDB2;
+    private javax.swing.JMenuItem mnuDataSync;
     private javax.swing.JMenuItem mnuDelfi;
     private javax.swing.JMenuItem mnuDtCom;
     private javax.swing.JMenuItem mnuEmporio;
