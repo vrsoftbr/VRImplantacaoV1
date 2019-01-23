@@ -80,10 +80,6 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
         
         return result;
     }
-
-    private String getCodigo(String cod1, String cod2) {
-        return cod1 + "-" + cod2;
-    }
     
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
@@ -129,7 +125,7 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     imp.setImportId(rst.getString("itcod"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
-                    imp.setEan(String.valueOf(rst.getDouble("ean")));
+                    imp.setEan(String.valueOf(Math.round(rst.getDouble("ean"))));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setQtdEmbalagemCotacao(Math.round(rst.getFloat("qtdembalagemcotacao")));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
@@ -199,7 +195,7 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(getCodigo(rst.getString("cod_emp"), rst.getString("codigo")));
+                    imp.setImportId(rst.getString("codigo"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setCnpj_cpf(rst.getString("cnpj_cpf"));
@@ -314,7 +310,7 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     
-                    imp.setId(getCodigo(rst.getString("cod_emp"), rst.getString("codigo")));
+                    imp.setId(rst.getString("codigo"));
                     imp.setCnpj(rst.getString("cnpj_cpf"));
                     imp.setInscricaoestadual(rst.getString("insc_est"));
                     imp.setRazao(rst.getString("razao"));
@@ -385,12 +381,12 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     
-                    imp.setId(getCodigo(rst.getString("emp"), rst.getString("codigo")));
+                    imp.setId(rst.getString("codigo"));
                     imp.setNumeroCupom(rst.getString("duplicata"));
                     imp.setEcf(rst.getString("ecf"));
                     imp.setValor(rst.getDouble("vlr_parcela"));
                     imp.setObservacao(rst.getString("obs"));
-                    imp.setIdCliente(getCodigo(rst.getString("emp"), rst.getString("cod_cliente")));
+                    imp.setIdCliente(rst.getString("cod_cliente"));
                     imp.setCnpjCliente(rst.getString("cnpj_cpf"));
                     imp.setDataEmissao(rst.getDate("vencimento"));
                     
