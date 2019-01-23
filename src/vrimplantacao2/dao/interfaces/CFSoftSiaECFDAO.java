@@ -92,7 +92,6 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
-                    "    p.itemp,\n" +
                     "    p.itcod,\n" +
                     "    p.itdata datacadastro,\n" +
                     "    p.italterado dataalteracao,\n" +
@@ -118,6 +117,7 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     "    p.fabricante\n" +
                     "from\n" +
                     "    item p\n" +
+                    "where p.itemp = 1\n" +
                     "order by\n" +
                     "    1, 2"
             )) {
@@ -126,7 +126,7 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(getCodigo(rst.getString("itemp"), rst.getString("itcod")));
+                    imp.setImportId(rst.getString("itcod"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
                     imp.setEan(String.valueOf(rst.getDouble("ean")));
@@ -169,7 +169,6 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
-                    "    f.cod_emp,\n" +
                     "    f.codigo,\n" +
                     "    f.razao,\n" +
                     "    f.fantasia,\n" +
@@ -191,6 +190,7 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     "    f.e_mail\n" +
                     "from\n" +
                     "    forne f\n" +
+                    "where f.cod_emp = 1\n" +
                     "order by\n" +
                     "    1, 2"
             )) {
@@ -253,8 +253,8 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    imp.setIdFornecedor(getCodigo("1", rst.getString("id_fornecedor")));
-                    imp.setIdProduto(getCodigo("1", rst.getString("id_produto")));
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setIdProduto(rst.getString("id_produto"));
                     imp.setCodigoExterno(rst.getString("codigo"));
                     
                     result.add(imp);
@@ -272,7 +272,6 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
-                    "    c.cod_emp,\n" +
                     "    c.codigo,\n" +
                     "    c.cnpj_cpf,\n" +
                     "    c.insc_est,\n" +
@@ -307,7 +306,8 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     "from\n" +
                     "    cliente c\n" +
                     "where\n" +
-                    "    c.codigo > 0\n" +
+                    "    c.codigo > 0 and\n" +
+                    "    c.cod_emp = 1\n" +
                     "order by\n" +
                     "    c.codigo"
             )) {
@@ -360,7 +360,6 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
-                    "    d.emp,\n" +
                     "    d.codigo,\n" +
                     "    d.duplicata,\n" +
                     "    d.ecf,\n" +
@@ -375,6 +374,7 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     "        d.emp = c.cod_emp and\n" +
                     "        d.cod_cliente = c.codigo\n" +
                     "where\n" +
+                    "    d.emp = 1 and\n" +
                     "    d.cod_cliente != 0 and\n" +
                     "    d.dtpago is null and\n" +
                     "    not d.codigo in (select duplicata from cheque) and\n" +
