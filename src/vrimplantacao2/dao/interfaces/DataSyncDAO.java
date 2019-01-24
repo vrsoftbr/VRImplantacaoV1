@@ -12,6 +12,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -174,6 +175,73 @@ public class DataSyncDAO extends InterfaceDAO {
         
         return result;
     }
-    
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	f.FORNECEDOR_ID id,\n" +
+                    "	f.NOME_RAZAO razao,\n" +
+                    "	f.FANTASIA fantasia,\n" +
+                    "	coalesce(f.CNPJ, f.CPF) cnpj,\n" +
+                    "	f.IE,\n" +
+                    "	f.ATIVO,\n" +
+                    "	f.ENDERECO,\n" +
+                    "	f.NUMERO,\n" +
+                    "	f.COMPLEMENTO,\n" +
+                    "	f.BAIRRO,\n" +
+                    "	cd.CIDADE_ID ibge_municipio,\n" +
+                    "	cd.NOME municipio,\n" +
+                    "	cd.UF uf,\n" +
+                    "	f.CEP,\n" +
+                    "	f.FONE,\n" +
+                    "	f.CELULAR,\n" +
+                    "	f.FAX,\n" +
+                    "	f.SUFRAMA,\n" +
+                    "	f.OBS,	\n" +
+                    "	f.PRAZO_ENTREGA\n" +
+                    "from\n" +
+                    "	FORNECEDORES f\n" +
+                    "	left join CIDADES cd on\n" +
+                    "		cd.CIDADE_ID = f.CIDADE_ID\n" +
+                    "order by\n" +
+                    "	f.FORNECEDOR_ID;"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("CNPJ"));
+                    imp.setIe_rg(rst.getString("IE"));
+                    imp.setAtivo(rst.getBoolean("ATIVO"));
+                    imp.setEndereco(rst.getString("ENDERECO"));
+                    imp.setNumero(rst.getString("NUMERO"));
+                    imp.setComplemento(rst.getString("COMPLEMENTO"));
+                    imp.setBairro(rst.getString("BAIRRO"));
+                    imp.setIbge_municipio(rst.getInt("ibge_municipio"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("CEP"));
+                    imp.setTel_principal(rst.getString("FONE"));
+                    imp.addCelular("CELULAR", rst.getString("CELULAR"));
+                    imp.addTelefone("FAX", rst.getString("FAX"));
+                    imp.setSuframa(rst.getString("SUFRAMA"));
+                    imp.setObservacao(rst.getString("OBS"));
+                    imp.setPrazoEntrega(rst.getInt("PRAZO_ENTREGA"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
     
 }
