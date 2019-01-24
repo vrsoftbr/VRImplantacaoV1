@@ -12,6 +12,8 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -243,5 +245,90 @@ public class DataSyncDAO extends InterfaceDAO {
         
         return result;
     }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	c.CLIENTE_ID id,\n" +
+                    "	coalesce(nullif(c.CNPJ,''),c.CPF) cnpj,\n" +
+                    "	c.IE,\n" +
+                    "	c.NOME_RAZAO razao,\n" +
+                    "	c.FANTASIA,\n" +
+                    "	c.ATIVO,\n" +
+                    "	c.ENDERECO,\n" +
+                    "	c.NUMERO,\n" +
+                    "	c.COMPLEMENTO,\n" +
+                    "	c.BAIRRO,\n" +
+                    "	c.CIDADE_ID,\n" +
+                    "	cd.NOME cidade,\n" +
+                    "	cd.UF,\n" +
+                    "	c.CEP,\n" +
+                    "	c.EST_CIVIL,\n" +
+                    "	c.DATA_CADASTRO,\n" +
+                    "	c.DATA_NASCIMENTO,\n" +
+                    "	c.SEXO,\n" +
+                    "	c.PROFISSAO,\n" +
+                    "	c.VR_RENDA salario,\n" +
+                    "	c.VR_LIMITE limite,\n" +
+                    "	c.NOME_PAI,\n" +
+                    "	c.NOME_MAE,\n" +
+                    "	c.CONJ_NOME conjuge,\n" +
+                    "	c.OBS,\n" +
+                    "	c.FONE,\n" +
+                    "	c.FAX,\n" +
+                    "	c.CELULAR,\n" +
+                    "	c.EMAIL\n" +
+                    "from \n" +
+                    "	CLIENTES c\n" +
+                    "	left join CIDADES cd on\n" +
+                    "		cd.CIDADE_ID = c.CIDADE_ID\n" +
+                    "order by\n" +
+                    "	id"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("IE"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("FANTASIA"));
+                    imp.setAtivo(rst.getBoolean("ATIVO"));
+                    imp.setEndereco(rst.getString("ENDERECO"));
+                    imp.setNumero(rst.getString("NUMERO"));
+                    imp.setComplemento(rst.getString("COMPLEMENTO"));
+                    imp.setBairro(rst.getString("BAIRRO"));
+                    imp.setMunicipioIBGE(rst.getInt("CIDADE_ID"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("UF"));
+                    imp.setCep(rst.getString("CEP"));
+                    imp.setEstadoCivil(rst.getString("EST_CIVIL"));
+                    imp.setDataCadastro(rst.getDate("DATA_CADASTRO"));
+                    imp.setDataNascimento(rst.getDate("DATA_NASCIMENTO"));
+                    imp.setSexo(Utils.acertarTexto(rst.getString("SEXO")).startsWith("M") ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
+                    imp.setCargo(rst.getString("PROFISSAO"));
+                    imp.setSalario(rst.getDouble("salario"));
+                    imp.setValorLimite(rst.getDouble("limite"));
+                    imp.setNomePai(rst.getString("NOME_PAI"));
+                    imp.setNomeMae(rst.getString("NOME_MAE"));
+                    imp.setNomeConjuge(rst.getString("conjuge"));
+                    imp.setObservacao(rst.getString("OBS"));
+                    imp.setTelefone(rst.getString("FONE"));
+                    imp.setFax(rst.getString("FAX"));
+                    imp.setCelular(rst.getString("CELULAR"));
+                    imp.setEmail(rst.getString("EMAIL"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
     
 }
