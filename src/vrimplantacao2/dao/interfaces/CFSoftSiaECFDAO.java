@@ -100,7 +100,17 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     "    p.itqtd estoqueminimo,\n" +
                     "    p.peso,\n" +
                     "    p.itmargem margem,\n" +
-                    "    p.ituni custo,\n" +
+                    "    coalesce((\n" +
+                    "        select first 1\n" +
+                    "            i.entpreco\n" +
+                    "        from\n" +
+                    "            itempentrada i\n" +
+                    "            join pentrada e on i.entcodigo = e.encodigo\n" +
+                    "        where\n" +
+                    "            i.entcoditem = p.itcod\n" +
+                    "        order by\n" +
+                    "            e.endta_emi desc, i.entcodigo desc\n" +
+                    "    ), 0) custo,\n" +
                     "    p.itpreco preco,\n" +
                     "    p.status,\n" +
                     "    p.ncm,\n" +
