@@ -25,13 +25,15 @@ public class GerarCodigoBarrasAtacadoDAO {
                     + "from produto "
             )) {
                 while (rst.next()) {
-                    if ((rst.getInt("id_tipoembalagem") == 4) || (rst.getInt("id") <= 9999)
+                    /*if ((rst.getInt("id_tipoembalagem") == 4) || (rst.getInt("id") <= 9999)
                             || (rst.getBoolean("pesavel"))) {
                         codigoBarras = Long.parseLong("99999" + String.valueOf(rst.getInt("id")));
                     } else {
                         codigoBarras = Utils.gerarEan13((int) rst.getInt("id"), true);
-                    }
+                    }*/
 
+                    codigoBarras = Long.parseLong("999999" + String.valueOf(rst.getInt("id")));
+                    
                     ProdutoVO vo = new ProdutoVO();
                     ProdutoAutomacaoVO oAutomacao = new ProdutoAutomacaoVO();
                     vo.setId(rst.getInt("id"));

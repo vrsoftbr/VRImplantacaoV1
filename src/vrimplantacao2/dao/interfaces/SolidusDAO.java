@@ -166,6 +166,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
             OpcaoProduto.FAMILIA_PRODUTO,
             OpcaoProduto.FAMILIA,
+            OpcaoProduto.IMPORTAR_MANTER_BALANCA,
             OpcaoProduto.PRODUTOS,
             OpcaoProduto.EAN,
             OpcaoProduto.EAN_EM_BRANCO,
@@ -308,7 +309,9 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    tribent.val_icms icms_entrada_aliq,\n" +
                     "    tribent.val_reducao_base_calculo icms_entrada_reducao,\n" +
                     "    pl.cod_tributacao,\n" +
-                    "    pl.cod_trib_entrada\n" +
+                    "    pl.cod_trib_entrada,\n" +
+                    "    pl.per_pauta_iva,\n" +
+                    "    pl.val_pauta_iva\n" +
                     "from\n" +
                     "    tab_produto p\n" +
                     "    join tab_loja loja on loja.cod_loja = " + getLojaOrigem() + "\n" +
@@ -351,6 +354,9 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    left join tab_tributacao tribent on\n" +
                     "        pl.cod_trib_entrada = tribent.cod_tributacao\n" +
                     //"where \n" +
+                    //"   (p.flg_envia_balanca = 'S') and\n" +
+                    //"    p.status = 0 and\n" +
+                    //"    cast(p.cod_barra_principal as numeric(18,0)) <= 999999\n" +
                     //"    (not p.des_produto  like 'MP %' or\n" +
                     //"    not p.des_produto  like 'EMB %' or\n" +
                     //"    not p.des_produto  like 'USO %')\n" +
@@ -370,14 +376,12 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagemcotacao"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.seteBalanca(rst.getBoolean("ebalanca"));
-                    if ("KG".equals(imp.getTipoEmbalagem())) {
-                        imp.seteBalanca(true);
-                    }
                     imp.setValidade(rst.getInt("validade"));
-                    if (imp.isBalanca() && removerDigitoProdutoBalanca) {
-                        String ean = Utils.stringLong(imp.getEan());
-                        ean = ean.substring(0, ean.length() - 2);
-                        imp.setEan(ean);
+                    long ean = Utils.stringToLong(imp.getEan());
+                    if (imp.isBalanca() && (ean <= 999999) && removerDigitoProdutoBalanca) {
+                        String eanAux = String.valueOf(ean);
+                        eanAux = eanAux.substring(0, eanAux.length() - 1);
+                        imp.setEan(eanAux);
                     }
                     imp.setDescricaoCompleta(rst.getString("decricaocompleta"));
                     imp.setDescricaoGondola(rst.getString("decricaocompleta"));

@@ -52,11 +52,11 @@ public class ClientePreferencialContatoVO {
     }
 
     public void setTelefone(String telefone) {
-        this.telefone = Utils.stringLong(telefone);
+        this.telefone = Utils.formataNumero(Utils.stringLong(telefone), 14, "0000000000");
     }
 
     public void setCelular(String celular) {
-        this.celular = Utils.stringLong(celular);
+        this.celular = Utils.formataNumero(Utils.stringLong(celular), 14, "");
     }
 
     public void setTipoContato(TipoContato tipoContato) {

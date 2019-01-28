@@ -14,17 +14,24 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoDBF;
+import vrimplantacao.dao.cadastro.BancoDAO;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -125,26 +132,29 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
 
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select "
-                    + "m1.CODGRUPO as merc1, m1.DESCRICAO as desc_merc1, "
-                    + "m2.CODCAT as merc2, m2.DESCRICAO as desc_merc2, "
-                    + "m3.CODFAM as merc3, m3.DESCRICAO as desc_merc3 "
-                    + "from produtos p "
-                    + "left join grupos m1 on m1.CODGRUPO = p.GRUPO "
-                    + "left join categorias m2 on m2.CODCAT = p.CATEGORIA "
-                    + "left join familias m3 on m3.CODFAM = p.FAMILIA "
-                    + "order by m1.CODGRUPO, m2.CODCAT, m3.CODFAM"
+                    /*"select "
+                     + "m1.CODGRUPO as merc1, m1.DESCRICAO as desc_merc1, "
+                     + "m2.CODCAT as merc2, m2.DESCRICAO as desc_merc2, "
+                     + "m3.CODFAM as merc3, m3.DESCRICAO as desc_merc3 "
+                     + "from produtos p "
+                     + "left join grupos m1 on m1.CODGRUPO = p.GRUPO "
+                     + "left join categorias m2 on m2.CODCAT = p.CATEGORIA "
+                     + "left join familias m3 on m3.CODFAM = p.FAMILIA "
+                     + "order by m1.CODGRUPO, m2.CODCAT, m3.CODFAM"*/
+                    "select CODGRUPO, DESCRICAO "
+                    + "from grupos "
+                    + "order by CODGRUPO "
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setMerc1ID(rst.getString("merc1"));
-                    imp.setMerc1Descricao(rst.getString("desc_merc1"));
-                    imp.setMerc2ID(rst.getString("merc2"));
-                    imp.setMerc2Descricao(rst.getString("desc_merc2"));
-                    imp.setMerc3ID(rst.getString("merc3"));
-                    imp.setMerc3Descricao(rst.getString("desc_merc3"));
+                    imp.setMerc1ID(rst.getString("CODGRUPO"));
+                    imp.setMerc1Descricao(rst.getString("DESCRICAO"));
+                    imp.setMerc2ID("1");
+                    imp.setMerc2Descricao(rst.getString("DESCRICAO"));
+                    imp.setMerc3ID("1");
+                    imp.setMerc3Descricao(rst.getString("DESCRICAO"));
                     result.add(imp);
                 }
             }
@@ -180,24 +190,47 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
                     + "p.PIS, "
                     + "p.COFINS, "
                     + "p.MARKDOWN, "
-                    + "p.CEST "
+                    + "p.CEST, "
+                    + "p.ID_SIMILAR "
                     + "from produtos p"
             )) {
                 int cont = 0;
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
                     if (rst.getString("CODITEM") != null) {
+
                         ProdutoIMP imp = new ProdutoIMP();
+                        ProdutoBalancaVO produtoBalanca;
+                        imp.setImportId(rst.getString("CODITEM"));
+
+                        long codigoProduto;
+                        codigoProduto = Long.parseLong(imp.getImportId());
+                        if (codigoProduto <= Integer.MAX_VALUE) {
+                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                        } else {
+                            produtoBalanca = null;
+                        }
+
+                        if (produtoBalanca != null) {
+                            imp.seteBalanca(true);
+                            imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
+                        } else {
+                            imp.setValidade(0);
+                            imp.seteBalanca(false);
+                        }
+
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("CODITEM"));
                         imp.setEan(rst.getString("CODBARRA"));
                         imp.setDescricaoCompleta(rst.getString("DESCRICAO"));
                         imp.setDescricaoReduzida(rst.getString("ABREVIA"));
                         imp.setDescricaoGondola(imp.getDescricaoCompleta());
                         imp.setTipoEmbalagem(rst.getString("UNIDADE"));
                         imp.setQtdEmbalagem(rst.getInt("QTDEMB"));
-                        imp.seteBalanca("S".equals(rst.getString("BALANCA")));
-                        imp.setIdFamiliaProduto(rst.getString("FAMILIA"));
+                        imp.setIdFamiliaProduto(rst.getString("ID_SIMILAR"));
+                        imp.setCodMercadologico1(rst.getString("GRUPO"));
+                        imp.setCodMercadologico2("1");
+                        imp.setCodMercadologico3("1");
                         imp.setMargem(rst.getDouble("MARKDOWN"));
                         imp.setPrecovenda(rst.getDouble("UNITARIO") / 1000);
                         imp.setCustoComImposto(rst.getDouble("CUSTO") / 1000);
@@ -224,6 +257,10 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         ConexaoDBF.abrirConexao(i_arquivo);
+        WorkbookSettings settings = new WorkbookSettings();
+        Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls + "//PRODUTOS.xls"), settings);
+        Sheet[] sheets = arquivo.getSheets();
+        int linha;
 
         if (opt == OpcaoProduto.PRECO) {
             try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
@@ -290,6 +327,43 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
                 }
             }
             return result;
+        }
+
+        if (opt == OpcaoProduto.ATIVO) {
+
+            try {
+
+                for (int sh = 0; sh < sheets.length; sh++) {
+                    Sheet sheet = arquivo.getSheet(sh);
+                    linha = 0;
+
+                    for (int i = 0; i < sheet.getRows(); i++) {
+                        linha++;
+                        if (linha == 1) {
+                            continue;
+                        }
+
+                        Cell cellIdProduto = sheet.getCell(1, i);
+
+                        if ((cellIdProduto.getContents() != null)
+                                && (!cellIdProduto.getContents().trim().isEmpty())) {
+
+                            if (!Utils.encontrouLetraCampoNumerico(cellIdProduto.getContents())) {
+                                ProdutoIMP imp = new ProdutoIMP();
+                                imp.setImportLoja(getLojaOrigem());
+                                imp.setImportSistema(getSistema());
+                                imp.setImportId(cellIdProduto.getContents());
+                                imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+                                result.add(imp);
+                            }
+                        }
+                    }
+                }
+                return result;
+            } catch (Exception ex) {
+                throw ex;
+            }
+
         }
 
         return null;
@@ -490,7 +564,7 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
         }
         return result;
     }
-    
+
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
@@ -524,7 +598,7 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
                     Cell cellCupom = sheet.getCell(24, i);
 
                     System.out.println(linha + " " + cellEmissao.getContents() + " " + cellVencimento.getContents());
-                    
+
                     if ((cellEmissao.getContents() != null)
                             && (!cellEmissao.getContents().trim().isEmpty())) {
                         dataEmissao = new java.sql.Date(fmt.parse(cellEmissao.getContents()).getTime());
@@ -549,6 +623,92 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
                     imp.setNumeroCupom(cellCupom.getContents());
                     imp.setEcf(cellCaixa.getContents());
                     imp.setObservacao(cellHistorico.getContents());
+                    result.add(imp);
+                }
+            }
+            return result;
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        java.sql.Date dataEmissao, dataVencimento;
+        DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
+        WorkbookSettings settings = new WorkbookSettings();
+        Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls + "//cheques.xls"), settings);
+        Sheet[] sheets = arquivo.getSheets();
+        int linha;
+
+        try {
+
+            for (int sh = 0; sh < sheets.length; sh++) {
+                Sheet sheet = arquivo.getSheet(sh);
+                linha = 0;
+
+                for (int i = 0; i < sheet.getRows(); i++) {
+                    linha++;
+                    if (linha == 1) {
+                        continue;
+                    }
+
+                    Cell cellIdCheque = sheet.getCell(0, i);
+                    Cell cellNumCheque = sheet.getCell(1, i);
+                    Cell cellCpf = sheet.getCell(2, i);
+                    Cell cellNomeEmitente = sheet.getCell(3, i);
+                    Cell cellIdBanco = sheet.getCell(4, i);
+                    Cell cellValor = sheet.getCell(5, i);
+                    Cell cellVencimento = sheet.getCell(6, i);
+                    Cell cellDevolvido = sheet.getCell(7, i);
+                    Cell cellCaixa = sheet.getCell(8, i);
+                    Cell cellCupom = sheet.getCell(9, i);
+                    Cell cellEmissao = sheet.getCell(10, i);
+                    Cell cellObservacao = sheet.getCell(12, i);
+                    Cell cellCmc7 = sheet.getCell(17, i);
+                    Cell cellAgencia = sheet.getCell(19, i);
+                    Cell cellConta = sheet.getCell(20, i);
+
+                    System.out.println(linha + " " + cellEmissao.getContents() + " " + cellVencimento.getContents());
+
+                    if ((cellEmissao.getContents() != null)
+                            && (!cellEmissao.getContents().trim().isEmpty())) {
+                        dataEmissao = new java.sql.Date(fmt.parse(cellEmissao.getContents()).getTime());
+                    } else {
+                        dataEmissao = new Date(new java.util.Date().getTime());
+                    }
+
+                    if ((cellVencimento.getContents() != null)
+                            && (!cellVencimento.getContents().trim().isEmpty())) {
+                        dataVencimento = new java.sql.Date(fmt.parse(cellVencimento.getContents()).getTime());
+                    } else {
+                        dataVencimento = new Date(new java.util.Date().getTime());
+                    }
+
+                    int idBanco = new BancoDAO().getId(Integer.parseInt(cellIdBanco.getContents()));
+                    ChequeIMP imp = new ChequeIMP();
+                    imp.setId(cellIdCheque.getContents());
+                    imp.setDate(dataEmissao);
+                    imp.setDataDeposito(dataVencimento);
+                    imp.setNumeroCupom(cellCupom.getContents());
+                    imp.setNumeroCheque(cellNumCheque.getContents());
+                    imp.setAgencia(cellAgencia.getContents());
+                    imp.setConta(cellConta.getContents());                    
+                    imp.setCpf(cellCpf.getContents());
+                    imp.setNome(cellNomeEmitente.getContents());
+                    imp.setObservacao(cellObservacao.getContents());
+                    imp.setValor(Double.parseDouble(cellValor.getContents()));
+                    imp.setBanco(idBanco);
+                    imp.setCmc7(cellCmc7.getContents());
+                    imp.setEcf(cellCaixa.getContents());
+                    
+                    if ("N".equals(cellDevolvido.getContents().trim())) {
+                        imp.setAlinea(0);
+                    } else {
+                        imp.setAlinea(1);
+                    }
+                    
                     result.add(imp);
                 }
             }
@@ -584,7 +744,7 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
                     Cell cellIdProduto = sheet.getCell(0, i);
                     Cell cellPrecoOferta = sheet.getCell(7, i);
                     Cell cellInicioOferta = sheet.getCell(20, i);
-                    Cell cellFimOferta = sheet.getCell(21, i);                    
+                    Cell cellFimOferta = sheet.getCell(21, i);
 
                     if ((cellInicioOferta.getContents() != null)
                             && (!cellInicioOferta.getContents().trim().isEmpty())

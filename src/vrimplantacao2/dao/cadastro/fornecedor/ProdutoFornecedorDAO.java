@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
@@ -24,6 +25,8 @@ import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
  * @author Leandro
  */
 public class ProdutoFornecedorDAO {
+    
+    private static final Logger LOG = Logger.getLogger(ProdutoFornecedorDAO.class.getName());
     
     private int idLojaVR = -1;
     private String importLoja = "";
@@ -68,6 +71,7 @@ public class ProdutoFornecedorDAO {
         prodAntDAO.setImportLoja(importLoja);
         
         System.gc();
+        
         //<editor-fold defaultstate="collapsed" desc="Carrega as listagens">
         ProgressBar.setStatus("Produto Fornecedor...Carregando listagens...");
         int idUfEmpresa = 0;
@@ -190,6 +194,14 @@ public class ProdutoFornecedorDAO {
         prodAntDAO.atualizarCodigoAnterior();
         //</editor-fold>
         
+        LOG.fine(
+                "Totalizadores:\r\n" +
+                " - Total de itens: " + produtos.size() + "\r\n" +
+                " - Produto Fornecedores Existentes: " + produtoFornecedorExistentes.size() + "\r\n" +
+                " - Códigos Externos Existentes: " + codigoExternoExistentes.size() + "\r\n" +
+                " - Custos: " + custos.size()
+        );
+        
         System.gc();
         
         ProgressBar.setStatus("Produto Fornecedor...Gravando...");
@@ -221,6 +233,11 @@ public class ProdutoFornecedorDAO {
                     ).getCodigoAtual();
                 }
 
+                LOG.finer(
+                        "Fornecedor ID: " + imp.getIdFornecedor() + " - " + String.valueOf(fornecedor) + "\r\n" +
+                        "Produto ID: " + imp.getIdProduto() + " - " + String.valueOf(produto) + "\r\n"
+                );
+                
                 /**
                  * Se o Fornecedor existir E
                  * Se o Produto existir E

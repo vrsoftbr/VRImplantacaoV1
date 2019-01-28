@@ -112,6 +112,7 @@ import vrimplantacao2.gui.interfaces.AutoSystemGUI;
 import vrimplantacao2.gui.interfaces.AvanceGUI;
 import vrimplantacao2.gui.interfaces.BaseGUI;
 import vrimplantacao2.gui.interfaces.BrainSoftGUI;
+import vrimplantacao2.gui.interfaces.CFSoftSiaECFGUI;
 import vrimplantacao2.gui.interfaces.CPGestorGUI;
 import vrimplantacao2.gui.interfaces.CPlusGUI;
 import vrimplantacao2.gui.interfaces.CadastraFacilGUI;
@@ -119,6 +120,7 @@ import vrimplantacao2.gui.interfaces.CefasGUI;
 import vrimplantacao2.gui.interfaces.CgaGUI;
 import vrimplantacao2.gui.interfaces.CissGUI;
 import vrimplantacao2.gui.interfaces.ContechGUI;
+import vrimplantacao2.gui.interfaces.DataSyncGUI;
 import vrimplantacao2.gui.interfaces.DestroGUI;
 import vrimplantacao2.gui.interfaces.DtComGUI;
 import vrimplantacao2.gui.interfaces.EmporioGUI;
@@ -567,6 +569,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAlphaSys = new javax.swing.JMenuItem();
         mnuZpf = new javax.swing.JMenuItem();
         mnuFlash = new javax.swing.JMenuItem();
+        mnuCFSoftSiaECF = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -603,6 +606,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuFHOnline = new javax.swing.JMenuItem();
         mnuHiper = new javax.swing.JMenuItem();
         mnuLince = new javax.swing.JMenuItem();
+        mnuDataSync = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1203,6 +1207,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu15.add(mnuFlash);
 
+        mnuCFSoftSiaECF.setText("CFSoft/SiaECF");
+        mnuCFSoftSiaECF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuCFSoftSiaECFActionPerformed(evt);
+            }
+        });
+        jMenu15.add(mnuCFSoftSiaECF);
+
         jMenu2.add(jMenu15);
 
         jMenu6.setText("SQL Server");
@@ -1482,6 +1494,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuLince);
+
+        mnuDataSync.setText("DataSync");
+        mnuDataSync.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuDataSyncActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuDataSync);
 
         jMenu2.add(mnuSqlServer2);
 
@@ -4094,6 +4114,14 @@ public final class MenuGUI extends VRMdiFrame {
         SiaCriareDbfGUI.exibir(this);
     }//GEN-LAST:event_mnuSiaCriareDbfActionPerformed
 
+    private void mnuCFSoftSiaECFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCFSoftSiaECFActionPerformed
+        CFSoftSiaECFGUI.exibir(this);
+    }//GEN-LAST:event_mnuCFSoftSiaECFActionPerformed
+
+    private void mnuDataSyncActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuDataSyncActionPerformed
+        DataSyncGUI.exibir(this);
+    }//GEN-LAST:event_mnuDataSyncActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -4211,6 +4239,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuAvance;
     private javax.swing.JMenuItem mnuBase;
     private javax.swing.JMenuItem mnuBrainSoft;
+    private javax.swing.JMenuItem mnuCFSoftSiaECF;
     private javax.swing.JMenuItem mnuCPGestor;
     private javax.swing.JMenu mnuCache;
     private javax.swing.JMenuItem mnuCadastraFacil;
@@ -4220,6 +4249,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuControll;
     private javax.swing.JMenuItem mnuCplus;
     private javax.swing.JMenu mnuDB2;
+    private javax.swing.JMenuItem mnuDataSync;
     private javax.swing.JMenuItem mnuDelfi;
     private javax.swing.JMenuItem mnuDtCom;
     private javax.swing.JMenuItem mnuEmporio;
