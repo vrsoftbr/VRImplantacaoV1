@@ -424,8 +424,8 @@ public class SolidusGUI extends VRInternalFrame {
         jLabel1 = new javax.swing.JLabel();
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
-        tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         vRTabbedPane2 = new vrframework.bean.tabbedPane.VRTabbedPane();
+        tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabImpFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -562,7 +562,7 @@ public class SolidusGUI extends VRInternalFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        tabs.addTab("Produtos", tabProdutos);
+        vRTabbedPane2.addTab("Produtos", tabProdutos);
 
         tabImpFornecedor.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
