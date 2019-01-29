@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
-import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -27,28 +26,6 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
     @Override
     public String getSistema() {
         return "CFSoftSiaECF";
-    }
-
-    public List<Estabelecimento> getLojasCliente() throws Exception {
-        List<Estabelecimento> result = new ArrayList<>();
-        
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    e.codigo,\n" +
-                    "    e.nome\n" +
-                    "from\n" +
-                    "    EMPRESA e\n" +
-                    "order by\n" +
-                    "    e.codigo"
-            )) {
-                while (rst.next()) {
-                    result.add(new Estabelecimento(rst.getString("codigo"), rst.getString("nome")));
-                }
-            }
-        }
-        
-        return result;
     }
 
     @Override
