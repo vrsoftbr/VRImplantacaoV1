@@ -190,6 +190,7 @@ import vrimplantacao2.gui.interfaces.UpFortiGUI;
 import vrimplantacao2.gui.interfaces.VisualComercioGUI;
 import vrimplantacao2.gui.interfaces.WShopGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
+import vrimplantacao2.gui.interfaces.WinNexusGUI;
 import vrimplantacao2.gui.interfaces.WinthorGUI;
 import vrimplantacao2.gui.interfaces.Wm_byFileGUI;
 import vrimplantacao2.gui.interfaces.WmsiGUI;
@@ -607,6 +608,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuHiper = new javax.swing.JMenuItem();
         mnuLince = new javax.swing.JMenuItem();
         mnuDataSync = new javax.swing.JMenuItem();
+        mnuWinNexus = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1502,6 +1504,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuDataSync);
+
+        mnuWinNexus.setText("WinNexus");
+        mnuWinNexus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuWinNexusActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuWinNexus);
 
         jMenu2.add(mnuSqlServer2);
 
@@ -4122,6 +4132,11 @@ public final class MenuGUI extends VRMdiFrame {
         DataSyncGUI.exibir(this);
     }//GEN-LAST:event_mnuDataSyncActionPerformed
 
+    private void mnuWinNexusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuWinNexusActionPerformed
+        // TODO add your handling code here:
+        WinNexusGUI.exibir(this);
+    }//GEN-LAST:event_mnuWinNexusActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -4330,6 +4345,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuUpForti;
     private javax.swing.JMenuItem mnuVisualComercio;
     private javax.swing.JMenuItem mnuWebsaq;
+    private javax.swing.JMenuItem mnuWinNexus;
     private javax.swing.JMenuItem mnuWmByFile;
     private javax.swing.JMenuItem mnuWmsi;
     private javax.swing.JMenuItem mnuWmsi1;
