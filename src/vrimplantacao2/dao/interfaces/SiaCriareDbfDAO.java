@@ -258,53 +258,75 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
         List<ProdutoIMP> result = new ArrayList<>();
         ConexaoDBF.abrirConexao(i_arquivo);
         WorkbookSettings settings = new WorkbookSettings();
-        Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls + "//PRODUTOS.xls"), settings);
+        Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls + "//produtos.xls"), settings);
         Sheet[] sheets = arquivo.getSheets();
         int linha;
 
         if (opt == OpcaoProduto.PRECO) {
-            try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
-                try (ResultSet rst = stm.executeQuery(
-                        "select "
-                        + "ID_PRODUTO, "
-                        + "UNITARIO "
-                        + "from estoque "
-                        + "where ID_EMPRESA = " + getLojaOrigem()
-                )) {
-                    while (rst.next()) {
-                        ProdutoIMP imp = new ProdutoIMP();
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("ID_PRODUTO"));
-                        imp.setPrecovenda(rst.getDouble("UNITARIO") / 1000);
-                        result.add(imp);
+            try {
+
+                for (int sh = 0; sh < sheets.length; sh++) {
+                    Sheet sheet = arquivo.getSheet(sh);
+                    linha = 0;
+
+                    for (int i = 0; i < sheet.getRows(); i++) {
+                        linha++;
+                        if (linha == 1) {
+                            continue;
+                        }
+
+                        Cell cellIdProduto = sheet.getCell(0, i);
+                        Cell cellPreco = sheet.getCell(6, i);
+
+
+                            if (!Utils.encontrouLetraCampoNumerico(cellIdProduto.getContents())) {
+                                ProdutoIMP imp = new ProdutoIMP();
+                                imp.setImportLoja(getLojaOrigem());
+                                imp.setImportSistema(getSistema());
+                                imp.setImportId(cellIdProduto.getContents());
+                                imp.setPrecovenda(Double.parseDouble(cellPreco.getContents()));
+                                result.add(imp);
+                            }
                     }
                 }
+                return result;
+            } catch (Exception ex) {
+                throw ex;
             }
-            return result;
         }
 
         if (opt == OpcaoProduto.CUSTO) {
-            try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
-                try (ResultSet rst = stm.executeQuery(
-                        "select "
-                        + "ID_PRODUTO, "
-                        + "CUSTO "
-                        + "from estoque "
-                        + "where ID_EMPRESA = " + getLojaOrigem()
-                )) {
-                    while (rst.next()) {
-                        ProdutoIMP imp = new ProdutoIMP();
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("ID_PRODUTO"));
-                        imp.setCustoComImposto(rst.getDouble("CUSTO") / 1000);
-                        imp.setCustoSemImposto(imp.getCustoComImposto());
-                        result.add(imp);
+            try {
+
+                for (int sh = 0; sh < sheets.length; sh++) {
+                    Sheet sheet = arquivo.getSheet(sh);
+                    linha = 0;
+
+                    for (int i = 0; i < sheet.getRows(); i++) {
+                        linha++;
+                        if (linha == 1) {
+                            continue;
+                        }
+
+                        Cell cellIdProduto = sheet.getCell(0, i);
+                        Cell cellCusto = sheet.getCell(4, i);
+
+
+                            if (!Utils.encontrouLetraCampoNumerico(cellIdProduto.getContents())) {
+                                ProdutoIMP imp = new ProdutoIMP();
+                                imp.setImportLoja(getLojaOrigem());
+                                imp.setImportSistema(getSistema());
+                                imp.setImportId(cellIdProduto.getContents());
+                                imp.setCustoComImposto(Double.parseDouble(cellCusto.getContents()));
+                                imp.setCustoSemImposto(Double.parseDouble(cellCusto.getContents()));
+                                result.add(imp);
+                            }
                     }
                 }
+                return result;
+            } catch (Exception ex) {
+                throw ex;
             }
-            return result;
         }
 
         if (opt == OpcaoProduto.ESTOQUE) {
@@ -329,7 +351,7 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
             return result;
         }
 
-        if (opt == OpcaoProduto.ATIVO) {
+        /*if (opt == OpcaoProduto.ATIVO) {
 
             try {
 
@@ -364,7 +386,7 @@ public class SiaCriareDbfDAO extends InterfaceDAO implements MapaTributoProvider
                 throw ex;
             }
 
-        }
+        }*/
 
         return null;
     }
