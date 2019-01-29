@@ -139,6 +139,10 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setQtdEmbalagemCotacao(Math.round(rst.getFloat("qtdembalagemcotacao")));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
+                    imp.seteBalanca("KG".equals(imp.getTipoEmbalagem()));
+                    if (imp.isBalanca()) {
+                        imp.setEan(imp.getImportId());
+                    }
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoGondola(rst.getString("descricao"));
                     imp.setDescricaoReduzida(rst.getString("descricao"));
