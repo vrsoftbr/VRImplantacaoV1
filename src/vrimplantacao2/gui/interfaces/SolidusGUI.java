@@ -59,6 +59,7 @@ public class SolidusGUI extends VRInternalFrame {
         txtSenha.setText(params.getWithNull("masterkey", SISTEMA, "SENHA"));
         txtSistema.setText(params.getWithNull("Solidus", SISTEMA, "SISTEMA"));
         txtReiniciarID.setText(params.getWithNull("1", SISTEMA, "N_REINICIO"));
+        edtDtNotaIni.setDate(params.getDate(SISTEMA, "DATA_NOTAS"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
@@ -73,6 +74,7 @@ public class SolidusGUI extends VRInternalFrame {
         params.put(txtUsuario.getText(), SISTEMA, "USUARIO");
         params.put(txtSenha.getText(), SISTEMA, "SENHA");
         params.put(txtSistema.getText(), SISTEMA, "SISTEMA");
+        params.put(edtDtNotaIni.getDate(), SISTEMA, "DATA_NOTAS");
         params.put(Utils.stringToInt(txtReiniciarID.getText()), SISTEMA, "N_REINICIO");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         

@@ -25,15 +25,15 @@ public class NotaFiscalIMP {
     private double valorFrete = 0;
     private double valorOutrasDespesas = 0;
     private double valorProduto = 0;
-    private double valorTotal = 0;
-    private double valorBaseCalculo = 0;
-    private double valorIcms = 0;
-    private double valorBaseSubstituicao = 0;
-    private double valorIcmsSubstituicao = 0;
-    private double valorBaseIpi = 0;
+    //private double valorTotal = 0;
+    //private double valorBaseCalculo = 0;
+    //private double valorIcms = 0;
+    //private double valorBaseSubstituicao = 0;
+    //private double valorIcmsSubstituicao = 0;
+    //private double valorBaseIpi = 0;
     private double valorSeguro = 0;
     private double valorDesconto = 0;
-    private double valorGuiaSubstituicao = 0;
+    //private double valorGuiaSubstituicao = 0;
     private boolean impressao = true;
     private boolean finalizada = true;
     private boolean produtorRural = false;
@@ -154,53 +154,7 @@ public class NotaFiscalIMP {
         this.valorProduto = valorProduto;
     }
 
-    public double getValorTotal() {
-        return valorTotal;
-    }
-
-    public void setValorTotal(double valorTotal) {
-        this.valorTotal = valorTotal;
-    }
-
-    public double getValorBaseCalculo() {
-        return valorBaseCalculo;
-    }
-
-    public void setValorBaseCalculo(double valorBaseCalculo) {
-        this.valorBaseCalculo = valorBaseCalculo;
-    }
-
-    public double getValorIcms() {
-        return valorIcms;
-    }
-
-    public void setValorIcms(double valorIcms) {
-        this.valorIcms = valorIcms;
-    }
-
-    public double getValorBaseSubstituicao() {
-        return valorBaseSubstituicao;
-    }
-
-    public void setValorBaseSubstituicao(double valorBaseSubstituicao) {
-        this.valorBaseSubstituicao = valorBaseSubstituicao;
-    }
-
-    public double getValorIcmsSubstituicao() {
-        return valorIcmsSubstituicao;
-    }
-
-    public void setValorIcmsSubstituicao(double valorIcmsSubstituicao) {
-        this.valorIcmsSubstituicao = valorIcmsSubstituicao;
-    }
-
-    public double getValorBaseIpi() {
-        return valorBaseIpi;
-    }
-
-    public void setValorBaseIpi(double valorBaseIpi) {
-        this.valorBaseIpi = valorBaseIpi;
-    }
+    //
 
     public double getValorSeguro() {
         return valorSeguro;
@@ -218,13 +172,7 @@ public class NotaFiscalIMP {
         this.valorDesconto = valorDesconto;
     }
 
-    public double getValorGuiaSubstituicao() {
-        return valorGuiaSubstituicao;
-    }
-
-    public void setValorGuiaSubstituicao(double valorGuiaSubstituicao) {
-        this.valorGuiaSubstituicao = valorGuiaSubstituicao;
-    }
+    //
 
     public boolean isImpressao() {
         return impressao;

@@ -21,9 +21,12 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.interfaces.custom.solidus.Entidade;
+import vrimplantacao2.utils.sql.SQLUtils;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
+import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -35,6 +38,7 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NotaFiscalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -62,6 +66,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     private List<Entidade> entidadesCheques;
     private List<Entidade> entidadesCreditoRotativo;
     private List<Entidade> entidadesContas;
+    private Date dataEmissaoNfe = new Date();
     
     private boolean removerDigitoProdutoBalanca = false;
 
@@ -95,6 +100,10 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setEntidadesContas(List<Entidade> entidadesContas) {
         this.entidadesContas = entidadesContas;
+    }
+
+    public void setDataEmissaoNfe(Date dataEmissaoNfe) {
+        this.dataEmissaoNfe = dataEmissaoNfe != null ? dataEmissaoNfe : new Date();
     }
     
     @Override
@@ -192,7 +201,9 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.PIS_COFINS,
             OpcaoProduto.NATUREZA_RECEITA,
             OpcaoProduto.ICMS,
-            OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC
+            OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC,
+            OpcaoProduto.PAUTA_FISCAL,
+            OpcaoProduto.PAUTA_FISCAL_PRODUTO
         }));
     }
 
@@ -411,6 +422,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCstEntrada(rst.getInt("icms_entrada_cst"));
                     imp.setIcmsAliqEntrada(rst.getDouble("icms_entrada_aliq"));
                     imp.setIcmsReducaoEntrada(rst.getDouble("icms_entrada_reducao"));
+                    imp.setPautaFiscalId(rst.getString("ncm"));
                     
                     result.add(imp);
                 }
@@ -1184,8 +1196,115 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    ncm.num_ncm ncm,\n" +
+                    "    nuf.des_sigla uf,\n" +
+                    "    nuf.per_iva,\n" +
+                    "    nuf.cod_trib_entrada,\n" +
+                    "    nuf.cod_tributacao,\n" +
+                    "    coalesce((select first 1 cod_trib_entrada from tab_ncm_uf where cod_ncm = nuf.cod_ncm and des_sigla != 'SP'), nuf.cod_trib_entrada) cod_tributacao_entrada_foraestado,\n" +
+                    "    coalesce((select first 1 cod_tributacao from tab_ncm_uf where cod_ncm = nuf.cod_ncm and des_sigla != 'SP'), nuf.cod_tributacao) cod_tributacao_foraestado\n" +
+                    "from\n" +
+                    "    tab_ncm_uf nuf\n" +
+                    "    join tab_ncm ncm on ncm.cod_ncm = nuf.cod_ncm\n" +
+                    "where\n" +
+                    "    nuf.des_sigla = 'SP'\n" +
+                    "order by\n" +
+                    "    ncm, uf"
+            )) {
+                while (rst.next()) {
+                    PautaFiscalIMP imp = new PautaFiscalIMP();
+                    
+                    imp.setId(rst.getString("ncm"));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setIva(rst.getDouble("per_iva"));
+                    imp.setTipoIva(TipoIva.PERCENTUAL);
+                    imp.setAliquotaDebitoId(rst.getString("cod_tributacao"));
+                    imp.setAliquotaCreditoId(rst.getString("cod_trib_entrada"));
+                    imp.setAliquotaDebitoForaEstadoId(rst.getString("cod_tributacao_foraestado"));
+                    imp.setAliquotaCreditoForaEstadoId(rst.getString("cod_tributacao_entrada_foraestado"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
     public List<NotaFiscalIMP> getNotasFiscais() throws Exception {
-        return super.getNotasFiscais();
+        List<NotaFiscalIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    nf.cod_parceiro,\n" +
+                    "    nf.tipo_parceiro,\n" +
+                    "    nf.num_nf, \n" +
+                    "    nf.num_serie_nf,\n" +
+                    "    nf.tipo_ident,\n" +
+                    "    nf.tipo_operacao,\n" +
+                    "    nf.tipo_nf,\n" +
+                    "    nf.num_serie_nf serie,\n" +
+                    "    nf.num_nf numeronota,\n" +
+                    "    nf.dta_emissao dataemissao,\n" +
+                    "    nf.dta_entrada dataentradasaida,\n" +
+                    "    nf.val_total_nf total_nota,\n" +
+                    "    nf.cod_parceiro dest_id,\n" +
+                    "    nf.des_razao_social dest_razao,\n" +
+                    "    nf.num_cnpj_cpf dest_cnpj,\n" +
+                    "    nf.num_ie_rg dest_ie,\n" +
+                    "    nf.des_endereco dest_endereco,\n" +
+                    "    nf.num_endereco dest_numero,\n" +
+                    "    nf.des_bairro dest_bairro,\n" +
+                    "    nf.num_municipio dest_municipio_ibge,\n" +
+                    "    nf.des_cidade dest_municipio,\n" +
+                    "    nf.des_uf dest_uf,\n" +
+                    "    nf.num_cep dest_cep,\n" +
+                    "    nf.cod_transportadora,\n" +
+                    "    nf.cod_motorista,\n" +
+                    "    nf.tipo_frete,\n" +
+                    "    nf.tipo_pagamento,\n" +
+                    "    nf.tipo_emitente,\n" +
+                    "    nf.obs_fiscal,\n" +
+                    "    nf.obs_livre,\n" +
+                    "    nf.val_peso_cte,\n" +
+                    "    nf.flg_cancelado,\n" +
+                    "    nf.flg_denegada,\n" +
+                    "    nf.flg_inutilizada,\n" +
+                    "    nf.num_chave_acesso,\n" +
+                    "    nf.dta_alteracao\n" +
+                    "\n" +
+                    "from\n" +
+                    "    tab_nf nf\n" +
+                    "    left join tab_motorista mt on\n" +
+                    "        nf.cod_motorista = mt.cod_motorista\n" +
+                    "    left join tab_transportadora tr on\n" +
+                    "        nf.cod_transportadora = tr.cod_transportadora\n" +
+                    "where\n" +
+                    "    nf.cod_loja = " + getLojaOrigem() + " and\n" +
+                    "    nf.dta_emissao >= " + SQLUtils.stringSQL(DATE_FORMAT.format(dataEmissaoNfe)) + "\n" +
+                    "order by\n" +
+                    "    nf.dta_emissao"
+            )) {
+                while (rst.next()) {
+                    NotaFiscalIMP imp = new NotaFiscalIMP();
+                    
+                    
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
     }    
     
 }
