@@ -41,6 +41,7 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
         Parametros params = Parametros.get();
         conexao.carregarParametros();
         tabProdutos.carregarParametros(params, SISTEMA);
+        chkImportarSimples.setSelected(params.getBool(SISTEMA, "IMPORTAR_SIMPLES"));
         txtLoja.setText(params.get(SISTEMA, "LOJA_CLIENTE"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
@@ -50,6 +51,7 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
         Parametros params = Parametros.get();
         conexao.atualizarParametros();
         tabProdutos.gravarParametros(params, SISTEMA);
+        
         params.put(txtLoja.getText(), SISTEMA, "LOJA_CLIENTE");
         ItemComboVO vr = (ItemComboVO) cmbLojaVR.getSelectedItem();
         if (vr != null) {
@@ -133,6 +135,7 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
+                    dao.setImportarSimples(chkImportarSimples.isSelected());
 
                     if (tabs.getSelectedIndex() == 0) {
 
@@ -237,7 +240,10 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
         jLabel2 = new javax.swing.JLabel();
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
-        vRTabbedPane2 = new vrframework.bean.tabbedPane.VRTabbedPane();
+        tabParametros = new vrframework.bean.tabbedPane.VRTabbedPane();
+        tabOutrosParametros = new vrframework.bean.panel.VRPanel();
+        chkImportarSimples = new vrframework.bean.checkBox.VRCheckBox();
+        vRLabel1 = new vrframework.bean.label.VRLabel();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabImpFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -305,7 +311,41 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
 
         jLabel2.setText("Loja Origem");
 
-        vRTabbedPane2.addTab("Produtos", tabProdutos);
+        tabOutrosParametros.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+
+        chkImportarSimples.setText("<html>\nUtilizar tabela <b>entrada</b> e <b>entitem</b>\n<html>");
+        chkImportarSimples.setEnabled(true);
+        chkImportarSimples.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkImportarSimplesActionPerformed(evt);
+            }
+        });
+
+        vRLabel1.setText("Produtos");
+
+        javax.swing.GroupLayout tabOutrosParametrosLayout = new javax.swing.GroupLayout(tabOutrosParametros);
+        tabOutrosParametros.setLayout(tabOutrosParametrosLayout);
+        tabOutrosParametrosLayout.setHorizontalGroup(
+            tabOutrosParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabOutrosParametrosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabOutrosParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkImportarSimples, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(292, Short.MAX_VALUE))
+        );
+        tabOutrosParametrosLayout.setVerticalGroup(
+            tabOutrosParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabOutrosParametrosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkImportarSimples, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(188, Short.MAX_VALUE))
+        );
+
+        tabParametros.addTab("Outros Parâmetros", tabOutrosParametros);
+        tabParametros.addTab("Produtos", tabProdutos);
 
         tabImpFornecedor.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
@@ -382,7 +422,7 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
                 .addContainerGap(135, Short.MAX_VALUE))
         );
 
-        vRTabbedPane2.addTab("Fornecedores", tabImpFornecedor);
+        tabParametros.addTab("Fornecedores", tabImpFornecedor);
 
         tabClienteDados.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
@@ -447,9 +487,9 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
 
         tabClientes.addTab("Descrição", tabClienteDados);
 
-        vRTabbedPane2.addTab("Clientes", tabClientes);
+        tabParametros.addTab("Clientes", tabClientes);
 
-        tabs.addTab("Importação", vRTabbedPane2);
+        tabs.addTab("Importação", tabParametros);
 
         chkUnifProdutos.setText("Produtos (Somente com EAN válido)");
 
@@ -598,6 +638,10 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
     private void chkReiniciarIDClienteUnifActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkReiniciarIDClienteUnifActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkReiniciarIDClienteUnifActionPerformed
+
+    private void chkImportarSimplesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkImportarSimplesActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkImportarSimplesActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
@@ -609,6 +653,7 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFTipoEmpresa;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkImportarSimples;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkReiniciarIDClienteUnif;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
@@ -623,13 +668,15 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel tabClienteDados;
     private vrframework.bean.tabbedPane.VRTabbedPane tabClientes;
     private vrframework.bean.panel.VRPanel tabImpFornecedor;
+    private vrframework.bean.panel.VRPanel tabOutrosParametros;
+    private vrframework.bean.tabbedPane.VRTabbedPane tabParametros;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private vrframework.bean.textField.VRTextField txtLoja;
     private vrframework.bean.textField.VRTextField txtReiniciarIDClienteUnif;
+    private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
-    private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;
     // End of variables declaration//GEN-END:variables
 
     private void getEntidadesSelecionadas(String param, VRList list) {

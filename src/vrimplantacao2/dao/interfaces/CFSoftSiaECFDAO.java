@@ -22,7 +22,13 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  * @author Leandro
  */
 public class CFSoftSiaECFDAO extends InterfaceDAO {
+    
+    private boolean importarSimples = false;
 
+    public void setImportarSimples(boolean importarSimples) {
+        this.importarSimples = importarSimples;
+    }
+    
     @Override
     public String getSistema() {
         return "CFSoftSiaECF";
@@ -81,8 +87,8 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     "        select first 1\n" +
                     "            i.entpreco\n" +
                     "        from\n" +
-                    "            itempentrada i\n" +
-                    "            join pentrada e on i.entcodigo = e.encodigo\n" +
+                    "            " + (importarSimples ? "entitem" : "itempentrada") + " i\n" +
+                    "            join " + (importarSimples ? "entrada" : "pentrada") + " e on i.entcodigo = e.encodigo\n" +
                     "        where\n" +
                     "            i.entcoditem = p.itcod\n" +
                     "        order by\n" +
