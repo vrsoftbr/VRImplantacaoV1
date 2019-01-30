@@ -1190,7 +1190,8 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                         dao.setLojaOrigem(txtCodLojaOrigem.getText());
                         importador.setLojaVR(((ItemComboVO) cmbLojaDestino.getSelectedItem()).id);
                         tabProdImportacao.setImportador(importador);
-
+                        dao.setFormatoData(txtFormatoData.getText());
+                        dao.setFormatoDataCompleta(txtFormatoDataCompleta.getText());
                         ProgressBar.show();
                         ProgressBar.setCancel(true);
                         
