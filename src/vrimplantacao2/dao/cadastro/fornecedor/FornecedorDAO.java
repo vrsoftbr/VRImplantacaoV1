@@ -566,7 +566,7 @@ public class FornecedorDAO {
             sql.put("cnpj", vo.getCnpj());// numeric(14,0) NOT NULL,
             sql.put("revenda", false);// boolean NOT NULL,
             sql.put("id_situacaocadastro", vo.getSituacaoCadastro().getId());// integer NOT NULL,
-            sql.put("id_tipopagamento", vo.getTipoPagamento().getId());// integer NOT NULL,
+            sql.put("id_tipopagamento", vo.getTipoPagamento() == null ? Parametros.get().getTipoPagamento().getId() : vo.getTipoPagamento().getId());// integer NOT NULL,
             sql.put("numerodoc", 0);// integer NOT NULL,
             sql.put("pedidominimoqtd", vo.getPedidoMinimoQtd());// integer NOT NULL,
             sql.put("pedidominimovalor", vo.getPedidoMinimoValor());// numeric(11,2) NOT NULL,
