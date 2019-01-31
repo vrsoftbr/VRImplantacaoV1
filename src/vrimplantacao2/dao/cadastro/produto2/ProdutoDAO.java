@@ -303,6 +303,12 @@ public class ProdutoDAO {
         if(opt.contains(OpcaoProduto.DATA_ALTERACAO)) {
             sql.put("dataalteracao", vo.getDataAlteracao());
         }
+        if (opt.contains(OpcaoProduto.PESO_BRUTO)) {
+            sql.put("pesobruto", vo.getPesoBruto());
+        }
+        if (opt.contains(OpcaoProduto.PESO_LIQUIDO)) {
+            sql.put("pesoliquido", vo.getPesoLiquido());
+        }
         
         sql.setWhere("id = " + vo.getId());
         

@@ -168,7 +168,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 opt.contains(OpcaoProduto.QTD_EMBALAGEM_EAN) ||
                 opt.contains(OpcaoProduto.SUGESTAO_PEDIDO) ||
                 opt.contains(OpcaoProduto.SUGESTAO_COTACAO) ||
-                opt.contains(OpcaoProduto.VENDA_PDV)
+                opt.contains(OpcaoProduto.VENDA_PDV) ||
+                opt.contains(OpcaoProduto.PESO_BRUTO) ||
+                opt.contains(OpcaoProduto.PESO_LIQUIDO)
         ) {
             chkDescCompleta.setVisible(opt.contains(OpcaoProduto.DESC_COMPLETA));
             chkDescReduzida.setVisible(opt.contains(OpcaoProduto.DESC_REDUZIDA));
@@ -181,6 +183,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkSugestaoPedido.setVisible(opt.contains(OpcaoProduto.SUGESTAO_PEDIDO));
             chkSugestaoCotacao.setVisible(opt.contains(OpcaoProduto.SUGESTAO_COTACAO));
             chkVendaPdv.setVisible(opt.contains(OpcaoProduto.VENDA_PDV));
+            chkPesoBruto.setVisible(opt.contains(OpcaoProduto.PESO_BRUTO));
+            chkPesoLiquido.setVisible(opt.contains(OpcaoProduto.PESO_LIQUIDO));
             tabImportacao.add(pnlImpInfoAdic);
         }
         
@@ -311,6 +315,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkSugestaoCotacao = new vrframework.bean.checkBox.VRCheckBox();
         chkVendaPdv = new vrframework.bean.checkBox.VRCheckBox();
         chkFabricante = new vrframework.bean.checkBox.VRCheckBox();
+        chkPesoBruto = new vrframework.bean.checkBox.VRCheckBox();
+        chkPesoLiquido = new vrframework.bean.checkBox.VRCheckBox();
         pnlImpOutrosDados = new vrframework.bean.panel.VRPanel();
         jLabel9 = new javax.swing.JLabel();
         chkAssociado = new vrframework.bean.checkBox.VRCheckBox();
@@ -807,6 +813,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkFabricante, "Fabricante");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkPesoBruto, "Peso Bruto");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkPesoLiquido, "Peso Líquido");
+
         javax.swing.GroupLayout pnlImpInfoAdicLayout = new javax.swing.GroupLayout(pnlImpInfoAdic);
         pnlImpInfoAdic.setLayout(pnlImpInfoAdicLayout);
         pnlImpInfoAdicLayout.setHorizontalGroup(
@@ -843,7 +853,11 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                         .addContainerGap()
                         .addComponent(chkVendaPdv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkFabricante, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(chkFabricante, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkPesoBruto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkPesoLiquido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         pnlImpInfoAdicLayout.setVerticalGroup(
@@ -868,7 +882,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlImpInfoAdicLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkVendaPdv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkFabricante, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkFabricante, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkPesoBruto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkPesoLiquido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(7, 7, 7))
         );
 
@@ -995,6 +1011,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkPautaFiscal;
     public vrframework.bean.checkBox.VRCheckBox chkPautaFiscalProduto;
     public vrframework.bean.checkBox.VRCheckBox chkPautaUsarEansMenores;
+    public vrframework.bean.checkBox.VRCheckBox chkPesoBruto;
+    public vrframework.bean.checkBox.VRCheckBox chkPesoLiquido;
     public vrframework.bean.checkBox.VRCheckBox chkPisCofins;
     public vrframework.bean.checkBox.VRCheckBox chkPreco;
     public vrframework.bean.checkBox.VRCheckBox chkProdMercadologico;
@@ -1228,6 +1246,12 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
                 if (chkNaoTransformarEANemUN.isSelected()) {
                     opt.add(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN);
+                }
+                if (chkPesoBruto.isSelected()) {
+                    opcoes.add(OpcaoProduto.PESO_BRUTO);
+                }
+                if (chkPesoLiquido.isSelected()) {
+                    opcoes.add(OpcaoProduto.PESO_LIQUIDO);
                 }
                 if (!opcoes.isEmpty()) {
                     importador.atualizarProdutos(opcoes);

@@ -203,7 +203,9 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.ICMS,
             OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC,
             OpcaoProduto.PAUTA_FISCAL,
-            OpcaoProduto.PAUTA_FISCAL_PRODUTO
+            OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+            OpcaoProduto.PESO_BRUTO,
+            OpcaoProduto.PESO_LIQUIDO
         }));
     }
 
@@ -301,6 +303,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    p.cod_sub_grupo,\n" +
                     "    p.cod_produto_similar id_familia,\n" +
                     "    p.val_peso peso,\n" +
+                    "    p.val_peso_emb pesoliquido,\n" +
+                    "    p.val_vda_peso_bruto pesobruto,\n" +
                     "    pl.qtd_est_atual estoque,\n" +
                     "    pl.qtd_est_minimo estoqueminimo,\n" +
                     "    pl.val_margem margem,\n" +
@@ -402,8 +406,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico3(rst.getString("cod_sub_grupo"));
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
                     imp.setFornecedorFabricante(rst.getString("fabricante"));
-                    imp.setPesoBruto(rst.getDouble("peso"));
-                    imp.setPesoLiquido(rst.getDouble("peso"));
+                    imp.setPesoBruto(rst.getDouble("pesobruto"));
+                    imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setMargem(rst.getDouble("margem"));
