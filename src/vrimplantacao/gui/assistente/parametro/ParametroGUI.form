@@ -108,7 +108,7 @@
                       <Component id="vRPanel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="pnlDiversos" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="208" max="32767" attributes="0"/>
+                      <EmptySpace pref="186" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -266,19 +266,27 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
+                      <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
-                                  <Component id="vRLabel4" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="234" max="32767" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Group type="102" attributes="0">
+                                          <Component id="vRLabel4" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace min="0" pref="234" max="32767" attributes="0"/>
+                                      </Group>
+                                      <Component id="cmbTipoPagamento" max="32767" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                      <Component id="txtVendaProdutoPadrao" max="32767" attributes="0"/>
+                                      <Component id="vRLabel5" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
-                              <Component id="cmbTipoPagamento" max="32767" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                              <Component id="txtVendaProdutoPadrao" max="32767" attributes="0"/>
-                              <Component id="vRLabel5" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkIgnorarClienteImpVenda" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -301,7 +309,9 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="chkIgnorarClienteImpVenda" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -327,6 +337,11 @@
                 <Component class="vrframework.bean.label.VRLabel" name="vRLabel5">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="ID Prod. Padr&#xe3;o (Para Vendas)"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIgnorarClienteImpVenda">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Ignorar cliente n&#xe3;o importado na importa&#xe7;&#xe3;o de venda"/>
                   </Properties>
                 </Component>
               </SubComponents>

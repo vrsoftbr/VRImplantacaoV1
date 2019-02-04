@@ -59,6 +59,7 @@ public class VendaRepository {
             provider.notificar("Vendas...Convertendo as vendas", (int) provider.getVendaImpSize());
             
             int produtoPadrao = Parametros.get().getItemVendaPadrao();
+            boolean ignorarClienteImpVenda = Parametros.get().isIgnorarClienteImpVenda();
             
             List<VendaItemIMP> divergentes = new ArrayList<>();
 
@@ -73,6 +74,8 @@ public class VendaRepository {
                 /**
                  * Se houver informações sobre o cliente preferencial
                  */
+                
+
                 if (impVenda.getIdClientePreferencial() != null && !"".equals(impVenda.getIdClientePreferencial().trim())) {
 
                     ClientePreferencialVO cliente = cliPreferencialAnterior.get(impVenda.getIdClientePreferencial());
@@ -86,16 +89,20 @@ public class VendaRepository {
                         venda.setNomeCliente(cliente.getNome());
                         venda.setCpf(cliente.getCnpj());
                     } else {
-                        haDivergencia = true;
+                        if (ignorarClienteImpVenda) {
+                            haDivergencia = false;
+                        } else {
+                            haDivergencia = true;
+                        }
+                        
                         LOG.warning("01-Sem cliente preferencial " + impVenda.getIdClientePreferencial() + " na venda " + impVenda.getId());
                     }
-
                 }
-                
+
                 /**
                  * Se houver informações sobre o cliente eventual
                  */
-                if (impVenda.getClienteEventual()!= null && !"".equals(impVenda.getClienteEventual().trim())) {
+                if (impVenda.getClienteEventual() != null && !"".equals(impVenda.getClienteEventual().trim())) {
 
                     ClienteEventualVO cliente = cliEventualAnterior.get(impVenda.getClienteEventual());
                     if (cliente == null) {
@@ -108,8 +115,13 @@ public class VendaRepository {
                         venda.setNomeCliente(cliente.getNome());
                         venda.setCpf(cliente.getCnpj());
                     } else {
-                        haDivergencia = true;
-                        LOG.warning("01-Sem cliente eventual " + impVenda.getClienteEventual()+ " na venda " + impVenda.getId());
+                        if (ignorarClienteImpVenda) {
+                            haDivergencia = false;
+                        } else {
+                            haDivergencia = true;
+                        }
+                        
+                        LOG.warning("01-Sem cliente eventual " + impVenda.getClienteEventual() + " na venda " + impVenda.getId());
                     }
 
                 }

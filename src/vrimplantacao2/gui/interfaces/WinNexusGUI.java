@@ -1,10 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
-import java.awt.Frame;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -20,25 +16,20 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
-import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
-import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
-import vrimplantacao2.dao.interfaces.GetWayDAO;
+import vrimplantacao2.dao.interfaces.WinNexusDAO;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
 public class WinNexusGUI extends VRInternalFrame {
 
-    private static final String SISTEMA = "GetWay";
+    private static final String SISTEMA = "WinNexus";
     private static final String SERVIDOR_SQL = "Sql Server";
     private static WinNexusGUI instance;
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
-    private GetWayDAO getWayDAO = new GetWayDAO();
+    private WinNexusDAO dao = new WinNexusDAO();
     private ConexaoSqlServer connSqlServer = new ConexaoSqlServer();
 
     private void carregarParametros() throws Exception {
@@ -119,7 +110,7 @@ public class WinNexusGUI extends VRInternalFrame {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja : getWayDAO.getLojas()) {
+        for (Estabelecimento loja : dao.getLojas()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -179,14 +170,12 @@ public class WinNexusGUI extends VRInternalFrame {
                         lojaMesmoId = "";
                     }
                      
-                    getWayDAO.v_lojaMesmoId = lojaMesmoId;
-
-                    Importador importador = new Importador(getWayDAO);
+                    Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
                     
 
-                    if (tabs.getSelectedIndex() == 1) {
+                    if (tabs.getSelectedIndex() == 0) {
                         if (chkProdutos.isSelected()) {
                             importador.importarProduto();
                         }
@@ -293,7 +282,7 @@ public class WinNexusGUI extends VRInternalFrame {
                             
                         }
                         
-                    } else if (tabs.getSelectedIndex() == 2) {
+                    } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
                         }

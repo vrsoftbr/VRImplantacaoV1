@@ -1518,6 +1518,7 @@ public final class MenuGUI extends VRMdiFrame {
         jMenu7.setText("Oracle");
 
         jMenuItemRMS.setText("RMS");
+        jMenuItemRMS.setEnabled(false);
         jMenuItemRMS.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemRMSActionPerformed(evt);
@@ -2668,23 +2669,6 @@ public final class MenuGUI extends VRMdiFrame {
             this.setDefaultCursor();
         }
     }//GEN-LAST:event_jMenuItem15ActionPerformed
-
-    private void jMenuItemRMSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemRMSActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarRM == null || formImportarRM.isClosed()) {
-                formImportarRM = new RMSGUI(this);
-            }
-
-            formImportarRM.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
-
-    }//GEN-LAST:event_jMenuItemRMSActionPerformed
 
     private void jMenuItem17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem17ActionPerformed
         try {
@@ -4136,6 +4120,22 @@ public final class MenuGUI extends VRMdiFrame {
         // TODO add your handling code here:
         WinNexusGUI.exibir(this);
     }//GEN-LAST:event_mnuWinNexusActionPerformed
+
+    private void jMenuItemRMSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemRMSActionPerformed
+        try {
+            this.setWaitCursor();
+            if (formImportarRM == null || formImportarRM.isClosed()) {
+                formImportarRM = new RMSGUI(this);
+            }
+
+            formImportarRM.setVisible(true);
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, getTitle());
+
+        } finally {
+            this.setDefaultCursor();
+        }
+    }//GEN-LAST:event_jMenuItemRMSActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;

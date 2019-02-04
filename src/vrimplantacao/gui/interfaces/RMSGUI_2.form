@@ -496,7 +496,7 @@
                               <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="10" max="32767" attributes="0"/>
-                          <Component id="vRPanel1" min="-2" pref="134" max="-2" attributes="0"/>
+                          <Component id="vRPanel1" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="-2" pref="168" max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -593,22 +593,12 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="103" alignment="0" groupAlignment="0" attributes="0">
-                                      <Group type="102" attributes="0">
-                                          <Component id="lblMesVenda" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace type="unrelated" max="32767" attributes="0"/>
-                                      </Group>
-                                      <Group type="102" alignment="1" attributes="0">
-                                          <Component id="dtVenda" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace max="32767" attributes="0"/>
-                                      </Group>
-                                  </Group>
-                                  <Group type="102" attributes="0">
-                                      <Component id="chkVendas" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="32767" attributes="0"/>
-                                  </Group>
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                  <Component id="lblMesVenda" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkVendas" max="32767" attributes="0"/>
+                                  <Component id="dtVenda" alignment="0" max="32767" attributes="0"/>
                               </Group>
+                              <EmptySpace pref="21" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -621,7 +611,7 @@
                               <Component id="lblMesVenda" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="dtVenda" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="17" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -637,7 +627,7 @@
                         <Property name="text" type="java.lang.String" value="M&#xea;s da Venda"/>
                       </Properties>
                     </Component>
-                    <Component class="org.jdesktop.swingx.JXDatePicker" name="dtVenda">
+                    <Component class="vrframework.bean.textField.VRTextField" name="dtVenda">
                     </Component>
                   </SubComponents>
                 </Container>

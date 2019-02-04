@@ -44,6 +44,7 @@ public final class Parametros implements Iterable<Parametro>{
     private static final String GERAR_BANCO_IMPLANTACAO = "GERAR_BANCO_IMPLANTACAO";
     private static final String IMPORTAR_BANCO_IMPLANTACAO = "IMPORTAR_BANCO_IMPLANTACAO";
     private static final String ITEM_VENDA_PADRAO = "ITEM_VENDA_PADRAO";
+    private static final String IGNORAR_CLIENTE_IMP_VENDA = "IGNORAR_CLIENTE_IMP_VENDA";
     private static final SimpleDateFormat DATA_FORMAT= new SimpleDateFormat("yyyy-MM-dd");
     public static String lite;
     
@@ -54,6 +55,7 @@ public final class Parametros implements Iterable<Parametro>{
     private MunicipioVO municipioCache;
     private vrimplantacao2.vo.cadastro.local.MunicipioVO municipioCache2;
     private TipoPagamento tipoPagamento;
+    private boolean ignorarClienteImpVenda;
     
     private Map<String, LoggingConfig> loggers;
     //</editor-fold>
@@ -450,6 +452,23 @@ public final class Parametros implements Iterable<Parametro>{
         }
     }
 
-   
+    /**
+     * @return the verificaClienteImpVenda
+     */
+    public boolean isIgnorarClienteImpVenda() {
+        return getBool(IGNORAR_CLIENTE_IMP_VENDA);
+    }
 
+    /**
+     * @param ignorarClienteImpVenda the verificaClienteImpVenda to set
+     */
+    public void setIgnorarClienteImpVenda(boolean ignorarClienteImpVenda) {
+        try {
+            put(ignorarClienteImpVenda, IGNORAR_CLIENTE_IMP_VENDA);
+            LOG.finer("Importar dados do banco implantacao alterado");
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Erro ao gravar", ex);
+            throw new RuntimeException(ex);            
+        }
+    }
 }

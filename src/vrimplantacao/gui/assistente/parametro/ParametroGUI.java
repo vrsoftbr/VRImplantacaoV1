@@ -16,7 +16,6 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -124,6 +123,7 @@ public class ParametroGUI extends VRInternalFrame {
         cmbTipoPagamento = new JComboBox();
         txtVendaProdutoPadrao = new VRTextField();
         vRLabel5 = new VRLabel();
+        chkIgnorarClienteImpVenda = new VRCheckBox();
         tabLogging = new VRPanel();
         btnLogGravar = new VRButton();
         btnLogCancelar = new VRButton();
@@ -268,6 +268,8 @@ public class ParametroGUI extends VRInternalFrame {
 
         vRLabel5.setText("ID Prod. Padrão (Para Vendas)");
 
+        chkIgnorarClienteImpVenda.setText("Ignorar cliente não importado na importação de venda");
+
         GroupLayout pnlDiversosLayout = new GroupLayout(pnlDiversos);
         pnlDiversos.setLayout(pnlDiversosLayout);
         pnlDiversosLayout.setHorizontalGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -275,13 +277,18 @@ public class ParametroGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addGroup(pnlDiversosLayout.createSequentialGroup()
-                        .addComponent(vRLabel4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 234, Short.MAX_VALUE))
-                    .addComponent(cmbTipoPagamento, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(txtVendaProdutoPadrao, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(vRLabel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addGroup(pnlDiversosLayout.createSequentialGroup()
+                                .addComponent(vRLabel4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 234, Short.MAX_VALUE))
+                            .addComponent(cmbTipoPagamento, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(txtVendaProdutoPadrao, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(vRLabel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(pnlDiversosLayout.createSequentialGroup()
+                        .addComponent(chkIgnorarClienteImpVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         pnlDiversosLayout.setVerticalGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -296,7 +303,9 @@ public class ParametroGUI extends VRInternalFrame {
                         .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                             .addComponent(cmbTipoPagamento, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtVendaProdutoPadrao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap())
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkIgnorarClienteImpVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         GroupLayout tabValorPadrãoLayout = new GroupLayout(tabValorPadrão);
@@ -318,7 +327,7 @@ public class ParametroGUI extends VRInternalFrame {
                 .addComponent(vRPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlDiversos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(208, Short.MAX_VALUE))
+                .addContainerGap(186, Short.MAX_VALUE))
         );
 
         tabs.addTab("Valores padrão", tabValorPadrão);
@@ -574,6 +583,7 @@ public class ParametroGUI extends VRInternalFrame {
     private VRButton btnLogExcluir;
     private VRButton btnLogGravar;
     private VRCheckBox chkGerarBancoImplantacao;
+    private VRCheckBox chkIgnorarClienteImpVenda;
     private VRCheckBox chkImportarBancoImplantacao;
     private VRComboBox cmbMunicipioPadrao;
     private JComboBox cmbTipoPagamento;
@@ -658,6 +668,7 @@ public class ParametroGUI extends VRInternalFrame {
 
         chkGerarBancoImplantacao.setSelected(parametros.isGerarBancoImplantacao());
         chkImportarBancoImplantacao.setSelected(parametros.isImportarBancoImplantacao());
+        chkIgnorarClienteImpVenda.setSelected(parametros.isIgnorarClienteImpVenda());
         txtVendaProdutoPadrao.setInt(parametros.getItemVendaPadrao());
         
         LOG.fine("Parametros carregados na tela");
@@ -674,6 +685,7 @@ public class ParametroGUI extends VRInternalFrame {
             parametros.setImportarBancoImplantacao(chkImportarBancoImplantacao.isSelected());
             parametros.setTipoPagamento((TipoPagamento) cmbTipoPagamento.getSelectedItem());
             parametros.setItemVendaPadrao(txtVendaProdutoPadrao.getInt());
+            parametros.setIgnorarClienteImpVenda(chkIgnorarClienteImpVenda.isSelected());
             parametros.salvar();
             Util.exibirMensagem("Parâmetros gravados com sucesso!", title);
         } else {
