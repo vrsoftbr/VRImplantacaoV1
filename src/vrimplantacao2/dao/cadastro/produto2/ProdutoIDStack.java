@@ -83,6 +83,9 @@ public class ProdutoIDStack {
             }
 
             if (gerarID) {
+                if (balanca.isEmpty()) {
+                    balanca = normais;
+                }
                 if (eBalanca) {
                     id = (int) balanca.pop();
                     normais.remove((long) id);
