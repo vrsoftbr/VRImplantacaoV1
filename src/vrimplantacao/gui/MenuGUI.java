@@ -117,6 +117,7 @@ import vrimplantacao2.gui.interfaces.CPGestorGUI;
 import vrimplantacao2.gui.interfaces.CPlusGUI;
 import vrimplantacao2.gui.interfaces.CadastraFacilGUI;
 import vrimplantacao2.gui.interfaces.CefasGUI;
+import vrimplantacao2.gui.interfaces.CerebroGUI;
 import vrimplantacao2.gui.interfaces.CgaGUI;
 import vrimplantacao2.gui.interfaces.CissGUI;
 import vrimplantacao2.gui.interfaces.ContechGUI;
@@ -572,6 +573,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuZpf = new javax.swing.JMenuItem();
         mnuFlash = new javax.swing.JMenuItem();
         mnuCFSoftSiaECF = new javax.swing.JMenuItem();
+        mnuCerebro = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1218,6 +1220,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu15.add(mnuCFSoftSiaECF);
+
+        mnuCerebro.setText("Cerebro/SCOL");
+        mnuCerebro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuCerebroActionPerformed(evt);
+            }
+        });
+        jMenu15.add(mnuCerebro);
 
         jMenu2.add(jMenu15);
 
@@ -4151,6 +4161,11 @@ public final class MenuGUI extends VRMdiFrame {
         RPInfoGUI.exibir(this);
     }//GEN-LAST:event_mnuRPInfoActionPerformed
 
+    private void mnuCerebroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCerebroActionPerformed
+        // TODO add your handling code here:
+        CerebroGUI.exibir(this);
+    }//GEN-LAST:event_mnuCerebroActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -4274,6 +4289,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuCadastraFacil;
     private javax.swing.JMenu mnuCaixa;
     private javax.swing.JMenuItem mnuCefas;
+    private javax.swing.JMenuItem mnuCerebro;
     private javax.swing.JMenuItem mnuCodigoBarrasAtacado;
     private javax.swing.JMenuItem mnuControll;
     private javax.swing.JMenuItem mnuCplus;
