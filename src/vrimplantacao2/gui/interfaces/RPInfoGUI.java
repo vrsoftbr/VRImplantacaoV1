@@ -1,89 +1,100 @@
 package vrimplantacao2.gui.interfaces;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
-import org.openide.util.Exceptions;
+import javax.swing.WindowConstants;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
-import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
-import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.LojaDAO;
-import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
-import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
-import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.interfaces.CFSoftSiaECFDAO;
-import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.interfaces.RPInfoDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.parametro.Parametros;
 
-public class CFSoftSiaECFGUI extends VRInternalFrame {
+/**
+ *
+ * @author Leandro
+ */
+public class RPInfoGUI extends VRInternalFrame {
     
-    private static final Logger LOG = Logger.getLogger(CFSoftSiaECFGUI.class.getName());
-    
-    public static final String SISTEMA = "CFSoftSiaECF";
-    private static final String SERVIDOR_SQL = "Firebird";
-    private static CFSoftSiaECFGUI instance;
-    
-    private String vLojaCliente = "-1";
-    private int vLojaVR = -1;
+    private static final String SISTEMA = "RPInfo";
+    private static final Logger LOG = Logger.getLogger(RPInfoGUI.class.getName());
 
-    private void carregarParametros() throws Exception {
-        Parametros params = Parametros.get();
-        conexao.carregarParametros();
-        tabProdutos.carregarParametros(params, SISTEMA);
-        txtLoja.setText(params.get(SISTEMA, "LOJA_CLIENTE"));
-        vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
-        vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
-    }
+    private static RPInfoGUI instance;
     
-    private void gravarParametros() throws Exception {
-        Parametros params = Parametros.get();
-        conexao.atualizarParametros();
-        tabProdutos.gravarParametros(params, SISTEMA);
-        
-        params.put(txtLoja.getText(), SISTEMA, "LOJA_CLIENTE");
-        ItemComboVO vr = (ItemComboVO) cmbLojaVR.getSelectedItem();
-        if (vr != null) {
-            params.put(vr.id, SISTEMA, "LOJA_VR");
-            vLojaVR = vr.id;
+    private String vLojaCliente;
+    private int vLojaVR;
+    private final RPInfoDAO dao;
+    
+    public static void exibir(VRMdiFrame i_mdiFrame) {
+        try {
+            i_mdiFrame.setWaitCursor();            
+            if (instance == null || instance.isClosed()) {
+                instance = new RPInfoGUI(i_mdiFrame);
+            }
+            instance.setVisible(true);
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, "Erro ao abrir");
+        } finally {
+            i_mdiFrame.setDefaultCursor();
         }
-        params.salvar();
     }
     
-    private CFSoftSiaECFDAO dao = new CFSoftSiaECFDAO();
-    private ConexaoFirebird conn = new ConexaoFirebird();
-    
-    private CFSoftSiaECFGUI(VRMdiFrame i_mdiFrame) throws Exception {
-        super(i_mdiFrame);
+    /**
+     * Creates new form RPInfoGUI
+     * @param frame
+     * @throws java.lang.Exception
+     */
+    public RPInfoGUI(VRMdiFrame frame) throws Exception {
+        super(frame);
+        this.dao = new RPInfoDAO();
         initComponents();
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        addInternalFrameListener(new InternalFrameAdapter() {
+            @Override
+            public void internalFrameClosed(InternalFrameEvent e) {
+                instance = null;
+            }            
+        });
         conexao.setSistema(SISTEMA);
+        conexao.host = "localhost";
+        conexao.database = "erp";
+        conexao.port = "5432";
+        conexao.user = "postgres";
+        conexao.pass = "s3gr3d0";
         conexao.setOnConectar(new ConexaoEvent() {
             @Override
             public void executar() throws Exception {
-                gravarParametros();        
                 carregarLojaVR();
+                carregarLojaCliente();
+                gravarParametros();
             }
         });
-        conexao.host = "localhost";
-        conexao.database = "c://CFSOFT//GDB//NOVASERRA.FDB";
-        conexao.port = "3050";
-        conexao.user = "SYSDBA";
-        conexao.pass = "masterkey";
-        tabProdutos.setOpcoesDisponiveis(dao);
         
-        this.title = "Importação " + SISTEMA;
-        
-        carregarParametros();
         
         centralizarForm();
-        this.setMaximum(false);
+        this.setMaximum(false);        
     }
     
+    public void carregarLojaCliente() throws Exception {
+        cmbLojaOrigem.setModel(new DefaultComboBoxModel());
+        int cont = 0;
+        int index = 0;
+        for (Estabelecimento loja : dao.getLojaOrigem()) {
+            cmbLojaOrigem.addItem(loja);
+            if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
+                index = cont;
+            }
+            cont++;
+        }
+        cmbLojaOrigem.setSelectedIndex(index);
+    }
+
     public void carregarLojaVR() throws Exception {
         cmbLojaVR.setModel(new DefaultComboBoxModel());
         int cont = 0;
@@ -97,141 +108,50 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
         }
         cmbLojaVR.setSelectedIndex(index);
     }
+
+    private void carregarParametros() throws Exception {
+        Parametros params = Parametros.get();
+        conexao.carregarParametros();
+        tabProdutos.carregarParametros(params, SISTEMA);
+        vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
+        vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
+    }
     
-    public static void exibir(VRMdiFrame i_mdiFrame) {
-        try {
-            i_mdiFrame.setWaitCursor();            
-            if (instance == null || instance.isClosed()) {
-                instance = new CFSoftSiaECFGUI(i_mdiFrame);
-            }
-
-            instance.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, "Erro ao abrir");
-        } finally {
-            i_mdiFrame.setDefaultCursor();
+    private void gravarParametros() throws Exception {
+        Parametros params = Parametros.get();
+        conexao.atualizarParametros();
+        tabProdutos.gravarParametros(params, SISTEMA);
+        
+        Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
+        if (cliente != null) {
+            params.put(cliente.cnpj, SISTEMA, "LOJA_CLIENTE");
+            vLojaCliente = cliente.cnpj;
         }
+        
+        ItemComboVO vr = (ItemComboVO) cmbLojaVR.getSelectedItem();
+        if (vr != null) {
+            params.put(vr.id, SISTEMA, "LOJA_VR");
+            vLojaVR = vr.id;
+        }
+        params.salvar();
     }
-
-    public void importarTabelas() throws Exception {
-        Thread thread = new Thread() {
-            int idLojaVR;
-            String idLojaCliente;
-            @Override
-            public void run() {
-                try {
-                    ProgressBar.show();
-                    ProgressBar.setCancel(true);
-                    
-                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
-                    idLojaCliente = txtLoja.getText();
-                    
-                    Importador importador = new Importador(dao);
-                    importador.setLojaOrigem(idLojaCliente);
-                    importador.setLojaVR(idLojaVR);
-
-                    if (tabs.getSelectedIndex() == 0) {
-
-                        tabProdutos.setImportador(importador);
-                        tabProdutos.executarImportacao();
-                                                
-                        if (chkFornecedor.isSelected()) {
-                            importador.importarFornecedor();
-                        }
-                        if (chkProdutoFornecedor.isSelected()) {
-                            importador.importarProdutoFornecedor();
-                        } 
-                        {
-                            List<OpcaoFornecedor> opcoes = new ArrayList<>();
-                            if (chkFContatos.isSelected()) {
-                                opcoes.add(OpcaoFornecedor.CONTATOS);                        
-                            }              
-                            if (chkFCnpj.isSelected()) {
-                                opcoes.add(OpcaoFornecedor.CNPJ_CPF);
-                            }
-                            if (chkFTipoEmpresa.isSelected()) {
-                                opcoes.add(OpcaoFornecedor.TIPO_EMPRESA);
-                            }
-                            if (!opcoes.isEmpty()) {
-                                importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
-                            }
-                        }
-                        if (chkClientePreferencial.isSelected()) {
-                            importador.importarClientePreferencial();
-                        }
-                        if (chkClienteEventual.isSelected()) {
-                            importador.importarClienteEventual();
-                        }
-                        if (chkCreditoRotativo.isSelected()) {
-                            importador.importarCreditoRotativo();
-                        }
-                        if (chkCheque.isSelected()) {
-                            importador.importarCheque();
-                        }
-                    } else if (tabs.getSelectedIndex() == 1) {
-                        if (chkUnifProdutos.isSelected()) {
-                            importador.unificarProdutos();
-                        }
-                        if (chkUnifFornecedor.isSelected()) {
-                            importador.unificarFornecedor();
-                        }
-                        if (chkUnifProdutoFornecedor.isSelected()) {
-                            importador.unificarProdutoFornecedor();
-                        }                        
-                        if (chkUnifClientePreferencial.isSelected()) {
-                            List<OpcaoCliente> opcoes = new ArrayList<>();
-                            if (chkReiniciarIDClienteUnif.isSelected()) {
-                                opcoes.add(
-                                    OpcaoCliente.IMP_REINICIAR_NUMERACAO.addParametro(
-                                        "N_REINICIO",
-                                        Utils.stringToInt(txtReiniciarIDClienteUnif.getText())
-                                    )
-                                );
-                            }
-                            importador.unificarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));
-                        }                        
-                        if (chkClienteEventual.isSelected()) {
-                            List<OpcaoCliente> opcoes = new ArrayList<>();
-                            if (chkReiniciarIDClienteUnif.isSelected()) {
-                                opcoes.add(
-                                    OpcaoCliente.IMP_REINICIAR_NUMERACAO.addParametro(
-                                        "N_REINICIO",
-                                        Utils.stringToInt(txtReiniciarIDClienteUnif.getText())
-                                    )
-                                );
-                            }
-                            importador.unificarClienteEventual(opcoes.toArray(new OpcaoCliente[]{}));
-                        }
-                    }
-                                       
-                    ProgressBar.dispose();
-                    Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
-                } catch (Exception ex) {
-                    try {                    
-                        conn.close();
-                    } catch (Exception ex1) {
-                        Exceptions.printStackTrace(ex1);
-                    }
-                    ProgressBar.dispose();
-                    Util.exibirMensagemErro(ex, getTitle());
-                }
-            }
-        };
-
-        thread.start();
+    
+    private void importarTabelas() throws Exception {
+    
     }
-
+    
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        conexao = new vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel();
-        txtLoja = new vrframework.bean.textField.VRTextField();
-        vRPanel3 = new vrframework.bean.panel.VRPanel();
-        btnMigrar = new vrframework.bean.button.VRButton();
+        conexao = new vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel();
         jLabel1 = new javax.swing.JLabel();
-        cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
-        jLabel2 = new javax.swing.JLabel();
+        cmbLojaOrigem = new vrframework.bean.comboBox.VRComboBox();
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabParametros = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
@@ -255,57 +175,18 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
         chkUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         chkReiniciarIDClienteUnif = new vrframework.bean.checkBox.VRCheckBox();
         txtReiniciarIDClienteUnif = new vrframework.bean.textField.VRTextField();
+        vRPanel3 = new vrframework.bean.panel.VRPanel();
+        btnMigrar = new vrframework.bean.button.VRButton();
+        jLabel2 = new javax.swing.JLabel();
+        cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
 
-        setTitle("Importação CFSoft/SiaECF");
-        setToolTipText("");
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.jLabel1.text")); // NOI18N
 
-        conexao.setSistema("CFSoftSiaECF");
-
-        btnMigrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
-        btnMigrar.setText("Migrar");
-        btnMigrar.setFocusable(false);
-        btnMigrar.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
-        btnMigrar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        btnMigrar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnMigrarActionPerformed(evt);
-            }
-        });
-
-        jLabel1.setText("Loja:");
-
-        javax.swing.GroupLayout vRPanel3Layout = new javax.swing.GroupLayout(vRPanel3);
-        vRPanel3.setLayout(vRPanel3Layout);
-        vRPanel3Layout.setHorizontalGroup(
-            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(cmbLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-        vRPanel3Layout.setVerticalGroup(
-            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel1)
-                        .addComponent(cmbLojaVR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        jLabel2.setText("Loja Origem");
-
-        tabParametros.addTab("Produtos", tabProdutos);
+        tabParametros.addTab(org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.tabProdutos.TabConstraints.tabTitle"), tabProdutos); // NOI18N
 
         tabImpFornecedor.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
-        chkFornecedor.setText("Fornecedor");
+        org.openide.awt.Mnemonics.setLocalizedText(chkFornecedor, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkFornecedor.text")); // NOI18N
         chkFornecedor.setEnabled(true);
         chkFornecedor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -313,7 +194,7 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
             }
         });
 
-        chkProdutoFornecedor.setText("Produto Fornecedor");
+        org.openide.awt.Mnemonics.setLocalizedText(chkProdutoFornecedor, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkProdutoFornecedor.text")); // NOI18N
         chkProdutoFornecedor.setEnabled(true);
         chkProdutoFornecedor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -321,7 +202,7 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
             }
         });
 
-        chkFContatos.setText("Contatos");
+        org.openide.awt.Mnemonics.setLocalizedText(chkFContatos, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkFContatos.text")); // NOI18N
         chkFContatos.setEnabled(true);
         chkFContatos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -329,7 +210,7 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
             }
         });
 
-        chkFCnpj.setText("CNPJ/CPF");
+        org.openide.awt.Mnemonics.setLocalizedText(chkFCnpj, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkFCnpj.text")); // NOI18N
         chkFCnpj.setEnabled(true);
         chkFCnpj.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -337,7 +218,7 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
             }
         });
 
-        chkFTipoEmpresa.setText("Tipo Empresa");
+        org.openide.awt.Mnemonics.setLocalizedText(chkFTipoEmpresa, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkFTipoEmpresa.text")); // NOI18N
         chkFTipoEmpresa.setEnabled(true);
         chkFTipoEmpresa.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -375,14 +256,14 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkFTipoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(135, Short.MAX_VALUE))
+                .addContainerGap(153, Short.MAX_VALUE))
         );
 
-        tabParametros.addTab("Fornecedores", tabImpFornecedor);
+        tabParametros.addTab(org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.tabImpFornecedor.TabConstraints.tabTitle"), tabImpFornecedor); // NOI18N
 
         tabClienteDados.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
-        chkClientePreferencial.setText("Cliente Preferencial");
+        org.openide.awt.Mnemonics.setLocalizedText(chkClientePreferencial, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkClientePreferencial.text")); // NOI18N
         chkClientePreferencial.setEnabled(true);
         chkClientePreferencial.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -390,7 +271,7 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
             }
         });
 
-        chkClienteEventual.setText("Cliente Eventual");
+        org.openide.awt.Mnemonics.setLocalizedText(chkClienteEventual, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkClienteEventual.text")); // NOI18N
         chkClienteEventual.setEnabled(true);
         chkClienteEventual.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -398,7 +279,7 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
             }
         });
 
-        chkCreditoRotativo.setText("Crédito Rotativo");
+        org.openide.awt.Mnemonics.setLocalizedText(chkCreditoRotativo, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkCreditoRotativo.text")); // NOI18N
         chkCreditoRotativo.setEnabled(true);
         chkCreditoRotativo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -406,7 +287,7 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
             }
         });
 
-        chkCheque.setText("Cheques");
+        org.openide.awt.Mnemonics.setLocalizedText(chkCheque, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkCheque.text")); // NOI18N
         chkCheque.setEnabled(true);
         chkCheque.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -438,26 +319,26 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(107, Short.MAX_VALUE))
+                .addContainerGap(125, Short.MAX_VALUE))
         );
 
-        tabClientes.addTab("Descrição", tabClienteDados);
+        tabClientes.addTab(org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.tabClienteDados.TabConstraints.tabTitle"), tabClienteDados); // NOI18N
 
-        tabParametros.addTab("Clientes", tabClientes);
+        tabParametros.addTab(org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.tabClientes.TabConstraints.tabTitle"), tabClientes); // NOI18N
 
-        tabs.addTab("Importação", tabParametros);
+        tabs.addTab(org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.tabParametros.TabConstraints.tabTitle"), tabParametros); // NOI18N
 
-        chkUnifProdutos.setText("Produtos (Somente com EAN válido)");
+        org.openide.awt.Mnemonics.setLocalizedText(chkUnifProdutos, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkUnifProdutos.text")); // NOI18N
 
-        chkUnifFornecedor.setText("Fornecedor (Somente com CPF/CNPJ)");
+        org.openide.awt.Mnemonics.setLocalizedText(chkUnifFornecedor, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkUnifFornecedor.text")); // NOI18N
 
-        chkUnifProdutoFornecedor.setText("Produto Fornecedor (Somente com CPF/CNPJ)");
+        org.openide.awt.Mnemonics.setLocalizedText(chkUnifProdutoFornecedor, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkUnifProdutoFornecedor.text")); // NOI18N
 
-        chkUnifClientePreferencial.setText("Cliente Preferencial (Somente com CPF/CNPJ)");
+        org.openide.awt.Mnemonics.setLocalizedText(chkUnifClientePreferencial, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkUnifClientePreferencial.text")); // NOI18N
 
-        chkUnifClienteEventual.setText("Cliente Eventual (Somente com CPF/CNPJ)");
+        org.openide.awt.Mnemonics.setLocalizedText(chkUnifClienteEventual, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkUnifClienteEventual.text")); // NOI18N
 
-        chkReiniciarIDClienteUnif.setText("Reiniciar ID (Clientes)");
+        org.openide.awt.Mnemonics.setLocalizedText(chkReiniciarIDClienteUnif, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkReiniciarIDClienteUnif.text")); // NOI18N
         chkReiniciarIDClienteUnif.setEnabled(true);
         chkReiniciarIDClienteUnif.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -465,7 +346,7 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
             }
         });
 
-        txtReiniciarIDClienteUnif.setMascara("Numero");
+        txtReiniciarIDClienteUnif.setMascara(org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.txtReiniciarIDClienteUnif.mascara")); // NOI18N
 
         javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
         vRPanel2.setLayout(vRPanel2Layout);
@@ -498,14 +379,52 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
                 .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 108, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 126, Short.MAX_VALUE)
                 .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkReiniciarIDClienteUnif, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtReiniciarIDClienteUnif, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
-        tabs.addTab("Unificação", vRPanel2);
+        tabs.addTab(org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.vRPanel2.TabConstraints.tabTitle"), vRPanel2); // NOI18N
+
+        btnMigrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(btnMigrar, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.btnMigrar.text")); // NOI18N
+        btnMigrar.setFocusable(false);
+        btnMigrar.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        btnMigrar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnMigrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMigrarActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.jLabel2.text")); // NOI18N
+
+        javax.swing.GroupLayout vRPanel3Layout = new javax.swing.GroupLayout(vRPanel3);
+        vRPanel3.setLayout(vRPanel3Layout);
+        vRPanel3Layout.setHorizontalGroup(
+            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(cmbLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        vRPanel3Layout.setVerticalGroup(
+            vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel2)
+                        .addComponent(cmbLojaVR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -515,12 +434,12 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(conexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 511, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtLoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -530,17 +449,55 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
                 .addComponent(conexao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(txtLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel1)
+                    .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 295, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)
+                .addGap(5, 5, 5)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
-
-        pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void chkFornecedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFornecedorActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkFornecedorActionPerformed
+
+    private void chkProdutoFornecedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkProdutoFornecedorActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkProdutoFornecedorActionPerformed
+
+    private void chkFContatosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFContatosActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkFContatosActionPerformed
+
+    private void chkFCnpjActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFCnpjActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkFCnpjActionPerformed
+
+    private void chkFTipoEmpresaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFTipoEmpresaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkFTipoEmpresaActionPerformed
+
+    private void chkClientePreferencialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkClientePreferencialActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkClientePreferencialActionPerformed
+
+    private void chkClienteEventualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkClienteEventualActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkClienteEventualActionPerformed
+
+    private void chkCreditoRotativoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCreditoRotativoActionPerformed
+
+    }//GEN-LAST:event_chkCreditoRotativoActionPerformed
+
+    private void chkChequeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkChequeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkChequeActionPerformed
+
+    private void chkReiniciarIDClienteUnifActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkReiniciarIDClienteUnifActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkReiniciarIDClienteUnifActionPerformed
 
     private void btnMigrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMigrarActionPerformed
         try {
@@ -555,46 +512,7 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
         }
     }//GEN-LAST:event_btnMigrarActionPerformed
 
-    private void chkFornecedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFornecedorActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkFornecedorActionPerformed
 
-    private void chkProdutoFornecedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkProdutoFornecedorActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkProdutoFornecedorActionPerformed
-
-    private void chkClientePreferencialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkClientePreferencialActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkClientePreferencialActionPerformed
-
-    private void chkClienteEventualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkClienteEventualActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkClienteEventualActionPerformed
-
-    private void chkFContatosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFContatosActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkFContatosActionPerformed
-
-    private void chkFCnpjActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFCnpjActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkFCnpjActionPerformed
-
-    private void chkCreditoRotativoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCreditoRotativoActionPerformed
-
-    }//GEN-LAST:event_chkCreditoRotativoActionPerformed
-
-    private void chkChequeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkChequeActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkChequeActionPerformed
-
-    private void chkFTipoEmpresaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFTipoEmpresaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkFTipoEmpresaActionPerformed
-
-    private void chkReiniciarIDClienteUnifActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkReiniciarIDClienteUnifActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkReiniciarIDClienteUnifActionPerformed
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
@@ -612,8 +530,9 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
+    private vrframework.bean.comboBox.VRComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
-    private vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel conexao;
+    private vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel conexao;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private vrframework.bean.panel.VRPanel tabClienteDados;
@@ -622,10 +541,8 @@ public class CFSoftSiaECFGUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane tabParametros;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
-    private vrframework.bean.textField.VRTextField txtLoja;
     private vrframework.bean.textField.VRTextField txtReiniciarIDClienteUnif;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     // End of variables declaration//GEN-END:variables
-    
 }
