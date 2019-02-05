@@ -23,12 +23,6 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class CFSoftSiaECFDAO extends InterfaceDAO {
     
-    private boolean importarSimples = false;
-
-    public void setImportarSimples(boolean importarSimples) {
-        this.importarSimples = importarSimples;
-    }
-    
     @Override
     public String getSistema() {
         return "CFSoftSiaECF";
@@ -85,10 +79,10 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     "    p.itmargem margem,\n" +
                     "    coalesce((\n" +
                     "        select first 1\n" +
-                    "            i.entpreco\n" +
+                    "            i.entvlruni\n" +
                     "        from\n" +
-                    "            " + (importarSimples ? "entitem" : "itempentrada") + " i\n" +
-                    "            join " + (importarSimples ? "entrada" : "pentrada") + " e on i.entcodigo = e.encodigo\n" +
+                    "            entitem i\n" +
+                    "            join entrada e on i.entcodigo = e.encodigo\n" +
                     "        where\n" +
                     "            i.entcoditem = p.itcod\n" +
                     "        order by\n" +
@@ -332,7 +326,7 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     imp.setNomePai(rst.getString("pai"));
                     imp.setNomeMae(rst.getString("mae"));
                     imp.setObservacao(rst.getString("obs"));
-                    imp.setObservacao2(rst.getString("obs2"));
+                    imp.setObservacao2(rst.getString("obs2") + "OBS " + rst.getString("site"));
                     imp.addContato("A", "CONTATO", rst.getString("contato"), "", "");
                     imp.addEmail(rst.getString("e_mail"), TipoContato.COMERCIAL);
                     imp.setTelefone(rst.getString("fone"));
@@ -356,7 +350,7 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     "    d.codigo,\n" +
                     "    d.duplicata,\n" +
                     "    d.ecf,\n" +
-                    "    d.vlr_parcela,\n" +
+                    "    d.debito_venda valor,\n" +
                     "    d.obs,\n" +
                     "    d.cod_cliente,\n" +
                     "    c.cnpj_cpf,\n" +
@@ -367,11 +361,10 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     "        d.emp = c.cod_emp and\n" +
                     "        d.cod_cliente = c.codigo\n" +
                     "where\n" +
-                    "    d.emp = 1 and\n" +
-                    "    d.cod_cliente != 0 and\n" +
-                    "    d.dtpago is null and\n" +
+                    "    c.codigo != 0 and\n" +
+                    "    d.dtrecebimento is null and\n" +
                     "    not d.codigo in (select duplicata from cheque) and\n" +
-                    "    d.vlr_parcela > 0\n" +
+                    "    d.debito_venda > 0\n" +
                     "order by\n" +
                     "    1, 2"
             )) {
@@ -381,7 +374,7 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     imp.setId(rst.getString("codigo"));
                     imp.setNumeroCupom(rst.getString("duplicata"));
                     imp.setEcf(rst.getString("ecf"));
-                    imp.setValor(rst.getDouble("vlr_parcela"));
+                    imp.setValor(rst.getDouble("valor"));
                     imp.setObservacao(rst.getString("obs"));
                     imp.setIdCliente(rst.getString("cod_cliente"));
                     imp.setCnpjCliente(rst.getString("cnpj_cpf"));
