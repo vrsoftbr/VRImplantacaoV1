@@ -10,7 +10,12 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -19,9 +24,30 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class CerebroDAO extends InterfaceDAO {
 
+    public String complSistema = "";
+    
     @Override
     public String getSistema() {
-        return "Cerebro";
+        if ((complSistema != null) && (!complSistema.trim().isEmpty())) {
+            return "Cerebro" + complSistema;
+        } else {
+            return "Cerebro";
+        }
+    }
+
+    public List<Estabelecimento> getLojas() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select codigo_empresa, descricao, cpf_cnpj from empresas\n"
+                    + "order by codigo_empresa"
+            )) {
+                while (rst.next()) {
+                    result.add(new Estabelecimento(rst.getString("codigo_empresa"), rst.getString("descricao")));
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -152,6 +178,176 @@ public class CerebroDAO extends InterfaceDAO {
                     imp.setImportId(rst.getString("codigo_produto"));
                     imp.setEan(rst.getString("codigo_barra"));
                     imp.setQtdEmbalagem(rst.getInt("quantidade"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.ESTOQUE) {
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "with mov as\n"
+                        + "(\n"
+                        + "  select codigo_produto, max(ultimo_movimento) as data\n"
+                        + "  from produtos_saldo\n"
+                        + "  where codigo_almoxarifado = 1\n"
+                        + "  group by codigo_produto\n"
+                        + ")\n"
+                        + "select e.codigo_produto,\n"
+                        + "       e.saldo_atual,\n"
+                        + "       e.saldo_minimo,\n"
+                        + "       e.saldo_maximo,\n"
+                        + "       e.ultimo_movimento\n"
+                        + "from produtos_saldo e\n"
+                        + "inner join mov as mov2 on mov2.codigo_produto = e.codigo_produto\n"
+                        + "where e.codigo_almoxarifado = 1"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("codigo_produto"));
+                        imp.setEstoque(rst.getDouble("saldo_atual"));
+                        imp.setEstoqueMaximo(rst.getDouble("saldo_maximo"));
+                        imp.setEstoqueMinimo(rst.getDouble("saldo_minimo"));
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "codigo_fornecedor,\n"
+                    + "descricao,\n"
+                    + "razao_social,\n"
+                    + "nome_fantasia,\n"
+                    + "endereco,\n"
+                    + "numero,\n"
+                    + "bairro,\n"
+                    + "cidade,\n"
+                    + "estado,\n"
+                    + "cep,\n"
+                    + "cpf_cnpj,\n"
+                    + "inscricao_estadual,\n"
+                    + "contato,\n"
+                    + "telefone,\n"
+                    + "telefone2,\n"
+                    + "fax,\n"
+                    + "celular,\n"
+                    + "email,\n"
+                    + "observacao,\n"
+                    + "prazo_pagto,\n"
+                    + "data_cadastro,\n"
+                    + "desativado\n"
+                    + "from fornecedores\n"
+                    + "order by codigo_fornecedor"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("codigo_fornecedor"));
+                    imp.setRazao(rst.getString("razao_social"));
+                    imp.setFantasia(rst.getString("nome_fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cpf_cnpj"));
+                    imp.setIe_rg(rst.getString("inscricao_estadual"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setDatacadastro(rst.getDate("data_cadastro"));
+                    imp.setAtivo("F".equals(rst.getString("desativado")));
+                    imp.setTel_principal(rst.getString("telefone"));
+
+                    if ((rst.getString("telefone2") != null)
+                            && (!rst.getString("telefone2").trim().isEmpty())) {
+                        imp.addContato(
+                                "TELEFONE 2",
+                                rst.getString("telefone2"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("fax") != null)
+                            && (!rst.getString("fax").trim().isEmpty())) {
+                        imp.addContato(
+                                "FAX",
+                                rst.getString("fax"),
+                                null,
+                                TipoContato.NFE,
+                                null
+                        );
+                    }
+                    if ((rst.getString("celular") != null)
+                            && (!rst.getString("celular").trim().isEmpty())) {
+                        imp.addContato(
+                                "CELULAR",
+                                null,
+                                rst.getString("celular"),
+                                TipoContato.NFE,
+                                null
+                        );
+                    }
+                    if ((rst.getString("email") != null)
+                            && (!rst.getString("email").trim().isEmpty())) {
+                        imp.addContato(
+                                "EMAIL",
+                                null,
+                                null,
+                                TipoContato.NFE,
+                                rst.getString("email").toLowerCase()
+                        );
+                    }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "codigo_fornecedor,\n"
+                    + "codigo_produto\n"
+                    + "ultima_data,\n"
+                    + "ultimo_custo,\n"
+                    + "referencia\n"
+                    + "from produtos_fornecedor\n"
+                    + "order by codigo_fornecedor, codigo_produto"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("codigo_produto"));
+                    imp.setIdFornecedor(rst.getString("codigo_fornecedor"));
+                    imp.setCodigoExterno(rst.getString("referencia"));
+                    imp.setDataAlteracao(rst.getDate("ultima_data"));
+                    imp.setCustoTabela(rst.getDouble("ultimo_custo"));
                     result.add(imp);
                 }
             }

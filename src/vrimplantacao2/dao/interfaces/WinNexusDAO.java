@@ -64,7 +64,7 @@ public class WinNexusDAO extends InterfaceDAO {
                     + "pm.margem_liquida, e.NCM, e.CEST, e.CST_COFINS,\n"
                     + "e.CST_COFINS_ENT, e.CST_PIS, e.CST_PIS_ENT,\n"
                     + "e.NATUREZA_RECEITA_PIS, al.ST, e.CST, al.ICMS,\n"
-                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO\n"
+                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO, p.CUSTO_MEDIO\n"
                     + "from produtos p\n"
                     + "left join ESTOQUE e on e.ESTOQUE_ID = p.CODIGO\n"
                     + "left join ESTOQUE_ATUAL ea on ea.ESTOQUE_ID = p.CODIGO and e.FILIAL = 1\n"
@@ -81,7 +81,7 @@ public class WinNexusDAO extends InterfaceDAO {
                     + "pm.margem_liquida, e.NCM, e.CEST, e.CST_COFINS,\n"
                     + "e.CST_COFINS_ENT, e.CST_PIS, e.CST_PIS_ENT,\n"
                     + "e.NATUREZA_RECEITA_PIS, al.ST, e.CST, al.ICMS,\n"
-                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO\n"
+                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO, p.CUSTO_MEDIO\n"
                     + "from produtos p\n"
                     + "left join ESTOQUE e on e.ESTOQUE_ID = p.CODIGO\n"
                     + "left join ESTOQUE_ATUAL ea on ea.ESTOQUE_ID = p.CODIGO and e.FILIAL = 1\n"
@@ -99,7 +99,7 @@ public class WinNexusDAO extends InterfaceDAO {
                     + "pm.margem_liquida, e.NCM, e.CEST, e.CST_COFINS,\n"
                     + "e.CST_COFINS_ENT, e.CST_PIS, e.CST_PIS_ENT,\n"
                     + "e.NATUREZA_RECEITA_PIS, al.ST, e.CST, al.ICMS,\n"
-                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO\n"
+                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO, p.CUSTO_MEDIO\n"
                     + "from produtos p\n"
                     + "left join ESTOQUE e on e.ESTOQUE_ID = p.CODIGO\n"
                     + "left join ESTOQUE_ATUAL ea on ea.ESTOQUE_ID = p.CODIGO and e.FILIAL = 1\n"
@@ -117,7 +117,7 @@ public class WinNexusDAO extends InterfaceDAO {
                     + "pm.margem_liquida, e.NCM, e.CEST, e.CST_COFINS,\n"
                     + "e.CST_COFINS_ENT, e.CST_PIS, e.CST_PIS_ENT,\n"
                     + "e.NATUREZA_RECEITA_PIS, al.ST, e.CST, al.ICMS,\n"
-                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO\n"
+                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO, p.CUSTO_MEDIO\n"
                     + "from produtos p\n"
                     + "left join ESTOQUE e on e.ESTOQUE_ID = p.CODIGO\n"
                     + "left join ESTOQUE_ATUAL ea on ea.ESTOQUE_ID = p.CODIGO and e.FILIAL = 1\n"
@@ -135,7 +135,7 @@ public class WinNexusDAO extends InterfaceDAO {
                     + "pm.margem_liquida, e.NCM, e.CEST, e.CST_COFINS,\n"
                     + "e.CST_COFINS_ENT, e.CST_PIS, e.CST_PIS_ENT,\n"
                     + "e.NATUREZA_RECEITA_PIS, al.ST, e.CST, al.ICMS,\n"
-                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO\n"
+                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO, p.CUSTO_MEDIO\n"
                     + "from produtos p\n"
                     + "left join ESTOQUE e on e.ESTOQUE_ID = p.CODIGO\n"
                     + "left join ESTOQUE_ATUAL ea on ea.ESTOQUE_ID = p.CODIGO and e.FILIAL = 1\n"
@@ -153,7 +153,7 @@ public class WinNexusDAO extends InterfaceDAO {
                     + "pm.margem_liquida, e.NCM, e.CEST, e.CST_COFINS,\n"
                     + "e.CST_COFINS_ENT, e.CST_PIS, e.CST_PIS_ENT,\n"
                     + "e.NATUREZA_RECEITA_PIS, al.ST, e.CST, al.ICMS,\n"
-                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO\n"
+                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO, p.CUSTO_MEDIO\n"
                     + "from produtos p\n"
                     + "left join ESTOQUE e on e.ESTOQUE_ID = p.CODIGO\n"
                     + "left join ESTOQUE_ATUAL ea on ea.ESTOQUE_ID = p.CODIGO and e.FILIAL = 1\n"
@@ -171,7 +171,7 @@ public class WinNexusDAO extends InterfaceDAO {
                     + "pm.margem_liquida, e.NCM, e.CEST, e.CST_COFINS,\n"
                     + "e.CST_COFINS_ENT, e.CST_PIS, e.CST_PIS_ENT,\n"
                     + "e.NATUREZA_RECEITA_PIS, al.ST, e.CST, al.ICMS,\n"
-                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO\n"
+                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO, p.CUSTO_MEDIO\n"
                     + "from produtos p\n"
                     + "left join ESTOQUE e on e.ESTOQUE_ID = p.CODIGO\n"
                     + "left join ESTOQUE_ATUAL ea on ea.ESTOQUE_ID = p.CODIGO and e.FILIAL = 1\n"
@@ -189,7 +189,7 @@ public class WinNexusDAO extends InterfaceDAO {
                     + "pm.margem_liquida, e.NCM, e.CEST, e.CST_COFINS,\n"
                     + "e.CST_COFINS_ENT, e.CST_PIS, e.CST_PIS_ENT,\n"
                     + "e.NATUREZA_RECEITA_PIS, al.ST, e.CST, al.ICMS,\n"
-                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO\n"
+                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO, p.CUSTO_MEDIO\n"
                     + "from produtos p\n"
                     + "left join ESTOQUE e on e.ESTOQUE_ID = p.CODIGO\n"
                     + "left join ESTOQUE_ATUAL ea on ea.ESTOQUE_ID = p.CODIGO and e.FILIAL = 1\n"
@@ -207,7 +207,7 @@ public class WinNexusDAO extends InterfaceDAO {
                     + "pm.margem_liquida, e.NCM, e.CEST, e.CST_COFINS,\n"
                     + "e.CST_COFINS_ENT, e.CST_PIS, e.CST_PIS_ENT,\n"
                     + "e.NATUREZA_RECEITA_PIS, al.ST, e.CST, al.ICMS,\n"
-                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO\n"
+                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO, p.CUSTO_MEDIO\n"
                     + "from produtos p\n"
                     + "left join ESTOQUE e on e.ESTOQUE_ID = p.CODIGO\n"
                     + "left join ESTOQUE_ATUAL ea on ea.ESTOQUE_ID = p.CODIGO and e.FILIAL = 1\n"
@@ -225,7 +225,7 @@ public class WinNexusDAO extends InterfaceDAO {
                     + "pm.margem_liquida, e.NCM, e.CEST, e.CST_COFINS,\n"
                     + "e.CST_COFINS_ENT, e.CST_PIS, e.CST_PIS_ENT,\n"
                     + "e.NATUREZA_RECEITA_PIS, al.ST, e.CST, al.ICMS,\n"
-                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO\n"
+                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO, p.CUSTO_MEDIO\n"
                     + "from produtos p\n"
                     + "left join ESTOQUE e on e.ESTOQUE_ID = p.CODIGO\n"
                     + "left join ESTOQUE_ATUAL ea on ea.ESTOQUE_ID = p.CODIGO and e.FILIAL = 1\n"
@@ -243,7 +243,7 @@ public class WinNexusDAO extends InterfaceDAO {
                     + "pm.margem_liquida, e.NCM, e.CEST, e.CST_COFINS,\n"
                     + "e.CST_COFINS_ENT, e.CST_PIS, e.CST_PIS_ENT,\n"
                     + "e.NATUREZA_RECEITA_PIS, al.ST, e.CST, al.ICMS,\n"
-                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO\n"
+                    + "p.ICM_VENDA, e.CST_ENT, p.ICMS_CREDITO, p.CUSTO_MEDIO\n"
                     + "from produtos p\n"
                     + "left join ESTOQUE e on e.ESTOQUE_ID = p.CODIGO\n"
                     + "left join ESTOQUE_ATUAL ea on ea.ESTOQUE_ID = p.CODIGO and e.FILIAL = 1\n"
@@ -264,9 +264,8 @@ public class WinNexusDAO extends InterfaceDAO {
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setTipoEmbalagem(rst.getString("UNIDADE"));
                     imp.setDataCadastro(rst.getDate("CADASTRO"));
-                    imp.setMargem(rst.getDouble("margem_liquida"));
-                    imp.setCustoSemImposto(rst.getDouble("CUSTOSEMIMPOSTO"));
-                    imp.setCustoComImposto(rst.getDouble("CUSTOCOMIMPOSTO"));
+                    imp.setCustoSemImposto(rst.getDouble("CUSTO_MEDIO"));
+                    imp.setCustoComImposto(rst.getDouble("CUSTO_MEDIO"));
                     imp.setPrecovenda(rst.getDouble("preco_de_venda"));
                     imp.setEstoque(rst.getDouble("ESTOQUE"));
                     imp.setNcm(rst.getString("NCM"));
