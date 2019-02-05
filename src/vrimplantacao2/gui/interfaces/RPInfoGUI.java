@@ -1,5 +1,7 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.WindowConstants;
@@ -7,11 +9,16 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
+import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.dao.cadastro.LojaDAO;
+import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.RPInfoDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.parametro.Parametros;
@@ -75,6 +82,7 @@ public class RPInfoGUI extends VRInternalFrame {
                 gravarParametros();
             }
         });
+        tabProdutos.setOpcoesDisponiveis(dao);
         
         carregarParametros();
         
@@ -138,7 +146,106 @@ public class RPInfoGUI extends VRInternalFrame {
     }
     
     private void importarTabelas() throws Exception {
-    
+        Thread thread = new Thread() {
+            int idLojaVR;
+            String idLojaCliente;
+            @Override
+            public void run() {
+                try {
+                    ProgressBar.show();
+                    ProgressBar.setCancel(true);
+                    
+                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
+                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+                    
+                    Importador importador = new Importador(dao);
+                    importador.setLojaOrigem(idLojaCliente);
+                    importador.setLojaVR(idLojaVR);
+
+                    if (tabs.getSelectedIndex() == 0) {
+
+                        tabProdutos.setImportador(importador);
+                        tabProdutos.executarImportacao();
+                                                
+                        if (chkFornecedor.isSelected()) {
+                            importador.importarFornecedor();
+                        }
+                        if (chkProdutoFornecedor.isSelected()) {
+                            importador.importarProdutoFornecedor();
+                        } 
+                        {
+                            List<OpcaoFornecedor> opcoes = new ArrayList<>();
+                            if (chkFContatos.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.CONTATOS);                        
+                            }              
+                            if (chkFCnpj.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.CNPJ_CPF);
+                            }
+                            if (chkFTipoEmpresa.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.TIPO_EMPRESA);
+                            }
+                            if (!opcoes.isEmpty()) {
+                                importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
+                            }
+                        }
+                        if (chkClientePreferencial.isSelected()) {
+                            importador.importarClientePreferencial();
+                        }
+                        if (chkClienteEventual.isSelected()) {
+                            importador.importarClienteEventual();
+                        }
+                        if (chkCreditoRotativo.isSelected()) {
+                            importador.importarCreditoRotativo();
+                        }
+                        if (chkCheque.isSelected()) {
+                            importador.importarCheque();
+                        }
+                    } else if (tabs.getSelectedIndex() == 1) {
+                        if (chkUnifProdutos.isSelected()) {
+                            importador.unificarProdutos();
+                        }
+                        if (chkUnifFornecedor.isSelected()) {
+                            importador.unificarFornecedor();
+                        }
+                        if (chkUnifProdutoFornecedor.isSelected()) {
+                            importador.unificarProdutoFornecedor();
+                        }                        
+                        if (chkUnifClientePreferencial.isSelected()) {
+                            List<OpcaoCliente> opcoes = new ArrayList<>();
+                            if (chkReiniciarIDClienteUnif.isSelected()) {
+                                opcoes.add(
+                                    OpcaoCliente.IMP_REINICIAR_NUMERACAO.addParametro(
+                                        "N_REINICIO",
+                                        Utils.stringToInt(txtReiniciarIDClienteUnif.getText())
+                                    )
+                                );
+                            }
+                            importador.unificarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));
+                        }                        
+                        if (chkClienteEventual.isSelected()) {
+                            List<OpcaoCliente> opcoes = new ArrayList<>();
+                            if (chkReiniciarIDClienteUnif.isSelected()) {
+                                opcoes.add(
+                                    OpcaoCliente.IMP_REINICIAR_NUMERACAO.addParametro(
+                                        "N_REINICIO",
+                                        Utils.stringToInt(txtReiniciarIDClienteUnif.getText())
+                                    )
+                                );
+                            }
+                            importador.unificarClienteEventual(opcoes.toArray(new OpcaoCliente[]{}));
+                        }
+                    }
+                                       
+                    ProgressBar.dispose();
+                    Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
+                } catch (Exception ex) {
+                    ProgressBar.dispose();
+                    Util.exibirMensagemErro(ex, getTitle());
+                }
+            }
+        };
+
+        thread.start();
     }
     
     /**
