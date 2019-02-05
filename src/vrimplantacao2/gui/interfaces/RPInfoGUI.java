@@ -76,6 +76,7 @@ public class RPInfoGUI extends VRInternalFrame {
             }
         });
         
+        carregarParametros();
         
         centralizarForm();
         this.setMaximum(false);        
@@ -85,7 +86,7 @@ public class RPInfoGUI extends VRInternalFrame {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja : dao.getLojaOrigem()) {
+        for (Estabelecimento loja : dao.getLojas()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -150,8 +151,8 @@ public class RPInfoGUI extends VRInternalFrame {
     private void initComponents() {
 
         conexao = new vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel();
+        cmbLojaOrigem = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
-        cmbLojaOrigem = new vrframework.bean.comboBox.VRComboBox();
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabParametros = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
@@ -180,13 +181,18 @@ public class RPInfoGUI extends VRInternalFrame {
         jLabel2 = new javax.swing.JLabel();
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.jLabel1.text")); // NOI18N
+        setIconifiable(true);
+        setMaximizable(true);
+        setResizable(true);
+        setTitle("Importação RPInfo");
 
-        tabParametros.addTab(org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.tabProdutos.TabConstraints.tabTitle"), tabProdutos); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, "Loja:");
+
+        tabParametros.addTab("Produtos", tabProdutos);
 
         tabImpFornecedor.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkFornecedor, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkFornecedor.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkFornecedor, "Fornecedor");
         chkFornecedor.setEnabled(true);
         chkFornecedor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -194,7 +200,7 @@ public class RPInfoGUI extends VRInternalFrame {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkProdutoFornecedor, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkProdutoFornecedor.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkProdutoFornecedor, "Produto Fornecedor");
         chkProdutoFornecedor.setEnabled(true);
         chkProdutoFornecedor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -202,7 +208,7 @@ public class RPInfoGUI extends VRInternalFrame {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkFContatos, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkFContatos.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkFContatos, "Contatos");
         chkFContatos.setEnabled(true);
         chkFContatos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -210,7 +216,7 @@ public class RPInfoGUI extends VRInternalFrame {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkFCnpj, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkFCnpj.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkFCnpj, "CNPJ/CPF");
         chkFCnpj.setEnabled(true);
         chkFCnpj.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -218,7 +224,7 @@ public class RPInfoGUI extends VRInternalFrame {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkFTipoEmpresa, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkFTipoEmpresa.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkFTipoEmpresa, "Tipo Empresa");
         chkFTipoEmpresa.setEnabled(true);
         chkFTipoEmpresa.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -256,14 +262,14 @@ public class RPInfoGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkFTipoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(153, Short.MAX_VALUE))
+                .addContainerGap(157, Short.MAX_VALUE))
         );
 
-        tabParametros.addTab(org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.tabImpFornecedor.TabConstraints.tabTitle"), tabImpFornecedor); // NOI18N
+        tabParametros.addTab("Fornecedores", tabImpFornecedor);
 
         tabClienteDados.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkClientePreferencial, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkClientePreferencial.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkClientePreferencial, "Cliente Preferencial");
         chkClientePreferencial.setEnabled(true);
         chkClientePreferencial.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -271,7 +277,7 @@ public class RPInfoGUI extends VRInternalFrame {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkClienteEventual, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkClienteEventual.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkClienteEventual, "Cliente Eventual");
         chkClienteEventual.setEnabled(true);
         chkClienteEventual.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -279,7 +285,7 @@ public class RPInfoGUI extends VRInternalFrame {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkCreditoRotativo, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkCreditoRotativo.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkCreditoRotativo, "Crédito Rotativo");
         chkCreditoRotativo.setEnabled(true);
         chkCreditoRotativo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -287,7 +293,7 @@ public class RPInfoGUI extends VRInternalFrame {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkCheque, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkCheque.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkCheque, "Cheques");
         chkCheque.setEnabled(true);
         chkCheque.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -319,26 +325,26 @@ public class RPInfoGUI extends VRInternalFrame {
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(125, Short.MAX_VALUE))
+                .addContainerGap(129, Short.MAX_VALUE))
         );
 
-        tabClientes.addTab(org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.tabClienteDados.TabConstraints.tabTitle"), tabClienteDados); // NOI18N
+        tabClientes.addTab("Descrição", tabClienteDados);
 
-        tabParametros.addTab(org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.tabClientes.TabConstraints.tabTitle"), tabClientes); // NOI18N
+        tabParametros.addTab("Clientes", tabClientes);
 
-        tabs.addTab(org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.tabParametros.TabConstraints.tabTitle"), tabParametros); // NOI18N
+        tabs.addTab("Importação", tabParametros);
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkUnifProdutos, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkUnifProdutos.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkUnifProdutos, "Produtos (Somente com EAN válido)");
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkUnifFornecedor, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkUnifFornecedor.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkUnifFornecedor, "Fornecedor (Somente com CPF/CNPJ)");
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkUnifProdutoFornecedor, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkUnifProdutoFornecedor.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkUnifProdutoFornecedor, "Produto Fornecedor (Somente com CPF/CNPJ)");
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkUnifClientePreferencial, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkUnifClientePreferencial.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkUnifClientePreferencial, "Cliente Preferencial (Somente com CPF/CNPJ)");
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkUnifClienteEventual, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkUnifClienteEventual.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkUnifClienteEventual, "Cliente Eventual (Somente com CPF/CNPJ)");
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkReiniciarIDClienteUnif, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.chkReiniciarIDClienteUnif.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(chkReiniciarIDClienteUnif, "Reiniciar ID (Clientes)");
         chkReiniciarIDClienteUnif.setEnabled(true);
         chkReiniciarIDClienteUnif.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -346,7 +352,7 @@ public class RPInfoGUI extends VRInternalFrame {
             }
         });
 
-        txtReiniciarIDClienteUnif.setMascara(org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.txtReiniciarIDClienteUnif.mascara")); // NOI18N
+        txtReiniciarIDClienteUnif.setMascara("Numero");
 
         javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
         vRPanel2.setLayout(vRPanel2Layout);
@@ -379,17 +385,17 @@ public class RPInfoGUI extends VRInternalFrame {
                 .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 126, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 130, Short.MAX_VALUE)
                 .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkReiniciarIDClienteUnif, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtReiniciarIDClienteUnif, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
-        tabs.addTab(org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.vRPanel2.TabConstraints.tabTitle"), vRPanel2); // NOI18N
+        tabs.addTab("Unificação", vRPanel2);
 
         btnMigrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(btnMigrar, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.btnMigrar.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(btnMigrar, "Migrar");
         btnMigrar.setFocusable(false);
         btnMigrar.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         btnMigrar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -399,7 +405,7 @@ public class RPInfoGUI extends VRInternalFrame {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(RPInfoGUI.class, "RPInfoGUI.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, "Loja:");
 
         javax.swing.GroupLayout vRPanel3Layout = new javax.swing.GroupLayout(vRPanel3);
         vRPanel3.setLayout(vRPanel3Layout);
@@ -436,8 +442,8 @@ public class RPInfoGUI extends VRInternalFrame {
                     .addComponent(conexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 511, Short.MAX_VALUE)
                     .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -452,7 +458,7 @@ public class RPInfoGUI extends VRInternalFrame {
                     .addComponent(jLabel1)
                     .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)
+                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE)
                 .addGap(5, 5, 5)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -530,7 +536,7 @@ public class RPInfoGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
-    private vrframework.bean.comboBox.VRComboBox cmbLojaOrigem;
+    private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel conexao;
     private javax.swing.JLabel jLabel1;

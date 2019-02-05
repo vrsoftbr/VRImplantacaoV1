@@ -11,9 +11,9 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
  *
  * @author Leandro
  */
-public class RPInfoDAO {
+public class RPInfoDAO extends InterfaceDAO {
     
-    public List<Estabelecimento> getLojaOrigem() throws Exception {
+    public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
         
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -27,6 +27,11 @@ public class RPInfoDAO {
         }
         
         return result;
+    }
+
+    @Override
+    public String getSistema() {
+        return "RPInfo";
     }
     
 }

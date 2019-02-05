@@ -160,6 +160,7 @@ import vrimplantacao2.gui.interfaces.PomaresGUI;
 import vrimplantacao2.gui.interfaces.PwsGUI;
 import vrimplantacao2.gui.interfaces.RCNetGUI;
 import vrimplantacao2.gui.interfaces.RMSAutomaHelpGUI;
+import vrimplantacao2.gui.interfaces.RPInfoGUI;
 import vrimplantacao2.gui.interfaces.RepleisGUI;
 import vrimplantacao2.gui.interfaces.SDInformaticaGUI;
 import vrimplantacao2.gui.interfaces.SatecfeGUI;
@@ -638,6 +639,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuUniplus = new javax.swing.JMenuItem();
         mnuSofttech = new javax.swing.JMenuItem();
         mnuLyncis = new javax.swing.JMenuItem();
+        mnuRPInfo = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -1737,6 +1739,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuLyncis);
+
+        mnuRPInfo.setText("RPInfo");
+        mnuRPInfo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuRPInfoActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuRPInfo);
 
         jMenu2.add(jMenu8);
 
@@ -4137,6 +4147,10 @@ public final class MenuGUI extends VRMdiFrame {
         }
     }//GEN-LAST:event_jMenuItemRMSActionPerformed
 
+    private void mnuRPInfoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRPInfoActionPerformed
+        RPInfoGUI.exibir(this);
+    }//GEN-LAST:event_mnuRPInfoActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -4318,6 +4332,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuRCNet;
     private javax.swing.JMenuItem mnuRMS_2;
     private javax.swing.JMenuItem mnuRMS_3;
+    private javax.swing.JMenuItem mnuRPInfo;
     private javax.swing.JMenuItem mnuRepleis;
     private javax.swing.JMenuItem mnuSDInformatica;
     private javax.swing.JMenuItem mnuSaac;
