@@ -362,7 +362,7 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     "        d.cod_cliente = c.codigo\n" +
                     "where\n" +
                     "    c.codigo != 0 and\n" +
-                    "    d.dtrecebimento is null and\n" +
+                    "    d.status = 'ABERTA' and\n" +
                     "    not d.codigo in (select duplicata from cheque) and\n" +
                     "    d.debito_venda > 0\n" +
                     "order by\n" +
