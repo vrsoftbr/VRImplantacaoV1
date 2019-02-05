@@ -13,6 +13,7 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -25,7 +26,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class CerebroDAO extends InterfaceDAO {
 
     public String complSistema = "";
-    
+
     @Override
     public String getSistema() {
         if ((complSistema != null) && (!complSistema.trim().isEmpty())) {
@@ -353,5 +354,78 @@ public class CerebroDAO extends InterfaceDAO {
             }
         }
         return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "/* clientes */\n"
+                    + "select\n"
+                    + "c.codigo_cliente,\n"
+                    + "c.descricao,\n"
+                    + "c.razao_social, \n"
+                    + "c.nome_fantasia,\n"
+                    + "c.endereco,\n"
+                    + "c.numero,\n"
+                    + "c.cep,\n"
+                    + "c.bairro,\n"
+                    + "c.cidade,\n"
+                    + "c.estado,\n"
+                    + "c.telefone1,\n"
+                    + "c.telefone2,\n"
+                    + "c.fax, \n"
+                    + "c.celular,\n"
+                    + "c.email,\n"
+                    + "c.data_cadastro,\n"
+                    + "c.data_nascimento,\n"
+                    + "c.cpf_cnpj,\n"
+                    + "c.inscricao_estadual,\n"
+                    + "c.rg,\n"
+                    + "c.rg_orgao,\n"
+                    + "c.rg_expedicao,\n"
+                    + "c.ponto_referencia,\n"
+                    + "c.contato,\n"
+                    + "c.cobranca_endereco,\n"
+                    + "c.cobranca_bairro,\n"
+                    + "c.cobranca_cidade,\n"
+                    + "c.cobranca_estado,\n"
+                    + "c.cobranca_cep,\n"
+                    + "c.cobranca_telefone,\n"
+                    + "c.nome_mae,\n"
+                    + "c.nome_pai,\n"
+                    + "c.naturalidade,\n"
+                    + "c.trabalho_local,\n"
+                    + "c.trabalho_tempo,\n"
+                    + "c.trabalho_salario,\n"
+                    + "c.trabalho_telefone,\n"
+                    + "c.observacao,\n"
+                    + "c.limite_credito,\n"
+                    + "c.limite_convenio,\n"
+                    + "c.status_credito,\n"
+                    + "c.entrega_endereco,\n"
+                    + "c.entrega_bairro,\n"
+                    + "c.entrega_cidade,\n"
+                    + "c.entrega_estado,\n"
+                    + "c.entrega_cep,\n"
+                    + "c.entrega_telefone,\n"
+                    + "c.cod_banco,\n"
+                    + "c.num_agencia,\n"
+                    + "c.numagencia_dv,\n"
+                    + "c.num_conta,\n"
+                    + "c.numconta_dv,\n"
+                    + "c.sexo, \n"
+                    + "c.profissao\n"
+                    + "from clientes c\n"
+                    + "order by c.codigo_cliente"
+            )) {
+                while (rst.next()) {
+
+                }
+            }
+        }
+        return null;
     }
 }
