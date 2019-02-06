@@ -362,8 +362,7 @@ public class CerebroDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "/* clientes */\n"
-                    + "select\n"
+                    "select\n"
                     + "c.codigo_cliente,\n"
                     + "c.descricao,\n"
                     + "c.razao_social, \n"
@@ -422,10 +421,79 @@ public class CerebroDAO extends InterfaceDAO {
                     + "order by c.codigo_cliente"
             )) {
                 while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("codigo_cliente"));
+                    imp.setRazao(rst.getString("razao_social") == null ? rst.getString("descricao") : rst.getString("razao_social"));
+                    imp.setFantasia(rst.getString("nome_fantasia") == null ? rst.getString("descricao") : rst.getString("nome_fantasia"));
+                    imp.setCnpj(rst.getString("cpf_cnpj"));
+                    imp.setInscricaoestadual(rst.getString("inscricao_estadual") == null ? rst.getString("rg") : rst.getString("inscricao_estadual"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setTelefone(rst.getString("telefone1"));
+                    imp.setFax(rst.getString("fax"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setDataCadastro(rst.getDate("data_cadastro"));
+                    imp.setDataNascimento(rst.getDate("data_nascimento"));
+                    imp.setOrgaoemissor(rst.getString("rg_orgao"));
+                    imp.setCobrancaEndereco(rst.getString("cobranca_endereco"));
+                    imp.setCobrancaBairro(rst.getString("cobranca_bairro"));
+                    imp.setCobrancaMunicipio(rst.getString("cobranca_cidade"));
+                    imp.setCobrancaUf(rst.getString("cobranca_estado"));
+                    imp.setCobrancaCep(rst.getString("cobranca_cep"));
+                    imp.setNomePai(rst.getString("nome_pai"));
+                    imp.setNomeMae(rst.getString("nome_mae"));
+                    imp.setPermiteCheque(true);
+                    imp.setPermiteCreditoRotativo(true);
+                    imp.setEmpresa(rst.getString("trabalho_local"));
+                    imp.setSalario(rst.getDouble("trabalho_salario"));
+                    imp.setCargo(rst.getString("profissao"));
+                    imp.setValorLimite(rst.getDouble("limite_credito") < 1 ? rst.getDouble("limite_convenio") : rst.getDouble("limite_credito"));
+                    imp.setObservacao(rst.getString("observacao"));
 
+                    if ((rst.getString("ponto_referencia") != null)
+                            && (!rst.getString("ponto_referencia").trim().isEmpty())) {
+                        imp.setObservacao2("PONTO REFERENCIA - " + rst.getString("ponto_referencia"));
+                    }
+
+                    if ((rst.getString("telefone2") != null)
+                            && (!rst.getString("telefone2").trim().isEmpty())) {
+                        imp.addContato(
+                                "1",
+                                "TELEFONE 2",
+                                rst.getString("telefone2"),
+                                null,
+                                null
+                        );
+                    }
+                    if ((rst.getString("cobranca_telefone") != null)
+                            && (!rst.getString("cobranca_telefone").trim().isEmpty())) {
+                        imp.addContato(
+                                "2",
+                                "TEL COBRANCA",
+                                rst.getString("cobranca_telefone"),
+                                null,
+                                null
+                        );
+                    }
+                    if ((rst.getString("trabalho_telefone") != null)
+                            && (!rst.getString("trabalho_telefone").trim().isEmpty())) {
+                        imp.addContato(
+                                "3",
+                                "TEL TRABALHO",
+                                rst.getString("trabalho_telefone"),
+                                null,
+                                null
+                        );
+                    }
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 }
