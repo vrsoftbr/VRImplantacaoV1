@@ -514,4 +514,66 @@ public abstract class InterfaceDAO {
         return new ArrayList<>();
     }
     
+    /**
+     * Utilize esta classe para casos onde não haja cadastro de família, utilize
+     * um sql que ordene por código agrupador e por descrição, depois utilize a
+     * classe.<br>
+     * <br>
+     *  <pre>{@code
+     *  ProdutoParaFamiliaHelper gerador = new ProdutoParaFamiliaHelper();
+     *  while (rst.next()) {
+     *      gerador.gerarFamilia(rst.getString("id"), rst.getString("descricao"), result);
+     *  }
+     * }</pre>
+     */
+    protected class ProdutoParaFamiliaHelper {
+        
+        String id = "";
+        String[] descricao = new String[]{};
+        boolean unico = true;
+        String descricaoCasoVazio = "";
+        
+        void gerarFamilia(String pId, String pDescricao, List<FamiliaProdutoIMP> result) {
+            if (!id.equals(pId)) {
+                if (!unico) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(id);
+                    imp.setDescricao("");
+                    for (String s: descricao) {
+                        imp.setDescricao(imp.getDescricao() + " " + s);
+                    }
+                    if (descricao.length == 0) {
+                        imp.setDescricao(descricaoCasoVazio);
+                    }
+                    result.add(imp);
+                }
+                id = pId;
+                descricaoCasoVazio = pDescricao;
+                descricao = descricaoCasoVazio.split(" ");
+                unico = true;
+            } else {
+                unico = false;
+                String[] descricaoOther = pDescricao.split(" ");
+                int length;
+                if (descricao.length < descricaoOther.length) {
+                    length = descricao.length;
+                } else {
+                    length = descricaoOther.length;
+                }       
+                ArrayList<String> res = new ArrayList<>();
+                for (int i = 0; i < length; i++) {
+                    if (descricao[i].equals(descricaoOther[i])) {
+                        res.add(descricao[i]);
+                    } else {
+                        descricao = res.toArray(new String[]{});
+                        break;
+                    }
+                }
+            }
+        }
+        
+    }
+    
 }

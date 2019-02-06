@@ -10,6 +10,7 @@ import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 
 /**
@@ -23,10 +24,10 @@ public class RPInfoDAO extends InterfaceDAO {
         
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select empr_codigo, empr_nome from empresas order by empr_codigo"
+                    "select unid_codigo, unid_reduzido from unidades order by 1"
             )) {
                 while (rst.next()) {
-                    result.add(new Estabelecimento(rst.getString("empr_codigo"), rst.getString("empr_nome")));
+                    result.add(new Estabelecimento(rst.getString("unid_codigo"), rst.getString("unid_reduzido")));
                 }
             }
         }
@@ -44,7 +45,9 @@ public class RPInfoDAO extends InterfaceDAO {
         return new HashSet<>(Arrays.asList(new OpcaoProduto[]{
             OpcaoProduto.MERCADOLOGICO,
             OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
-            OpcaoProduto.MERCADOLOGICO_PRODUTO
+            OpcaoProduto.MERCADOLOGICO_PRODUTO,
+            OpcaoProduto.FAMILIA_PRODUTO,
+            OpcaoProduto.FAMILIA
         }));
     }
 
@@ -83,7 +86,23 @@ public class RPInfoDAO extends InterfaceDAO {
         
         return result;
     }
-    
-    
+
+    @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select prod_codpreco, prod_descricao from produtos where prod_codpreco != 0 order by prod_codpreco"
+            )) {
+                ProdutoParaFamiliaHelper gerador = new ProdutoParaFamiliaHelper();
+                while (rst.next()) {
+                    gerador.gerarFamilia(rst.getString("prod_codpreco"), rst.getString("prod_descricao"), result);
+                }
+            }
+        }
+        
+        return result;
+    }
     
 }
