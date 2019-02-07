@@ -14,6 +14,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -26,6 +27,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class CerebroDAO extends InterfaceDAO {
 
     public String complSistema = "";
+    public String tipoDocumento = "";
 
     @Override
     public String getSistema() {
@@ -457,7 +459,11 @@ public class CerebroDAO extends InterfaceDAO {
 
                     if ((rst.getString("ponto_referencia") != null)
                             && (!rst.getString("ponto_referencia").trim().isEmpty())) {
-                        imp.setObservacao2("PONTO REFERENCIA - " + rst.getString("ponto_referencia"));
+                        imp.setObservacao2("PONTO REFERENCIA - " + rst.getString("ponto_referencia") + " ");
+                    }
+                    if ((rst.getString("naturalidade") != null)
+                            && (!rst.getString("naturalidade").trim().isEmpty())) {
+                        imp.setObservacao2(imp.getObservacao2() + "NATURALIDADE - " + rst.getString("naturalidade"));
                     }
 
                     if ((rst.getString("telefone2") != null)
@@ -492,6 +498,61 @@ public class CerebroDAO extends InterfaceDAO {
                     }
                     result.add(imp);
                 }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "sequencial_cpr,\n"
+                    + "codigo_cliente,\n"
+                    + "documento,\n"
+                    + "data_emissao,\n"
+                    + "data_vencimento,\n"
+                    + "valor,\n"
+                    + "juros,\n"
+                    + "desconto,\n"
+                    + "observacao,\n"
+                    + "valor_emaberto\n"
+                    + "from MOVIMENTOS_CPR\n"
+                    + "where codigo_empresa = " + getLojaOrigem() + "\n"
+                    + "and codigo_tipodocumento in (" + tipoDocumento + ")\n"
+                    + "and coalesce(valor_emaberto, 0) > 0"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("sequencial_cpr"));
+                    imp.setDataEmissao(rst.getDate("data_emissao"));
+                    imp.setDataVencimento(rst.getDate("data_vencimento"));
+                    imp.setValor(rst.getDouble("valor_emaberto"));
+                    imp.setNumeroCupom(rst.getString("documento"));
+                    imp.setJuros(rst.getDouble("juros"));
+                    imp.setIdCliente(rst.getString("codigo_cliente"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<String> getTipoDocumentos() throws Exception {
+        List<String> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select (codigo_tipodocumento ||' - '|| descricao) as documento "
+                    + "from tipos_documento "
+                    + "where clientefornecedor <> 'F' "
+                    + "order by codigo_tipodocumento"
+            )) {
+                result.add(rst.getString("documento"));
             }
         }
         return result;
