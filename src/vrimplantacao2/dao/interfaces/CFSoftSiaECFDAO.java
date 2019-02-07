@@ -87,7 +87,18 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     "            i.entcoditem = p.itcod\n" +
                     "        order by\n" +
                     "            e.endta_emi desc, i.entcodigo desc\n" +
-                    "    ), 0) custo,\n" +
+                    "    ), 0) custosemimposto,\n" +
+                    "    coalesce((\n" +
+                    "        select first 1\n" +
+                    "            i.entvlruni + i.icmscredito\n" +
+                    "        from\n" +
+                    "            entitem i\n" +
+                    "            join entrada e on i.entcodigo = e.encodigo\n" +
+                    "        where\n" +
+                    "            i.entcoditem = p.itcod\n" +
+                    "        order by\n" +
+                    "            e.endta_emi desc, i.entcodigo desc\n" +
+                    "    ), 0) custocomimposto,\n" +
                     "    p.itpreco preco,\n" +
                     "    p.status,\n" +
                     "    p.ncm,\n" +
@@ -128,8 +139,8 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     imp.setPesoBruto(rst.getDouble("peso"));
                     imp.setPesoLiquido(rst.getDouble("peso"));
                     imp.setMargem(rst.getDouble("margem"));
-                    imp.setCustoComImposto(rst.getDouble("custo"));
-                    imp.setCustoSemImposto(rst.getDouble("custo"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setPrecovenda(rst.getDouble("preco"));
                     imp.setSituacaoCadastro("2".equals(rst.getString("status")) ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setNcm(rst.getString("ncm"));
