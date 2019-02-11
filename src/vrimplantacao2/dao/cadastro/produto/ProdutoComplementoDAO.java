@@ -6,7 +6,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Set;
+import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.MathUtils;
@@ -18,6 +20,8 @@ import vrimplantacao2.vo.cadastro.oferta.OfertaVO;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 
 public class ProdutoComplementoDAO {
+    
+    private static final Logger LOG = Logger.getLogger(ProdutoComplementoDAO.class.getName());
     
     private MultiMap<Integer, Integer> complementos;
     public MultiMap<Integer, Integer> getComplementos() throws Exception {
@@ -255,7 +259,11 @@ public class ProdutoComplementoDAO {
                 sql.put("custosemimposto", complemento.getCustoSemImposto());
             }
             if (opt.contains(OpcaoProduto.ESTOQUE)) {
-                sql.put("estoque", complemento.getEstoque());
+                if (opt.contains(OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE)) {
+                    sql.putSql("estoque", String.format(Locale.US, "estoque + (%.2f)", complemento.getEstoque()));
+                } else {
+                    sql.put("estoque", complemento.getEstoque());
+                }
             }
             if (opt.contains(OpcaoProduto.ESTOQUE_MINIMO)) {
                 sql.put("estoqueminimo", complemento.getEstoqueMinimo());
@@ -289,7 +297,9 @@ public class ProdutoComplementoDAO {
                 );
             }
             if (!sql.isEmpty()) {
-                stm.execute(sql.getUpdate());
+                String sq = sql.getUpdate();
+                LOG.finer(sq);
+                stm.execute(sq);
                 if (!"".equals(oft)) {
                     stm.execute(oft);
                 }

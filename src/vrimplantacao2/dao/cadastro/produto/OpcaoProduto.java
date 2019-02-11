@@ -234,6 +234,15 @@ public enum OpcaoProduto {
             return "Fabricação Própria";
         }
     },
+    /**
+     * Soma o estoque do produto.
+     */
+    ATUALIZAR_SOMAR_ESTOQUE{
+        @Override
+        public String toString() {
+            return "Somar estoque(ativo)";
+        }        
+    },
     FAMILIA_PRODUTO, 
     PRODUTOS, 
     EAN, 

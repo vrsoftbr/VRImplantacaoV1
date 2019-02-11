@@ -264,6 +264,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         btnMapaTribut = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
         jLabel1 = new javax.swing.JLabel();
         chkNaoTransformarEANemUN = new vrframework.bean.checkBox.VRCheckBox();
+        chkSomarEstoqueAoProduto = new vrframework.bean.checkBox.VRCheckBox();
         pnlOptAssociado = new vrframework.bean.panel.VRPanel();
         jLabel2 = new javax.swing.JLabel();
         chkInverterAssociado = new vrframework.bean.checkBox.VRCheckBox();
@@ -400,6 +401,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkNaoTransformarEANemUN.setToolTipText("<html>\nEm alguns sistemas o produto pode ser vendido tanto pelo EAN13 quanto na balança.<br>\nIsso para o VR pode causar problemas, por essa razão o VRImplantação trata esse<br>\nproduto com EAN e o converte em unitário.<br>\n<br>\n<b>Ao marcar esta opção, o sistema ignora o EAN e fixa o que for passado como unidade.</b>\n</html>");
         chkNaoTransformarEANemUN.setEnabled(true);
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkSomarEstoqueAoProduto, "Somar o estoque do produto");
+        chkSomarEstoqueAoProduto.setToolTipText("<html>\nAo contrario do procedimento normal de atualização do estoque onde o valor dele é substítuido<br>\npelo importado, ao marcar esta opção o valor importado serásomado ao estoque atual.\n</html>");
+        chkSomarEstoqueAoProduto.setEnabled(true);
+
         javax.swing.GroupLayout pnlOptProdutoLayout = new javax.swing.GroupLayout(pnlOptProduto);
         pnlOptProduto.setLayout(pnlOptProdutoLayout);
         pnlOptProdutoLayout.setHorizontalGroup(
@@ -415,8 +420,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                             .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(pnlOptProdutoLayout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(chkNaoTransformarEANemUN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(0, 0, Short.MAX_VALUE))
+                        .addGroup(pnlOptProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkSomarEstoqueAoProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkNaoTransformarEANemUN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(0, 139, Short.MAX_VALUE))
         );
         pnlOptProdutoLayout.setVerticalGroup(
             pnlOptProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -432,6 +439,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                         .addComponent(btnMapaTribut, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkNaoTransformarEANemUN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkSomarEstoqueAoProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))))
         );
 
@@ -1031,6 +1040,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkReceitaFilizola;
     public vrframework.bean.checkBox.VRCheckBox chkReceitaToledo;
     public vrframework.bean.checkBox.VRCheckBox chkSituacaoCadastro;
+    public vrframework.bean.checkBox.VRCheckBox chkSomarEstoqueAoProduto;
     public vrframework.bean.checkBox.VRCheckBox chkSugestaoCotacao;
     public vrframework.bean.checkBox.VRCheckBox chkSugestaoPedido;
     public vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
@@ -1161,6 +1171,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
             {
                 List<OpcaoProduto> opcoes = new ArrayList<>();
+                if (chkSomarEstoqueAoProduto.isSelected()) {
+                    opcoes.add(OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE);
+                }
                 if (chkCusto.isSelected()) {
                     opcoes.add(OpcaoProduto.CUSTO);
                 }
