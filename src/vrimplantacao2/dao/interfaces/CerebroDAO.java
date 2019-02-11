@@ -13,6 +13,8 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -25,7 +27,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class CerebroDAO extends InterfaceDAO {
 
     public String complSistema = "";
-    
+    public String tipoDocumento = "";
+
     @Override
     public String getSistema() {
         if ((complSistema != null) && (!complSistema.trim().isEmpty())) {
@@ -350,6 +353,206 @@ public class CerebroDAO extends InterfaceDAO {
                     imp.setCustoTabela(rst.getDouble("ultimo_custo"));
                     result.add(imp);
                 }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "c.codigo_cliente,\n"
+                    + "c.descricao,\n"
+                    + "c.razao_social, \n"
+                    + "c.nome_fantasia,\n"
+                    + "c.endereco,\n"
+                    + "c.numero,\n"
+                    + "c.cep,\n"
+                    + "c.bairro,\n"
+                    + "c.cidade,\n"
+                    + "c.estado,\n"
+                    + "c.telefone1,\n"
+                    + "c.telefone2,\n"
+                    + "c.fax, \n"
+                    + "c.celular,\n"
+                    + "c.email,\n"
+                    + "c.data_cadastro,\n"
+                    + "c.data_nascimento,\n"
+                    + "c.cpf_cnpj,\n"
+                    + "c.inscricao_estadual,\n"
+                    + "c.rg,\n"
+                    + "c.rg_orgao,\n"
+                    + "c.rg_expedicao,\n"
+                    + "c.ponto_referencia,\n"
+                    + "c.contato,\n"
+                    + "c.cobranca_endereco,\n"
+                    + "c.cobranca_bairro,\n"
+                    + "c.cobranca_cidade,\n"
+                    + "c.cobranca_estado,\n"
+                    + "c.cobranca_cep,\n"
+                    + "c.cobranca_telefone,\n"
+                    + "c.nome_mae,\n"
+                    + "c.nome_pai,\n"
+                    + "c.naturalidade,\n"
+                    + "c.trabalho_local,\n"
+                    + "c.trabalho_tempo,\n"
+                    + "c.trabalho_salario,\n"
+                    + "c.trabalho_telefone,\n"
+                    + "c.observacao,\n"
+                    + "c.limite_credito,\n"
+                    + "c.limite_convenio,\n"
+                    + "c.status_credito,\n"
+                    + "c.entrega_endereco,\n"
+                    + "c.entrega_bairro,\n"
+                    + "c.entrega_cidade,\n"
+                    + "c.entrega_estado,\n"
+                    + "c.entrega_cep,\n"
+                    + "c.entrega_telefone,\n"
+                    + "c.cod_banco,\n"
+                    + "c.num_agencia,\n"
+                    + "c.numagencia_dv,\n"
+                    + "c.num_conta,\n"
+                    + "c.numconta_dv,\n"
+                    + "c.sexo, \n"
+                    + "c.profissao\n"
+                    + "from clientes c\n"
+                    + "order by c.codigo_cliente"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("codigo_cliente"));
+                    imp.setRazao(rst.getString("razao_social") == null ? rst.getString("descricao") : rst.getString("razao_social"));
+                    imp.setFantasia(rst.getString("nome_fantasia") == null ? rst.getString("descricao") : rst.getString("nome_fantasia"));
+                    imp.setCnpj(rst.getString("cpf_cnpj"));
+                    imp.setInscricaoestadual(rst.getString("inscricao_estadual") == null ? rst.getString("rg") : rst.getString("inscricao_estadual"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setTelefone(rst.getString("telefone1"));
+                    imp.setFax(rst.getString("fax"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setDataCadastro(rst.getDate("data_cadastro"));
+                    imp.setDataNascimento(rst.getDate("data_nascimento"));
+                    imp.setOrgaoemissor(rst.getString("rg_orgao"));
+                    imp.setCobrancaEndereco(rst.getString("cobranca_endereco"));
+                    imp.setCobrancaBairro(rst.getString("cobranca_bairro"));
+                    imp.setCobrancaMunicipio(rst.getString("cobranca_cidade"));
+                    imp.setCobrancaUf(rst.getString("cobranca_estado"));
+                    imp.setCobrancaCep(rst.getString("cobranca_cep"));
+                    imp.setNomePai(rst.getString("nome_pai"));
+                    imp.setNomeMae(rst.getString("nome_mae"));
+                    imp.setPermiteCheque(true);
+                    imp.setPermiteCreditoRotativo(true);
+                    imp.setEmpresa(rst.getString("trabalho_local"));
+                    imp.setSalario(rst.getDouble("trabalho_salario"));
+                    imp.setCargo(rst.getString("profissao"));
+                    imp.setValorLimite(rst.getDouble("limite_credito") < 1 ? rst.getDouble("limite_convenio") : rst.getDouble("limite_credito"));
+                    imp.setObservacao(rst.getString("observacao"));
+
+                    if ((rst.getString("ponto_referencia") != null)
+                            && (!rst.getString("ponto_referencia").trim().isEmpty())) {
+                        imp.setObservacao2("PONTO REFERENCIA - " + rst.getString("ponto_referencia") + " ");
+                    }
+                    if ((rst.getString("naturalidade") != null)
+                            && (!rst.getString("naturalidade").trim().isEmpty())) {
+                        imp.setObservacao2(imp.getObservacao2() + "NATURALIDADE - " + rst.getString("naturalidade"));
+                    }
+
+                    if ((rst.getString("telefone2") != null)
+                            && (!rst.getString("telefone2").trim().isEmpty())) {
+                        imp.addContato(
+                                "1",
+                                "TELEFONE 2",
+                                rst.getString("telefone2"),
+                                null,
+                                null
+                        );
+                    }
+                    if ((rst.getString("cobranca_telefone") != null)
+                            && (!rst.getString("cobranca_telefone").trim().isEmpty())) {
+                        imp.addContato(
+                                "2",
+                                "TEL COBRANCA",
+                                rst.getString("cobranca_telefone"),
+                                null,
+                                null
+                        );
+                    }
+                    if ((rst.getString("trabalho_telefone") != null)
+                            && (!rst.getString("trabalho_telefone").trim().isEmpty())) {
+                        imp.addContato(
+                                "3",
+                                "TEL TRABALHO",
+                                rst.getString("trabalho_telefone"),
+                                null,
+                                null
+                        );
+                    }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "sequencial_cpr,\n"
+                    + "codigo_cliente,\n"
+                    + "documento,\n"
+                    + "data_emissao,\n"
+                    + "data_vencimento,\n"
+                    + "valor,\n"
+                    + "juros,\n"
+                    + "desconto,\n"
+                    + "observacao,\n"
+                    + "valor_emaberto\n"
+                    + "from MOVIMENTOS_CPR\n"
+                    + "where codigo_empresa = " + getLojaOrigem() + "\n"
+                    + "and codigo_tipodocumento in (" + tipoDocumento + ")\n"
+                    + "and coalesce(valor_emaberto, 0) > 0"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("sequencial_cpr"));
+                    imp.setDataEmissao(rst.getDate("data_emissao"));
+                    imp.setDataVencimento(rst.getDate("data_vencimento"));
+                    imp.setValor(rst.getDouble("valor_emaberto"));
+                    imp.setNumeroCupom(rst.getString("documento"));
+                    imp.setJuros(rst.getDouble("juros"));
+                    imp.setIdCliente(rst.getString("codigo_cliente"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<String> getTipoDocumentos() throws Exception {
+        List<String> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select (codigo_tipodocumento ||' - '|| descricao) as documento "
+                    + "from tipos_documento "
+                    + "where clientefornecedor <> 'F' "
+                    + "order by codigo_tipodocumento"
+            )) {
+                result.add(rst.getString("documento"));
             }
         }
         return result;
