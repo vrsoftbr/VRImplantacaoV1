@@ -4,17 +4,23 @@ import java.util.HashMap;
 import java.util.Map;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
-import vrimplantacao.utils.Utils;
-import vrimplantacao2.vo.enums.SituacaoCadastro;
-import vrimplantacao2.vo.importacao.ProdutoIMP;
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
+import static org.mockito.Matchers.anyDouble;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
 import org.mockito.Mock;
+import static org.mockito.Mockito.when;
 import org.mockito.runners.MockitoJUnitRunner;
+import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.CestVO;
 import vrimplantacao.vo.vrimplantacao.EstadoVO;
 import vrimplantacao2.vo.cadastro.FamiliaProdutoVO;
@@ -30,7 +36,9 @@ import vrimplantacao2.vo.enums.NaturezaReceitaVO;
 import vrimplantacao2.vo.enums.NcmVO;
 import vrimplantacao2.vo.enums.NormaReposicao;
 import vrimplantacao2.vo.enums.PisCofinsVO;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoEmbalagem;
+import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  *
@@ -362,7 +370,7 @@ public class ProdutoRepositoryTest {
     @Test
     public void testConverterAliquota_MOCA() throws Exception {
         ProdutoIMP imp = getProdutoIMP_MOCA();
-        ProdutoAliquotaVO actual = new ProdutoRepository(provider).converterAliquota(imp);
+        ProdutoAliquotaVO actual = new ProdutoRepository(provider).converterAliquotaSimples(imp);
         
         assertEquals(20, actual.getAliquotaDebito().getCst());
         assertEquals(4, actual.getAliquotaDebito().getId());
@@ -404,7 +412,7 @@ public class ProdutoRepositoryTest {
     @Test
     public void testConverterAliquota_MOCA2() throws Exception {
         ProdutoIMP imp = getProdutoIMP_MOCA2();
-        ProdutoAliquotaVO actual = new ProdutoRepository(provider).converterAliquota(imp);
+        ProdutoAliquotaVO actual = new ProdutoRepository(provider).converterAliquotaSimples(imp);
         
         assertEquals(20, actual.getAliquotaDebito().getCst());
         assertEquals(4, actual.getAliquotaDebito().getId());
@@ -446,7 +454,7 @@ public class ProdutoRepositoryTest {
     @Test
     public void testConverterAliquota_ACEM() throws Exception {
         ProdutoIMP imp = getProdutoIMP_ACEM();
-        ProdutoAliquotaVO actual = new ProdutoRepository(provider).converterAliquota(imp);
+        ProdutoAliquotaVO actual = new ProdutoRepository(provider).converterAliquotaSimples(imp);
         
         assertEquals(0, actual.getAliquotaDebito().getCst());
         assertEquals(2, actual.getAliquotaDebito().getId());

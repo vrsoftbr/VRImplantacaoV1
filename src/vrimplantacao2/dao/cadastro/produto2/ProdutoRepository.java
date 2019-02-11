@@ -49,6 +49,7 @@ public class ProdutoRepository {
     private static final SimpleDateFormat DATA_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
     private boolean naoTransformarEANemUN = false;
+    private boolean usarConversaoDeAliquotaSimples = true;
     
     public ProdutoRepository(ProdutoRepositoryProvider provider) {
         this.provider = provider;
@@ -83,6 +84,8 @@ public class ProdutoRepository {
     }
 
     public void salvar(List<ProdutoIMP> produtos) throws Exception {
+        usarConversaoDeAliquotaSimples = provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
+        
         LOG.finest("Abrindo a transação");
         begin();        
         try {
@@ -234,7 +237,8 @@ public class ProdutoRepository {
     }
     
     public void atualizar(List<ProdutoIMP> produtos, OpcaoProduto... opcoes) throws Exception {
-
+        usarConversaoDeAliquotaSimples = provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
+        
         LOG.finer("Entrando no método atualizar; produtos(" + produtos.size() + ") opcoes(" + opcoes.length + ")");
         //<editor-fold defaultstate="collapsed" desc="Separa as opções entre 'com lista especial' e 'sem lista especial'">
         Set<OpcaoProduto> optComLista = new LinkedHashSet<>();
@@ -392,6 +396,8 @@ public class ProdutoRepository {
      * @throws Exception
      */
     public void unificar(List<ProdutoIMP> produtos) throws Exception {
+        usarConversaoDeAliquotaSimples = provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
+        
         begin();
         try {
             System.gc();
@@ -534,6 +540,8 @@ public class ProdutoRepository {
      * @throws Exception
      */
     public void unificar2(List<ProdutoIMP> produtos) throws Exception {
+        usarConversaoDeAliquotaSimples = provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
+        
         begin();
         try {
             System.gc();
@@ -703,6 +711,14 @@ public class ProdutoRepository {
         }
     }
     
+    public ProdutoAliquotaVO converterAliquota(ProdutoIMP imp) throws Exception {
+        if (usarConversaoDeAliquotaSimples) {
+            return converterAliquotaSimples(imp);
+        } else {
+            return converterAliquotaCompleta(imp);
+        }
+    }
+    
     /**
      * Converte um {@link ProdutoIMP} em {@link ProdutoAliquotaVO}.
      *
@@ -710,7 +726,7 @@ public class ProdutoRepository {
      * @return
      * @throws Exception
      */
-    public ProdutoAliquotaVO converterAliquota(ProdutoIMP imp) throws Exception {
+    public ProdutoAliquotaVO converterAliquotaSimples(ProdutoIMP imp) throws Exception {
         ProdutoAliquotaVO aliquota = new ProdutoAliquotaVO();
         aliquota.setEstado(provider.tributo().getUf(getLojaVR()));
 

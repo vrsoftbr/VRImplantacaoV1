@@ -264,7 +264,12 @@ public enum OpcaoProduto {
         <br>
         <b>Ao marcar esta opção, o sistema ignora o EAN e fixa o que for passado como unidade.</b>
      */
-    IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN;
+    IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN, 
+    /**
+     * Ao informar este parâmetro, a conversão das alíquotas é feita para cada campo da tributação, 
+     * diferentemente do modo tradicional onde apenas as alíquotas de entrada e saída são usadas.
+     */
+    USAR_CONVERSAO_ALIQUOTA_COMPLETA;
 
     public static Set<OpcaoProduto> getAll() {
         return new HashSet<>(Arrays.asList(OpcaoProduto.values()));

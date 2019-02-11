@@ -22,6 +22,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
     public Importador importador;
     private Set<OpcaoProduto> opt = OpcaoProduto.getPadrao();
+    private List<OpcaoProduto> parametrosExtras = new ArrayList<>();
     private ImportAction importadorMercadologico = new ImportAction(this) {
 
         @Override
@@ -46,6 +47,14 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         }
         
     }; 
+
+    public void setParametrosExtras(List<OpcaoProduto> parametrosExtras) {
+        this.parametrosExtras = parametrosExtras;
+    }
+
+    public List<OpcaoProduto> getParametrosExtras() {
+        return parametrosExtras;
+    }
 
     public void setImportadorMercadologico(ImportAction importadorMercadologico) {
         this.importadorMercadologico = importadorMercadologico;
@@ -1122,7 +1131,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
                 if (chkManterBalanca.isSelected()) {
                     opt.add(OpcaoProduto.IMPORTAR_MANTER_BALANCA);
-                }                
+                }
+                opt.addAll(getParametrosExtras());
                 importador.importarProduto(opt.toArray(new OpcaoProduto[]{}));
             }
             
@@ -1253,6 +1263,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 if (chkPesoLiquido.isSelected()) {
                     opcoes.add(OpcaoProduto.PESO_LIQUIDO);
                 }
+                opcoes.addAll(getParametrosExtras());
                 if (!opcoes.isEmpty()) {
                     importador.atualizarProdutos(opcoes);
                 }
