@@ -12,6 +12,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  *
@@ -98,6 +99,23 @@ public class RPInfoDAO extends InterfaceDAO {
                 ProdutoParaFamiliaHelper gerador = new ProdutoParaFamiliaHelper();
                 while (rst.next()) {
                     gerador.gerarFamilia(rst.getString("prod_codpreco"), rst.getString("prod_descricao"), result);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    ""
+            )) {
+                while (rst.next()) {
+                
                 }
             }
         }

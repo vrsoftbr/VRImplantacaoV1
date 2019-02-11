@@ -49,7 +49,28 @@ public class DataSyncDAO extends InterfaceDAO {
         return new HashSet<>(Arrays.asList(new OpcaoProduto[]{
             OpcaoProduto.PRODUTOS,
             OpcaoProduto.EAN,
-            OpcaoProduto.EAN_EM_BRANCO
+            OpcaoProduto.EAN_EM_BRANCO,
+            OpcaoProduto.PRECO,
+            OpcaoProduto.CUSTO,
+            OpcaoProduto.ESTOQUE,
+            OpcaoProduto.MARGEM,
+            OpcaoProduto.DATA_CADASTRO,
+            OpcaoProduto.DATA_ALTERACAO,
+            OpcaoProduto.TIPO_EMBALAGEM_EAN,
+            OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.PESAVEL,
+            OpcaoProduto.VALIDADE,
+            OpcaoProduto.DESC_COMPLETA,
+            OpcaoProduto.DESC_GONDOLA,
+            OpcaoProduto.DESC_REDUZIDA,
+            OpcaoProduto.PESO_BRUTO,
+            OpcaoProduto.PESO_LIQUIDO,
+            OpcaoProduto.ATIVO,
+            OpcaoProduto.NCM,
+            OpcaoProduto.CEST,
+            OpcaoProduto.PIS_COFINS,
+            OpcaoProduto.NATUREZA_RECEITA,
+            OpcaoProduto.ICMS
         }));
     }
 
@@ -59,7 +80,7 @@ public class DataSyncDAO extends InterfaceDAO {
                 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "declare @empresa integer = " + getLojaOrigem() + ";\n" +
+                    "declare @empresa integer =  " + getLojaOrigem() + ";\n" +
                     "select\n" +
                     "	e.ESTOQUE_ID id,\n" +
                     "	e.DATA_CADASTRO,\n" +
@@ -77,7 +98,24 @@ public class DataSyncDAO extends InterfaceDAO {
                     "	e.PESO pesobruto,\n" +
                     "	e.PESO_LIQUIDO pesoliquodo,\n" +
                     "	coalesce(estoque.QUANTIDADE, 0) estoque,\n" +
-                    "	pr.VALOR preco,\n" +
+                    "	round(pr.VALOR, 2) preco,\n" +
+                    "	coalesce(round(\n" +
+                    "		(select top 1 a.custo_bruto from \n" +
+                    "			ESTOQUE_FORMACAO_PRECOS a\n" +
+                    "		where\n" +
+                    "			a.ESTOQUE_ID = f.ESTOQUE_ID and\n" +
+                    "			a.EMPRESA_ID = @empresa\n" +
+                    "		order by a.NF_ID desc)\n" +
+                    "	,2),0) custo,\n" +
+                    "	coalesce(round(\n" +
+                    "		(select top 1 a.MARGEN_LUCRO from \n" +
+                    "			ESTOQUE_FORMACAO_PRECOS a\n" +
+                    "			join NOTA_FISCAL_COMPRA nf on a.NF_ID = nf.NF_ID\n" +
+                    "		where\n" +
+                    "			a.ESTOQUE_ID = f.ESTOQUE_ID and\n" +
+                    "			a.EMPRESA_ID = @empresa\n" +
+                    "		order by nf.DATA_EMISSAO desc)\n" +
+                    "	,2),0) margem,\n" +
                     "	case e.INATIVO when 1 then 0 else 1 end ativo,\n" +
                     "	e.CODIGO_NCM ncm,\n" +
                     "	e.CODIGO_CEST cest,\n" +
@@ -112,19 +150,14 @@ public class DataSyncDAO extends InterfaceDAO {
                     "		e.UNIDADE_ID_VENDA = un.UNIDADE_ID\n" +
                     "	left join (\n" +
                     "		SELECT\n" +
-                    "			em.ESTOQUE_ID,\n" +
-                    "			ISNULL(SUM(\n" +
-                    "				case etm.operacao when 0 then em.quantidade else em.QUANTIDADE * (-1) end\n" +
-                    "				), 0) AS QUANTIDADE\n" +
-                    "		FROM\n" +
-                    "			ESTOQUE_MOVIMENTOS em\n" +
-                    "			LEFT JOIN (select tipo_id, case operacao when 'Entrada' then 0 else 1 end operacao from ESTOQUE_TIPOS_MOVIMENTOS) etm ON\n" +
-                    "				etm.TIPO_ID = em.TIPO_ID\n" +
-                    "		WHERE\n" +
-                    "			(em.DEL IS NULL OR em.DEL = 0) and\n" +
-                    "			em.EMPRESA_ID = @empresa	\n" +
-                    "		group by\n" +
-                    "			em.ESTOQUE_ID\n" +
+                    "		  e1.ESTOQUE_ID,\n" +
+                    "		  sum(ISNULL(dbo.FN_ESTOQUE_CONTA(e1.ESTOQUE_ID, ec.EMPRESA_ID, ec.CONTA_EST_ID), 0) + \n" +
+                    "		  ISNULL(dbo.FN_ESTOQUE_COMPROMETIDO(e1.ESTOQUE_ID, ec.EMPRESA_ID, ec.CONTA_EST_ID, 1), 0)) AS QUANTIDADE\n" +
+                    "		FROM ESTOQUE e1\n" +
+                    "		LEFT JOIN ESTOQUE_CONTAS ec\n" +
+                    "		  ON (ec.DEL IS NULL\n" +
+                    "		  OR ec.DEL = 0)\n" +
+                    "		group by e1.ESTOQUE_ID\n" +
                     "	) estoque on\n" +
                     "		estoque.ESTOQUE_ID = e.ESTOQUE_ID\n" +
                     "	left join ESTOQUE_TABELA_PRECOS pr on\n" +
@@ -134,6 +167,7 @@ public class DataSyncDAO extends InterfaceDAO {
                     "	left join ESTOQUE_DADOS_FISCAIS f on\n" +
                     "		f.EMPRESA_ID = @empresa and\n" +
                     "		f.ESTOQUE_ID = e.ESTOQUE_ID\n" +
+                    //"--where e.ESTOQUE_ID = 20368\n" +
                     "order by\n" +
                     "	1"
             )) {
@@ -155,6 +189,9 @@ public class DataSyncDAO extends InterfaceDAO {
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquodo"));
                     imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setMargem(rst.getDouble("margem"));
+                    imp.setCustoComImposto(rst.getDouble("custo"));
+                    imp.setCustoSemImposto(rst.getDouble("custo"));
                     imp.setPrecovenda(rst.getDouble("preco"));
                     imp.setSituacaoCadastro(rst.getInt("ativo") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setNcm(rst.getString("ncm"));
@@ -163,10 +200,14 @@ public class DataSyncDAO extends InterfaceDAO {
                     imp.setPiscofinsCstCredito(rst.getString("piscofins_cst_ent"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_natureza_receita"));
                     imp.setIcmsCstSaida(Utils.stringToInt(rst.getString("SAI_CST_DENTRO_EST")));
+                    imp.setIcmsCstEntrada(Utils.stringToInt(rst.getString("SAI_CST_DENTRO_EST")));
                     imp.setIcmsCstSaidaForaEstado(Utils.stringToInt(rst.getString("SAI_CST_FORA_EST")));
+                    imp.setIcmsCstEntradaForaEstado(Utils.stringToInt(rst.getString("SAI_CST_FORA_EST")));
                     imp.setIcmsCstSaidaForaEstadoNF(Utils.stringToInt(rst.getString("SAI_CST_FORA_EST")));
                     imp.setIcmsAliqSaida(rst.getDouble("SAI_ICMS_DENTRO_EST"));
+                    imp.setIcmsAliqEntrada(rst.getDouble("SAI_ICMS_DENTRO_EST"));
                     imp.setIcmsAliqSaidaForaEstado(rst.getDouble("SAI_ICMS_FORA_EST"));
+                    imp.setIcmsAliqEntradaForaEstado(rst.getDouble("SAI_ICMS_FORA_EST"));
                     imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("SAI_ICMS_FORA_EST"));
                     imp.setFornecedorFabricante(rst.getString("FABRICANTE_ID"));
                     

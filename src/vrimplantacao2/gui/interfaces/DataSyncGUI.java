@@ -21,6 +21,7 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.DataSyncDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
@@ -159,6 +160,7 @@ public class DataSyncGUI extends VRInternalFrame {
                     if (tabs.getSelectedIndex() == 0) {
 
                         tabProdutos.setImportador(importador);
+                        tabProdutos.getParametrosExtras().add(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
                         tabProdutos.executarImportacao();
                                                 
                         if (chkFornecedor.isSelected()) {

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -139,8 +140,8 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     imp.setPesoBruto(rst.getDouble("peso"));
                     imp.setPesoLiquido(rst.getDouble("peso"));
                     imp.setMargem(rst.getDouble("margem"));
-                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(MathUtils.round(rst.getDouble("custosemimposto"),2));
+                    imp.setCustoComImposto(MathUtils.round(rst.getDouble("custocomimposto"),2));
                     imp.setPrecovenda(rst.getDouble("preco"));
                     imp.setSituacaoCadastro("2".equals(rst.getString("status")) ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setNcm(rst.getString("ncm"));
