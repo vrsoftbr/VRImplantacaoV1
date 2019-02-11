@@ -22,7 +22,6 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
-import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -719,7 +718,6 @@ public class IntelliCashDAO extends InterfaceDAO {
                         next.setHoraTermino(timestamp.parse(horaTermino));
                         next.setSubTotalImpressora(rst.getDouble("valor"));
                         next.setCpf(rst.getString("cnpj"));
-                        next.setModeloImpressora(rst.getString("modelo"));
                         next.setNomeCliente(rst.getString("nome"));
                         String endereco
                                 = Utils.acertarTexto(rst.getString("endereco")) + ","
@@ -740,51 +738,54 @@ public class IntelliCashDAO extends InterfaceDAO {
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select\n" +
-                    "    c.cupom coo,\n" +
-                    "    c.emissao,\n" +
-                    "    c.pdv ecf,\n" +
-                    "    min(c.hora) horainicio,\n" +
-                    "    max(c.hora) horatermino,\n" +
-                    "    sum(c.valor) valor,\n" +
-                    "    sum(c.desconto) desconto,\n" +
-                    "    c.motivocanc,\n" +
-                    "    iif(c.codag is null, '', c.codag) idcliente,\n" +
-                    "    iif(a.nome is null, '', a.nome) nome,\n" +
-                    "    iif(a.doc is null, '', a.doc) cnpj,\n" +
-                    "    iif(e.cep is null, '', e.cep) cep,\n" +
-                    "    iif(e.logradouro is null, '', e.logradouro) endereco,\n" +
-                    "    iif(e.numero is null, '', e.numero) numero,\n" +
-                    "    iif(e.bairro is null, '', e.bairro) bairro,\n" +
-                    "    iif(ci.cidade is null, '', ci.cidade) cidade,\n" +
-                    "    iif(ci.uf is null, '', ci.uf) estado,\n" +
-                    "    c.modelo,\n" +
-                    "    c.consumidor\n" +
-                    "from\n" +
-                    "    TMP60I c\n" +
-                    "left join agentes a on (c.codag = a.id)\n" +
-                    "left join enderecos e on (a.id = e.agente)\n" +
-                    "left join cidades ci on (e.cidade = ci.id)\n" +
-                    "where\n" +
-                    "    emissao between '" + FORMAT.format(dataInicio) + "' and '" +  FORMAT.format(dataTermino) + "' and\n" +
-                    "    c.empresa = " + idLojaCliente + "\n" +
-                    "group by\n" +
-                    "    c.cupom,\n" +
-                    "    c.emissao,\n" +
-                    "    c.pdv,\n" +
-                    "    c.motivocanc,\n" +
-                    "    c.codag,\n" +
-                    "    a.nome,\n" +
-                    "    a.doc,\n" +
-                    "    e.cep,\n" +
-                    "    e.logradouro,\n" +
-                    "    e.numero,\n" +
-                    "    e.bairro,\n" +
-                    "    ci.cidade,\n" +
-                    "    ci.uf,\n" +
-                    "    c.modelo,\n" +
-                    "    c.consumidor\n" +
-                    "order by\n" +
-                    "    c.emissao, c.cupom";
+                        "    c.codag idcliente,\n" +
+                        "    a.doc cnpj,\n" +
+                        "    c.turno,\n" +
+                        "    c.empresa,\n" +
+                        "    c.ecf,\n" +
+                        "    c.cupom coo,\n" +
+                        "    c.data emissao,\n" +
+                        "    max(i.hora) horainicio,\n" +
+                        "    max(i.hora) horatermino,\n" +
+                        "    sum(i.valor) valor,\n" +
+                        "    iif(a.nome is null, '', a.nome) nome,\n" +
+                        "    iif(a.doc is null, '', a.doc) cnpj,\n" +
+                        "    iif(e.cep is null, '', e.cep) cep,\n" +
+                        "    iif(e.logradouro is null, '', e.logradouro) endereco,\n" +
+                        "    iif(e.numero is null, '', e.numero) numero,\n" +
+                        "    iif(e.bairro is null, '', e.bairro) bairro,\n" +
+                        "    iif(ci.cidade is null, '', ci.cidade) cidade,\n" +
+                        "    iif(ci.uf is null, '', ci.uf) estado\n" +
+                        "from\n" +
+                        "    cupom_r60i c\n" +
+                        "join\n" +
+                        "    V60I i on (c.cupom = i.cupom) and\n" +
+                        "    c.ecf = i.ecf\n" +
+                        "left join\n" +
+                        "    agentes a on (c.codag = a.id)\n" +
+                        "left join\n" +
+                        "    enderecos e on (a.id = e.agente)\n" +
+                        "left join\n" +
+                        "    cidades ci on (e.cidade = ci.id)\n" +
+                        "where\n" +
+                        "    c.data between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "' and\n" +
+                        "    c.empresa = " + idLojaCliente + "\n" +
+                        "group by\n" +
+                        "    c.codag,\n" +
+                        "    a.doc,\n" +
+                        "    c.turno,\n" +
+                        "    c.empresa,\n" +
+                        "    c.ecf,\n" +
+                        "    c.cupom,\n" +
+                        "    c.data,\n" +
+                        "    a.nome,\n" +
+                        "    a.doc,\n" +
+                        "    e.cep,\n" +
+                        "    e.logradouro,\n" +
+                        "    e.numero,\n" +
+                        "    e.bairro,\n" +
+                        "    ci.cidade,\n" +
+                        "    ci.uf";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -821,32 +822,31 @@ public class IntelliCashDAO extends InterfaceDAO {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String id = rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("emissao") + "-" + rst.getDouble("sequencia");
+                        //String id = rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("emissao") + "-" + rst.getDouble("sequencia");
                         String idVenda = rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("emissao");
 
-                        next.setId(id);
+                        next.setId(rst.getString("id"));
                         next.setVenda(idVenda);
-                        next.setProduto(rst.getString("idproduto"));
+                        next.setProduto(rst.getString("id_produto"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
-                        next.setQuantidade(rst.getDouble("qtde"));
+                        next.setQuantidade(rst.getDouble("quantidade"));
                         next.setTotalBruto(rst.getDouble("valor"));
-                        next.setValorDesconto(rst.getDouble("desconto"));
                         next.setCancelado(rst.getBoolean("cancelado"));
                         next.setCodigoBarras(rst.getString("ean"));
                         next.setUnidadeMedida(rst.getString("unidade"));
-                        next.setIcmsAliq(rst.getDouble("aliqicms"));
-                        int cst;
-                        switch(rst.getString("idicms")) {
-                            case "F": cst = 60; break;
-                            case "I": cst = 40; break;    
-                            case "N": cst = 41; break;
-                            case "T07": cst = 0; break;
-                            case "T12": cst = 0; break;
-                            case "T18": cst = 0; break;
-                            case "T25": cst = 0; break;
-                            default: cst = 40;
+                        int trib;
+                        switch(rst.getString("trib")) {
+                            case "F": trib = 0; break;
+                            case "I": trib = 0; break;    
+                            case "N": trib = 41; break;
+                            case "T07": trib = 7; break;
+                            case "T12": trib = 12; break;
+                            case "T18": trib = 18; break;
+                            case "T25": trib = 25; break;
+                            default: trib = 0;
                         }
-                        next.setIcmsCst(cst);
+                        next.setIcmsAliq(trib);
+                        next.setIcmsCst(rst.getInt("icmscst"));
                         next.setSequencia(rst.getInt("sequencia"));
                     }
                 }
@@ -860,36 +860,32 @@ public class IntelliCashDAO extends InterfaceDAO {
             this.sql
                     = 
                     "select\n" +
+                    "    i.id,\n" +
+                    "    i.numitem sequencia,\n" +
+                    "    i.data emissao,\n" +
+                    "    i.hora,\n" +
+                    "    i.ecf,\n" +
                     "    i.cupom coo,\n" +
-                    "    i.pdv ecf,\n" +
-                    "    i.emissao,\n" +
-                    "    e.produto idproduto,\n" +
+                    "    i.prod id_produto,\n" +
                     "    p.descricao,\n" +
                     "    un.descricao unidade,\n" +
                     "    i.ean,\n" +
-                    "    i.qtde,\n" +
-                    "    i.trib,\n" +
-                    "    i.custo,\n" +
+                    "    i.qtde quantidade,\n" +
                     "    i.valor,\n" +
-                    "    i.numitem sequencia,\n" +
-                    "    i.cancelado,\n" +
-                    "    i.datahorasistema,\n" +
-                    "    i.desconto,\n" +
-                    "    i.descontocupom,\n" +
-                    "    i.acrescimoitem,\n" +
-                    "    icms.descricao idicms,\n" +
-                    "    icms.valor aliqicms\n" +
+                    "    i.trib,\n" +
+                    "    i.icmscst,\n" +
+                    "    i.piscofinscst,\n" +
+                    "    i.cancelado\n" +
                     "from\n" +
-                    "    tmp60i i\n" +
-                    "join eans e on (i.idean = e.id)\n" +
-                    "join produtos p on (e.produto = p.id)\n" +
-                    "left join objetos un on (p.unidade = un.id)\n" +
-                    "left join objetos icms on (p.trib = icms.id)\n" +
+                    "    v60i i\n" +
+                    "join eans e on i.ean = e.ean\n" +
+                    "join produtos p on e.produto = p.id\n" +
+                    "join objetos un on (p.unidade = un.id)\n" +
                     "where\n" +
-                    "    i.emissao between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "' and \n" +
+                    "    i.data between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "' and\n" +
                     "    i.empresa = " + idLojaCliente + "\n" +
                     "order by\n" +
-                    "    i.cupom, i.emissao";
+                    "    i.data, i.cupom";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

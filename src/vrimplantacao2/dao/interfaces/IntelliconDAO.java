@@ -851,43 +851,31 @@ public class IntelliconDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = 
                     "select\n" +
-                    "    i.loja,\n" +
-                    "    i.num_cupom coo,\n" +
-                    "    i.num_ecf ecf,\n" +
-                    "    i.data_cupom dtemissao,\n" +
-                    "    i.cod_produto idproduto,\n" +
-                    "    case when p.nome_reduzido = '' then\n" +
-                    "     substring(p.nome_produto from 1 for 30) else\n" +
-                    "    p.nome_produto end descricaoreduzida,\n" +
-                    "    upper(p.unidade) unidade,\n" +
-                    "    i.cod_barra ean,\n" +
-                    "    i.quantidade,\n" +
-                    "    i.preco,\n" +
-                    "    i.valor_total valortotal,\n" +
-                    "    i.valor_desc_item desconto,\n" +
-                    "    i.valor_acresc_item acrescimo,\n" +
+                    "    i.id,\n" +
+                    "    i.data,\n" +
+                    "    i.ecf,\n" +
+                    "    i.valor,\n" +
+                    "    i.numitem sequencia,\n" +
+                    "    i.prod idproduto,\n" +
+                    "    p.descricao,\n" +
+                    "    un.descricao unidade,\n" +
+                    "    i.ean,\n" +
+                    "    i.qtde,\n" +
                     "    i.cancelado,\n" +
-                    "    i.statusshop status,\n" +
-                    "    i.cod_tributacao idaliquota,\n" +
-                    "    a.aliquota aliqicms,\n" +
-                    "    a.cst_icms,\n" +
-                    "    i.aliq_pis,\n" +
-                    "    i.cst_pis,\n" +
-                    "    i.cst_cofins,\n" +
-                    "    i.cod_natureza_financeira naturezareceita,\n" +
-                    "    i.cest,\n" +
-                    "    i.posicao\n" +
+                    "    i.trib,\n" +
+                    "    i.idtrib,\n" +
+                    "    i.icmscst,\n" +
+                    "    icms.descricao idicms,\n" +
+                    "    icms.valor aliqicms\n" +
                     "from\n" +
-                    "    itenscupom i\n" +
-                    "inner join\n" +
-                    "    produto p on i.cod_produto = p.cod_produto\n" +
-                    "left join\n" +
-                    "    aliquotas a on i.cod_tributacao = a.cod_tributacao\n" +
+                    "    V60I i\n" +
+                    "join eans e on (i.prod = e.produto)\n" +
+                    "join produtos p on (e.produto = p.id)\n" +
+                    "left join objetos un on (p.unidade = un.id)\n" +
+                    "left join objetos icms on (p.trib = icms.id)\n" +
                     "where\n" +
-                    "    i.data_cupom between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "' and\n" +
-                    "    i.loja = " + idLojaCliente + "\n" +
-                    "order by\n" +
-                    "    i.data_cupom";
+                    "    i.data between " + FORMAT.format(dataInicio) + " and " + FORMAT.format(dataTermino) + " and\n" +
+                    "    i.empresa = " + idLojaCliente;
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
