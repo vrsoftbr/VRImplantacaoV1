@@ -75,7 +75,7 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     "    p.itunidade unidade,\n" +
                     "    p.itnome descricao,\n" +
                     "    p.itgrupo merc1,\n" +
-                    "    p.itqtd estoqueminimo,\n" +
+                    "    p.itqtd estoque,\n" +
                     "    p.peso,\n" +
                     "    p.itmargem margem,\n" +
                     "    coalesce((\n" +
@@ -136,7 +136,7 @@ public class CFSoftSiaECFDAO extends InterfaceDAO {
                     imp.setDescricaoGondola(rst.getString("descricao"));
                     imp.setDescricaoReduzida(rst.getString("descricao"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
-                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
+                    imp.setEstoque(rst.getDouble("estoque"));
                     imp.setPesoBruto(rst.getDouble("peso"));
                     imp.setPesoLiquido(rst.getDouble("peso"));
                     imp.setMargem(rst.getDouble("margem"));
