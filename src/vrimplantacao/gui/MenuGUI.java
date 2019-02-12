@@ -54,7 +54,7 @@ import vrimplantacao.gui.interfaces.IdealGUI;
 import vrimplantacao.gui.interfaces.IdealSoftGUI;
 import vrimplantacao.gui.interfaces.ImportacoesDiversasGUI;
 import vrimplantacao.gui.interfaces.ImportarNotaSaidaImportacaoArquivoGUI;
-import vrimplantacao.gui.interfaces.InfoBrasilGUI;
+import vrimplantacao2.gui.interfaces.InfoBrasilGUI;
 import vrimplantacao.gui.interfaces.InfoStoreGUI;
 import vrimplantacao.gui.interfaces.InteragemGUI_2;
 import vrimplantacao.gui.interfaces.JMasterGUI;
@@ -3438,18 +3438,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItem25ActionPerformed
 
     private void jMenuItemInfoBrasilActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemInfoBrasilActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarInfoBrasil == null || formImportarInfoBrasil.isClosed()) {
-                formImportarInfoBrasil = new InfoBrasilGUI(this);
-            }
-
-            formImportarInfoBrasil.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
+        InfoBrasilGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemInfoBrasilActionPerformed
 
     private void mnuPlanilhaV2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPlanilhaV2ActionPerformed

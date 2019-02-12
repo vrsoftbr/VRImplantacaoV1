@@ -230,7 +230,7 @@ public class RCNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3(rst.getString("merc3"));
                     imp.setIdFamiliaProduto(rst.getString("idfamiliaproduto"));
-                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setEstoque(Utils.stringToDouble(rst.getString("estoque")));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setMargem(Utils.stringToDouble(rst.getString("margem"), 0));
