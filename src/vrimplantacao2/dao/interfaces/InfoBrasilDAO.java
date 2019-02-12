@@ -12,6 +12,7 @@ import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -24,11 +25,16 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class InfoBrasilDAO extends InterfaceDAO {
 
+    public String complSistema = "";
     public String i_tipoDocumento;
 
     @Override
     public String getSistema() {
-        return "InfoBrasil";
+        if ((complSistema != null) && (!complSistema.trim().isEmpty())) {
+            return "InfoBrasil" + complSistema;
+        } else {
+            return "InfoBrasil";
+        }
     }
 
     public List<Estabelecimento> getLojas() throws Exception {
@@ -169,7 +175,10 @@ public class InfoBrasilDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select pro_codigo, pra_codigo from prod_agregados\n"
+                    "select "
+                    + "pro_codigo, "
+                    + "pra_codigo "
+                    + "from prod_agregados\n"
                     + "order by pro_codigo"
             )) {
                 while (rst.next()) {
@@ -315,11 +324,40 @@ public class InfoBrasilDAO extends InterfaceDAO {
                     + "order by c.cli_codigo"
             )) {
                 while (rst.next()) {
-
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("nome"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
+                    imp.setEndereco(rst.getString("res_endereco"));
+                    imp.setNumero(rst.getString("res_numero"));
+                    imp.setComplemento(rst.getString("res_complemento"));
+                    imp.setCep(rst.getString("res_cep"));
+                    imp.setBairro(rst.getString("res_bairro"));
+                    imp.setMunicipio(rst.getString("res_cidade"));
+                    imp.setUf(rst.getString("res_uf"));
+                    imp.setTelefone(rst.getString("fone1"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setDataNascimento(rst.getDate("datanascimento"));
+                    imp.setSexo(rst.getInt("sexo") == 0 ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                    imp.setBloqueado(rst.getInt("bloqueado") == 1);
+                    imp.setAtivo(rst.getInt("id_situacaocadastro") == 1);
+                    imp.setNomePai(rst.getString("nomePai"));
+                    imp.setNomeMae(rst.getString("nomeMae"));
+                    imp.setCargo(rst.getString("cargo"));
+                    imp.setSalario(rst.getDouble("salario"));
+                    imp.setEstadoCivil(rst.getInt("estadocivil"));
+                    imp.setValorLimite(rst.getDouble("limitepreferencial"));
+                    imp.setPermiteCheque(true);
+                    imp.setPermiteCreditoRotativo(true);
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 
     public List<String> getTipoDocumentos() throws Exception {
