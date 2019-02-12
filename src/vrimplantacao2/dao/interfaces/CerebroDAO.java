@@ -552,7 +552,9 @@ public class CerebroDAO extends InterfaceDAO {
                     + "where clientefornecedor <> 'F' "
                     + "order by codigo_tipodocumento"
             )) {
-                result.add(rst.getString("documento"));
+                while (rst.next()) {
+                    result.add(rst.getString("documento"));
+                }
             }
         }
         return result;

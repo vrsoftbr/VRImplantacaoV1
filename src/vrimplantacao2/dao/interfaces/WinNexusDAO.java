@@ -13,6 +13,7 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -398,6 +399,64 @@ public class WinNexusDAO extends InterfaceDAO {
                                 rst.getString("SITE")
                         );
                     }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "c.cliente_id, \n"
+                    + "c.nome,\n"
+                    + "c.contato,\n"
+                    + "c.ie,\n"
+                    + "c.cgc,\n"
+                    + "c.logradouro,\n"
+                    + "c.complemento,\n"
+                    + "c.numero,\n"
+                    + "c.bairro,\n"
+                    + "c.cidade,\n"
+                    + "c.estado,\n"
+                    + "c.cep,\n"
+                    + "c.telefone,\n"
+                    + "c.celular,\n"
+                    + "c.fax,\n"
+                    + "c.email,\n"
+                    + "c.obs,\n"
+                    + "c.cadastro,\n"
+                    + "c.dataultimaalteracao,\n"
+                    + "case c.ativo when 'SIM' then 1 else 0 end situacaocadastro\n"
+                    + "from clientes c\n"
+                    + "order by c.cliente_id"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("cliente_id"));
+                    imp.setRazao(rst.getString("nome"));
+                    imp.setFantasia(rst.getString("nome"));
+                    imp.setCnpj(rst.getString("cgc"));
+                    imp.setInscricaoestadual(rst.getString("ie"));
+                    imp.setDataCadastro(rst.getDate("cadastro") == null ? rst.getDate("dataultimaalteracao") : rst.getDate("cadastro"));
+                    imp.setEndereco(rst.getString("logradouro"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setObservacao(rst.getString("obs"));
+                    imp.setAtivo(rst.getInt("situacaocadastro") == 1);
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setFax(rst.getString("fax"));
+                    imp.setEmail(rst.getString("email"));
                     result.add(imp);
                 }
             }
