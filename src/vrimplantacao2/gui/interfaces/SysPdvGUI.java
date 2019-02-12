@@ -41,6 +41,8 @@ public class SysPdvGUI extends VRInternalFrame {
         super(i_mdiFrame);
         initComponents();     
         
+        txtDtTerminoOferta.setFormats("dd/MM/yyyy");
+        
         this.title = "Importação " + SISTEMA;
                        
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
@@ -272,7 +274,11 @@ public class SysPdvGUI extends VRInternalFrame {
                         }
                         if (chkT1EANemBranco.isSelected()) {
                             importador.importarEANemBranco();
-                        }                        
+                        }
+                        if (chkOfertas.isSelected()) {
+                            importador.importarOfertas(txtDtTerminoOferta.getDate());
+                        }
+                        
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
@@ -366,6 +372,9 @@ public class SysPdvGUI extends VRInternalFrame {
         chkFabricante = new vrframework.bean.checkBox.VRCheckBox();
         chkMargem = new vrframework.bean.checkBox.VRCheckBox();
         chkAtacado = new vrframework.bean.checkBox.VRCheckBox();
+        pnlOferta = new javax.swing.JPanel();
+        chkOfertas = new vrframework.bean.checkBox.VRCheckBox();
+        txtDtTerminoOferta = new org.jdesktop.swingx.JXDatePicker();
         tabImpFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -551,6 +560,34 @@ public class SysPdvGUI extends VRInternalFrame {
 
         chkAtacado.setText("Atacado");
         tabImpProduto.add(chkAtacado);
+
+        chkOfertas.setText("Ofertas");
+        chkOfertas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkOfertasActionPerformed(evt);
+            }
+        });
+
+        txtDtTerminoOferta.setEnabled(false);
+
+        javax.swing.GroupLayout pnlOfertaLayout = new javax.swing.GroupLayout(pnlOferta);
+        pnlOferta.setLayout(pnlOfertaLayout);
+        pnlOfertaLayout.setHorizontalGroup(
+            pnlOfertaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlOfertaLayout.createSequentialGroup()
+                .addComponent(chkOfertas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtDtTerminoOferta, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        pnlOfertaLayout.setVerticalGroup(
+            pnlOfertaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlOfertaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(chkOfertas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtDtTerminoOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        tabImpProduto.add(pnlOferta);
 
         vRTabbedPane2.addTab("Produtos", tabImpProduto);
 
@@ -889,10 +926,6 @@ public class SysPdvGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFContatosActionPerformed
 
-    private void chkFamiliaProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFamiliaProdutoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkFamiliaProdutoActionPerformed
-
     private void chkFCnpjActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFCnpjActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFCnpjActionPerformed
@@ -900,6 +933,14 @@ public class SysPdvGUI extends VRInternalFrame {
     private void chkCreditoRotativoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCreditoRotativoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkCreditoRotativoActionPerformed
+
+    private void chkFamiliaProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkFamiliaProdutoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkFamiliaProdutoActionPerformed
+
+    private void chkOfertasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkOfertasActionPerformed
+        txtDtTerminoOferta.setEnabled(chkOfertas.isSelected());
+    }//GEN-LAST:event_chkOfertasActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
@@ -918,6 +959,7 @@ public class SysPdvGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
+    private vrframework.bean.checkBox.VRCheckBox chkOfertas;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
@@ -949,6 +991,7 @@ public class SysPdvGUI extends VRInternalFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel pnlOferta;
     private vrframework.bean.panel.VRPanel tabClienteDados;
     private vrframework.bean.panel.VRPanel tabImpFornecedor;
     private vrframework.bean.panel.VRPanel tabImpProduto;
@@ -956,6 +999,7 @@ public class SysPdvGUI extends VRInternalFrame {
     private javax.swing.JTabbedPane tabsConexoes;
     private javax.swing.JTextField txtCodFinalizadoras;
     private vrframework.bean.textField.VRTextField txtComplNomeSistema;
+    private org.jdesktop.swingx.JXDatePicker txtDtTerminoOferta;
     private vrframework.bean.textArea.VRTextArea txtFinalizadorasCliente;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel1;

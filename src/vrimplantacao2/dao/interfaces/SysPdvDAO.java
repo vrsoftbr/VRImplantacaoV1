@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,14 +21,21 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.cadastro.convenio.transacao.SituacaoTransacaoConveniado;
+import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ConveniadoIMP;
+import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
+import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -723,6 +732,173 @@ public class SysPdvDAO extends InterfaceDAO {
 
         return result;
     }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct\n" +
+                    "    oft.procod id_produto,\n" +
+                    "    oft.pprdatini datainicial,\n" +
+                    "    oft.pprdatfim datafinal,\n" +
+                    "    oft.pprprcprog precooferta\n" +
+                    "from\n" +
+                    "    preco_programado oft\n" +
+                    "where\n" +
+                    "    oft.pprdatfim >= '" + new SimpleDateFormat("yyyy-MM-dd").format(dataTermino) + "'\n" +
+                    "order by\n" +
+                    "    id_produto"
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    
+                    imp.setIdProduto(rst.getString("id_produto"));
+                    imp.setDataInicio(rst.getDate("datainicial"));
+                    imp.setDataFim(rst.getDate("datafinal"));
+                    imp.setPrecoOferta(rst.getDouble("precooferta"));
+                    imp.setSituacaoOferta(SituacaoOferta.ATIVO);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
+        List<ConvenioEmpresaIMP> result = new ArrayList<>();
+        
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    c.clicod id, \n" +
+                    "    c.clides razao,\n" +
+                    "    c.clicpfcgc cnpj,\n" +
+                    "    c.clirgcgf inscricaoestadual,\n" +
+                    "    c.cliend endereco,\n" +
+                    "    c.clinum numero,\n" +
+                    "    c.clicmp complemento,\n" +
+                    "    c.clibai bairro,\n" +
+                    "    c.clicodigoibge ibge_municipio,\n" +
+                    "    c.clicid cidade,\n" +
+                    "    c.cliest estado,\n" +
+                    "    c.clicep cep,\n" +
+                    "    c.clitel telefone,\n" +
+                    "    co.cnvdatini datainicio,\n" +
+                    "    co.cnvdatvnc datatermino,\n" +
+                    "    case when co.cnvsta = 'N' then 0 else 1 end situacaocadastro,\n" +
+                    "    co.cnvdiafec diapagamento,\n" +
+                    "    co.cnvdes observacao\n" +
+                    "from\n" +
+                    "    convenio co\n" +
+                    "    join cliente c on\n" +
+                    "        co.clicod = c.clicod\n" +
+                    "order by\n" +
+                    "    1"
+            )) {
+                while (rst.next()) {
+                    ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoEstadual(rst.getString("inscricaoestadual"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setIbgeMunicipio(rst.getInt("ibge_municipio"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setDataInicio(rst.getDate("datainicio"));
+                    imp.setDataTermino(rst.getDate("datatermino"));
+                    imp.setSituacaoCadastro(rst.getInt("situacaocadastro") == 0 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
+                    imp.setDiaPagamento(rst.getInt("diapagamento"));
+                    imp.setObservacoes(rst.getString("observacao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ConveniadoIMP> getConveniado() throws Exception {
+        List<ConveniadoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    c.clicod id, \n" +
+                    "    c.clides razao,\n" +
+                    "    co.cnvcod id_empresa,\n" +
+                    "    c.clicpfcgc cnpj,\n" +
+                    "    co.cncsta status,\n" +
+                    "    co.cnclimcre limitedecredito\n" +
+                    "from\n" +
+                    "    convenio_cliente co\n" +
+                    "    join cliente c on\n" +
+                    "        co.clicod = c.clicod\n" +
+                    "order by\n" +
+                    "    1"
+            )) {
+                while (rst.next()) {
+                    ConveniadoIMP imp = new ConveniadoIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setNome(rst.getString("razao"));
+                    imp.setIdEmpresa(rst.getString("id_empresa"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setSituacaoCadastro("N".equals(rst.getString("status")) ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
+                    imp.setConvenioLimite(rst.getDouble("limitedecredito"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
+        List<ConvenioTransacaoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    ""
+            )) {
+                while (rst.next()) {
+                    ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
+                    
+                    imp.setId(rst.getString(""));
+                    imp.setDataHora(rst.getTimestamp(""));
+                    imp.setDataMovimento(rst.getDate(""));
+                    imp.setEcf(rst.getString(""));
+                    imp.setFinalizado(rst.getBoolean(""));
+                    imp.setIdConveniado(rst.getString(""));
+                    imp.setNumeroCupom(rst.getString(""));
+                    imp.setObservacao(rst.getString(""));
+                    imp.setSituacaoTransacaoConveniado(SituacaoTransacaoConveniado.PENDENTE);
+                    imp.setValor(rst.getDouble(""));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    
 
     public List<Estabelecimento> getLojasCliente() throws SQLException {
         List<Estabelecimento> result = new ArrayList<>();
