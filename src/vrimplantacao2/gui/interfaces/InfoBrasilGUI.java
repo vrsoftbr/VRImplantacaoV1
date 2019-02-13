@@ -158,6 +158,7 @@ public class InfoBrasilGUI extends VRInternalFrame implements ConexaoEvent {
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
                     dao.complSistema = txtComplSistema.getText();
+                    dao.i_tipoDocumento = txtCodTiposDocumentos.getText();
 
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
@@ -333,7 +334,7 @@ public class InfoBrasilGUI extends VRInternalFrame implements ConexaoEvent {
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
-        txtCodFinalizadoras = new javax.swing.JTextField();
+        txtCodTiposDocumentos = new javax.swing.JTextField();
         jScrollPane2 = new javax.swing.JScrollPane();
         txtTiposDocumentos = new vrframework.bean.textArea.VRTextArea();
         vRLabel3 = new vrframework.bean.label.VRLabel();
@@ -639,8 +640,8 @@ public class InfoBrasilGUI extends VRInternalFrame implements ConexaoEvent {
 
         txtTiposDocumentos.setEditable(false);
         txtTiposDocumentos.setColumns(1000);
-        txtTiposDocumentos.setRows(100);
-        txtTiposDocumentos.setTabSize(100);
+        txtTiposDocumentos.setRows(300);
+        txtTiposDocumentos.setTabSize(300);
         jScrollPane2.setViewportView(txtTiposDocumentos);
 
         vRLabel3.setText("O quadro ao mostra os tipo de documentos usadas pelo cliente.");
@@ -664,7 +665,7 @@ public class InfoBrasilGUI extends VRInternalFrame implements ConexaoEvent {
                 .addGroup(vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtCodFinalizadoras, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtCodTiposDocumentos, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -693,7 +694,7 @@ public class InfoBrasilGUI extends VRInternalFrame implements ConexaoEvent {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtCodFinalizadoras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtCodTiposDocumentos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -936,7 +937,7 @@ public class InfoBrasilGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
-    private javax.swing.JTextField txtCodFinalizadoras;
+    private javax.swing.JTextField txtCodTiposDocumentos;
     private vrframework.bean.textField.VRTextField txtComplSistema;
     private vrframework.bean.textArea.VRTextArea txtTiposDocumentos;
     private vrframework.bean.checkBox.VRCheckBox vRCheckBox1;

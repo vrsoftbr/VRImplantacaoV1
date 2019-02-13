@@ -396,8 +396,8 @@ public class InfoBrasilDAO extends InterfaceDAO {
                     + "join clientes c on r.cli_codigo = c.cli_codigo\n"
                     + "where\n"
                     + "    r.loj_codigo = " + getLojaOrigem() + "\n"
-                    + "    r.rec_datapag is null and\n"
-                    + "    r.fpg_codigo in (" + i_tipoDocumento + ")\n"
+                    + "    and r.rec_datapag is null \n"
+                    + "    and r.fpg_codigo in (" + i_tipoDocumento + ")\n"
                     + "order by\n"
                     + "   r.rec_datalanc"
             )) {
