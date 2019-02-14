@@ -526,14 +526,19 @@ public abstract class InterfaceDAO {
      *  }
      * }</pre>
      */
-    protected class ProdutoParaFamiliaHelper {
+    public final class ProdutoParaFamiliaHelper {
         
-        String id = "";
-        String[] descricao = new String[]{};
-        boolean unico = true;
-        String descricaoCasoVazio = "";
+        private String id = "";
+        private String[] descricao = new String[]{};
+        private boolean unico = true;
+        private String descricaoCasoVazio = "";
+        private final List<FamiliaProdutoIMP> result;
+
+        public ProdutoParaFamiliaHelper(List<FamiliaProdutoIMP> result) {
+            this.result = result;
+        }
         
-        void gerarFamilia(String pId, String pDescricao, List<FamiliaProdutoIMP> result) {
+        public void gerarFamilia(String pId, String pDescricao) {
             if (!id.equals(pId)) {
                 if (!unico) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();

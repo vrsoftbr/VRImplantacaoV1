@@ -10,12 +10,14 @@ import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -52,7 +54,34 @@ public class RPInfoDAO extends InterfaceDAO {
             OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
             OpcaoProduto.MERCADOLOGICO_PRODUTO,
             OpcaoProduto.FAMILIA_PRODUTO,
-            OpcaoProduto.FAMILIA
+            OpcaoProduto.FAMILIA,
+            OpcaoProduto.PRODUTOS,
+            OpcaoProduto.EAN,
+            OpcaoProduto.EAN_EM_BRANCO,
+            OpcaoProduto.ATIVO,
+            OpcaoProduto.CEST,
+            OpcaoProduto.CUSTO,
+            OpcaoProduto.PRECO,
+            OpcaoProduto.ESTOQUE_MINIMO,
+            OpcaoProduto.ESTOQUE_MAXIMO,
+            OpcaoProduto.ESTOQUE,
+            OpcaoProduto.DATA_ALTERACAO,
+            OpcaoProduto.DATA_CADASTRO,
+            OpcaoProduto.DESC_COMPLETA,
+            OpcaoProduto.DESC_GONDOLA,
+            OpcaoProduto.DESC_REDUZIDA,
+            OpcaoProduto.MARGEM,
+            OpcaoProduto.QTD_EMBALAGEM_EAN,
+            OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+            OpcaoProduto.TIPO_EMBALAGEM_EAN,
+            OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.NCM,
+            OpcaoProduto.PESO_BRUTO,
+            OpcaoProduto.PESO_LIQUIDO,
+            OpcaoProduto.DESCONTINUADO,
+            OpcaoProduto.PESAVEL,
+            OpcaoProduto.ICMS,
+            OpcaoProduto.PIS_COFINS
         }));
     }
 
@@ -100,9 +129,9 @@ public class RPInfoDAO extends InterfaceDAO {
             try (ResultSet rst = stm.executeQuery(
                     "select prod_codpreco, prod_descricao from produtos where prod_codpreco != 0 order by prod_codpreco"
             )) {
-                ProdutoParaFamiliaHelper gerador = new ProdutoParaFamiliaHelper();
+                ProdutoParaFamiliaHelper gerador = new ProdutoParaFamiliaHelper(result);
                 while (rst.next()) {
-                    gerador.gerarFamilia(rst.getString("prod_codpreco"), rst.getString("prod_descricao"), result);
+                    gerador.gerarFamilia(rst.getString("prod_codpreco"), rst.getString("prod_descricao"));
                 }
             }
         }
@@ -116,10 +145,117 @@ public class RPInfoDAO extends InterfaceDAO {
         
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select\n" +
+                    "	p.prod_codigo id,\n" +
+                    "	p.prod_datacad datacadastro,\n" +
+                    "	p.prod_dataalt dataalteracao,\n" +
+                    "	ean.ean,\n" +
+                    "	ean.qtdembalagem,\n" +
+                    "	case\n" +
+                    "	when p.prod_balanca = 'P' then 'KG'\n" +
+                    "	when p.prod_balanca = 'U' then 'UN'\n" +
+                    "	when ean.qtdembalagem = 1 then 'UN'\n" +
+                    "	else un.prun_emb end unidade,\n" +
+                    "	case \n" +
+                    "	when p.prod_balanca in ('P', 'U') then 1\n" +
+                    "	else 0 end e_balanca,\n" +
+                    "	coalesce(un.prun_validade, 0) validade,\n" +
+                    "	p.prod_descricao || ' ' || p.prod_complemento descricaocompleta,\n" +
+                    "	p.prod_descrpdvs descricaoreduzida,\n" +
+                    "	p.prod_dpto_codigo merc1,\n" +
+                    "	p.prod_grup_codigo merc2,\n" +
+                    "	p.prod_codpreco id_familia,\n" +
+                    "	p.prod_peso pesobruto,\n" +
+                    "	p.prod_pesoliq pesoliquido,\n" +
+                    "	un.prun_estmin estoqueminimo,\n" +
+                    "	un.prun_estmax estoquemaximo,\n" +
+                    "	un.prun_estoque1 + un.prun_estoque2 + un.prun_estoque3 + un.prun_estoque4 + un.prun_estoque5 estoque,\n" +
+                    "	un.prun_prultcomp,\n" +
+                    "	un.prun_ctcompra custosemimposto,\n" +
+                    "	un.prun_ctfiscal custocomimposto,\n" +
+                    "	un.prun_margem margem,\n" +
+                    "	un.prun_prvenda precovenda,\n" +
+                    "	case un.prun_ativo when 'S' then 1 else 0 end situacaocadastro,\n" +
+                    "	case un.prun_bloqueado when 'N' then 0 else 1 end descontinuado,\n" +
+                    "	p.prod_codigoncm ncm,\n" +
+                    "	ax.prau_cest cest\n" +
+                    "from\n" +
+                    "	produtos p\n" +
+                    "	left join prodaux ax on ax.prau_prod_codigo = p.prod_codigo\n" +
+                    "	left join produn un on p.prod_codigo = un.prun_prod_codigo\n" +
+                    "	left join (\n" +
+                    "		select\n" +
+                    "			prod_codigo id,\n" +
+                    "			prod_codbarras ean,\n" +
+                    "			prod_funcao unidade,\n" +
+                    "			1 qtdembalagem\n" +
+                    "		from\n" +
+                    "			produtos\n" +
+                    "		union\n" +
+                    "		select\n" +
+                    "			prod_codigo id,\n" +
+                    "			prod_codcaixa ean,\n" +
+                    "			prod_emb unidade,\n" +
+                    "			prod_qemb qtdembalagem\n" +
+                    "		from\n" +
+                    "			produtos\n" +
+                    "		where\n" +
+                    "			nullif(trim(prod_codcaixa),'') is not null\n" +
+                    "		union\n" +
+                    "		select\n" +
+                    "			cbal_prod_codigo id,\n" +
+                    "			cbal_prod_codbarras ean,\n" +
+                    "			null unidade,\n" +
+                    "			coalesce(nullif(cbalt.cbal_fatoremb,0),1) qtdembalagem\n" +
+                    "		from\n" +
+                    "			cbalt\n" +
+                    "	) ean on ean.id = p.prod_codigo\n" +
+                    "where\n" +
+                    "	un.prun_unid_codigo = '" + getLojaOrigem() + "'\n" +
+                    "order by\n" +
+                    "	id"
             )) {
                 while (rst.next()) {
-                
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setTipoEmbalagem(rst.getString("unidade"));
+                    imp.seteBalanca(rst.getBoolean("e_balanca"));
+                    imp.setValidade(rst.getInt("validade"));
+                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoGondola(rst.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    imp.setCodMercadologico1(rst.getString("merc1"));
+                    imp.setCodMercadologico2(rst.getString("merc2"));
+                    imp.setIdFamiliaProduto(rst.getString("id_familia"));
+                    imp.setPesoBruto(rst.getDouble("pesobruto"));
+                    imp.setPesoLiquido(rst.getDouble("pesoliquido"));
+                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
+                    imp.setEstoqueMinimo(rst.getDouble("estoquemaximo"));
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setMargem(rst.getDouble("margem"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setSituacaoCadastro(rst.getBoolean("situacaocadastro") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setDescontinuado(rst.getBoolean("descontinuado"));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+                    imp.setPiscofinsCstDebito(7);
+                    imp.setPiscofinsCstCredito(71);
+                    imp.setIcmsCstEntrada(40);
+                    imp.setIcmsCstEntradaForaEstado(40);
+                    imp.setIcmsCstSaida(40);
+                    imp.setIcmsCstSaidaForaEstado(40);
+                    imp.setIcmsCstSaidaForaEstadoNF(40);
+                    
+                    result.add(imp);
                 }
             }
         }
@@ -315,8 +451,41 @@ public class RPInfoDAO extends InterfaceDAO {
         
         return result;
     }
-    
-    
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	pf.pfor_forn_codigo id_fornecedor,\n" +
+                    "	pf.pfor_prod_codigo id_produto,\n" +
+                    "	pf.pfor_codigo codigoexterno,\n" +
+                    "	pf.pfor_emb unidade,\n" +
+                    "	case pf.pfor_qemb when 0 then 1 else pf.pfor_qemb end qemb\n" +
+                    "from\n" +
+                    "	prodfor pf\n" +
+                    "order by\n" +
+                    "	1, 2"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setIdProduto(rst.getString("id_produto"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rst.getDouble("qemb"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
     
     
 }

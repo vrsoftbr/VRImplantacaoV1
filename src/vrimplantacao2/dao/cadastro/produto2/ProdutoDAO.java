@@ -152,6 +152,9 @@ public class ProdutoDAO {
             sql.put("permitetroca", true);
             sql.put("temperatura", 0);
             sql.put("id_tipoorigemmercadoria", 0);
+            if (Versao.maiorQue(3,18,2)) {
+                sql.put("id_tipoorigemmercadoriaentrada", 0);
+            }
             sql.put("ipi", 0);
             sql.put("pesavel", vo.isPesavel());
             sql.put("id_tipopiscofinscredito", vo.getPisCofinsCredito().getId());
