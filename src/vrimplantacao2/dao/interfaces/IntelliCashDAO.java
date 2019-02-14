@@ -118,7 +118,7 @@ public class IntelliCashDAO extends InterfaceDAO {
         List<ProdutoIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            String loja = getLojaOrigem().split("-")[0];
+            //String loja = getLojaOrigem().split("-")[0];
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    p.id,\n"
@@ -141,10 +141,11 @@ public class IntelliCashDAO extends InterfaceDAO {
                     + "    p.estqmin estoqueMinimo,\n"
                     + "    p.estqmax estoqueMaximo,\n"
                     + "    (select qtde from getestqprod(p.id, emp.id)) estoque, \n"
-                    //+ "    p.mkp as margem,\n"
+                    //+ "   p.mkp as margem,\n"
                     + "    c.custoatual custoSemImposto,\n"
                     + "    c.custoatual custoComImposto,\n"
-                    + "    prc.vpreco precoVenda,\n"
+                    + "    prc.vpreco preco,\n"
+                    + "    prc.vpreconormal precoVenda,\n"       
                     + "    p.ativo,\n"
                     + "    fisco.ncm,\n"
                     + "    pst.cod_cest cest,    \n"
@@ -160,7 +161,7 @@ public class IntelliCashDAO extends InterfaceDAO {
                     + "    icms.valor icms_aliq\n"
                     + "from\n"
                     + "    produtos p\n"
-                    + "    left join empresas emp on emp.id = " + loja + "\n"
+                    + "    left join empresas emp on emp.id = " + getLojaOrigem() + "\n"
                     + "    left join pesaveis bal on p.id = bal.id\n"
                     + "    left join estoque est on p.id = est.idprod\n"
                     + "    left join prodst pst on p.id = pst.id\n"
@@ -174,7 +175,8 @@ public class IntelliCashDAO extends InterfaceDAO {
                     + "    left join objetos icms on icms.id = p.trib\n"
                     + "    left join objetos subg on subg.id = p.subgrupo\n"
                     + "    left join custoanterior c on c.id = p.id\n"
-                    + "    left join VW_EC_EXPT_PRODUTOS prc on prc.idproduto = p.id\n"
+                    + "    left join VW_EC_EXPT_PRODUTOS prc on prc.idproduto = p.id and\n"
+                    + "    emp.id = prc.empresa\n"        
                     + "order by\n"
                     + "    p.id"
             )) {
@@ -204,6 +206,9 @@ public class IntelliCashDAO extends InterfaceDAO {
                     imp.setMargem(Utils.arredondar(margem, 2));
                     imp.setCustoSemImposto(rst.getDouble("custoSemImposto"));
                     imp.setCustoComImposto(rst.getDouble("custoComImposto"));
+                    if(rst.getDouble("precoVenda") == 0) {
+                        imp.setPrecovenda(rst.getDouble("preco"));
+                    }
                     imp.setPrecovenda(rst.getDouble("precoVenda"));
                     if (rst.getInt("ativo") == 0) {
                         imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
@@ -569,7 +574,7 @@ public class IntelliCashDAO extends InterfaceDAO {
                     + "    af.juros\n"
                     + "from agendafin af\n"
                     + "inner join agentes ag on ag.id = af.codag\n"
-                    + "inner join clientes cli on cli.id = ag.id\n"
+                    + "left join clientes cli on cli.id = ag.id\n"
                     + "where af.pg is null\n"
                     + "and af.empresa = " + getLojaOrigem()
             )) {
@@ -597,7 +602,6 @@ public class IntelliCashDAO extends InterfaceDAO {
                             imp.setNumeroCupom(Utils.formataNumero(rst.getString("doc")));
                         }
                     }
-
                     result.add(imp);
                 }
             }

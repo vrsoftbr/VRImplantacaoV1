@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.cliente.ClientePreferencialDAO;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -129,6 +130,7 @@ public class CreditoRotativoRepository {
                         provider.getLoja(),
                         imp.getIdCliente()
                 );
+                
                 if (anterior == null) {
                     anterior = converterRotativoAnterior(imp);
                     if (preferencial != null && preferencial.getCodigoAtual() != null) {
