@@ -134,6 +134,7 @@ public class CerebroDAO extends InterfaceDAO {
                     imp.setImportId(rst.getString("codigo_produto"));
                     imp.setEan(rst.getString("codigo_barra"));
                     imp.seteBalanca("T".equals(rst.getString("pesavel")));
+                    imp.setValidade(rst.getInt("validade"));
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -523,10 +524,9 @@ public class CerebroDAO extends InterfaceDAO {
                     + "from MOVIMENTOS_CPR\n"
                     + "where codigo_empresa = " + getLojaOrigem() + "\n"
                     + "and codigo_tipodocumento in (" + tipoDocumento + ")\n"
-                    + "and coalesce(valor_emaberto, 0) > 0"                    
+                    + "and coalesce(valor_emaberto, 0) > 0"
             )) {
-                
-                
+
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rst.getString("sequencial_cpr"));

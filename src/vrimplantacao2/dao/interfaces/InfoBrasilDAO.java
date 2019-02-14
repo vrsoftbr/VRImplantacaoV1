@@ -160,6 +160,15 @@ public class InfoBrasilDAO extends InterfaceDAO {
                     imp.setNcm(rst.getString("ncm"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofins_cst_sai"));
                     imp.setPiscofinsCstCredito(rst.getString("piscofins_cst_ent"));
+                    
+                    if ((rst.getDouble("icms_aliq") > 0)
+                            && (rst.getDouble("icms_reducao") == 0)) {
+                        imp.setIcmsCst(0);
+                    }
+                    if (rst.getDouble("icms_reducao") == 100) {
+                        imp.setIcmsCst(40);
+                    }
+                    
                     imp.setIcmsAliq(rst.getDouble("icms_aliq"));
                     imp.setIcmsReducao(rst.getDouble("icms_reducao"));
                     result.add(imp);
