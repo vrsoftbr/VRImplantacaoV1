@@ -55,6 +55,7 @@ public class RPInfoDAO extends InterfaceDAO {
             OpcaoProduto.MERCADOLOGICO_PRODUTO,
             OpcaoProduto.FAMILIA_PRODUTO,
             OpcaoProduto.FAMILIA,
+            OpcaoProduto.IMPORTAR_MANTER_BALANCA,
             OpcaoProduto.PRODUTOS,
             OpcaoProduto.EAN,
             OpcaoProduto.EAN_EM_BRANCO,
@@ -443,6 +444,79 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setPermiteCheque("S".equals(rst.getString("permitecheque")));
                     imp.setSenha(rst.getInt("senhapdv"));
                     imp.setLimiteCompra(rst.getDouble("limite"));
+                    
+                    result.add(imp);
+                }
+            }
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	f.func_codigo id,\n" +
+                    "	f.func_cpf cnpj,\n" +
+                    "	f.func_rg ierg,\n" +
+                    "	f.func_nome nome,\n" +
+                    "	f.func_nome fantasia,\n" +
+                    "	f.func_situacao,\n" +
+                    "	f.func_endereco endereco,\n" +
+                    "	f.func_endereconumero numero,\n" +
+                    "	f.func_enderecocompl complemento,\n" +
+                    "	f.func_bairro bairro,\n" +
+                    "	m.muni_codigoibge ibge_municipio,\n" +
+                    "	m.muni_nome municipio,\n" +
+                    "	m.muni_uf estado,\n" +
+                    "	f.func_cep cep,\n" +
+                    "	f.func_estcivil,\n" +
+                    "	f.func_dtcad datacadastro,\n" +
+                    "	f.func_nasci datanascimento,\n" +
+                    "	f.func_sexo sexo,\n" +
+                    "	f.func_admissao dataadmissao,\n" +
+                    "	f.func_salbase salario,\n" +
+                    "	f.func_limiteconv limiteconvenio,\n" +
+                    "	f.func_pai pai,\n" +
+                    "	f.func_mae mae,\n" +
+                    "	f.func_observacao observacao,\n" +
+                    "	f.func_demissao is null ativo,\n" +
+                    "	f.func_senha senha,\n" +
+                    "	f.func_telefone telefone,\n" +
+                    "	f.func_celular celular,\n" +
+                    "	f.func_email email\n" +
+                    "from\n" +
+                    "	funcionarios f\n" +
+                    "	left join municipios m on\n" +
+                    "		f.func_muni_codigo = m.muni_codigo\n" +
+                    "order by\n" +
+                    "	f.func_codigo"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("ierg"));
+                    imp.setRazao(rst.getString("nome"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipioIBGE(rst.getInt("ibge_municipio"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setDataNascimento(rst.getDate("datanascimento"));
+                    imp.setSexo("F".equals(rst.getString("sexo")) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                    imp.setDataAdmissao(rst.getDate("dataadmissao"));
+                    imp.setSalario(rst.getDouble("salario"));
+                    imp.setLimiteCompra(rst.getDouble("limiteconvenio"));
+                    imp.setNomePai(rst.getString("pai"));
+                    imp.setNomeMae(rst.getString("mae"));
+                    imp.setObservacao2(rst.getString("observacao"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setSenha(rst.getInt("senha"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setObservacao("FUNCIONARIO");
                     
                     result.add(imp);
                 }
