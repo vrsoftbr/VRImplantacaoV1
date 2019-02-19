@@ -31,27 +31,27 @@ import vrimplantacao2.utils.window.WindowUtils;
  * @author Leandro
  */
 public class PlanilhaV2GUI extends VRInternalFrame {
-    
+
     private final Parametros parametros = Parametros.get();
     private final PlanilhaDAO dao = new PlanilhaDAO();
-        
+
     private PlanilhaV2GUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
-                
+
         initComponents();
-        
+
         inicializar();
 
         centralizarForm();
         this.setMaximum(false);
         tabProdImportacao.setOpcoesDisponiveis(dao);
     }
-    
+
     private static PlanilhaV2GUI instance;
 
     public static void Exibir(VRMdiFrame i_mdiFrame) {
         try {
-            i_mdiFrame.setWaitCursor();            
+            i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
                 instance = new PlanilhaV2GUI(i_mdiFrame);
             }
@@ -959,9 +959,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private void btnMigrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMigrarActionPerformed
         try {
             this.setWaitCursor();
-            
+
             migrar();
-            
+
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, getTitle());
 
@@ -1071,13 +1071,13 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
     private void btnMapaTributActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaTributActionPerformed
         try {
-            dao.getOpcoes().put("delimiter", txtDelimitadorTribut.getText());                                
+            dao.getOpcoes().put("delimiter", txtDelimitadorTribut.getText());
             dao.setArquivo(txtTributoFile.getArquivo());
             MapaTributacaoView.exibir(
-                mdiFrame,
-                txtSistema.getText(),
-                txtCodLojaOrigem.getText(),
-                dao);
+                    mdiFrame,
+                    txtSistema.getText(),
+                    txtCodLojaOrigem.getText(),
+                    dao);
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Erro ao abrir");
         }
@@ -1194,10 +1194,10 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                         dao.setFormatoDataCompleta(txtFormatoDataCompleta.getText());
                         ProgressBar.show();
                         ProgressBar.setCancel(true);
-                        
+
                         switch (tabModel.getSelectedIndex()) {
                             case 0: {
-                                dao.getOpcoes().put("delimiter", txtDelimitadorProd.getText());                                
+                                dao.getOpcoes().put("delimiter", txtDelimitadorProd.getText());
                                 dao.setArquivo(txtProdutoFile.getArquivo());
                                 if (tabsProduto.getSelectedIndex() == 0) {
                                     tabProdImportacao.executarImportacao();
@@ -1206,10 +1206,11 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                         importador.unificarProdutos();
                                     }
                                 }
-                                
-                            }break;
+
+                            }
+                            break;
                             case 1: {
-                                dao.getOpcoes().put("delimiter", txtDelimitadorForn.getText()); 
+                                dao.getOpcoes().put("delimiter", txtDelimitadorForn.getText());
                                 dao.setArquivo(txtFornecedorFile.getArquivo());
                                 if (tabsForn.getSelectedIndex() == 0) {
                                     List<OpcaoFornecedor> opcoes = new ArrayList<>();
@@ -1220,7 +1221,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                         opcoes.add(OpcaoFornecedor.CONTATOS);
                                     }
                                     if (!opcoes.isEmpty()) {
-                                        importador.importarFornecedor();                                
+                                        importador.importarFornecedor();
                                     }
                                     if (chkFornProdutoFornecedor.isSelected()) {
                                         importador.importarProdutoFornecedor();
@@ -1233,7 +1234,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                         importador.unificarProdutoFornecedor();
                                     }
                                 }
-                            }; break;
+                            }
+                            ;
+                            break;
                             case 2: {
                                 dao.setArquivo(txtVendaHistFile.getArquivo());
                                 dao.setArquivoVendas(txtVendaHistFile.getArquivo());
@@ -1246,7 +1249,8 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                 if (chkPdvVendas.isSelected()) {
                                     importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                                 }
-                            }break;
+                            }
+                            break;
                             case 3: {
                                 dao.setArquivo(txtClienteFile.getArquivo());
                                 dao.getOpcoes().put("delimiter", txtClienteDelimitador.getText());
@@ -1282,7 +1286,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                         importador.unificarClienteEventual();
                                     }
                                 }
-                            }; break;
+                            }
+                            ;
+                            break;
                         }
 
                         gravarParametros();
@@ -1294,26 +1300,56 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                         Util.exibirMensagemErro(ex, getTitle());
                     } finally {
                         tabProdImportacao.setImportador(null);
-                    }                 
+                    }
                 }
             };
-            
+
             thread.start();
-           
-        }        
+
+        }
     }
 
     private boolean validado() throws Exception {
         StringBuilder error = new StringBuilder("");
-        
+
+        if (!"".equals(txtProdutoFile.getArquivo().trim())) {
+            if (!txtProdutoFile.getArquivo().endsWith(".xls") && !txtProdutoFile.getArquivo().endsWith(".csv")) {
+                error.append("* Planilha de Produto deve estar no formato xls ou csv!\n");
+            }
+        }
+
+        if (!"".equals(txtFornecedorFile.getArquivo().trim())) {
+            if (!txtFornecedorFile.getArquivo().endsWith(".xls") && !txtFornecedorFile.getArquivo().endsWith(".csv")) {
+                error.append("* Planilha de Fornecedor deve estar no formato xls ou csv!\n");
+            }
+        }
+
+        if (!"".equals(txtVendaHistFile.getArquivo().trim())) {
+            if (!txtVendaHistFile.getArquivo().endsWith(".xls") && !txtVendaHistFile.getArquivo().endsWith(".csv")) {
+                error.append("* Planilha de Venda deve estar no formato xls ou csv!\n");
+            }
+        }
+
+        if (!"".equals(txtVendaItemFile.getArquivo().trim())) {
+            if (!txtVendaItemFile.getArquivo().endsWith(".xls") && !txtVendaItemFile.getArquivo().endsWith(".csv")) {
+                error.append("* Planilha de Venda Item deve estar no formato xls ou csv!\n");
+            }
+        }
+
+        if (!"".equals(txtClienteFile.getArquivo().trim())) {
+            if (!txtClienteFile.getArquivo().endsWith(".xls") && !txtClienteFile.getArquivo().endsWith(".csv")) {
+                error.append("* Planilha de Cliente deve estar no formato xls ou csv!\n");
+            }
+        }
+
         if (cmbLojaDestino.getSelectedIndex() == -1) {
             error.append("* Loja de destino não selecionada!\n");
         }
-        
+
         if ("".equals(txtCodLojaOrigem.getText().trim())) {
             error.append("* Loja de origem não informada!\n");
         }
-        
+
         if (!"".equals(error.toString())) {
             Util.exibirMensagem(error.toString(), "Verifique antes de continuar!", 200, JOptionPane.WARNING_MESSAGE);
             return false;
@@ -1324,10 +1360,10 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
     private void inicializar() throws Exception {
         carregarParametros();
-        
+
         cmbLojaDestino.removeAllItems();
         cmbLojaDestino.setModel(new DefaultComboBoxModel());
-        for (LojaVO loja: new LojaDAO().carregar()) {
+        for (LojaVO loja : new LojaDAO().carregar()) {
             cmbLojaDestino.addItem(new ItemComboVO(loja.getId(), loja.getDescricao()));
         }
     }
@@ -1345,14 +1381,14 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         parametros.put(txtDelimitadorTribut.getText(), "IMPORTACAO", "PLANILHA", "ICMS", "DELIMITER");
         parametros.put(txtTributoFile.getArquivo(), "IMPORTACAO", "PLANILHA", "ICMS", "ARQUIVO");
         parametros.put(txtVendaHistFile.getArquivo(), "IMPORTACAO", "PLANILHA", "VENDA", "ARQUIVO");
-        parametros.put(txtVendaItemFile.getArquivo(), "IMPORTACAO", "PLANILHA", "VENDA-ITEM", "ARQUIVO");        
+        parametros.put(txtVendaItemFile.getArquivo(), "IMPORTACAO", "PLANILHA", "VENDA-ITEM", "ARQUIVO");
         parametros.put(txtVendaDelimitador.getText(), "IMPORTACAO", "PLANILHA", "VENDA", "DELIMITER");
         parametros.put(txtVendaStrQuote.getText(), "IMPORTACAO", "PLANILHA", "VENDA", "QUOTE");
         parametros.put(txtFormatoData.getText(), "IMPORTACAO", "PLANILHA", "FORMATO_DATA");
         parametros.put(txtFormatoDataCompleta.getText(), "IMPORTACAO", "PLANILHA", "FORMATO_DATA_COMPLETA");
         parametros.salvar();
     }
-    
+
     private void carregarParametros() throws Exception {
         String arquivo = parametros.get("IMPORTACAO", "PLANILHA", "ARQUIVO_PRODUTO");
         String origem = parametros.getWithNull("1", "IMPORTACAO", "PLANILHA", "LOJA_ORIGEM");
@@ -1375,9 +1411,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                 cmbLojaDestino.setSelectedIndex(index);
             }
         }
-        
+
         tabProdImportacao.carregarParametros(parametros, "IMPORTACAO", "PLANILHA");
-        
+
         String arquivoForn = parametros.get("IMPORTACAO", "PLANILHA", "FORNECEDOR", "ARQUIVO");
         txtFornecedorFile.setArquivo(arquivoForn != null ? arquivoForn : "");
         String arquivoCli = parametros.get("IMPORTACAO", "PLANILHA", "CLIENTE", "ARQUIVO");
@@ -1390,20 +1426,18 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         txtTributoFile.setArquivo(arquivoTrib != null ? arquivoTrib : "");
         String delTrib = parametros.get("IMPORTACAO", "PLANILHA", "ICMS", "DELIMITER");
         txtDelimitadorTribut.setText(delTrib != null ? delTrib : "");
-        
-        
-        
+
         String vend = parametros.get("IMPORTACAO", "PLANILHA", "VENDA", "ARQUIVO");
         txtVendaHistFile.setArquivo(vend != null ? vend : "");
         String vendItem = parametros.get("IMPORTACAO", "PLANILHA", "VENDA-ITEM", "ARQUIVO");
-        txtVendaItemFile.setArquivo(vendItem != null ? vendItem : "");        
+        txtVendaItemFile.setArquivo(vendItem != null ? vendItem : "");
         String delVend = parametros.get("IMPORTACAO", "PLANILHA", "VENDA", "DELIMITER");
         txtVendaDelimitador.setText(delVend != null ? delVend : "");
         String quoteVend = parametros.get("IMPORTACAO", "PLANILHA", "VENDA", "QUOTE");
         txtVendaStrQuote.setText(quoteVend != null ? quoteVend : "");
         txtFormatoData.setText(parametros.getWithNull("yyyy-MM-dd", "IMPORTACAO", "PLANILHA", "FORMATO_DATA"));
         txtFormatoDataCompleta.setText(parametros.getWithNull("yyyy-MM-dd hh:mm:ss.SSS", "IMPORTACAO", "PLANILHA", "FORMATO_DATA_COMPLETA"));
-        
+
     }
-    
+
 }

@@ -140,15 +140,15 @@ public class IntelliCashDAO extends InterfaceDAO {
                     + "    f.descricao as desc_familia,\n"
                     + "    p.estqmin estoqueMinimo,\n"
                     + "    p.estqmax estoqueMaximo,\n"
-                    + "    (select qtde from getestqprod(p.id, emp.id)) estoque, \n"
-                    //+ "   p.mkp as margem,\n"
+                    + "    (select qtde from getestqprod(p.id, emp.id)) estoque,\n"
+                  //+ "    p.mkp as margem,\n"
                     + "    c.custoatual custoSemImposto,\n"
                     + "    c.custoatual custoComImposto,\n"
                     + "    prc.vpreco preco,\n"
                     + "    prc.vpreconormal precoVenda,\n"       
                     + "    p.ativo,\n"
                     + "    fisco.ncm,\n"
-                    + "    pst.cod_cest cest,    \n"
+                    + "    pst.cod_cest cest,\n"
                     + "    coalesce(fisco.pis_cst_s, 13) pis_cst_e,\n"
                     + "    coalesce(fisco.pis_cst_s, 1) pis_cst_s,\n"
                     + "    fisco.cod_natureza_receita pis_natureza_receita,\n"
@@ -201,15 +201,17 @@ public class IntelliCashDAO extends InterfaceDAO {
                     imp.setEstoqueMaximo(rst.getInt("estoqueMaximo"));
                     imp.setEstoque(rst.getDouble("estoque"));
                     if(rst.getDouble("custocomimposto") != 0) {
-                        margem = (((rst.getDouble("precovenda") / rst.getDouble("custocomimposto")) - 1) * 100);
+                        margem = (((rst.getDouble("precovenda") == 0 ? rst.getDouble("preco") : rst.getDouble("precovenda")
+                                / rst.getDouble("custocomimposto")) - 1) * 100);
                     }
                     imp.setMargem(Utils.arredondar(margem, 2));
                     imp.setCustoSemImposto(rst.getDouble("custoSemImposto"));
                     imp.setCustoComImposto(rst.getDouble("custoComImposto"));
                     if(rst.getDouble("precoVenda") == 0) {
                         imp.setPrecovenda(rst.getDouble("preco"));
+                    } else {
+                        imp.setPrecovenda(rst.getDouble("precoVenda"));
                     }
-                    imp.setPrecovenda(rst.getDouble("precoVenda"));
                     if (rst.getInt("ativo") == 0) {
                         imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
                     } else {
