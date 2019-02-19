@@ -84,7 +84,7 @@ public class ProdutoRepository {
     }
 
     public void salvar(List<ProdutoIMP> produtos) throws Exception {
-        usarConversaoDeAliquotaSimples = provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
+        usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
         
         LOG.finest("Abrindo a transação");
         begin();        
@@ -237,7 +237,7 @@ public class ProdutoRepository {
     }
     
     public void atualizar(List<ProdutoIMP> produtos, OpcaoProduto... opcoes) throws Exception {
-        usarConversaoDeAliquotaSimples = provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
+        usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
         
         LOG.finer("Entrando no método atualizar; produtos(" + produtos.size() + ") opcoes(" + opcoes.length + ")");
         //<editor-fold defaultstate="collapsed" desc="Separa as opções entre 'com lista especial' e 'sem lista especial'">
@@ -396,7 +396,7 @@ public class ProdutoRepository {
      * @throws Exception
      */
     public void unificar(List<ProdutoIMP> produtos) throws Exception {
-        usarConversaoDeAliquotaSimples = provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
+        usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
         
         begin();
         try {
@@ -540,7 +540,7 @@ public class ProdutoRepository {
      * @throws Exception
      */
     public void unificar2(List<ProdutoIMP> produtos) throws Exception {
-        usarConversaoDeAliquotaSimples = provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
+        usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
         
         begin();
         try {

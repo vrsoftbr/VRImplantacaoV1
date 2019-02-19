@@ -524,7 +524,7 @@ public class SysPdvDAO extends InterfaceDAO {
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemento"));
                     imp.setBairro(rst.getString("bairro"));
-                    imp.setIbge_municipio(rst.getInt("ibge_municipio"));
+                    imp.setIbge_municipio(Utils.stringToInt(rst.getString("ibge_municipio")));
                     imp.setCep(rst.getString("cep"));
                     imp.setTel_principal(rst.getString("telefone"));
                     imp.setDatacadastro(rst.getDate("datacadastro"));
@@ -682,10 +682,10 @@ public class SysPdvDAO extends InterfaceDAO {
 
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select (FZDCOD||' - '||FZDDES) as doc from finalizadora order by FZDCOD"
+                    "select FZDCOD, FZDDES from finalizadora order by FZDCOD"
             )) {
                 while (rst.next()) {
-                    result.add(rst.getString("doc"));
+                    result.add(rst.getString("FZDCOD") + " - " + rst.getString("FZDDES"));
                 }
             }
             return result;
