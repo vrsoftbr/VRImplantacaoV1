@@ -12,6 +12,7 @@ import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -102,12 +103,12 @@ public class CerebroDAO extends InterfaceDAO {
                     + "p.codigo_subgrupo, \n"
                     + "p.descricao, \n"
                     + "p.preco_venda,\n"
-                    + "p.custo_atual,\n"
+                    + "p.custo_final,\n"
                     + "p.unidade_saida,\n"
                     + "p.validade,\n"
                     + "p.peso,\n"
                     + "p.codigo_tributo,\n"
-                    + "p.status,\n"
+                    + "case p.status when 1 then 'ATIVO' else 'INATIVO' end situacaocadastro,\n"
                     + "p.cst,\n"
                     + "t.codigo_tributo as cod_trib,\n"
                     + "t.descricao as icms_desc,\n"
@@ -135,6 +136,7 @@ public class CerebroDAO extends InterfaceDAO {
                     imp.setEan(rst.getString("codigo_barra"));
                     imp.seteBalanca("T".equals(rst.getString("pesavel")));
                     imp.setValidade(rst.getInt("validade"));
+                    imp.setSituacaoCadastro("ATIVO".equals(rst.getString("situacaocadastro")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -143,7 +145,7 @@ public class CerebroDAO extends InterfaceDAO {
                     imp.setCodMercadologico2(rst.getString("codigo_subgrupo"));
                     imp.setCodMercadologico3("1");
                     imp.setPrecovenda(rst.getDouble("preco_venda"));
-                    imp.setCustoComImposto(rst.getDouble("custo_atual"));
+                    imp.setCustoComImposto(rst.getDouble("custo_final"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
