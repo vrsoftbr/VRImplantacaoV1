@@ -54,7 +54,6 @@ import vrimplantacao.gui.interfaces.IdealGUI;
 import vrimplantacao.gui.interfaces.IdealSoftGUI;
 import vrimplantacao.gui.interfaces.ImportacoesDiversasGUI;
 import vrimplantacao.gui.interfaces.ImportarNotaSaidaImportacaoArquivoGUI;
-import vrimplantacao2.gui.interfaces.InfoBrasilGUI;
 import vrimplantacao.gui.interfaces.InfoStoreGUI;
 import vrimplantacao.gui.interfaces.InteragemGUI_2;
 import vrimplantacao.gui.interfaces.JMasterGUI;
@@ -139,6 +138,7 @@ import vrimplantacao2.gui.interfaces.GuiaSistemasGUI;
 import vrimplantacao2.gui.interfaces.HipcomGUI;
 import vrimplantacao2.gui.interfaces.HiperGUI;
 import vrimplantacao2.gui.interfaces.ICommerceGUI;
+import vrimplantacao2.gui.interfaces.InfoBrasilGUI;
 import vrimplantacao2.gui.interfaces.InfoMacGUI;
 import vrimplantacao2.gui.interfaces.IntelliCashGUI;
 import vrimplantacao2.gui.interfaces.IntelliconGUI;
@@ -154,6 +154,7 @@ import vrimplantacao2.gui.interfaces.LyncisGUI;
 import vrimplantacao2.gui.interfaces.MSIInforGUI;
 import vrimplantacao2.gui.interfaces.MarketGUI;
 import vrimplantacao2.gui.interfaces.MultiPdvGUI;
+import vrimplantacao2.gui.interfaces.OpenGUI;
 import vrimplantacao2.gui.interfaces.OrionGUI;
 import vrimplantacao2.gui.interfaces.PdvVrGUI;
 import vrimplantacao2.gui.interfaces.PlanilhaVrGUI;
@@ -660,6 +661,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAvance = new javax.swing.JMenuItem();
         mnuHipcom = new javax.swing.JMenuItem();
         mnuUmPontoDois = new javax.swing.JMenuItem();
+        mnuOpen = new javax.swing.JMenuItem();
         mnuOrion = new javax.swing.JMenu();
         jMenuItemOrion = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -1897,6 +1899,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu9.add(mnuUmPontoDois);
+
+        mnuOpen.setText("Open");
+        mnuOpen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuOpenActionPerformed(evt);
+            }
+        });
+        jMenu9.add(mnuOpen);
 
         jMenu2.add(jMenu9);
 
@@ -4155,6 +4165,10 @@ public final class MenuGUI extends VRMdiFrame {
         CerebroGUI.exibir(this);
     }//GEN-LAST:event_mnuCerebroActionPerformed
 
+    private void mnuOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuOpenActionPerformed
+        OpenGUI.exibir(this);
+    }//GEN-LAST:event_mnuOpenActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -4326,6 +4340,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuMapeamentoMercadologico;
     private javax.swing.JMenuItem mnuMarket;
     private javax.swing.JMenuBar mnuMenu;
+    private javax.swing.JMenuItem mnuOpen;
     private javax.swing.JMenu mnuOrion;
     private javax.swing.JMenuItem mnuParametros;
     private javax.swing.JMenuItem mnuParametros1;
