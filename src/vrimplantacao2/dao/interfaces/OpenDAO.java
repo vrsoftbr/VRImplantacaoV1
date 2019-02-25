@@ -12,7 +12,9 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -286,6 +288,77 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                             rst.getDouble("aliquota"),
                             rst.getDouble("reduzido")
                     ));
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	 f.CODFOR10 id,\n" +
+                    "    f.NOMFOR10 razao,\n" +
+                    "    f.NOMFOR10 fantasia,\n" +
+                    "    f.CGCMFF10 cnpj,\n" +
+                    "    f.INSEST10 inscricaoestadual,\n" +
+                    "    f.desativado,\n" +
+                    "    f.ENDERE10 endereco,\n" +
+                    "    f.NUMERO10 numero,\n" +
+                    "    f.COMPLE10 complemento,\n" +
+                    "    f.BAIRRO10 bairro,\n" +
+                    "    f.CIDADE10 cidade,\n" +
+                    "    f.ESTADO10 estado,\n" +
+                    "    f.CEPEST10 cep,\n" +
+                    "    f.TEFON110 telefone1,\n" +
+                    "    f.TEFON210 telefone2,\n" +
+                    "    f.FFAAXX10 fax,\n" +
+                    "    f.CONTA110 contato1,\n" +
+                    "    f.CONTA210 contato2,\n" +
+                    "    f.CONTA310 contato3,\n" +
+                    "    f.CONTA410 contato4,\n" +
+                    "    f.INFADICIONAIS observacoes,\n" +
+                    "    f.OBSERV,\n" +
+                    "    f.OBSERV_TOLEDO,\n" +
+                    "    f.PERIOD10 vencimento\n" +
+                    "from\n" +
+                    "	comfor f\n" +
+                    "order by 1"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("inscricaoestadual"));
+                    imp.setAtivo("N".equals(rst.getString("desativado")));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setTel_principal(rst.getString("telefone1"));
+                    imp.addTelefone("TELEFONE2", rst.getString("telefone2"));
+                    imp.addTelefone("FAX", rst.getString("fax"));
+                    imp.addContato(rst.getString("contato1"), rst.getString("telefone1"), "", TipoContato.COMERCIAL, "");
+                    imp.addContato(rst.getString("contato2"), rst.getString("telefone2"), "", TipoContato.COMERCIAL, "");
+                    imp.addContato(rst.getString("contato3"), "", "", TipoContato.COMERCIAL, "");
+                    imp.addContato(rst.getString("contato4"), "", "", TipoContato.COMERCIAL, "");
+                    imp.setObservacao(rst.getString("observacoes"));
+                    imp.setPrazoEntrega(rst.getInt("vencimento"));
+                    
+                    result.add(imp);
                 }
             }
         }
