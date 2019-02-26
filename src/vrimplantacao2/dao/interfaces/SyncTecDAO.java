@@ -14,6 +14,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -48,6 +49,34 @@ public class SyncTecDAO extends InterfaceDAO {
             }
         }
         
+        return result;
+    }
+    
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    g.grupo codmercadologico,\n" +
+                    "    g.codigo,\n" +
+                    "    g.descricaogrupo descmercadologico,\n" +
+                    "    g.desativado\n" +
+                    "from\n" +
+                    "    grupos g\n" +
+                    "order by\n" +
+                    "    g.descricaogrupo")) {
+                while(rs.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setMerc1ID(rs.getString("codmercadologico"));
+                    imp.setMerc1Descricao(rs.getString("descmercadologico"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 
@@ -248,6 +277,7 @@ public class SyncTecDAO extends InterfaceDAO {
                     imp.seteBalanca(rst.getBoolean("e_balanca"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.setValidade(rst.getInt("validade"));
+                    imp.setCodMercadologico1(rst.getString("codmercadologico"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaocompleta"));
                     imp.setDescricaoGondola(rst.getString("descricaocompleta"));
