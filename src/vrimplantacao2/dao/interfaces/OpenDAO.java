@@ -10,12 +10,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -63,7 +63,8 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.CEST,
             OpcaoProduto.PIS_COFINS,
             OpcaoProduto.NATUREZA_RECEITA,
-            OpcaoProduto.ICMS
+            OpcaoProduto.ICMS,
+            OpcaoProduto.MARGEM
         }));
     }
 
@@ -233,40 +234,13 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     List<String> eanList = eans.get(rst.getString("id"));
-                    OpenCusto custo = getCusto(rst.getString("id"));
                     if (eanList == null) {
                         ProdutoIMP imp = gerarProdutoImp(rst);
-                        if (custo != null) {
-                            imp.setCustoComImposto(custo.custocomimposto);
-                            imp.setCustoSemImposto(custo.custosemimposto);
-                        } else {
-                            LOG.log(Level.FINE,
-                            String.format(
-                                    "Produto sem entrada: %s - %s(%f - %f)",
-                                    imp.getImportId(),
-                                    imp.getDescricaoCompleta(),
-                                    imp.getCustoSemImposto(),
-                                    imp.getCustoComImposto()
-                            ));
-                        }
                         result.add(imp);
                     } else {
                         for (String ean: eanList) {                            
                             ProdutoIMP imp = gerarProdutoImp(rst);
-                            imp.setEan(ean);
-                            if (custo != null) {
-                                imp.setCustoComImposto(custo.custocomimposto);
-                                imp.setCustoSemImposto(custo.custosemimposto);
-                            } else {
-                                LOG.log(Level.FINE,
-                                String.format(
-                                        "Produto sem entrada: %s - %s(%f - %f)",
-                                        imp.getImportId(),
-                                        imp.getDescricaoCompleta(),
-                                        imp.getCustoSemImposto(),
-                                        imp.getCustoComImposto()
-                                ));
-                            }                        
+                            imp.setEan(ean);                      
                             result.add(imp);
                         }
                     }
@@ -275,12 +249,6 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         
         return result;
-    }
-    
-    private class OpenCusto {
-        String id = "";
-        double custocomimposto = 0;
-        double custosemimposto = 0;
     }
 
     protected ProdutoIMP gerarProdutoImp(final ResultSet rst) throws SQLException {
@@ -306,7 +274,10 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
         imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
         imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
         imp.setEstoque(rst.getDouble("estoque"));
+        imp.setCustoComImposto(rst.getDouble("custo"));
+        imp.setCustoSemImposto(rst.getDouble("custo"));
         imp.setPrecovenda(rst.getDouble("precovenda"));
+        imp.setMargem(MathUtils.round(((rst.getDouble("precovenda") / rst.getDouble("custo")) - 1) * 100, 2, 9999999));
         imp.setNcm(rst.getString("ncm"));
         imp.setCest(rst.getString("cest"));
         imp.setPiscofinsCstDebito(rst.getString("piscofinssaida"));
@@ -314,23 +285,6 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
         imp.setIcmsDebitoId(rst.getString("id_icms"));
         imp.setIcmsCreditoId(rst.getString("id_icms"));
         return imp;
-    }
-
-    private OpenCusto getCusto(String id) throws SQLException {
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select produto, round(precounfinal,2) custocomimposto, round(precounit,2) custosemimposto from esteni where produto = '" + id + "' order by dataemis desc limit 1"
-            )) {
-                while (rst.next()) {                    
-                    OpenCusto n = new OpenCusto();
-                    n.id = rst.getString("produto");
-                    n.custocomimposto = rst.getDouble("custocomimposto");
-                    n.custosemimposto = rst.getDouble("custosemimposto");
-                    return n;
-                }
-            }
-        }
-        return null;
     }
 
     @Override
