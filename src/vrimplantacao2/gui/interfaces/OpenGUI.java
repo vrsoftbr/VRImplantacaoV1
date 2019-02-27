@@ -14,6 +14,7 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.OpenDAO;
@@ -192,7 +193,10 @@ public class OpenGUI extends VRInternalFrame implements ConexaoEvent {
                         }
                         
                         if (chkClientePreferencial.isSelected()) {
-                            importador.importarClientePreferencial();
+                            importador.importarClientePreferencial(OpcaoCliente.DADOS,OpcaoCliente.CONTATOS);
+                        }
+                        if (chkClienteEventual.isSelected()) {
+                            importador.importarClienteEventual(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
                         }
                 
                         if (chkCreditoRotativo.isSelected()) {

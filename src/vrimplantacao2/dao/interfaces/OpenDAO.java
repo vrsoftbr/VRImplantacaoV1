@@ -18,6 +18,8 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -417,7 +419,72 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
-    
-    
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	c.codigo id,\n" +
+                    "	c.cgc cnpj,\n" +
+                    "	c.inscricao ie,\n" +
+                    "	c.razaos razao,\n" +
+                    "	coalesce(nullif(c.reduzido,''), c.razaos) fantasia,\n" +
+                    "	c.desativado,\n" +
+                    "	c.endereco,\n" +
+                    "	c.numero,\n" +
+                    "	c.complemento,\n" +
+                    "	c.bairro,\n" +
+                    "	c.codibge cidadeibge,\n" +
+                    "	c.cidade,\n" +
+                    "	c.estado,\n" +
+                    "	c.cep,\n" +
+                    "	c.estado_civil,\n" +
+                    "	c.datacad datacadastro,\n" +
+                    "	coalesce(c.sexo,'') sexo,\n" +
+                    "	c.infadicionais observacoes,\n" +
+                    "	c.telefone,\n" +
+                    "	c.fax,\n" +
+                    "	c.email,\n" +
+                    "	c.email_xml\n" +
+                    "from \n" +
+                    "	estcli c\n" +
+                    "order by 1"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("ie"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setAtivo(!"S".equals(rst.getString("desativado")));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipioIBGE(rst.getInt("cidadeibge"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setEstadoCivil(rst.getString("estado_civil"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setSexo(rst.getString("sexo").startsWith("F") ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                    imp.setObservacao2(rst.getString("observacoes"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setFax(rst.getString("fax"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.addEmail(rst.getString("email_xml"), TipoContato.NFE);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
     
 }
