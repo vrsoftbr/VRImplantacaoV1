@@ -18,9 +18,9 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.TipoContato;
-import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -134,23 +134,6 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-    }
-
-    @Override
-    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
-        List<FamiliaProdutoIMP> result = new ArrayList<>();
-        
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    ""
-            )) {
-                while (rst.next()) {
-                    
-                }
-            }
-        }
-        
-        return result;
     }
 
     @Override
@@ -397,5 +380,44 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	pf.codfor20 id_fornecedor,\n" +
+                    "	pf.codpro20 id_produto,\n" +
+                    "	coalesce(pf.referencia, pf.sequencial, pf.codpro20) codigoexterno,\n" +
+                    "	case when pf.quauni <= 0 then 1 else pf.quauni end qtdembalagem\n" +
+                    "from\n" +
+                    "	comprf pf\n" +
+                    "	join comfor f on pf.codfor20 = f.codfor10	\n" +
+                    "where \n" +
+                    "	pf.desativado = 'N'\n" +
+                    "order by\n" +
+                    "	1,2"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setIdProduto(rst.getString("id_produto"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    
     
 }
