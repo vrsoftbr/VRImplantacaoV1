@@ -1,12 +1,17 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -23,6 +28,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  * @author Leandro
  */
 public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
+    
+    private static final Logger LOG = Logger.getLogger(OpenDAO.class.getName());
 
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
@@ -87,7 +94,7 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT depto, descricao FROM open.gendep where classe = '' and subclasse = '' order by 1"
+                    "SELECT depto, descricao FROM gendep where classe = '' and subclasse = '' order by 1"
             )) {
                 while (rst.next()) {
                     MercadologicoNivelIMP imp = new MercadologicoNivelIMP(rst.getString("depto"), rst.getString("descricao"));
@@ -105,7 +112,7 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
     private void importarMercadologicoNivel2(MercadologicoNivelIMP imp) throws Exception {
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT depto, classe, subclasse, descricao FROM open.gendep where depto = '" + imp.getId() + "' and classe != '' and subclasse = '' order by 1,2"
+                    "SELECT depto, classe, subclasse, descricao FROM gendep where depto = '" + imp.getId() + "' and classe != '' and subclasse = '' order by 1,2"
             )) {
                 while (rst.next()) {                    
                     importarMercadologicoNivel3(
@@ -119,7 +126,7 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
     private void importarMercadologicoNivel3(MercadologicoNivelIMP imp) throws Exception {
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT depto, classe, subclasse, descricao FROM open.gendep where depto = '" + imp.getMercadologicoPai().getId() + "' and classe = '" + imp.getId() + "' and subclasse != '' order by 1,2,3"
+                    "SELECT depto, classe, subclasse, descricao FROM gendep where depto = '" + imp.getMercadologicoPai().getId() + "' and classe = '" + imp.getId() + "' and subclasse != '' order by 1,2,3"
             )) {
                 while (rst.next()) {                    
                     imp.addFilho(rst.getString("subclasse"), rst.getString("descricao"));
@@ -149,37 +156,9 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         
+        Map<String, List<String>> eans = new HashMap<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    p.CODPRO10 id,\n" +
-                    "    coalesce(nullif(p.daulp510,'0000-00-00'),nullif(p.daulp410,'0000-00-00'),nullif(p.daulp310,'0000-00-00'),nullif(p.daulp210,'0000-00-00'),nullif(p.daulp110,'0000-00-00')) datacadastro,\n" +
-                    "    coalesce(nullif(p.DAULVE10,'0000-00-00'),nullif(p.dtalttrib,'0000-00-00')) dataalteracao,\n" +
-                    "    ean.ean,\n" +
-                    "    1 qtdembalagem,\n" +
-                    "    p.UNIDAD10 unidade,\n" +
-                    "    p.PESOVA10 pesavel,\n" +
-                    "    p.validade,\n" +
-                    "    p.DESCPR10 descricaocompleta,\n" +
-                    "    p.DESCRE10 descricaoreduzida,\n" +
-                    "    p.DEPTOS10 merc1,\n" +
-                    "    p.CLASSE10 merc2,\n" +
-                    "    p.SUBCLA10 merc3,\n" +
-                    "    null id_familia,\n" +
-                    "    p.PSOUNI10 peso,\n" +
-                    "    p.ESTMIN10 estoqueminimo,\n" +
-                    "    p.ESTMAX10 estoquemaximo,\n" +
-                    "    p.ESTATU10 estoque,\n" +
-                    "    coalesce(nullif(p.precu110,0),p.precu210) custo,\n" +
-                    "    coalesce(nullif(p.preco110,0),p.preco210) precovenda,\n" +
-                    "    p.ncm,\n" +
-                    "    nullif(p.cest,'0000000') cest,\n" +
-                    "    p.PISPIS10 piscofinssaida,\n" +
-                    "    p.natureza_receita piscofinsnatrec,\n" +
-                    "    concat(coalesce(p.tribut10,''),'|',coalesce(p.basred10,'')) id_icms\n" +
-                    "from\n" +
-                    "	genpro p\n" +
-                    "    left join (\n" +
                     "		select\n" +
                     "			p.CODPRO10 id,\n" +
                     "			p.CODEAN10 ean\n" +
@@ -208,51 +187,150 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		from\n" +
                     "			genpro p\n" +
                     "		where\n" +
-                    "			p.BARRA410 != ''\n" +
-                    "    ) ean on p.codpro10 = ean.id\n" +
+                    "			p.BARRA410 != ''\n"
+            )) {
+                while (rst.next()) {
+                    List<String> eanList = eans.get(rst.getString("id"));
+                    if (eanList == null) {
+                        eanList = new ArrayList<>();
+                        eans.put(rst.getString("id"), eanList);
+                    }
+                    eanList.add(rst.getString("ean"));
+                }
+            }
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    p.CODPRO10 id,\n" +
+                    "    coalesce(nullif(p.daulp510,'0000-00-00'),nullif(p.daulp410,'0000-00-00'),nullif(p.daulp310,'0000-00-00'),nullif(p.daulp210,'0000-00-00'),nullif(p.daulp110,'0000-00-00')) datacadastro,\n" +
+                    "    coalesce(nullif(p.DAULVE10,'0000-00-00'),nullif(p.dtalttrib,'0000-00-00')) dataalteracao,\n" +
+                    "    1 qtdembalagem,\n" +
+                    "    p.UNIDAD10 unidade,\n" +
+                    "    p.PESOVA10 pesavel,\n" +
+                    "    p.validade,\n" +
+                    "    p.DESCPR10 descricaocompleta,\n" +
+                    "    p.DESCRE10 descricaoreduzida,\n" +
+                    "    p.DEPTOS10 merc1,\n" +
+                    "    p.CLASSE10 merc2,\n" +
+                    "    p.SUBCLA10 merc3,\n" +
+                    "    null id_familia,\n" +
+                    "    p.PSOUNI10 peso,\n" +
+                    "    p.ESTMIN10 estoqueminimo,\n" +
+                    "    p.ESTMAX10 estoquemaximo,\n" +
+                    "    p.ESTATU10 estoque,\n" +
+                    "    cld.precomp custo,\n" +
+                    "    coalesce(nullif(p.preco210,0),p.preco210) precovenda,\n" +
+                    "    p.ncm,\n" +
+                    "    nullif(p.cest,'0000000') cest,\n" +
+                    "    p.PISPIS10 piscofinssaida,\n" +
+                    "    cld.pis piscofinsentrada,\n" +
+                    "    p.natureza_receita piscofinsnatrec,\n" +
+                    "    concat(coalesce(p.tribut10,''),'|',coalesce(p.basred10,'')) id_icms,\n" +
+                    "    cld.*\n" +
+                    "from\n" +
+                    "	 genpro p\n" +
+                    "	 left join comcld cld on p.codpro10 = codpro30\n" +
                     "order by 1"
             )) {
                 while (rst.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rst.getString("id"));
-                    imp.setDataCadastro(rst.getDate("datacadastro"));
-                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
-                    imp.setEan(rst.getString("ean"));
-                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                    imp.setTipoEmbalagem(rst.getString("unidade"));
-                    imp.seteBalanca("S".equals(rst.getString("pesavel")));
-                    imp.setValidade(rst.getInt("validade"));
-                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                    imp.setDescricaoGondola(rst.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
-                    imp.setCodMercadologico1(rst.getString("merc1"));
-                    imp.setCodMercadologico2(rst.getString("merc2"));
-                    imp.setCodMercadologico3(rst.getString("merc3"));
-                    imp.setIdFamiliaProduto(rst.getString("id_familia"));
-                    imp.setPesoBruto(rst.getDouble("peso"));
-                    imp.setPesoLiquido(rst.getDouble("peso"));
-                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
-                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
-                    imp.setEstoque(rst.getDouble("estoque"));
-                    imp.setCustoComImposto(rst.getDouble("custo"));
-                    imp.setCustoSemImposto(rst.getDouble("custo"));
-                    imp.setPrecovenda(rst.getDouble("precovenda"));
-                    imp.setNcm(rst.getString("ncm"));
-                    imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstDebito(rst.getString("piscofinssaida"));
-                    imp.setPiscofinsNaturezaReceita(rst.getString("piscofinsnatrec"));
-                    imp.setIcmsDebitoId(rst.getString("id_icms"));
-                    imp.setIcmsCreditoId(rst.getString("id_icms"));
-                    
-                    result.add(imp);
+                    List<String> eanList = eans.get(rst.getString("id"));
+                    OpenCusto custo = getCusto(rst.getString("id"));
+                    if (eanList == null) {
+                        ProdutoIMP imp = gerarProdutoImp(rst);
+                        if (custo != null) {
+                            imp.setCustoComImposto(custo.custocomimposto);
+                            imp.setCustoSemImposto(custo.custosemimposto);
+                        } else {
+                            LOG.log(Level.FINE,
+                            String.format(
+                                    "Produto sem entrada: %s - %s(%f - %f)",
+                                    imp.getImportId(),
+                                    imp.getDescricaoCompleta(),
+                                    imp.getCustoSemImposto(),
+                                    imp.getCustoComImposto()
+                            ));
+                        }
+                        result.add(imp);
+                    } else {
+                        for (String ean: eanList) {                            
+                            ProdutoIMP imp = gerarProdutoImp(rst);
+                            imp.setEan(ean);
+                            if (custo != null) {
+                                imp.setCustoComImposto(custo.custocomimposto);
+                                imp.setCustoSemImposto(custo.custosemimposto);
+                            } else {
+                                LOG.log(Level.FINE,
+                                String.format(
+                                        "Produto sem entrada: %s - %s(%f - %f)",
+                                        imp.getImportId(),
+                                        imp.getDescricaoCompleta(),
+                                        imp.getCustoSemImposto(),
+                                        imp.getCustoComImposto()
+                                ));
+                            }                        
+                            result.add(imp);
+                        }
+                    }
                 }
             }
         }
         
         return result;
+    }
+    
+    private class OpenCusto {
+        String id = "";
+        double custocomimposto = 0;
+        double custosemimposto = 0;
+    }
+
+    protected ProdutoIMP gerarProdutoImp(final ResultSet rst) throws SQLException {
+        ProdutoIMP imp = new ProdutoIMP();
+        imp.setImportSistema(getSistema());
+        imp.setImportLoja(getLojaOrigem());
+        imp.setImportId(rst.getString("id"));
+        imp.setDataCadastro(rst.getDate("datacadastro"));
+        imp.setDataAlteracao(rst.getDate("dataalteracao"));
+        imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+        imp.setTipoEmbalagem(rst.getString("unidade"));
+        imp.seteBalanca("S".equals(rst.getString("pesavel")));
+        imp.setValidade(rst.getInt("validade"));
+        imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+        imp.setDescricaoGondola(rst.getString("descricaocompleta"));
+        imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+        imp.setCodMercadologico1(rst.getString("merc1"));
+        imp.setCodMercadologico2(rst.getString("merc2"));
+        imp.setCodMercadologico3(rst.getString("merc3"));
+        imp.setIdFamiliaProduto(rst.getString("id_familia"));
+        imp.setPesoBruto(rst.getDouble("peso"));
+        imp.setPesoLiquido(rst.getDouble("peso"));
+        imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
+        imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
+        imp.setEstoque(rst.getDouble("estoque"));
+        imp.setPrecovenda(rst.getDouble("precovenda"));
+        imp.setNcm(rst.getString("ncm"));
+        imp.setCest(rst.getString("cest"));
+        imp.setPiscofinsCstDebito(rst.getString("piscofinssaida"));
+        imp.setPiscofinsNaturezaReceita(rst.getString("piscofinsnatrec"));
+        imp.setIcmsDebitoId(rst.getString("id_icms"));
+        imp.setIcmsCreditoId(rst.getString("id_icms"));
+        return imp;
+    }
+
+    private OpenCusto getCusto(String id) throws SQLException {
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select produto, round(precounfinal,2) custocomimposto, round(precounit,2) custosemimposto from esteni where produto = '" + id + "' order by dataemis desc limit 1"
+            )) {
+                while (rst.next()) {                    
+                    OpenCusto n = new OpenCusto();
+                    n.id = rst.getString("produto");
+                    n.custocomimposto = rst.getDouble("custocomimposto");
+                    n.custosemimposto = rst.getDouble("custosemimposto");
+                    return n;
+                }
+            }
+        }
+        return null;
     }
 
     @Override
