@@ -507,7 +507,7 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setSexo("F".equals(rst.getString("sexo")) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
                     imp.setDataAdmissao(rst.getDate("dataadmissao"));
                     imp.setSalario(rst.getDouble("salario"));
-                    imp.setLimiteCompra(rst.getDouble("limiteconvenio"));
+                    imp.setValorLimite(rst.getDouble("limiteconvenio"));
                     imp.setNomePai(rst.getString("pai"));
                     imp.setNomeMae(rst.getString("mae"));
                     imp.setObservacao2(rst.getString("observacao"));
