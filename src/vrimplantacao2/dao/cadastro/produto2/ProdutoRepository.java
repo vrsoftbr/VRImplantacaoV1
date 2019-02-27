@@ -771,11 +771,16 @@ public class ProdutoRepository {
             debitoForaEstado = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, icmsReducaoSaida);
             debitoForaEstadoNfe = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, icmsReducaoSaida);
 
-            if (icmsCstSaida == 20) {
-                double aliq = MathUtils.round(icmsAliqSaida - (icmsAliqSaida * (icmsReducaoSaida / 100)), 1);
-                consumidor = provider.tributo().getIcms(0, aliq, 0);
+            if (imp.getIcmsCstConsumidor() == null) {
+                if (icmsCstSaida == 20) {
+                    double aliq = MathUtils.round(icmsAliqSaida - (icmsAliqSaida * (icmsReducaoSaida / 100)), 1);
+                    consumidor = provider.tributo().getIcms(0, aliq, 0);
+                } else {
+                    consumidor = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, 0);
+                }
             } else {
-                consumidor = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, 0);
+                consumidor = provider.tributo().getIcms(Integer.parseInt(imp.getIcmsCstConsumidor()), 
+                                                                         imp.getIcmsAliqConsumidor(), 0);
             }
         }
         
@@ -880,11 +885,16 @@ public class ProdutoRepository {
             debitoForaEstado = provider.tributo().getIcms(icmsCstSaidaForaEstado, icmsAliqSaidaForaEstado, icmsReducaoSaidaForaEstado);
             debitoForaEstadoNfe = provider.tributo().getIcms(icmsCstSaidaForaEstadoNF, icmsAliqSaidaForaEstadoNF, icmsReducaoSaidaForaEstadoNF);
 
-            if (icmsCstSaida == 20) {
-                double aliq = MathUtils.round(icmsAliqSaida - (icmsAliqSaida * (icmsReducaoSaida / 100)), 1);
-                consumidor = provider.tributo().getIcms(0, aliq, 0);
+            if (imp.getIcmsCstConsumidor() == null) {
+                if (icmsCstSaida == 20) {
+                    double aliq = MathUtils.round(icmsAliqSaida - (icmsAliqSaida * (icmsReducaoSaida / 100)), 1);
+                    consumidor = provider.tributo().getIcms(0, aliq, 0);
+                } else {
+                    consumidor = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, 0);
+                }
             } else {
-                consumidor = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, 0);
+                consumidor = provider.tributo().getIcms(Integer.parseInt(imp.getIcmsCstConsumidor()), 
+                                                                         imp.getIcmsAliqConsumidor(), 0);
             }
         }
         
@@ -893,6 +903,7 @@ public class ProdutoRepository {
             aliqCredito = provider.tributo().getAliquotaByMapaId(idIcmsCredito);
             creditoForaEstado = provider.tributo().getAliquotaByMapaId(idIcmsCredito);            
         } else {
+            
             int icmsCstEntrada = imp.getIcmsCstEntrada();
             double icmsAliqEntrada = 0;
             double icmsReducaoEntrada = 0;

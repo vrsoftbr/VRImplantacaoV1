@@ -108,7 +108,7 @@ public class CerebroDAO extends InterfaceDAO {
                     + "p.validade,\n"
                     + "p.peso,\n"
                     + "p.codigo_tributo,\n"
-                    + "case p.status when 1 then 'ATIVO' else 'INATIVO' end situacaocadastro,\n"
+                    + "p.status,\n"
                     + "p.cst,\n"
                     + "t.codigo_tributo as cod_trib,\n"
                     + "t.descricao as icms_desc,\n"
@@ -123,7 +123,9 @@ public class CerebroDAO extends InterfaceDAO {
                     + "p.cst_pis_ent,\n"
                     + "p.cst_cofins_ent,\n"
                     + "p.ncm, \n"
-                    + "p.cest\n"
+                    + "p.cest, \n"
+                    + "t.tipo, \n"
+                    + "t.icms_vip as aliq_consumidor \n"
                     + "from produtos p\n"
                     + "left join tributos t on t.codigo_tributo = p.codigo_tributo\n"
                     + "order by codigo_produto"
@@ -136,7 +138,7 @@ public class CerebroDAO extends InterfaceDAO {
                     imp.setEan(rst.getString("codigo_barra"));
                     imp.seteBalanca("T".equals(rst.getString("pesavel")));
                     imp.setValidade(rst.getInt("validade"));
-                    imp.setSituacaoCadastro("ATIVO".equals(rst.getString("situacaocadastro")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setSituacaoCadastro(rst.getInt("status") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -151,12 +153,6 @@ public class CerebroDAO extends InterfaceDAO {
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("cst_pis"));
                     imp.setPiscofinsCstCredito(rst.getString("cst_cofins_ent"));
-                    imp.setIcmsCstSaida(rst.getInt("cst_icms_saida"));
-                    imp.setIcmsAliqSaida(rst.getDouble("icms_saida"));
-                    imp.setIcmsReducaoSaida(rst.getDouble("red_saida"));
-                    imp.setIcmsCstEntrada(rst.getInt("cst_icms_ent"));
-                    imp.setIcmsAliqEntrada(rst.getDouble("icms_ent"));
-                    imp.setIcmsReducao(rst.getDouble("red_ent"));
                     result.add(imp);
                 }
             }
@@ -228,6 +224,195 @@ public class CerebroDAO extends InterfaceDAO {
                 return result;
             }
         }
+
+        if (opt == OpcaoProduto.ICMS_SAIDA) {
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + " p.codigo_produto, \n"
+                        + " p.codigo_barra,\n"
+                        + " tr.codigo_natureza_op as op,\n"
+                        + " tr.cst_icms icms_cst,\n"
+                        + " coalesce(tr.percentual_icms, 0) icms_aliq,\n"
+                        + " coalesce(tr.perc_reducaoicms, 0) icms_red,\n "
+                        + " t.tipo as tipo_trib, \n"
+                        + " coalesce(t.icms_vip, 0) icms_cons\n"
+                        + "from produtos p\n"
+                        + "left join tributos t on t.codigo_tributo = p.codigo_tributo\n"
+                        + "inner join tributacoes tr on tr.codigo_tributo = t.codigo_tributo\n"
+                        + "    and tr.codigo_natureza_op = 1\n"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("codigo_produto"));
+
+                        imp.setIcmsCstSaida(rst.getInt("icms_cst"));
+
+                        if ((imp.getIcmsCstSaida() == 0)
+                                && (rst.getInt("icms_aliq") == 0)) {
+                            imp.setIcmsAliqSaida(rst.getDouble("icms_cons"));
+                        } else {
+                            imp.setIcmsAliqSaida(rst.getDouble("icms_aliq"));
+                        }
+                        imp.setIcmsReducaoSaida(rst.getDouble("icms_red"));
+
+                        imp.setIcmsCstSaidaForaEstado(imp.getIcmsCstSaida());
+                        imp.setIcmsAliqSaidaForaEstado(imp.getIcmsAliqSaida());
+                        imp.setIcmsReducaoSaidaForaEstado(imp.getIcmsReducaoSaida());
+
+                        imp.setIcmsCstSaidaForaEstadoNF(imp.getIcmsCstSaida());
+                        imp.setIcmsAliqSaidaForaEstadoNF(imp.getIcmsAliqSaida());
+                        imp.setIcmsReducaoSaidaForaEstadoNF(imp.getIcmsReducaoSaida());
+
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+
+        if (opt == OpcaoProduto.ICMS_ENTRADA) {
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + "p.codigo_produto, \n"
+                        + "p.codigo_barra,\n"
+                        + "p.descricao,\n"
+                        + "tr.codigo_natureza_op as op,\n"
+                        + "tr.cst_icms icms_cst,\n"
+                        + "coalesce(tr.percentual_icms, 0) icms_aliq,\n"
+                        + "coalesce(tr.perc_reducaoicms, 0) icms_red,\n"
+                        + "tr.cfop,\n"
+                        + "cf.operacao_fiscal,\n"
+                        + "cf.descricao as desc_cfop,\n"
+                        + "cf.tipo as tipo_cfop\n"
+                        + "from produtos p\n"
+                        + "left join tributos t on t.codigo_tributo = p.codigo_tributo\n"
+                        + "inner join tributacoes tr on tr.codigo_tributo = t.codigo_tributo\n"
+                        + "    and tr.codigo_natureza_op = 2\n"
+                        + "inner join cfop cf on cf.operacao_fiscal = tr.cfop and cf.tipo = 'D'"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("codigo_produto"));
+                        imp.setIcmsCstEntrada(rst.getInt("icms_cst"));
+                        imp.setIcmsAliqEntrada(rst.getDouble("icms_aliq"));
+                        imp.setIcmsReducaoEntrada(rst.getDouble("icms_red"));
+                        imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstEntrada());
+                        imp.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqEntrada());
+                        imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoEntrada());
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+        if (opt == OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO) {
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + "p.codigo_produto, \n"
+                        + "p.codigo_barra,\n"
+                        + "p.descricao,\n"
+                        + "tr.codigo_natureza_op as op,\n"
+                        + "tr.cst_icms icms_cst,\n"
+                        + "coalesce(tr.percentual_icms, 0) icms_aliq,\n"
+                        + "coalesce(tr.perc_reducaoicms, 0) icms_red,\n"
+                        + "tr.cfop,\n"
+                        + "cf.operacao_fiscal,\n"
+                        + "cf.descricao as desc_cfop,\n"
+                        + "cf.tipo as tipo_cfop\n"
+                        + "from produtos p\n"
+                        + "left join tributos t on t.codigo_tributo = p.codigo_tributo\n"
+                        + "inner join tributacoes tr on tr.codigo_tributo = t.codigo_tributo\n"
+                        + "    and tr.codigo_natureza_op = 2\n"
+                        + "inner join cfop cf on cf.operacao_fiscal = tr.cfop and cf.tipo = 'F'"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("codigo_produto"));
+                        
+                        if ((rst.getInt("icms_cst") == 0) && (rst.getDouble("icms_aliq") > 0)) {                            
+                            imp.setIcmsCstEntradaForaEstado(rst.getInt("icms_cst"));
+                            imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms_aliq"));
+                            imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("icms_red"));
+                        }
+                        if ((rst.getInt("icms_cst") == 20) && (rst.getDouble("icms_aliq") > 0) && (rst.getDouble("icms_red") > 0)) {
+                            imp.setIcmsCstEntradaForaEstado(rst.getInt("icms_cst"));
+                            imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms_aliq"));
+                            imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("icms_red"));
+                        }
+                        if ((rst.getInt("icms_cst") == 10)
+                                || (rst.getInt("icms_cst") == 40)
+                                || (rst.getInt("icms_cst") == 41)
+                                || (rst.getInt("icms_cst") == 50)
+                                || (rst.getInt("icms_cst") == 51)
+                                || (rst.getInt("icms_cst") == 60)
+                                || (rst.getInt("icms_cst") == 70)
+                                || (rst.getInt("icms_cst") == 90)) {
+                            imp.setIcmsCstEntradaForaEstado(rst.getInt("icms_cst"));
+                            imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms_aliq"));
+                            imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("icms_red"));
+                        }
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+
+        if (opt == OpcaoProduto.ICMS_CONSUMIDOR) {
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + " p.codigo_produto, \n"
+                        + " p.codigo_barra,\n"
+                        + " t.tipo as tipo_trib,\n"
+                        + " coalesce(t.icms_vip, 0) icms_cons\n"
+                        + "from produtos p\n"
+                        + "left join tributos t on t.codigo_tributo = p.codigo_tributo"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("codigo_produto"));
+
+                        if (null != rst.getString("tipo_trib")) {
+                            switch (rst.getString("tipo_trib")) {
+                                case "T":
+                                    imp.setIcmsCstConsumidor(String.valueOf(0));
+                                    break;
+                                case "N":
+                                    imp.setIcmsCstConsumidor(String.valueOf(41));
+                                    break;
+                                case "I":
+                                    imp.setIcmsCstConsumidor(String.valueOf(40));
+                                    break;
+                                case "F":
+                                    imp.setIcmsCstConsumidor(String.valueOf(60));
+                                    break;
+                                default:
+                                    imp.setIcmsCstConsumidor(String.valueOf(40));
+                                    break;
+                            }
+                        }
+
+                        imp.setIcmsAliqConsumidor(rst.getDouble("icms_cons"));
+                        imp.setIcmsReducaoConsumidor(0);
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+
         return null;
     }
 
@@ -421,7 +606,9 @@ public class CerebroDAO extends InterfaceDAO {
                     + "c.num_conta,\n"
                     + "c.numconta_dv,\n"
                     + "c.sexo, \n"
-                    + "c.profissao\n"
+                    + "c.profissao, \n"
+                    + "case c.status_credito when 'A' then 'ATIVO' else 'INATIVO' end status, \n"
+                    + "c.status_credito \n"
                     + "from clientes c\n"
                     + "order by c.codigo_cliente"
             )) {
@@ -459,6 +646,8 @@ public class CerebroDAO extends InterfaceDAO {
                     imp.setCargo(rst.getString("profissao"));
                     imp.setValorLimite(rst.getDouble("limite_credito") < 1 ? rst.getDouble("limite_convenio") : rst.getDouble("limite_credito"));
                     imp.setObservacao(rst.getString("observacao"));
+                    imp.setAtivo("ATIVO".equals(rst.getString("status")));
+                    imp.setBloqueado("C".equals(rst.getString("status_credito")));
 
                     if ((rst.getString("ponto_referencia") != null)
                             && (!rst.getString("ponto_referencia").trim().isEmpty())) {
