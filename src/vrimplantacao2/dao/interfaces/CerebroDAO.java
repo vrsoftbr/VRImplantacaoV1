@@ -9,7 +9,9 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import vrframework.classe.Conexao;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -104,7 +106,10 @@ public class CerebroDAO extends InterfaceDAO {
                     + "p.descricao, \n"
                     + "p.preco_venda,\n"
                     + "p.custo_final,\n"
+                    + "p.multiplica_entrada as qtdembalagem_pro,\n"
+                    + "upper(p.unidade_entrada) as tipoembalagem_pro,\n"
                     + "p.unidade_saida,\n"
+                    + "p.multiplica_saida as qtdembalagem_ean,"
                     + "p.validade,\n"
                     + "p.peso,\n"
                     + "p.codigo_tributo,\n"
@@ -142,7 +147,9 @@ public class CerebroDAO extends InterfaceDAO {
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    imp.setTipoEmbalagem(rst.getString("unidade_saida"));
+                    imp.setTipoEmbalagem((rst.getString("tipoembalagem_pro").replace("]", "")));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem_pro"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem_ean"));
                     imp.setCodMercadologico1(rst.getString("codigo_grupo"));
                     imp.setCodMercadologico2(rst.getString("codigo_subgrupo"));
                     imp.setCodMercadologico3("1");
@@ -191,6 +198,29 @@ public class CerebroDAO extends InterfaceDAO {
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
+        if (opt == OpcaoProduto.TIPO_EMBALAGEM_EAN) {
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select "
+                        + "codigo_produto,\n"
+                        + "codigo_barra,\n"
+                        + "unidade_saida\n"
+                        + "from produtos"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("codigo_produto"));
+                        imp.setEan(rst.getString("codigo_barra"));
+                        imp.setTipoEmbalagem(rst.getString("unidade_saida"));
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+
         if (opt == OpcaoProduto.ESTOQUE) {
             try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -231,6 +261,52 @@ public class CerebroDAO extends InterfaceDAO {
                         "select\n"
                         + " p.codigo_produto, \n"
                         + " p.codigo_barra,\n"
+                        + " t.tipo as tipo_trib,\n"
+                        + " coalesce(t.icms_vip, 0) icms_cons\n"
+                        + "from produtos p\n"
+                        + "left join tributos t on t.codigo_tributo = p.codigo_tributo"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("codigo_produto"));
+
+                        if (null != rst.getString("tipo_trib")) {
+                            switch (rst.getString("tipo_trib")) {
+                                case "T":
+                                    imp.setIcmsCstSaida(0);
+                                    break;
+                                case "N":
+                                    imp.setIcmsCstSaida(41);
+                                    break;
+                                case "I":
+                                    imp.setIcmsCstSaida(40);
+                                    break;
+                                case "F":
+                                    imp.setIcmsCstSaida(60);
+                                    break;
+                                default:
+                                    imp.setIcmsCstSaida(40);
+                                    break;
+                            }
+                        }
+
+                        imp.setIcmsAliqSaida(rst.getDouble("icms_cons"));
+                        imp.setIcmsReducaoSaida(0);
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+        
+        if (opt == OpcaoProduto.ICMS_SAIDA_FORA_ESTADO) {
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + " p.codigo_produto, \n"
+                        + " p.codigo_barra,\n"
                         + " tr.codigo_natureza_op as op,\n"
                         + " tr.cst_icms icms_cst,\n"
                         + " coalesce(tr.percentual_icms, 0) icms_aliq,\n"
@@ -248,24 +324,57 @@ public class CerebroDAO extends InterfaceDAO {
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("codigo_produto"));
 
-                        imp.setIcmsCstSaida(rst.getInt("icms_cst"));
+                        if ((rst.getInt("icms_cst") == 0) &&
+                                (rst.getDouble("icms_aliq") == 0)) {
+                            
+                            imp.setIcmsCstSaidaForaEstado(90);
+                            imp.setIcmsAliqSaidaForaEstado(0);
+                            imp.setIcmsReducaoSaidaForaEstado(0);
+                            
+                            imp.setIcmsCstSaidaForaEstadoNF(90);
+                            imp.setIcmsAliqSaidaForaEstadoNF(0);
+                            imp.setIcmsReducaoSaidaForaEstadoNF(0);
+                            
+                        } else if ((rst.getInt("icms_cst") == 20) &&
+                                (rst.getDouble("icms_aliq") == 0) &&
+                                (rst.getDouble("icms_red") == 0)) {
 
-                        if ((imp.getIcmsCstSaida() == 0)
-                                && (rst.getInt("icms_aliq") == 0)) {
-                            imp.setIcmsAliqSaida(rst.getDouble("icms_cons"));
+                            imp.setIcmsCstSaidaForaEstado(90);
+                            imp.setIcmsAliqSaidaForaEstado(0);
+                            imp.setIcmsReducaoSaidaForaEstado(0);
+                            
+                            imp.setIcmsCstSaidaForaEstadoNF(90);
+                            imp.setIcmsAliqSaidaForaEstadoNF(0);
+                            imp.setIcmsReducaoSaidaForaEstadoNF(0);
+                            
+                        } else if ((rst.getInt("icms_cst") == 10)
+                                || (rst.getInt("icms_cst") == 40)
+                                || (rst.getInt("icms_cst") == 41)
+                                || (rst.getInt("icms_cst") == 50)
+                                || (rst.getInt("icms_cst") == 51)
+                                || (rst.getInt("icms_cst") == 60)
+                                || (rst.getInt("icms_cst") == 70)
+                                || (rst.getInt("icms_cst") == 90)) {
+
+                            imp.setIcmsCstSaidaForaEstado(rst.getInt("icms_cst"));
+                            imp.setIcmsAliqSaidaForaEstado(0);
+                            imp.setIcmsReducaoSaidaForaEstado(0);
+                            
+                            imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("icms_cst"));
+                            imp.setIcmsAliqSaidaForaEstadoNF(0);
+                            imp.setIcmsReducaoSaidaForaEstadoNF(0);
+                            
                         } else {
-                            imp.setIcmsAliqSaida(rst.getDouble("icms_aliq"));
+                            
+                            imp.setIcmsCstSaidaForaEstado(rst.getInt("icms_cst"));
+                            imp.setIcmsAliqSaidaForaEstado(rst.getDouble("icms_aliq"));
+                            imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("icms_red"));
+                            
+                            imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("icms_cst"));
+                            imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("icms_aliq"));
+                            imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("icms_red"));
+                            
                         }
-                        imp.setIcmsReducaoSaida(rst.getDouble("icms_red"));
-
-                        imp.setIcmsCstSaidaForaEstado(imp.getIcmsCstSaida());
-                        imp.setIcmsAliqSaidaForaEstado(imp.getIcmsAliqSaida());
-                        imp.setIcmsReducaoSaidaForaEstado(imp.getIcmsReducaoSaida());
-
-                        imp.setIcmsCstSaidaForaEstadoNF(imp.getIcmsCstSaida());
-                        imp.setIcmsAliqSaidaForaEstadoNF(imp.getIcmsAliqSaida());
-                        imp.setIcmsReducaoSaidaForaEstadoNF(imp.getIcmsReducaoSaida());
-
                         result.add(imp);
                     }
                 }
@@ -299,9 +408,42 @@ public class CerebroDAO extends InterfaceDAO {
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("codigo_produto"));
-                        imp.setIcmsCstEntrada(rst.getInt("icms_cst"));
-                        imp.setIcmsAliqEntrada(rst.getDouble("icms_aliq"));
-                        imp.setIcmsReducaoEntrada(rst.getDouble("icms_red"));
+                        
+                        if ((rst.getInt("icms_cst") == 0) &&
+                                (rst.getDouble("icms_aliq") == 0)) {
+                            
+                            imp.setIcmsCstEntrada(90);
+                            imp.setIcmsAliqEntrada(0);
+                            imp.setIcmsReducaoEntrada(0);
+                            
+                        } else if ((rst.getInt("icms_cst") == 20) &&
+                                (rst.getDouble("icms_aliq") == 0) &&
+                                (rst.getDouble("icms_red") == 0)) {
+
+                            imp.setIcmsCstEntrada(90);
+                            imp.setIcmsAliqEntrada(0);
+                            imp.setIcmsReducaoEntrada(0);
+                            
+                        } else if ((rst.getInt("icms_cst") == 10)
+                                || (rst.getInt("icms_cst") == 40)
+                                || (rst.getInt("icms_cst") == 41)
+                                || (rst.getInt("icms_cst") == 50)
+                                || (rst.getInt("icms_cst") == 51)
+                                || (rst.getInt("icms_cst") == 60)
+                                || (rst.getInt("icms_cst") == 70)
+                                || (rst.getInt("icms_cst") == 90)) {
+                            
+                            imp.setIcmsCstEntrada(rst.getInt("icms_cst"));
+                            imp.setIcmsAliqEntrada(0);
+                            imp.setIcmsReducaoEntrada(0);
+                            
+                        } else {
+                            
+                            imp.setIcmsCstEntrada(rst.getInt("icms_cst"));
+                            imp.setIcmsAliqEntrada(rst.getDouble("icms_aliq"));
+                            imp.setIcmsReducaoEntrada(rst.getDouble("icms_red"));
+                        }
+                        
                         imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstEntrada());
                         imp.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqEntrada());
                         imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoEntrada());
@@ -338,17 +480,23 @@ public class CerebroDAO extends InterfaceDAO {
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("codigo_produto"));
                         
-                        if ((rst.getInt("icms_cst") == 0) && (rst.getDouble("icms_aliq") > 0)) {                            
-                            imp.setIcmsCstEntradaForaEstado(rst.getInt("icms_cst"));
-                            imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms_aliq"));
-                            imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("icms_red"));
-                        }
-                        if ((rst.getInt("icms_cst") == 20) && (rst.getDouble("icms_aliq") > 0) && (rst.getDouble("icms_red") > 0)) {
-                            imp.setIcmsCstEntradaForaEstado(rst.getInt("icms_cst"));
-                            imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms_aliq"));
-                            imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("icms_red"));
-                        }
-                        if ((rst.getInt("icms_cst") == 10)
+                        
+                        if ((rst.getInt("icms_cst") == 0) &&
+                                (rst.getDouble("icms_aliq") == 0)) {
+                            
+                            imp.setIcmsCstEntradaForaEstado(90);
+                            imp.setIcmsAliqEntradaForaEstado(0);
+                            imp.setIcmsReducaoEntradaForaEstado(0);
+                            
+                        } else if ((rst.getInt("icms_cst") == 20) &&
+                                (rst.getDouble("icms_aliq") == 0) &&
+                                (rst.getDouble("icms_red") == 0)) {
+
+                            imp.setIcmsCstEntradaForaEstado(90);
+                            imp.setIcmsAliqEntradaForaEstado(0);
+                            imp.setIcmsReducaoEntradaForaEstado(0);
+                            
+                        } else if ((rst.getInt("icms_cst") == 10)
                                 || (rst.getInt("icms_cst") == 40)
                                 || (rst.getInt("icms_cst") == 41)
                                 || (rst.getInt("icms_cst") == 50)
@@ -356,6 +504,13 @@ public class CerebroDAO extends InterfaceDAO {
                                 || (rst.getInt("icms_cst") == 60)
                                 || (rst.getInt("icms_cst") == 70)
                                 || (rst.getInt("icms_cst") == 90)) {
+                            
+                            imp.setIcmsCstEntradaForaEstado(rst.getInt("icms_cst"));
+                            imp.setIcmsAliqEntradaForaEstado(0);
+                            imp.setIcmsReducaoEntradaForaEstado(0);
+                            
+                        } else {
+                            
                             imp.setIcmsCstEntradaForaEstado(rst.getInt("icms_cst"));
                             imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms_aliq"));
                             imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("icms_red"));

@@ -107,6 +107,9 @@ public class ProdutoAliquotaDAO {
                     sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
                     sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
                     sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
+                } else if (opt.contains(OpcaoProduto.ICMS_SAIDA_FORA_ESTADO)) {
+                    sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
+                    sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
                 } else if (opt.contains(OpcaoProduto.ICMS_CONSUMIDOR)) {
                     sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
                 }
@@ -160,6 +163,9 @@ public class ProdutoAliquotaDAO {
                 sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
                 sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
                 sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
+            } else if (opt.contains(OpcaoProduto.ICMS_SAIDA_FORA_ESTADO)) {
+                sql.put("id_aliquotadebitoforaestado", vo.getAliquotaDebitoForaEstado().getId());
+                sql.put("id_aliquotadebitoforaestadonf", vo.getAliquotaDebitoForaEstadoNf().getId());
             } else if (opt.contains(OpcaoProduto.ICMS_CONSUMIDOR)) {
                 sql.put("id_aliquotaconsumidor", vo.getAliquotaConsumidor().getId());
             }

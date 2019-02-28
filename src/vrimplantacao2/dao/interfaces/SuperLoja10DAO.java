@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -77,15 +78,18 @@ public class SuperLoja10DAO extends InterfaceDAO {
                     + "pis.ENTRADA_PIS_CST,\n"
                     + "pis.PIS_DETALHEMENTO,\n"
                     + "p.PRECO_CUSTO,\n"
-                    + "p.ICMS_ALIQUOTA,\n"
                     + "p.ICMS_CST,\n"
+                    + "p.ICMS_ALIQUOTA,\n"
                     + "p.VALIDADE,\n"
                     + "p.ESTOQUE_MINIMO,\n"
                     + "p.PESAVEL,\n"
-                    + "p.CEST\n"
+                    + "p.CEST,\n"
+                    + "pre.VALOR,\n"
+                    + "pre.MARKUP\n"
                     + "from PRODUTOS p\n"
                     + "left join TRIBUTACAO_PIS_COFINS pis on pis.TIPO = p.TRIBUTACAO_PIS_COFINS\n"
-                    + "order by p.PRODUTO;"
+                    + "left join PRODUTOS_PRECOS pre on pre.PRODUTO = p.PRODUTO\n"
+                    + "order by p.PRODUTO"
             )) {
                 while (rst.next()) {
 
@@ -212,6 +216,36 @@ public class SuperLoja10DAO extends InterfaceDAO {
             )) {
                 while (rst.next()) {
 
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select  \n"
+                    + "REGISTRO,\n"
+                    + "NUMERO,\n"
+                    + "CLIENTE,\n"
+                    + "EMISSAO,\n"
+                    + "VENCIMENTO,\n"
+                    + "VALOR,\n"
+                    + "VALOR_LIQUIDO,\n"
+                    + "JURO,\n"
+                    + "DESCONTO,\n"
+                    + "MULTA,\n"
+                    + "OBSERVACOES\n"
+                    + "from CONTAS_RECEBER \n"
+                    + "where PAGAMENTO = '' \n"
+                    + "and EMPRESA = 1"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
                 }
             }
         }
