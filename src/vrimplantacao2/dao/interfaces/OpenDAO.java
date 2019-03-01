@@ -19,6 +19,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.MathUtils;
+import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -209,7 +210,13 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    p.ESTMAX10 estoquemaximo,\n" +
                     "    p.ESTATU10 estoque,\n" +
                     "    cld.precomp custo,\n" +
-                    "    coalesce(nullif(p.preco210,0),p.preco210) precovenda,\n" +
+                    "	 CASE g.LISTADEF\n" +
+                    "	 WHEN 1 THEN p.PRECO110 \n" +
+                    "	 WHEN 2 THEN p.PRECO210\n" +
+                    "	 WHEN 3 THEN p.PRECO310\n" +
+                    "	 WHEN 4 THEN p.PRECO410\n" +
+                    "	 WHEN 5 THEN p.PRECO510\n" +
+                    "	 END precovenda,\n" +
                     "    p.ncm,\n" +
                     "    nullif(p.cest,'0000000') cest,\n" +
                     "    p.PISPIS10 piscofinssaida,\n" +
@@ -219,6 +226,7 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    cld.*\n" +
                     "from\n" +
                     "	 genpro p\n" +
+                    "	 join genpar g\n" +
                     "	 left join comcld cld on p.codpro10 = codpro30\n" +
                     "order by 1"
             )) {
@@ -270,7 +278,8 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
         imp.setMargem(MathUtils.round(((rst.getDouble("precovenda") / rst.getDouble("custo")) - 1) * 100, 2, 9999999));
         imp.setNcm(rst.getString("ncm"));
         imp.setCest(rst.getString("cest"));
-        imp.setPiscofinsCstDebito(rst.getString("piscofinssaida"));
+        //imp.setPiscofinsCstDebito(rst.getString("piscofinssaida"));
+        imp.setPiscofinsCstCredito(rst.getString("piscofinsentrada"));
         imp.setPiscofinsNaturezaReceita(rst.getString("piscofinsnatrec"));
         imp.setIcmsDebitoId(rst.getString("id_icms"));
         imp.setIcmsCreditoId(rst.getString("id_icms"));
@@ -491,6 +500,27 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+
+    private Date dataVendaInicio;
+    private Date dataVendaTermino;
+
+    public void setDataVendaInicio(Date dataVendaInicio) {
+        this.dataVendaInicio = dataVendaInicio;
+    }
+
+    public void setDataVendaTermino(Date dataVendaTermino) {
+        this.dataVendaTermino = dataVendaTermino;
+    }
+    
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new VendaIterator(getLojaOrigem(), dataVendaInicio, dataVendaTermino);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new VendaItemIterator(getLojaOrigem(), dataVendaInicio, dataVendaTermino);
+    }
     
     private static class VendaIterator implements Iterator<VendaIMP> {
 
@@ -501,26 +531,91 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
         private Set<String> uk = new HashSet<>();
 
         private void obterNext() {
-            /*try {
+            try {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        String id = rst.getString("ecf") + "-" + rst.getString("numerocupom") + "-" + rst.getString("data");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
                         next.setId(id);
-                        
+                        next.setEcf(rst.getInt("ecf"));
+                        next.setNumeroCupom(rst.getInt("numerocupom"));
+                        next.setData(rst.getDate("data"));
+                        next.setHoraInicio(rst.getTime("horainicio"));
+                        next.setHoraInicio(rst.getTime("horatermino"));
+                        next.setIdClientePreferencial(rst.getString("id_cliente"));
+                        next.setCpf(rst.getString("cnpj"));
+                        if (rst.getDouble("subtotalimpressora") == 0) {
+                            next.setCancelado(true);
+                            next.setSubTotalImpressora(rst.getDouble("valorcancelado"));
+                        } else {
+                            next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
+                        }                        
+                        next.setChaveNfCe(rst.getString("chv_nfe"));
                     }
                 }
-            } catch (SQLException | ParseException ex) {
+            } catch (SQLException ex) {
                 LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
                 throw new RuntimeException(ex);
-            }*/
+            }
         }
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
-            this.sql = "";
+            this.sql = "SELECT\n" +
+                "	mov.nrequip ecf,\n" +
+                "	mov.cupom numerocupom,\n" +
+                "	mov.data,\n" +
+                "	min(mov.hora) horainicio,\n" +
+                "	max(mov.hora) horatermino,\n" +
+                "	mov.cliente id_cliente,\n" +
+                "	cli.cgc cnpj,\n" +
+                "	SUM(\n" +
+                "		IF(\n" +
+                "			(mov.ENTRSAI = \"S\" AND mov.TROCO = \"\" AND mov.SITUACAO = \"C\"), \n" +
+                "			ROUND(mov.VALOR, 6),\n" +
+                "			0\n" +
+                "		)\n" +
+                "	) valorcancelado,\n" +
+                "	SUM(\n" +
+                "		IF(\n" +
+                "			(mov.ENTRSAI = \"S\" AND mov.TROCO = \"S\" AND mov.SITUACAO = \"\") OR\n" +
+                "			(mov.ENTRSAI = \"S\" AND mov.TROCO = \"\" AND mov.SITUACAO = \"C\"), \n" +
+                "			ROUND(mov.VALOR * -1, 6), \n" +
+                "			ROUND(mov.VALOR, 6)\n" +
+                "		)\n" +
+                "	) subtotalimpressora,\n" +
+                "	mc.chv_nfe,\n" +
+                "	mc.ser serie,\n" +
+                "	mc.num_doc numerodocumento,\n" +
+                "	mc.cod_mod modelo\n" +
+                "FROM\n" +
+                "	RETMOV mov\n" +
+                "	left join memcab mc on date_format(mc.Dt_Doc,'%Y%m%d') =date_format(mov.data,'%Y%m%d') AND mc.Ser = mov.nrequip AND mc.NroTransacao = mov.cupom\n" +
+                "	left join auxequ ecf on ecf.codigo = mov.nrequip and ecf.tipo = 1\n" +
+                "	left join estcli cli on cli.codigo = mov.cliente\n" +
+                "WHERE\n" +
+                "	mov.DATA between " + SQLUtils.dateSQL(dataInicio) + " and " + SQLUtils.dateSQL(dataTermino) + "\n" +
+                "	AND UCASE(mov.SANGRIA) NOT IN (\"F\", \"S\", \"P\", \"R\")\n" +
+                "	AND (\n" +
+                "			  (mov.ENTRSAI = \"E\" AND mov.TROCO = \"\" AND mov.SITUACAO = \"\")\n" +
+                "		OR  (mov.ENTRSAI = \"S\" AND mov.TROCO = \"S\" AND mov.SITUACAO = \"\")\n" +
+                "		OR  (mov.ENTRSAI = \"S\" AND mov.TROCO = \"\" AND mov.SITUACAO = \"C\")\n" +
+                "		OR  (mov.ENTRSAI = \"E\" AND mov.TROCO = \"S\" AND mov.SITUACAO = \"C\")\n" +
+                "	)\n" +
+                "group by\n" +
+                "	mov.nrequip,\n" +
+                "	mov.cupom,\n" +
+                "	mov.data,\n" +
+                "	mov.cliente,\n" +
+                "	cli.cgc,\n" +
+                "	mc.chv_nfe,\n" +
+                "	mc.ser,\n" +
+                "	mc.num_doc,\n" +
+                "	mc.cod_mod\n" +
+                "order by\n" +
+                "	1, 2";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -558,25 +653,12 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        String id = rst.getString("ecf") + "-" + rst.getString("numerocupom") + "-" + rst.getString("data");
+                        
+                        
 
                         next.setId(rst.getString("id"));
-                        next.setVenda(id);
-                        next.setProduto(rst.getString("produto"));
-                        next.setDescricaoReduzida(rst.getString("descricao"));
-                        next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setTotalBruto(rst.getDouble("total"));
-                        next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
-                        next.setCodigoBarras(rst.getString("codigobarras"));
-                        next.setUnidadeMedida(rst.getString("unidade"));
                         
-                        String trib = rst.getString("codaliq_venda");
-                        if (trib == null || "".equals(trib)) {
-                            trib = rst.getString("codaliq_produto");
-                        }
-
                     }
                 }
             } catch (Exception ex) {
