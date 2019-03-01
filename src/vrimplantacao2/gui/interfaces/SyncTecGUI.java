@@ -23,11 +23,11 @@ import vrimplantacao2.dao.interfaces.SyncTecDAO;
 import vrimplantacao2.parametro.Parametros;
 
 public class SyncTecGUI extends VRInternalFrame {
-    
+
     private static final String SISTEMA = "SyncTec";
     private static final String SERVIDOR_SQL = "Firebird";
     private static SyncTecGUI instance;
-    
+
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
 
@@ -41,7 +41,7 @@ public class SyncTecGUI extends VRInternalFrame {
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
-    
+
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         params.put(txtHost.getText(), SISTEMA, "HOST");
@@ -61,21 +61,21 @@ public class SyncTecGUI extends VRInternalFrame {
         }
         params.salvar();
     }
-    
+
     private SyncTecDAO dao = new SyncTecDAO();
     private ConexaoFirebird conn = new ConexaoFirebird();
-    
+
     private SyncTecGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
-        ConexaoFirebird.encoding = "WIN1252";        
-        
+        ConexaoFirebird.encoding = "WIN1252";
+
         this.title = "Importação " + SISTEMA;
-                
+
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
         carregarParametros();
-        
+
         centralizarForm();
         this.setMaximum(false);
     }
@@ -91,7 +91,7 @@ public class SyncTecGUI extends VRInternalFrame {
             if (txtDatabase.getArquivo().isEmpty()) {
                 throw new VRException("Favor informar nome do banco de dados " + SERVIDOR_SQL + "!");
             }
-        } 
+        }
         if (txtSenha.getText().isEmpty()) {
             throw new VRException("Favor informar a senha do banco de dados " + SERVIDOR_SQL + "!");
         }
@@ -100,16 +100,16 @@ public class SyncTecGUI extends VRInternalFrame {
         }
 
         if (tabsConn.getSelectedIndex() == 0) {
-            conn.abrirConexao(txtHost.getText(), txtPorta.getInt(), 
+            conn.abrirConexao(txtHost.getText(), txtPorta.getInt(),
                     txtDatabase.getArquivo(), txtUsuario.getText(), txtSenha.getText());
         }
-        
+
         gravarParametros();
-        
+
         carregarLojaVR();
         carregarLojaCliente();
     }
-    
+
     public void carregarLojaVR() throws Exception {
         cmbLojaVR.setModel(new DefaultComboBoxModel());
         int cont = 0;
@@ -123,12 +123,12 @@ public class SyncTecGUI extends VRInternalFrame {
         }
         cmbLojaVR.setSelectedIndex(index);
     }
-    
+
     public void carregarLojaCliente() throws Exception {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja: dao.getLojasCliente()) {
+        for (Estabelecimento loja : dao.getLojasCliente()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -137,10 +137,10 @@ public class SyncTecGUI extends VRInternalFrame {
         }
         cmbLojaOrigem.setSelectedIndex(index);
     }
-    
+
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
-            i_mdiFrame.setWaitCursor();            
+            i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
                 instance = new SyncTecGUI(i_mdiFrame);
             }
@@ -157,15 +157,16 @@ public class SyncTecGUI extends VRInternalFrame {
         Thread thread = new Thread() {
             int idLojaVR;
             String idLojaCliente;
+
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
-                    
-                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
-                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;                                        
-                    
+
+                    idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
+                    idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
+
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
@@ -179,6 +180,10 @@ public class SyncTecGUI extends VRInternalFrame {
                             }
                             opcoes.add(OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC);
                             importador.importarProduto(opcoes.toArray(new OpcaoProduto[]{}));
+                        }
+
+                        if (chkMercadologico.isSelected()) {
+                            importador.importarMercadologico();
                         }
 
                         {
@@ -209,7 +214,7 @@ public class SyncTecGUI extends VRInternalFrame {
                             }
                             if (chkT1AtivoInativo.isSelected()) {
                                 opcoes.add(OpcaoProduto.ATIVO);
-                            }    
+                            }
                             if (chkT1DescCompleta.isSelected()) {
                                 opcoes.add(OpcaoProduto.DESC_COMPLETA);
                             }
@@ -221,7 +226,7 @@ public class SyncTecGUI extends VRInternalFrame {
                             }
                             if (chkT1ProdMercadologico.isSelected()) {
                                 opcoes.add(OpcaoProduto.MERCADOLOGICO);
-                            }                        
+                            }
                             if (chkValidade.isSelected()) {
                                 opcoes.add(OpcaoProduto.VALIDADE);
                             }
@@ -253,11 +258,11 @@ public class SyncTecGUI extends VRInternalFrame {
                         }
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
-                        }                        
+                        }
                         List<OpcaoFornecedor> opcoes = new ArrayList<>();
                         if (chkFContatos.isSelected()) {
-                            opcoes.add(OpcaoFornecedor.CONTATOS);                        
-                        }              
+                            opcoes.add(OpcaoFornecedor.CONTATOS);
+                        }
                         if (chkFCnpj.isSelected()) {
                             opcoes.add(OpcaoFornecedor.CNPJ_CPF);
                         }
@@ -282,19 +287,19 @@ public class SyncTecGUI extends VRInternalFrame {
                         }
                         if (chkUnifProdutoFornecedor.isSelected()) {
                             importador.unificarProdutoFornecedor();
-                        }                        
+                        }
                         if (chkUnifClientePreferencial.isSelected()) {
                             importador.unificarClientePreferencial();
-                        }                        
+                        }
                         if (chkClienteEventual.isSelected()) {
                             importador.unificarClienteEventual();
                         }
                     }
-                                       
+
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
-                    try {                    
+                    try {
                         conn.close();
                     } catch (Exception ex1) {
                         Exceptions.printStackTrace(ex1);
@@ -335,6 +340,7 @@ public class SyncTecGUI extends VRInternalFrame {
         chkT1DescCompleta = new vrframework.bean.checkBox.VRCheckBox();
         chkT1DescReduzida = new vrframework.bean.checkBox.VRCheckBox();
         chkT1DescGondola = new vrframework.bean.checkBox.VRCheckBox();
+        chkMercadologico = new vrframework.bean.checkBox.VRCheckBox();
         chkT1ProdMercadologico = new vrframework.bean.checkBox.VRCheckBox();
         chkValidade = new vrframework.bean.checkBox.VRCheckBox();
         chkFamilia = new vrframework.bean.checkBox.VRCheckBox();
@@ -484,6 +490,9 @@ public class SyncTecGUI extends VRInternalFrame {
 
         chkT1DescGondola.setText("Descrição Gondola");
         tabImpProduto.add(chkT1DescGondola);
+
+        chkMercadologico.setText("Mercadológico");
+        tabImpProduto.add(chkMercadologico);
 
         chkT1ProdMercadologico.setText("Prod. Mercadológico");
         tabImpProduto.add(chkT1ProdMercadologico);
@@ -932,6 +941,7 @@ public class SyncTecGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
+    private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
@@ -983,7 +993,5 @@ public class SyncTecGUI extends VRInternalFrame {
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
     // End of variables declaration//GEN-END:variables
-
-    
 
 }

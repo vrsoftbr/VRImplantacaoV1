@@ -259,6 +259,11 @@
                     <Property name="text" type="java.lang.String" value="Descri&#xe7;&#xe3;o Gondola"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMercadologico">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Mercadol&#xf3;gico"/>
+                  </Properties>
+                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1ProdMercadologico">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Prod. Mercadol&#xf3;gico"/>

@@ -27,17 +27,17 @@
             <Property name="text" type="java.lang.String" value="Interface"/>
           </Properties>
           <SubComponents>
-            <Menu class="javax.swing.JMenu" name="jMenu1">
+            <Menu class="javax.swing.JMenu" name="mnuImpSistema">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Importa&#xe7;&#xe3;o"/>
               </Properties>
               <SubComponents>
-                <Menu class="javax.swing.JMenu" name="jMenu2">
+                <Menu class="javax.swing.JMenu" name="mnuDatabase">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Sistemas"/>
                   </Properties>
                   <SubComponents>
-                    <Menu class="javax.swing.JMenu" name="jMenu5">
+                    <Menu class="javax.swing.JMenu" name="mnuFirebird">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Firebird / Interbase"/>
                       </Properties>
@@ -300,7 +300,7 @@
                         </MenuItem>
                       </SubComponents>
                     </Menu>
-                    <Menu class="javax.swing.JMenu" name="jMenu15">
+                    <Menu class="javax.swing.JMenu" name="mnuFirebird2">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Firebird / Interbase 2"/>
                       </Properties>
@@ -351,6 +351,14 @@
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuCerebroActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuSyncTech">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="SyncTech"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuSyncTechActionPerformed"/>
                           </Events>
                         </MenuItem>
                       </SubComponents>
