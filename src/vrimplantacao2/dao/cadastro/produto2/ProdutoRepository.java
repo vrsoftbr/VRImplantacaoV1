@@ -346,6 +346,11 @@ public class ProdutoRepository {
                         ProdutoAutomacaoDescontoVO precoAtacadoDesconto = converterProdutoAutomacaoDesconto(imp);
                         precoAtacadoDesconto.setProduto(prod);
 
+                        LOG.info("Ean: " + precoAtacadoDesconto.getCodigoBarras() + 
+                                " - Produtos: " + precoAtacadoDesconto.getProduto().getId() + 
+                                " - Loja " + precoAtacadoDesconto.getId_loja() + 
+                                " - Valor: " + precoAtacadoDesconto.getDesconto());    
+                        
                         provider.atualizar(prod, optSimples);
                         provider.complemento().atualizar(complemento, optSimples);
                         provider.automacao().atualizar(automacao, optSimples);

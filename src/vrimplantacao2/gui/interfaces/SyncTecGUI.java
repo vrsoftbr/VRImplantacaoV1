@@ -242,6 +242,9 @@ public class SyncTecGUI extends VRInternalFrame {
                             if (chkQtdEmbalagemEAN.isSelected()) {
                                 opcoes.add(OpcaoProduto.QTD_EMBALAGEM_EAN);
                             }
+                            if(chkAtacado.isSelected()) {
+                                opcoes.add(OpcaoProduto.ATACADO);
+                            }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
                             }
@@ -328,6 +331,7 @@ public class SyncTecGUI extends VRInternalFrame {
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         chkProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
+        chkAtacado = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Custo = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Preco = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Estoque = new vrframework.bean.checkBox.VRCheckBox();
@@ -454,6 +458,9 @@ public class SyncTecGUI extends VRInternalFrame {
         );
 
         tabImpProduto.add(vRPanel1);
+
+        chkAtacado.setText("Atacado");
+        tabImpProduto.add(chkAtacado);
 
         chkT1Custo.setText("Custo");
         tabImpProduto.add(chkT1Custo);
@@ -931,6 +938,7 @@ public class SyncTecGUI extends VRInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkAtacado;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
