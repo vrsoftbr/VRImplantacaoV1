@@ -178,6 +178,7 @@ import vrimplantacao2.gui.interfaces.SofttechGUI;
 import vrimplantacao2.gui.interfaces.SolidusGUI;
 import vrimplantacao2.gui.interfaces.SriGUI;
 import vrimplantacao2.gui.interfaces.SuperGUI;
+import vrimplantacao2.gui.interfaces.SuperLoja10GUI;
 import vrimplantacao2.gui.interfaces.SuperServerGUI;
 import vrimplantacao2.gui.interfaces.SysPdvGUI;
 import vrimplantacao2.gui.interfaces.SysmoFirebirdGUI;
@@ -660,6 +661,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAvance = new javax.swing.JMenuItem();
         mnuHipcom = new javax.swing.JMenuItem();
         mnuUmPontoDois = new javax.swing.JMenuItem();
+        mnuSuperLoja10 = new javax.swing.JMenuItem();
         mnuOrion = new javax.swing.JMenu();
         jMenuItemOrion = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -1897,6 +1899,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu9.add(mnuUmPontoDois);
+
+        mnuSuperLoja10.setText("Super Loja 10");
+        mnuSuperLoja10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSuperLoja10ActionPerformed(evt);
+            }
+        });
+        jMenu9.add(mnuSuperLoja10);
 
         jMenu2.add(jMenu9);
 
@@ -4155,6 +4165,11 @@ public final class MenuGUI extends VRMdiFrame {
         CerebroGUI.exibir(this);
     }//GEN-LAST:event_mnuCerebroActionPerformed
 
+    private void mnuSuperLoja10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSuperLoja10ActionPerformed
+        // TODO add your handling code here:
+        SuperLoja10GUI.exibir(this);
+    }//GEN-LAST:event_mnuSuperLoja10ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu1;
@@ -4357,6 +4372,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu mnuSqlServer2;
     private javax.swing.JMenuItem mnuSri;
     private javax.swing.JMenuItem mnuSuper;
+    private javax.swing.JMenuItem mnuSuperLoja10;
     private javax.swing.JMenuItem mnuSysmoFirebird;
     private javax.swing.JMenuItem mnuSysmoPostgres;
     private javax.swing.JMenuItem mnuTsti;
