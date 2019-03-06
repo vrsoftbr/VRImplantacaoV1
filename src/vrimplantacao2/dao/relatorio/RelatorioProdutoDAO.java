@@ -186,4 +186,17 @@ public class RelatorioProdutoDAO {
         }
         return result;
     }
+    
+    public void dropTable() throws Exception {
+        try(Statement stm = Conexao.createStatement()) {
+            stm.execute(
+                    "do $$\n" +
+                    "begin\n" +
+                    "	if exists (select table_name from information_schema.tables where table_schema = 'implantacao' and table_name = 'planilhaproduto') then\n" +
+                    "	execute 'drop table implantacao.planilhaproduto';\n" +
+                    "end if;\n" +
+                    "end;\n" +
+                    "$$");
+        }
+    }
 }

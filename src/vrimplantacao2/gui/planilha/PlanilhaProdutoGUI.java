@@ -134,6 +134,11 @@ public class PlanilhaProdutoGUI extends VRInternalFrame {
         tblProduto.setRowHeight(20);
         tblProduto.setModel(dados);
     }
+    
+    private void dropTable() throws Exception {
+        new RelatorioProdutoDAO().dropTable();
+        Util.exibirMensagem("Tabela excluída", getTitle());
+    }
 
     public static void exibir(VRMdiFrame i_mdiFrame) {
         try {
@@ -158,6 +163,7 @@ public class PlanilhaProdutoGUI extends VRInternalFrame {
         pnlBotoes = new vrframework.bean.panel.VRPanel();
         btnRel = new vrframework.bean.button.VRButton();
         btnSair = new vrframework.bean.button.VRButton();
+        btnDel = new vrframework.bean.button.VRButton();
         pnlDados = new vrframework.bean.panel.VRPanel();
         cmbLoja = new javax.swing.JComboBox();
         lblLoja = new vrframework.bean.label.VRLabel();
@@ -178,12 +184,21 @@ public class PlanilhaProdutoGUI extends VRInternalFrame {
             }
         });
 
+        btnDel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/apagar.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(btnDel, "Deletar Tabela");
+        btnDel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDelActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlBotoesLayout = new javax.swing.GroupLayout(pnlBotoes);
         pnlBotoes.setLayout(pnlBotoesLayout);
         pnlBotoesLayout.setHorizontalGroup(
             pnlBotoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlBotoesLayout.createSequentialGroup()
-                .addContainerGap(424, Short.MAX_VALUE)
+                .addComponent(btnDel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 301, Short.MAX_VALUE)
                 .addComponent(btnSair, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -194,7 +209,8 @@ public class PlanilhaProdutoGUI extends VRInternalFrame {
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addGroup(pnlBotoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnRel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnSair, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(btnSair, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnDel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         org.openide.awt.Mnemonics.setLocalizedText(lblLoja, "Loja");
@@ -262,8 +278,20 @@ public class PlanilhaProdutoGUI extends VRInternalFrame {
         this.setVisible(false);
     }//GEN-LAST:event_btnSairActionPerformed
 
+    private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelActionPerformed
+        try {
+            this.setWaitCursor();
+            dropTable();
+        } catch (Exception ex) {
+            Util.exibirMensagemErro(ex, getTitle());
+        } finally {
+            this.setDefaultCursor();
+        }
+    }//GEN-LAST:event_btnDelActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private vrframework.bean.button.VRButton btnDel;
     private vrframework.bean.button.VRButton btnRel;
     private vrframework.bean.button.VRButton btnSair;
     private javax.swing.JComboBox cmbLoja;
