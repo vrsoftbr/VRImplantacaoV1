@@ -90,7 +90,7 @@ public class SuperLoja10DAO extends InterfaceDAO {
                     + "     p.NCM,\n"
                     + "     p.TIPOTRIBUTACAO,\n"
                     + "     p.EAN13,\n"
-                    + "     p.INATIVO,,\n"
+                    + "     p.INATIVO,\n"
                     + "     p.PESO_BRUTO,\n"
                     + "     p.PESO_LIQUIDO,\n"
                     + "     p.EMBALAGEM,\n"
