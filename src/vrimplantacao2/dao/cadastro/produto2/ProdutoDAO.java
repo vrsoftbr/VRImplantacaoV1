@@ -2,14 +2,17 @@ package vrimplantacao2.dao.cadastro.produto2;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.Util;
+import vrframework.remote.ItemComboVO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.collection.IDStack;
@@ -18,20 +21,23 @@ import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.ProdutoVO;
 import vrimplantacao2.vo.enums.NaturezaReceitaVO;
 import vrimplantacao2.vo.enums.NcmVO;
+import vrimplantacao2.vo.enums.TipoEmbalagem;
 
 /**
  * Classe que faz a interface entre o sistema e o banco de dados.
+ *
  * @author Leandro
  */
 public class ProdutoDAO {
 
     private static final Logger LOG = Logger.getLogger(ProdutoDAO.class.getName());
-    
+
     /**
-     * Retorna um {@link IDStack} com todos os IDs disponíveis maiores que 0 e 
+     * Retorna um {@link IDStack} com todos os IDs disponíveis maiores que 0 e
      * menores que 10000 para produtos de balança.
+     *
      * @return Pilha com os IDs para produtos de balança.
-     * @throws Exception 
+     * @throws Exception
      */
     public IDStack getIDsVagosBalanca() throws Exception {
         IDStack balanca = new IDStack();
@@ -50,10 +56,11 @@ public class ProdutoDAO {
     }
 
     /**
-     * Retorna um {@link IDStack} com todos os IDs disponíveis maiores que 9999 e 
-     * menores que 1000000 para os produtos normais.
+     * Retorna um {@link IDStack} com todos os IDs disponíveis maiores que 9999
+     * e menores que 1000000 para os produtos normais.
+     *
      * @return Pilha com os IDs para produtos normais.
-     * @throws Exception 
+     * @throws Exception
      */
     public IDStack getIDsVagosNormais() throws Exception {
         IDStack normais = new IDStack();
@@ -73,8 +80,9 @@ public class ProdutoDAO {
 
     /**
      * Retorna um {@link Set} com todos os IDs cadastrados na tabela produtos.
+     *
      * @return IDs cadastrados.
-     * @throws Exception 
+     * @throws Exception
      */
     public Set<Integer> getIDsCadastrados() throws Exception {
         Set<Integer> cadastrados = new TreeSet<>();
@@ -90,15 +98,15 @@ public class ProdutoDAO {
 
     /**
      * Insere um {@link ProdutoVO} no banco de dados.
+     *
      * @param vo {@link ProdutoVO} a ser incluso.
-     * @throws Exception 
+     * @throws Exception
      */
     public void salvar(ProdutoVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
             sql.setTableName("produto");
-            
-            
+
             sql.put("id", vo.getId());
             sql.put("descricaocompleta", vo.getDescricaoCompleta());
             sql.put("qtdembalagem", vo.getQtdEmbalagem());
@@ -152,7 +160,7 @@ public class ProdutoDAO {
             sql.put("permitetroca", true);
             sql.put("temperatura", 0);
             sql.put("id_tipoorigemmercadoria", 0);
-            if (Versao.maiorQue(3,18,2)) {
+            if (Versao.maiorQue(3, 18, 2)) {
                 sql.put("id_tipoorigemmercadoriaentrada", 0);
             }
             sql.put("ipi", 0);
@@ -188,14 +196,14 @@ public class ProdutoDAO {
             sql.put("id_cest", vo.getCest() != null ? vo.getCest().getId() : null);
             sql.putNull("lastro");
             sql.putNull("margemminima");
-            sql.putNull("margemmaxima");            
+            sql.putNull("margemmaxima");
             sql.put("permitedescontopdv", true);
             sql.put("verificapesopdv", false);
-            if (Versao.menorQue(3,17,10)) {
+            if (Versao.menorQue(3, 17, 10)) {
                 sql.put("id_tipoproduto", 0);
                 sql.put("fabricacaopropria", false);
             }
-            
+
             try {
                 stm.execute(sql.getInsert());
             } catch (Exception e) {
@@ -203,12 +211,13 @@ public class ProdutoDAO {
             }
         }
     }
-    
+
     /**
      * Executa um update na tabela produtos.
+     *
      * @param vo (@link ProdutoVO} com as informações a serem atualizadas.
      * @param opt Listagem que indica quais informações devem ser atualizadas.
-     * @throws Exception 
+     * @throws Exception
      */
     public void atualizar(ProdutoVO vo, Set<OpcaoProduto> opt) throws Exception {
         SQLBuilder sql = new SQLBuilder();
@@ -249,7 +258,7 @@ public class ProdutoDAO {
             NaturezaReceitaVO nat = vo.getPisCofinsNaturezaReceita();
             sql.put("tiponaturezareceita", nat != null ? nat.getCodigo() : null);
         }
-        
+
         if (opt.contains(OpcaoProduto.NATUREZA_RECEITA)) {
             NaturezaReceitaVO nat = vo.getPisCofinsNaturezaReceita();
             sql.put("tiponaturezareceita", nat != null ? nat.getCodigo() : null);
@@ -284,13 +293,13 @@ public class ProdutoDAO {
             sql.put("ncm2", vo.getNcm().getNcm2());
             sql.put("ncm3", vo.getNcm().getNcm3());
         }
-        
+
         if (opt.contains(OpcaoProduto.SUGESTAO_COTACAO)) {
             sql.put("sugestaocotacao", vo.isSugestaoCotacao());
         }
         if (opt.contains(OpcaoProduto.SUGESTAO_PEDIDO)) {
             sql.put("sugestaopedido", vo.isSugestaoPedido());
-        }        
+        }
         if (opt.contains(OpcaoProduto.FABRICANTE)) {
             sql.put("id_fornecedorfabricante", vo.getIdFornecedorFabricante());
         }
@@ -303,7 +312,7 @@ public class ProdutoDAO {
         if (opt.contains(OpcaoProduto.EXCECAO)) {
             sql.put("excecao", vo.getExcecao());
         }
-        if(opt.contains(OpcaoProduto.DATA_ALTERACAO)) {
+        if (opt.contains(OpcaoProduto.DATA_ALTERACAO)) {
             sql.put("dataalteracao", vo.getDataAlteracao());
         }
         if (opt.contains(OpcaoProduto.PESO_BRUTO)) {
@@ -312,21 +321,21 @@ public class ProdutoDAO {
         if (opt.contains(OpcaoProduto.PESO_LIQUIDO)) {
             sql.put("pesoliquido", vo.getPesoLiquido());
         }
-        
+
         sql.setWhere("id = " + vo.getId());
-        
+
         try {
             if (!sql.isEmpty()) {
                 try (Statement stm = Conexao.createStatement()) {
                     stm.execute(sql.getUpdate());
                 }
-            }            
+            }
         } catch (Exception e) {
             Util.exibirMensagem(sql.getUpdate(), "Erro");
             throw e;
         }
     }
-    
+
     public Map<Integer, ProdutoVO> getProdutos() throws Exception {
         Map<Integer, ProdutoVO> result = new HashMap<>();
         try (Statement stm = Conexao.createStatement()) {
@@ -344,5 +353,4 @@ public class ProdutoDAO {
         }
         return result;
     }
-
 }

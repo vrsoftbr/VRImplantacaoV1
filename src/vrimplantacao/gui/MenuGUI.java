@@ -101,6 +101,7 @@ import vrimplantacao.gui.interfaces.VRSoftwarePDVGUI;
 import vrimplantacao.gui.interfaces.WisaSoftGUI_2;
 import vrimplantacao.gui.interfaces.nfce.NotaSaidaNfceImportacaoArquivoGUI;
 import vrimplantacao.gui.interfaces.rfd.ImportacaoLogVendaGUI;
+import vrimplantacao2.gui.planilha.PlanilhaProdutoGUI;
 import vrimplantacao.vo.Formulario;
 import vrimplantacao2.gui.component.sqleditor.SQLEditor;
 import vrimplantacao2.gui.interfaces.ASoftGUI;
@@ -737,6 +738,8 @@ public final class MenuGUI extends VRMdiFrame {
         mnuImportarNCM = new javax.swing.JMenuItem();
         mnuParametros = new javax.swing.JMenuItem();
         mnuParametros1 = new javax.swing.JMenuItem();
+        mnuPlanilha = new javax.swing.JMenu();
+        mnuPlanilhaProduto = new javax.swing.JMenuItem();
         mnuJanela = new javax.swing.JMenu();
         mnuAjuda = new javax.swing.JMenu();
         jSeparator4 = new javax.swing.JSeparator();
@@ -2450,6 +2453,18 @@ public final class MenuGUI extends VRMdiFrame {
         mnuFerramentas.add(mnuAvancadas);
 
         mnuMenu.add(mnuFerramentas);
+
+        mnuPlanilha.setText("Planilha");
+
+        mnuPlanilhaProduto.setText("Planilha de Produto");
+        mnuPlanilhaProduto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuPlanilhaProdutoActionPerformed(evt);
+            }
+        });
+        mnuPlanilha.add(mnuPlanilhaProduto);
+
+        mnuMenu.add(mnuPlanilha);
 
         mnuJanela.setText("Janela");
         mnuMenu.add(mnuJanela);
@@ -4183,6 +4198,10 @@ public final class MenuGUI extends VRMdiFrame {
         SyncTecGUI.exibir(this);
     }//GEN-LAST:event_mnuSyncTechActionPerformed
 
+    private void mnuPlanilhaProdutoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPlanilhaProdutoActionPerformed
+        PlanilhaProdutoGUI.exibir(this);
+    }//GEN-LAST:event_mnuPlanilhaProdutoActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4358,8 +4377,10 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu mnuOrion;
     private javax.swing.JMenuItem mnuParametros;
     private javax.swing.JMenuItem mnuParametros1;
+    private javax.swing.JMenu mnuPlanilha;
     private javax.swing.JMenuItem mnuPlanilhaForn;
     private javax.swing.JMenuItem mnuPlanilhaPadrao;
+    private javax.swing.JMenuItem mnuPlanilhaProduto;
     private javax.swing.JMenuItem mnuPlanilhaV2;
     private javax.swing.JMenuItem mnuPlanilhaVr;
     private javax.swing.JMenuItem mnuPws;
