@@ -20,6 +20,7 @@ public class ProdutoComplementoVO {
     private boolean descontinuado = false;
     private boolean fabricacaoPropria = false;
     private TipoProduto tipoProduto = TipoProduto.MERCADORIA_REVENDA;
+    private int idAliquotaCredito = 0;
 
     public void setId(int id) {
         this.id = id;
@@ -131,6 +132,14 @@ public class ProdutoComplementoVO {
 
     public void setFabricacaoPropria(boolean fabricacaoPropria) {
         this.fabricacaoPropria = fabricacaoPropria;
+    }
+
+    public int getIdAliquotaCredito() {
+        return idAliquotaCredito;
+    }
+
+    public void setIdAliquotaCredito(int idAliquotaCredito) {
+        this.idAliquotaCredito = idAliquotaCredito;
     }
 
 }

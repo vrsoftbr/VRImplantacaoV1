@@ -181,10 +181,13 @@ public class ProdutoRepository {
 
                         anterior = converterImpEmAnterior(imp);
                         anterior.setCodigoAtual(prod);
-                        ProdutoComplementoVO complemento = converterComplemento(imp);
-                        complemento.setProduto(prod);
+                        
                         ProdutoAliquotaVO aliquota = converterAliquota(imp);
                         aliquota.setProduto(prod);
+                        
+                        ProdutoComplementoVO complemento = converterComplemento(imp);
+                        complemento.setProduto(prod);
+                        complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
 
                         provider.salvar(prod);
                         provider.anterior().salvar(anterior);
@@ -333,11 +336,12 @@ public class ProdutoRepository {
                         anterior = converterImpEmAnterior(imp);
                         anterior.setCodigoAtual(prod);
 
-                        ProdutoComplementoVO complemento = converterComplemento(imp);
-                        complemento.setProduto(prod);
-
                         ProdutoAliquotaVO aliquota = converterAliquota(imp);
                         aliquota.setProduto(prod);
+                        
+                        ProdutoComplementoVO complemento = converterComplemento(imp);
+                        complemento.setProduto(prod);
+                        complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
 
                         ProdutoAutomacaoVO automacao = converterEAN(imp, ean, unidade);
                         automacao.setProduto(prod);
@@ -478,10 +482,12 @@ public class ProdutoRepository {
 
                             codigoAtual = converterIMP(imp, id, ean, unidade, eBalanca);
 
-                            ProdutoComplementoVO complemento = converterComplemento(imp);
-                            complemento.setProduto(codigoAtual);
                             ProdutoAliquotaVO aliquota = converterAliquota(imp);
                             aliquota.setProduto(codigoAtual);
+                            
+                            ProdutoComplementoVO complemento = converterComplemento(imp);
+                            complemento.setProduto(codigoAtual);
+                            complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
 
                             provider.salvar(codigoAtual);
                             //provider.anterior().salvar(anterior);
@@ -622,10 +628,12 @@ public class ProdutoRepository {
 
                             codigoAtual = converterIMP(imp, id, ean, unidade, eBalanca);
 
-                            ProdutoComplementoVO complemento = converterComplemento(imp);
-                            complemento.setProduto(codigoAtual);
                             ProdutoAliquotaVO aliquota = converterAliquota(imp);
                             aliquota.setProduto(codigoAtual);
+                            
+                            ProdutoComplementoVO complemento = converterComplemento(imp);
+                            complemento.setProduto(codigoAtual);
+                            complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());
 
                             provider.salvar(codigoAtual);
                             //provider.anterior().salvar(anterior);
@@ -654,10 +662,12 @@ public class ProdutoRepository {
 
                                 codigoAtual = converterIMP(imp, id, ean, unidade, eBalanca);
 
-                                ProdutoComplementoVO complemento = converterComplemento(imp);
-                                complemento.setProduto(codigoAtual);
                                 ProdutoAliquotaVO aliquota = converterAliquota(imp);
                                 aliquota.setProduto(codigoAtual);
+                                
+                                ProdutoComplementoVO complemento = converterComplemento(imp);
+                                complemento.setProduto(codigoAtual);
+                                complemento.setIdAliquotaCredito(aliquota.getAliquotaCredito().getId());                                
 
                                 provider.salvar(codigoAtual);
                                 //provider.anterior().salvar(anterior);
