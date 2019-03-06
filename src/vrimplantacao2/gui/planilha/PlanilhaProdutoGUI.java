@@ -135,8 +135,56 @@ public class PlanilhaProdutoGUI extends VRInternalFrame {
         tblProduto.setModel(dados);
     }
     
+    private void iniciaPlanilha() throws Exception {
+        List<ProdutoRelatorioVO> produto = new ArrayList<>();
+        
+        Object[][] dados = new Object[produto.size()][34];
+        int i = 0;
+        for (ProdutoRelatorioVO vo : produto) {
+            dados[i][0] = vo.getId();
+            dados[i][1] = vo.getDescricaoCompleta();
+            dados[i][2] = vo.getDescricaoReduzida();
+            dados[i][3] = vo.getEan().toUpperCase();
+            dados[i][4] = vo.getBalanca();
+            dados[i][5] = vo.getPrecoVenda();
+            dados[i][6] = vo.getCustoComImposto();
+            dados[i][7] = vo.getCustoSemImposto();
+            dados[i][8] = vo.getCodMerc1();
+            dados[i][9] = vo.getMerc1();
+            dados[i][10] = vo.getCodMerc2();
+            dados[i][11] = vo.getMerc2();
+            dados[i][12] = vo.getCodMerc3();
+            dados[i][13] = vo.getMerc3();
+            dados[i][14] = vo.getCodMerc4();
+            dados[i][15] = vo.getMerc4();
+            dados[i][16] = vo.getCodMerc5();
+            dados[i][17] = vo.getMerc5();
+            dados[i][18] = vo.getIdFamiliaProduto();
+            dados[i][19] = vo.getFamiliaProduto();
+            dados[i][20] = vo.getValidade();
+            dados[i][21] = vo.getEstoqueMax();
+            dados[i][22] = vo.getEstoqueMin();
+            dados[i][23] = vo.getEstoque();
+            dados[i][24] = vo.getAtivo();
+            dados[i][25] = vo.getDescontinuado();
+            dados[i][26] = vo.getNcm();
+            dados[i][27] = vo.getCest();
+            dados[i][28] = vo.getPisCofinsDebito();
+            dados[i][29] = vo.getPisCofinsCredito();
+            dados[i][30] = vo.getPisCofinsNaturezaReceita();
+            dados[i][31] = vo.getIcmsAliquotaDebito();
+            dados[i][32] = vo.getIcmsAliquotaCredito();
+            dados[i][33] = vo.getIcmsAliquotaConsumidor();
+            
+            i++;
+        }
+        tblProduto.setRowHeight(20);
+        tblProduto.setModel(dados);
+    }
+    
     private void dropTable() throws Exception {
         new RelatorioProdutoDAO().dropTable();
+        iniciaPlanilha();
         Util.exibirMensagem("Tabela excluída", getTitle());
     }
 
