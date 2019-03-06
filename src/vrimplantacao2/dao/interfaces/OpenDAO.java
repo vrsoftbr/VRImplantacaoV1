@@ -3,6 +3,7 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -15,6 +16,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoMySQL;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -58,6 +60,7 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.VALIDADE,
             OpcaoProduto.DESC_COMPLETA,
             OpcaoProduto.DESC_GONDOLA,
+            OpcaoProduto.ATIVO,
             OpcaoProduto.DESC_REDUZIDA,
             OpcaoProduto.MERCADOLOGICO_PRODUTO,
             OpcaoProduto.PESO_BRUTO,
@@ -201,6 +204,7 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    p.validade,\n" +
                     "    p.DESCPR10 descricaocompleta,\n" +
                     "    p.DESCRE10 descricaoreduzida,\n" +
+                    "    if(coalesce(DADESA10, '0000-00-00 00:00:00') = '0000-00-00 00:00:00',1,0) situacao,\n" +
                     "    p.DEPTOS10 merc1,\n" +
                     "    p.CLASSE10 merc2,\n" +
                     "    p.SUBCLA10 merc3,\n" +
@@ -278,7 +282,8 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
         imp.setMargem(MathUtils.round(((rst.getDouble("precovenda") / rst.getDouble("custo")) - 1) * 100, 2, 9999999));
         imp.setNcm(rst.getString("ncm"));
         imp.setCest(rst.getString("cest"));
-        //imp.setPiscofinsCstDebito(rst.getString("piscofinssaida"));
+        imp.setSituacaoCadastro(rst.getInt("situacao"));
+        imp.setPiscofinsCstDebito(rst.getString("piscofinssaida"));
         imp.setPiscofinsCstCredito(rst.getString("piscofinsentrada"));
         imp.setPiscofinsNaturezaReceita(rst.getString("piscofinsnatrec"));
         imp.setIcmsDebitoId(rst.getString("id_icms"));
@@ -522,6 +527,8 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
         return new VendaItemIterator(getLojaOrigem(), dataVendaInicio, dataVendaTermino);
     }
     
+    private static final SimpleDateFormat VENDA_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    
     private static class VendaIterator implements Iterator<VendaIMP> {
 
         private Statement stm = ConexaoMySQL.getConexao().createStatement();
@@ -535,11 +542,11 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("ecf") + "-" + rst.getString("numerocupom") + "-" + rst.getString("data");
-                        if (!uk.add(id)) {
-                            LOG.warning("Venda " + id + " já existe na listagem");
-                        }
-                        next.setId(id);
+                        next.setId((
+                                rst.getString("ecf") + "-" + 
+                                rst.getString("numerocupom") + "-" + 
+                                VENDA_DATE_FORMAT.format(rst.getDate("data"))
+                        ));
                         next.setEcf(rst.getInt("ecf"));
                         next.setNumeroCupom(rst.getInt("numerocupom"));
                         next.setData(rst.getDate("data"));
@@ -569,7 +576,7 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                 "	mov.data,\n" +
                 "	min(mov.hora) horainicio,\n" +
                 "	max(mov.hora) horatermino,\n" +
-                "	mov.cliente id_cliente,\n" +
+                "	if(cli.cgc = 0, null, mov.cliente) id_cliente,\n" +
                 "	cli.cgc cnpj,\n" +
                 "	SUM(\n" +
                 "		IF(\n" +
@@ -586,9 +593,8 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                 "			ROUND(mov.VALOR, 6)\n" +
                 "		)\n" +
                 "	) subtotalimpressora,\n" +
-                "	mc.chv_nfe,\n" +
+                "	min(mc.chv_nfe) chv_nfe,\n" +
                 "	mc.ser serie,\n" +
-                "	mc.num_doc numerodocumento,\n" +
                 "	mc.cod_mod modelo\n" +
                 "FROM\n" +
                 "	RETMOV mov\n" +
@@ -610,9 +616,7 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                 "	mov.data,\n" +
                 "	mov.cliente,\n" +
                 "	cli.cgc,\n" +
-                "	mc.chv_nfe,\n" +
                 "	mc.ser,\n" +
-                "	mc.num_doc,\n" +
                 "	mc.cod_mod\n" +
                 "order by\n" +
                 "	1, 2";
@@ -653,12 +657,28 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String id = rst.getString("ecf") + "-" + rst.getString("numerocupom") + "-" + rst.getString("data");
-                        
-                        
 
-                        next.setId(rst.getString("id"));
-                        
+                        next.setId(
+                                rst.getString("nrequip") + "-" + 
+                                rst.getString("cupom") + "-" + 
+                                VENDA_DATE_FORMAT.format(rst.getDate("data")) + "-" + 
+                                rst.getString("item")
+                        );
+                        next.setVenda(
+                                rst.getString("nrequip") + "-" + 
+                                rst.getString("cupom") + "-" + 
+                                VENDA_DATE_FORMAT.format(rst.getDate("data"))
+                        );
+                        next.setSequencia(Utils.stringToInt(rst.getString("item")));
+                        next.setProduto(rst.getString("id_produto"));
+                        next.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                        next.setQuantidade(rst.getDouble("qtd"));
+                        next.setTotalBruto(rst.getDouble("totalbruto"));
+                        next.setCancelado(rst.getBoolean("cancelado"));
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setValorAcrescimo(rst.getDouble("acrescimo"));                        
+                        next.setCodigoBarras(rst.getString("ean"));
+                        next.setUnidadeMedida(rst.getString("unidade"));
                     }
                 }
             } catch (Exception ex) {
@@ -668,7 +688,40 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
         }
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
-            this.sql = "";
+            this.sql = "select\n" +
+            "	i.nrequip,\n" +
+            "	i.data,\n" +
+            "	min(i.hora) hora,\n" +
+            "	i.cupom,\n" +
+            "	i.item,\n" +
+            "	i.codpro10 id_produto,\n" +
+            "	p.descpr10 descricaoreduzida,\n" +
+            "	avg(i.quantid) qtd,\n" +
+            "	sum(case when i.situacao = 'C' then -1 * i.vendtot else i.vendtot end) totalbruto,\n" +
+            "	max(case when i.situacao = 'C' then 1 else 0 end) cancelado,\n" +
+            "	sum(i.desconto) desconto,\n" +
+            "	sum(i.acrescimo) acrescimo,\n" +
+            "	i.produto ean,\n" +
+            "	p.UNIDAD10 unidade\n" +
+            "from\n" +
+            "	retvdi i\n" +
+            "	join genpro p on i.codpro10 = p.codpro10\n" +
+            "where\n" +
+            "	i.data between " + SQLUtils.dateSQL(dataInicio) + " and " + SQLUtils.dateSQL(dataTermino) + "\n" +
+            "group by\n" +
+            "	nrequip,\n" +
+            "	data,\n" +
+            "	cupom,\n" +
+            "	item,\n" +
+            "	id_produto,\n" +
+            "	descricaoreduzida,\n" +
+            "	ean,\n" +
+            "	unidade\n" +
+            "order by\n" +
+            "	nrequip,\n" +
+            "	data,\n" +
+            "	cupom,\n" +
+            "	item";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }

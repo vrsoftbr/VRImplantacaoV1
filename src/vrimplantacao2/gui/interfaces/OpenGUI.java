@@ -16,6 +16,7 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.OpenDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
@@ -65,6 +66,9 @@ public class OpenGUI extends VRInternalFrame implements ConexaoEvent {
     private OpenGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
+        
+        txtDtVendaIni.setFormats("dd/MM/yyyy");
+        txtDtVendaFim.setFormats("dd/MM/yyyy");
 
         tabProdutos.setOpcoesDisponiveis(dao);
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
@@ -204,7 +208,9 @@ public class OpenGUI extends VRInternalFrame implements ConexaoEvent {
                         }
                         
                         if (chkVendas.isSelected()) {
-                            importador.importarVendas();
+                            dao.setDataVendaInicio(txtDtVendaIni.getDate());
+                            dao.setDataVendaTermino(txtDtVendaFim.getDate());
+                            importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                     }
 

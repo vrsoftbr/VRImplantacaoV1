@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.dao.cadastro.NutricionalFilizolaDAO;
@@ -864,6 +865,9 @@ public class Importador {
                 ProgressBar.setStatus("Vendas...Gerando listagem dos itens das vendas...");
                 new VendaItemImpDao(source).persistir(getInterfaceDAO().getVendaItemIterator());
                 System.gc();
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, ex.getMessage(), ex);
+                throw ex;
             }
         }
 
