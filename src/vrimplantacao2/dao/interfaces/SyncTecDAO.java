@@ -9,6 +9,9 @@ import java.util.Map;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
+import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -85,11 +88,13 @@ public class SyncTecDAO extends InterfaceDAO {
         public String item;
         public String ean;
         public String unidade;
+        public int quantidade;
 
-        public Ean(String item, String ean, String unidade) {
+        public Ean(String item, String ean, String unidade, int quantidade) {
             this.item = item;
             this.ean = ean;
             this.unidade = unidade;
+            this.quantidade = quantidade;
         }
     }
 
@@ -103,7 +108,8 @@ public class SyncTecDAO extends InterfaceDAO {
                     "select\n" +
                     "    i.item,\n" +
                     "    i.codigo,\n" +
-                    "    i.unidadevarejo unidade\n" +
+                    "    i.unidadevarejo unidade,\n" +
+                    "    1 quantidade\n" +
                     "from\n" +
                     "    itens i\n" +
                     "where\n" +
@@ -113,7 +119,8 @@ public class SyncTecDAO extends InterfaceDAO {
                     "select\n" +
                     "    ic.item,\n" +
                     "    ic.codigo,\n" +
-                    "    coalesce(ic.unidade, 'UN') unidade\n" +
+                    "    coalesce(ic.unidade, 'UN') unidade,\n" +
+                    "    1 quantidade\n" +
                     "from\n" +
                     "    itenscodigos ic\n" +
                     "where\n" +
@@ -122,11 +129,37 @@ public class SyncTecDAO extends InterfaceDAO {
                     "select\n" +
                     "    i.item,\n" +
                     "    i.codigobarras,\n" +
-                    "    i.unidade\n" +
+                    "    i.unidade,\n" +
+                    "    1 quantidade\n" +
                     "from\n" +
                     "    itens i\n" +
                     "where\n" +
-                    "    i.codigobarras is not null"
+                    "    i.codigobarras is not null\n" +
+                    "    union\n" +
+                    "select\n" +
+                    "    iu.item id,\n" +
+                    "    case when\n" +
+                    "        char_length(iu.codigo) <= 6 then\n" +
+                    "    '99999'||iu.codigo else\n" +
+                    "    iu.codigo end as ean,\n" +
+                    "    iu.unidade,\n" +
+                    "    iu.fator quantidade\n" +
+                    "from\n" +
+                    "    itensunidades iu\n" +
+                    "join\n" +
+                    "    itens i on iu.item = i.item\n" +
+                    "join\n" +
+                    "    (select\n" +
+                    "        precomanual,\n" +
+                    "        item\n" +
+                    "     from\n" +
+                    "        itensunidades \n" +
+                    "     where\n" +
+                    "        fator = 1) a on iu.item = a.item\n" +
+                    "where\n" +
+                    "    iu.fator > 1 and\n" +
+                    "    iu.precomanual <> 0 and\n" +
+                    "    iu.codigo is not null"
             )) {
                 while (rst.next()) {
                     List<Ean> list = eans.get(rst.getString("item"));
@@ -134,7 +167,7 @@ public class SyncTecDAO extends InterfaceDAO {
                         list = new ArrayList<>();
                         eans.put(rst.getString("item"), list);
                     }
-                    list.add(new Ean(rst.getString("item"), rst.getString("codigo"), rst.getString("unidade")));
+                    list.add(new Ean(rst.getString("item"), rst.getString("codigo"), rst.getString("unidade"), rst.getInt("quantidade")));
                 }
             }
             try (ResultSet rst = stm.executeQuery(
@@ -180,7 +213,7 @@ public class SyncTecDAO extends InterfaceDAO {
 
                     if (eanList == null) {
                         eanList = new ArrayList<>();
-                        eanList.add(new Ean(rst.getString("item"), rst.getString("item"), "UN"));
+                        eanList.add(new Ean(rst.getString("item"), rst.getString("item"), "UN", 1));
                     }
 
                     for (Ean ean : eanList) {
@@ -200,6 +233,7 @@ public class SyncTecDAO extends InterfaceDAO {
                         if (!imp.isBalanca() && "KG".equals(imp.getTipoEmbalagem())) {
                             imp.setTipoEmbalagem("UN");
                         }
+                        imp.setQtdEmbalagem(ean.quantidade);
                         imp.setValidade(rst.getInt("validade"));
                         imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                         imp.setDescricaoReduzida(rst.getString("descricaocompleta"));
@@ -326,6 +360,62 @@ public class SyncTecDAO extends InterfaceDAO {
         }
 
         return result;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        if (opt == OpcaoProduto.ATACADO) {
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n" +
+                        "    i.codigobarras,\n" +
+                        "    i.descricaocompra descricao,\n" +
+                        "    iu.item id,\n" +
+                        "    iu.codigo,\n" +
+                        "    iu.fator quantidade,\n" +
+                        "    iu.precomanual precoatacado,\n" +
+                        "    a.precomanual preconormal\n" +
+                        "from\n" +
+                        "    itensunidades iu\n" +
+                        "join\n" +
+                        "    itens i on iu.item = i.item\n" +
+                        "join\n" +
+                        "    (select\n" +
+                        "        precomanual,\n" +
+                        "        item\n" +
+                        "     from\n" +
+                        "        itensunidades \n" +
+                        "     where\n" +
+                        "        fator = 1) a on iu.item = a.item\n" +
+                        "where\n" +
+                        "    iu.fator > 1 and\n" +
+                        "    iu.precomanual <> 0 and\n" +
+                        "    iu.codigo is not null"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id"));
+                        if((rst.getString("codigo") != null) && (rst.getString("codigo").length() <= 6)) {
+                            imp.setEan("99999" + rst.getString("codigo"));
+                        } else {
+                            imp.setEan(rst.getString("codigo"));
+                        }
+                        imp.setPrecovenda(rst.getDouble("preconormal"));
+                        imp.setQtdEmbalagem(rst.getInt("quantidade"));
+                        double valorAtacado = 0;
+                        valorAtacado = MathUtils.round(rst.getDouble("precoatacado") / imp.getQtdEmbalagem(), 2);
+                        imp.setAtacadoPreco(valorAtacado);
+                        
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+        return null;
     }
 
     @Override

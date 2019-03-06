@@ -6,6 +6,7 @@
 package vrimplantacao2.dao.cadastro.pdv.operador;
 
 import java.util.List;
+import java.util.Map;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -41,13 +42,13 @@ public class OperadorRepository {
                 //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
                 setNotificacao("Preparando para gravar operadores...", operadores.size());
                 OperadorIDStack ids = provider.getOperadorIDStack(iniciarEm);
-                MultiMap<String, OperadorVO> anteriores = provider.getOperadores();
+                MultiMap<String, OperadorVO> operadorExistente = provider.getOperadores();
                 //</editor-fold>
 
                 setNotificacao("Gravando operador...", operadores.size());
 
                 for (OperadorIMP imp : operadores) {
-                    OperadorVO opGravado = anteriores.get(
+                    OperadorVO opGravado = operadorExistente.get(
                             String.valueOf(provider.getLojaVR()),
                             imp.getMatricula()
                     );
@@ -61,11 +62,11 @@ public class OperadorRepository {
                         // Converte os dados
                         operador = converterOperador(imp);
                         operador.setId(id);
-
+                                                
                         // Grava os dados
                         gravarOperador(operador);
                         
-                        anteriores.put(operador, String.valueOf(provider.getLojaVR()), imp.getMatricula());
+                        operadorExistente.put(operador, String.valueOf(provider.getLojaVR()), imp.getMatricula());
                     }
                     notificar();
                 }

@@ -199,6 +199,11 @@
                     </Component>
                   </SubComponents>
                 </Container>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAtacado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Atacado"/>
+                  </Properties>
+                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1Custo">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Custo"/>
