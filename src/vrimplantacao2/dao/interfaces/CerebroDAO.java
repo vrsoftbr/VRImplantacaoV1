@@ -762,7 +762,7 @@ public class CerebroDAO extends InterfaceDAO {
                     + "c.numconta_dv,\n"
                     + "c.sexo, \n"
                     + "c.profissao, \n"
-                    + "case c.status_credito when 'A' then 'ATIVO' else 'INATIVO' end status, \n"
+                    + "c.status_credito as status, \n"
                     + "c.status_credito \n"
                     + "from clientes c\n"
                     + "order by c.codigo_cliente"
@@ -801,7 +801,7 @@ public class CerebroDAO extends InterfaceDAO {
                     imp.setCargo(rst.getString("profissao"));
                     imp.setValorLimite(rst.getDouble("limite_credito") < 1 ? rst.getDouble("limite_convenio") : rst.getDouble("limite_credito"));
                     imp.setObservacao(rst.getString("observacao"));
-                    imp.setAtivo("ATIVO".equals(rst.getString("status")));
+                    imp.setAtivo("A".equals(rst.getString("status").trim()) ? true : false);
                     imp.setBloqueado("C".equals(rst.getString("status_credito")));
 
                     if ((rst.getString("ponto_referencia") != null)
@@ -870,7 +870,7 @@ public class CerebroDAO extends InterfaceDAO {
                     + "from MOVIMENTOS_CPR\n"
                     + "where codigo_empresa = " + getLojaOrigem() + "\n"
                     + "and codigo_tipodocumento in (" + tipoDocumento + ")\n"
-                    + "and coalesce(valor_emaberto, 0) > 0"
+                    + "and status in ('N', 'P')"
             )) {
 
                 while (rst.next()) {
@@ -878,7 +878,7 @@ public class CerebroDAO extends InterfaceDAO {
                     imp.setId(rst.getString("sequencial_cpr"));
                     imp.setDataEmissao(rst.getDate("data_emissao"));
                     imp.setDataVencimento(rst.getDate("data_vencimento"));
-                    imp.setValor(rst.getDouble("valor_emaberto"));
+                    imp.setValor(rst.getDouble("valor"));
                     imp.setNumeroCupom(rst.getString("documento"));
                     imp.setJuros(rst.getDouble("juros"));
                     imp.setIdCliente(rst.getString("codigo_cliente"));
