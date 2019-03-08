@@ -35,6 +35,7 @@ import vrimplantacao2.vo.enums.TipoIndicadorIE;
 import vrimplantacao2.vo.enums.TipoOrgaoPublico;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -579,6 +580,36 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             result.add(imp);
         }
         
+        return result;
+    }
+    
+    private String arquivoContaPagar;
+    public void setArquivoContaPagar(String arquivoContaPagar) {
+        this.arquivoContaPagar = arquivoContaPagar;
+    }
+    
+    @Override
+    public List<ContaPagarIMP> getContasPagar()throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        Arquivo arq = ArquivoFactory.getArquivo(this.arquivoContaPagar, getOpcoes());
+        
+        for(LinhaArquivo linha : arq) {
+            if(linha.getString("id") != null) {
+                ContaPagarIMP imp = new ContaPagarIMP();
+                imp.setId(linha.getString("id"));
+                imp.setIdFornecedor(linha.getString("idfornecedor"));
+                imp.setDataEmissao(linha.getData("dataemissao"));
+                imp.setDataEntrada(linha.getData("dataemissao"));
+                imp.setNumeroDocumento(linha.getString("nota"));
+                imp.setValor(linha.getDouble("valor"));
+                imp.setObservacao(linha.getString("observacao"));
+                imp.addVencimento(linha.getData("datavencimento"), imp.getValor());
+                
+                System.out.println("ID: " + imp.getId() + " - Valor: " + imp.getValor() + " Emissão: " + imp.getDataEmissao());
+            
+                result.add(imp);
+            }
+        }
         return result;
     }
 
