@@ -72,6 +72,10 @@ public class ProdutoIMP {
     private double icmsAliqSaidaForaEstadoNF = 0;
     private double icmsReducaoSaidaForaEstadoNF = 0;
     
+    private String icmsCstConsumidor = null;
+    private double icmsAliqConsumidor;
+    private double icmsReducaoConsumidor;
+    
     private String icmsDebitoId;
     private String icmsCreditoId;
     private String icmsCreditoForaEstadoId;
@@ -746,6 +750,30 @@ public class ProdutoIMP {
 
     public void setFabricacaoPropria(boolean fabricacaoPropria) {
         this.fabricacaoPropria = fabricacaoPropria;
+    }
+
+    public String getIcmsCstConsumidor() {
+        return icmsCstConsumidor;
+    }
+
+    public void setIcmsCstConsumidor(String icmsCstConsumidor) {
+        this.icmsCstConsumidor = icmsCstConsumidor;
+    }
+
+    public double getIcmsAliqConsumidor() {
+        return icmsAliqConsumidor;
+    }
+
+    public void setIcmsAliqConsumidor(double icmsAliqConsumidor) {
+        this.icmsAliqConsumidor = icmsAliqConsumidor;
+    }
+
+    public double getIcmsReducaoConsumidor() {
+        return icmsReducaoConsumidor;
+    }
+
+    public void setIcmsReducaoConsumidor(double icmsReducaoConsumidor) {
+        this.icmsReducaoConsumidor = icmsReducaoConsumidor;
     }
     
 }

@@ -1045,12 +1045,21 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuUmPontoDoisActionPerformed"/>
                           </Events>
                         </MenuItem>
+<<<<<<< HEAD
                         <MenuItem class="javax.swing.JMenuItem" name="mnuOpen">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Open"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuOpenActionPerformed"/>
+=======
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuSuperLoja10">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Super Loja 10"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuSuperLoja10ActionPerformed"/>
+>>>>>>> alteracoes_icms_cerebro
                           </Events>
                         </MenuItem>
                       </SubComponents>

@@ -53,10 +53,25 @@ public enum OpcaoProduto {
         public String toString() {
             return "ICMS (Entrada)";
         }
+    }, ICMS_ENTRADA_FORA_ESTADO {
+        @Override
+        public String toString() {
+            return "Icms Entrada Fora Estado";
+        }
     }, ICMS_SAIDA {
         @Override
         public String toString() {
             return "ICMS (Saída)";
+        }
+    }, ICMS_SAIDA_FORA_ESTADO {
+        @Override
+        public String toString() {
+            return "Icms Saída Fora Estado";
+        }
+    }, ICMS_CONSUMIDOR {
+        @Override
+        public String toString() {
+            return "ICMS Consumidor";
         }
     }, ATIVO {
         @Override
