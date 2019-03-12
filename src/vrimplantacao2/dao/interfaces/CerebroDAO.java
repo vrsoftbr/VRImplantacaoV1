@@ -228,7 +228,7 @@ public class CerebroDAO extends InterfaceDAO {
                         + "(\n"
                         + "  select codigo_produto, max(ultimo_movimento) as data\n"
                         + "  from produtos_saldo\n"
-                        + "  where codigo_almoxarifado = 1\n"
+                        + "  where codigo_almoxarifado = 2\n"
                         + "  group by codigo_produto\n"
                         + ")\n"
                         + "select e.codigo_produto,\n"
@@ -238,7 +238,7 @@ public class CerebroDAO extends InterfaceDAO {
                         + "       e.ultimo_movimento\n"
                         + "from produtos_saldo e\n"
                         + "inner join mov as mov2 on mov2.codigo_produto = e.codigo_produto\n"
-                        + "where e.codigo_almoxarifado = 1"
+                        + "where e.codigo_almoxarifado = 2"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();

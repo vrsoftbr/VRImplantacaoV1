@@ -219,7 +219,11 @@ public class SysPdvGUI extends VRInternalFrame {
                             if (chkT1Estoque.isSelected()) {
                                 opcoes.add(OpcaoProduto.ESTOQUE);
                             }
-                            if (chkT1PisCofins.isSelected()) {
+                            /*if (chkT1PisCofins.isSelected()) {
+                                opcoes.add(OpcaoProduto.PIS_COFINS);
+                            }*/
+                            if (!txtPiscofins.getArquivo().trim().isEmpty()) {
+                                dao.v_pahtFileXls = txtPiscofins.getArquivo().trim();
                                 opcoes.add(OpcaoProduto.PIS_COFINS);
                             }
                             if (chkT1NatReceita.isSelected()) {
@@ -302,6 +306,10 @@ public class SysPdvGUI extends VRInternalFrame {
                             importador.importarClienteEventual();
                         }
                         if (chkCreditoRotativo.isSelected()) {
+                            importador.importarCreditoRotativo();
+                        }
+                        if (!txtCreditoRotativo.getArquivo().trim().isEmpty()) {
+                            dao.v_pahtFileXls = txtCreditoRotativo.getArquivo();
                             importador.importarCreditoRotativo();
                         }
                     } else if (tabs.getSelectedIndex() == 1) {
@@ -394,6 +402,11 @@ public class SysPdvGUI extends VRInternalFrame {
         vRLabel6 = new vrframework.bean.label.VRLabel();
         vRLabel7 = new vrframework.bean.label.VRLabel();
         txtCodFinalizadoras = new javax.swing.JTextField();
+        vRPanel5 = new vrframework.bean.panel.VRPanel();
+        txtCreditoRotativo = new vrframework.bean.fileChooser.VRFileChooser();
+        vRLabel8 = new vrframework.bean.label.VRLabel();
+        vRLabel9 = new vrframework.bean.label.VRLabel();
+        txtPiscofins = new vrframework.bean.fileChooser.VRFileChooser();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -762,6 +775,42 @@ public class SysPdvGUI extends VRInternalFrame {
 
         vRTabbedPane2.addTab("Clientes", tabClienteDados);
 
+        vRLabel8.setText("Importar Crédito Rotativo por Planilha");
+
+        vRLabel9.setText("Importar Piscofins por Planilha");
+
+        javax.swing.GroupLayout vRPanel5Layout = new javax.swing.GroupLayout(vRPanel5);
+        vRPanel5.setLayout(vRPanel5Layout);
+        vRPanel5Layout.setHorizontalGroup(
+            vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtCreditoRotativo, javax.swing.GroupLayout.DEFAULT_SIZE, 529, Short.MAX_VALUE)
+                    .addGroup(vRPanel5Layout.createSequentialGroup()
+                        .addGroup(vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(vRLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(vRLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(txtPiscofins, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        vRPanel5Layout.setVerticalGroup(
+            vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(vRLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtPiscofins, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(150, Short.MAX_VALUE))
+        );
+
+        vRTabbedPane2.addTab("Especiais", vRPanel5);
+
         tabs.addTab("Importação", vRTabbedPane2);
 
         chkUnifProdutos.setText("Produtos (Somente com EAN válido)");
@@ -999,8 +1048,10 @@ public class SysPdvGUI extends VRInternalFrame {
     private javax.swing.JTabbedPane tabsConexoes;
     private javax.swing.JTextField txtCodFinalizadoras;
     private vrframework.bean.textField.VRTextField txtComplNomeSistema;
+    private vrframework.bean.fileChooser.VRFileChooser txtCreditoRotativo;
     private org.jdesktop.swingx.JXDatePicker txtDtTerminoOferta;
     private vrframework.bean.textArea.VRTextArea txtFinalizadorasCliente;
+    private vrframework.bean.fileChooser.VRFileChooser txtPiscofins;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.label.VRLabel vRLabel2;
@@ -1009,10 +1060,13 @@ public class SysPdvGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel5;
     private vrframework.bean.label.VRLabel vRLabel6;
     private vrframework.bean.label.VRLabel vRLabel7;
+    private vrframework.bean.label.VRLabel vRLabel8;
+    private vrframework.bean.label.VRLabel vRLabel9;
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.panel.VRPanel vRPanel4;
+    private vrframework.bean.panel.VRPanel vRPanel5;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;
     // End of variables declaration//GEN-END:variables
 
