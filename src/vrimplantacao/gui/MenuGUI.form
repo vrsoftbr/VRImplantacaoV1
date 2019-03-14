@@ -1633,6 +1633,21 @@
             </Menu>
           </SubComponents>
         </Menu>
+        <Menu class="javax.swing.JMenu" name="mnuPlanilha">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Planilha"/>
+          </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="mnuPlanilhaProduto">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Planilha de Produto"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuPlanilhaProdutoActionPerformed"/>
+              </Events>
+            </MenuItem>
+          </SubComponents>
+        </Menu>
         <Menu class="javax.swing.JMenu" name="mnuJanela">
           <Properties>
             <Property name="text" type="java.lang.String" value="Janela"/>

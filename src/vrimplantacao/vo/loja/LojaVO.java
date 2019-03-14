@@ -129,4 +129,8 @@ public class LojaVO {
         this.copiaTecladoLayout = copiaTecladoLayout;
     }
     
+    @Override
+    public String toString() {
+        return descricao;
+    }
 }

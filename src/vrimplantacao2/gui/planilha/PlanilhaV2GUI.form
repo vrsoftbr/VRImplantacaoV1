@@ -167,7 +167,7 @@
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="tabsProduto" pref="316" max="32767" attributes="0"/>
+                      <Component id="tabsProduto" pref="336" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -362,7 +362,7 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnMapaTribut" min="-2" pref="32" max="-2" attributes="0"/>
-                              <EmptySpace pref="193" max="32767" attributes="0"/>
+                              <EmptySpace pref="213" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -428,38 +428,45 @@
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="tabsForn" alignment="0" max="32767" attributes="0"/>
+                          <Component id="txtContaPagarFile" alignment="1" max="32767" attributes="0"/>
+                          <Component id="txtFornecedorFile" alignment="1" max="32767" attributes="0"/>
                           <Group type="102" attributes="0">
-                              <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="380" max="32767" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="1" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="tabsForn" max="32767" attributes="0"/>
-                                  <Group type="102" attributes="0">
-                                      <Component id="txtDelimitadorForn" min="-2" pref="22" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="vRLabel18" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="txtFornecedorFile" max="32767" attributes="0"/>
+                                      <Component id="txtDelimitadorForn" min="-2" pref="22" max="-2" attributes="0"/>
                                   </Group>
+                                  <Component id="lblContaPagar" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="vRLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace max="-2" attributes="0"/>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="txtFornecedorFile" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtDelimitadorForn" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="txtDelimitadorForn" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="vRLabel18" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <Component id="txtFornecedorFile" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <Component id="lblContaPagar" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <Component id="txtContaPagarFile" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                       <Component id="tabsForn" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -491,11 +498,15 @@
                           <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="chkFornDados" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="chkFornDados" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                                      <Component id="chkContaPagar" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                                   <Component id="chkFornContatos" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkFornProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="473" max="32767" attributes="0"/>
+                              <EmptySpace pref="380" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -503,12 +514,15 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkFornDados" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="chkFornDados" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkContaPagar" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkFornContatos" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkFornProdutoFornecedor" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="211" max="32767" attributes="0"/>
+                              <EmptySpace pref="149" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -527,6 +541,11 @@
                     <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornProdutoFornecedor">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Produtos Fornecedores"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkContaPagar">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Conta Pagar"/>
                       </Properties>
                     </Component>
                   </SubComponents>
@@ -560,7 +579,7 @@
                               <Component id="chkFornUnificar" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkFornUnificarProd" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="234" max="32767" attributes="0"/>
+                              <EmptySpace pref="172" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -607,7 +626,7 @@
                               <Component id="btnFornContatos" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnFornDados" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="229" max="32767" attributes="0"/>
+                              <EmptySpace pref="167" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -636,6 +655,18 @@
             <Component class="javax.swing.JTextField" name="txtDelimitadorForn">
               <Properties>
                 <Property name="text" type="java.lang.String" value="^"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.label.VRLabel" name="lblContaPagar">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Informe o arquivo de conta a pagar"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtContaPagarFile">
+            </Component>
+            <Component class="vrframework.bean.label.VRLabel" name="vRLabel18">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Delimitador"/>
               </Properties>
             </Component>
           </SubComponents>
@@ -709,7 +740,7 @@
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="chkPdvVendas" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="208" max="32767" attributes="0"/>
+                      <EmptySpace pref="224" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -1226,7 +1257,7 @@
                               <Component id="txtFormatoData" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace pref="343" max="32767" attributes="0"/>
+                      <EmptySpace pref="359" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
