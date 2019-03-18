@@ -896,11 +896,11 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     private Date getData(String format) throws ParseException {
-        return formatData.parse(format);
+        return format == null ? null : formatData.parse(format);
     }
     
     private Date getDataCompleta(String format) throws ParseException {
-        return formatData.parse(format);
+        return format == null ? null : formatData.parse(format);
     }
     
     @Override
