@@ -363,7 +363,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setMargem(rst.getDouble("margem_param"));
                     }
-                    imp.setSituacaoCadastro(("S".equals(rst.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
+                    imp.setSituacaoCadastro(("S".equals(rst.getString("ativo").trim()) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
                     imp.setDescontinuado("S".equals(rst.getString("desativacompra")) || rst.getBoolean("descontinuado"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
