@@ -136,6 +136,7 @@ import vrimplantacao2.gui.interfaces.FortiGUI;
 import vrimplantacao2.gui.interfaces.GR7GUI;
 import vrimplantacao2.gui.interfaces.GetWayGUI;
 import vrimplantacao2.gui.interfaces.GuiaSistemasGUI;
+import vrimplantacao2.gui.interfaces.HRTechGUI;
 import vrimplantacao2.gui.interfaces.HipcomGUI;
 import vrimplantacao2.gui.interfaces.HiperGUI;
 import vrimplantacao2.gui.interfaces.ICommerceGUI;
@@ -616,6 +617,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuLince = new javax.swing.JMenuItem();
         mnuDataSync = new javax.swing.JMenuItem();
         mnuWinNexus = new javax.swing.JMenuItem();
+        mnuHRTech = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1539,6 +1541,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuWinNexus);
+
+        mnuHRTech.setText("HRTech");
+        mnuHRTech.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuHRTechActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuHRTech);
 
         mnuDatabase.add(mnuSqlServer2);
 
@@ -4202,6 +4212,10 @@ public final class MenuGUI extends VRMdiFrame {
         PlanilhaProdutoGUI.exibir(this);
     }//GEN-LAST:event_mnuPlanilhaProdutoActionPerformed
 
+    private void mnuHRTechActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuHRTechActionPerformed
+        HRTechGUI.exibir(this);
+    }//GEN-LAST:event_mnuHRTechActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4346,6 +4360,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuFlatan;
     private javax.swing.JMenuItem mnuFort;
     private javax.swing.JMenuItem mnuForti;
+    private javax.swing.JMenuItem mnuHRTech;
     private javax.swing.JMenuItem mnuHipcom;
     private javax.swing.JMenuItem mnuHiper;
     private javax.swing.JMenuItem mnuHipicom;

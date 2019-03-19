@@ -259,6 +259,11 @@
                     <Property name="text" type="java.lang.String" value="Descri&#xe7;&#xe3;o Gondola"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMercadologico">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Mercadol&#xf3;gico"/>
+                  </Properties>
+                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1ProdMercadologico">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Prod. Mercadol&#xf3;gico"/>
@@ -608,7 +613,7 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
           <SubComponents>
-            <Container class="javax.swing.JPanel" name="jPanel4">
+            <Container class="javax.swing.JPanel" name="pnlConexao">
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
                   <JTabbedPaneConstraints tabName="Dados da conex&#xe3;o">
@@ -632,8 +637,8 @@
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Component id="vRLabel25" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txtDatabase" pref="222" max="32767" attributes="0"/>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="txtDatabase" pref="226" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Component id="vRTextField1" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
                       </Group>
@@ -693,7 +698,7 @@
                     <Property name="text" type="java.lang.String" value="vRTextField1"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.textField.VRTextField" name="txtDatabase">
+                <Component class="javax.swing.JTextField" name="txtDatabase">
                 </Component>
               </SubComponents>
             </Container>

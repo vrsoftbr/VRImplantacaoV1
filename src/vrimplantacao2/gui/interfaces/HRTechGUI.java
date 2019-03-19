@@ -173,6 +173,10 @@ public class HRTechGUI extends VRInternalFrame {
                         if (chkProdutos.isSelected()) {
                             importador.importarProduto();
                         }
+                        
+                        if(chkMercadologico.isSelected()) {
+                            importador.importarMercadologico();
+                        }
 
                         {
                             List<OpcaoProduto> opcoes = new ArrayList<>();
@@ -331,6 +335,7 @@ public class HRTechGUI extends VRInternalFrame {
         chkT1DescCompleta = new vrframework.bean.checkBox.VRCheckBox();
         chkT1DescReduzida = new vrframework.bean.checkBox.VRCheckBox();
         chkT1DescGondola = new vrframework.bean.checkBox.VRCheckBox();
+        chkMercadologico = new vrframework.bean.checkBox.VRCheckBox();
         chkT1ProdMercadologico = new vrframework.bean.checkBox.VRCheckBox();
         chkValidade = new vrframework.bean.checkBox.VRCheckBox();
         chkAtacado = new vrframework.bean.checkBox.VRCheckBox();
@@ -357,14 +362,14 @@ public class HRTechGUI extends VRInternalFrame {
         vRLabel21 = new vrframework.bean.label.VRLabel();
         btnConectar = new javax.swing.JToggleButton();
         tabsConn = new javax.swing.JTabbedPane();
-        jPanel4 = new javax.swing.JPanel();
+        pnlConexao = new javax.swing.JPanel();
         txtHost = new vrframework.bean.textField.VRTextField();
         vRLabel23 = new vrframework.bean.label.VRLabel();
         txtPorta = new vrframework.bean.textField.VRTextField();
         vRLabel24 = new vrframework.bean.label.VRLabel();
         vRLabel25 = new vrframework.bean.label.VRLabel();
         vRTextField1 = new vrframework.bean.textField.VRTextField();
-        txtDatabase = new vrframework.bean.textField.VRTextField();
+        txtDatabase = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
         lblLoja = new vrframework.bean.label.VRLabel();
@@ -474,6 +479,9 @@ public class HRTechGUI extends VRInternalFrame {
 
         chkT1DescGondola.setText("Descrição Gondola");
         vRPanel7.add(chkT1DescGondola);
+
+        chkMercadologico.setText("Mercadológico");
+        vRPanel7.add(chkMercadologico);
 
         chkT1ProdMercadologico.setText("Prod. Mercadológico");
         vRPanel7.add(chkT1ProdMercadologico);
@@ -668,11 +676,11 @@ public class HRTechGUI extends VRInternalFrame {
 
         vRTextField1.setText("vRTextField1");
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnlConexaoLayout = new javax.swing.GroupLayout(pnlConexao);
+        pnlConexao.setLayout(pnlConexaoLayout);
+        pnlConexaoLayout.setHorizontalGroup(
+            pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlConexaoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(vRLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -684,16 +692,16 @@ public class HRTechGUI extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtDatabase, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtDatabase, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(2, 2, 2))
         );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
+        pnlConexaoLayout.setVerticalGroup(
+            pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlConexaoLayout.createSequentialGroup()
                 .addGap(12, 12, 12)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(vRLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtHost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(vRLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -704,7 +712,7 @@ public class HRTechGUI extends VRInternalFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        tabsConn.addTab("Dados da conexão", jPanel4);
+        tabsConn.addTab("Dados da conexão", pnlConexao);
 
         jLabel2.setText("Loja Origem");
 
@@ -875,6 +883,7 @@ public class HRTechGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkIcmsEntrada;
     private vrframework.bean.checkBox.VRCheckBox chkIcmsSaida;
+    private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
@@ -903,12 +912,12 @@ public class HRTechGUI extends VRInternalFrame {
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private vrframework.bean.label.VRLabel lblLoja;
+    private javax.swing.JPanel pnlConexao;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private javax.swing.JTabbedPane tabsConn;
-    private vrframework.bean.textField.VRTextField txtDatabase;
+    private javax.swing.JTextField txtDatabase;
     private vrframework.bean.textField.VRTextField txtHost;
     private vrframework.bean.textField.VRTextField txtLojaMesmoID;
     private vrframework.bean.textField.VRTextField txtPorta;
