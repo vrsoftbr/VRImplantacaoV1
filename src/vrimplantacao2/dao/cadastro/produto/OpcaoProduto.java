@@ -293,7 +293,8 @@ public enum OpcaoProduto {
      * Ao informar este parâmetro, a conversão das alíquotas é feita para cada campo da tributação, 
      * diferentemente do modo tradicional onde apenas as alíquotas de entrada e saída são usadas.
      */
-    USAR_CONVERSAO_ALIQUOTA_COMPLETA;
+    USAR_CONVERSAO_ALIQUOTA_COMPLETA,
+    IMPORTAR_INDIVIDUAL_LOJA;
 
     public static Set<OpcaoProduto> getAll() {
         return new HashSet<>(Arrays.asList(OpcaoProduto.values()));

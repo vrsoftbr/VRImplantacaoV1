@@ -114,6 +114,7 @@ public class Importador {
 
     private InterfaceDAO interfaceDAO;
     private int lojaVR = 1;
+    private boolean importarIndividualLoja = false;
 
     public Importador(InterfaceDAO interfaceDAO) {
         this.interfaceDAO = interfaceDAO;
@@ -135,6 +136,20 @@ public class Importador {
         this.lojaVR = lojaVR;
     }
 
+    /**
+     * @return the importarIndividualLoja
+     */
+    public boolean isImportarIndividualLoja() {
+        return importarIndividualLoja;
+    }
+
+    /**
+     * @param importarIndividualLoja the importarIndividualLoja to set
+     */
+    public void setImportarIndividualLoja(boolean importarIndividualLoja) {
+        this.importarIndividualLoja = importarIndividualLoja;
+    }
+    
     /**
      *
      * @return
@@ -421,6 +436,11 @@ public class Importador {
         provider.setSistema(getInterfaceDAO().getSistema());
         provider.setLoja(getInterfaceDAO().getLojaOrigem());
         provider.setLojaVR(getLojaVR());
+        
+        if (isImportarIndividualLoja()) {
+            provider.getOpcoes().add(OpcaoProduto.IMPORTAR_INDIVIDUAL_LOJA);
+        }
+        
         provider.getOpcoes().add(OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC);
         ProdutoRepository repository = new ProdutoRepository(provider);
         LOG.info("Produtos da listagem normal repassados: " + produtos.size());
@@ -1022,5 +1042,4 @@ public class Importador {
         NotaFiscalRepository repository = new NotaFiscalRepository(provider);
         repository.importar(opt);
     }
-    
 }

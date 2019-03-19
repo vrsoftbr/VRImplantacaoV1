@@ -50,6 +50,7 @@ public class ProdutoRepository {
 
     private boolean naoTransformarEANemUN = false;
     private boolean usarConversaoDeAliquotaSimples = true;
+    public boolean importarSomenteLoja = false;
     
     public ProdutoRepository(ProdutoRepositoryProvider provider) {
         this.provider = provider;
@@ -241,6 +242,8 @@ public class ProdutoRepository {
     
     public void atualizar(List<ProdutoIMP> produtos, OpcaoProduto... opcoes) throws Exception {
         usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
+        importarSomenteLoja = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_INDIVIDUAL_LOJA);
+        
         
         LOG.finer("Entrando no método atualizar; produtos(" + produtos.size() + ") opcoes(" + opcoes.length + ")");
         //<editor-fold defaultstate="collapsed" desc="Separa as opções entre 'com lista especial' e 'sem lista especial'">
@@ -312,7 +315,15 @@ public class ProdutoRepository {
                     }
                     ProdutoIMP imp = organizados.get(chave);
 
-                    ProdutoAnteriorVO anterior = provider.anterior().get(chaveProd);
+                    ProdutoAnteriorVO anterior = null;
+                    
+                    System.out.println(importarSomenteLoja);
+                    
+                    if (!importarSomenteLoja) {
+                        anterior = provider.anterior().get(chaveProd);
+                    } else {
+                        anterior = provider.anterior().getLojaImp(chaveProd);
+                    }                    
 
                     if (anterior != null && anterior.getCodigoAtual() != null) {
 

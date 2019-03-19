@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
@@ -17,6 +18,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
+import org.sonar.runner.commonsio.FilenameUtils;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.dao.cadastro.CestDAO;
@@ -27,7 +29,8 @@ import vrimplantacao.vo.vrimplantacao.CestVO;
  * @author Leandro
  */
 public class ImportacoesDiversasDAO {
-    
+
+    public int origem = 1; // 1 = pagina web, 2 = arquivo xls
     private final NcmDAO dao = new NcmDAO();
     
     public void importarNCM(String i_arquivo) throws Exception {
@@ -134,11 +137,71 @@ public class ImportacoesDiversasDAO {
     }
 
     public void importarCEST(String arquivo) throws IOException, Exception {
-        List<CestVO> cestMapeados = parseHtml(arquivo);     
-        ProgressBar.setStatus("Importando CEST....Gravando CESTs....");
-        new CestDAO().salvar(cestMapeados);
+        String extFile = FilenameUtils.getExtension(arquivo);
+        if ("xls".equals(extFile)) {
+            List<CestVO> cestMapeadosXls = parseXls(arquivo);
+            ProgressBar.setStatus("Carregando dados...Cest arquivo Xls...");
+            ProgressBar.setMaximum(cestMapeadosXls.size());
+            new CestDAO().salvar(cestMapeadosXls);
+        } else {
+            List<CestVO> cestMapeados = parseHtml(arquivo);
+            ProgressBar.setStatus("Importando CEST....Gravando CESTs....");
+            new CestDAO().salvar(cestMapeados);
+        }
     }
 
+    private List<CestVO> parseXls(String i_arquivo) throws Exception {
+        List<CestVO> result = new ArrayList<>();
+        WorkbookSettings settings = new WorkbookSettings();
+        settings.setEncoding("CP1250");
+        Workbook arquivo = Workbook.getWorkbook(new File(i_arquivo), settings);
+        Sheet[] sheets = arquivo.getSheets();
+        int linha;
+        
+        try {
+            for (int sh = 0; sh < sheets.length; sh++) {
+                Sheet sheet = arquivo.getSheet(sh);
+                linha = 0;
+                
+                for (int i = 0; i < sheet.getRows(); i++) {
+                    linha ++;
+                    if (linha == 1) {
+                        continue;
+                    }
+                    
+                    Cell cellCest = sheet.getCell(0, i);
+                    Cell cellNcm = sheet.getCell(1, i);
+                    Cell cellDescCest = sheet.getCell(4, i);
+                    
+                    List<String> ncms = null;
+                    String strNcms = cellNcm.getContents().trim();
+                    if (strNcms.length() == 2) {
+                        ncms = processaCapitulos(strNcms);
+                    } else {
+                        ncms = breakNcms(strNcms);
+                    }
+                    
+                    CestVO vo = new CestVO();
+                    String[] codCest = cellCest.getContents().split("\\.");
+                    vo.setCest1(Integer.parseInt(codCest[0]));
+                    vo.setCest2(Integer.parseInt(codCest[1]));
+                    vo.setCest3(Integer.parseInt(codCest[2]));
+                    vo.setDescricao(cellDescCest.getContents());
+                    //Para cada informação de ncm encontrada, cria uma entrada na tabela
+                    for (String nc : ncms) {
+                        for (NcmVO ncm : ncmsIniciadosPor(nc)) {
+                            vo.getNcms().add(ncm);
+                        }
+                    }
+                    result.add(vo);                    
+                }
+            }
+            return result;
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+    
     private List<CestVO> parseHtml(String arquivo) throws Exception, IOException, NumberFormatException {
         ProgressBar.setStatus("Importando CEST....Convertendo tabelas HTML....");
         List<CestVO> result = new ArrayList<>();

@@ -190,6 +190,12 @@ public class ProdutoRepositoryProvider {
             return dao.getCodigoAnterior().get(keys);
         }
 
+        public ProdutoAnteriorVO getLojaImp(String... keys) throws Exception {
+            dao.setImportSistema(getSistema());
+            dao.setImportLoja(getLoja());
+            return dao.getCodigoAnteriorLoja().get(keys);
+        }
+        
         public void salvar(ProdutoAnteriorVO anterior) throws Exception {
             dao.setImportSistema(getSistema());
             dao.setImportLoja(getLoja());

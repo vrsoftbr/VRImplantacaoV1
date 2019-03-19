@@ -427,11 +427,6 @@ public class SysPdvDAO extends InterfaceDAO {
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        WorkbookSettings settings = new WorkbookSettings();
-        Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls), settings);
-        Sheet[] sheets = arquivo.getSheets();
-        int linha;
-
         double desconto = 0;
 
         if (opt == OpcaoProduto.ATACADO) {
@@ -462,40 +457,6 @@ public class SysPdvDAO extends InterfaceDAO {
                 }
                 return result;
             }
-        }
-
-        if (opt == OpcaoProduto.PIS_COFINS) {
-
-            try {
-
-                for (int sh = 0; sh < sheets.length; sh++) {
-                    Sheet sheet = arquivo.getSheet(sh);
-                    linha = 0;
-
-                    for (int i = 0; i < sheet.getRows(); i++) {
-                        linha++;
-                        if (linha == 1) {
-                            continue;
-                        }
-
-                        Cell cellIdProduto = sheet.getCell(0, i);
-                        Cell cellCstPisEntrada = sheet.getCell(4, i);
-                        Cell cellCstPisSaida = sheet.getCell(6, i);
-
-                        ProdutoIMP imp = new ProdutoIMP();
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportSistema(getSistema());
-                        imp.setImportId(cellIdProduto.getContents().trim());
-                        imp.setPiscofinsCstDebito(cellCstPisSaida.getContents().trim());
-                        imp.setPiscofinsCstCredito(cellCstPisEntrada.getContents().trim());
-                        result.add(imp);
-                    }
-                }
-                return result;
-            } catch (Exception ex) {
-                throw ex;
-            }
-
         }
         return null;
     }
@@ -859,7 +820,8 @@ public class SysPdvDAO extends InterfaceDAO {
         }
     }
 
-    public List<CreditoRotativoIMP> getCreditoRotativo2() throws Exception {
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
 
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
@@ -896,82 +858,6 @@ public class SysPdvDAO extends InterfaceDAO {
         }
 
         return result;
-    }
-
-    @Override
-    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
-        List<CreditoRotativoIMP> result = new ArrayList<>();
-        java.sql.Date dataEmissao, dataVencimento;
-        DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
-        WorkbookSettings settings = new WorkbookSettings();
-        Workbook arquivo = Workbook.getWorkbook(new File(v_pahtFileXls), settings);
-        Sheet[] sheets = arquivo.getSheets();
-        int linha;
-
-        try {
-
-            for (int sh = 0; sh < sheets.length; sh++) {
-                Sheet sheet = arquivo.getSheet(sh);
-                linha = 0;
-
-                for (int i = 0; i < sheet.getRows(); i++) {
-                    linha++;
-                    if (linha == 1) {
-                        continue;
-                    } else if (Utils.encontrouLetraCampoNumerico(sheet.getCell(0, i).getContents())) {
-                        continue;
-                    } else if ((sheet.getCell(0, i).getContents().trim().isEmpty())
-                            || (sheet.getCell(0, i).getContents() == null)) {
-                        continue;
-                    }
-
-                    Cell cellIdVenda = sheet.getCell(0, i);
-                    Cell cellCodCliente = sheet.getCell(2, i);
-                    Cell cellCupom = sheet.getCell(4, i);
-                    Cell cellEmissao = sheet.getCell(5, i);
-                    Cell cellVencimento = sheet.getCell(6, i);
-                    Cell cellValor = sheet.getCell(15, i);
-                    Cell cellHistorico = sheet.getCell(8, i);
-                    Cell cellJuros = sheet.getCell(11, i);
-                    Cell cellDesconto = sheet.getCell(13, i);
-                    Cell cellMulta = sheet.getCell(12, i);
-
-                    if ((cellEmissao.getContents() != null)
-                            && (!cellEmissao.getContents().trim().isEmpty())) {
-                        dataEmissao = new java.sql.Date(fmt.parse(cellEmissao.getContents()).getTime());
-                    } else {
-                        dataEmissao = new java.sql.Date(new java.util.Date().getTime());
-                    }
-
-                    if ((cellVencimento.getContents() != null)
-                            && (!cellVencimento.getContents().trim().isEmpty())) {
-                        dataVencimento = new java.sql.Date(fmt.parse(cellVencimento.getContents()).getTime());
-                    } else {
-                        dataVencimento = new java.sql.Date(new java.util.Date().getTime());
-                    }
-
-                    String id_cliente = cellCodCliente.getContents().substring(0, cellCodCliente.getContents().indexOf("-"));
-
-                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    imp.setId(cellIdVenda.getContents());
-                    imp.setIdCliente(id_cliente.trim());
-                    imp.setDataEmissao(dataEmissao);
-                    imp.setDataVencimento(dataVencimento);
-                    imp.setValor(Double.parseDouble(cellValor.getContents().replace(",", ".")));
-                    imp.setJuros(Double.parseDouble(cellJuros.getContents().replace(",", ".")));
-                    imp.setMulta(Double.parseDouble(cellMulta.getContents().replace(",", ".")));
-                    imp.setNumeroCupom(cellCupom.getContents());
-                    imp.setObservacao(cellHistorico.getContents());
-
-                    System.out.println(imp.getIdCliente());
-
-                    result.add(imp);
-                }
-            }
-            return result;
-        } catch (Exception ex) {
-            throw ex;
-        }
     }
 
     @Override

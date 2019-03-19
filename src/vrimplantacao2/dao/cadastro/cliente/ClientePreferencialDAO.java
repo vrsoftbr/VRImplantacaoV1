@@ -90,6 +90,7 @@ public class ClientePreferencialDAO {
             sql.put("salarioconjuge", 0);
             sql.put("outrarendaconjuge", 0);
             sql.putNull("id_grupo");
+            sql.put("utilizaappdescontos", false);
 
             try {
                 stm.execute(sql.getInsert());

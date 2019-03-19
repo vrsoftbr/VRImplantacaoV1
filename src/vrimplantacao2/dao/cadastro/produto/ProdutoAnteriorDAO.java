@@ -56,6 +56,13 @@ public class ProdutoAnteriorDAO {
         return codigoAnterior;
     }
 
+    public MultiMap<String, ProdutoAnteriorVO> getCodigoAnteriorLoja() throws Exception {
+        if (codigoAnterior == null) {
+            atualizarCodigoAnteriorLoja();
+        }
+        return codigoAnterior;
+    }
+    
     private void createTable() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute(
@@ -365,6 +372,89 @@ public class ProdutoAnteriorDAO {
         }
     }
 
+    public void atualizarCodigoAnteriorLoja() throws Exception {
+        codigoAnterior = new MultiMap<>(3);
+        createTable();
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n"
+                    + "	ant.impsistema, \n"
+                    + "	ant.imploja, \n"
+                    + "	ant.impid, \n"
+                    + "	ant.descricao, \n"
+                    + "	p.descricaocompleta, \n"
+                    + "	p.descricaoreduzida, \n"
+                    + "	p.descricaogondola, \n"
+                    + "	ant.codigoatual, \n"
+                    + "	ant.piscofinscredito, \n"
+                    + "	ant.piscofinsdebito, \n"
+                    + "	ant.piscofinsnaturezareceita, \n"
+                    + "	ant.icmscst, \n"
+                    + "	ant.icmsaliq, \n"
+                    + "	ant.icmsreducao, \n"
+                    + "	ant.estoque, \n"
+                    + "	ant.e_balanca, \n"
+                    + "	ant.custosemimposto, \n"
+                    + "	ant.custocomimposto, \n"
+                    + "	ant.margem, \n"
+                    + "	ant.precovenda, \n"
+                    + "	ant.ncm, \n"
+                    + "	ant.cest,\n"
+                    + "	ant.contadorimportacao,\n"
+                    + "	ant.novo\n"
+                    + "FROM \n"
+                    + "	implantacao.codant_produto ant\n"
+                    + "	left join produto p on ant.codigoatual = p.id\n"
+                    + "where codigoatual not in (select codigoatual from implantacao.codant_produto\n"
+                    + "                        where impsistema <> " + SQLUtils.stringSQL(getImportSistema())
+                    + "                        and imploja = " + SQLUtils.stringSQL(getImportLoja()) + ")\n"
+                    + "                and impsistema = " + SQLUtils.stringSQL(getImportSistema())
+                    + "                and imploja = " + SQLUtils.stringSQL(getImportLoja()) + "\n"
+                    + "order by\n"
+                    + "	ant.impsistema, \n"
+                    + "	ant.imploja, \n"
+                    + "	ant.impid"
+            )) {
+                int cont = 1;
+                while (rst.next()) {
+                    ProdutoAnteriorVO vo = new ProdutoAnteriorVO();
+
+                    vo.setImportSistema(rst.getString("impsistema"));
+                    vo.setImportLoja(rst.getString("imploja"));
+                    vo.setImportId(rst.getString("impid"));
+                    vo.setDescricao(rst.getString("descricao"));
+                    ProdutoVO produto = null;
+                    if (rst.getString("codigoatual") != null) {
+                        produto = new ProdutoVO();
+                        produto.setId(rst.getInt("codigoatual"));
+                        produto.setDescricaoCompleta("descricaocompleta");
+                        produto.setDescricaoCompleta("descricaogondola");
+                        produto.setDescricaoCompleta("descricaoreduzida");
+                    }
+                    vo.setCodigoAtual(produto);
+                    vo.setPisCofinsCredito(rst.getInt("piscofinscredito"));
+                    vo.setPisCofinsDebito(rst.getInt("piscofinsdebito"));
+                    vo.setPisCofinsNaturezaReceita(rst.getInt("piscofinsnaturezareceita"));
+                    vo.setIcmsCst(rst.getInt("icmscst"));
+                    vo.setIcmsAliq(rst.getDouble("icmsaliq"));
+                    vo.setIcmsReducao(rst.getDouble("icmsreducao"));
+                    vo.setEstoque(rst.getDouble("estoque"));
+                    vo.seteBalanca(rst.getBoolean("e_balanca"));
+                    vo.setCustosemimposto(rst.getDouble("custosemimposto"));
+                    vo.setCustocomimposto(rst.getDouble("custocomimposto"));
+                    vo.setPrecovenda(rst.getDouble("precovenda"));
+                    vo.setNcm(rst.getString("ncm"));
+                    vo.setCest(rst.getString("cest"));
+                    vo.setNovo(rst.getBoolean("novo"));
+                    vo.setContadorImportacao(rst.getInt("contadorimportacao"));
+                    eanAnteriorDAO.addEans(vo);
+                    codigoAnterior.put(vo, vo.getChave());
+                    cont++;
+                }
+            }
+        }
+    }
+    
     private int contador = -1;
 
     private void obtemContador() throws Exception {
