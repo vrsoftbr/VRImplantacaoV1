@@ -149,7 +149,10 @@ public class VendaRepository {
                     }
                     if ( produto == null && String.valueOf(item.getCodigoBarras()).length() > 6 ) {
                         produto = provider.getProdutoPorEANAtual(item.getCodigoBarras());
-                    }  
+                    }
+                    if ( produto == null && opt.contains(OpcaoVenda.IMPORTAR_POR_EAN_ATUAL)) {
+                        produto = provider.getProdutoPorEANAtual(item.getCodigoBarras());
+                    }
                     if (produto == null && produtoPadrao != 0) {
                         produto = produtoPadrao;
                     }
@@ -346,6 +349,11 @@ public class VendaRepository {
             ));
             item.setId_aliquota(provider.getIsento().getId());
         }
+        
+        if(item.getId_aliquota() != 0 && imp.getIdAliquota() != 0) {
+            item.setId_aliquota(imp.getIdAliquota());
+        }
+        
         item.setCancelado(imp.isCancelado() || cupomCancelado);
         if (item.isCancelado()) {
             item.setValorCancelado(item.getValorTotal());

@@ -375,6 +375,7 @@ public class PdvVendaDAO {
             "		data = " + SQLUtils.stringSQL(DATE_FORMAT.format(data)) + "\n" +
             "	into v_id;\n" +
             "	if ( not v_id is null ) then\n" +
+            "       DELETE FROM pdv.vendacfe WHERE id_venda = v_id;\n" +        
             "       DELETE FROM pdv.vendakititem WHERE id_vendakit IN (SELECT id FROM pdv.vendakit WHERE id_venda = v_id);\n" +
             "       DELETE FROM pdv.vendakit WHERE id_venda = v_id;\n" +
             "       DELETE FROM pdv.vendapromocao WHERE id_venda = v_id;\n" +

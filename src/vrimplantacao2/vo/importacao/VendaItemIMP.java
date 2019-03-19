@@ -50,6 +50,8 @@ public class VendaItemIMP {
     private double icmsReduzido = 0;
     @DatabaseField()
     private int contadorDoc;
+    @DatabaseField()
+    private int idAliquota;
 
     public String getId() {
         return id;
@@ -209,5 +211,12 @@ public class VendaItemIMP {
     public void setIcmsReduzido(double icmsReduzido) {
         this.icmsReduzido = icmsReduzido;
     }
-   
+
+    public int getIdAliquota() {
+        return idAliquota;
+    }
+
+    public void setIdAliquota(int idAliquota) {
+        this.idAliquota = idAliquota;
+    }
 }

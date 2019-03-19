@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.interfaces;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
@@ -594,7 +596,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         Arquivo arq = ArquivoFactory.getArquivo(this.arquivoContaPagar, getOpcoes());
         
         for(LinhaArquivo linha : arq) {
-            if(linha.getString("id") != null) {
+            if(linha.getString("id") != null && !"".equals(linha.getString("id").trim())) {
                 ContaPagarIMP imp = new ContaPagarIMP();
                 imp.setId(linha.getString("id"));
                 imp.setIdFornecedor(linha.getString("idfornecedor"));
@@ -804,10 +806,12 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             if (!"".equals(ln.getString("tipodesconto"))) {
                 imp.setTipoDesconto(TipoDesconto.getById(ln.getInt("tipodesconto")));
             }
-            imp.setIcmsCst(ln.getInt("icms_cst"));
+            imp.setIdAliquota(ln.getInt("id_aliquota"));
+            /*imp.setIcmsCst(ln.getInt("icms_cst"));
             imp.setIcmsAliq(ln.getDouble("icms_aliq"));
-            imp.setIcmsReduzido(ln.getDouble("icms_red"));
+            imp.setIcmsReduzido(ln.getDouble("icms_red"));*/
             imp.setContadorDoc(ln.getInt("contadordoc"));
+            
             
             /*if (!hasNext()) {
                 try {
@@ -892,11 +896,11 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     private Date getData(String format) throws ParseException {
-        return formatData.parse(format);
+        return format == null ? null : formatData.parse(format);
     }
     
     private Date getDataCompleta(String format) throws ParseException {
-        return formatData.parse(format);
+        return format == null ? null : formatData.parse(format);
     }
     
     @Override

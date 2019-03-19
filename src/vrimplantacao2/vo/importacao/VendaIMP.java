@@ -259,5 +259,4 @@ public class VendaIMP {
     public void setXml(String xml) {
         this.xml = xml;
     }
-
 }

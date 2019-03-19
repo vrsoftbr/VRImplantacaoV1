@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import vrframework.classe.Conexao;
+import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.cliente.ClientePreferencialVO;
 
@@ -89,6 +90,9 @@ public class ClientePreferencialDAO {
             sql.put("cargoconjuge", "");
             sql.put("salarioconjuge", 0);
             sql.put("outrarendaconjuge", 0);
+            if (Versao.maiorQue(3,17)) {
+                sql.put("utilizaappdescontos", false);
+            }
             sql.putNull("id_grupo");
             sql.put("utilizaappdescontos", false);
 

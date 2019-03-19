@@ -328,7 +328,6 @@ public class SysPdvDAO extends InterfaceDAO {
                         imp.setCodMercadologico1(rst.getString("merc1"));
                         imp.setCodMercadologico2(rst.getString("merc2"));
                         imp.setCodMercadologico3(rst.getString("merc3"));
-
                         ProdutoBalancaVO bal = balanca.get(Utils.stringToInt(rst.getString("id")));
                         if (bal != null) {
                             imp.seteBalanca(true);

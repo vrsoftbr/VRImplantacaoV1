@@ -68,6 +68,8 @@ public class Icms {
         }
     }
     
+    
+    
     /**
      * Retorna o icms correspondente ao cst, aliquota e redução.
      * @param cst Cst do icms.
