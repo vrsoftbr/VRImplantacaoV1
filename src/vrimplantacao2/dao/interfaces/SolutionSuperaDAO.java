@@ -10,6 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -26,6 +27,21 @@ public class SolutionSuperaDAO extends InterfaceDAO {
     @Override
     public String getSistema() {
         return "SolutionSupera";
+    }
+
+    public List<Estabelecimento> getLojasCliente() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select codigo_emp as id, razaosocial from empresa ORDER BY 1"
+            )) {
+                while (rst.next()) {
+                    result.add(new Estabelecimento(rst.getString("id"), rst.getString("razaosocial")));
+                }
+            }
+        }
+        return result;
     }
 
     @Override
