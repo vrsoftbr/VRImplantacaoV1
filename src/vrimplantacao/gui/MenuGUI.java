@@ -179,6 +179,7 @@ import vrimplantacao2.gui.interfaces.SisMouraGUI;
 import vrimplantacao2.gui.interfaces.SoftcomGUI;
 import vrimplantacao2.gui.interfaces.SofttechGUI;
 import vrimplantacao2.gui.interfaces.SolidusGUI;
+import vrimplantacao2.gui.interfaces.SolutionSuperaGUI;
 import vrimplantacao2.gui.interfaces.SriGUI;
 import vrimplantacao2.gui.interfaces.SuperGUI;
 import vrimplantacao2.gui.interfaces.SuperLoja10GUI;
@@ -580,6 +581,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuCFSoftSiaECF = new javax.swing.JMenuItem();
         mnuCerebro = new javax.swing.JMenuItem();
         mnuSyncTech = new javax.swing.JMenuItem();
+        mnuSolutionSupera = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1247,6 +1249,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird2.add(mnuSyncTech);
+
+        mnuSolutionSupera.setText("Solution Supera");
+        mnuSolutionSupera.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSolutionSuperaActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuSolutionSupera);
 
         mnuDatabase.add(mnuFirebird2);
 
@@ -1933,7 +1943,6 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu9.add(mnuOpen);
 
-        mnuDatabase.add(jMenu9);
         mnuSuperLoja10.setText("Super Loja 10");
         mnuSuperLoja10.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1941,6 +1950,8 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu9.add(mnuSuperLoja10);
+
+        mnuDatabase.add(jMenu9);
 
         mnuOrion.setText("DBF");
 
@@ -4229,6 +4240,11 @@ public final class MenuGUI extends VRMdiFrame {
         HRTechGUI.exibir(this);
     }//GEN-LAST:event_mnuHRTechActionPerformed
 
+    private void mnuSolutionSuperaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSolutionSuperaActionPerformed
+        // TODO add your handling code here:
+        SolutionSuperaGUI.exibir(this);
+    }//GEN-LAST:event_mnuSolutionSuperaActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4432,11 +4448,12 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSoftcom;
     private javax.swing.JMenuItem mnuSofttech;
     private javax.swing.JMenuItem mnuSolidus;
+    private javax.swing.JMenuItem mnuSolutionSupera;
     private javax.swing.JMenu mnuSqlServer2;
     private javax.swing.JMenuItem mnuSri;
     private javax.swing.JMenuItem mnuSuper;
-    private javax.swing.JMenuItem mnuSyncTech;
     private javax.swing.JMenuItem mnuSuperLoja10;
+    private javax.swing.JMenuItem mnuSyncTech;
     private javax.swing.JMenuItem mnuSysmoFirebird;
     private javax.swing.JMenuItem mnuSysmoPostgres;
     private javax.swing.JMenuItem mnuTsti;
