@@ -14,6 +14,7 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
+import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.utils.Utils;
@@ -24,6 +25,7 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.DataSyncDAO;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.dao.interfaces.SolutionSuperaDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.interfaces.custom.solidus.Entidade;
 import vrimplantacao2.parametro.Parametros;
@@ -65,8 +67,8 @@ public class SolutionSuperaGUI extends VRInternalFrame {
         params.salvar();
     }
     
-    private DataSyncDAO dao = new DataSyncDAO();
-    private ConexaoSqlServer conn = new ConexaoSqlServer();
+    private SolutionSuperaDAO dao = new SolutionSuperaDAO();
+    private ConexaoFirebird conn = new ConexaoFirebird();
     
     private SolutionSuperaGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
