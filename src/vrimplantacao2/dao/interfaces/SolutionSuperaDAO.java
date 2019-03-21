@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -88,6 +89,7 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     + "p.codigo_pro as id,\n"
                     + "p.codigo_grp as merc1,\n"
                     + "p.codigo_sgp as merc2,\n"
+                    + "'1' as merc3,\n"
                     + "p.codigo_ean as ean,\n"
                     + "p.descricao as descricaoproduto,\n"
                     + "p.cod_ncm as ncm,\n"
@@ -121,11 +123,45 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     + "order by p.codigo_pro"
             )) {
                 while (rst.next()) {
-
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.seteBalanca("T".equals(rst.getString("balanca")));
+                    imp.setDescricaoCompleta(rst.getString("descricaoproduto"));
+                    imp.setDescricaoReduzida(imp.getDescricaoCompleta());
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setCodMercadologico1(rst.getString("merc1"));
+                    imp.setCodMercadologico2(rst.getString("merc2"));
+                    imp.setCodMercadologico3(rst.getString("merc3"));
+                    imp.setTipoEmbalagem(rst.getString("embvenda"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setPesoBruto(rst.getDouble("peso_bruto"));
+                    imp.setPesoLiquido(rst.getDouble("peso_liquido"));
+                    imp.setDataCadastro(rst.getDate("data_cadastro"));
+                    imp.setMargem(rst.getDouble("margem1"));
+                    imp.setPrecovenda(rst.getDouble("preco"));
+                    imp.setCustoComImposto(rst.getDouble("custo"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setEstoqueMaximo(rst.getDouble("estoque_max"));
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+                    imp.setPiscofinsCstDebito(rst.getString("cst_pis_saida"));
+                    imp.setPiscofinsCstCredito(rst.getString("cst_pis_entrada"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
+                    imp.setIcmsCstSaida(rst.getInt("aliq_icms_debito"));
+                    imp.setIcmsAliqSaida(rst.getDouble("aliq_icms_debito"));
+                    imp.setIcmsReducaoSaida(rst.getDouble("red_icms_debito"));
+                    imp.setIcmsCstEntrada(rst.getInt("cst_icms_credito"));
+                    imp.setIcmsAliqEntrada(rst.getDouble("aliq_icms_credito"));
+                    imp.setIcmsReducaoEntrada(rst.getDouble("red_icms_credito"));
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -170,11 +206,95 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     + "order by f.codigo_for"
             )) {
                 while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("ie_rg"));
+                    imp.setAtivo("A".equals(rst.getString("situacaocadastro")));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setIbge_municipio(rst.getInt("ibge_municipio"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setIbge_uf(rst.getInt("cod_uf_ibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setTel_principal(rst.getString("telefone"));
 
+                    if ((rst.getString("representante") != null)
+                            && (!rst.getString("representante").trim().isEmpty())) {
+                        imp.setObservacao("REPRESENTANTE " + rst.getString("representante"));
+                    }
+
+                    if ((rst.getString("fax") != null)
+                            && (!rst.getString("fax").trim().isEmpty())) {
+                        imp.addContato(
+                                "FAX",
+                                rst.getString("fax"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("emaill") != null)
+                            && (!rst.getString("emaill").trim().isEmpty())) {
+                        imp.addContato(
+                                "EMAIL",
+                                null,
+                                null,
+                                TipoContato.NFE,
+                                rst.getString("emaill").toLowerCase()
+                        );
+                    }
+                    if ((rst.getString("celular") != null)
+                            && (!rst.getString("celular").trim().isEmpty())) {
+                        imp.addContato(
+                                "CELULAR",
+                                null,
+                                rst.getString("celular"),
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("telefone_rep") != null)
+                            && (!rst.getString("telefone_rep").trim().isEmpty())) {
+                        imp.addContato(
+                                "TELEFONE REP",
+                                rst.getString("telefone_rep"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("fax_rep") != null)
+                            && (!rst.getString("fax_rep").trim().isEmpty())) {
+                        imp.addContato(
+                                "FAX REP",
+                                rst.getString("fax_rep"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("emaill_rep") != null)
+                            && (!rst.getString("emaill_rep").trim().isEmpty())) {
+                        imp.addContato(
+                                "EMAIL REP",
+                                null,
+                                null,
+                                TipoContato.COMERCIAL,
+                                rst.getString("emaill_rep").toLowerCase()
+                        );
+                    }
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -191,11 +311,17 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     + "order by id_fornecedor, id_produto"
             )) {
                 while (rst.next()) {
-
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("id_produto"));
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setCodigoExterno(rst.getString("id"));
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -207,6 +333,9 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     "select\n"
                     + "c.codigo_cli as id,\n"
                     + "c.codigo_cid as ibge_municipio,\n"
+                    + "upper(m.municipio) as municipio,\n"
+                    + "m.cod_uf_ibge,\n"
+                    + "u.sigla as uf,\n"
                     + "c.cod_tipo_logradouro,\n"
                     + "c.codigo_bco as id_banco,\n"
                     + "c.razaosocial as razao,\n"
@@ -248,11 +377,62 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     + "order by c.codigo_cli"
             )) {
                 while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj(rst.getString("cnpjcpf"));
+                    imp.setInscricaoestadual(rst.getString("ie_rg"));
+                    imp.setDataCadastro(rst.getDate("data_cadastro"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento_endereco"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setMunicipioIBGE(rst.getInt("ibge_municipio"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUfIBGE(rst.getInt("cod_uf_ibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCobrancaEndereco(rst.getString("endereco_cob"));
+                    imp.setCobrancaBairro(rst.getString("bairro_cob"));
+                    imp.setCobrancaMunicipio(rst.getString("cidade_cob"));
+                    imp.setCobrancaCep(rst.getString("cep_cob"));
+                    imp.setNomePai(rst.getString("nome_pai"));
+                    imp.setNomeMae(rst.getString("nome_mae"));
+                    imp.setNomeConjuge(rst.getString("conjugue"));
+                    imp.setDataNascimento(rst.getDate("data_nascimento"));
+                    imp.setAtivo("A".equals(rst.getString("situacaocadastro")));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setFax(rst.getString("fax"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setEmail(rst.getString("emaill"));
+                    imp.setValorLimite(rst.getDouble("limite_cred"));
 
+                    if ((rst.getString("telefone_cob") != null)
+                            && (!rst.getString("telefone_cob").trim().isEmpty())) {
+                        imp.addContato(
+                                "TELEFONE COB",
+                                rst.getString("telefone_cob"),
+                                null,
+                                null,
+                                null
+                        );
+                    }
+                    if ((rst.getString("telefax_cob") != null)
+                            && (!rst.getString("telefax_cob").trim().isEmpty())) {
+                        imp.addContato(
+                                "FAX COB",
+                                rst.getString("telefax_cob"),
+                                null,
+                                null,
+                                null
+                        );
+                    }
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -262,7 +442,7 @@ public class SolutionSuperaDAO extends InterfaceDAO {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "codigo_crc,\n"
+                    + "codigo_crc as id,\n"
                     + "titulo as cupom,\n"
                     + "codigo_cli as id_cliente,\n"
                     + "fatura as numerocupom,\n"
@@ -275,10 +455,18 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     + "order by data_emi asc"
             )) {
                 while (rst.next()) {
-
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdCliente(rst.getString("id_cliente"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 }
