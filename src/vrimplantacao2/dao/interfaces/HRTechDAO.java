@@ -10,6 +10,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoInscricao;
+import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -317,7 +318,7 @@ public class HRTechDAO extends InterfaceDAO {
         try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
-                    "	c.id_cliente,\n" +
+                    "	c.codigoenti id,\n" +
                     "	cpf.nomeentida razao,\n" +
                     "	cpf.nomapelido fantasia,\n" +
                     "	cpf.codinsc_rg rgie,\n" +
@@ -349,7 +350,27 @@ public class HRTechDAO extends InterfaceDAO {
                     "	cep.tipocadast = 'CLI'\n" +
                     "order by\n" +
                     "	c.id_cliente")) {
-                
+                while(rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setInscricaoestadual(rs.getString("rgie"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setDataNascimento(rs.getDate("datanascimento"));
+                    imp.setValorLimite(rs.getDouble("limite"));
+                    imp.setAtivo(rs.getInt("situacao") == 0 ? true : false);
+                    imp.setSexo("F".equals(rs.getString("sexo")) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setUf(rs.getString("estado"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    
+                    result.add(imp);
+                }
             }
         }
         return result;
