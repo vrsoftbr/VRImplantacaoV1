@@ -219,6 +219,11 @@
                     <Property name="text" type="java.lang.String" value="Estoque"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkZerarMargem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Zerar Margem"/>
+                  </Properties>
+                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1EAN">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="EAN"/>

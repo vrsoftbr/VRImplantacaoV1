@@ -10,7 +10,6 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -26,6 +25,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  * @author Leandro
  */
 public class SyncTecDAO extends InterfaceDAO {
+    
+    public boolean zerarMargem = false;
 
     @Override
     public String getSistema() {
@@ -106,8 +107,8 @@ public class SyncTecDAO extends InterfaceDAO {
             Map<String, List<Ean>> eans = new HashMap<>();
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
-                    "    i.item,\n" +
-                    "    i.codigo,\n" +
+                    "    i.codigo item,\n" +
+                    "    i.codigo codigo,\n" +
                     "    i.unidadevarejo unidade,\n" +
                     "    1 quantidade\n" +
                     "from\n" +
@@ -117,31 +118,34 @@ public class SyncTecDAO extends InterfaceDAO {
                     "    not i.codigo is null\n" +
                     "    union\n" +
                     "select\n" +
-                    "    ic.item,\n" +
-                    "    ic.codigo,\n" +
+                    "    c.codigo item,\n" +
+                    "    ic.codigo codigo,\n" +
                     "    coalesce(ic.unidade, 'UN') unidade,\n" +
                     "    1 quantidade\n" +
                     "from\n" +
                     "    itenscodigos ic\n" +
+                    "join\n" +
+                    "    itens c on (ic.item = c.item)\n" +
                     "where\n" +
                     "    not nullif(ic.codigo, '') is null\n" +
                     "    union\n" +
                     "select\n" +
-                    "    i.item,\n" +
-                    "    i.codigobarras,\n" +
+                    "    i.codigo item,\n" +
+                    "    i.codigobarras codigo,\n" +
                     "    i.unidade,\n" +
                     "    1 quantidade\n" +
                     "from\n" +
                     "    itens i\n" +
                     "where\n" +
-                    "    i.codigobarras is not null\n" +
+                    "    i.codigobarras is not null and\n" +
+                    "    i.codigo is not null\n" +
                     "    union\n" +
                     "select\n" +
-                    "    iu.item id,\n" +
+                    "    i.codigo item,\n" +
                     "    case when\n" +
                     "        char_length(iu.codigo) <= 6 then\n" +
                     "    '99999'||iu.codigo else\n" +
-                    "    iu.codigo end as ean,\n" +
+                    "    iu.codigo end as codigo,\n" +
                     "    iu.unidade,\n" +
                     "    iu.fator quantidade\n" +
                     "from\n" +
@@ -159,7 +163,8 @@ public class SyncTecDAO extends InterfaceDAO {
                     "where\n" +
                     "    iu.fator > 1 and\n" +
                     "    iu.precomanual <> 0 and\n" +
-                    "    iu.codigo is not null"
+                    "    iu.codigo is not null and\n" +
+                    "    i.codigo is not null"
             )) {
                 while (rst.next()) {
                     List<Ean> list = eans.get(rst.getString("item"));
@@ -172,9 +177,8 @@ public class SyncTecDAO extends InterfaceDAO {
             }
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "    p.item id,\n"
+                    + "    p.codigo id,\n"
                     + "    p.datacadastro,\n"
-                    + "    p.codigo ean,\n"
                     + "    p.unidade,\n"
                     + "    case when p.pesavel != 'N' then 1 else 0 end e_balanca,\n"
                     + "    coalesce(p.tempomediovalidade, 0) validade,\n"
@@ -204,16 +208,18 @@ public class SyncTecDAO extends InterfaceDAO {
                     + "from\n"
                     + "    itens p\n"
                     + "    join produtospreco preco on p.item = preco.item and preco.tabelapreco = 0\n"
+                    + "where\n"
+                    + "    p.codigo is not null\n"
                     + "order by\n"
                     + "    p.item"
             )) {
                 while (rst.next()) {
 
-                    List<Ean> eanList = eans.get(rst.getString("item"));
+                    List<Ean> eanList = eans.get(rst.getString("id"));
 
                     if (eanList == null) {
                         eanList = new ArrayList<>();
-                        eanList.add(new Ean(rst.getString("item"), rst.getString("item"), "UN", 1));
+                        eanList.add(new Ean(rst.getString("id"), rst.getString("id"), "UN", 1));
                     }
 
                     for (Ean ean : eanList) {
@@ -226,7 +232,7 @@ public class SyncTecDAO extends InterfaceDAO {
 
                         imp.setImportSistema(getSistema());
                         imp.setImportLoja(getLojaOrigem());
-                        imp.setImportId(rst.getString("item"));
+                        imp.setImportId(rst.getString("id"));
                         imp.setEan(ean.ean);
                         imp.setTipoEmbalagem(ean.unidade);
                         imp.seteBalanca(rst.getBoolean("e_balanca"));
@@ -275,9 +281,8 @@ public class SyncTecDAO extends InterfaceDAO {
 
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
-                    "    p.item id,\n" +
                     "    p.datacadastro,\n" +
-                    "    p.codigo ean,\n" +
+                    "    p.codigo id,\n" +
                     "    p.unidade,\n" +
                     "    case when p.pesavel != 'N' then 1 else 0 end e_balanca,\n" +
                     "    coalesce(p.tempomediovalidade, 0) validade,\n" +
@@ -316,6 +321,8 @@ public class SyncTecDAO extends InterfaceDAO {
                     "        itensunidades iu\n" +
                     "    where\n" +
                     "        iu.fator = 1) a on (p.item = a.item)\n" +
+                    "where\n" +
+                    "    p.codigo is not null\n" +        
                     "order by\n" +
                     "    p.item"
             )) {
@@ -325,8 +332,8 @@ public class SyncTecDAO extends InterfaceDAO {
 
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rst.getString("item"));
-                    imp.setEan(rst.getString("codigo"));
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("id"));
                     imp.seteBalanca(rst.getBoolean("e_balanca"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.setValidade(rst.getInt("validade"));
@@ -339,7 +346,11 @@ public class SyncTecDAO extends InterfaceDAO {
                     imp.setEstoqueMinimo(rst.getDouble("qtdeminimo"));
                     imp.setEstoqueMaximo(rst.getDouble("qtdemaximo"));
                     imp.setEstoque(rst.getDouble("estoque"));
-                    imp.setMargem(rst.getDouble("margem"));
+                    if(zerarMargem) {
+                        imp.setMargem(0);
+                    } else {
+                        imp.setMargem(rst.getDouble("margem"));
+                    }
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
@@ -369,7 +380,7 @@ public class SyncTecDAO extends InterfaceDAO {
             try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select\n" +
-                        "    i.codigobarras,\n" +
+                        "    i.codigo id,\n" +
                         "    i.descricaocompra descricao,\n" +
                         "    iu.item id,\n" +
                         "    iu.codigo,\n" +
@@ -391,7 +402,8 @@ public class SyncTecDAO extends InterfaceDAO {
                         "where\n" +
                         "    iu.fator > 1 and\n" +
                         "    iu.precomanual <> 0 and\n" +
-                        "    iu.codigo is not null"
+                        "    iu.codigo is not null and\n" +
+                        "    i.codigo is not null"       
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
@@ -424,39 +436,39 @@ public class SyncTecDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "    f.favorecido id,\n"
-                    + "    coalesce(f.razao, f.nome) razao,\n"
-                    + "    coalesce(f.nome, f.razao) fantasia,\n"
-                    + "    f.cpf_cnpj cnpj,\n"
-                    + "    f.inscricao_est,\n"
-                    + "    f.inscricao_mun,\n"
-                    + "    f.suframa,\n"
-                    + "    case f.desativado when 'S' then 0 else 1 end ativo,\n"
-                    + "    f.endereco,\n"
-                    + "    f.nro,\n"
-                    + "    f.bairro,\n"
-                    + "    f.cidade,\n"
-                    + "    f.uf,\n"
-                    + "    f.municipio,\n"
-                    + "    f.cep,\n"
-                    + "    f.fone1,\n"
-                    + "    f.fone2,\n"
-                    + "    case f.permitircheque when 'N' then 0 else 1 end as permitircheque,\n"
-                    + "    case f.permitirfiado when 'N' then 0 else 1 end as permitirrotativo,\n"
-                    + "    f.datacadastro,\n"
-                    + "    f.obs,\n"
-                    + "    f.celular,\n"
-                    + "    f.fax,\n"
-                    + "    f.email,\n"
-                    + "    coalesce(f.adddiasprazo,0) prazoentrega\n"
-                    + "from\n"
-                    + "    favorecidos f\n"
-                    + "where\n"
-                    + "    tipofavorecido = 2\n"
-                    + "    and favorecido > 0\n"
-                    + "order by\n"
-                    + "    1"
+                    "select\n" +
+                    "    f.codigo id,\n" +
+                    "    coalesce(f.razao, f.nome) razao,\n" +
+                    "    coalesce(f.nome, f.razao) fantasia,\n" +
+                    "    f.cpf_cnpj cnpj,\n" +
+                    "    f.inscricao_est,\n" +
+                    "    f.inscricao_mun,\n" +
+                    "    f.suframa,\n" +
+                    "    case f.desativado when 'S' then 0 else 1 end ativo,\n" +
+                    "    f.endereco,\n" +
+                    "    f.nro,\n" +
+                    "    f.bairro,\n" +
+                    "    f.cidade,\n" +
+                    "    f.uf,\n" +
+                    "    f.municipio,\n" +
+                    "    f.cep,\n" +
+                    "    f.fone1,\n" +
+                    "    f.fone2,\n" +
+                    "    case f.permitircheque when 'N' then 0 else 1 end as permitircheque,\n" +
+                    "    case f.permitirfiado when 'N' then 0 else 1 end as permitirrotativo,\n" +
+                    "    f.datacadastro,\n" +
+                    "    f.obs,\n" +
+                    "    f.celular,\n" +
+                    "    f.fax,\n" +
+                    "    f.email,\n" +
+                    "    coalesce(f.adddiasprazo,0) prazoentrega\n" +
+                    "from\n" +
+                    "    favorecidos f\n" +
+                    "where\n" +
+                    "    tipofavorecido = 2\n" +
+                    "    and favorecido > 0\n" +
+                    "order by\n" +
+                    "    1"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -509,25 +521,31 @@ public class SyncTecDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct\n"
-                    + "    fornecedor,\n"
-                    + "    item,\n"
-                    + "    codigoforn,\n"
-                    + "    data,\n"
-                    + "    precocompra,\n"
-                    + "    quantidade\n"
-                    + "from\n"
-                    + "    itensforn pf\n"
-                    + "order by\n"
-                    + "    1, 2"
+                    "select\n" +
+                    "    distinct\n" +
+                    "    f.codigo idfornecedor,\n" +
+                    "    p.codigo idproduto,\n" +
+                    "    coalesce(codigoforn, '') codigoforn,\n" +
+                    "    pf.data,\n" +
+                    "    pf.precocompra,\n" +
+                    "    pf.quantidade\n" +
+                    "from\n" +
+                    "    itensforn pf\n" +
+                    "join\n" +
+                    "    favorecidos f on (pf.fornecedor = f.favorecido) and\n" +
+                    "    f.tipofavorecido = 2\n" +
+                    "join\n" +
+                    "    itens p on (pf.item = p.item)\n" +
+                    "order by\n" +
+                    "    1, 2"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
 
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    imp.setIdFornecedor(rst.getString("fornecedor"));
-                    imp.setIdProduto(rst.getString("item"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setIdProduto(rst.getString("idproduto"));
                     imp.setCodigoExterno(rst.getString("codigoforn"));
                     imp.setDataAlteracao(rst.getDate("data"));
                     imp.setCustoTabela(rst.getDouble("precocompra"));
@@ -548,7 +566,7 @@ public class SyncTecDAO extends InterfaceDAO {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "    f.favorecido id,\n"
+                    + "    f.codigo id,\n"
                     + "    f.cpf_cnpj cnpj,\n"
                     + "    coalesce(nullif(f.inscricao_est,''),f.rg) inscricaoestadual,\n"
                     + "    coalesce(f.razao, f.nome) razao,\n"
@@ -633,27 +651,27 @@ public class SyncTecDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "    r.id,\n"
-                    + "    r.competencia dataemissao,\n"
-                    + "    r.notafiscal,\n"
-                    + "    r.pdv,\n"
-                    + "    r.valor,\n"
-                    + "    r.obs,\n"
-                    + "    r.cliente,\n"
-                    + "    r.vencimento,\n"
-                    + "    r.parcela,\n"
-                    + "    cast(r.valor * (r.jurosplano/ 100) as numeric(10,2)) juros,\n"
-                    + "    cast(r.valor * (r.percentualmulta/ 100) as numeric(10,2)) multa\n"
-                    + "from\n"
-                    + "    titulosareceber r\n"
-                    + "    join favorecidos f on\n"
-                    + "        f.favorecido = r.cliente\n"
-                    + "where\n"
-                    + "    (r.valorpago = 0 or r.datapago is null) and\n"
-                    + "    r.empresa = " + getLojaOrigem() + "\n"
-                    + "order by\n"
-                    + "    r.id"
+                    "select\n" +
+                    "    r.id,\n" +
+                    "    r.competencia dataemissao,\n" +
+                    "    r.notafiscal,\n" +
+                    "    r.pdv,\n" +
+                    "    (r.valor - r.valorpago) valor,\n" +
+                    "    r.obs,\n" +
+                    "    f.codigo cliente,\n" +
+                    "    r.vencimento,\n" +
+                    "    r.parcela,\n" +
+                    "    cast(r.valor * (r.jurosplano/ 100) as numeric(10,2)) juros,\n" +
+                    "    cast(r.valor * (r.percentualmulta/ 100) as numeric(10,2)) multa\n" +
+                    "from\n" +
+                    "    titulosareceber r\n" +
+                    "    join favorecidos f on\n" +
+                    "        f.favorecido = r.cliente\n" +
+                    "where\n" +
+                    "    (r.valorpago = 0 or r.datapago is null or (r.valor > r.valorpago) ) and\n" +
+                    "    r.empresa = " + getLojaOrigem() + "\n" +
+                    "order by\n" +
+                    "    r.id"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();

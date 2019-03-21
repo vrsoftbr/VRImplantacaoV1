@@ -170,6 +170,7 @@ public class SyncTecGUI extends VRInternalFrame {
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
+                    dao.zerarMargem = chkZerarMargem.isSelected();
 
                     if (tabs.getSelectedIndex() == 0) {
 
@@ -335,6 +336,7 @@ public class SyncTecGUI extends VRInternalFrame {
         chkT1Custo = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Preco = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Estoque = new vrframework.bean.checkBox.VRCheckBox();
+        chkZerarMargem = new vrframework.bean.checkBox.VRCheckBox();
         chkT1EAN = new vrframework.bean.checkBox.VRCheckBox();
         chkT1EANemBranco = new vrframework.bean.checkBox.VRCheckBox();
         chkT1PisCofins = new vrframework.bean.checkBox.VRCheckBox();
@@ -470,6 +472,9 @@ public class SyncTecGUI extends VRInternalFrame {
 
         chkT1Estoque.setText("Estoque");
         tabImpProduto.add(chkT1Estoque);
+
+        chkZerarMargem.setText("Zerar Margem");
+        tabImpProduto.add(chkZerarMargem);
 
         chkT1EAN.setText("EAN");
         tabImpProduto.add(chkT1EAN);
@@ -974,6 +979,7 @@ public class SyncTecGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkValidade;
+    private vrframework.bean.checkBox.VRCheckBox chkZerarMargem;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private javax.swing.JLabel jLabel1;
