@@ -317,8 +317,6 @@ public class ProdutoRepository {
 
                     ProdutoAnteriorVO anterior = null;
                     
-                    System.out.println(importarSomenteLoja);
-                    
                     if (!importarSomenteLoja) {
                         anterior = provider.anterior().get(chaveProd);
                     } else {
