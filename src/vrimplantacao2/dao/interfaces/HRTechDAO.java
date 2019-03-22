@@ -331,44 +331,72 @@ public class HRTechDAO extends InterfaceDAO {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	c.codigoenti id,\n"
-                    + "	cpf.nomeentida razao,\n"
-                    + "	cpf.nomapelido fantasia,\n"
-                    + "	cpf.codinsc_rg rgie,\n"
-                    + "	cpf.numcgc_cpf cnpj,\n"
-                    + "	cpf.datanascim datanascimento,\n"
-                    + "	c.clin12limi limite,\n"
-                    + "	c.clic01stat situacao,\n"
-                    + "	c.codigosexo sexo,\n"
-                    + "	c.estadocivi estadocivil,\n"
-                    + "	c.datacadast datacadastro,\n"
-                    + "	cpf.codcepresi cep,\n"
-                    + "	cpf.compreside numero,\n"
-                    + "	ltrim(cep.titulo + ' ' + cep.logradouro) endereco,\n"
-                    + "	cep.bairro,\n"
-                    + "	cep.cidade,\n"
-                    + "	cep.estado,\n"
-                    + "	tel.telefone01 telefone\n"
-                    + "from\n"
-                    + "	FL400CLI c \n"
-                    + "left join\n"
-                    + "	flcgccpf cpf on (c.codcgccpfs = cpf.codigoenti)\n"
-                    + "left join\n"
-                    + "	fl423cep cep on (c.id_cliente = cep.id_cliente) and\n"
-                    + "	cpf.codcepresi = cep.codigocep\n"
-                    + "left join\n"
-                    + "	fltelefo_cad tel on (c.id_cliente = tel.id_cadastro)\n"
-                    + "where\n"
-                    + "	c.codigoloja = " + getLojaOrigem() + " and\n"
-                    + "	cep.tipocadast = 'CLI'\n"
-                    + "order by\n"
-                    + "	c.id_cliente")) {
+                    "select \n" +
+                    "    c.codigoenti id,\n" +
+                    "    cpf.nomeentida razao,\n" +
+                    "    cpf.nomapelido fantasia,\n" +
+                    "    cpf.codinsc_rg rgie,\n" +
+                    "    cpf.numcgc_cpf cnpj,\n" +
+                    "    cpf.datanascim datanascimento,\n" +
+                    "    c.clin12limi limite,\n" +
+                    "    c.clic01stat situacao,\n" +
+                    "    c.codigosexo sexo,\n" +
+                    "    c.estadocivi estadocivil,\n" +
+                    "    c.datacadast datacadastro,\n" +
+                    "    cpf.codcepresi cep,\n" +
+                    "    cpf.compreside numero,\n" +
+                    "    ltrim(cep.titulo + ' ' + cep.logradouro) endereco,\n" +
+                    "    cep.bairro,\n" +
+                    "    cep.cidade,\n" +
+                    "    cep.estado,\n" +
+                    "    tel.telefone01 telefone\n" +
+                    "from\n" +
+                    "    FL400CLI c \n" +
+                    "left join\n" +
+                    "    flcgccpf cpf on (c.codcgccpfs = cpf.codigoenti)\n" +
+                    "left join\n" +
+                    "    fl423cep cep on (c.id_cliente = cep.id_cliente) and\n" +
+                    "    cpf.codcepresi = cep.codigocep\n" +
+                    "left join\n" +
+                    "    fltelefo_cad tel on (c.id_cliente = tel.id_cadastro)\n" +
+                    "where\n" +
+                    "    cep.tipocadast = 'CLI'\n" +
+                    "union\n" +
+                    "select \n" +
+                    "	distinct\n" +
+                    "	f.codigoenti id,\n" +
+                    "	cpf.nomeentida razao,\n" +
+                    "	cpf.nomapelido fantasia,\n" +
+                    "	cpf.codinsc_rg rgie,\n" +
+                    "	cpf.numcgc_cpf cnpj,\n" +
+                    "	cpf.datanascim datanascimento,\n" +
+                    "	0 limite,\n" +
+                    "	1 situacao,\n" +
+                    "	'M' sexo,\n" +
+                    "	0 estadocivil,\n" +
+                    "	f.datusucada datacadastro,\n" +
+                    "	cpf.codcepcome cep,\n" +
+                    "	cpf.compcomerc numero,\n" +
+                    "	ltrim(cep.titulo + ' ' + cep.logradouro) endereco,\n" +
+                    "	cep.bairro,\n" +
+                    "	cep.cidade,\n" +
+                    "	cep.estado,\n" +
+                    "	tel.telefone01 telefone\n" +
+                    "from \n" +
+                    "	FL800FOR f\n" +
+                    "left join flcgccpf cpf on (f.id_entidade = cpf.id_entidade)\n" +
+                    "left join fl423cep cep on (f.codigoenti = cep.codigoenti)\n" +
+                    "left join fltelefo_cad tel on (f.codigoenti = tel.id_cadastro)\n" +
+                    "join FL700FIN cr on (f.codigoenti = cr.codigoenti)\n" +
+                    "where\n" +
+                    "	cep.tipocadast = 'FOR' and\n" +
+                    "	tel.TP_CADASTRO = 'FOR' and\n" +
+                    "	cr.TIPOLANCAM = 'R'")) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rs.getString("id"));
                     imp.setRazao(rs.getString("razao"));
-                    imp.setInscricaoestadual(rs.getString("rgie"));
+                    imp.setInscricaoestadual(rs.getString("rgie").trim());
                     imp.setCnpj(rs.getString("cnpj"));
                     imp.setDataNascimento(rs.getDate("datanascimento"));
                     imp.setValorLimite(rs.getDouble("limite"));
@@ -473,6 +501,27 @@ public class HRTechDAO extends InterfaceDAO {
         }
         return result;
     }
+    
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda); 
+    }
+    
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
+
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
 
     private static class VendaIterator implements Iterator<VendaIMP> {
 
@@ -487,7 +536,7 @@ public class HRTechDAO extends InterfaceDAO {
         private void obterNext() {
             try {
                 SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
-                SimpleDateFormat timestamp = new SimpleDateFormat("hh:mm");
+                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hhmm");
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
@@ -500,8 +549,8 @@ public class HRTechDAO extends InterfaceDAO {
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
                         next.setData(rst.getDate("data"));
                         next.setIdClientePreferencial(rst.getString("idcliente"));
-                        String horaInicio = rst.getString("horainicio");
-                        String horaTermino = rst.getString("horatermino");
+                        String horaInicio = timestampDate.format(rst.getDate("data") + " " + rst.getString("horainicio"));
+                        String horaTermino = timestampDate.format(rst.getDate("data") + " " + rst.getString("horatermino"));
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
                         next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
@@ -528,7 +577,7 @@ public class HRTechDAO extends InterfaceDAO {
             this.sql
                     = "select\n"
                     + "	c.codi_relacio id,\n"
-                    + "   coalesce(cl.CODIGOENTI, '') idcliente,\n"
+                    + " coalesce(cl.CODIGOENTI, '') idcliente,\n"
                     + "	c.numerocaix ecf,\n"
                     + "	c.numerocupo coo,\n"
                     + "	c.datamovime data,\n"
@@ -539,12 +588,12 @@ public class HRTechDAO extends InterfaceDAO {
                     + "	c.chave_nfe chavenfe,\n"
                     + "	coalesce(cpf.nomeentida, '') razao,\n"
                     + "	coalesce(cep.logradouro, '') endereco,\n"
-                    + "   coalesce(cpf.complocent, '') complemento,\n"
-                    + "   coalesce(cpf.compreside, '') numero,\n"
+                    + " coalesce(cpf.complocent, '') complemento,\n"
+                    + " coalesce(cpf.compreside, '') numero,\n"
                     + "	coalesce(cep.bairro, '') bairro,\n"
                     + "	coalesce(cep.cidade, '') cidade,\n"
                     + "	coalesce(cep.estado, '') estado,\n"
-                    + "   coalesce(cpf.codcepresi, '') cep\n"
+                    + " coalesce(cpf.codcepresi, '') cep\n"
                     + "from\n"
                     + "	FL305CUP c\n"
                     + "left join flcgccpf cpf on \n"
@@ -554,7 +603,7 @@ public class HRTechDAO extends InterfaceDAO {
                     + "	cep.tipocadast = 'CLI'\n"
                     + "where\n"
                     + "	c.codigoloja = " + idLojaCliente + " and\n"
-                    + "	cast(c.datamovime as date) between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "'\n"
+                    + "	(c.datamovime between convert(date, '" + FORMAT.format(dataInicio) + "', 23) and convert(date, '" + FORMAT.format(dataTermino) + "', 23))\n"
                     + "order by\n"
                     + "	c.datamovime, c.numerocupo";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
@@ -644,7 +693,7 @@ public class HRTechDAO extends InterfaceDAO {
                     + "	it.codigoloja = pr.codigoloja\n"
                     + "where \n"
                     + "	it.codigoloja = " + idLojaCliente + " and\n"
-                    + "	cast(it.datamovime as date) between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + "	(it.datamovime between convert(date, '" + VendaIterator.FORMAT.format(dataInicio) + "', 23) and convert(date, '" + VendaIterator.FORMAT.format(dataTermino) + "', 23))\n"
                     + "order by\n"
                     + "	it.codi_relacio, it.id_item";
             LOG.log(Level.FINE, "SQL da venda: " + sql);

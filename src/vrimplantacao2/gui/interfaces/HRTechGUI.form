@@ -565,7 +565,7 @@
                           <Component id="chkUnifProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="chkUnifFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="chkUnifProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="vRCheckBox1" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkUnifClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace pref="296" max="32767" attributes="0"/>
                   </Group>
@@ -581,7 +581,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkUnifProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="vRCheckBox1" min="-2" max="-2" attributes="0"/>
+                      <Component id="chkUnifClientePreferencial" min="-2" max="-2" attributes="0"/>
                       <EmptySpace pref="96" max="32767" attributes="0"/>
                   </Group>
               </Group>
@@ -603,7 +603,7 @@
                 <Property name="text" type="java.lang.String" value="Produto Fornecedor (Somente com CPF/CNPJ)"/>
               </Properties>
             </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="vRCheckBox1">
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUnifClientePreferencial">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Cliente Preferencial (Somente com CPF/CNPJ)"/>
               </Properties>
