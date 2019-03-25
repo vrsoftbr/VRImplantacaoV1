@@ -284,7 +284,6 @@ public class HRTechGUI extends VRInternalFrame {
                         if(chkCreditoRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }
-                        
                         if (chkPdvVendas.isSelected()) {
                             dao.setDataInicioVenda(edtDtVendaIni.getDate());
                             dao.setDataTerminoVenda(edtDtVendaFim.getDate());
