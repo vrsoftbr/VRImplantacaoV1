@@ -34,7 +34,7 @@ import vrimplantacao.gui.interfaces.ConcretizeGUI;
 import vrimplantacao.gui.interfaces.ControlWareGUI;
 import vrimplantacao.gui.interfaces.ControllGUI;
 import vrimplantacao.gui.interfaces.DGComGUI;
-import vrimplantacao.gui.interfaces.DelfiiGUI;
+import vrimplantacao2.gui.interfaces.DelphiGUI;
 import vrimplantacao.gui.interfaces.DirectorGUI;
 import vrimplantacao.gui.interfaces.EccusInformaticaGUI;
 import vrimplantacao.gui.interfaces.EverastGUI;
@@ -273,7 +273,6 @@ public final class MenuGUI extends VRMdiFrame {
     public HostMundoGUI formImportarHostMundo = null;
     public FlatanGUI formImportarFlatan = null;
     public BrainSoftGUI formImportarBrainSoft = null;
-    public DelfiiGUI formImportarDelfi = null;
     public FabTechGUI formImportarFabTech = null;
     public JacsysGUI formImportarJacsys = null;
     public SifatGUI formImportarSifat = null;
@@ -3770,17 +3769,7 @@ public final class MenuGUI extends VRMdiFrame {
 
     private void mnuDelfiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuDelfiActionPerformed
         // TODO add your handling code here:
-        try {
-            this.setWaitCursor();
-            if (formImportarDelfi == null || formImportarDelfi.isClosed()) {
-                formImportarDelfi = new DelfiiGUI(this);
-            }
-            formImportarDelfi.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
+        DelphiGUI.exibir(this);
     }//GEN-LAST:event_mnuDelfiActionPerformed
 
     private void mnuFabTechActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuFabTechActionPerformed

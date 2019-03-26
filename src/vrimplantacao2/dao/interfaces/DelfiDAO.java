@@ -10,6 +10,7 @@ import vrframework.classe.Conexao;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.importacao.ChequeIMP;
@@ -18,20 +19,18 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
-public class DelfiDAO extends InterfaceDAO {
+public class DelfiDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "Delfi";
+        return "Delphi";
     }
 
-    /*public InterfaceDAO getDao() {
-     return dao;
-     }*/
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
@@ -47,6 +46,29 @@ public class DelfiDAO extends InterfaceDAO {
         return vResult;
     }
 
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "codigo_aliquota,\n"
+                    + "descricao,\n"
+                    + "aliquota_ecf,\n"
+                    + "percentual_icms\n"
+                    + "from aliquotas\n"
+                    + "order by codigo_aliquota"
+            )) {
+                while (rst.next()) {
+                    result.add(new MapaTributoIMP(rst.getString("codigo_aliquota"), (rst.getString("descricao") + " - " + rst.getString("aliquota_ecf"))));
+                }
+            }
+        }
+        
+        return result;
+    }
+    
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> vResult = new ArrayList<>();
@@ -102,12 +124,12 @@ public class DelfiDAO extends InterfaceDAO {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select p.codigo_produto, p.codigo_barra, p.codigo_fabricante, p.codigo_linha,\n"
-                    + "p.codigo_aliquota, p.descricao, p.unidade, p.estoque, p.preco_custo, p.lucro_percentual,\n"
+                    + "p.codigo_aliquota, p.descricao, substring(p.unidade from 1 for 2) as unidade, p.estoque, p.preco_custo, p.lucro_percentual,\n"
                     + "p.lucro_real, p.preco_venda, p.inativo, p.data_cad, p.situacao_tributaria,  p.icms_credito,\n"
                     + "p.aliquota, p.peso_liquido, p.peso_bruto, p.pis_cofins, p.ncm, descricao_abreviada,\n"
                     + "p.cst_pis, p.cst_cofins, p.cst_icms_entrada, p.cst_pis_entrada, p.cst_cofins_entrada,\n"
                     + "p.cest, a.descricao desc_aliquota, a.aliquota_ecf, a.percentual_icms, f.descricao desc_fabricante,\n"
-                    + "l.descricao desc_linha\n"
+                    + "l.descricao desc_linha, p.codigo_aliquota\n"
                     + "from produtos p\n"
                     + "inner join aliquotas a on a.codigo_aliquota = p.codigo_aliquota\n"
                     + "left join fabricantes f on f.codigo_fabricante = p.codigo_fabricante\n"
@@ -138,11 +160,11 @@ public class DelfiDAO extends InterfaceDAO {
                     imp.setPiscofinsCstCredito(rst.getInt("cst_pis_entrada"));
                     imp.setMargem(rst.getDouble("lucro_percentual"));
                     imp.setCustoComImposto(rst.getDouble("preco_custo"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setPrecovenda(rst.getDouble("preco_venda"));
                     imp.setEstoque(rst.getDouble("estoque"));
-                    imp.setIcmsCstSaida(rst.getInt("situacao_tributaria"));
-                    imp.setIcmsAliq(rst.getDouble("percentual_icms"));
-                    imp.setIcmsCstEntrada(rst.getInt("cst_icms_entrada"));
+                    imp.setIcmsDebitoId(rst.getString("codigo_aliquota"));
+                    imp.setIcmsCreditoId(rst.getString("codigo_aliquota"));
                     vResult.add(imp);
                 }
             }
