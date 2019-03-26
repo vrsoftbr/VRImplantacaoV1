@@ -17,6 +17,7 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
@@ -263,6 +264,9 @@ public class HRTechGUI extends VRInternalFrame {
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
+                        if(chkContaPagar.isSelected()) {
+                            importador.importarContasPagar(OpcaoContaPagar.NOVOS);
+                        }
                         if (chkProdutoFornecedor.isSelected()) {
                             importador.importarProdutoFornecedor();
                         }
@@ -284,7 +288,6 @@ public class HRTechGUI extends VRInternalFrame {
                         if(chkCreditoRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }
-                        
                         if (chkPdvVendas.isSelected()) {
                             dao.setDataInicioVenda(edtDtVendaIni.getDate());
                             dao.setDataTerminoVenda(edtDtVendaFim.getDate());
