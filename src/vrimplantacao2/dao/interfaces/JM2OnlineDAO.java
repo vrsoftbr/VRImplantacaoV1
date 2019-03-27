@@ -3,6 +3,8 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
@@ -530,7 +532,37 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
-        return OpcaoProduto.getPadrao();
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.CEST,
+                OpcaoProduto.CUSTO,
+                OpcaoProduto.DATA_ALTERACAO,
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.OFERTA,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.FABRICANTE,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO
+        ));
     }
     
 }
