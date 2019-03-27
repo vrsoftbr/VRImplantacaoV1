@@ -257,7 +257,8 @@ public class NotaSaidaNfceDAO {
                 Element qCom = (Element) prod.getElementsByTagName("qCom").item(0);
 
                 if (verificarCodigoAnterior) {
-                    ProdutoMapa mp = mapa.get(tipo.toString(), String.valueOf(Utils.formataNumero(cProd.getTextContent())));
+                    String codigo = cProd.getTextContent().replace("'", "").replace("\n", "").trim();
+                    ProdutoMapa mp = mapa.get(tipo.toString(), codigo);
                     if (importacaoV2) {
                         daoV2.setImportSistema(impLoja.impSistema);
                         daoV2.setImportLoja(impLoja.impLoja);
@@ -265,7 +266,7 @@ public class NotaSaidaNfceDAO {
                         if (mp != null && mp.getCodigoAtual() > 0) {
                             codigoProduto = mp.getCodigoAtual();
                         } else {
-                            codigoProduto = daoV2.getCodigoAnterior2(daoV2.getImportSistema(), daoV2.getImportLoja(), cProd.getTextContent().replace("'", "").replace("\n", "").trim());
+                            codigoProduto = daoV2.getCodigoAnterior2(daoV2.getImportSistema(), daoV2.getImportLoja(), codigo);
                         }
                     } else {
                         if (mp != null && mp.getCodigoAtual() > 0) {
