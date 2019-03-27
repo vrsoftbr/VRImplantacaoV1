@@ -558,7 +558,7 @@ public class HRTechDAO extends InterfaceDAO {
                     imp.setId(rs.getString("id"));
                     imp.setNumeroDocumento(rs.getString("documento"));
                     imp.setDataEmissao(rs.getDate("emissao"));
-                    imp.setVencimento(rs.getDate("vencimento"));
+                    imp.setDataEntrada(rs.getDate("emissao"));
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
                     imp.setValor(rs.getDouble("valor"));
 
@@ -569,6 +569,9 @@ public class HRTechDAO extends InterfaceDAO {
                     } else {
                         imp.setObservacao(rs.getString("observacao").trim());
                     }
+                    
+                    imp.addVencimento(rs.getDate("vencimento"), imp.getValor());
+                    
                     result.add(imp);
                 }
             }
