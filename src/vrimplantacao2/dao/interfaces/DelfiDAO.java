@@ -369,8 +369,8 @@ public class DelfiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "r.obs, c.nome, c.cnpj_cpf\n"
                     + "from receber r\n"
                     + "left join clientes c on c.codigo_cliente = r.codigo_cliente\n"
-                    + "where r.status = 'A' "
-                    + "and r.forma not in ('CH')"
+                    + "where r.status = 'A'\n"
+                    + "and r.forma = 'P'"
             )) {
                 dataPagamento = new Date(new java.util.Date().getTime());
                 while (rst.next()) {
