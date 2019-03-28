@@ -177,6 +177,7 @@ public class SysPdvGUI extends VRInternalFrame {
                     importador.setLojaVR(idLojaVR);
                     dao.setComplementoSistema(txtComplNomeSistema.getText());
                     dao.FZDCOD = txtCodFinalizadoras.getText().trim();
+                    dao.setGerarEanAtacado(chkGerarEANAtacado.isSelected());
                     
                     switch(tabsConexoes.getSelectedIndex()) {
                         case 0: dao.setTipoConexao(SysPdvDAO.TipoConexao.FIREBIRD); break;
@@ -269,7 +270,7 @@ public class SysPdvGUI extends VRInternalFrame {
                             }
                         }
 
-                        if (chkT1EAN.isSelected()) {
+                        if (chkT1EAN.isSelected() || chkGerarEANAtacado.isSelected()) {
                             importador.importarEAN();
                         }
                         if (chkT1EANemBranco.isSelected()) {
@@ -345,6 +346,7 @@ public class SysPdvGUI extends VRInternalFrame {
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
         vRTabbedPane2 = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabImpProduto = new vrframework.bean.panel.VRPanel();
+        chkGerarEANAtacado = new vrframework.bean.checkBox.VRCheckBox();
         chkMercadologico = new vrframework.bean.checkBox.VRCheckBox();
         chkFamiliaProduto = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
@@ -453,6 +455,9 @@ public class SysPdvGUI extends VRInternalFrame {
 
         tabImpProduto.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         tabImpProduto.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        chkGerarEANAtacado.setText("Gerar EAN Para atacado");
+        tabImpProduto.add(chkGerarEANAtacado);
 
         chkMercadologico.setText("Mercadologico");
         chkMercadologico.setEnabled(true);
@@ -957,6 +962,7 @@ public class SysPdvGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
     private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkGerarEANAtacado;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;

@@ -159,6 +159,11 @@
                 <Property name="alignment" type="int" value="0"/>
               </Layout>
               <SubComponents>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkGerarEANAtacado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Gerar EAN Para atacado"/>
+                  </Properties>
+                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMercadologico">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Mercadologico"/>
