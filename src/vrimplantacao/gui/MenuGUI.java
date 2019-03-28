@@ -46,6 +46,7 @@ import vrimplantacao.gui.interfaces.FlatanGUI;
 import vrimplantacao.gui.interfaces.GCFGUI;
 import vrimplantacao.gui.interfaces.GZSistemasGUI;
 import vrimplantacao.gui.interfaces.GdoorGUI;
+import vrimplantacao.gui.interfaces.GeraContaPagarGUI;
 import vrimplantacao.gui.interfaces.GerarCodigoBarrasAtacadoGUI;
 import vrimplantacao.gui.interfaces.GestoraGUI;
 import vrimplantacao.gui.interfaces.GetWayCloudGUI;
@@ -732,6 +733,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnupdvvendaitem = new javax.swing.JMenuItem();
         mnuPlanilhaVr = new javax.swing.JMenuItem();
         mnuAcertarIdsProdutos = new javax.swing.JMenuItem();
+        mnuContaPagar = new javax.swing.JMenuItem();
         jMenuItemVRPdv = new javax.swing.JMenuItem();
         mnuSistema = new javax.swing.JMenu();
         mnuSistemaLogin = new javax.swing.JMenuItem();
@@ -2405,6 +2407,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuImpSistema.add(mnuAcertarIdsProdutos);
+
+        mnuContaPagar.setText("Gerar Conta Pagar");
+        mnuContaPagar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuContaPagarActionPerformed(evt);
+            }
+        });
+        mnuImpSistema.add(mnuContaPagar);
 
         mnuInterface.add(mnuImpSistema);
 
@@ -4234,6 +4244,10 @@ public final class MenuGUI extends VRMdiFrame {
         SolutionSuperaGUI.exibir(this);
     }//GEN-LAST:event_mnuSolutionSuperaActionPerformed
 
+    private void mnuContaPagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuContaPagarActionPerformed
+        GeraContaPagarGUI.exibir(this);
+    }//GEN-LAST:event_mnuContaPagarActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4355,6 +4369,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuCefas;
     private javax.swing.JMenuItem mnuCerebro;
     private javax.swing.JMenuItem mnuCodigoBarrasAtacado;
+    private javax.swing.JMenuItem mnuContaPagar;
     private javax.swing.JMenuItem mnuControll;
     private javax.swing.JMenuItem mnuCplus;
     private javax.swing.JMenu mnuDB2;
