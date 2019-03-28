@@ -1,6 +1,5 @@
 package vrimplantacao2.dao.interfaces;
 
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
@@ -361,7 +360,6 @@ public class DelfiDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> vResult = new ArrayList<>();
         String observacao;
-        java.sql.Date dataPagamento;
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select r.codigo_receber, r.codigo_cliente, r.data_emissao, r.numero_venda, r.forma,\n"
@@ -369,10 +367,9 @@ public class DelfiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "r.obs, c.nome, c.cnpj_cpf\n"
                     + "from receber r\n"
                     + "left join clientes c on c.codigo_cliente = r.codigo_cliente\n"
-                    + "where r.status = 'A' "
-                    + "and r.forma not in ('CH')"
+                    + "where r.status = 'A'\n"
+                    + "and r.forma = 'P'"
             )) {
-                dataPagamento = new Date(new java.util.Date().getTime());
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rst.getString("codigo_receber"));
@@ -413,6 +410,7 @@ public class DelfiDAO extends InterfaceDAO implements MapaTributoProvider {
                     ChequeIMP imp = new ChequeIMP();
                     imp.setId(rst.getString("codigo_receber"));
                     imp.setDate(rst.getDate("data_emissao"));
+                    imp.setDataDeposito(rst.getDate("data_vencimento"));
                     imp.setValor(rst.getDouble("valor_conta"));
                     imp.setCpf(rst.getString("cnpj_cpf"));
                     imp.setRg(rst.getString("numero_ident"));

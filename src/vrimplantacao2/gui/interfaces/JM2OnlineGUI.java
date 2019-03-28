@@ -195,6 +195,9 @@ public class JM2OnlineGUI extends VRInternalFrame implements ConexaoEvent {
                             if (chkFTipoForn.isSelected()) {
                                 opcoes.add(OpcaoFornecedor.TIPO_FORNECEDOR);
                             }
+                            if (chkFSituacaoCadastro.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.SITUACAO_CADASTRO);
+                            }
 
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
@@ -203,6 +206,22 @@ public class JM2OnlineGUI extends VRInternalFrame implements ConexaoEvent {
                         
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
+                        }
+                        
+                        {
+                            List<OpcaoCliente> opt = new ArrayList<>();
+                            if (chkCBloqueado.isSelected()) {
+                                opt.add(OpcaoCliente.BLOQUEADO);
+                            }
+                            if (chkCObservacoes.isSelected()) {
+                                opt.add(OpcaoCliente.OBSERVACOES2);
+                            }
+                            if (chkCIeRg.isSelected()) {
+                                opt.add(OpcaoCliente.INSCRICAO_ESTADUAL);
+                            }
+                            if (!opt.isEmpty()) {
+                                importador.atualizarClientePreferencial(opt.toArray(new OpcaoCliente[]{}));
+                            }
                         }
                         if (chkClienteEventual.isSelected()) {
                             importador.importarClienteEventual(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
@@ -261,20 +280,24 @@ public class JM2OnlineGUI extends VRInternalFrame implements ConexaoEvent {
         tabImportacao = new javax.swing.JTabbedPane();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
-        jPanel3 = new javax.swing.JPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
-        chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
-        chkFTipoPagamento = new vrframework.bean.checkBox.VRCheckBox();
-        chkFEndereco = new vrframework.bean.checkBox.VRCheckBox();
-        chkFNumero = new vrframework.bean.checkBox.VRCheckBox();
         chkFTipoEmp = new vrframework.bean.checkBox.VRCheckBox();
         chkFTipoForn = new vrframework.bean.checkBox.VRCheckBox();
+        chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
+        chkFTipoPagamento = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkFEndereco = new vrframework.bean.checkBox.VRCheckBox();
+        chkFNumero = new vrframework.bean.checkBox.VRCheckBox();
+        chkProdutoFornecedor1 = new vrframework.bean.checkBox.VRCheckBox();
+        chkFSituacaoCadastro = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
+        chkCBloqueado = new vrframework.bean.checkBox.VRCheckBox();
+        chkCObservacoes = new vrframework.bean.checkBox.VRCheckBox();
+        chkCIeRg = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -296,42 +319,37 @@ public class JM2OnlineGUI extends VRInternalFrame implements ConexaoEvent {
 
         tabImportacao.addTab("Produtos", tabProdutos);
 
-        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        tabFornecedor.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         chkFornecedor.setText("Fornecedor");
-        jPanel3.add(chkFornecedor);
-
-        chkFContatos.setText("Contatos");
-        jPanel3.add(chkFContatos);
-
-        chkFTipoPagamento.setText("Tipo Pagamento");
-        jPanel3.add(chkFTipoPagamento);
-
-        chkFEndereco.setText("Endereço");
-        jPanel3.add(chkFEndereco);
-
-        chkFNumero.setText("Número");
-        jPanel3.add(chkFNumero);
+        tabFornecedor.add(chkFornecedor);
 
         chkFTipoEmp.setText("Tipo Empresa");
-        jPanel3.add(chkFTipoEmp);
+        tabFornecedor.add(chkFTipoEmp);
 
         chkFTipoForn.setText("Tipo Fornecedor");
-        jPanel3.add(chkFTipoForn);
+        tabFornecedor.add(chkFTipoForn);
+
+        chkFContatos.setText("Contatos");
+        tabFornecedor.add(chkFContatos);
+
+        chkFTipoPagamento.setText("Tipo Pagamento");
+        tabFornecedor.add(chkFTipoPagamento);
 
         chkProdutoFornecedor.setText("Produto Fornecedor");
-        jPanel3.add(chkProdutoFornecedor);
+        tabFornecedor.add(chkProdutoFornecedor);
 
-        javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
-        tabFornecedor.setLayout(tabFornecedorLayout);
-        tabFornecedorLayout.setHorizontalGroup(
-            tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 550, Short.MAX_VALUE)
-        );
-        tabFornecedorLayout.setVerticalGroup(
-            tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
-        );
+        chkFEndereco.setText("Endereço");
+        tabFornecedor.add(chkFEndereco);
+
+        chkFNumero.setText("Número");
+        tabFornecedor.add(chkFNumero);
+
+        chkProdutoFornecedor1.setText("Produto Fornecedor");
+        tabFornecedor.add(chkProdutoFornecedor1);
+
+        chkFSituacaoCadastro.setText("Situação Cadastro");
+        tabFornecedor.add(chkFSituacaoCadastro);
 
         tabImportacao.addTab("Fornecedores", tabFornecedor);
 
@@ -343,6 +361,12 @@ public class JM2OnlineGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkCheque.setText("Cheque");
 
+        chkCBloqueado.setText("Bloqueado");
+
+        chkCObservacoes.setText("Observações");
+
+        chkCIeRg.setText("IE/RG");
+
         javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
         tabClientes.setLayout(tabClientesLayout);
         tabClientesLayout.setHorizontalGroup(
@@ -350,24 +374,35 @@ public class JM2OnlineGUI extends VRInternalFrame implements ConexaoEvent {
             .addGroup(tabClientesLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(tabClientesLayout.createSequentialGroup()
+                        .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCObservacoes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCIeRg, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(425, Short.MAX_VALUE))
+                .addContainerGap(96, Short.MAX_VALUE))
         );
         tabClientesLayout.setVerticalGroup(
             tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabClientesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCObservacoes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCIeRg, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(176, Short.MAX_VALUE))
+                .addContainerGap(180, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
@@ -507,6 +542,9 @@ public class JM2OnlineGUI extends VRInternalFrame implements ConexaoEvent {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkCBloqueado;
+    private vrframework.bean.checkBox.VRCheckBox chkCIeRg;
+    private vrframework.bean.checkBox.VRCheckBox chkCObservacoes;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
@@ -514,11 +552,13 @@ public class JM2OnlineGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFEndereco;
     private vrframework.bean.checkBox.VRCheckBox chkFNumero;
+    private vrframework.bean.checkBox.VRCheckBox chkFSituacaoCadastro;
     private vrframework.bean.checkBox.VRCheckBox chkFTipoEmp;
     private vrframework.bean.checkBox.VRCheckBox chkFTipoForn;
     private vrframework.bean.checkBox.VRCheckBox chkFTipoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor1;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
@@ -528,7 +568,6 @@ public class JM2OnlineGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.sqlserver.ConexaoSqlServerPanel conexao;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel3;
     private org.jdesktop.swingx.JXDatePicker jXDatePicker1;
     private vrframework.bean.panel.VRPanel pnlLoja;
     private vrframework.bean.panel.VRPanel tabClientes;

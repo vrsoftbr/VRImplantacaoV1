@@ -1,11 +1,9 @@
 package vrimplantacao2.dao.interfaces;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,11 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import jxl.Cell;
-import jxl.Sheet;
-import jxl.Workbook;
-import jxl.WorkbookSettings;
-import org.apache.commons.lang3.StringUtils;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
@@ -56,6 +49,11 @@ public class SysPdvDAO extends InterfaceDAO {
     private String complementoSistema = "";
     public String FZDCOD = "";
     public String v_pahtFileXls;
+    private boolean gerarEanAtacado = false;
+
+    public void setGerarEanAtacado(boolean gerarEanAtacado) {
+        this.gerarEanAtacado = gerarEanAtacado;
+    }
 
     public void setTipoConexao(TipoConexao tipoConexao) {
         this.tipoConexao = tipoConexao;
@@ -396,37 +394,40 @@ public class SysPdvDAO extends InterfaceDAO {
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = tipoConexao.getConnection().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select "
-                    + "procod, "
-                    + "proprc1, "
-                    + "proprc2, "
-                    + "proqtdminprc2 "
-                    + "from produto\n"
-                    + "where proqtdminprc2 > 1"
-            )) {
-                while (rst.next()) {
+        if (gerarEanAtacado) {
+            try (Statement stm = tipoConexao.getConnection().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select "
+                        + "procod, "
+                        + "proprc1, "
+                        + "proprc2, "
+                        + "proqtdminprc2 "
+                        + "from produto\n"
+                        + "where proqtdminprc2 > 1"
+                )) {
+                    while (rst.next()) {
 
-                    int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("procod"));
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("procod"));
 
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("procod"));
-                    imp.setEan("99999" + String.valueOf(codigoAtual));
-                    imp.setQtdEmbalagem(rst.getInt("proqtdminprc2"));
-                    result.add(imp);
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("procod"));
+                        imp.setEan("99999" + String.valueOf(codigoAtual));
+                        imp.setQtdEmbalagem(rst.getInt("proqtdminprc2"));
+                        result.add(imp);
+                    }
                 }
             }
-            return result;
+        } else {
+            result = getProdutos();
         }
+        return result;
     }
 
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        double desconto = 0;
 
         if (opt == OpcaoProduto.ATACADO) {
             try (Statement stm = tipoConexao.getConnection().createStatement()) {
@@ -454,10 +455,9 @@ public class SysPdvDAO extends InterfaceDAO {
                         result.add(imp);
                     }
                 }
-                return result;
             }
         }
-        return null;
+        return result;
     }
 
     @Override
