@@ -140,8 +140,8 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.pesoB pesobruto,\n" +
                     "	p.saldoAtual estoque,\n" +
                     "	pr.margem1 margem,\n" +
-                    "	p.precoUltimaCompra custocomimposto,\n" +
-                    "	p.precoUltimaCompraLiquido custosemimposto,\n" +
+                    "	p.precoUltimaEntrada custocomimposto,\n" +
+                    "	p.precoUltimaEntradaLiquido custosemimposto,\n" +
                     "	pr.preco1 preco,\n" +
                     "	p.statusProduto status,\n" +
                     "	p.classificacaoFiscal ncm,\n" +
@@ -272,7 +272,7 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	e.tipoEntidade like '%F%' and\n" +
                     "	e.dataFinal is null\n" +
                     "order by\n" +
-                    "	e.codigo;"
+                    "	e.codigo"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -359,7 +359,7 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select\n" +
                     "	e.codigo id,\n" +
                     "	e.cnpjCPF cnpj,\n" +
-                    "	e.ieRG,\n" +
+                    "	case when upper(e.ieRG) = 'ISENTO' then e.rg else e.ieRG end as ieRG,\n" +
                     "	e.razaoSocial,\n" +
                     "	e.fantasia,\n" +
                     "	e.status,\n" +
@@ -386,14 +386,15 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	e.cobbairro,\n" +
                     "	e.cobcidade,\n" +
                     "	e.cobestado,\n" +
-                    "	e.cobcep\n" +
+                    "	e.cobcep,\n" +
+                    "	e.contato\n" +
                     "from\n" +
                     "	Entidades e\n" +
                     "where\n" +
                     "	e.tipoEntidade like '%C%' and\n" +
                     "	e.dataFinal is null\n" +
                     "order by\n" +
-                    "	e.codigo;"
+                    "	e.codigo"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -404,6 +405,7 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setRazao(rst.getString("razaoSocial"));
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setAtivo(!"I".equals(rst.getString("status")));
+                    imp.setBloqueado("S".equals(rst.getString("vendaBloqueada")));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemento"));
@@ -415,7 +417,13 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rst.getDate("dataInicio"));
                     imp.setCargo(rst.getString("cargoU"));
                     imp.setValorLimite(rst.getDouble("limiteDeCredito"));
-                    imp.setObservacao2(rst.getString("obsFixa"));
+                    imp.setObservacao2(
+                            (
+                                    rst.getString("contato") != null && !rst.getString("contato").trim().equals("") ?
+                                    "CONTATOS " + rst.getString("contato") + " - " :
+                                    ""
+                            ) + rst.getString("obsFixa")
+                    );
                     imp.setDiaVencimento(rst.getInt("diavencimento"));
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setEmail(rst.getString("email"));
@@ -467,7 +475,7 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		ent.id = c.idEntidade\n" +
                     "where\n" +
                     "	c.tipoDaConta = 'R' and\n" +
-                    "	c.valorDaDuplicata > cp.valorPago and\n" +
+                    "	c.valorDaDuplicata > coalesce(cp.valorPago, 0) and\n" +
                     "	c.idEmpresa = " + getLojaOrigem() + "\n" +
                     "order by c.id"
             )) {

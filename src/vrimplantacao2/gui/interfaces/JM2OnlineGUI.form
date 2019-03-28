@@ -111,67 +111,60 @@
                 </Constraint>
               </Constraints>
 
-              <Layout>
-                <DimensionLayout dim="0">
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jPanel3" alignment="0" pref="550" max="32767" attributes="0"/>
-                  </Group>
-                </DimensionLayout>
-                <DimensionLayout dim="1">
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jPanel3" alignment="0" pref="275" max="32767" attributes="0"/>
-                  </Group>
-                </DimensionLayout>
+              <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
+                <Property name="alignment" type="int" value="0"/>
               </Layout>
               <SubComponents>
-                <Container class="javax.swing.JPanel" name="jPanel3">
-
-                  <Layout class="org.netbeans.modules.form.compat2.layouts.DesignFlowLayout">
-                    <Property name="alignment" type="int" value="0"/>
-                  </Layout>
-                  <SubComponents>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornecedor">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Fornecedor"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFContatos">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Contatos"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFTipoPagamento">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Tipo Pagamento"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFEndereco">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Endere&#xe7;o"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFNumero">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="N&#xfa;mero"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFTipoEmp">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Tipo Empresa"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFTipoForn">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Tipo Fornecedor"/>
-                      </Properties>
-                    </Component>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoFornecedor">
-                      <Properties>
-                        <Property name="text" type="java.lang.String" value="Produto Fornecedor"/>
-                      </Properties>
-                    </Component>
-                  </SubComponents>
-                </Container>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornecedor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Fornecedor"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFTipoEmp">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo Empresa"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFTipoForn">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo Fornecedor"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFContatos">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Contatos"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFTipoPagamento">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo Pagamento"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoFornecedor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Produto Fornecedor"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFEndereco">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Endere&#xe7;o"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFNumero">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="N&#xfa;mero"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoFornecedor1">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Produto Fornecedor"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFSituacaoCadastro">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Situa&#xe7;&#xe3;o Cadastro"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="tabClientes">
@@ -189,12 +182,20 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCBloqueado" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCObservacoes" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCIeRg" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="425" max="32767" attributes="0"/>
+                          <EmptySpace pref="96" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -202,14 +203,19 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkClientePreferencial" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCBloqueado" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCObservacoes" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCIeRg" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="176" max="32767" attributes="0"/>
+                          <EmptySpace pref="180" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -233,6 +239,21 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCheque">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cheque"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCBloqueado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Bloqueado"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCObservacoes">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Observa&#xe7;&#xf5;es"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCIeRg">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="IE/RG"/>
                   </Properties>
                 </Component>
               </SubComponents>
