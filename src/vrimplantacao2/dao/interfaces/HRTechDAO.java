@@ -192,58 +192,60 @@ public class HRTechDAO extends InterfaceDAO {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	distinct\n"
-                    + "	p.codigoplu id,\n"
-                    + "	case \n"
-                    + "		when p.estc13codi = '' then \n"
-                    + "		p.codigoplu \n"
-                    + "	else p.estc13codi end ean,\n"
-                    + "	p.estc35desc descricaocompleta,\n"
-                    + "	p.descreduzi descricaoreduzida,\n"
-                    + "	ps.situacao,\n"
-                    + "	ps.dtcadastro,\n"
-                    + "	p.estc03seto merc1,\n"
-                    + "	p.estc03grup merc2,\n"
-                    + "	p.estc03subg merc3,\n"
-                    + "	p.estc03fami merc4,\n"
-                    + "	p.estc03subf merc5,\n"
-                    + "	p.estc01peso pesavel,\n"
-                    + "	coalesce(bal.diasvalida, 0) validade,\n"
-                    + "	coalesce(bal.peso_varia, '') peso,\n"
-                    + "	cus.custoliqui custosemimposto,\n"
-                    + "	cus.custoliqui custocomimposto,\n"
-                    + "	p.vendaatua venda,\n"
-                    + " round((((p.vendaatua / case when cus.custoliqui = 0 then 1 else cus.custoliqui end) - 1) * 100), 2) margem,\n"
-                    + "	p.tip_emb_vd embalagem,\n"
-                    + "	p.datreajatu datareajuste,\n"
-                    + "	p.estoque,\n"
-                    + "	p.cod_ncm ncm,\n"
-                    + "	p.data_alte dataalteracao,\n"
-                    + "	p.siglatribu,\n"
-                    + "	p.tributouni tributo,\n"
-                    + "	p.valoricm icms,\n"
-                    + "	tr.situatribu cst,\n"
-                    + "	tr.mrger icmsreducao,\n"
-                    + "	p.cstpis,\n"
-                    + "	p.cstcof cstcofins,\n"
-                    + "	nat.NAT_REC_PIS naturezareceita,\n"
-                    + "	p.codcest cest\n"
-                    + "from \n"
-                    + "	HRPDV_PREPARA_PRO p\n"
-                    + "left join FLTRIBUT tr on (p.codigotrib = tr.codigotrib) and\n"
-                    + "	p.codigoloja = tr.codigoloja\n"
-                    + "left join FL303CUS cus on (p.codigoplu = cus.codigoplu) and\n"
-                    + "	cus.codigoloja = p.codigoloja\n"
-                    + "left join FL300EST ps on (p.codigoplu = ps.codigoplu)\n"
-                    + "left join FL328BAL bal on (p.codigoplu = bal.codigoplu)\n"
-                    + "left join FLTABNCM_PIS nat on (p.cod_ncm = nat.codigo) and\n"
-                    + "	nat.cstpis = p.cstpis and\n"
-                    + "	nat.cstcof = p.cstcof\n"
-                    + "where\n"
-                    + "	p.codigoloja = " + getLojaOrigem() + "\n"
-                    + "order by\n"
-                    + "	p.codigoplu")) {
+                    "select \n" +
+                    "	distinct\n" +
+                    "	p.codigoplu id,\n" +
+                    "	case \n" +
+                    "		when p.estc13codi = '' then \n" +
+                    "		p.codigoplu \n" +
+                    "	else p.estc13codi end ean,\n" +
+                    "	p.estc35desc descricaocompleta,\n" +
+                    "	p.descreduzi descricaoreduzida,\n" +
+                    "	ps.situacao,\n" +
+                    "	ps.dtcadastro,\n" +
+                    "	p.estc03seto merc1,\n" +
+                    "	p.estc03grup merc2,\n" +
+                    "	p.estc03subg merc3,\n" +
+                    "	p.estc03fami merc4,\n" +
+                    "	p.estc03subf merc5,\n" +
+                    "	p.estc01peso pesavel,\n" +
+                    "	coalesce(bal.diasvalida, 0) validade,\n" +
+                    "	coalesce(bal.peso_varia, '') peso,\n" +
+                    "	cus.custoliqui custosemimposto,\n" +
+                    "	cus.custoliqui custocomimposto,\n" +
+                    "	p.vendaatua venda,\n" +
+                    "	ep.estn05mrge margem,\n" +
+                    "	p.tip_emb_vd embalagem,\n" +
+                    "	p.datreajatu datareajuste,\n" +
+                    "	p.estoque,\n" +
+                    "	p.cod_ncm ncm,\n" +
+                    "	p.data_alte dataalteracao,\n" +
+                    "	p.siglatribu,\n" +
+                    "	p.tributouni tributo,\n" +
+                    "	p.valoricm icms,\n" +
+                    "	tr.situatribu cst,\n" +
+                    "	tr.mrger icmsreducao,\n" +
+                    "	p.cstpis,\n" +
+                    "	p.cstcof cstcofins,\n" +
+                    "	nat.NAT_REC_PIS naturezareceita,\n" +
+                    "	p.codcest cest\n" +
+                    "from \n" +
+                    "	HRPDV_PREPARA_PRO p\n" +
+                    "left join FLTRIBUT tr on (p.codigotrib = tr.codigotrib) and\n" +
+                    "	p.codigoloja = tr.codigoloja\n" +
+                    "left join FL303CUS cus on (p.codigoplu = cus.codigoplu) and\n" +
+                    "	cus.codigoloja = p.codigoloja\n" +
+                    "left join FL300EST ps on (p.codigoplu = ps.codigoplu)\n" +
+                    "left join FL301EST ep on (p.codigoplu = ep.codigoplu) and\n" +
+                    "	 p.codigoloja = ep.codigoloja\n" +
+                    "left join FL328BAL bal on (p.codigoplu = bal.codigoplu)\n" +
+                    "left join FLTABNCM_PIS nat on (p.cod_ncm = nat.codigo) and\n" +
+                    "	nat.cstpis = p.cstpis and\n" +
+                    "	nat.cstcof = p.cstcof\n" +
+                    "where\n" +
+                    "	p.codigoloja = " + getLojaOrigem() + "\n" +
+                    "order by\n" +
+                    "	p.codigoplu")) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportSistema(getSistema());
