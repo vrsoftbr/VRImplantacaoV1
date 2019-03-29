@@ -28,9 +28,16 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private String descricaoAdicional = "";
+
+    public void setDescricaoAdicional(String descricaoAdicional) {
+        this.descricaoAdicional = descricaoAdicional == null ? "" : descricaoAdicional;
+        System.out.println(getSistema());
+    }
+    
     @Override
     public String getSistema() {
-        return "JM2Online";
+        return "JM2Online" + (!"".equals(descricaoAdicional) ? " - " + descricaoAdicional : "");
     }
 
     @Override
@@ -387,11 +394,40 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	e.cobcidade,\n" +
                     "	e.cobestado,\n" +
                     "	e.cobcep,\n" +
-                    "	e.contato\n" +
+                    "	e.contato,\n" +
+                    "	e2.codigo e2\n" +
                     "from\n" +
                     "	Entidades e\n" +
+                    "	left join (\n" +
+                    "		select distinct\n" +
+                    "			ent.codigo\n" +
+                    "		from\n" +
+                    "			Contas c\n" +
+                    "			left join ContasPDV pdv on\n" +
+                    "				pdv.id = c.idGerador\n" +
+                    "			left join PDVs on\n" +
+                    "				pdv.idPdv = PDVs.id\n" +
+                    "			left join Entidades ent on\n" +
+                    "				ent.id = c.idEntidade\n" +
+                    "		where\n" +
+                    "				(c.idEmpresa = " + getLojaOrigem() + ") and \n" +
+                    "				not (\n" +
+                    "						(\n" +
+                    "							(\n" +
+                    "								(c.status = N'Q') or \n" +
+                    "								(c.status = N'A')\n" +
+                    "							) and \n" +
+                    "							(c.restante = 0)\n" +
+                    "						)\n" +
+                    "				) and \n" +
+                    "				not ((c.status = N'C')) \n" +
+                    "				and (c.tipoDaConta = N'R')\n" +
+                    "	) e2 on e.codigo = e2.codigo\n" +
                     "where\n" +
-                    "	e.tipoEntidade like '%C%' and\n" +
+                    "	(\n" +
+                    "		e.tipoEntidade like '%C%' or\n" +
+                    "		not e2.codigo is null\n" +
+                    "	) and\n" +
                     "	e.dataFinal is null\n" +
                     "order by\n" +
                     "	e.codigo"
