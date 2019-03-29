@@ -459,14 +459,11 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	c.valorDaDuplicata,\n" +
                     "	c.obs,\n" +
                     "	ent.codigo idCliente,\n" +
-                    "	c.dataVencimento,\n" +
                     "	c.parcela,\n" +
                     "	c.contaJuros,\n" +
-                    "	cp.valorPago\n" +
+                    "	c.valorDaDuplicata - c.restante valorPago\n" +
                     "from\n" +
                     "	Contas c\n" +
-                    "	left join (select idConta, sum(valorTotal) valorPago from ContasBaixas group by idConta) cp on\n" +
-                    "		c.id = cp.idConta\n" +
                     "	left join ContasPDV pdv on\n" +
                     "		pdv.id = c.idGerador\n" +
                     "	left join PDVs on\n" +
@@ -474,10 +471,18 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	left join Entidades ent on\n" +
                     "		ent.id = c.idEntidade\n" +
                     "where\n" +
-                    "	c.tipoDaConta = 'R' and\n" +
-                    "	c.valorDaDuplicata > coalesce(cp.valorPago, 0) and\n" +
-                    "	c.idEmpresa = " + getLojaOrigem() + "\n" +
-                    "order by c.id"
+                    "		(c.idEmpresa = " + getLojaOrigem() + ") and \n" +
+                    "		not (\n" +
+                    "				(\n" +
+                    "					(\n" +
+                    "						(c.status = N'Q') or \n" +
+                    "						(c.status = N'A')\n" +
+                    "					) and \n" +
+                    "					(c.restante = 0)\n" +
+                    "				)\n" +
+                    "		) and \n" +
+                    "		not ((c.status = N'C')) \n" +
+                    "		and (c.tipoDaConta = N'R')"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
