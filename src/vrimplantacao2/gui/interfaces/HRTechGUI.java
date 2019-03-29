@@ -187,6 +187,9 @@ public class HRTechGUI extends VRInternalFrame {
                             if (chkT1Custo.isSelected()) {
                                 opcoes.add(OpcaoProduto.CUSTO);
                             }
+                            if(chkMargem.isSelected()) {
+                                opcoes.add(OpcaoProduto.MARGEM);
+                            }
                             if (chkCustoComImposto.isSelected()) {
                                 opcoes.add(OpcaoProduto.CUSTO_COM_IMPOSTO);
                             }
@@ -343,6 +346,7 @@ public class HRTechGUI extends VRInternalFrame {
         vRPanel7 = new vrframework.bean.panel.VRPanel();
         chkProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Custo = new vrframework.bean.checkBox.VRCheckBox();
+        chkMargem = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Preco = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Estoque = new vrframework.bean.checkBox.VRCheckBox();
         chkT1EAN = new vrframework.bean.checkBox.VRCheckBox();
@@ -468,6 +472,9 @@ public class HRTechGUI extends VRInternalFrame {
 
         chkT1Custo.setText("Custo");
         vRPanel7.add(chkT1Custo);
+
+        chkMargem.setText("Margem");
+        vRPanel7.add(chkMargem);
 
         chkT1Preco.setText("Preço");
         vRPanel7.add(chkT1Preco);
@@ -1015,6 +1022,7 @@ public class HRTechGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkIcmsEntrada;
     private vrframework.bean.checkBox.VRCheckBox chkIcmsSaida;
+    private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
