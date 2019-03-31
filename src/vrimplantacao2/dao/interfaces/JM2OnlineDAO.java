@@ -422,13 +422,14 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     "				) and \n" +
                     "				not ((c.status = N'C')) \n" +
                     "				and (c.tipoDaConta = N'R')\n" +
+                    "				and c.numeroNota = 0\n" +
+                    "				and not ent.razaoSocial like '%NÃO ESPECIFICADO%'\n" +
                     "	) e2 on e.codigo = e2.codigo\n" +
                     "where\n" +
                     "	(\n" +
                     "		e.tipoEntidade like '%C%' or\n" +
                     "		not e2.codigo is null\n" +
-                    "	) and\n" +
-                    "	e.dataFinal is null\n" +
+                    "	)\n" +
                     "order by\n" +
                     "	e.codigo"
             )) {
@@ -507,18 +508,20 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	left join Entidades ent on\n" +
                     "		ent.id = c.idEntidade\n" +
                     "where\n" +
-                    "		(c.idEmpresa = " + getLojaOrigem() + ") and \n" +
-                    "		not (\n" +
+                    "	(c.idEmpresa = " + getLojaOrigem() + ") and \n" +
+                    "	not (\n" +
+                    "			(\n" +
                     "				(\n" +
-                    "					(\n" +
-                    "						(c.status = N'Q') or \n" +
-                    "						(c.status = N'A')\n" +
-                    "					) and \n" +
-                    "					(c.restante = 0)\n" +
-                    "				)\n" +
-                    "		) and \n" +
-                    "		not ((c.status = N'C')) \n" +
-                    "		and (c.tipoDaConta = N'R')"
+                    "					(c.status = N'Q') or \n" +
+                    "					(c.status = N'A')\n" +
+                    "				) and \n" +
+                    "				(c.restante = 0)\n" +
+                    "			)\n" +
+                    "	) and \n" +
+                    "	not ((c.status = N'C')) \n" +
+                    "	and (c.tipoDaConta = N'R')\n" +
+                    "	and c.numeroNota = 0\n" +
+                    "	and not ent.razaoSocial like '%NÃO ESPECIFICADO%'"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
