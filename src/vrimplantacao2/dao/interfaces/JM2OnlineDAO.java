@@ -519,9 +519,9 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     "			)\n" +
                     "	) and \n" +
                     "	not ((c.status = N'C')) \n" +
-                    "	and (c.tipoDaConta = N'R')\n" +
-                    "	and c.numeroNota = 0\n" +
-                    "	and not ent.razaoSocial like '%NÃO ESPECIFICADO%'"
+                    "	and (c.tipoDaConta = N'R')"//\n" +
+                    //"	and c.numeroNota = 0\n" +
+                    //"	and not ent.razaoSocial like '%NÃO ESPECIFICADO%'"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
