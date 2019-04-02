@@ -29,6 +29,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private String descricaoAdicional = "";
+    private boolean apenasObservacoes = false;
 
     public void setDescricaoAdicional(String descricaoAdicional) {
         this.descricaoAdicional = descricaoAdicional == null ? "" : descricaoAdicional;
@@ -473,7 +474,26 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCobrancaUf(rst.getString("cobestado"));
                     imp.setCobrancaCep(rst.getString("cobcep"));
                     
-                    result.add(imp);
+                    boolean gerencial = false;
+                    StringBuilder obs = new StringBuilder(imp.getObservacao2());
+                    try (Statement stm2 = ConexaoSqlServer.getConexao().createStatement()) {
+                        try (ResultSet rst2 = stm2.executeQuery(
+                                "SELECT * FROM Entidades_Obs where codigoEntidade = " + rst.getString("id")
+                        )) {
+                            while (rst2.next()) {
+                                String text = Utils.acertarTexto(rst2.getString("obsGerencial"));
+                                if (!"".equals(text)) {
+                                    obs.append(text).append("\n");
+                                    gerencial = true;
+                                }
+                            }
+                        }
+                    }
+                    imp.setObservacao2(obs.toString());
+                    
+                    if (this.apenasObservacoes && gerencial) {
+                        result.add(imp);
+                    }
                 }
             }
         }
@@ -615,6 +635,10 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.FABRICANTE,
                 OpcaoProduto.TIPO_EMBALAGEM_PRODUTO
         ));
+    }
+
+    public void setApenasObservacoes(boolean apenasObservacoes) {
+        this.apenasObservacoes = apenasObservacoes;
     }
     
 }
