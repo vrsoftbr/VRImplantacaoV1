@@ -28,9 +28,17 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private String descricaoAdicional = "";
+    private boolean apenasObservacoes = false;
+
+    public void setDescricaoAdicional(String descricaoAdicional) {
+        this.descricaoAdicional = descricaoAdicional == null ? "" : descricaoAdicional;
+        System.out.println(getSistema());
+    }
+    
     @Override
     public String getSistema() {
-        return "JM2Online";
+        return "JM2Online" + (!"".equals(descricaoAdicional) ? " - " + descricaoAdicional : "");
     }
 
     @Override
@@ -387,12 +395,42 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	e.cobcidade,\n" +
                     "	e.cobestado,\n" +
                     "	e.cobcep,\n" +
-                    "	e.contato\n" +
+                    "	e.contato,\n" +
+                    "	e2.codigo e2\n" +
                     "from\n" +
                     "	Entidades e\n" +
+                    "	left join (\n" +
+                    "		select distinct\n" +
+                    "			ent.codigo\n" +
+                    "		from\n" +
+                    "			Contas c\n" +
+                    "			left join ContasPDV pdv on\n" +
+                    "				pdv.id = c.idGerador\n" +
+                    "			left join PDVs on\n" +
+                    "				pdv.idPdv = PDVs.id\n" +
+                    "			left join Entidades ent on\n" +
+                    "				ent.id = c.idEntidade\n" +
+                    "		where\n" +
+                    "				(c.idEmpresa = " + getLojaOrigem() + ") and \n" +
+                    "				not (\n" +
+                    "						(\n" +
+                    "							(\n" +
+                    "								(c.status = N'Q') or \n" +
+                    "								(c.status = N'A')\n" +
+                    "							) and \n" +
+                    "							(c.restante = 0)\n" +
+                    "						)\n" +
+                    "				) and \n" +
+                    "				not ((c.status = N'C')) \n" +
+                    "				and (c.tipoDaConta = N'R')\n" +
+                    "				and c.numeroNota = 0\n" +
+                    "				and not ent.razaoSocial like '%NÃO ESPECIFICADO%'\n" +
+                    "	) e2 on e.codigo = e2.codigo\n" +
                     "where\n" +
-                    "	e.tipoEntidade like '%C%' and\n" +
-                    "	e.dataFinal is null\n" +
+                    "	(\n" +
+                    "		e.tipoEntidade like '%C%' or\n" +
+                    "		not e2.codigo is null\n" +
+                    "	)\n" +
                     "order by\n" +
                     "	e.codigo"
             )) {
@@ -436,7 +474,26 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCobrancaUf(rst.getString("cobestado"));
                     imp.setCobrancaCep(rst.getString("cobcep"));
                     
-                    result.add(imp);
+                    boolean gerencial = false;
+                    StringBuilder obs = new StringBuilder(imp.getObservacao2());
+                    try (Statement stm2 = ConexaoSqlServer.getConexao().createStatement()) {
+                        try (ResultSet rst2 = stm2.executeQuery(
+                                "SELECT * FROM Entidades_Obs where codigoEntidade = " + rst.getString("id")
+                        )) {
+                            while (rst2.next()) {
+                                String text = Utils.acertarTexto(rst2.getString("obsGerencial"));
+                                if (!"".equals(text)) {
+                                    obs.append(text).append("\n");
+                                    gerencial = true;
+                                }
+                            }
+                        }
+                    }
+                    imp.setObservacao2(obs.toString());
+                    
+                    if (this.apenasObservacoes && gerencial) {
+                        result.add(imp);
+                    }
                 }
             }
         }
@@ -459,14 +516,11 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	c.valorDaDuplicata,\n" +
                     "	c.obs,\n" +
                     "	ent.codigo idCliente,\n" +
-                    "	c.dataVencimento,\n" +
                     "	c.parcela,\n" +
                     "	c.contaJuros,\n" +
-                    "	cp.valorPago\n" +
+                    "	c.valorDaDuplicata - c.restante valorPago\n" +
                     "from\n" +
                     "	Contas c\n" +
-                    "	left join (select idConta, sum(valorTotal) valorPago from ContasBaixas group by idConta) cp on\n" +
-                    "		c.id = cp.idConta\n" +
                     "	left join ContasPDV pdv on\n" +
                     "		pdv.id = c.idGerador\n" +
                     "	left join PDVs on\n" +
@@ -474,10 +528,20 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	left join Entidades ent on\n" +
                     "		ent.id = c.idEntidade\n" +
                     "where\n" +
-                    "	c.tipoDaConta = 'R' and\n" +
-                    "	c.valorDaDuplicata > coalesce(cp.valorPago, 0) and\n" +
-                    "	c.idEmpresa = " + getLojaOrigem() + "\n" +
-                    "order by c.id"
+                    "	(c.idEmpresa = " + getLojaOrigem() + ") and \n" +
+                    "	not (\n" +
+                    "			(\n" +
+                    "				(\n" +
+                    "					(c.status = N'Q') or \n" +
+                    "					(c.status = N'A')\n" +
+                    "				) and \n" +
+                    "				(c.restante = 0)\n" +
+                    "			)\n" +
+                    "	) and \n" +
+                    "	not ((c.status = N'C')) \n" +
+                    "	and (c.tipoDaConta = N'R')"//\n" +
+                    //"	and c.numeroNota = 0\n" +
+                    //"	and not ent.razaoSocial like '%NÃO ESPECIFICADO%'"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -571,6 +635,10 @@ public class JM2OnlineDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.FABRICANTE,
                 OpcaoProduto.TIPO_EMBALAGEM_PRODUTO
         ));
+    }
+
+    public void setApenasObservacoes(boolean apenasObservacoes) {
+        this.apenasObservacoes = apenasObservacoes;
     }
     
 }

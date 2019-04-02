@@ -309,80 +309,84 @@ public class SysPdvDAO extends InterfaceDAO {
                     + "    p.procod"
             )) {
                 Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
+                System.out.println(eans.size());
                 while (rst.next()) {
+                    Set<Ean> e = eans.get(rst.getString("id"));
 
-                    for (Ean ean : eans.get(rst.getString("id"))) {
+                    if (e != null) {
+                        for (Ean ean : e) {
 
-                        ProdutoIMP imp = new ProdutoIMP();
+                            ProdutoIMP imp = new ProdutoIMP();
 
-                        imp.setImportSistema(getSistema());
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportId(rst.getString("id"));
-                        imp.setEan(ean.ean);
-                        imp.setQtdEmbalagem(ean.qtdEmbalagem);
-                        imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                        imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
-                        imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                        imp.setCodMercadologico1(rst.getString("merc1"));
-                        imp.setCodMercadologico2(rst.getString("merc2"));
-                        imp.setCodMercadologico3(rst.getString("merc3"));
-                        ProdutoBalancaVO bal = balanca.get(Utils.stringToInt(rst.getString("id")));
-                        if (bal != null) {
-                            imp.seteBalanca(true);
-                            if (null != bal.getPesavel()) {
-                                switch (bal.getPesavel()) {
-                                    case "P":
-                                        imp.setTipoEmbalagem("KG");
-                                        break;
-                                    case "U":
-                                        imp.setTipoEmbalagem("UN");
-                                        break;
+                            imp.setImportSistema(getSistema());
+                            imp.setImportLoja(getLojaOrigem());
+                            imp.setImportId(rst.getString("id"));
+                            imp.setEan(ean.ean);
+                            imp.setQtdEmbalagem(ean.qtdEmbalagem);
+                            imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                            imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                            imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                            imp.setCodMercadologico1(rst.getString("merc1"));
+                            imp.setCodMercadologico2(rst.getString("merc2"));
+                            imp.setCodMercadologico3(rst.getString("merc3"));
+                            ProdutoBalancaVO bal = balanca.get(Utils.stringToInt(rst.getString("id")));
+                            if (bal != null) {
+                                imp.seteBalanca(true);
+                                if (null != bal.getPesavel()) {
+                                    switch (bal.getPesavel()) {
+                                        case "P":
+                                            imp.setTipoEmbalagem("KG");
+                                            break;
+                                        case "U":
+                                            imp.setTipoEmbalagem("UN");
+                                            break;
+                                    }
                                 }
-                            }
-                            imp.setValidade(bal.getValidade());
-                        } else {
-                            if (balanca.isEmpty()) {
-                                imp.seteBalanca(rst.getBoolean("e_balanca"));
-                                imp.setTipoEmbalagem(rst.getString("prounid"));
+                                imp.setValidade(bal.getValidade());
                             } else {
-                                imp.seteBalanca(false);
-                                imp.setTipoEmbalagem(rst.getString("prounid"));
+                                if (balanca.isEmpty()) {
+                                    imp.seteBalanca(rst.getBoolean("e_balanca"));
+                                    imp.setTipoEmbalagem(rst.getString("prounid"));
+                                } else {
+                                    imp.seteBalanca(false);
+                                    imp.setTipoEmbalagem(rst.getString("prounid"));
+                                }
+                                imp.setValidade(Utils.stringToInt(rst.getString("validade")));
                             }
-                            imp.setValidade(Utils.stringToInt(rst.getString("validade")));
+
+                            imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
+                            imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
+                            imp.setEstoque(rst.getDouble("estoque"));
+                            imp.setNcm(rst.getString("ncm"));
+                            imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
+                            imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                            imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                            imp.setDataCadastro(rst.getDate("datacadastro"));
+                            imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
+                            imp.setMargem(rst.getDouble("margem2"));
+                            imp.setPrecovenda(rst.getDouble("precovenda"));
+                            imp.setIdFamiliaProduto(rst.getString("id_familiaproduto"));
+                            imp.setPesoBruto(rst.getDouble("pesobruto"));
+                            imp.setPesoLiquido(rst.getDouble("pesoliquido"));
+                            imp.setIcmsCstSaida(Utils.stringToInt(rst.getString("icms_cst")));
+                            imp.setIcmsAliqSaida(rst.getDouble("icms_aliquota"));
+                            imp.setIcmsReducaoSaida(rst.getDouble("icms_reducao"));
+                            imp.setIcmsCstEntrada(Utils.stringToInt(rst.getString("icms_cst")));
+                            imp.setIcmsAliqEntrada(rst.getDouble("icms_aliquota"));
+                            imp.setIcmsReducaoEntrada(rst.getDouble("icms_reducao"));
+                            imp.setCest(rst.getString("cest"));
+
+                            int[] pis = piscofins.get(rst.getString("id"));
+
+                            if (pis != null) {
+                                imp.setPiscofinsCstCredito(pis[0]);
+                                imp.setPiscofinsCstDebito(pis[1]);
+                                imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_natrec"));
+                            }
+
+                            result.add(imp);
+
                         }
-
-                        imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
-                        imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
-                        imp.setEstoque(rst.getDouble("estoque"));
-                        imp.setNcm(rst.getString("ncm"));
-                        imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
-                        imp.setCustoComImposto(rst.getDouble("custocomimposto"));
-                        imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                        imp.setDataCadastro(rst.getDate("datacadastro"));
-                        imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
-                        imp.setMargem(rst.getDouble("margem2"));
-                        imp.setPrecovenda(rst.getDouble("precovenda"));
-                        imp.setIdFamiliaProduto(rst.getString("id_familiaproduto"));
-                        imp.setPesoBruto(rst.getDouble("pesobruto"));
-                        imp.setPesoLiquido(rst.getDouble("pesoliquido"));
-                        imp.setIcmsCstSaida(Utils.stringToInt(rst.getString("icms_cst")));
-                        imp.setIcmsAliqSaida(rst.getDouble("icms_aliquota"));
-                        imp.setIcmsReducaoSaida(rst.getDouble("icms_reducao"));
-                        imp.setIcmsCstEntrada(Utils.stringToInt(rst.getString("icms_cst")));
-                        imp.setIcmsAliqEntrada(rst.getDouble("icms_aliquota"));
-                        imp.setIcmsReducaoEntrada(rst.getDouble("icms_reducao"));
-                        imp.setCest(rst.getString("cest"));
-
-                        int[] pis = piscofins.get(rst.getString("id"));
-
-                        if (pis != null) {
-                            imp.setPiscofinsCstCredito(pis[0]);
-                            imp.setPiscofinsCstDebito(pis[1]);
-                            imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_natrec"));
-                        }
-
-                        result.add(imp);
-
                     }
                 }
             }
