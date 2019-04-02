@@ -46,6 +46,7 @@ import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.RecebimentoCaixaIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
+import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -580,5 +581,13 @@ public abstract class InterfaceDAO {
         }
         
     }
-    
+
+    public List<ReceitaIMP> getReceitas() throws Exception {
+        return new ArrayList<>();
+    }
+    /**
+    *Listagem com as informações de Receita
+    * @return List com as receitas
+    * @throws Exception
+    */    
 }

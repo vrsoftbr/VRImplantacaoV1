@@ -29,6 +29,7 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaIMP;
 
 /**
  *
@@ -43,7 +44,7 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
     public void setDataInicialOutrasDespesas(Date dataInicialOutrasDespesas) {
         this.dataInicialOutrasDespesas = dataInicialOutrasDespesas;
     }
-    
+
     @Override
     public String getSistema() {
         return "Lince" + ("".equals(complementoSistema) ? "" : " - " + complementoSistema);
@@ -52,7 +53,7 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         Set<OpcaoProduto> s = new HashSet<>();
-        
+
         if (!lite) {
             s.addAll(OpcaoProduto.getMercadologico());
             s.add(OpcaoProduto.PRODUTOS);
@@ -84,7 +85,7 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
             s.add(OpcaoProduto.EAN);
             s.add(OpcaoProduto.EAN_EM_BRANCO);
         }
-        
+
         return s;
     }
 
@@ -94,22 +95,22 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stmt = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stmt.executeQuery(
-                    "select distinct\n" +
-                    "	case p.flg_situacao_trib \n" +
-                    "	when 'T' then 0\n" +
-                    "	when 'F' then 60\n" +
-                    "	when 'N' then 41\n" +
-                    "	else 40\n" +
-                    "	end	icms_cst,\n" +
-                    "	case p.flg_situacao_trib\n" +
-                    "	when 'T' then coalesce(icms.percentual, 0)\n" +
-                    "	else 0\n" +
-                    "	end icms_aliquota\n" +
-                    "from \n" +
-                    "	produto p\n" +
-                    "	left join icms on icms.cod_icms = p.cod_icms and icms.cod_loja = 1\n" +
-                    "order by\n" +
-                    "	1, 2"
+                    "select distinct\n"
+                    + "	case p.flg_situacao_trib \n"
+                    + "	when 'T' then 0\n"
+                    + "	when 'F' then 60\n"
+                    + "	when 'N' then 41\n"
+                    + "	else 40\n"
+                    + "	end	icms_cst,\n"
+                    + "	case p.flg_situacao_trib\n"
+                    + "	when 'T' then coalesce(icms.percentual, 0)\n"
+                    + "	else 0\n"
+                    + "	end icms_aliquota\n"
+                    + "from \n"
+                    + "	produto p\n"
+                    + "	left join icms on icms.cod_icms = p.cod_icms and icms.cod_loja = 1\n"
+                    + "order by\n"
+                    + "	1, 2"
             )) {
                 while (rs.next()) {
                     String id = rs.getString("icms_cst") + "-" + String.format("%.2f", rs.getDouble("icms_aliquota"));
@@ -163,77 +164,77 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "declare @id_loja integer = " + getLojaOrigem() + ";\n" +
-                    "select\n" +
-                    "	p.COD_PROD id,\n" +
-                    "	p.DATA_MUDANCA_PRECO datacadastro,\n" +
-                    "	coalesce(p.DATA_MUDANCA, p.DATA_MUDANCA_PRECO) dataultimaalteracao,\n" +
-                    "	ean.ean ean,\n" +
-                    "	p.FLG_UNIDADE_VENDA unidade,\n" +
-                    "	coalesce(sec.CHK_BALANCA,subd.chk_balanca,dp.CHK_BALANCA) chk_balanca,\n" +
-                    "	coalesce(sec.CHK_BALANCA_KG,subd.chk_balanca_kg,dp.CHK_BALANCA_KG) chk_balanca_kg,\n" +
-                    "	p.VALIDADE validade,\n" +
-                    "	p.DESCRICAO descricao,\n" +
-                    "	p.COD_FORN,\n" +
-                    "	nullif(p.COD_DEPART, 0) merc1,\n" +
-                    "	nullif(p.COD_SUBDEPART, 0) merc2,\n" +
-                    "	nullif(p.COD_SECAO, 0) merc3,\n" +
-                    "	p.PESO_BRUTO peso_bruto,\n" +
-                    "	p.PESO_LIQUIDO peso_liquido,\n" +
-                    "	p.QTDE_ESTOQUE_MINIMO estoque_minimo,\n" +
-                    "	p.QTDE_ESTOQUE_MAXIMO estoque_maximo,\n" +
-                    "	p.QTDE_ESTOQUE_LOJA estoque,\n" +
-                    "	p.perc_margem margem,\n" +
-                    "	p.vlr_custo_receita custo,\n" +
-                    "	p.VLR_PRECO preco,\n" +
-                    "	case when p.CHK_ATIVO = 'T' then 1 else 0 end ativo,\n" +
-                    "	p.COD_NCM ncm,\n" +
-                    "	cest.CEST cest,\n" +
-                    "	p.COD_PIS piscofins_saida,\n" +
-                    "	p.nat_rec_pis piscofins_nat,\n" +
-                    "	case p.flg_situacao_trib \n" +
-                    "	when 'T' then 0\n" +
-                    "	when 'F' then 60\n" +
-                    "	when 'N' then 41\n" +
-                    "	else 40\n" +
-                    "	end	icms_cst,\n" +
-                    "	case p.flg_situacao_trib\n" +
-                    "	when 'T' then coalesce(icms.percentual, 0)\n" +
-                    "	else 0\n" +
-                    "	end icms_aliquota,\n" +
-                    "	p.cod_tipo_prod tipo_produto\n" +
-                    "from \n" +
-                    "	produto p\n" +
-                    "	left join (\n" +
-                    "		select\n" +
-                    "		cod_loja,\n" +
-                    "		p.cod_prod,\n" +
-                    "		p.codigo_barras ean\n" +
-                    "	from\n" +
-                    "		produto p\n" +
-                    "	union\n" +
-                    "	select\n" +
-                    "		cod_loja,\n" +
-                    "		cod_prod,\n" +
-                    "		codigo_barras ean\n" +
-                    "	from\n" +
-                    "		barras_vinculada b\n" +
-                    "	where not codigo_barras in (\n" +
-                    "		select codigo_barras from produto where cod_loja = 1\n" +
-                    "		union \n" +
-                    "		select\n" +
-                    "		nullif(coalesce(ltrim(rtrim(barras_embalagem)),''), '0')\n" +
-                    "		from produto \n" +
-                    "		where cod_loja = 1 and nullif(coalesce(ltrim(rtrim(barras_embalagem)),''), '0') != '')\n" +
-                    "	) ean on p.cod_prod = ean.cod_prod and ean.COD_LOJA = @id_loja\n" +
-                    "	left join PRODUTO_CEST cest on cest.id = p.id_cest\n" +
-                    "	left join icms on icms.cod_icms = p.cod_icms and icms.cod_loja = @id_loja\n" +
-                    "	left join DEPARTAMENTO dp on p.COD_DEPART = dp.COD_DEPART and dp.COD_LOJA = @id_loja\n" +
-                    "	left join SUB_DEPARTAMENTO subd on p.COD_DEPART = subd.COD_DEPART and p.COD_SUBDEPART = subd.COD_SUBDEPART and subd.COD_LOJA = @id_loja\n" +
-                    "	left join SECAO sec on p.COD_SECAO = sec.COD_SECAO and sec.COD_LOJA = @id_loja\n" +
-                    "where\n" +
-                    "	p.cod_loja = @id_loja\n" +
-                    "order by id"
+                    "declare @id_loja integer = " + getLojaOrigem() + ";\n"
+                    + "select\n"
+                    + "	p.COD_PROD id,\n"
+                    + "	p.DATA_MUDANCA_PRECO datacadastro,\n"
+                    + "	coalesce(p.DATA_MUDANCA, p.DATA_MUDANCA_PRECO) dataultimaalteracao,\n"
+                    + "	ean.ean ean,\n"
+                    + "	p.FLG_UNIDADE_VENDA unidade,\n"
+                    + "	coalesce(sec.CHK_BALANCA,subd.chk_balanca,dp.CHK_BALANCA) chk_balanca,\n"
+                    + "	coalesce(sec.CHK_BALANCA_KG,subd.chk_balanca_kg,dp.CHK_BALANCA_KG) chk_balanca_kg,\n"
+                    + "	p.VALIDADE validade,\n"
+                    + "	p.DESCRICAO descricao,\n"
+                    + "	p.COD_FORN,\n"
+                    + "	nullif(p.COD_DEPART, 0) merc1,\n"
+                    + "	nullif(p.COD_SUBDEPART, 0) merc2,\n"
+                    + "	nullif(p.COD_SECAO, 0) merc3,\n"
+                    + "	p.PESO_BRUTO peso_bruto,\n"
+                    + "	p.PESO_LIQUIDO peso_liquido,\n"
+                    + "	p.QTDE_ESTOQUE_MINIMO estoque_minimo,\n"
+                    + "	p.QTDE_ESTOQUE_MAXIMO estoque_maximo,\n"
+                    + "	p.QTDE_ESTOQUE_LOJA estoque,\n"
+                    + "	p.perc_margem margem,\n"
+                    + "	p.vlr_custo_receita custo,\n"
+                    + "	p.VLR_PRECO preco,\n"
+                    + "	case when p.CHK_ATIVO = 'T' then 1 else 0 end ativo,\n"
+                    + "	p.COD_NCM ncm,\n"
+                    + "	cest.CEST cest,\n"
+                    + "	p.COD_PIS piscofins_saida,\n"
+                    + "	p.nat_rec_pis piscofins_nat,\n"
+                    + "	case p.flg_situacao_trib \n"
+                    + "	when 'T' then 0\n"
+                    + "	when 'F' then 60\n"
+                    + "	when 'N' then 41\n"
+                    + "	else 40\n"
+                    + "	end	icms_cst,\n"
+                    + "	case p.flg_situacao_trib\n"
+                    + "	when 'T' then coalesce(icms.percentual, 0)\n"
+                    + "	else 0\n"
+                    + "	end icms_aliquota,\n"
+                    + "	p.cod_tipo_prod tipo_produto\n"
+                    + "from \n"
+                    + "	produto p\n"
+                    + "	left join (\n"
+                    + "		select\n"
+                    + "		cod_loja,\n"
+                    + "		p.cod_prod,\n"
+                    + "		p.codigo_barras ean\n"
+                    + "	from\n"
+                    + "		produto p\n"
+                    + "	union\n"
+                    + "	select\n"
+                    + "		cod_loja,\n"
+                    + "		cod_prod,\n"
+                    + "		codigo_barras ean\n"
+                    + "	from\n"
+                    + "		barras_vinculada b\n"
+                    + "	where not codigo_barras in (\n"
+                    + "		select codigo_barras from produto where cod_loja = 1\n"
+                    + "		union \n"
+                    + "		select\n"
+                    + "		nullif(coalesce(ltrim(rtrim(barras_embalagem)),''), '0')\n"
+                    + "		from produto \n"
+                    + "		where cod_loja = 1 and nullif(coalesce(ltrim(rtrim(barras_embalagem)),''), '0') != '')\n"
+                    + "	) ean on p.cod_prod = ean.cod_prod and ean.COD_LOJA = @id_loja\n"
+                    + "	left join PRODUTO_CEST cest on cest.id = p.id_cest\n"
+                    + "	left join icms on icms.cod_icms = p.cod_icms and icms.cod_loja = @id_loja\n"
+                    + "	left join DEPARTAMENTO dp on p.COD_DEPART = dp.COD_DEPART and dp.COD_LOJA = @id_loja\n"
+                    + "	left join SUB_DEPARTAMENTO subd on p.COD_DEPART = subd.COD_DEPART and p.COD_SUBDEPART = subd.COD_SUBDEPART and subd.COD_LOJA = @id_loja\n"
+                    + "	left join SECAO sec on p.COD_SECAO = sec.COD_SECAO and sec.COD_LOJA = @id_loja\n"
+                    + "where\n"
+                    + "	p.cod_loja = @id_loja\n"
+                    + "order by id"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -286,7 +287,7 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setTipoProduto(rst.getString("tipo_produto"));
                     }
                     imp.setFabricacaoPropria(imp.getTipoProduto() == TipoProduto.PRODUTO_ACABADO);
-                    
+
                     result.add(imp);
                 }
             }
@@ -490,7 +491,7 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select cod_loja, cnpj, nome_reduzido from loja order by 1"
@@ -503,41 +504,41 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	l.lancamento,\n" +
-                    "	l.cod_forn,\n" +
-                    "	coalesce(l.documento, l.origem) documento,\n" +
-                    "	l.data,\n" +
-                    "	l.vencimento,\n" +
-                    "	l.vlr_valor valor,\n" +
-                    "	l.descricao,\n" +
-                    "	l.observacao,\n" +
-                    "	doc.descricao tipo_doc\n" +
-                    "from\n" +
-                    "	FIN_LANCAMENTO l\n" +
-                    "	left join fin_tipo_doc doc on\n" +
-                    "		l.COD_TIPO_DOC = doc.COD_TIPO_DOC and\n" +
-                    "		l.cod_loja = doc.cod_loja\n" +
-                    "where\n" +
-                    "	l.cod_loja = " + getLojaOrigem() + " and\n" +
-                    (dataInicialOutrasDespesas == null ? "" : " l.vencimento >= '" + new SimpleDateFormat("yyyy-MM-dd").format(dataInicialOutrasDespesas) + "' and\n") +
-                    "	l.pagamento is null\n" +
-                    "order by\n" +
-                    "	l.data"
+                    "select\n"
+                    + "	l.lancamento,\n"
+                    + "	l.cod_forn,\n"
+                    + "	coalesce(l.documento, l.origem) documento,\n"
+                    + "	l.data,\n"
+                    + "	l.vencimento,\n"
+                    + "	l.vlr_valor valor,\n"
+                    + "	l.descricao,\n"
+                    + "	l.observacao,\n"
+                    + "	doc.descricao tipo_doc\n"
+                    + "from\n"
+                    + "	FIN_LANCAMENTO l\n"
+                    + "	left join fin_tipo_doc doc on\n"
+                    + "		l.COD_TIPO_DOC = doc.COD_TIPO_DOC and\n"
+                    + "		l.cod_loja = doc.cod_loja\n"
+                    + "where\n"
+                    + "	l.cod_loja = " + getLojaOrigem() + " and\n"
+                    + (dataInicialOutrasDespesas == null ? "" : " l.vencimento >= '" + new SimpleDateFormat("yyyy-MM-dd").format(dataInicialOutrasDespesas) + "' and\n")
+                    + "	l.pagamento is null\n"
+                    + "order by\n"
+                    + "	l.data"
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
-                    
+
                     imp.setId(rst.getString("lancamento"));
                     imp.setIdFornecedor(rst.getString("cod_forn"));
                     imp.setDataEntrada(rst.getDate("data"));
@@ -546,23 +547,66 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroDocumento(rst.getString("documento"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setObservacao(
-                        "DESCRICAO: " + rst.getString("descricao") +
-                        "   OBSERVACAO: " + rst.getString("observacao") +
-                        "   TIPO DOC.: " + rst.getString("tipo_doc")
+                            "DESCRICAO: " + rst.getString("descricao")
+                            + "   OBSERVACAO: " + rst.getString("observacao")
+                            + "   TIPO DOC.: " + rst.getString("tipo_doc")
                     );
                     imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     public void setLite(boolean lite) {
         this.lite = lite;
     }
-    
-    
+
+    @Override
+    public List<ReceitaIMP> getReceitas() throws Exception {
+        List<ReceitaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "r.COD_PROD, \n"
+                    + "p.DESCRICAO as DESC_PROD,\n"
+                    + "coalesce(r.NOME_ETIQUETA, p.DESCRICAO) as NOMERECEITA, \n"
+                    + "r.VLR_TOTAL, \n"
+                    + "r.VLR_PRECO_UND, \n"
+                    + "r.VLR_PRECO_KG,\n"
+                    + "r.VLR_TOTAL_EMBALAGEM, \n"
+                    + "r.QTDE_PRODUCAO_KG,\n"
+                    + "r.QTDE_INGREDIENTE,\n"
+                    + "r.QTDE_PRODUCAO_UND,\n"
+                    + "r.QTDE_MINIMA,\n"
+                    + "r.QTDE_MAXIMA,\n"
+                    + "r.QTDE_PERDA,\n"
+                    + "r.PERC_PERDA,\n"
+                    + "r.OBS1 as RECEITA,\n"
+                    + "r.OBS_ETIQUETA\n"
+                    + "from RECEITA r \n"
+                    + "inner join PRODUTO p on p.COD_PROD = r.COD_PROD\n"
+                    + "where r.COD_LOJA = " + getLojaOrigem() + "\n"
+                    + "order by r.COD_PROD"
+            )) {
+                while (rst.next()) {
+                    ReceitaIMP imp = new ReceitaIMP();
+                    imp.setImportloja(getLojaOrigem());
+                    imp.setImportsistema(getSistema());
+                    imp.setIdproduto(rst.getString("COD_PROD"));
+                    imp.setDescricao(rst.getString("NOMERECEITA"));
+                    imp.setFichatecnica(rst.getString("RECEITA"));
+                    imp.setQtdembalagemreceita(rst.getInt("QTDE_PRODUCAO_KG"));
+                    imp.setQtdembalagemproduto(rst.getInt("QTDE_INGREDIENTE"));
+                    imp.setRendimento(1);
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 }
