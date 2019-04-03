@@ -5,6 +5,8 @@
  */
 package vrimplantacao2.vo.importacao;
 
+import java.util.HashSet;
+import java.util.Set;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 
 /**
@@ -23,6 +25,7 @@ public class ReceitaIMP {
   private double rendimento;
   private int qtdembalagemreceita;
   private int qtdembalagemproduto;
+  private Set<String> produtos = new HashSet<>();
 
     /**
      * @return the importid
@@ -164,4 +167,12 @@ public class ReceitaIMP {
         this.importsistema = importsistema;
     }
 
+    public Set<String> getProdutos() {
+        return produtos;
+    }
+
+    public void setProdutos(Set<String> produtos) {
+        this.produtos = produtos;
+    }
+    
 }

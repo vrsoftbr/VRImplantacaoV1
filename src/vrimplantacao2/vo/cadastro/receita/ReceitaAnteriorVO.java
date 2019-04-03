@@ -23,6 +23,7 @@ public class ReceitaAnteriorVO {
   private double rendimento;
   private int qtdembalagemreceita;
   private int qtdembalagemproduto;
+  private int codigoAtual;
 
     /**
      * @return the importsistema
@@ -162,5 +163,19 @@ public class ReceitaAnteriorVO {
      */
     public void setQtdembalagemproduto(int qtdembalagemproduto) {
         this.qtdembalagemproduto = qtdembalagemproduto;
+    }
+
+    /**
+     * @return the codigoAtual
+     */
+    public int getCodigoAtual() {
+        return codigoAtual;
+    }
+
+    /**
+     * @param codigoAtual the codigoAtual to set
+     */
+    public void setCodigoAtual(int codigoAtual) {
+        this.codigoAtual = codigoAtual;
     }
 }

@@ -5,6 +5,8 @@
  */
 package vrimplantacao2.vo.cadastro.receita;
 
+import vrimplantacao.utils.Utils;
+
 /**
  *
  * @author lucasrafael
@@ -41,7 +43,7 @@ public class ReceitaVO {
      * @param descricao the descricao to set
      */
     public void setDescricao(String descricao) {
-        this.descricao = descricao;
+        this.descricao = Utils.acertarTexto(descricao, 30);
     }
 
     /**

@@ -68,6 +68,8 @@ import vrimplantacao2.dao.cadastro.produto2.associado.AssociadoRepositoryProvide
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.cadastro.receita.ReceitaBalancaRepository;
 import vrimplantacao2.dao.cadastro.receita.ReceitaBalancaRepositoryProvider;
+import vrimplantacao2.dao.cadastro.receita.ReceitaRepository;
+import vrimplantacao2.dao.cadastro.receita.ReceitaRepositoryProvider;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.cadastro.venda.VendaHistoricoDAO;
 import vrimplantacao2.dao.cadastro.venda.VendaHistoricoRepository;
@@ -107,6 +109,7 @@ import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.RecebimentoCaixaIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
+import vrimplantacao2.vo.importacao.ReceitaIMP;
 
 public class Importador {
 
@@ -947,6 +950,18 @@ public class Importador {
         rep.importar(receita, opt);
     }
 
+    public void importarReceitas() throws Exception {
+        ProgressBar.setStatus("Receitas...Gerando listagem...");
+        List<ReceitaIMP> receita = getInterfaceDAO().getReceitas();
+        ReceitaRepositoryProvider provider = new ReceitaRepositoryProvider (
+            getSistema(),
+            getLojaOrigem(),
+            getLojaVR()
+        );
+        ReceitaRepository rep = new ReceitaRepository(provider);
+        rep.importar(receita);
+    }
+    
     public void importarOutrasReceitas(OpcaoContaReceber... opcoes) throws Exception {
         Set<OpcaoContaReceber> opt = new HashSet<>(Arrays.asList(opcoes));
         ProgressBar.setStatus("Outras Receitas...Gerando listagem...");

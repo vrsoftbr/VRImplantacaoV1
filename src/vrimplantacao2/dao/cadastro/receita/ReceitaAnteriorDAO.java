@@ -22,7 +22,7 @@ public class ReceitaAnteriorDAO {
     public static void createTable() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute(
-                    "create table implantacao.codant_receita (\n"
+                    "create table if not exists implantacao.codant_receita (\n"
                     + "  sistema varchar,\n"
                     + "  loja varchar,\n"
                     + "  id varchar,\n"
@@ -30,11 +30,12 @@ public class ReceitaAnteriorDAO {
                     + "  descricao varchar,\n"
                     + "  fichatecnica text,\n"
                     + "  qtdembalagemreceita int,\n"
-                    + "  qdembalagemproduto int,\n"
+                    + "  qtdembalagemproduto int,\n"
                     + "  fatorembalagem numeric (11,2),\n"
                     + "  baixaestoque boolean,\n"
                     + "  embalagem boolean default false,\n"
-                    + "  redmimento numeric(11,3),\n"
+                    + "  rendimento numeric(11,3),\n"
+                    + "  codigoatual integer ,\n"
                     + "  primary key (sistema, loja, id)\n"
                     + ")"
             );
@@ -58,11 +59,11 @@ public class ReceitaAnteriorDAO {
                     + "  descricao,\n"
                     + "  fichatecnica,\n"
                     + "  qtdembalagemreceita,\n"
-                    + "  qdembalagemproduto,\n"
+                    + "  qtdembalagemproduto,\n"
                     + "  fatorembalagem,\n"
                     + "  baixaestoque,\n"
                     + "  embalagem,\n"
-                    + "  redmimento\n"
+                    + "  rendimento\n"
                     + "from implantacao.codant_receita\n"
                     + "where sistema = '" + sistema + "' \n"
                     + "  and loja = '" + loja + "'\n"
@@ -95,6 +96,7 @@ public class ReceitaAnteriorDAO {
             sql.put("qtdembalagemreceita", vo.getQtdembalagemreceita());
             sql.put("qtdembalagemproduto", vo.getQtdembalagemproduto());
             sql.put("rendimento", vo.getRendimento());
+            sql.put("codigoatual", vo.getCodigoAtual());
             stm.execute(sql.getInsert());            
         }
     }

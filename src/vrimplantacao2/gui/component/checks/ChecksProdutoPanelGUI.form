@@ -1044,6 +1044,8 @@
                                   <Component id="chkNutricionalFilizola" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="chkInventario" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkReceitaProduto" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="chkAssociado" min="-2" max="-2" attributes="0"/>
@@ -1079,6 +1081,7 @@
                               <Component id="chkNutricionalToledo" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkNutricionalFilizola" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkInventario" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkReceitaProduto" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
                       </Group>
@@ -1132,6 +1135,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkInventario">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Invent&#xe1;rio"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkReceitaProduto">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Receita (Produto)"/>
                   </Properties>
                 </Component>
               </SubComponents>

@@ -80,6 +80,7 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
             s.add(OpcaoProduto.ICMS);
             s.add(OpcaoProduto.TIPO_PRODUTO);
             s.add(OpcaoProduto.FABRICACAO_PROPRIA);
+            s.add(OpcaoProduto.RECEITA);
         } else {
             s.add(OpcaoProduto.PRODUTOS);
             s.add(OpcaoProduto.EAN);
@@ -597,12 +598,14 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
                     ReceitaIMP imp = new ReceitaIMP();
                     imp.setImportloja(getLojaOrigem());
                     imp.setImportsistema(getSistema());
+                    imp.setImportid(rst.getString("COD_PROD"));
                     imp.setIdproduto(rst.getString("COD_PROD"));
                     imp.setDescricao(rst.getString("NOMERECEITA"));
                     imp.setFichatecnica(rst.getString("RECEITA"));
                     imp.setQtdembalagemreceita(rst.getInt("QTDE_PRODUCAO_KG"));
                     imp.setQtdembalagemproduto(rst.getInt("QTDE_INGREDIENTE"));
                     imp.setRendimento(1);
+                    imp.getProdutos().add(rst.getString("COD_PROD"));
                     result.add(imp);
                 }
             }
