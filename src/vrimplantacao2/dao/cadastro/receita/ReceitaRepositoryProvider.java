@@ -5,6 +5,7 @@
  */
 package vrimplantacao2.dao.cadastro.receita;
 
+import java.util.List;
 import java.util.Map;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
@@ -13,6 +14,7 @@ import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.receita.ReceitaAnteriorVO;
 import vrimplantacao2.vo.cadastro.receita.ReceitaItemVO;
+import vrimplantacao2.vo.cadastro.receita.ReceitaLojaVO;
 import vrimplantacao2.vo.cadastro.receita.ReceitaProdutoVO;
 import vrimplantacao2.vo.cadastro.receita.ReceitaVO;
 
@@ -41,7 +43,7 @@ public class ReceitaRepositoryProvider {
     public ReceitaRepositoryProvider() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
     public String getSistema() {
         return sistema;
     }
@@ -53,16 +55,16 @@ public class ReceitaRepositoryProvider {
     public int getLojaVR() {
         return lojaVR;
     }
-    
+
     public void setMessage(String message) throws Exception {
         ProgressBar.setStatus(message);
     }
-    
+
     public void setMessage(String message, int size) throws Exception {
         setMessage(message);
         ProgressBar.setMaximum(size);
     }
-    
+
     public void setMessage() throws Exception {
         ProgressBar.next();
     }
@@ -74,7 +76,7 @@ public class ReceitaRepositoryProvider {
     public Map<String, ReceitaAnteriorVO> getAnteriores() throws Exception {
         return anteriorDAO.getAnteriores(sistema, loja);
     }
-    
+
     public IDStack getIdsVagos() throws Exception {
         return receitaDAO.getIdsVagos(999999);
     }
@@ -82,33 +84,49 @@ public class ReceitaRepositoryProvider {
     public void begin() throws Exception {
         Conexao.begin();
     }
-    
+
     public void commit() throws Exception {
         Conexao.commit();
     }
-    
+
     public void rollback() throws Exception {
         Conexao.rollback();
     }
-    
+
     public void gravar(ReceitaVO vo) throws Exception {
         receitaDAO.gravar(vo);
     }
-    
+
     public void gravar(ReceitaAnteriorVO vo) throws Exception {
         anteriorDAO.gravar(vo);
     }
-    
+
     public void gravarItem(ReceitaItemVO vo) throws Exception {
         receitaDAO.gravarItem(vo);
     }
-    
+
     public void gravarProduto(ReceitaProdutoVO vo) throws Exception {
         receitaDAO.gravarProduto(vo);
     }
-    
-    public MultiMap<Integer, Void> getReceitas() throws Exception {
-        return receitaDAO.getReceitas(lojaVR);
+
+    public void gravarReceitaLoja(ReceitaLojaVO vo) throws Exception {
+        receitaDAO.gravarReceitaLoja(vo);
     }
-    
+
+    public MultiMap<Integer, Void> getReceitaItem() throws Exception {
+        return receitaDAO.getReceitaItem();
+    }
+
+    public MultiMap<Integer, Void> getReceitaProduto() throws Exception {
+        return receitaDAO.getReceitaProduto();
+    }
+
+    public MultiMap<Integer, Void> getReceitaLoja() throws Exception {
+        return receitaDAO.getReceitaLoja(this.lojaVR);
+    }
+
+    public ReceitaIDStack getReceitaIDStack(int iniciarEm) {
+        return new ReceitaIDStack(iniciarEm);
+    }
+
 }

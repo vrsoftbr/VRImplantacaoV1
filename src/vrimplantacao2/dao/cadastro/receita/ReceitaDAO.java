@@ -13,6 +13,7 @@ import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.receita.ReceitaItemVO;
+import vrimplantacao2.vo.cadastro.receita.ReceitaLojaVO;
 import vrimplantacao2.vo.cadastro.receita.ReceitaProdutoVO;
 
 /**
@@ -50,11 +51,11 @@ public class ReceitaDAO {
             stm.execute(sql.getInsert());
         }
     }
-    
+
     public void gravarItem(ReceitaItemVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
-            
+
             sql.setTableName("receitaitem");
             sql.put("id_receita", vo.getId_receita());
             sql.put("id_produto", vo.getId_produto());
@@ -66,11 +67,11 @@ public class ReceitaDAO {
             stm.execute(sql.getInsert());
         }
     }
-    
+
     public void gravarProduto(ReceitaProdutoVO vo) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
-            
+
             sql.setTableName("receitaproduto");
             sql.put("id_receita", vo.getId_receita());
             sql.put("id_produto", vo.getId_produto());
@@ -79,7 +80,18 @@ public class ReceitaDAO {
         }
     }
 
-    public MultiMap<Integer, Void> getReceitas(int idLojaVR) throws Exception {
+    public void gravarReceitaLoja(ReceitaLojaVO vo) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            SQLBuilder sql = new SQLBuilder();
+
+            sql.setTableName("receitaloja");
+            sql.put("id_loja", vo.getId_loja());
+            sql.put("id_receita", vo.getId_receita());
+            stm.execute(sql.getInsert());
+        }
+    }
+
+    public MultiMap<Integer, Void> getReceitaItem() throws Exception {
         MultiMap<Integer, Void> result = new MultiMap<>();
 
         try (Statement stm = Conexao.createStatement()) {
@@ -87,8 +99,7 @@ public class ReceitaDAO {
                     "select \n"
                     + "  id_produto,\n"
                     + "  id_receita\n"
-                    + "from receitaproduto\n"
-                    + "where id_receita in (select id_receita from receitaloja where id_loja = " + idLojaVR + ")"
+                    + "from receitaproduto"
             )) {
                 while (rst.next()) {
                     result.put(null, rst.getInt("id_receita"), rst.getInt("id_produto"));
@@ -96,6 +107,41 @@ public class ReceitaDAO {
             }
         }
 
+        return result;
+    }
+
+    public MultiMap<Integer, Void> getReceitaProduto() throws Exception {
+        MultiMap<Integer, Void> result = new MultiMap<>();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "id_produto "
+                    + "from receitaproduto "
+            )) {
+                while (rst.next()) {
+                    result.put(null, rst.getInt("id_produto"), rst.getInt("id_produto"));
+                }
+            }
+        }
+        return result;
+    }
+
+    public MultiMap<Integer, Void> getReceitaLoja(int idLojaVR) throws Exception {
+        MultiMap<Integer, Void> result = new MultiMap<>();
+
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "id_receita,\n"
+                    + "id_loja\n"
+                    + "from receitaloja"
+            )) {
+                while (rst.next()) {
+                    result.put(null, rst.getInt("id_receita"), rst.getInt("id_loja"));
+                }
+            }
+        }
         return result;
     }
 }

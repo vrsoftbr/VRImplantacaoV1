@@ -602,9 +602,9 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdproduto(rst.getString("COD_PROD"));
                     imp.setDescricao(rst.getString("NOMERECEITA"));
                     imp.setFichatecnica(rst.getString("RECEITA"));
-                    imp.setQtdembalagemreceita(rst.getInt("QTDE_PRODUCAO_KG"));
-                    imp.setQtdembalagemproduto(rst.getInt("QTDE_INGREDIENTE"));
-                    imp.setRendimento(1);
+                    imp.setQtdembalagemreceita(rst.getInt("QTDE_INGREDIENTE") * 100);
+                    imp.setQtdembalagemproduto(rst.getInt("QTDE_PRODUCAO_UND") * 100);
+                    imp.setRendimento(rst.getInt("QTDE_PRODUCAO_KG"));
                     imp.getProdutos().add(rst.getString("COD_PROD"));
                     result.add(imp);
                 }
