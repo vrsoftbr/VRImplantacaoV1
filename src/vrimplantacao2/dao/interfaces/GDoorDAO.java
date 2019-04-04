@@ -4,16 +4,14 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import vrimplantacao.classe.ConexaoFirebird;
-import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
-import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -145,6 +143,32 @@ public class GDoorDAO extends InterfaceDAO {
                     
                     result.add(imp);
                 }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    codigo idproduto,\n" +
+                    "    cod_fornecedor idfornecedor,\n" +
+                    "    cod_item_fornecedor codigoexterno\n" +
+                    "from\n" +
+                    "    rel_est_fornecedor\n" +
+                    "order by\n" +
+                    "    1, 2")) {
+                ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                imp.setImportSistema(getSistema());
+                imp.setImportLoja(getLojaOrigem());
+                imp.setIdFornecedor(rs.getString("idfornecedor"));
+                imp.setIdProduto(rs.getString("idproduto"));
+                imp.setCodigoExterno(rs.getString("codigoexterno"));
+                
+                result.add(imp);
             }
         }
         return result;
@@ -300,6 +324,47 @@ public class GDoorDAO extends InterfaceDAO {
 
                     result.add(imp);
                 }                
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    vendas_id,\n" +
+                    "    documento,\n" +
+                    "    num_parcela parcela,\n" +
+                    "    historico observacao,\n" +
+                    "    cod_cliente idcliente,\n" +
+                    "    c.cnpj_cnpf cnpj,\n" +
+                    "    nom_cliente nome,\n" +
+                    "    emissao,\n" +
+                    "    vencimento,\n" +
+                    "    valor_dup valor\n" +
+                    "from\n" +
+                    "    receber r\n" +
+                    "join cliente c on (r.cod_cliente = c.codigo)\n" +
+                    "where\n" +
+                    "    recebimento is null\n" +
+                    "order by\n" +
+                    "    emissao")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rs.getString("documento"));
+                    imp.setParcela(rs.getInt("parcela"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setCnpjCliente(rs.getString("cnpj"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setValor(rs.getDouble("valor"));
+                    
+                    result.add(imp);
+                }
             }
         }
         return result;
