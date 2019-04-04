@@ -119,6 +119,7 @@ public class ReceitaRepository {
         ant.setImportsistema(imp.getImportsistema());
         ant.setImportloja(imp.getImportloja());
         ant.setImportid(imp.getImportid());
+        ant.setIdproduto(imp.getIdproduto());
         ant.setDescricao(imp.getDescricao());
         ant.setFichatecnica(imp.getFichatecnica());
         ant.setQtdembalagemreceita(imp.getQtdembalagemreceita());

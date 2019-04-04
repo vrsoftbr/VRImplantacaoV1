@@ -91,6 +91,7 @@ public class ReceitaAnteriorDAO {
             sql.put("sistema", vo.getImportsistema());
             sql.put("loja", vo.getImportloja());
             sql.put("id", vo.getImportid());
+            sql.put("idproduto", vo.getIdproduto());
             sql.put("descricao", vo.getDescricao());
             sql.put("fichatecnica", vo.getFichatecnica());
             sql.put("qtdembalagemreceita", vo.getQtdembalagemreceita());
