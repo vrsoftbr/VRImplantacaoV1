@@ -18,6 +18,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -435,7 +436,7 @@ public class HRTechDAO extends InterfaceDAO {
                     + "    flcgccpf cpf on (c.codcgccpfs = cpf.codigoenti)\n"
                     + "left join\n"
                     + "    fl423cep cep on (c.id_cliente = cep.id_cliente) and\n"
-                    + "    cpf.codceplent = cep.codigocep\n"
+                    + "    cpf.codcepresi = cep.codigocep\n"
                     + "left join\n"
                     + "    fltelefo_cad tel on (c.id_cliente = tel.id_cadastro)\n"
                     + "where\n"
@@ -481,6 +482,7 @@ public class HRTechDAO extends InterfaceDAO {
                     imp.setValorLimite(rs.getDouble("limite"));
                     imp.setAtivo(rs.getInt("situacao") == 0 ? true : false);
                     imp.setSexo("F".equals(rs.getString("sexo")) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                    imp.setEstadoCivil(rs.getInt("estadocivil") == 0 ? TipoEstadoCivil.CASADO : TipoEstadoCivil.SOLTEIRO);
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setCep(rs.getString("cep"));
                     imp.setNumero(rs.getString("numero"));

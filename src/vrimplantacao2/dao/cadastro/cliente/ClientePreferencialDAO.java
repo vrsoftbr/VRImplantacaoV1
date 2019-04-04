@@ -330,6 +330,9 @@ public class ClientePreferencialDAO {
                 if(opt.contains(OpcaoCliente.COMPLEMENTO)) {
                     sql.put("complemento", vo.getComplemento());
                 }
+                if(opt.contains(OpcaoCliente.ESTADO_CIVIL)) {
+                    sql.put("id_tipoestadocivil", vo.getTipoEstadoCivil().getID());
+                }
 
                 sql.setWhere("id = " + vo.getId());
                 stm.execute(sql.getUpdate());

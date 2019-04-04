@@ -93,7 +93,6 @@ public class GDoorDAO extends InterfaceDAO {
                     "    estoque p\n" +
                     "order by\n" +
                     "    p.codigo")) {
-                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -297,8 +296,7 @@ public class GDoorDAO extends InterfaceDAO {
                     imp.setCargo(rst.getString("cargo"));
                     imp.setSalario(rst.getDouble("salario"));
                     imp.setEstadoCivil(rst.getInt("estadoCivil"));
-                    imp.setNomeConjuge(rst.getString("conjuge"));
-                    imp.setOrgaoemissor(rst.getString("ORGAOEMISSOR"));                   
+                    imp.setNomeConjuge(rst.getString("conjuge"));                   
 
                     result.add(imp);
                 }                
