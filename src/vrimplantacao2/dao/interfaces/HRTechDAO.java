@@ -192,58 +192,58 @@ public class HRTechDAO extends InterfaceDAO {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	distinct\n" +
-                    "	p.codigoplu id,\n" +
-                    "	case \n" +
-                    "		when p.estc13codi = '' then \n" +
-                    "		p.codigoplu \n" +
+                    "select\n" +
+                    "	p.codigoplu id, \n" +
+                    "	case  \n" +
+                    "		when p.estc13codi = '' then  \n" +
+                    "		p.codigoplu  \n" +
                     "	else p.estc13codi end ean,\n" +
                     "	p.estc35desc descricaocompleta,\n" +
                     "	p.descreduzi descricaoreduzida,\n" +
-                    "	ps.situacao,\n" +
-                    "	ps.dtcadastro,\n" +
-                    "	p.estc03seto merc1,\n" +
-                    "	p.estc03grup merc2,\n" +
-                    "	p.estc03subg merc3,\n" +
-                    "	p.estc03fami merc4,\n" +
-                    "	p.estc03subf merc5,\n" +
+                    "	p.dtcadastro,\n" +
+                    "	p.situacao,\n" +
                     "	p.estc01peso pesavel,\n" +
                     "	coalesce(bal.diasvalida, 0) validade,\n" +
                     "	coalesce(bal.peso_varia, '') peso,\n" +
-                    "	cus.custoliqui custosemimposto,\n" +
-                    "	cus.custoliqui custocomimposto,\n" +
-                    "	p.vendaatua venda,\n" +
-                    "	ep.estn05mrge margem,\n" +
-                    "	p.tip_emb_vd embalagem,\n" +
-                    "	p.datreajatu datareajuste,\n" +
-                    "	p.estoque,\n" +
-                    "	p.cod_ncm ncm,\n" +
-                    "	p.data_alte dataalteracao,\n" +
-                    "	p.siglatribu,\n" +
-                    "	p.tributouni tributo,\n" +
-                    "	p.valoricm icms,\n" +
-                    "	tr.situatribu cst,\n" +
-                    "	tr.mrger icmsreducao,\n" +
-                    "	p.cstpis,\n" +
-                    "	p.cstcof cstcofins,\n" +
-                    "	nat.NAT_REC_PIS naturezareceita,\n" +
-                    "	p.codcest cest\n" +
-                    "from \n" +
-                    "	HRPDV_PREPARA_PRO p\n" +
-                    "left join FLTRIBUT tr on (p.codigotrib = tr.codigotrib) and\n" +
-                    "	p.codigoloja = tr.codigoloja\n" +
-                    "left join FL303CUS cus on (p.codigoplu = cus.codigoplu) and\n" +
-                    "	cus.codigoloja = p.codigoloja\n" +
-                    "left join FL300EST ps on (p.codigoplu = ps.codigoplu)\n" +
-                    "left join FL301EST ep on (p.codigoplu = ep.codigoplu) and\n" +
-                    "	 p.codigoloja = ep.codigoloja\n" +
-                    "left join FL328BAL bal on (p.codigoplu = bal.codigoplu)\n" +
-                    "left join FLTABNCM_PIS nat on (p.cod_ncm = nat.codigo) and\n" +
-                    "	nat.cstpis = p.cstpis and\n" +
-                    "	nat.cstcof = p.cstcof\n" +
+                    "	p.estc03seto merc1, \n" +
+                    "	p.estc03grup merc2, \n" +
+                    "	p.estc03subg merc3, \n" +
+                    "	p.estc03fami merc4, \n" +
+                    "	p.estc03subf merc5,\n" +
+                    "	est.estn05mrge margem,\n" +
+                    "	est.qtd_emb_co qtdembalagemcotacao,\n" +
+                    "	est.qtd_emb_vd qtdembalagem,\n" +
+                    "	est.tip_emb_vd embalagem,\n" +
+                    "	v.vendaatua venda,\n" +
+                    "	c.custoliqui custocomimposto,\n" +
+                    "	c.custorepos custosemimposto,\n" +
+                    "	e.estoqueatu estoque,\n" +
+                    "	est.estn10maxi estoquemaximo,\n" +
+                    "	est.estn10mini estoqueminimo,\n" +
+                    "	ncm.cod_ncm ncm,\n" +
+                    "	ncm.id_cest cest,\n" +
+                    "	ts.situatribu cst,\n" +
+                    "	ts.aliquotapdv icms,\n" +
+                    "	ts.mrger icmsreducao,\n" +
+                    "	pis.cstpis cstpis,\n" +
+                    "	pis.cstcof cstcofins\n" +
+                    "from\n" +
+                    "	fl300est p\n" +
+                    "join fl304ven v on (p.codigoplu = v.codigoplu)\n" +
+                    "join fl309est e on (p.codigoplu = e.codigoplu) and \n" +
+                    "	 v.codigoloja = e.codigoloja\n" +
+                    "join fl303cus c on (p.codigoplu = c.codigoplu) and\n" +
+                    "	v.codigoloja = c.codigoloja\n" +
+                    "join fltabncm_pro ncm on (p.codigoplu = ncm.codigoplu)\n" +
+                    "join fl301est est on (p.codigoplu = est.codigoplu) and\n" +
+                    "	est.codigoloja = v.codigoloja\n" +
+                    "join fltribut ts on (est.codtribsai = ts.codigotrib) and\n" +
+                    "	v.codigoloja = ts.codigoloja\n" +
+                    "left join fl328bal bal on (p.codigoplu = bal.codigoplu)\n" +
+                    "left join hrpdv_prepara_pro pis on (pis.codigoplu = p.codigoplu) and\n" +
+                    "	pis.codigoloja = v.codigoloja\n" +
                     "where\n" +
-                    "	p.codigoloja = " + getLojaOrigem() + "\n" +
+                    "	v.codigoloja = " + getLojaOrigem() + "\n" +
                     "order by\n" +
                     "	p.codigoplu")) {
                 while (rs.next()) {
@@ -273,10 +273,13 @@ public class HRTechDAO extends InterfaceDAO {
                     imp.setMargem(rs.getDouble("margem"));
                     imp.setPrecovenda(rs.getDouble("venda"));
                     imp.setTipoEmbalagem(rs.getString("embalagem"));
+                    imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagemcotacao"));
                     imp.setEstoque(rs.getDouble("estoque"));
+                    imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
+                    imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
                     imp.setNcm(rs.getString("ncm"));
-                    imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
-                    imp.setDataAlteracao(rs.getDate("dataalteracao"));
+                    //imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
+                    //imp.setDataAlteracao(rs.getDate("dataalteracao"));
                     imp.setIcmsAliq(rs.getDouble("icms"));
                     imp.setIcmsCst(rs.getString("cst"));
                     imp.setIcmsReducao(rs.getDouble("icmsreducao"));
