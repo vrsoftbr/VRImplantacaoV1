@@ -45,7 +45,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="vRPanel6" min="-2" pref="162" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabs" pref="215" max="32767" attributes="0"/>
+              <Component id="tabs" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -574,6 +574,43 @@
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUnifClienteEventual">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Cliente Eventual (Somente com CPF/CNPJ)"/>
+              </Properties>
+            </Component>
+          </SubComponents>
+        </Container>
+        <Container class="javax.swing.JPanel" name="jPanel1">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Balan&#xe7;a">
+                <Property name="tabTitle" type="java.lang.String" value="Balan&#xe7;a"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="vRImportaArquivBalancaPanel1" pref="576" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="vRImportaArquivBalancaPanel1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="86" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Component class="vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel" name="vRImportaArquivBalancaPanel1">
+              <Properties>
+                <Property name="sistema" type="java.lang.String" value="GetWay"/>
               </Properties>
             </Component>
           </SubComponents>

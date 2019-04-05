@@ -306,38 +306,38 @@ public class HRTechDAO extends InterfaceDAO {
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	f.codigoenti id_fornecedor,\n"
-                    + "	f.datusucada datacadastro,\n"
-                    + "	cpf.nomeentida razao,\n"
-                    + "	cpf.nomapelido fantasia,\n"
-                    + "	cpf.codinsc_rg rgie,\n"
-                    + "	cpf.numcgc_cpf cnpj,\n"
-                    + "	cpf.tipempresa tipo,\n"
-                    + "	cpf.datanascim datanascimento,\n"
-                    + "	cpf.codcepcome cep,\n"
-                    + "	cpf.compcomerc numero,\n"
-                    + "	f.forn02visi prazovisita,\n"
-                    + "	f.diasemanas,\n"
-                    + "	f.prod_rural produtorural,\n"
-                    + "	ltrim(cep.titulo + ' ' + cep.logradouro) endereco,\n"
-                    + "	cep.bairro,\n"
-                    + "	cep.cidade,\n"
-                    + "	cep.estado,\n"
-                    + "	tel.telefone01 telefone\n"
-                    + "from \n"
-                    + "	FL800FOR f\n"
-                    + "left join\n"
-                    + "	flcgccpf cpf on (f.id_entidade = cpf.id_entidade)\n"
-                    + "left join\n"
-                    + "	fl423cep cep on (f.codigoenti = cep.codigoenti)\n"
-                    + "left join\n"
-                    + "	fltelefo_cad tel on (f.codigoenti = tel.id_cadastro)\n"
-                    + "where\n"
-                    + "	cep.tipocadast = 'FOR' and\n"
-                    + "	tel.TP_CADASTRO = 'FOR'\n"
-                    + "order by\n"
-                    + "	f.codigoenti")) {
+                    "select \n" +
+                    "	f.codigoenti id_fornecedor,\n" +
+                    "	f.datusucada datacadastro,\n" +
+                    "	cpf.nomeentida razao,\n" +
+                    "	cpf.nomapelido fantasia,\n" +
+                    "	cpf.codinsc_rg rgie,\n" +
+                    "	cpf.numcgc_cpf cnpj,\n" +
+                    "	cpf.tipempresa tipo,\n" +
+                    "	cpf.datanascim datanascimento,\n" +
+                    "	cpf.codcepcome cep,\n" +
+                    "	cpf.compcomerc numero,\n" +
+                    "	f.forn02visi prazovisita,\n" +
+                    "	f.forn02pent prazoentrega,\n" +
+                    "	rtrim(pg.nomcondpgt) condicaopagamento,\n" +
+                    "	f.diasemanas,\n" +
+                    "	f.prod_rural produtorural,\n" +
+                    "	ltrim(cep.titulo + ' ' + cep.logradouro) endereco,\n" +
+                    "	cep.bairro,\n" +
+                    "	cep.cidade,\n" +
+                    "	cep.estado,\n" +
+                    "	tel.telefone01 telefone\n" +
+                    "from \n" +
+                    "	FL800FOR f\n" +
+                    "left join flcgccpf cpf on (f.id_entidade = cpf.id_entidade)\n" +
+                    "left join fl423cep cep on (f.codigoenti = cep.codigoenti)\n" +
+                    "left join fltelefo_cad tel on (f.codigoenti = tel.id_cadastro)\n" +
+                    "left join flcondpg pg on (f.codcondpgt = pg.codcondpgt)\n" +
+                    "where\n" +
+                    "	cep.tipocadast = 'FOR' and\n" +
+                    "	tel.TP_CADASTRO = 'FOR'\n" +
+                    "order by\n" +
+                    "	f.codigoenti")) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportSistema(getSistema());
@@ -352,6 +352,8 @@ public class HRTechDAO extends InterfaceDAO {
                     imp.setCep(rs.getString("cep"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setPrazoVisita(rs.getInt("prazovisita"));
+                    imp.setPrazoEntrega(rs.getInt("prazoentrega"));
+                    imp.setCondicaoPagamento(rs.getInt("condicaopagamento"));
                     if (rs.getInt("produtorural") == 1) {
                         imp.setProdutorRural();
                     }
