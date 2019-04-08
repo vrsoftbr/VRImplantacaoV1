@@ -1,6 +1,5 @@
 package vrimplantacao2.dao.interfaces;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,7 +10,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
@@ -333,7 +331,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 forn.setTel_principal(linha.getString("tel_principal"));
                 forn.setQtd_minima_pedido(linha.getInt("qtd_minima_pedido"));
                 forn.setValor_minimo_pedido(linha.getDouble("valor_minimo_pedido"));
-                forn.setDatacadastro(linha.getData("datacadastro"));
+                forn.setDatacadastro(getData(linha.getString("datacadastro")));
                 forn.setObservacao(linha.getString("observacao"));    
                 
                 int i = 1;
@@ -391,7 +389,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setImportLoja(getLojaOrigem());
             imp.setIdFornecedor(linha.getString("id_fornecedor"));
             imp.setIdProduto(linha.getString("id_produto"));
-            imp.setDataAlteracao(linha.getData("dataalteracao"));
+            imp.setDataAlteracao(getData(linha.getString("dataalteracao")));
             imp.setCodigoExterno(linha.getString("cod_produto_fornecedor"));
             imp.setPesoEmbalagem(linha.getDouble("pesoembalagem"));
             imp.setQtdEmbalagem(linha.getInt("qtdembalagem"));
@@ -430,7 +428,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setFantasia(linha.getString("fantasia"));
             imp.setAtivo(!"N".equalsIgnoreCase(linha.getString("ativo")));
             imp.setBloqueado("N".equalsIgnoreCase(linha.getString("bloqueado")));
-            imp.setDataBloqueio(linha.getData("dataBloqueio"));
+            imp.setDataBloqueio(getData(linha.getString("dataBloqueio")));
             imp.setEndereco(linha.getString("endereco"));
             imp.setNumero(linha.getString("numero"));
             imp.setComplemento(linha.getString("complemento"));
@@ -443,8 +441,8 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             String civil = linha.getString("estadoCivil") + "   ";
             civil = (civil != null ? civil.substring(1, 3) : "NAO");
             imp.setEstadoCivil(estCivil.get(civil));
-            imp.setDataNascimento(linha.getData("dataNascimento"));
-            imp.setDataCadastro(linha.getData("dataCadastro"));
+            imp.setDataNascimento(getData(linha.getString("dataNascimento")));
+            imp.setDataCadastro(getData(linha.getString("dataCadastro")));
             String sexo = linha.getString("sexo") != null ? linha.getString("sexo") : "";
             imp.setSexo("F".startsWith(sexo.toUpperCase()) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
             imp.setEmpresa(linha.getString("empresa"));
@@ -458,7 +456,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setEmpresaUf(linha.getString("empresaUf"));
             imp.setEmpresaCep(linha.getString("empresaCep"));
             imp.setEmpresaTelefone(linha.getString("empresaTelefone"));
-            imp.setDataAdmissao(linha.getData("dataAdmissao"));
+            imp.setDataAdmissao(getData(linha.getString("dataAdmissao")));
             imp.setCargo(linha.getString("cargo"));
             imp.setSalario(linha.getDouble("salario"));
             imp.setValorLimite(linha.getDouble("valorLimite"));
@@ -547,8 +545,8 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             try {
                 imp.setId(linha.getString("id"));
                 imp.setCnpjCliente(linha.getString("cnpj"));
-                imp.setDataEmissao(linha.getData("emissao"));
-                imp.setDataVencimento(linha.getData("vencimento"));
+                imp.setDataEmissao(getData(linha.getString("emissao")));
+                imp.setDataVencimento(getData(linha.getString("vencimento")));
                 imp.setEcf(linha.getString("ecf"));
                 imp.setIdCliente(linha.getString("idcliente"));
                 imp.setJuros(linha.getDouble("juros"));
@@ -600,12 +598,12 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 ContaPagarIMP imp = new ContaPagarIMP();
                 imp.setId(linha.getString("id"));
                 imp.setIdFornecedor(linha.getString("idfornecedor"));
-                imp.setDataEmissao(linha.getData("dataemissao"));
-                imp.setDataEntrada(linha.getData("dataemissao"));
+                imp.setDataEmissao(getData(linha.getString("dataemissao")));
+                imp.setDataEntrada(getData(linha.getString("dataemissao")));
                 imp.setNumeroDocumento(linha.getString("nota"));
                 imp.setValor(linha.getDouble("valor"));
                 imp.setObservacao(linha.getString("observacao"));
-                imp.addVencimento(linha.getData("datavencimento"), imp.getValor());
+                imp.addVencimento(getData(linha.getString("datavencimento")), imp.getValor());
                 
                 System.out.println("ID: " + imp.getId() + " - Valor: " + imp.getValor() + " Emissão: " + imp.getDataEmissao());
             
@@ -656,7 +654,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             
             imp.setIdProduto(linha.getString("id_produto"));
             imp.setEan(linha.getString("ean"));
-            imp.setData(linha.getData("data"));
+            imp.setData(getData(linha.getString("data")));
             imp.setPrecoVenda(linha.getDouble("preco"));
             imp.setQuantidade(linha.getDouble("qtd"));
             imp.setCustoComImposto(linha.getDouble("custocomimposto"));
@@ -896,7 +894,10 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     private Date getData(String format) throws ParseException {
-        return format == null ? null : formatData.parse(format);
+        if (format != null && !"".equals(format.trim())) {
+            return format == null ? null : formatData.parse(format);
+        }
+        return null;
     }
     
     private Date getDataCompleta(String format) throws ParseException {

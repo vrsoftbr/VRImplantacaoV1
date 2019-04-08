@@ -90,11 +90,10 @@ public class ClientePreferencialDAO {
             sql.put("cargoconjuge", "");
             sql.put("salarioconjuge", 0);
             sql.put("outrarendaconjuge", 0);
-            if (Versao.maiorQue(3,17)) {
+            if (Versao.maiorQue(3,18,2)) {
                 sql.put("utilizaappdescontos", false);
             }
             sql.putNull("id_grupo");
-            sql.put("utilizaappdescontos", false);
 
             try {
                 stm.execute(sql.getInsert());
