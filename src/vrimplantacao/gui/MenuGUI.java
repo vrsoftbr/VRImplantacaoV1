@@ -134,6 +134,7 @@ import vrimplantacao2.gui.interfaces.FenixGUI;
 import vrimplantacao2.gui.interfaces.FlashGUI;
 import vrimplantacao2.gui.interfaces.FortGUI;
 import vrimplantacao2.gui.interfaces.FortiGUI;
+import vrimplantacao2.gui.interfaces.GDoorGUI;
 import vrimplantacao2.gui.interfaces.GR7GUI;
 import vrimplantacao2.gui.interfaces.GetWayGUI;
 import vrimplantacao2.gui.interfaces.GuiaSistemasGUI;
@@ -582,6 +583,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuCerebro = new javax.swing.JMenuItem();
         mnuSyncTech = new javax.swing.JMenuItem();
         mnuSolutionSupera = new javax.swing.JMenuItem();
+        mnuGDoor = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1258,6 +1260,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird2.add(mnuSolutionSupera);
+
+        mnuGDoor.setText("GDoor");
+        mnuGDoor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuGDoorActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuGDoor);
 
         mnuDatabase.add(mnuFirebird2);
 
@@ -4248,6 +4258,10 @@ public final class MenuGUI extends VRMdiFrame {
         GeraContaPagarGUI.exibir(this);
     }//GEN-LAST:event_mnuContaPagarActionPerformed
 
+    private void mnuGDoorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuGDoorActionPerformed
+        GDoorGUI.exibir(this);
+    }//GEN-LAST:event_mnuGDoorActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4393,6 +4407,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuFlatan;
     private javax.swing.JMenuItem mnuFort;
     private javax.swing.JMenuItem mnuForti;
+    private javax.swing.JMenuItem mnuGDoor;
     private javax.swing.JMenuItem mnuHRTech;
     private javax.swing.JMenuItem mnuHipcom;
     private javax.swing.JMenuItem mnuHiper;

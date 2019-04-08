@@ -151,7 +151,8 @@ public class ClienteRepository {
                                 || (opt.contains(OpcaoCliente.PERMITE_CHEQUE))
                                 || (opt.contains(OpcaoCliente.PERMITE_CREDITOROTATIVO))
                                 || (opt.contains(OpcaoCliente.RAZAO))
-                                || (opt.contains(OpcaoCliente.EMAIL))) {
+                                || (opt.contains(OpcaoCliente.EMAIL))
+                                || (opt.contains(OpcaoCliente.ENDERECO_COMPLETO))) {
 
                             cliente = converterClientePreferencial(imp);
                             cliente.setId(anterior.getCodigoAtual().getId());
@@ -239,6 +240,9 @@ public class ClienteRepository {
                         atualizarClientePreferencial(vo, opt);
                     }
                     if(opt.contains(OpcaoCliente.COMPLEMENTO)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if(opt.contains(OpcaoCliente.ESTADO_CIVIL)) {
                         atualizarClientePreferencial(vo, opt);
                     }
                 }

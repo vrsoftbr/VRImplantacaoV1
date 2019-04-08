@@ -281,6 +281,7 @@ public enum OpcaoProduto {
     PESO_BRUTO, 
     PESO_LIQUIDO, 
     IMPORTAR_PDV_VR,
+    RECEITA,
     /**
         Em alguns sistemas o produto pode ser vendido tanto pelo EAN13 quanto na balança.
         Isso para o VR pode causar problemas, por essa razão o VRImplantação trata esse
