@@ -44,7 +44,7 @@ import vrimplantacao.gui.interfaces.FabTechGUI;
 import vrimplantacao.gui.interfaces.FaucomGUI;
 import vrimplantacao.gui.interfaces.FlatanGUI;
 import vrimplantacao.gui.interfaces.GCFGUI;
-import vrimplantacao.gui.interfaces.GZSistemasGUI;
+import vrimplantacao2.gui.interfaces.GZSistemasGUI;
 import vrimplantacao.gui.interfaces.GdoorGUI;
 import vrimplantacao.gui.interfaces.GeraContaPagarGUI;
 import vrimplantacao.gui.interfaces.GerarCodigoBarrasAtacadoGUI;
@@ -3256,19 +3256,7 @@ public final class MenuGUI extends VRMdiFrame {
 
     private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
         // TODO add your handling code here:
-        try {
-            this.setWaitCursor();
-            if (formImportarGZSistemas == null || formImportarGZSistemas.isClosed()) {
-                formImportarGZSistemas = new GZSistemasGUI(this);
-            }
-
-            formImportarGZSistemas.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
-
+        GZSistemasGUI.exibir(this);
     }//GEN-LAST:event_jMenuItem11ActionPerformed
 
     private void jMenuItemSBOMarketActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSBOMarketActionPerformed
