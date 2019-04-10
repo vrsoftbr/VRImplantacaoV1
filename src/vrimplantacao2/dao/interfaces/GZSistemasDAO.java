@@ -41,6 +41,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
         return "GZSistemas";
     }
 
+    @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(new OpcaoProduto[]{
             OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
