@@ -125,10 +125,8 @@ public class HRTechDAO extends InterfaceDAO {
                     + "	estc13codi ean,\n"
                     + "	qtd_emb_vd quantidade,\n"
                     + "	por_des_vd desconto\n"
-                    + "from\n"
-                    + "	FL322EAN\n"
-                    + "where\n"
-                    + "	por_des_vd > 0")) {
+                  + "from\n"
+                    + "	FL322EAN")) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -353,7 +351,11 @@ public class HRTechDAO extends InterfaceDAO {
                     imp.setNumero(rs.getString("numero"));
                     imp.setPrazoVisita(rs.getInt("prazovisita"));
                     imp.setPrazoEntrega(rs.getInt("prazoentrega"));
-                    imp.setCondicaoPagamento(rs.getInt("condicaopagamento"));
+                    
+                    String pagamento[] = rs.getString("condicaopagamento").split("/");
+                    for(String pag : pagamento) {
+                        imp.setCondicaoPagamento(Utils.stringToInt(pag.trim()));
+                    }
                     if (rs.getInt("produtorural") == 1) {
                         imp.setProdutorRural();
                     }
@@ -506,32 +508,46 @@ public class HRTechDAO extends InterfaceDAO {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "	numerolanc id,\n"
-                    + "	codigoenti idcliente,\n"
-                    + "	notafiscal documento,\n"
-                    + "	parcela,\n"
-                    + "	datemissao emissao,\n"
-                    + "	datvencime vencimento,\n"
-                    + "	vlrtotalnf valor,\n"
-                    + "	historico observacao\n"
-                    + "from\n"
-                    + "	FL700FIN\n"
-                    + "where\n"
-                    + "	datpagto = '1900-01-01' and\n"
-                    + "	codigoloja = " + getLojaOrigem() + " and\n"
-                    + "	tipolancam = 'R'\n"
-                    + "order by\n"
-                    + "	datvencime")) {
+                    "select \n" +
+                    "	distinct\n" +
+                    "	f.codi_relacio id,\n" +
+                    "	cl.codigoenti idcliente,\n" +
+                    "	f.numcgc_cpf cnpj,\n" +
+                    "	f.numeroecf ecf,\n" +
+                    "	f.numerocoo coo,\n" +
+                    "	f.datamovime data,\n" +
+                    "	f.vdg_dia valor,\n" +
+                    "	f.datadeposi vencimento \n" +
+                    "from \n" +
+                    "	vw305fin f\n" +
+                    "join flcgccpf cpf on cast(f.numcgc_cpf as bigint) = cast(cpf.numcgc_cpf as bigint)\n" +
+                    "join fl400cli cl on cpf.codigoenti = cl.codcgccpfs and\n" +
+                    "	cl.id_entidade = cpf.id_entidade\n" +
+                    "where  \n" +
+                    "	f.datamovime >= '2005-01-01 00:00:00' and \n" +
+                    "	f.codigofina in ('007') and \n" +
+                    "	(ORIGEM != CASE WHEN \n" +
+                    "		DATAMOVIME > '20131231' THEN 'C' ELSE '\\' END OR \n" +
+                    "	 EXISTS (SELECT \n" +
+                    "			CODI_RELACIO \n" +
+                    "		 FROM \n" +
+                    "			FL404CON \n" +
+                    "            WHERE \n" +
+                    "			CODIGOLOJA = f.CODIGOLOJA AND \n" +
+                    "			CODI_RELACIO = f.CODI_RELACIO)) and\n" +
+                    "	f.codigoloja = " + getLojaOrigem() + "\n" +
+                    "order by\n" +
+                    "	f.datamovime")) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rs.getString("id"));
                     imp.setIdCliente(rs.getString("idcliente"));
-                    imp.setNumeroCupom(rs.getString("documento"));
-                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setCnpjCliente(rs.getString("cnpj"));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setNumeroCupom(rs.getString("coo"));
+                    imp.setDataEmissao(rs.getDate("data"));
                     imp.setDataVencimento(rs.getDate("vencimento"));
                     imp.setValor(rs.getDouble("valor"));
-                    imp.setObservacao(rs.getString("observacao"));
 
                     result.add(imp);
                 }
