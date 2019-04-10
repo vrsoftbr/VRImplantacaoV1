@@ -8,13 +8,17 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoMySQL;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
-import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -37,6 +41,59 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
         return "GZSistemas";
     }
 
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(new OpcaoProduto[]{
+            OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+            OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+            OpcaoProduto.MERCADOLOGICO,
+            OpcaoProduto.MAPA_TRIBUTACAO,
+            OpcaoProduto.PRODUTOS,
+            OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+            OpcaoProduto.DATA_CADASTRO,
+            OpcaoProduto.DATA_ALTERACAO,
+            OpcaoProduto.EAN,
+            OpcaoProduto.EAN_EM_BRANCO,
+            OpcaoProduto.TIPO_EMBALAGEM_EAN,
+            OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.PESAVEL,
+            OpcaoProduto.VALIDADE,
+            OpcaoProduto.DESC_COMPLETA,
+            OpcaoProduto.DESC_GONDOLA,
+            OpcaoProduto.ATIVO,
+            OpcaoProduto.DESC_REDUZIDA,
+            OpcaoProduto.MERCADOLOGICO_PRODUTO,
+            OpcaoProduto.PESO_BRUTO,
+            OpcaoProduto.PESO_LIQUIDO,
+            OpcaoProduto.ESTOQUE_MINIMO,
+            OpcaoProduto.ESTOQUE_MAXIMO,
+            OpcaoProduto.ESTOQUE,
+            OpcaoProduto.CUSTO,
+            OpcaoProduto.PRECO,
+            OpcaoProduto.NCM,
+            OpcaoProduto.CEST,
+            OpcaoProduto.PIS_COFINS,
+            OpcaoProduto.NATUREZA_RECEITA,
+            OpcaoProduto.ICMS,
+            OpcaoProduto.MARGEM
+        }));
+    }
+
+    public ArrayList<Estabelecimento> getLojasCliente() throws Exception {
+        ArrayList<Estabelecimento> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select codigo, nomfan, cgc from mercodb.lojas order by codigo"
+            )) {
+                while (rst.next()) {
+                    result.add(new Estabelecimento(rst.getString("codigo"), rst.getString("nomfan") + " - " + rst.getString("cgc")));
+                }
+            }
+        }
+        
+        return result;
+    }
+    
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
