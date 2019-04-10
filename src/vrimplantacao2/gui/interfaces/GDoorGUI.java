@@ -248,6 +248,9 @@ public class GDoorGUI extends VRInternalFrame {
                             if(chkAtacado.isSelected()) {
                                 opcoes.add(OpcaoProduto.ATACADO);
                             }
+                            if(chkCest.isSelected()) {
+                                opcoes.add(OpcaoProduto.CEST);
+                            }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
                             }
@@ -343,6 +346,7 @@ public class GDoorGUI extends VRInternalFrame {
         chkT1EAN = new vrframework.bean.checkBox.VRCheckBox();
         chkT1EANemBranco = new vrframework.bean.checkBox.VRCheckBox();
         chkT1PisCofins = new vrframework.bean.checkBox.VRCheckBox();
+        chkCest = new vrframework.bean.checkBox.VRCheckBox();
         chkT1NatReceita = new vrframework.bean.checkBox.VRCheckBox();
         chkT1ICMS = new vrframework.bean.checkBox.VRCheckBox();
         chkT1AtivoInativo = new vrframework.bean.checkBox.VRCheckBox();
@@ -494,6 +498,9 @@ public class GDoorGUI extends VRInternalFrame {
 
         chkT1PisCofins.setText("PIS/COFINS");
         tabImpProduto.add(chkT1PisCofins);
+
+        chkCest.setText("Cest");
+        tabImpProduto.add(chkCest);
 
         chkT1NatReceita.setText("Nat. Receita");
         tabImpProduto.add(chkT1NatReceita);
@@ -986,6 +993,7 @@ public class GDoorGUI extends VRInternalFrame {
     private javax.swing.JToggleButton btnConectar;
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkAtacado;
+    private vrframework.bean.checkBox.VRCheckBox chkCest;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
