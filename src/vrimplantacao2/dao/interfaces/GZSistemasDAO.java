@@ -14,6 +14,10 @@ import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEstadoCivil;
+import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -328,6 +332,145 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFornecedor(rst.getString("cdfornec"));
                     imp.setCodigoExterno(rst.getString("codigo"));
                     imp.setQtdEmbalagem(rst.getInt("porcaixa"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "codigo,\n"
+                    + "razsoc,\n"
+                    + "nomfan,\n"
+                    + "tipoender,\n"
+                    + "ender,\n"
+                    + "numero,\n"
+                    + "complemen,\n"
+                    + "ibge,\n"
+                    + "bairro,\n"
+                    + "munic,\n"
+                    + "estado,\n"
+                    + "cep,\n"
+                    + "telcom,\n"
+                    + "dddtel,\n"
+                    + "telefone,\n"
+                    + "dddfax,\n"
+                    + "telefax,\n"
+                    + "insest,\n"
+                    + "cgc,\n"
+                    + "dtnasc,\n"
+                    + "obs,\n"
+                    + "email,\n"
+                    + "endwww,\n"
+                    + "emptrab,\n"
+                    + "endemp,\n"
+                    + "bairroemp,\n"
+                    + "municemp,\n"
+                    + "estadoemp,\n"
+                    + "cepemp,\n"
+                    + "dddemp,\n"
+                    + "telemp,\n"
+                    + "cargo,\n"
+                    + "profissao,\n"
+                    + "estcivil,\n"
+                    + "sexo,\n"
+                    + "saldo\n"
+                    + "from mercodb.clientes\n"
+                    + "order by codigo"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("codigo"));
+                    imp.setRazao(rst.getString("razsoc"));
+                    imp.setFantasia(rst.getString("nomfan"));
+                    imp.setCnpj(rst.getString("cgc"));
+                    imp.setInscricaoestadual(rst.getString("insest"));
+                    imp.setEndereco((rst.getString("tipoender") + rst.getString("ender")).trim());
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemen"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("munic"));
+                    imp.setMunicipioIBGE(rst.getInt("ibge"));
+                    imp.setTelefone((rst.getString("dddtel") + rst.getString("telefone")).trim());
+                    imp.setFax((rst.getString("dddfax") + rst.getString("telefax")).trim());
+                    imp.setEmail(rst.getString("email"));
+                    imp.setDataNascimento(rst.getDate("dtnasc"));
+                    imp.setObservacao(rst.getString("obs"));
+                    imp.setEmpresa(rst.getString("emptrab"));
+                    imp.setEmpresaEndereco(rst.getString("endemp"));
+                    imp.setEmpresaBairro(rst.getString("bairroemp"));
+                    imp.setEmpresaMunicipio(rst.getString("municemp"));
+                    imp.setEmpresaUf(rst.getString("estadoemp"));
+                    imp.setEmpresaCep(rst.getString("cepemp"));
+                    imp.setEmpresaTelefone((rst.getString("dddemp") + rst.getString("telemp")).trim());
+                    imp.setCargo(rst.getString("cargo"));
+                    imp.setValorLimite(rst.getDouble("saldo"));
+                    imp.setSexo("M".equals(rst.getString("sexo")) ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
+
+                    if ((rst.getString("endwww") != null)
+                            && (!rst.getString("endwww").trim().isEmpty())) {
+                        imp.addContato(
+                                "SITE",
+                                null,
+                                null,
+                                null,
+                                rst.getString("endwww").toLowerCase()
+                        );
+                    }
+                    if ((rst.getString("telcom") != null)
+                            && (!rst.getString("telcom").trim().isEmpty())) {
+                        imp.addContato(
+                                "TEL COMERCIAL",
+                                rst.getString("telcom"),
+                                null,
+                                null,
+                                null
+                        );
+                    }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "id,\n"
+                    + "cdcliente,\n"
+                    + "caixa,\n"
+                    + "nrdoc,\n"
+                    + "(valor - valrec) valorConta,\n"
+                    + "emissao, "
+                    + "vencto, "
+                    + "obs\n"
+                    + "from mercodb.contrec\n"
+                    + "where receb is null\n"
+                    + "and loja = " + getLojaOrigem()
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdCliente(rst.getString("cdcliente"));
+                    imp.setEcf(rst.getString("caixa"));
+                    imp.setNumeroCupom(rst.getString("nrdoc"));
+                    imp.setValor(rst.getDouble("valorConta"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setDataVencimento(rst.getDate("vencto"));
+                    imp.setObservacao(rst.getString("obs"));
                     result.add(imp);
                 }
             }
