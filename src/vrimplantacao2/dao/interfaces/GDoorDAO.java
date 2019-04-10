@@ -58,44 +58,46 @@ public class GDoorDAO extends InterfaceDAO {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "    p.codigo id,\n"
-                    + "    p.descricao descricaocompleta,\n"
-                    + "    p.descricao descricaoreduzida,\n"
-                    + "    p.descricao descricaogondola,\n"
-                    + "    case upper(p.situacao) when 'INATIVO' then 0 else 1 end as id_situacaocadastro,\n"
-                    + "    p.data_cadastro datacadastro,\n"
-                    + "    case when p.grupo = 'Balança' then 1 else 0 end e_balanca,\n"
-                    + "    p.grupo,\n"
-                    + "    14 mercadologico1,\n"
-                    + "    1 mercadologico2,\n"
-                    + "    1 mercadologico3,\n"
-                    + "    p.cod_ncm ncm,\n"
-                    + "    p.cod_cest cest,\n"
-                    + "    p.familia id_familia,\n"
-                    + "    p.margem_lucro margem,\n"
-                    + "    case when p.barras = '' then p.codigo else p.barras end ean,\n"
-                    + "    p.validade_dias validade,\n"
-                    + "    p.und id_tipoembalagem,\n"
-                    + "    p.peso pesobruto,\n"
-                    + "    p.peso pesoliquido,\n"
-                    + "    p.pis_codigo piscofins_cst_sai,\n"
-                    + "    p.pise_codigo piscofins_cst_ent,\n"
-                    + "    '' as piscofins_natrec,\n"
-                    + "    p.preco_venda preco,\n"
-                    + "    p.preco_custo custocomimposto,\n"
-                    + "    p.preco_custo custosemimposto,\n"
-                    + "    p.qtd estoque,\n"
-                    + "    p.qtd_ideal minimo,\n"
-                    + "    0 maximo,\n"
-                    + "    case elo when '101' then 18\n"
-                    + "    when '102' then 18 else 0 end as icms,\n"
-                    + "    st icmscst,\n"
-                    + "    0 icms_reducao\n"
-                    + "from\n"
-                    + "    estoque p\n"
-                    + "order by\n"
-                    + "    p.codigo")) {
+                    "select\n" +
+                    "    p.codigo id,\n" +
+                    "    case when p.barras = '' then p.codigo else p.barras end ean,\n" +
+                    "    p.descricao descricaocompleta,\n" +
+                    "    p.descricao descricaoreduzida,\n" +
+                    "    p.descricao descricaogondola,\n" +
+                    "    case upper(p.situacao) when 'INATIVO' then 0 else 1 end as id_situacaocadastro,\n" +
+                    "    p.data_cadastro datacadastro,\n" +
+                    "    case when p.grupo = 'Balança' then 1 else 0 end e_balanca,\n" +
+                    "    p.grupo,\n" +
+                    "    14 mercadologico1,\n" +
+                    "    1 mercadologico2,\n" +
+                    "    1 mercadologico3,\n" +
+                    "    p.cod_ncm ncm,\n" +
+                    "    c.codigo cest,\n" +
+                    "    p.familia id_familia,\n" +
+                    "    p.margem_lucro margem,\n" +
+                    "    p.validade_dias validade,\n" +
+                    "    p.und id_tipoembalagem,\n" +
+                    "    p.peso pesobruto,\n" +
+                    "    p.peso pesoliquido,\n" +
+                    "    p.pis_codigo piscofins_cst_sai,\n" +
+                    "    p.pise_codigo piscofins_cst_ent,\n" +
+                    "    '' as piscofins_natrec,\n" +
+                    "    p.preco_venda preco,\n" +
+                    "    p.preco_custo custocomimposto,\n" +
+                    "    p.preco_custo custosemimposto,\n" +
+                    "    p.qtd estoque,\n" +
+                    "    p.qtd_ideal minimo,\n" +
+                    "    0 maximo,\n" +
+                    "    case elo when '101' then 18\n" +
+                    "    when '102' then 18 else 0 end as icms,\n" +
+                    "    st icmscst,\n" +
+                    "    0 icms_reducao\n" +
+                    "from\n" +
+                    "    estoque p\n" +
+                    "left join\n" +
+                    "    cest c on p.cod_cest = c.id\n" +
+                    "order by\n" +
+                    "    p.codigo")) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
