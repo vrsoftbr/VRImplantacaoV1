@@ -749,7 +749,7 @@ public class HRTechDAO extends InterfaceDAO {
                     if (rst.next()) {
                         next = new VendaItemIMP();
 
-                        next.setId(rst.getString("id_venda") + rst.getInt("sequencia"));
+                        next.setId(rst.getString("id"));
                         next.setVenda(rst.getString("id_venda"));
                         String id = rst.getString("id_produto");
                         id = id.substring(0, id.length() - 1);
@@ -777,6 +777,7 @@ public class HRTechDAO extends InterfaceDAO {
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select\n"
+                    + " it.codi_relacio + '-' + cast(coalesce(it.id_item, 1) as varchar) + '-' + cast(it.vdg_dia as varchar) id,\n" 
                     + "	it.codi_relacio id_venda,\n"
                     + "	it.codigoplu id_produto,\n"
                     + "	pr.estc35desc descricao,\n"
