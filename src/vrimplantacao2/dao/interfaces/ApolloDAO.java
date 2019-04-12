@@ -511,7 +511,7 @@ public class ApolloDAO extends InterfaceDAO implements FinanceiroProvider {
                     "from\n" +
                     "    " + getSchema() + "cheque ch\n" +
                     "    left join " + getSchema() + "parceiros cl on ch.codparceiro = cl.codparceiro\n" +
-                    "    left join SINHAINTER.parceiros_end e on cl.codparceiro = e.codparceiro\n" +
+                    "    left join " + getSchema() + "parceiros_end e on cl.codparceiro = e.codparceiro\n" +
                     "    left join " + getSchema() + "bancos bc on ch.codbco = bc.codbco\n" +
                     "    left join " + getSchema() + "contas_bancarias cc on ch.codconta = cc.codconta and ch.codbco = cc.codbco\n" +
                     "where\n" +

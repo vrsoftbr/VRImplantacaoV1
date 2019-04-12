@@ -90,7 +90,7 @@ public class ClientePreferencialDAO {
             sql.put("cargoconjuge", "");
             sql.put("salarioconjuge", 0);
             sql.put("outrarendaconjuge", 0);
-            if (Versao.maiorQue(3,18,2)) {
+            if (Versao.maiorQue(3,17)) {
                 sql.put("utilizaappdescontos", false);
             }
             sql.putNull("id_grupo");
