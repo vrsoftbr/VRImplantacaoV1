@@ -368,7 +368,7 @@ public class DelfiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from receber r\n"
                     + "left join clientes c on c.codigo_cliente = r.codigo_cliente\n"
                     + "where r.status = 'A'\n"
-                    + "and r.forma = 'P'"
+                    + "and r.forma not in  ('CH', 'NC')"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -382,7 +382,7 @@ public class DelfiDAO extends InterfaceDAO implements MapaTributoProvider {
                     observacao = (rst.getString("duplicata") == null ? "" : "DUPLICATA - " + rst.getString("duplicata") + " ");
                     
                     if ("NC".equals(rst.getString("forma"))) {
-                        observacao = observacao + "NOTA CREDITO VALOR " + " " + rst.getString("valor_conta");
+                        observacao = observacao + "NOTA CREDITO VALOR " + " VALOR ORIGINAL DA CONTA (" + rst.getString("valor_conta") + ")";
                     }
                     imp.setObservacao(observacao + (rst.getString("obs") == null ? "" : rst.getString("obs")));
                     vResult.add(imp);
