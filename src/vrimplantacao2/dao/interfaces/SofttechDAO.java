@@ -132,67 +132,39 @@ public class SofttechDAO extends InterfaceDAO {
             
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
-                    "	p.codigo id,\n" +
-                    "	p.datacriado datacadastro,\n" +
-                    "	p.dataalterado dataalteracao,\n" +
-                    "	ean.ean,\n" +
-                    "	p.unidade,\n" +
-                    "	p.produtobalanca e_balanca,\n" +
-                    "	p.produto_pai,\n" +
-                    "	p.descricao descricaocompleta,\n" +
-                    "	p.descricaoreduzida descricaoreduzida,\n" +
-                    "	p.secao id_mercadologico,\n" +
-                    "	p.familia id_familia,\n" +
-                    "	p.estoqueminimo,\n" +
-                    "	p.estoquemaximo,\n" +
-                    "	p.estoquetotal estoque,\n" +
-                    "	p.perclucro margem,\n" +
-                    "	p.precocusto custocomimposto,\n" +
-                    "	p.precocusto custosemimposto,\n" +
-                    "	p.preco,\n" +
-                    "	p.desativado = 0 ativo,\n" +
-                    "	p.ncm,\n" +
-                    "	p.cest,\n" +
-                    "	p.pis_cst_saida,\n" +
-                    "	p.pis_cst_entrada,\n" +
-                    "	p.natureza_rec_pis,\n" +
-                    "	p.situacaotrib icms_cst,\n" +
-                    "	p.tipotributacao,\n" +
-                    "	p.tributacao icms_aliq,\n" +
-                    "	ean.ean_fornecedor\n" +
+                    "	codigo id,\n" +
+                    "	codigosweda ean,\n" +
+                    "	datacriado datacadastro,\n" +
+                    "	dataalterado dataalteracao,\n" +
+                    "	unidade,\n" +
+                    "	produtobalanca e_balanca,\n" +
+                    "	produto_pai,\n" +
+                    "	descricao descricaocompleta,\n" +
+                    "	descricaoreduzida descricaoreduzida,\n" +
+                    "	secao id_mercadologico,\n" +
+                    "	familia id_familia,\n" +
+                    "	estoqueminimo,\n" +
+                    "	estoquemaximo,\n" +
+                    "	estoquetotal estoque,\n" +
+                    "	perclucro margem,\n" +
+                    "	precocusto custocomimposto,\n" +
+                    "	precocusto custosemimposto,\n" +
+                    "	preco,\n" +
+                    "	desativado = 0 ativo,\n" +
+                    "	ncm,\n" +
+                    "	cest,\n" +
+                    "	pis_cst_saida,\n" +
+                    "	pis_cst_entrada,\n" +
+                    "	natureza_rec_pis,\n" +
+                    "	situacaotrib icms_cst,\n" +
+                    "	tipotributacao,\n" +
+                    "	tributacao icms_aliq\n" +
                     "from\n" +
-                    "	produtos p\n" +
-                    "	join (select\n" +
-                    "			codigo id_produto,\n" +
-                    "			codigoean ean,\n" +
-                    "			false ean_fornecedor\n" +
-                    "		from \n" +
-                    "			produtosean\n" +
-                    "		union\n" +
-                    "		select\n" +
-                    "			codigo id_produto,\n" +
-                    "			codigosweda ean,\n" +
-                    "			false ean_fornecedor\n" +
-                    "		from\n" +
-                    "			produtos\n" +
-                    "		union\n" +
-                    "		select distinct\n" +
-                    "			pro_id id_produto,\n" +
-                    "			codigo_barras ean,\n" +
-                    "			true ean_fornecedor\n" +
-                    "		from\n" +
-                    "			fornecedores_codbarras) ean on\n" +
-                    "		p.codigo = ean.id_produto\n" +
+                    "	produtos\n" +
                     "order by\n" +
                     "	id"
             )) {
                 while (rst.next()) {
-                    if (rst.getBoolean("ean_fornecedor")) {
-                        long ean = Utils.stringToLong(rst.getString("ean"));
-                        if (ean <= 999999) {
-                            continue;
-                        }
-                    }
                     ProdutoIMP imp = new ProdutoIMP();
                     
                     imp.setImportSistema(getSistema());
@@ -233,6 +205,32 @@ public class SofttechDAO extends InterfaceDAO {
             }
         }
         
+        return result;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	codigo id_produto,\n" +
+                    "	codigoean ean\n" +
+                    "from\n" +
+                    "	produtosean\n" +
+                    "order by\n" +
+                    "	1")) {
+                while(rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rs.getString("id_produto"));
+                    imp.setEan(rs.getString("ean"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 

@@ -682,6 +682,7 @@ public class HRTechDAO extends InterfaceDAO {
                     = "select\n"
                     + "	c.codi_relacio id,\n"
                     + "	coalesce(cl.codigoenti, '') idcliente,\n"
+                    + " case c.vdl_dia when 0.00 then 1 else 0 end cancelado,\n" 
                     + "	c.numerocaix ecf,\n"
                     + "	c.numerocupo coo,\n"
                     + "	c.datamovime data,\n"
@@ -752,6 +753,7 @@ public class HRTechDAO extends InterfaceDAO {
                         next.setId(rst.getString("id"));
                         next.setVenda(rst.getString("id_venda"));
                         String id = rst.getString("id_produto");
+                        next.setCancelado(rst.getInt("cancelado") == 1 ? true : false);
                         id = id.substring(0, id.length() - 1);
                         next.setProduto(id);
                         if (rst.getString("id_produto").equals(rst.getString("codigobarras"))) {
@@ -781,6 +783,7 @@ public class HRTechDAO extends InterfaceDAO {
                     + "	it.codi_relacio id_venda,\n"
                     + "	it.codigoplu id_produto,\n"
                     + "	pr.estc35desc descricao,\n"
+                    + " case upper(it.origem) when 'C' then 1 else 0 end cancelado,\n"
                     + "   case\n"
                     + "		pr.estc13codi when '' then pr.codigoplu else\n"
                     + "		pr.estc13codi end as codigobarras,\n"

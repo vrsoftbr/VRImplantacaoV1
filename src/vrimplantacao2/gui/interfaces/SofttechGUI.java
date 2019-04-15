@@ -197,6 +197,8 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        tabBalanca = new vrframework.bean.panel.VRPanel();
+        vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         vRLabel1 = new vrframework.bean.label.VRLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
         conexao = new vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel();
@@ -343,6 +345,27 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
 
         tabs.addTab("Fornecedor e Cliente", tabFornecedorCliente);
 
+        vRImportaArquivBalancaPanel1.setSistema("GetWay");
+
+        javax.swing.GroupLayout tabBalancaLayout = new javax.swing.GroupLayout(tabBalanca);
+        tabBalanca.setLayout(tabBalancaLayout);
+        tabBalancaLayout.setHorizontalGroup(
+            tabBalancaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabBalancaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(19, 19, 19))
+        );
+        tabBalancaLayout.setVerticalGroup(
+            tabBalancaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabBalancaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRImportaArquivBalancaPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(198, Short.MAX_VALUE))
+        );
+
+        tabs.addTab("Balança", tabBalanca);
+
         vRLabel1.setText("Loja (Cliente):");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -370,9 +393,9 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(11, 11, 11)
                 .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 332, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -412,10 +435,12 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
     private vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel conexao;
     private vrframework.bean.panel.VRPanel pnlClientes;
     private vrframework.bean.panel.VRPanel pnlFornecedores;
+    private vrframework.bean.panel.VRPanel tabBalanca;
     private vrframework.bean.panel.VRPanel tabFornecedorCliente;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private vrframework.bean.consultaContaContabil.VRConsultaContaContabil vRConsultaContaContabil1;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.label.VRLabel vRLabel6;
     private vrframework.bean.panel.VRPanel vRPanel3;
