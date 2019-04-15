@@ -1300,9 +1300,44 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     NotaFiscalIMP imp = new NotaFiscalIMP();
-                    
-                    
-                    
+                    /*
+                    imp.set(rst.getString("cod_parceiro"));
+                    imp.set(rst.getString("tipo_parceiro"));
+                    imp.set(rst.getString("num_nf"));
+                    imp.set(rst.getString("num_serie_nf"));
+                    imp.set(rst.getString("tipo_ident"));
+                    imp.set(rst.getString("tipo_operacao"));
+                    imp.set(rst.getString("tipo_nf"));
+                    imp.set(rst.getString("serie"));
+                    imp.set(rst.getString("numeronota"));
+                    imp.set(rst.getString("dataemissao"));
+                    imp.set(rst.getString("dataentradasaida"));
+                    imp.set(rst.getString("total_nota"));
+                    imp.set(rst.getString("dest_id"));
+                    imp.set(rst.getString("dest_razao"));
+                    imp.set(rst.getString("dest_cnpj"));
+                    imp.set(rst.getString("dest_ie"));
+                    imp.set(rst.getString("dest_endereco"));
+                    imp.set(rst.getString("dest_numero"));
+                    imp.set(rst.getString("dest_bairro"));
+                    imp.set(rst.getString("dest_municipio_ibge"));
+                    imp.set(rst.getString("dest_municipio"));
+                    imp.set(rst.getString("dest_uf"));
+                    imp.set(rst.getString("dest_cep"));
+                    imp.set(rst.getString("cod_transportadora"));
+                    imp.set(rst.getString("cod_motorista"));
+                    imp.set(rst.getString("tipo_frete"));
+                    imp.set(rst.getString("tipo_pagamento"));
+                    imp.set(rst.getString("tipo_emitente"));
+                    imp.set(rst.getString("obs_fiscal"));
+                    imp.set(rst.getString("obs_livre"));
+                    imp.set(rst.getString("val_peso_cte"));
+                    imp.set(rst.getString("flg_cancelado"));
+                    imp.set(rst.getString("flg_denegada"));
+                    imp.set(rst.getString("flg_inutilizada"));
+                    imp.set(rst.getString("num_chave_acesso"));
+                    imp.set(rst.getString("dta_alteracao"));
+                    */
                     result.add(imp);
                 }
             }
