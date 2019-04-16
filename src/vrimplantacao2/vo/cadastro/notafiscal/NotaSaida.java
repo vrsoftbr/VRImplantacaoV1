@@ -21,7 +21,7 @@ public class NotaSaida implements Nota {
     private TipoNota tipoNota = TipoNota.NORMAL;// id_tiponota integer NOT NULL,
     private int idFornecedor = -1;//id_fornecedordestinatario integer,
     private int idClienteEventual = -1;//id_clienteeventualdestinatario integer,
-    private TipoSaida tipoSaida = TipoSaida.VENDA_MERCADORIA;// id_tiposaida integer NOT NULL,
+    private int idTipoSaida = -1;// id_tiposaida integer NOT NULL,
     private Timestamp dataHoraEmissao;// timestamp without time zone NOT NULL,
     private Date dataSaida;// date NOT NULL,
     private double valorIpi = 0;// numeric(11,2) NOT NULL,
@@ -132,12 +132,12 @@ public class NotaSaida implements Nota {
         this.idClienteEventual = idClienteEventual;
     }
 
-    public TipoSaida getTipoSaida() {
-        return tipoSaida;
+    public int getIdTipoSaida() {
+        return idTipoSaida;
     }
 
-    public void setTipoSaida(TipoSaida tipoSaida) {
-        this.tipoSaida = tipoSaida != null ? tipoSaida : TipoSaida.VENDA_MERCADORIA;
+    public void setIdTipoSaida(int idTipoSaida) {
+        this.idTipoSaida = idTipoSaida;
     }
 
     public Timestamp getDataHoraEmissao() {

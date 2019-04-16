@@ -6,6 +6,7 @@ package vrimplantacao2.vo.importacao;
  */
 public class Destinatario {
     
+    private TipoDestinatario tipo = TipoDestinatario.FORNECEDOR;
     private String id; //Pode ser Cliente Eventual ou Fornecedor
     private String razaoSocial;
     private String cnpjCpf;
@@ -17,6 +18,14 @@ public class Destinatario {
     private String municipio;
     private String estado;
     private String cep;
+
+    public TipoDestinatario getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(TipoDestinatario tipo) {
+        this.tipo = tipo;
+    }
 
     public String getId() {
         return id;
@@ -104,6 +113,11 @@ public class Destinatario {
 
     public void setCep(String cep) {
         this.cep = cep;
+    }
+
+    public static enum TipoDestinatario {
+        FORNECEDOR,
+        CLIENTE_EVENTUAL
     }
     
 }

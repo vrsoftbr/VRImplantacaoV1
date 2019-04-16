@@ -2,7 +2,7 @@ package vrimplantacao2.vo.importacao;
 
 import java.util.ArrayList;
 import java.util.Date;
-import vrimplantacao.vo.notafiscal.SituacaoNfe;
+import vrimplantacao2.vo.cadastro.notafiscal.SituacaoNfe;
 import vrimplantacao2.vo.cadastro.notafiscal.TipoFreteNotaFiscal;
 import vrimplantacao2.vo.cadastro.notafiscal.TipoNota;
 
