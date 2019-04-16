@@ -9,5 +9,5 @@ public enum OpcaoNotaFiscal {
      * Se a nota fiscal a ser importada, existir no VR, ela é excluida para ser
      * reimportada, ao invés de pular a nota.
      */
-    IMPORTAR_EXCLUIR_NOTAS_EXISTES
+    IMP_EXCLUIR_NOTAS_EXISTENTES
 }
