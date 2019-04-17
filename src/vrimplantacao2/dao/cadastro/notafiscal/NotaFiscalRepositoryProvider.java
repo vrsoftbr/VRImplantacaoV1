@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.cadastro.notafiscal;
 
+import vrframework.classe.ProgressBar;
 import vrimplantacao2.dao.cadastro.cliente.ClienteEventualAnteriorDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -63,13 +64,20 @@ public class NotaFiscalRepositoryProvider {
         return clienteEventualAnteriorDAO.getByIdAnterior(getSistema(), getLojaOrigem(), id);
     }
 
-    void notificar(String notas_FiscaisGravando_notas_fiscais, int size) {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    //<editor-fold defaultstate="collapsed" desc="NOTIFICAÇÃO">
+    public void notificar() throws Exception {
+        ProgressBar.next();
     }
-
-    void notificar(String notas_FiscaisCarregando_anteriores) {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    
+    public void notificar(String mensagem, int size) throws Exception {
+        ProgressBar.setStatus(mensagem);
+        ProgressBar.setMaximum(size);
     }
+    
+    public void notificar(String mensagem) throws Exception {
+        ProgressBar.setStatus(mensagem);
+    }
+    //</editor-fold>
 
     public MultiMap<String, NotaFiscalAnteriorVO> getAnteriores() throws Exception {
         return notaFiscalAnteriorDAO.getAnteriores(getSistema(), getLojaOrigem());
