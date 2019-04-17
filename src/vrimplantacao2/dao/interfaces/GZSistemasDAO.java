@@ -22,6 +22,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -34,7 +35,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
-    private static final Logger LOG = Logger.getLogger(HipcomDAO.class.getName());
+    private static final Logger LOG = Logger.getLogger(GZSistemasDAO.class.getName());
 
     @Override
     public String getSistema() {
@@ -44,10 +45,10 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(new OpcaoProduto[]{
-            OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
-            OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
             OpcaoProduto.MERCADOLOGICO,
             OpcaoProduto.MAPA_TRIBUTACAO,
+            OpcaoProduto.FAMILIA_PRODUTO,
+            OpcaoProduto.FAMILIA,
             OpcaoProduto.PRODUTOS,
             OpcaoProduto.IMPORTAR_MANTER_BALANCA,
             OpcaoProduto.DATA_CADASTRO,
@@ -81,7 +82,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public ArrayList<Estabelecimento> getLojasCliente() throws Exception {
         ArrayList<Estabelecimento> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select codigo, nomfan, cgc from mercodb.lojas order by codigo"
@@ -91,10 +92,10 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        
+
         return result;
     }
-    
+
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -118,6 +119,32 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                             rst.getDouble("aliquota"),
                             rst.getDouble("reducao")
                     ));
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "f.codigo,\n"
+                    + "e.descricao\n"
+                    + "from mercodb.equivale f\n"
+                    + "inner join mercodb.estoque e on e.cdprod = f.cdprod\n"
+                    + "order by f.codigo"
+            )) {
+                while (rst.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("codigo"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    result.add(imp);
                 }
             }
         }
@@ -228,7 +255,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estminimo"));
                     imp.setEstoqueMaximo(rst.getDouble("estmaximo"));
-                    imp.setSituacaoCadastro("A".equals("situacao") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setSituacaoCadastro(rst.getString("situacao").contains("A") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("stpis"));
@@ -242,6 +269,34 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        if (opt == OpcaoProduto.FAMILIA) {
+            try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + "codigo,\n"
+                        + "cdprod\n"
+                        + "from mercodb.equivale \n"
+                        + "order by codigo"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("cdprod"));
+                        imp.setIdFamiliaProduto(rst.getString("codigo"));
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }            
+        }
+        return null;
+    } 
+    
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
