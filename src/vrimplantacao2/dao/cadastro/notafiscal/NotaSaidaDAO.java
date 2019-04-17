@@ -3,6 +3,8 @@ package vrimplantacao2.dao.cadastro.notafiscal;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import vrframework.classe.Conexao;
+import vrimplantacao2.vo.cadastro.notafiscal.NotaSaida;
+import vrimplantacao2.vo.importacao.NotaFiscalIMP;
 
 /**
  * Classe responsável por gerenciar a manipulação dos dados das notas de saída.
@@ -67,6 +69,22 @@ public class NotaSaidaDAO {
                 return rst.getInt("id");
             }
         }
+    }
+
+    public void eliminarNota(int id) throws Exception {
+        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    }
+
+    public Integer getNota(NotaFiscalIMP imp) throws Exception {
+        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    }
+
+    public void salvar(NotaSaida ns) throws Exception {
+        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    }
+
+    public void salvarItens(NotaSaida ns) throws Exception {
+        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
     }
     
 }

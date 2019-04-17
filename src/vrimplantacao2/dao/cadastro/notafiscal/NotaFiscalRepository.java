@@ -339,7 +339,30 @@ public class NotaFiscalRepository {
     }
 
     private NotaFiscalAnteriorVO converterAnterior(NotaFiscalIMP imp) {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+        NotaFiscalAnteriorVO vo = new NotaFiscalAnteriorVO();
+        
+        vo.setSistema(provider.getSistema());
+        vo.setLoja(provider.getLojaOrigem());
+        vo.setOperacao(imp.getOperacao());
+        vo.setId(imp.getId());
+
+        //private Integer idNotaSaida;
+        //private Integer idNotaEntrada;
+
+        vo.setTipoNota(imp.getTipoNota());
+        vo.setModelo(imp.getModelo());
+        vo.setSerie(imp.getSerie());
+        vo.setNumeroNota(imp.getNumeroNota());
+        vo.setDataEmissao(imp.getDataEmissao());
+        vo.setValorProduto(imp.getValorProduto());
+        vo.setValorTotal(imp.getValorTotal());
+
+        vo.setTipoDestinatario(imp.getDestinatario().getTipo());
+        vo.setIdDestinatario(imp.getDestinatario().getId());
+        vo.setRazaoSocial(imp.getDestinatario().getRazaoSocial());
+        vo.setCnpjCpf(imp.getDestinatario().getCnpjCpf());
+        
+        return vo;
     }
     
     

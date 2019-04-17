@@ -83,44 +83,44 @@ public class NotaFiscalRepositoryProvider {
         return notaFiscalAnteriorDAO.getAnteriores(getSistema(), getLojaOrigem());
     }
 
-    void salvarEntrada(NotaEntrada ne) {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    public void salvarEntrada(NotaEntrada ne) throws Exception {
+        notaEntradaDAO.salvar(ne);
     }
 
-    void incluirAnterior(NotaFiscalAnteriorVO anterior) {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    public void incluirAnterior(NotaFiscalAnteriorVO anterior) throws Exception {
+        notaFiscalAnteriorDAO.incluir(anterior);
     }
 
-    void atualizarAnterior(NotaFiscalAnteriorVO anterior) {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    public void atualizarAnterior(NotaFiscalAnteriorVO anterior) throws Exception {
+        notaFiscalAnteriorDAO.atualizar(anterior);
     }
 
-    void salvarEntradaItens(NotaEntrada ne) {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    public void salvarEntradaItens(NotaEntrada ne) throws Exception {
+        notaEntradaDAO.salvarItens(ne);
     }
 
-    void eliminarNotaEntrada(int id) {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    public void eliminarNotaEntrada(int id) throws Exception {
+        notaEntradaDAO.eliminarNota(id);
     }
 
-    void eliminarNotaSaida(int id) {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    public void eliminarNotaSaida(int id) throws Exception {
+        notaSaidaDAO.eliminarNota(id);
     }
 
-    Integer getIdNotaEntrada(NotaFiscalIMP imp) {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    public Integer getIdNotaEntrada(NotaFiscalIMP imp) throws Exception {
+        return notaEntradaDAO.getNota(imp, getLojaVR());
     }
 
-    Integer getIdNotaSaida(NotaFiscalIMP imp) {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    public Integer getIdNotaSaida(NotaFiscalIMP imp) throws Exception {
+        return notaSaidaDAO.getNota(imp);
     }
 
-    void salvarSaida(NotaSaida ns) {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    public void salvarSaida(NotaSaida ns) throws Exception {
+        notaSaidaDAO.salvar(ns);
     }
 
-    void salvarSaidaItens(NotaSaida ns) {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    public void salvarSaidaItens(NotaSaida ns) throws Exception {
+        notaSaidaDAO.salvarItens(ns);
     }
     
 }

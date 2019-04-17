@@ -109,5 +109,13 @@ public class NotaFiscalAnteriorDAO {
         
         return result;
     }
+
+    void atualizar(NotaFiscalAnteriorVO anterior) {
+        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    }
+
+    void incluir(NotaFiscalAnteriorVO anterior) {
+        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    }
     
 }
