@@ -16,10 +16,8 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.GZSistemasDAO;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.OpenDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
@@ -94,10 +92,10 @@ public class GZSistemasGUI extends VRInternalFrame implements ConexaoEvent {
         this.title = "Importação " + SISTEMA;
 
         conexaoMySQL.host = "localhost";
-        conexaoMySQL.database = "dbIpcom";
+        conexaoMySQL.database = "mercodb";
         conexaoMySQL.port = "3306";
         conexaoMySQL.user = "root";
-        conexaoMySQL.pass = "infor";
+        conexaoMySQL.pass = "mestre";
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
