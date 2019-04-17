@@ -1055,6 +1055,6 @@ public class Importador {
                 getLojaVR()
         );
         NotaFiscalRepository repository = new NotaFiscalRepository(provider);
-        repository.importar(opt);
+        repository.importar(notas, opt);
     }
 }

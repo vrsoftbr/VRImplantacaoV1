@@ -186,6 +186,22 @@ public class ClienteEventualAnteriorDAO {
         
         return result;
     }
+
+    public Integer getByIdAnterior(String sistema, String loja, String id) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select codigoatual from implantacao.codant_clienteeventual where \n" +
+                    "	sistema = '" + sistema + "' and\n" +
+                    "	loja = '" + loja + "' and\n" +
+                    "	id = '" + id + "'"
+            )) {
+                if (rst.next()) {
+                    return rst.getObject("codigoatual", Integer.class);
+                }
+            }
+        }
+        return null;
+    }
     
     
     

@@ -189,5 +189,21 @@ public class FornecedorAnteriorDAO {
         
         return result;
     }
+
+    public Integer getByIdAnterior(String sistema, String loja, String id) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select codigoatual from implantacao.codant_fornecedor where \n" +
+                    "	importsistema = '" + sistema + "' and\n" +
+                    "	importloja = '" + loja + "' and\n" +
+                    "	importid = '" + id + "'"
+            )) {
+                if (rst.next()) {
+                    return rst.getObject("codigoatual", Integer.class);
+                }
+            }
+        }
+        return null;
+    }
     
 }

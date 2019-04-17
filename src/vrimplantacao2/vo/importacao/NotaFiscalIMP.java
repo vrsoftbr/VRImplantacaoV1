@@ -2,7 +2,7 @@ package vrimplantacao2.vo.importacao;
 
 import java.util.ArrayList;
 import java.util.Date;
-import vrimplantacao.vo.notafiscal.SituacaoNfe;
+import vrimplantacao2.vo.cadastro.notafiscal.SituacaoNfe;
 import vrimplantacao2.vo.cadastro.notafiscal.TipoFreteNotaFiscal;
 import vrimplantacao2.vo.cadastro.notafiscal.TipoNota;
 
@@ -17,7 +17,7 @@ public class NotaFiscalIMP {
     private TipoNota tipoNota = TipoNota.NORMAL;
     private Destinatario destinatario = new Destinatario();
     private String modelo = "55";
-    private int serie;
+    private String serie;
     private int numeroNota;
     private Date dataEmissao;
     private Date dataEntradaSaida;
@@ -25,11 +25,11 @@ public class NotaFiscalIMP {
     private double valorFrete = 0;
     private double valorOutrasDespesas = 0;
     private double valorProduto = 0;
-    //private double valorTotal = 0;
+    private double valorTotal = 0;
     //private double valorBaseCalculo = 0;
-    //private double valorIcms = 0;
+    private double valorIcms = 0;
     //private double valorBaseSubstituicao = 0;
-    //private double valorIcmsSubstituicao = 0;
+    private double valorIcmsSubstituicao = 0;
     //private double valorBaseIpi = 0;
     private double valorSeguro = 0;
     private double valorDesconto = 0;
@@ -90,11 +90,11 @@ public class NotaFiscalIMP {
         this.modelo = modelo;
     }
 
-    public int getSerie() {
+    public String getSerie() {
         return serie;
     }
 
-    public void setSerie(int serie) {
+    public void setSerie(String serie) {
         this.serie = serie;
     }
 
@@ -154,7 +154,29 @@ public class NotaFiscalIMP {
         this.valorProduto = valorProduto;
     }
 
-    //
+    public double getValorTotal() {
+        return valorTotal;
+    }
+
+    public void setValorTotal(double valorTotal) {
+        this.valorTotal = valorTotal;
+    }
+
+    public double getValorIcms() {
+        return valorIcms;
+    }
+
+    public void setValorIcms(double valorIcms) {
+        this.valorIcms = valorIcms;
+    }
+
+    public double getValorIcmsSubstituicao() {
+        return valorIcmsSubstituicao;
+    }
+
+    public void setValorIcmsSubstituicao(double valorIcmsSubstituicao) {
+        this.valorIcmsSubstituicao = valorIcmsSubstituicao;
+    }
 
     public double getValorSeguro() {
         return valorSeguro;
@@ -171,8 +193,6 @@ public class NotaFiscalIMP {
     public void setValorDesconto(double valorDesconto) {
         this.valorDesconto = valorDesconto;
     }
-
-    //
 
     public boolean isImpressao() {
         return impressao;
