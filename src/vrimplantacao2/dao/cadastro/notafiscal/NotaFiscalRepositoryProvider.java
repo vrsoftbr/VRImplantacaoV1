@@ -112,7 +112,7 @@ public class NotaFiscalRepositoryProvider {
     }
 
     public Integer getIdNotaSaida(NotaFiscalIMP imp) throws Exception {
-        return notaSaidaDAO.getNota(imp);
+        return notaSaidaDAO.getNota(imp, getLojaVR());
     }
 
     public void salvarSaida(NotaSaida ns) throws Exception {

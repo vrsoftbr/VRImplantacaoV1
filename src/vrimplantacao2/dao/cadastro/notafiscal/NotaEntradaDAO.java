@@ -77,7 +77,7 @@ public class NotaEntradaDAO {
     }
 
     public void salvarItens(NotaEntrada ne) throws Exception {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+        //TODO: Incluir rotina de importação dos itens da nota.
     }
 
     public void eliminarNota(int id) throws Exception {
@@ -96,7 +96,7 @@ public class NotaEntradaDAO {
                     "	n.modelo = '" + imp.getModelo() + "' and\n" +
                     "	n.serie = '" + imp.getSerie() + "' and\n" +
                     "	n.numeronota = " + imp.getNumeroNota() + " and\n" +
-                    "	n.dataentrada = " + new SimpleDateFormat("yyyy-MM-dd").format(imp.getDataEntradaSaida())
+                    "	n.dataentrada = '" + new SimpleDateFormat("yyyy-MM-dd").format(imp.getDataEntradaSaida()) + "'"
             )) {
                 if (rst.next()) {
                     return rst.getObject("id", Integer.class);
@@ -134,45 +134,53 @@ public class NotaEntradaDAO {
         sql.put("aplicacustoencargo", ne.isAplicaCustoEncargo());
         sql.put("aplicaicmsencargo", ne.isAplicaIcmsEncargo());
         sql.put("aplicadespesaadicional", ne.isAplicaDespesaAdicional());
-        /*        
-        private SituacaoNotaEntrada situacaoNotaEntrada = SituacaoNotaEntrada.FINALIZADO;//id_situacaonotaentrada; integer NOT NULL,
-        private String serie;// character varying(4) NOT NULL,
-        private double valorGuiaSubstituicao = 0;// numeric(11,2),
-        private double valorBaseCalculo = 0;// numeric(11,2),
-        private int aplicaAliquota = -1;// integer NOT NULL,
-        private double valorBaseSubstituicao = 0;// numeric(11,2) NOT NULL,
-        private double valorFunrural = 0;// numeric(11,2) NOT NULL,
-        private double valorDescontoBoleto = 0;// numeric(11,2) NOT NULL,
-        private String chaveNfe;// character varying(44) NOT NULL,
-        private boolean conferido = false;// boolean NOT NULL,
-        private TipoFreteNotaFiscal tipoFreteNotaFiscal = TipoFreteNotaFiscal.CONTRATADO_DESTINATARIO;//id_tipofretenotafiscal integer NOT NULL,
-        private String observacao = "";// text NOT NULL DEFAULT ''::character varying,
-        private long idNotaSaida = -1;//id_notasaida bigint,
-        private TipoNota tipoNota = TipoNota.NORMAL;//id_tiponota integer NOT NULL DEFAULT 0,
-        private String modelo;// character varying(2) NOT NULL DEFAULT ''::character varying,
-        private boolean liberadoPedido = false;// boolean NOT NULL DEFAULT false,
-        private Timestamp dataHoraFinalizacao;// timestamp without time zone DEFAULT '1900-01-01'::date,
-        private boolean importadoXml = false;// boolean NOT NULL DEFAULT false,
-        private boolean aplicaIcmsIpi = false;// boolean NOT NULL DEFAULT false,
-        private int liberadoBonificacao = 1;// integer NOT NULL DEFAULT '-1'::integer,
-        private String informacaoComplementar = "";// character varying(1000),
-        private double valorIcmsSN = 0;// numeric(13,4),
-        private Timestamp dataHoraAlteracao;// timestamp without time zone NOT NULL DEFAULT now(),
-        private int liberadoVencimento = -1;// integer NOT NULL DEFAULT '-1'::integer,
-        private String justificativaDivergencia;// character varying(50),
-        private boolean consistido = false;// boolean DEFAULT false,
-        private int quantidadePaletes = 0;// integer NOT NULL DEFAULT 0,
-        private long idNotaDespesa = -1;//id_notadespesa bigint,
-        private double valorDespesaFrete = 0;// numeric(11,2),
-        private boolean liberadoValidadeProduto = false;// boolean NOT NULL DEFAULT false,
-        private double valorFcp = 0;// numeric(11,2),
-        private double valorFcpST = 0;// numeric(11,2),
-        private double valorIcmsDesonerado = 0;// numeric(11,2),
-        private boolean liberadoDivergenciaColetor = false;// boolean DEFAULT false,
-        private double valorSuframa = -1;// numeric(11,2),
-        */
+        sql.put("id_situacaonotaentrada", ne.getSituacaoNotaEntrada().getId());
+        sql.put("serie", ne.getSerie());
+        sql.put("valorguiasubstituicao", ne.getValorGuiaSubstituicao());
+        sql.put("valorbasecalculo", ne.getValorBaseCalculo());
+        sql.put("aplicaaliquota", ne.getAplicaAliquota());
+        sql.put("valorbasesubstituicao", ne.getValorBaseSubstituicao());
+        sql.put("valorfunrural", ne.getValorFunrural());
+        sql.put("valordescontoboleto", ne.getValorDescontoBoleto());
+        sql.put("chavenfe", ne.getChaveNfe());
+        sql.put("conferido", ne.isConferido());
+        sql.put("id_tipofretenotafiscal", ne.getTipoFreteNotaFiscal().getIdVR());
+        sql.put("observacao", ne.getObservacao());
+        sql.put("id_notasaida", ne.getIdNotaSaida(), -1);
+        sql.put("id_tiponota", ne.getTipoNota().getId());
+        sql.put("modelo", ne.getModelo());
+        sql.put("liberadopedido", ne.isLiberadoPedido());
+        sql.put("dataHoraFinalizacao", ne.getDataHoraFinalizacao());
+        sql.put("importadoXml", ne.isImportadoXml());
+        sql.put("aplicaicmsipi", ne.isAplicaIcmsIpi());
+        sql.put("liberadobonificacao", ne.getLiberadoBonificacao());
+        sql.put("informacaocomplementar", ne.getInformacaoComplementar());
+        sql.put("valoricmssn", ne.getValorIcmsSN());
+        sql.put("datahoraalteracao", ne.getDataHoraAlteracao());
+        sql.put("liberadovencimento", ne.getLiberadoVencimento(), -1);
+        sql.put("justificativadivergencia", ne.getJustificativaDivergencia());
+        sql.put("consistido", ne.isConsistido());
+        sql.put("quantidadepaletes", ne.getQuantidadePaletes());
+        sql.put("id_notadespesa", ne.getIdNotaDespesa(), -1);
+        sql.put("valordespesafrete", ne.getValorDespesaFrete());
+        sql.put("liberadovalidadeproduto", ne.isLiberadoValidadeProduto());
+        sql.put("valorfcp", ne.getValorFcp());
+        sql.put("valorfcpst", ne.getValorFcpST());
+        sql.put("valoricmsdesonerado", ne.getValorIcmsDesonerado());
+        sql.put("liberadodivergenciacoletor", ne.isLiberadoDivergenciaColetor());
+        sql.put("valorsuframa", ne.getValorSuframa());
         
         sql.getReturning().add("id");
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    sql.getInsert()
+            )) {
+                if (rst.next()) {
+                    ne.setId(rst.getInt("id"));
+                }
+            }
+        }
     }
     
 }
