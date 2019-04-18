@@ -71,6 +71,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 
         chkManterBalanca.setVisible(opt.contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA));
         chkNaoTransformarEANemUN.setVisible(opt.contains(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN));
+        chkAliquotaCompleta.setVisible(opt.contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA));
                 
         if (
                 opt.contains(OpcaoProduto.MERCADOLOGICO_PRODUTO) ||
@@ -147,6 +148,11 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 opt.contains(OpcaoProduto.PIS_COFINS) ||
                 opt.contains(OpcaoProduto.NATUREZA_RECEITA) ||
                 opt.contains(OpcaoProduto.ICMS) ||
+                opt.contains(OpcaoProduto.ICMS_SAIDA) ||
+                opt.contains(OpcaoProduto.ICMS_SAIDA_FORA_ESTADO) ||
+                opt.contains(OpcaoProduto.ICMS_ENTRADA) ||
+                opt.contains(OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO) ||
+                opt.contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA) ||
                 opt.contains(OpcaoProduto.NCM) ||
                 opt.contains(OpcaoProduto.CEST) ||
                 opt.contains(OpcaoProduto.PAUTA_FISCAL_PRODUTO) ||
@@ -155,6 +161,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkPisCofins.setVisible(opt.contains(OpcaoProduto.PIS_COFINS));
             chkNatReceita.setVisible(opt.contains(OpcaoProduto.NATUREZA_RECEITA));
             chkICMS.setVisible(opt.contains(OpcaoProduto.ICMS));
+            chkIcmsDebito.setVisible(opt.contains(OpcaoProduto.ICMS_SAIDA));
+            chkIcmsDebitoForaEstado.setVisible(opt.contains(OpcaoProduto.ICMS_SAIDA_FORA_ESTADO));
+            chkIcmsCredito.setVisible(opt.contains(OpcaoProduto.ICMS_ENTRADA));
+            chkIcmsCreditoForaEstado.setVisible(opt.contains(OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO));
             btnMapaTribut.setVisible(chkICMS.isVisible());
             chkNcm.setVisible(opt.contains(OpcaoProduto.NCM));
             chkCest.setVisible(opt.contains(OpcaoProduto.CEST));
@@ -163,6 +173,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             tabImportacao.add(pnlImpTributacao);
             if (opt.contains(OpcaoProduto.PAUTA_FISCAL)) {
                 tabParametros.add(pnlOptPautaFiscal);
+            }
+            if (opt.contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA)) {
+                tabParametros.add(pnlOptIcms);
             }
         }
         
@@ -255,6 +268,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     private void initComponents() {
 
         btgPautaFiscal = new javax.swing.ButtonGroup();
+        vRCheckBox3 = new vrframework.bean.checkBox.VRCheckBox();
         scrollParametros = new javax.swing.JScrollPane();
         tabParametros = new vrframework.bean.panel.VRPanel();
         pnlOptMercadologico = new vrframework.bean.panel.VRPanel();
@@ -277,6 +291,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         rdbPautaIdProduto = new vrframework.bean.radioButton.VRRadioButton();
         rdbPautaEan = new vrframework.bean.radioButton.VRRadioButton();
         chkPautaUsarEansMenores = new vrframework.bean.checkBox.VRCheckBox();
+        pnlOptIcms = new vrframework.bean.panel.VRPanel();
+        jLabel11 = new javax.swing.JLabel();
+        chkAliquotaCompleta = new vrframework.bean.checkBox.VRCheckBox();
         scrollImportação = new javax.swing.JScrollPane();
         tabImportacao = new vrframework.bean.panel.VRPanel();
         pnlImpMercadologico = new vrframework.bean.panel.VRPanel();
@@ -313,6 +330,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkCest = new vrframework.bean.checkBox.VRCheckBox();
         chkPautaFiscal = new vrframework.bean.checkBox.VRCheckBox();
         chkPautaFiscalProduto = new vrframework.bean.checkBox.VRCheckBox();
+        chkIcmsDebito = new vrframework.bean.checkBox.VRCheckBox();
+        chkIcmsCredito = new vrframework.bean.checkBox.VRCheckBox();
+        chkIcmsDebitoForaEstado = new vrframework.bean.checkBox.VRCheckBox();
+        chkIcmsCreditoForaEstado = new vrframework.bean.checkBox.VRCheckBox();
         pnlImpInfoAdic = new vrframework.bean.panel.VRPanel();
         jLabel8 = new javax.swing.JLabel();
         chkDescCompleta = new vrframework.bean.checkBox.VRCheckBox();
@@ -340,6 +361,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkNutricionalFilizola = new vrframework.bean.checkBox.VRCheckBox();
         chkInventario = new vrframework.bean.checkBox.VRCheckBox();
         chkReceitaProduto = new vrframework.bean.checkBox.VRCheckBox();
+
+        org.openide.awt.Mnemonics.setLocalizedText(vRCheckBox3, "vRCheckBox3");
 
         scrollParametros.setBorder(null);
         scrollParametros.setPreferredSize(new java.awt.Dimension(593, 219));
@@ -494,7 +517,6 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         jLabel10.setPreferredSize(new java.awt.Dimension(132, 14));
 
         btgPautaFiscal.add(rdbPautaIdPauta);
-        rdbPautaIdPauta.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(rdbPautaIdPauta, "Usar ID da Pauta");
         rdbPautaIdPauta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -553,6 +575,37 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         );
 
         tabParametros.add(pnlOptPautaFiscal);
+
+        jLabel11.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel11, "ICMS");
+        jLabel11.setPreferredSize(new java.awt.Dimension(132, 14));
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkAliquotaCompleta, "USAR CONVERSAO ALIQUOTA COMPLETA");
+        chkAliquotaCompleta.setToolTipText("Selecione essa opção para que ao importar o associado, seja gerado também o associado para preço e custo.");
+
+        javax.swing.GroupLayout pnlOptIcmsLayout = new javax.swing.GroupLayout(pnlOptIcms);
+        pnlOptIcms.setLayout(pnlOptIcmsLayout);
+        pnlOptIcmsLayout.setHorizontalGroup(
+            pnlOptIcmsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlOptIcmsLayout.createSequentialGroup()
+                .addGap(5, 5, 5)
+                .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkAliquotaCompleta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(193, Short.MAX_VALUE))
+        );
+        pnlOptIcmsLayout.setVerticalGroup(
+            pnlOptIcmsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlOptIcmsLayout.createSequentialGroup()
+                .addGap(5, 5, 5)
+                .addGroup(pnlOptIcmsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkAliquotaCompleta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        tabParametros.add(pnlOptIcms);
 
         scrollParametros.setViewportView(tabParametros);
 
@@ -760,6 +813,14 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkPautaFiscalProduto, "Pauta Fiscal X Produto");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkIcmsDebito, "ICMS Débito");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkIcmsCredito, "ICMS Crédio");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkIcmsDebitoForaEstado, "ICMS Débito Fora Estado");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkIcmsCreditoForaEstado, "ICMS Crédito Fora Estado");
+
         javax.swing.GroupLayout pnlImpTributacaoLayout = new javax.swing.GroupLayout(pnlImpTributacao);
         pnlImpTributacao.setLayout(pnlImpTributacaoLayout);
         pnlImpTributacaoLayout.setHorizontalGroup(
@@ -771,21 +832,30 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                         .addComponent(jLabel4))
                     .addGroup(pnlImpTributacaoLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(pnlImpTributacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(chkPautaFiscal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkPisCofins, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(pnlImpTributacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(pnlImpTributacaoLayout.createSequentialGroup()
+                                .addComponent(chkPisCofins, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(chkNatReceita, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(chkICMS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkIcmsDebito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkIcmsCredito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkIcmsDebitoForaEstado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(pnlImpTributacaoLayout.createSequentialGroup()
+                                .addComponent(chkIcmsCreditoForaEstado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(chkPautaFiscal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(chkPautaFiscalProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(chkNcm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(chkCest, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(chkPautaFiscalProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(6, 6, 6))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkCest, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap())
         );
         pnlImpTributacaoLayout.setVerticalGroup(
             pnlImpTributacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -797,12 +867,16 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                     .addComponent(chkPisCofins, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkICMS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkNatReceita, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkNcm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCest, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(chkIcmsDebito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkIcmsCredito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkIcmsDebitoForaEstado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(pnlImpTributacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkPautaFiscal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkPautaFiscalProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(chkPautaFiscalProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkNcm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCest, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkIcmsCreditoForaEstado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         tabImportacao.add(pnlImpTributacao);
@@ -1000,6 +1074,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.ButtonGroup btgPautaFiscal;
     public vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTribut;
+    public vrframework.bean.checkBox.VRCheckBox chkAliquotaCompleta;
     public vrframework.bean.checkBox.VRCheckBox chkAssociado;
     public vrframework.bean.checkBox.VRCheckBox chkAssociadoSomenteAtivos;
     public vrframework.bean.checkBox.VRCheckBox chkAtacado;
@@ -1021,6 +1096,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkFamilia;
     public vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     public vrframework.bean.checkBox.VRCheckBox chkICMS;
+    public vrframework.bean.checkBox.VRCheckBox chkIcmsCredito;
+    public vrframework.bean.checkBox.VRCheckBox chkIcmsCreditoForaEstado;
+    public vrframework.bean.checkBox.VRCheckBox chkIcmsDebito;
+    public vrframework.bean.checkBox.VRCheckBox chkIcmsDebitoForaEstado;
     public vrframework.bean.checkBox.VRCheckBox chkInventario;
     public vrframework.bean.checkBox.VRCheckBox chkInverterAssociado;
     public vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
@@ -1059,6 +1138,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkVendaPdv;
     public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel10;
+    public javax.swing.JLabel jLabel11;
     public javax.swing.JLabel jLabel2;
     public javax.swing.JLabel jLabel3;
     public javax.swing.JLabel jLabel4;
@@ -1074,6 +1154,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.panel.VRPanel pnlImpProduto;
     public vrframework.bean.panel.VRPanel pnlImpTributacao;
     public vrframework.bean.panel.VRPanel pnlOptAssociado;
+    public vrframework.bean.panel.VRPanel pnlOptIcms;
     public vrframework.bean.panel.VRPanel pnlOptMercadologico;
     public vrframework.bean.panel.VRPanel pnlOptPautaFiscal;
     public vrframework.bean.panel.VRPanel pnlOptProduto;
@@ -1084,6 +1165,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public javax.swing.JScrollPane scrollParametros;
     public vrframework.bean.panel.VRPanel tabImportacao;
     public vrframework.bean.panel.VRPanel tabParametros;
+    public vrframework.bean.checkBox.VRCheckBox vRCheckBox3;
     // End of variables declaration//GEN-END:variables
 
     public void executarImportacao() throws Exception {
@@ -1204,8 +1286,23 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 if (chkNatReceita.isSelected()) {
                     opcoes.add(OpcaoProduto.NATUREZA_RECEITA);
                 }
+                if (chkAliquotaCompleta.isSelected()) {
+                    opcoes.add(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
+                }
                 if (chkICMS.isSelected()) {
                     opcoes.add(OpcaoProduto.ICMS);
+                }
+                if (chkIcmsDebito.isSelected()) {
+                    opcoes.add(OpcaoProduto.ICMS_SAIDA);
+                }
+                if (chkIcmsCredito.isSelected()) {
+                    opcoes.add(OpcaoProduto.ICMS_ENTRADA);
+                }
+                if (chkIcmsDebitoForaEstado.isSelected()) {
+                    opcoes.add(OpcaoProduto.ICMS_SAIDA_FORA_ESTADO);
+                }
+                if (chkIcmsCreditoForaEstado.isSelected()) {
+                    opcoes.add(OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO);
                 }
                 if (chkSituacaoCadastro.isSelected()) {
                     opcoes.add(OpcaoProduto.ATIVO);

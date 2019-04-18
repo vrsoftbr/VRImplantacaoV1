@@ -4,6 +4,11 @@
   <NonVisualComponents>
     <Component class="javax.swing.ButtonGroup" name="btgPautaFiscal">
     </Component>
+    <Component class="vrframework.bean.checkBox.VRCheckBox" name="vRCheckBox3">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="vRCheckBox3"/>
+      </Properties>
+    </Component>
   </NonVisualComponents>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
@@ -319,7 +324,6 @@
                     <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                       <ComponentRef name="btgPautaFiscal"/>
                     </Property>
-                    <Property name="selected" type="boolean" value="true"/>
                     <Property name="text" type="java.lang.String" value="Usar ID da Pauta"/>
                   </Properties>
                   <Events>
@@ -353,6 +357,54 @@
                     <Property name="text" type="java.lang.String" value="Usar EANs menores"/>
                     <Property name="toolTipText" type="java.lang.String" value="Considera EANs menores ou iguais a 999999 na busca por EAN."/>
                     <Property name="enabled" type="boolean" value="false"/>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="vrframework.bean.panel.VRPanel" name="pnlOptIcms">
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                          <Component id="jLabel11" min="-2" pref="132" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="chkAliquotaCompleta" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="193" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="jLabel11" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
+                              <Component id="chkAliquotaCompleta" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Component class="javax.swing.JLabel" name="jLabel11">
+                  <Properties>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Tahoma" size="11" style="1"/>
+                    </Property>
+                    <Property name="horizontalAlignment" type="int" value="4"/>
+                    <Property name="text" type="java.lang.String" value="ICMS"/>
+                    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+                      <Dimension value="[132, 14]"/>
+                    </Property>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAliquotaCompleta">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="USAR CONVERSAO ALIQUOTA COMPLETA"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Selecione essa op&#xe7;&#xe3;o para que ao importar o associado, seja gerado tamb&#xe9;m o associado para pre&#xe7;o e custo."/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -440,6 +492,22 @@
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
                       <ComponentRef name="pnlOptPautaFiscal"/>
+                    </ExpressionProvider>
+                  </ExpressionOrigin>
+                </CodeExpression>
+              </Parameters>
+            </CodeStatement>
+            <CodeStatement>
+              <CodeExpression id="1_tabParametros"/>
+              <StatementProvider type="CodeMethod">
+                <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
+              </StatementProvider>
+              <Parameters>
+                <CodeExpression id="7_pnlOptIcms">
+                  <CodeVariable name="pnlOptIcms" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
+                  <ExpressionOrigin>
+                    <ExpressionProvider type="ComponentRef">
+                      <ComponentRef name="pnlOptIcms"/>
                     </ExpressionProvider>
                   </ExpressionOrigin>
                 </CodeExpression>
@@ -771,26 +839,35 @@
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="1" attributes="0">
-                                      <Component id="chkPautaFiscal" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkPisCofins" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" alignment="0" attributes="0">
+                                          <Component id="chkPisCofins" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                           <Component id="chkNatReceita" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                           <Component id="chkICMS" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkIcmsDebito" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkIcmsCredito" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkIcmsDebitoForaEstado" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Component id="chkIcmsCreditoForaEstado" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <Component id="chkPautaFiscal" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <Component id="chkPautaFiscalProduto" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkNcm" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkCest" min="-2" max="-2" attributes="0"/>
                                       </Group>
-                                      <Component id="chkPautaFiscalProduto" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -804,13 +881,17 @@
                               <Component id="chkPisCofins" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkICMS" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkNatReceita" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkNcm" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkCest" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkIcmsDebito" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkIcmsCredito" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkIcmsDebitoForaEstado" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="chkPautaFiscal" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkPautaFiscalProduto" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkNcm" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCest" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkIcmsCreditoForaEstado" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -858,6 +939,26 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPautaFiscalProduto">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Pauta Fiscal X Produto"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIcmsDebito">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="ICMS D&#xe9;bito"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIcmsCredito">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="ICMS Cr&#xe9;dio"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIcmsDebitoForaEstado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="ICMS D&#xe9;bito Fora Estado"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIcmsCreditoForaEstado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="ICMS Cr&#xe9;dito Fora Estado"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -1147,7 +1248,7 @@
           </SubComponents>
           <LayoutCode>
             <CodeStatement>
-              <CodeExpression id="7_tabImportacao">
+              <CodeExpression id="8_tabImportacao">
                 <CodeVariable name="tabImportacao" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                 <ExpressionOrigin>
                   <ExpressionProvider type="ComponentRef">
@@ -1159,7 +1260,7 @@
                 <CodeMethod name="setLayout" class="java.awt.Container" parameterTypes="java.awt.LayoutManager"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="8">
+                <CodeExpression id="9">
                   <ExpressionOrigin>
                     <ExpressionProvider type="CodeConstructor">
                       <CodeConstructor class="org.jdesktop.swingx.VerticalLayout" parameterTypes=""/>
@@ -1169,12 +1270,12 @@
               </Parameters>
             </CodeStatement>
             <CodeStatement>
-              <CodeExpression id="7_tabImportacao"/>
+              <CodeExpression id="8_tabImportacao"/>
               <StatementProvider type="CodeMethod">
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="9_pnlImpMercadologico">
+                <CodeExpression id="10_pnlImpMercadologico">
                   <CodeVariable name="pnlImpMercadologico" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
@@ -1185,12 +1286,12 @@
               </Parameters>
             </CodeStatement>
             <CodeStatement>
-              <CodeExpression id="7_tabImportacao"/>
+              <CodeExpression id="8_tabImportacao"/>
               <StatementProvider type="CodeMethod">
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="10_pnlImpProduto">
+                <CodeExpression id="11_pnlImpProduto">
                   <CodeVariable name="pnlImpProduto" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
@@ -1201,12 +1302,12 @@
               </Parameters>
             </CodeStatement>
             <CodeStatement>
-              <CodeExpression id="7_tabImportacao"/>
+              <CodeExpression id="8_tabImportacao"/>
               <StatementProvider type="CodeMethod">
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="11_pnlImpCompl">
+                <CodeExpression id="12_pnlImpCompl">
                   <CodeVariable name="pnlImpCompl" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
@@ -1217,12 +1318,12 @@
               </Parameters>
             </CodeStatement>
             <CodeStatement>
-              <CodeExpression id="7_tabImportacao"/>
+              <CodeExpression id="8_tabImportacao"/>
               <StatementProvider type="CodeMethod">
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="12_pnlImpTributacao">
+                <CodeExpression id="13_pnlImpTributacao">
                   <CodeVariable name="pnlImpTributacao" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
@@ -1233,12 +1334,12 @@
               </Parameters>
             </CodeStatement>
             <CodeStatement>
-              <CodeExpression id="7_tabImportacao"/>
+              <CodeExpression id="8_tabImportacao"/>
               <StatementProvider type="CodeMethod">
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="13_pnlImpInfoAdic">
+                <CodeExpression id="14_pnlImpInfoAdic">
                   <CodeVariable name="pnlImpInfoAdic" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">
@@ -1249,12 +1350,12 @@
               </Parameters>
             </CodeStatement>
             <CodeStatement>
-              <CodeExpression id="7_tabImportacao"/>
+              <CodeExpression id="8_tabImportacao"/>
               <StatementProvider type="CodeMethod">
                 <CodeMethod name="add" class="java.awt.Container" parameterTypes="java.awt.Component"/>
               </StatementProvider>
               <Parameters>
-                <CodeExpression id="14_pnlImpOutrosDados">
+                <CodeExpression id="15_pnlImpOutrosDados">
                   <CodeVariable name="pnlImpOutrosDados" type="8193" declaredType="vrframework.bean.panel.VRPanel"/>
                   <ExpressionOrigin>
                     <ExpressionProvider type="ComponentRef">

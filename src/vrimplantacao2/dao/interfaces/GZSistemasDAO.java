@@ -75,7 +75,12 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.CEST,
             OpcaoProduto.PIS_COFINS,
             OpcaoProduto.NATUREZA_RECEITA,
-            OpcaoProduto.ICMS,
+            OpcaoProduto.ICMS,            
+            OpcaoProduto.ICMS_SAIDA,
+            OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+            OpcaoProduto.ICMS_ENTRADA,
+            OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+            OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA,
             OpcaoProduto.MARGEM
         }));
     }
@@ -237,6 +242,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("cdprod"));
                     imp.setEan(rst.getString("codbarra"));
+                    imp.setTipoEmbalagem(rst.getString("unidadevenda").trim());
                     imp.seteBalanca(rst.getInt("setor") > 0);
                     imp.setValidade(rst.getInt("validade"));
                     imp.setDescricaoCompleta(rst.getString("descricao"));
@@ -294,6 +300,99 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                 return result;
             }            
         }
+        
+        if (opt == OpcaoProduto.ICMS_SAIDA) {
+            try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + "cdprod,\n"
+                        + "tributa\n"
+                        + "from mercodb.esttrib\n"
+                        + "where uf = 'SP'\n"
+                        + "and loja = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("cdprod"));
+                        imp.setIcmsDebitoId(rst.getString("tributa"));
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+
+        if (opt == OpcaoProduto.ICMS_ENTRADA) {
+            try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + "cdprod,\n"
+                        + "tributa\n"
+                        + "from mercodb.esttrib\n"
+                        + "where uf = 'SP'\n"
+                        + "and loja = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("cdprod"));
+                        imp.setIcmsCreditoId(rst.getString("tributa"));
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+        
+        if (opt == OpcaoProduto.ICMS_SAIDA_FORA_ESTADO) {
+            try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + "cdprod,\n"
+                        + "tributa\n"
+                        + "from mercodb.esttrib\n"
+                        + "where uf <> 'SP'\n"
+                        + "and loja = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("cdprod"));
+                        imp.setIcmsDebitoId(rst.getString("tributa"));
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+        
+        if (opt == OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO) {
+            try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + "cdprod,\n"
+                        + "tributa\n"
+                        + "from mercodb.esttrib\n"
+                        + "where uf <> 'SP'\n"
+                        + "and loja = " + getLojaOrigem()
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("cdprod"));
+                        imp.setIcmsCreditoId(rst.getString("tributa"));
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+        
         return null;
     } 
     
