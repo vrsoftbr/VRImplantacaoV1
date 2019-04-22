@@ -216,6 +216,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "e.stpis,\n"
                     + "e.stcofinsen,\n"
                     + "e.stpisen,\n"
+                    + "s.natreceita,\n"
                     + "e.tributa,\n"
                     + "t.codigo as codtrib,\n"
                     + "t.st codTrib,\n"
@@ -266,6 +267,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("stpis"));
                     imp.setPiscofinsCstCredito(rst.getString("stpisen"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("natreceita"));
                     imp.setIcmsDebitoId(rst.getString("codtrib"));
                     imp.setIcmsCreditoId(rst.getString("codtrib"));
                     result.add(imp);
