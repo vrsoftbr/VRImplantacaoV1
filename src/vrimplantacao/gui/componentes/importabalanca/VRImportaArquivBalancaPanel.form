@@ -168,7 +168,11 @@
                           </Group>
                           <Group type="102" attributes="0">
                               <Component id="rdbFilizolaRdc360" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="0" pref="169" max="32767" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="rdbToledo" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="rdbToledoProduto" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="0" pref="3" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -179,7 +183,11 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="rdbFilizolaRdc360" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="rdbFilizolaRdc360" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="rdbToledo" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="rdbToledoProduto" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="btnImportarNutricional" alignment="1" min="-2" max="-2" attributes="0"/>
@@ -206,6 +214,16 @@
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnImportarNutricionalActionPerformed"/>
               </Events>
+            </Component>
+            <Component class="javax.swing.JRadioButton" name="rdbToledo">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Toledo"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JRadioButton" name="rdbToledoProduto">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Toledo x Produto"/>
+              </Properties>
             </Component>
           </SubComponents>
         </Container>

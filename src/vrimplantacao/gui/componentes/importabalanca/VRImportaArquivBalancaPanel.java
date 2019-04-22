@@ -11,6 +11,7 @@ import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrimplantacao.dao.cadastro.NutricionalFilizolaDAO;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao2.dao.cadastro.nutricional.NutricionalToledoDAO;
 
 /**
  *
@@ -81,6 +82,8 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
         rdbFilizolaRdc360 = new javax.swing.JRadioButton();
         txtNutricional = new vrframework.bean.fileChooser.VRFileChooser();
         btnImportarNutricional = new vrframework.bean.button.VRButton();
+        rdbToledo = new javax.swing.JRadioButton();
+        rdbToledoProduto = new javax.swing.JRadioButton();
 
         setBorder(null);
 
@@ -154,6 +157,10 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
             }
         });
 
+        rdbToledo.setText("Toledo");
+
+        rdbToledoProduto.setText("Toledo x Produto");
+
         javax.swing.GroupLayout tabNutricionalLayout = new javax.swing.GroupLayout(tabNutricional);
         tabNutricional.setLayout(tabNutricionalLayout);
         tabNutricionalLayout.setHorizontalGroup(
@@ -167,14 +174,21 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                         .addComponent(btnImportarNutricional, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(tabNutricionalLayout.createSequentialGroup()
                         .addComponent(rdbFilizolaRdc360)
-                        .addGap(0, 169, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(rdbToledo)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(rdbToledoProduto)
+                        .addGap(0, 3, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         tabNutricionalLayout.setVerticalGroup(
             tabNutricionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabNutricionalLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(rdbFilizolaRdc360)
+                .addGroup(tabNutricionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(rdbFilizolaRdc360)
+                    .addComponent(rdbToledo)
+                    .addComponent(rdbToledoProduto))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabNutricionalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnImportarNutricional, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -243,6 +257,12 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
                         if (rdbFilizolaRdc360.isSelected()) {
                             NutricionalFilizolaDAO.importarArquivoRdc360(sistema, loja, txtNutricional.getArquivo());
                         }
+                        if(rdbToledo.isSelected()) {
+                            NutricionalToledoDAO.importarNutricionalToledoProduto(txtNutricional.getArquivo(), sistema, loja);
+                        }
+                        if(rdbToledoProduto.isSelected()) {
+                            NutricionalToledoDAO.importarNutricionalToledo(txtNutricional.getArquivo());
+                        }
                     }                   
                     
                     ProgressBar.dispose();
@@ -272,6 +292,8 @@ public class VRImportaArquivBalancaPanel extends VRPanel {
     private vrframework.bean.radioButton.VRRadioButton rdbItensMgv;
     private javax.swing.ButtonGroup rdbNutriconal;
     private vrframework.bean.radioButton.VRRadioButton rdbPlanilha;
+    private javax.swing.JRadioButton rdbToledo;
+    private javax.swing.JRadioButton rdbToledoProduto;
     private vrframework.bean.radioButton.VRRadioButton rdbTxtItens;
     private javax.swing.JPanel tabNutricional;
     private javax.swing.JPanel tabPesaveis;

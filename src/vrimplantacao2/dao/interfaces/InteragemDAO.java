@@ -15,6 +15,8 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -125,7 +127,7 @@ public class InteragemDAO extends InterfaceDAO {
                     imp.setPiscofinsCstDebito(Integer.parseInt(Utils.formataNumero(rst.getString("piscofins_cst_debito"))));
                     imp.setPiscofinsCstCredito(Integer.parseInt(Utils.formataNumero(rst.getString("piscofins_cst_credito"))));
                     imp.setSituacaoCadastro(("S".equals(rst.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
-                    imp.setPrecovenda(MathUtils.trunc(rst.getDouble("precovenda"), 2));
+                    imp.setPrecovenda(MathUtils.trunc(rst.getDouble("precovenda"), 2, 11));
                     imp.setCustoComImposto(MathUtils.trunc(rst.getDouble("custocomimposto"), 2));
                     imp.setCustoSemImposto(MathUtils.trunc(rst.getDouble("custocomimposto"), 2));
                     imp.setEstoque(MathUtils.trunc(rst.getDouble("estoque"), 2));
@@ -364,5 +366,91 @@ public class InteragemDAO extends InterfaceDAO {
             }
         }
         return vResult;
+    }
+    
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    c.codcli id,\n" +
+                    "    c.nomcli razao,\n" +
+                    "    c.fancli fantasia,\n" +
+                    "    c.dtcadastro,\n" +
+                    "    c.dtnasc dtnascimento,\n" +
+                    "    c.endcli endereco,\n" +
+                    "    c.baicli bairro,\n" +
+                    "    c.nrendcli numero,\n" +
+                    "    c.cep,\n" +
+                    "    c.cidade,\n" +
+                    "    c.uf,\n" +
+                    "    c.pontoref referencia,\n" +
+                    "    c.fone1,\n" +
+                    "    c.fone2,\n" +
+                    "    c.fax,\n" +
+                    "    c.email,\n" +
+                    "    c.contato,\n" +
+                    "    c.cgc cnpj,\n" +
+                    "    c.inscest ie,\n" +
+                    "    c.estcivil estadocivil,\n" +
+                    "    cast((case sexo when '' then 0 else sexo end) as integer) sexo,\n" +
+                    "    c.nmpai nomepai,\n" +
+                    "    c.nmmae nomemae,\n" +
+                    "    c.vlmtcli limite,\n" +
+                    "    c.obs,\n" +
+                    "    c.diaspag,\n" +
+                    "    c.nmconjuge\n" +        
+                    "from\n" +
+                    "    tabcli c\n" +
+                    "order by\n" +
+                    "    cast(c.codcli as integer)")) {
+                while(rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setInscricaoestadual(rs.getString("ie"));
+                    if(rs.getString("fantasia") == null || "".equals(rs.getString("fantasia").trim())) {
+                        imp.setFantasia(rs.getString("razao"));
+                    } else {
+                        imp.setFantasia(rs.getString("fantasia"));
+                    }
+                    imp.setDataCadastro(rs.getDate("dtcadastro"));
+                    imp.setDataNascimento(rs.getDate("dtnascimento"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setTelefone(rs.getString("fone1"));
+                    if(rs.getString("fone2") != null && !"".equals(rs.getString("fone2").trim())) {
+                        imp.addContato("1", "TELEFONE 2", rs.getString("fone2"), "", "");
+                    }
+                    imp.setFax(rs.getString("fax"));
+                    imp.setEmail(rs.getString("email"));
+                    if(rs.getString("contato") != null && !"".equals(rs.getString("contato").trim())) {
+                        imp.addContato("2", "CONTATO", rs.getString("contato"), "", "");
+                    }
+                    
+                    imp.setSexo(rs.getInt("sexo") == 0 ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
+                    imp.setNomePai(rs.getString("nomepai"));
+                    imp.setNomeMae(rs.getString("nomemae"));
+                    imp.setValorLimite(rs.getDouble("limite"));
+                    if(rs.getString("obs") != null && !"".equals(rs.getString("obs").trim())) {
+                        imp.setObservacao(rs.getString("obs"));
+                    }
+                    imp.copiarEnderecoParaCobranca();
+                    imp.setPermiteCheque(true);
+                    imp.setPermiteCreditoRotativo(true);
+                    imp.setPrazoPagamento(rs.getInt("diaspag"));
+                    imp.setNomeConjuge(rs.getString("nmconjuge"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 }

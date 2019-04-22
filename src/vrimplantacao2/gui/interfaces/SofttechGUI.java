@@ -69,7 +69,8 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
         this.title = "Importação " + SofttechDAO.NOME_SISTEMA;
                 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
-        
+        vRImportaArquivBalancaPanel1.setSistema("Sofftech");
+        vRImportaArquivBalancaPanel1.setLoja("1");
         centralizarForm();
         this.setMaximum(false);  
     }

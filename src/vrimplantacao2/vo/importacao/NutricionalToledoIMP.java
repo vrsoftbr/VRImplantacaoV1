@@ -1,11 +1,12 @@
-package vrimplantacao.vo.vrimplantacao;
+package vrimplantacao2.vo.importacao;
 
-public class ProdutoBalancaVO {
-    public int codigo = 0;
-    public String descricao = "";
-    public String pesavel = "";
-    public int validade = 0;
-    public int valida = 0;
+public class NutricionalToledoIMP {
+    private int codigo = 0;
+    private String descricao = "";
+    private String pesavel = "";
+    private int validade = 0;
+    private int nutricional = 0;
+    
 
     public int getCodigo() {
         return codigo;
@@ -39,13 +40,11 @@ public class ProdutoBalancaVO {
         this.validade = validade;
     }
 
-    public int getValida() {
-        return valida;
+    public int getNutricional() {
+        return nutricional;
     }
 
-    public void setValida(int valida) {
-        this.valida = valida;
+    public void setNutricional(int nutricional) {
+        this.nutricional = nutricional;
     }
-    
- 
 }

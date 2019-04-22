@@ -46,6 +46,7 @@ public class NutricionalToledoVO {
     private List<String> mensagemAlergico = new ArrayList<>(15);
     private Set<String> idProdutos = new HashSet<>();
     public List<NutricionalToledoItemVO> vNutricionalToledoItem = new ArrayList<>();
+    private int idProduto = 0;
 
     public Set<String> getIdProdutos() {
         return idProdutos;
@@ -495,5 +496,12 @@ public class NutricionalToledoVO {
     public void setId_tipomedida(int id_tipomedida) {
         this.id_tipomedida = id_tipomedida;
     }
-    
+
+    public int getIdProduto() {
+        return idProduto;
+    }
+
+    public void setIdProduto(int idProduto) {
+        this.idProduto = idProduto;
+    }
 }

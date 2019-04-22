@@ -493,7 +493,8 @@ public class SysPdvDAO extends InterfaceDAO {
         return result;
     }
 
-    public List<FornecedorIMP> getFornecedores2() throws Exception {
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
 
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
@@ -557,7 +558,7 @@ public class SysPdvDAO extends InterfaceDAO {
         return result;
     }
 
-    @Override
+    /*@Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
 
@@ -673,7 +674,7 @@ public class SysPdvDAO extends InterfaceDAO {
             }
         }
         return result;
-    }
+    }*/
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {

@@ -24,20 +24,15 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="vRPanel3" max="32767" attributes="0"/>
-                  <Group type="102" attributes="0">
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="vRToolBarPadrao3" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="tabs" alignment="0" max="32767" attributes="0"/>
-                          <Component id="vRImportaArquivBalancaPanel1" alignment="0" max="32767" attributes="0"/>
-                          <Component id="vRPanel1" alignment="0" pref="526" max="32767" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                  </Group>
+                  <Component id="vRToolBarPadrao3" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="tabs" alignment="0" max="32767" attributes="0"/>
+                  <Component id="vRImportaArquivBalancaPanel1" alignment="0" max="32767" attributes="0"/>
+                  <Component id="vRPanel1" alignment="0" pref="526" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -45,15 +40,15 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
               <Component id="vRToolBarPadrao3" min="-2" pref="23" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="vRPanel1" min="-2" pref="119" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="vRImportaArquivBalancaPanel1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabs" min="-2" pref="308" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="tabs" pref="308" max="32767" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -128,10 +123,7 @@
                           </Group>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="32767" attributes="0"/>
-                              </Group>
+                              <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
                               <Component id="txtDatabase" max="32767" attributes="0"/>
                           </Group>
                       </Group>
@@ -457,10 +449,7 @@
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" attributes="0">
                                       <Group type="103" groupAlignment="1" attributes="0">
-                                          <Group type="102" alignment="1" attributes="0">
-                                              <EmptySpace min="23" pref="23" max="-2" attributes="0"/>
-                                              <Component id="chkEanAtacado" min="-2" max="-2" attributes="0"/>
-                                          </Group>
+                                          <Component id="chkEanAtacado" alignment="1" min="-2" max="-2" attributes="0"/>
                                           <Group type="102" alignment="1" attributes="0">
                                               <Component id="chkT1EAN" min="-2" max="-2" attributes="0"/>
                                               <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
