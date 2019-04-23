@@ -114,7 +114,7 @@ public class VendaImpDao {
                 LOG.fine("Vendas gravadas no banco temporário");
 
             } catch (Exception e) {
-                LOG.log(Level.SEVERE, "Erro ao gerar o banco " + (imp != null ? imp.toString() : ""), e);                
+                LOG.log(Level.SEVERE, "Erro ao gerar o banco " + (imp != null ? imp.toString() + " - " + imp.getId() : ""), e);                
                 throw e;
             }
 

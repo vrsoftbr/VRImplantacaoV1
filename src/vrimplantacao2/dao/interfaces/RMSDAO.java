@@ -1615,9 +1615,17 @@ public class RMSDAO extends InterfaceDAO {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = /*rst.getString("sequencia") + rst.getString("R60i_Sec") + rst.getString("vltotal") + "-" + */rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        String chave = rst.getString("chave");
+                        
+                        if(chave != null && !"".equals(chave)) {
+                            chave = chave.substring(36, 40);
+                        } else {
+                            chave = "";
+                        }
+                        
+                        String id = chave + "-" + rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
                         if (!uk.add(id)) {
-                            LOG.warning("Venda " + id + " já existe na listagem " + /*+ rst.getString("sequencia") + rst.getString("vltotal") + "-" + */rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("data"));
+                            LOG.warning("Venda " + id + " já existe na listagem " + rst.getString("chave") + "-" + rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("data"));
                         }
                         next.setId(id);
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("coo")));
@@ -1676,9 +1684,8 @@ public class RMSDAO extends InterfaceDAO {
                     "       tip.tip_bairro bairro,\n" +
                     "       tip.tip_cidade municipio,\n" +
                     "       tip.tip_estado uf,\n" +
-                    "       tip.tip_cep cep \n" +
-                    //"       vda.R60i_Seq sequencia,\n" +
-                    //"       vda.R60i_Sec \n"+
+                    "       tip.tip_cep cep,\n" +
+                    "       vda.r60i_chv_cel chave\n" +
                     "from \n" +
                       " AA1FR60I_" + tabela_venda + " vda\n" +
                     "left join\n" +
@@ -1686,7 +1693,8 @@ public class RMSDAO extends InterfaceDAO {
                     "left join\n" +
                     "       aa2cclir cli on tip.tip_codigo = cli.cli_codigo\n" +
                     "where\n" +
-                    "       vda.r60i_fil = " + idLojaCliente + "\n" +
+                    "       vda.r60i_fil = " + idLojaCliente + " and \n" +
+                    "       vda.r60i_cup != 17472 \n" +
                     "group by\n" +
                     "       vda.r60i_fil,\n" +
                     "       vda.r60i_dta,\n" +
@@ -1703,8 +1711,8 @@ public class RMSDAO extends InterfaceDAO {
                     "       tip.tip_bairro,\n" +
                     "       tip.tip_cidade,\n" +
                     "       tip.tip_estado,\n" +
-                    "       tip.tip_cep";
-                   // "       vda.R60i_Seq, vda.R60i_Sec";
+                    "       tip.tip_cep,\n" +
+                    "       vda.r60i_chv_cel";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
             System.out.println("Loja Digito: " + digito + "; Tabela: " + tabela_venda);
@@ -1736,14 +1744,23 @@ public class RMSDAO extends InterfaceDAO {
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
-
+        
         private void obterNext() {
             try {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String id = /*rst.getString("sequencia") + rst.getString("R60i_Sec") + rst.getString("vltotal") + "-" +*/rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
-                        String id_vendaitem = rst.getInt("sequencia") + /*rst.getString("R60i_Sec") +*/ "-" + rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        
+                        String chave = rst.getString("chave");
+                        
+                        if(chave != null && !"".equals(chave)) {
+                            chave = chave.substring(36, 40);
+                        } else {
+                            chave = "";
+                        }
+                        
+                        String id = chave + "-" + rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
+                        String id_vendaitem = rst.getString("vltotal") + "-" + rst.getInt("sequencia") + "-" + rst.getString("R60i_Sec") + "-" + rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
 
                         next.setId(id_vendaitem);
                         next.setVenda(id);
@@ -1842,11 +1859,12 @@ public class RMSDAO extends InterfaceDAO {
                     "       itm.r60i_vlr_ctb vltotal,\n" +
                     "       itm.r60i_vlr_dsc vldesconto,\n" +
                     "       itm.r60i_icm_trb tributacao,\n" +
-                    "       itm.r60i_icm_alq aliqicms\n" +
+                    "       itm.r60i_icm_alq aliqicms,\n" +
+                    "       itm.r60i_chv_cel chave\n" +
                     "from\n" +
                     "       AA1FR60I_" + tabela_venda + " itm\n" +
                     "join\n" +
-                    "       AA3CITEM p on itm.r60i_ite = p.git_cod_item\n" +
+                    "       AA3CITEM p on itm.r60i_ite = p.git_cod_item where itm.r60i_cup != 17472\n" +
                     "order by\n" +
                     "       itm.r60i_cup, itm.r60i_seq";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
