@@ -8,9 +8,14 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -25,11 +30,56 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class SolutionSuperaDAO extends InterfaceDAO {
 
+    private static final Logger LOG = Logger.getLogger(SolutionSuperaDAO.class.getName());
+    
     @Override
     public String getSistema() {
         return "SolutionSupera";
     }
 
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(new OpcaoProduto[]{
+            OpcaoProduto.MERCADOLOGICO,
+            OpcaoProduto.MAPA_TRIBUTACAO,
+            OpcaoProduto.FAMILIA_PRODUTO,
+            OpcaoProduto.FAMILIA,
+            OpcaoProduto.PRODUTOS,
+            OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+            OpcaoProduto.DATA_CADASTRO,
+            OpcaoProduto.DATA_ALTERACAO,
+            OpcaoProduto.EAN,
+            OpcaoProduto.EAN_EM_BRANCO,
+            OpcaoProduto.TIPO_EMBALAGEM_EAN,
+            OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.PESAVEL,
+            OpcaoProduto.VALIDADE,
+            OpcaoProduto.DESC_COMPLETA,
+            OpcaoProduto.DESC_GONDOLA,
+            OpcaoProduto.ATIVO,
+            OpcaoProduto.DESC_REDUZIDA,
+            OpcaoProduto.MERCADOLOGICO_PRODUTO,
+            OpcaoProduto.PESO_BRUTO,
+            OpcaoProduto.PESO_LIQUIDO,
+            OpcaoProduto.ESTOQUE_MINIMO,
+            OpcaoProduto.ESTOQUE_MAXIMO,
+            OpcaoProduto.ESTOQUE,
+            OpcaoProduto.CUSTO,
+            OpcaoProduto.PRECO,
+            OpcaoProduto.NCM,
+            OpcaoProduto.CEST,
+            OpcaoProduto.PIS_COFINS,
+            OpcaoProduto.NATUREZA_RECEITA,
+            OpcaoProduto.ICMS,            
+            OpcaoProduto.ICMS_SAIDA,
+            OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+            OpcaoProduto.ICMS_ENTRADA,
+            OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+            OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA,
+            OpcaoProduto.MARGEM
+        }));
+    }
+    
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
@@ -111,14 +161,14 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     + "p.cest, \n"
                     + "p.cst_pis_saida,\n"
                     + "p.cst_pis_entrada,\n"
-                    + "p.cst_icms_saida_interno as cst_icms_debito,\n"
-                    + "p.alq_icm_interna as aliq_icms_debito,\n"
-                    + "p.reducao_interna as red_icms_debito,\n"
-                    + "p.cst_icms_saida_externo as cst_icms_debito_fora_estado,\n"
-                    + "p.cst_icms_entrada_interno as cst_icms_credito,\n"
-                    + "p.alq_icm_externa as aliq_icms_credito,\n"
-                    + "p.reducao_externa as red_icms_credito,\n"
-                    + "p.cst_icms_entrada_externo as cst_icms_credito_fora_estado\n"
+                    + "p.cst_icms_entrada_interno as cst_aliquota_credito,\n"
+                    + "p.cst_icms_entrada_externo as cst_aliquota_credito_fora,\n"
+                    + "p.cst_icms_saida_interno as cst_aliquota_debito,\n"
+                    + "p.cst_icms_saida_externo as cst_aliquota_debito_fora,\n"
+                    + "p.aliquota_icms_entrada_interno as aliquota_credito,\n"
+                    + "p.aliquota_icms_entrada_externo as aliquota_credito_fora,\n"
+                    + "p.aliquota_icms_saida_interno as aliquota_debito,\n"
+                    + "p.aliquota_icms_saida_externo as aliquota_debito_fora\n"
                     + "from produtos p\n"
                     + "order by p.codigo_pro"
             )) {
@@ -150,13 +200,17 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("cst_pis_saida"));
                     imp.setPiscofinsCstCredito(rst.getString("cst_pis_entrada"));
-                    imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
-                    imp.setIcmsCstSaida(rst.getInt("cst_icms_debito"));
-                    imp.setIcmsAliqSaida(rst.getDouble("aliq_icms_debito"));
-                    imp.setIcmsReducaoSaida(rst.getDouble("red_icms_debito"));
-                    imp.setIcmsCstEntrada(rst.getInt("cst_icms_credito"));
-                    imp.setIcmsAliqEntrada(rst.getDouble("aliq_icms_credito"));
-                    imp.setIcmsReducaoEntrada(rst.getDouble("red_icms_credito"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));                    
+                    imp.setIcmsCstSaida(rst.getInt("cst_aliquota_credito"));
+                    imp.setIcmsAliqSaida(rst.getDouble("aliquota_debito"));
+                    imp.setIcmsCstSaidaForaEstado(rst.getInt("cst_aliquota_debito_fora"));
+                    imp.setIcmsAliqSaidaForaEstado(rst.getDouble("aliquota_debito_fora"));
+                    imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("cst_aliquota_debito_fora"));
+                    imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("aliquota_debito_fora"));                    
+                    imp.setIcmsCstEntrada(rst.getInt("cst_aliquota_credito"));
+                    imp.setIcmsAliqEntrada(rst.getDouble("aliquota_credito"));
+                    imp.setIcmsCstEntradaForaEstado(rst.getInt("cst_aliquota_credito_fora"));
+                    imp.setIcmsAliqEntradaForaEstado(rst.getDouble("aliquota_credito_fora"));
                     result.add(imp);
                 }
             }
