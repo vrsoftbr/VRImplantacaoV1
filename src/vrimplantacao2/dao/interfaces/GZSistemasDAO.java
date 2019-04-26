@@ -133,23 +133,23 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
-
+        
+        ProdutoParaFamiliaHelper helper = new ProdutoParaFamiliaHelper(result);
+        
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "f.codigo,\n"
-                    + "e.descricao\n"
-                    + "from mercodb.equivale f\n"
-                    + "inner join mercodb.estoque e on e.cdprod = f.cdprod\n"
-                    + "order by f.codigo"
+                    "select distinct\n" +
+                    "  eq.codigo,\n" +
+                    "  es.descricao\n" +
+                    "from\n" +
+                    "  equivale eq\n" +
+                    "  join estoque es on\n" +
+                    "    eq.cdprod = es.cdprod\n" +
+                    "order by\n" +
+                    "  eq.codigo"
             )) {
                 while (rst.next()) {
-                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("codigo"));
-                    imp.setDescricao(rst.getString("descricao"));
-                    result.add(imp);
+                    helper.gerarFamilia(rst.getString("codigo"), rst.getString("descricao"));
                 }
             }
         }
