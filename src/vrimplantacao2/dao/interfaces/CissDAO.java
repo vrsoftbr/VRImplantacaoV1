@@ -388,11 +388,23 @@ public class CissDAO extends InterfaceDAO {
                         imp.addContato("C", "EMAIL", "", "", TipoContato.COMERCIAL, rst.getString("EMAIL"));
                     }
                     
-                    switch (rst.getString("tiporegimetribfederal")) {
-                        //case "I": imp.setTipoEmpresa(TipoEmpresa. ISENTO); break;
-                        case "P": imp.setTipoEmpresa(TipoEmpresa.LUCRO_PRESUMIDO); break;
-                        case "R": imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL); break;
-                        case "S": imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES); break;
+                    
+                    if ((rst.getString("tiporegimetribfederal") != null)
+                            && (!rst.getString("tiporegimetribfederal").trim().isEmpty())) {
+                        switch (rst.getString("tiporegimetribfederal")) {
+                            //case "I": imp.setTipoEmpresa(TipoEmpresa. ISENTO); break;
+                            case "P":
+                                imp.setTipoEmpresa(TipoEmpresa.LUCRO_PRESUMIDO);
+                                break;
+                            case "R":
+                                imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
+                                break;
+                            case "S":
+                                imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
+                                break;
+                        }
+                    } else {
+                        imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
                     }
                     
                     switch (rst.getString("tiporegimetributacao")) {
@@ -585,11 +597,11 @@ public class CissDAO extends InterfaceDAO {
                     "        cr.obstitulo as observacao,\n" +
                     "        cr.sumvaljuroscobrado as juros\n" +
                     "from\n" +
-                    "        contas_receber cr\n" +
-                    "        join cliente_fornecedor cl on\n" +
+                    "        dba.contas_receber cr\n" +
+                    "        join dba.cliente_fornecedor cl on\n" +
                     "                cr.idclifor = cl.idclifor\n" +
                     "join\n" +
-                    "        cliente_fornecedor cf on cr.idclifor = cf.idclifor\n" +
+                    "        dba.cliente_fornecedor cf on cr.idclifor = cf.idclifor\n" +
                     "where\n" +
                     "        idempresa = " + getLojaOrigem() + "  and\n" +
                     "        flagbaixada = 'F' and\n" +
@@ -636,9 +648,9 @@ public class CissDAO extends InterfaceDAO {
                     "        ch.valor,\n" +
                     "        ch.dtvencimento\n" +
                     "from\n" +
-                    "        cheques ch\n" +
+                    "        dba.cheques ch\n" +
                     "join\n" +
-                    "        cliente_fornecedor cf on ch.idclifor = cf.idclifor\n" +
+                    "        dba.cliente_fornecedor cf on ch.idclifor = cf.idclifor\n" +
                     "where\n" +
                     "        ch.idempresa = " + getLojaOrigem() + " and\n" +
                     "        not upper(cf.nome) like '%CONSUMIDOR%FINAL%' and\n" +

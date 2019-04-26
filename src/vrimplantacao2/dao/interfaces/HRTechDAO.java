@@ -667,7 +667,7 @@ public class HRTechDAO extends InterfaceDAO {
                                 + Utils.acertarTexto(rst.getString("estado")) + ","
                                 + Utils.acertarTexto(rst.getString("cep"));
                         next.setEnderecoCliente(endereco);
-                        next.setChaveNfCe(rst.getString("chavenfe"));
+                        next.setChaveCfe(rst.getString("chavenfe"));
                     }
                 }
             } catch (SQLException | ParseException ex) {

@@ -160,7 +160,6 @@ public class SolutionSuperaGUI extends VRInternalFrame {
                     if (tabs.getSelectedIndex() == 0) {
 
                         tabProdutos.setImportador(importador);
-                        tabProdutos.getParametrosExtras().add(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
                         tabProdutos.executarImportacao();
                                                 
                         if (chkFornecedor.isSelected()) {

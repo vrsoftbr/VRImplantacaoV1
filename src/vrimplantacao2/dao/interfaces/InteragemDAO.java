@@ -17,6 +17,7 @@ import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -411,7 +412,7 @@ public class InteragemDAO extends InterfaceDAO {
                     imp.setRazao(rs.getString("razao"));
                     imp.setCnpj(rs.getString("cnpj"));
                     imp.setInscricaoestadual(rs.getString("ie"));
-                    if(rs.getString("fantasia") == null || "".equals(rs.getString("fantasia").trim())) {
+                    if(rs.getString("fantasia") == null && "".equals(rs.getString("fantasia").trim())) {
                         imp.setFantasia(rs.getString("razao"));
                     } else {
                         imp.setFantasia(rs.getString("fantasia"));
@@ -446,6 +447,49 @@ public class InteragemDAO extends InterfaceDAO {
                     imp.setPermiteCreditoRotativo(true);
                     imp.setPrazoPagamento(rs.getInt("diaspag"));
                     imp.setNomeConjuge(rs.getString("nmconjuge"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    r.codtit id,\n" +
+                    "    r.codcli idcliente,\n" +
+                    "    c.cgc cnpj,\n" +
+                    "    r.nrnota documento,\n" +
+                    "    r.nomcli razao,\n" +
+                    "    r.dtemitit emissao,\n" +
+                    "    r.dtventit vencimento,\n" +
+                    "    r.dtpagtit pagamento,\n" +
+                    "    r.vlduptit valor,\n" +
+                    "    r.vlabatit valorabatido,\n" +
+                    "    r.vlpagtit valorpago,\n" +
+                    "    r.obstit observacao\n" +
+                    "from\n" +
+                    "    titulor r\n" +
+                    "join tabcli c on r.codcli = c.codcli\n" +
+                    "where\n" +
+                    "    r.dtpagtit is null or (r.vlpagtit < r.vlduptit)\n" +
+                    "order by\n" +
+                    "    r.dtemitit")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setCnpjCliente(rs.getString("cnpj"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setNumeroCupom(rs.getString("documento"));
+                    imp.setValor(rs.getDouble("valorabatido"));
+                    imp.setObservacao(rs.getString("observacao"));
                     
                     result.add(imp);
                 }
