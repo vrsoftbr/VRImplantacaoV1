@@ -187,7 +187,6 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
         vRLabel6 = new vrframework.bean.label.VRLabel();
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
-        tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedorCliente = new vrframework.bean.panel.VRPanel();
         pnlFornecedores = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -200,6 +199,7 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         tabBalanca = new vrframework.bean.panel.VRPanel();
         vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
+        tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         vRLabel1 = new vrframework.bean.label.VRLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
         conexao = new vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel();
@@ -255,8 +255,6 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
                 .addComponent(vRLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addComponent(cmbLojaVR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
-
-        tabs.addTab("Produtos", tabProdutos);
 
         pnlFornecedores.setBorder(javax.swing.BorderFactory.createTitledBorder("Fornecedor"));
 
@@ -366,6 +364,7 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
         );
 
         tabs.addTab("Balança", tabBalanca);
+        tabs.addTab("Produtos", tabProdutos);
 
         vRLabel1.setText("Loja (Cliente):");
 

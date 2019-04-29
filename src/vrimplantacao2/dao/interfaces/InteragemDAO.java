@@ -60,7 +60,7 @@ public class InteragemDAO extends InterfaceDAO {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "p.codpro as id,\n"
+                    + "distinct p.codpro as id,\n"
                     + "coalesce(p.codbarun, '0') as ean,\n"
                     + "1 as qtdembalagem,\n"
                     + "p.unidade as unidade,\n"
@@ -128,12 +128,21 @@ public class InteragemDAO extends InterfaceDAO {
                     imp.setPiscofinsCstDebito(Integer.parseInt(Utils.formataNumero(rst.getString("piscofins_cst_debito"))));
                     imp.setPiscofinsCstCredito(Integer.parseInt(Utils.formataNumero(rst.getString("piscofins_cst_credito"))));
                     imp.setSituacaoCadastro(("S".equals(rst.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
-                    imp.setPrecovenda(MathUtils.trunc(rst.getDouble("precovenda"), 2, 11));
+                    String venda = rst.getString("precovenda");
+                    
+                    if(venda.length() > 11) {
+                        imp.setPrecovenda(0);
+                    } else {
+                        imp.setPrecovenda(rst.getDouble("precovenda"));
+                    }
+
                     imp.setCustoComImposto(MathUtils.trunc(rst.getDouble("custocomimposto"), 2));
                     imp.setCustoSemImposto(MathUtils.trunc(rst.getDouble("custocomimposto"), 2));
                     imp.setEstoque(MathUtils.trunc(rst.getDouble("estoque"), 2));
                     imp.setIcmsCst(Integer.parseInt(Utils.formataNumero(rst.getString("icms_cst"))));
+                    imp.setIcmsCstSaida(Integer.parseInt(Utils.formataNumero(rst.getString("icms_cst"))));
                     imp.setIcmsAliq(rst.getDouble("icms_aliquota"));
+                    imp.setIcmsAliqSaida(rst.getDouble("icms_aliquota"));
                     imp.setIcmsReducao(rst.getDouble("icms_reduzido"));
 
                     if ((rst.getString("ean") != null)
@@ -280,7 +289,7 @@ public class InteragemDAO extends InterfaceDAO {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select codfor, nomfor, fanfor, endfor, baifor, pontoref, cidade,\n"
-                    + "        uf, cep, fone1, fone2, fax,  email, contato, cnpj, inscest,\n"
+                    + "        uf, cep, nrendfor, fone1, fone2, fax,  email, contato, cnpj, inscest,\n"
                     + "        tpfornec, situacao, obs, tppessoa, represent01, fonerepre01,\n"
                     + "        represent02, fonerepre02, represent03, fonerepre03,\n"
                     + "        represent04, fonerepre04\n"
@@ -300,9 +309,11 @@ public class InteragemDAO extends InterfaceDAO {
                     imp.setMunicipio(rst.getString("cidade").toUpperCase());
                     imp.setUf(rst.getString("uf").toUpperCase());
                     imp.setCep(rst.getString("cep"));
+                    imp.setNumero(rst.getString("nrendfor"));
                     imp.setAtivo(("A".equals(rst.getString("situacao"))));
                     imp.setCnpj_cpf(Utils.formataNumero(rst.getString("cnpj")));
                     imp.setIe_rg(rst.getString("inscest"));
+                    imp.setTel_principal(rst.getString("fone1"));
 
                     if (Utils.stringToLong(rst.getString("fone2")) > 0) {
                         FornecedorContatoIMP cont = new FornecedorContatoIMP();
@@ -352,8 +363,27 @@ public class InteragemDAO extends InterfaceDAO {
         List<ProdutoFornecedorIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select codfor, codpro, codigo\n"
-                    + "  from tabprofor"
+                    "select\n" +
+                    "    pf.codfor,\n" +
+                    "    pf.codpro,\n" +
+                    "    pf.codigo,\n" +
+                    "    coalesce(fator.unidade, 'UN') unidade,\n" +
+                    "    coalesce(fator.fator, 1) qtd\n" +
+                    "from\n" +
+                    "    tabprofor pf\n" +
+                    "left join\n" +
+                    "    (select\n" +
+                    "        codpro,\n" +
+                    "        codfor,\n" +
+                    "        fator,\n" +
+                    "        unidade\n" +
+                    "    from\n" +
+                    "        tabproforund\n" +
+                    "    where\n" +
+                    "        fator > 1) fator on (pf.codpro = fator.codpro) and\n" +
+                    "        pf.codfor = fator.codfor\n" +
+                    "order by\n" +
+                    "    pf.codfor, pf.codpro"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -362,6 +392,7 @@ public class InteragemDAO extends InterfaceDAO {
                     imp.setIdProduto(rst.getString("codpro"));
                     imp.setIdFornecedor(rst.getString("codfor"));
                     imp.setCodigoExterno(rst.getString("codigo"));
+                    imp.setQtdEmbalagem(rst.getDouble("qtd"));
                     vResult.add(imp);
                 }
             }
@@ -385,7 +416,7 @@ public class InteragemDAO extends InterfaceDAO {
                     "    c.nrendcli numero,\n" +
                     "    c.cep,\n" +
                     "    c.cidade,\n" +
-                    "    c.uf,\n" +
+                    "    case when uf = '' then 'PA' else uf end as uf,\n" +
                     "    c.pontoref referencia,\n" +
                     "    c.fone1,\n" +
                     "    c.fone2,\n" +
@@ -412,7 +443,7 @@ public class InteragemDAO extends InterfaceDAO {
                     imp.setRazao(rs.getString("razao"));
                     imp.setCnpj(rs.getString("cnpj"));
                     imp.setInscricaoestadual(rs.getString("ie"));
-                    if(rs.getString("fantasia") == null && "".equals(rs.getString("fantasia").trim())) {
+                    if(rs.getString("fantasia") == null && "".equals(rs.getString("fantasia"))) {
                         imp.setFantasia(rs.getString("razao"));
                     } else {
                         imp.setFantasia(rs.getString("fantasia"));
@@ -434,7 +465,6 @@ public class InteragemDAO extends InterfaceDAO {
                     if(rs.getString("contato") != null && !"".equals(rs.getString("contato").trim())) {
                         imp.addContato("2", "CONTATO", rs.getString("contato"), "", "");
                     }
-                    
                     imp.setSexo(rs.getInt("sexo") == 0 ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
                     imp.setNomePai(rs.getString("nomepai"));
                     imp.setNomeMae(rs.getString("nomemae"));
