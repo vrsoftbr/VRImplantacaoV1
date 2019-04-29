@@ -364,7 +364,7 @@ public class InteragemDAO extends InterfaceDAO {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
-                    "    pf.codfor,\n" +
+                    "    distinct pf.codfor,\n" +
                     "    pf.codpro,\n" +
                     "    pf.codigo,\n" +
                     "    coalesce(fator.unidade, 'UN') unidade,\n" +

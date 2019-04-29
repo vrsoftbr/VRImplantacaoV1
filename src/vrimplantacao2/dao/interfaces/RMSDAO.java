@@ -1693,8 +1693,7 @@ public class RMSDAO extends InterfaceDAO {
                     "left join\n" +
                     "       aa2cclir cli on tip.tip_codigo = cli.cli_codigo\n" +
                     "where\n" +
-                    "       vda.r60i_fil = " + idLojaCliente + " and \n" +
-                    "       vda.r60i_cup != 17472 \n" +
+                    "       vda.r60i_fil = " + idLojaCliente + "\n" +
                     "group by\n" +
                     "       vda.r60i_fil,\n" +
                     "       vda.r60i_dta,\n" +
@@ -1864,7 +1863,7 @@ public class RMSDAO extends InterfaceDAO {
                     "from\n" +
                     "       AA1FR60I_" + tabela_venda + " itm\n" +
                     "join\n" +
-                    "       AA3CITEM p on itm.r60i_ite = p.git_cod_item where itm.r60i_cup != 17472\n" +
+                    "       AA3CITEM p on itm.r60i_ite = p.git_cod_item\n" +
                     "order by\n" +
                     "       itm.r60i_cup, itm.r60i_seq";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
