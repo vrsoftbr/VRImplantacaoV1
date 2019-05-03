@@ -14,6 +14,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -275,5 +276,51 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
+    }
+    
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "codigo,\n"
+                    + "codigo_cliente,\n"
+                    + "nome,\n"
+                    + "endereco,\n"
+                    + "numero,\n"
+                    + "complemento,\n"
+                    + "bairro,\n"
+                    + "cidade,\n"
+                    + "codigo_municipio,\n"
+                    + "estado,\n"
+                    + "cep,\n"
+                    + "cpf,\n"
+                    + "rg,\n"
+                    + "inscricao_estadual,\n"
+                    + "telefone,\n"
+                    + "estado_civil,\n"
+                    + "datanas,\n"
+                    + "sexo,\n"
+                    + "limite,\n"
+                    + "observacoes,\n"
+                    + "datacadastro,\n"
+                    + "celular,\n"
+                    + "email,\n"
+                    + "dia_emissao_fatura,\n"
+                    + "dia_fechamento_fatura,\n"
+                    + "dia_vencimento,\n"
+                    + "inativo\n"
+                    + "from clientes\n"
+                    + "where cod_convenio = 0\n"
+                    + "order by codigo"
+            )) {
+                while (rst.next()) {
+                    
+                }
+            }
+        }
+        return null;
     }
 }
