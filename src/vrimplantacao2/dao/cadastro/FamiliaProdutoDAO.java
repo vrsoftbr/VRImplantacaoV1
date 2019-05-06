@@ -40,8 +40,7 @@ public class FamiliaProdutoDAO {
                     "	ca.impid, \n" +
                     "	ca.codigoatual, \n" +
                     "	fa.descricao, \n" +
-                    "	fa.id_situacaocadastro,\n" +
-                    "	fa.codigoant\n" +
+                    "	fa.id_situacaocadastro\n" +
                     "from \n" +
                     "	implantacao.codant_familiaproduto ca \n" +
                     "	left join familiaproduto fa on \n" +

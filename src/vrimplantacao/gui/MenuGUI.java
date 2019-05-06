@@ -59,7 +59,6 @@ import vrimplantacao.gui.interfaces.InfoStoreGUI;
 import vrimplantacao.gui.interfaces.InteragemGUI_2;
 import vrimplantacao.gui.interfaces.JMasterGUI;
 import vrimplantacao.gui.interfaces.LogusGUI;
-import vrimplantacao.gui.interfaces.MRSGUI;
 import vrimplantacao.gui.interfaces.Maximus_DatasyncGUI;
 import vrimplantacao.gui.interfaces.MilenioGUI;
 import vrimplantacao.gui.interfaces.MobilityGUI;
@@ -157,6 +156,7 @@ import vrimplantacao2.gui.interfaces.LinnerGUI;
 import vrimplantacao2.gui.interfaces.LyncisGUI;
 import vrimplantacao2.gui.interfaces.MSIInforGUI;
 import vrimplantacao2.gui.interfaces.MarketGUI;
+import vrimplantacao2.gui.interfaces.MrsGUI;
 import vrimplantacao2.gui.interfaces.MultiPdvGUI;
 import vrimplantacao2.gui.interfaces.OpenGUI;
 import vrimplantacao2.gui.interfaces.OrionGUI;
@@ -226,7 +226,6 @@ public final class MenuGUI extends VRMdiFrame {
     public SoftaExGUI formImportarSoftaEx = null;
     public FMGUI formImportarFM = null;
     public EverastGUI formImportarEverast = null;
-    public MRSGUI formImportarMRS = null;
     public GuiaSistemasGUI formImportarGuiaSistemas = null;
     public GCFGUI formImportarGCF = null;
     public MultiPdvGUI formImportarMultiPdv = null;
@@ -3129,19 +3128,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemDirectorActionPerformed
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
-
-        try {
-            this.setWaitCursor();
-            if (formImportarMRS == null || formImportarMRS.isClosed()) {
-                formImportarMRS = new MRSGUI(this);
-            }
-            formImportarMRS.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
+        MrsGUI.exibir(this);
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
     private void jMenuItemVRPdvActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemVRPdvActionPerformed

@@ -31,14 +31,22 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
 
-    public String lojaCompl;
+    public String compl;
 
+    public void setCompl(String compl) {
+        this.compl = compl;
+    }
+    
     @Override
     public String getSistema() {
-        return "Mrs" + lojaCompl;
+        if (compl == null || compl.trim().equals("")) {
+            return "Mrs";
+        } else {
+            return "Mrs - " + compl;
+        }
     }
 
-    public List<Estabelecimento> getLojas() throws Exception {
+    public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
