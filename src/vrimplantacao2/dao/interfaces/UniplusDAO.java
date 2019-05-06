@@ -110,9 +110,9 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.precocusto, \n" +
                     "	p.lucrobruto as margembruta, \n" +
                     "	p.percentuallucroajustado as margem, \n" +
-                    "        case when p.precocusto = 0.000000 then \n" +
+                    "   case when p.precocusto = 0.000000 then \n" +
                     "        0 else \n" +
-                    "        round((((p.preco / case when p.precocusto = 0.000000 then 1 else p.precocusto end) - 1) * 100), 2) end as margemcalculada, \n" +
+                    "   round((((p.preco / case when p.precocusto = 0.000000 then 1 else p.precocusto end) - 1) * 100), 2) end as margemcalculada, \n" +
                     "	p.percentualmarkup, \n" +
                     "	p.preco as precovenda, \n" +
                     "	p.quantidademinima, \n" +
@@ -146,7 +146,7 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "left join\n" +
                     "	receitasemcontribuicao r on p.idreceitasemcontribuicao = r.id\n" +
                     " order by \n" +
-                    "	p.codigo::integer")) {
+                    "	p.codigo")) {
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportSistema(getSistema());
@@ -188,7 +188,7 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
     
-    //Modificado a quantidade do atacado para importação especifica
+    /*Modificado a quantidade do atacado para importação especifica
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -218,7 +218,7 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
             }
             return result;
         }
-    }
+    }*/
     
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
@@ -293,7 +293,7 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
     
-    /*@Override
+    @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -321,7 +321,7 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
-    }*/
+    }
     
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
