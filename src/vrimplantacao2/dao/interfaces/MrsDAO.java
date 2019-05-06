@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -27,9 +28,23 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private String compl;
+
+    public void setCompl(String compl) {
+        this.compl = compl;
+    }
+    
     @Override
     public String getSistema() {
-        return "Mrs";
+        if (compl == null || compl.trim().equals("")) {
+            return "Mrs";
+        } else {
+            return "Mrs - " + compl;
+        }
+    }
+
+    public List<Estabelecimento> getLojasCliente() throws Exception {
+        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
     }
 
     @Override

@@ -407,7 +407,7 @@ public class CissDAO extends InterfaceDAO {
                         imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
                     }
                     
-                    switch (rst.getString("tiporegimetributacao")) {
+                    switch (Utils.acertarTexto(rst.getString("tiporegimetributacao"))) {
                         case "A": imp.setTipoFornecedor(TipoFornecedor.ATACADO); break;
                         case "S": imp.setTipoFornecedor(TipoFornecedor.SEMTIPO); break;
                         case "F": imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA); break;
