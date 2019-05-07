@@ -652,6 +652,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSofttech = new javax.swing.JMenuItem();
         mnuLyncis = new javax.swing.JMenuItem();
         mnuRPInfo = new javax.swing.JMenuItem();
+        mnuMrs = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -1804,6 +1805,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuRPInfo);
+
+        mnuMrs.setText("Mrs");
+        mnuMrs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMrsActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuMrs);
 
         mnuDatabase.add(jMenu8);
 
@@ -4237,6 +4246,11 @@ public final class MenuGUI extends VRMdiFrame {
         GDoorGUI.exibir(this);
     }//GEN-LAST:event_mnuGDoorActionPerformed
 
+    private void mnuMrsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMrsActionPerformed
+        // TODO add your handling code here:
+        MrsGUI.exibir(this);
+    }//GEN-LAST:event_mnuMrsActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4411,6 +4425,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuMapeamentoMercadologico;
     private javax.swing.JMenuItem mnuMarket;
     private javax.swing.JMenuBar mnuMenu;
+    private javax.swing.JMenuItem mnuMrs;
     private javax.swing.JMenuItem mnuOpen;
     private javax.swing.JMenu mnuOrion;
     private javax.swing.JMenuItem mnuParametros;
