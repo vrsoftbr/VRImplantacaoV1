@@ -180,11 +180,13 @@
                               <Group type="102" attributes="0">
                                   <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                  <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkEmpresaConvenio" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkConveniado" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="249" max="32767" attributes="0"/>
+                          <EmptySpace pref="154" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -194,7 +196,8 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="chkClientePreferencial" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkClienteEventual" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkEmpresaConvenio" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkConveniado" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
@@ -209,14 +212,19 @@
                     <Property name="text" type="java.lang.String" value="Cliente Preferencial"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkClienteEventual">
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkEmpresaConvenio">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Cliente Eventual"/>
+                    <Property name="text" type="java.lang.String" value="Empresa Convenio"/>
                   </Properties>
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCreditoRotativo">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cr&#xe9;dito Rotativo"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkConveniado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Conveniado"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -283,12 +291,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
-        <Component class="vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel" name="conexaoMySQL">
-          <Properties>
-            <Property name="sistema" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="getSISTEMA()" type="code"/>
-            </Property>
-          </Properties>
+        <Component class="vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel" name="conexaoPostgres">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Conex&#xe3;o">

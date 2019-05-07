@@ -9,7 +9,7 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
-import vrimplantacao.classe.ConexaoMySQL;
+import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -34,7 +34,7 @@ public class MrsGUI extends VRInternalFrame implements ConexaoEvent {
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
-        conexaoMySQL.carregarParametros();
+        conexaoPostgres.carregarParametros();
         tabProdutos.carregarParametros(params, SISTEMA);
         txtComplemento.setText(params.get(SISTEMA, "COMPLEMENTO"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
@@ -43,7 +43,7 @@ public class MrsGUI extends VRInternalFrame implements ConexaoEvent {
 
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
-        conexaoMySQL.atualizarParametros();
+        conexaoPostgres.atualizarParametros();
         tabProdutos.gravarParametros(params, SISTEMA);
         params.put(txtComplemento.getText(), SISTEMA, "COMPLEMENTO");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
@@ -69,15 +69,15 @@ public class MrsGUI extends VRInternalFrame implements ConexaoEvent {
         
         this.title = "Importação " + SISTEMA;
 
-        conexaoMySQL.host = "localhost";
-        conexaoMySQL.database = "mrs";
-        conexaoMySQL.port = "3306";
-        conexaoMySQL.user = "root";
-        conexaoMySQL.pass = "m2012rstecno";    
+        conexaoPostgres.host = "localhost";
+        conexaoPostgres.database = "mrs";
+        conexaoPostgres.port = "5432";
+        conexaoPostgres.user = "postgres";
+        conexaoPostgres.pass = "postgres";    
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
 
-        conexaoMySQL.setOnConectar(this);
+        conexaoPostgres.setOnConectar(this);
 
         carregarParametros();
 
@@ -173,10 +173,12 @@ public class MrsGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(OpcaoCliente.DADOS,OpcaoCliente.CONTATOS);
                         }
-                        if (chkClienteEventual.isSelected()) {
-                            importador.importarClienteEventual(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
+                        if (chkEmpresaConvenio.isSelected()) {
+                            importador.importarConvenioEmpresa();
                         }
-                
+                        if (chkConveniado.isSelected()) {
+                            importador.importarConvenioConveniado();
+                        }
                         if (chkCreditoRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }
@@ -186,7 +188,7 @@ public class MrsGUI extends VRInternalFrame implements ConexaoEvent {
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
                     try {
-                        ConexaoMySQL.getConexao().close();
+                        ConexaoPostgres.getConexao().close();
                     } catch (Exception ex1) {
                         Exceptions.printStackTrace(ex1);
                     }
@@ -215,14 +217,15 @@ public class MrsGUI extends VRInternalFrame implements ConexaoEvent {
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
-        chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
+        chkEmpresaConvenio = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        chkConveniado = new vrframework.bean.checkBox.VRCheckBox();
         pnlLoja = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel1 = new javax.swing.JLabel();
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
         tabs = new javax.swing.JTabbedPane();
-        conexaoMySQL = new vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel();
+        conexaoPostgres = new vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel();
         txtComplemento = new vrframework.bean.textField.VRTextField();
 
         setTitle("Importação MRS");
@@ -268,9 +271,11 @@ public class MrsGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkClientePreferencial.setText("Cliente Preferencial");
 
-        chkClienteEventual.setText("Cliente Eventual");
+        chkEmpresaConvenio.setText("Empresa Convenio");
 
         chkCreditoRotativo.setText("Crédito Rotativo");
+
+        chkConveniado.setText("Conveniado");
 
         javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
         tabClientes.setLayout(tabClientesLayout);
@@ -282,9 +287,11 @@ public class MrsGUI extends VRInternalFrame implements ConexaoEvent {
                     .addGroup(tabClientesLayout.createSequentialGroup()
                         .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(chkEmpresaConvenio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(249, Short.MAX_VALUE))
+                .addContainerGap(154, Short.MAX_VALUE))
         );
         tabClientesLayout.setVerticalGroup(
             tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -292,7 +299,8 @@ public class MrsGUI extends VRInternalFrame implements ConexaoEvent {
                 .addContainerGap()
                 .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkEmpresaConvenio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(159, Short.MAX_VALUE))
@@ -339,8 +347,7 @@ public class MrsGUI extends VRInternalFrame implements ConexaoEvent {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        conexaoMySQL.setSistema(getSISTEMA());
-        tabs.addTab("Conexão", conexaoMySQL);
+        tabs.addTab("Conexão", conexaoPostgres);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -398,15 +405,16 @@ public class MrsGUI extends VRInternalFrame implements ConexaoEvent {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
-    private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
+    private vrframework.bean.checkBox.VRCheckBox chkConveniado;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
+    private vrframework.bean.checkBox.VRCheckBox chkEmpresaConvenio;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
-    private vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel conexaoMySQL;
+    private vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel conexaoPostgres;
     private javax.swing.JLabel jLabel1;
     private org.jdesktop.swingx.JXDatePicker jXDatePicker1;
     private vrframework.bean.panel.VRPanel pnlLoja;

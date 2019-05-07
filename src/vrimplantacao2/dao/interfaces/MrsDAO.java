@@ -5,8 +5,11 @@
  */
 package vrimplantacao2.dao.interfaces;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoPostgres;
@@ -189,7 +192,7 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getInt("cst_pis_saida"));
                     imp.setPiscofinsCstCredito(rst.getInt("cst_pis_entrada"));
-                    imp.setPiscofinsNaturezaReceita(rst.getInt("codigo_natureza_receita"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("codigo_natureza_receita"));
                     imp.setIcmsCstSaida(rst.getInt("cst_icms_s"));
                     imp.setIcmsAliqSaida(rst.getDouble("aliq_icms_s"));
                     imp.setIcmsReducaoSaida(rst.getDouble("red_icms_s"));
@@ -250,7 +253,7 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setComplemento(rst.getString("complemento"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("cidade"));
-                    imp.setIbge_municipio(rst.getInt("codigo_municipio"));
+                    imp.setIbge_municipio(Integer.parseInt(Utils.formataNumero(rst.getString("codigo_municipio"))));
                     imp.setUf(rst.getString("estado"));
 
                     if (!"  .   -   ".equals(rst.getString("cep"))) {
@@ -415,7 +418,7 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "lancamento\n"
                     + "from comprascliente \n"
                     + "where statuscompra = 'D'\n"
-                    + "and loja = " + getLojaOrigem()
+                    + "and loja = '" + getLojaOrigem() + "'"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -437,6 +440,11 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
         List<ConvenioEmpresaIMP> result = new ArrayList<>();
+        String strDataConvenio = "";
+        java.sql.Date dataConvenio;
+        DateFormat fmt = new SimpleDateFormat("yyyy/MM/dd");
+        
+        dataConvenio = new Date(new java.util.Date().getTime());
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -483,6 +491,8 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     imp.setSituacaoCadastro("N".equals(rst.getString("inativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setDesconto(rst.getDouble("desconto"));
+                    imp.setDataInicio(dataConvenio);
+                    imp.setDataTermino(dataConvenio);
                     result.add(imp);
                 }
             }
