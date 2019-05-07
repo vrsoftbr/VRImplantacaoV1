@@ -46,7 +46,7 @@ public class AriusGUI extends VRInternalFrame {
         txtHostOracle.setText(params.getWithNull("LOCALHOST", "ARIUS", "HOST"));
         txtBancoDadosOracle.setText(params.getWithNull("ARIUS","ARIUS", "DATABASE"));
         txtPortaOracle.setText(params.getWithNull("1521","ARIUS", "PORTA"));
-        txtUsuarioOracle.setText(params.getWithNull("ARIUS", "ARIUS", "USUARIO"));
+        txtUsuarioOracle.setText(params.getWithNull("PROREG", "ARIUS", "USUARIO"));
         txtSenhaOracle.setText(params.getWithNull("automa", "ARIUS", "SENHA"));
         vLojaCliente = params.getInt("ARIUS", "LOJA_CLIENTE");
         vLojaVR = params.getInt("ARIUS", "LOJA_VR");
