@@ -372,6 +372,80 @@ public class HRTechDAO extends InterfaceDAO {
         }
         return result;
     }
+    
+    /*
+    Este método foi copiado para trazer a importação de funcionários
+    que está em uma tabela especifíca no HRTech. Pois é necessário
+    para a importação de contas a pagar dos funcionários. Após usar o mesmo,
+    comentar este método e descomentar o método principal getFornecedores()
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	'U' + fun.codigoenti id_fornecedor,\n" +
+                    "	getdate() datacadastro,\n" +
+                    "	cpf.nomeentida razao,\n" +
+                    "	cpf.nomapelido fantasia,\n" +
+                    "	cpf.codinsc_rg rgie,\n" +
+                    "	cpf.numcgc_cpf cnpj,\n" +
+                    "	cpf.tipempresa tipo,\n" +
+                    "	cpf.datanascim datanascimento,\n" +
+                    "	cpf.codceplent cep,\n" +
+                    "	cpf.complocent numero,\n" +
+                    "	0 prazovisita,\n" +
+                    "	0 prazoentrega,\n" +
+                    "	0 condicaopagamento,\n" +
+                    "	0 diasemanas,\n" +
+                    "	0 produtorural,\n" +
+                    "	ltrim(cep.titulo + ' ' + cep.logradouro) endereco,\n" +
+                    "	cep.bairro,\n" +
+                    "	cep.cidade,\n" +
+                    "	cep.estado,\n" +
+                    "	0 telefone\n" +
+                    "from \n" +
+                    "	FL040FUN fun\n" +
+                    "join \n" +
+                    "	flcgccpf cpf on (fun.codcgccpfs = cpf.codigoenti)\n" +
+                    "left join fl423cep cep on (fun.codigoenti = cep.codigoenti) and\n" +
+                    "	cep.tipocadast = 'FUN'")) {
+                while (rs.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id_fornecedor"));
+                    imp.setDatacadastro(rs.getDate("datacadastro"));
+                    imp.setRazao(Utils.acertarTexto(rs.getString("razao")));
+                    imp.setFantasia(Utils.acertarTexto(rs.getString("fantasia")));
+                    imp.setIe_rg(rs.getString("rgie"));
+                    imp.setCnpj_cpf(rs.getString("cnpj"));
+                    imp.setTipo_inscricao("J".equals(rs.getString("tipo")) ? TipoInscricao.JURIDICA : TipoInscricao.FISICA);
+                    imp.setCep(rs.getString("cep"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setPrazoVisita(rs.getInt("prazovisita"));
+                    imp.setPrazoEntrega(rs.getInt("prazoentrega"));
+                    
+                    String pagamento[] = rs.getString("condicaopagamento").split("/");
+                    for(String pag : pagamento) {
+                        imp.setCondicaoPagamento(Utils.stringToInt(pag.trim()));
+                    }
+                    if (rs.getInt("produtorural") == 1) {
+                        imp.setProdutorRural();
+                    }
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setUf(rs.getString("estado"));
+                    imp.setTel_principal(rs.getString("telefone"));
+                    imp.copiarEnderecoParaCobranca();
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }*/
 
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
@@ -563,7 +637,11 @@ public class HRTechDAO extends InterfaceDAO {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "	numerolanc id,\n"
-                    + "	codigoenti idfornecedor,\n"
+                    + "	case \n" +
+                    " when tipocadast = 'U' \n" +
+                    " then 'U' + codigoenti \n" +
+                    " else \n" +
+                    " codigoenti end idfornecedor,\n"
                     + "	notafiscal documento,\n"
                     + "	parcela,\n"
                     + "	datemissao emissao,\n"
