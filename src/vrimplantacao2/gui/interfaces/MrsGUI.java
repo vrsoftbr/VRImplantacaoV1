@@ -182,6 +182,9 @@ public class MrsGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkCreditoRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }
+                        if (chkConvenioTransacao.isSelected()) {
+                            importador.importarConvenioTransacao();
+                        }
                     }
 
                     ProgressBar.dispose();
@@ -220,6 +223,7 @@ public class MrsGUI extends VRInternalFrame implements ConexaoEvent {
         chkEmpresaConvenio = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkConveniado = new vrframework.bean.checkBox.VRCheckBox();
+        chkConvenioTransacao = new vrframework.bean.checkBox.VRCheckBox();
         pnlLoja = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel1 = new javax.swing.JLabel();
@@ -277,6 +281,8 @@ public class MrsGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkConveniado.setText("Conveniado");
 
+        chkConvenioTransacao.setText("Convenio Transação");
+
         javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
         tabClientes.setLayout(tabClientesLayout);
         tabClientesLayout.setHorizontalGroup(
@@ -290,7 +296,8 @@ public class MrsGUI extends VRInternalFrame implements ConexaoEvent {
                         .addComponent(chkEmpresaConvenio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkConvenioTransacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(154, Short.MAX_VALUE))
         );
         tabClientesLayout.setVerticalGroup(
@@ -303,7 +310,9 @@ public class MrsGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(chkConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(159, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkConvenioTransacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(144, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
@@ -407,6 +416,7 @@ public class MrsGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkConveniado;
+    private vrframework.bean.checkBox.VRCheckBox chkConvenioTransacao;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkEmpresaConvenio;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;

@@ -185,6 +185,7 @@
                                   <Component id="chkConveniado" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkConvenioTransacao" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="154" max="32767" attributes="0"/>
                       </Group>
@@ -201,7 +202,9 @@
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="159" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkConvenioTransacao" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="144" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -225,6 +228,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkConveniado">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Conveniado"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkConvenioTransacao">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Convenio Transa&#xe7;&#xe3;o"/>
                   </Properties>
                 </Component>
               </SubComponents>

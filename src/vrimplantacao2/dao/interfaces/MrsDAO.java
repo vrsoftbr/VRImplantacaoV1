@@ -8,6 +8,7 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,10 +19,12 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
+import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -39,7 +42,7 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
     public void setCompl(String compl) {
         this.compl = compl;
     }
-    
+
     @Override
     public String getSistema() {
         if (compl == null || compl.trim().equals("")) {
@@ -320,6 +323,8 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "codigo,\n"
                     + "codigo_cliente,\n"
                     + "nome,\n"
+                    + "cod_convenio,\n"
+                    + "nome_empresa,\n"
                     + "endereco,\n"
                     + "numero,\n"
                     + "complemento,\n"
@@ -343,14 +348,49 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "dia_emissao_fatura,\n"
                     + "dia_fechamento_fatura,\n"
                     + "dia_vencimento,\n"
-                    + "inativo\n"
+                    + "inativo,\n"
+                    + "cod_convenio\n"
+                    + "from clientes\n"
+                    + "where nome = nome_empresa\n"
+                    + "union all\n"
+                    + "select \n"
+                    + "codigo,\n"
+                    + "codigo_cliente,\n"
+                    + "nome,\n"
+                    + "cod_convenio,\n"
+                    + "nome_empresa,\n"
+                    + "endereco,\n"
+                    + "numero,\n"
+                    + "complemento,\n"
+                    + "bairro,\n"
+                    + "cidade,\n"
+                    + "codigo_municipio,\n"
+                    + "estado,\n"
+                    + "cep,\n"
+                    + "cpf,\n"
+                    + "rg,\n"
+                    + "inscricao_estadual,\n"
+                    + "telefone,\n"
+                    + "estado_civil,\n"
+                    + "datanas,\n"
+                    + "sexo,\n"
+                    + "limite,\n"
+                    + "observacoes,\n"
+                    + "datacadastro,\n"
+                    + "celular,\n"
+                    + "email,\n"
+                    + "dia_emissao_fatura,\n"
+                    + "dia_fechamento_fatura,\n"
+                    + "dia_vencimento,\n"
+                    + "inativo,\n"
+                    + "cod_convenio\n"
                     + "from clientes\n"
                     + "where cod_convenio = 0\n"
                     + "order by codigo"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
-                    imp.setId(rst.getString("codigo"));
+                    imp.setId(rst.getString("codigo_cliente"));
                     imp.setRazao(rst.getString("nome"));
                     imp.setFantasia(imp.getRazao());
                     imp.setCnpj(rst.getString("cpf"));
@@ -387,6 +427,27 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDataNascimento(rst.getDate("datanas"));
                     imp.setSexo("Masculino".equals(rst.getString("Sexo")) ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
+
+                    if (null != rst.getString("estado_civil")) {
+                        switch (rst.getString("estado_civil")) {
+                            case "Solteiro(a)":
+                                imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
+                                break;
+                            case "Casado(a)":
+                                imp.setEstadoCivil(TipoEstadoCivil.CASADO);
+                                break;
+                            case "Viúvo(a)":
+                                imp.setEstadoCivil(TipoEstadoCivil.VIUVO);
+                                break;
+                            case "Divorciado(a)":
+                                imp.setEstadoCivil(TipoEstadoCivil.DIVORCIADO);
+                                break;
+                            default:
+                                imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
+                                break;
+                        }
+                    }
+
                     imp.setValorLimite(rst.getDouble("limite"));
                     imp.setObservacao(rst.getString("observacoes"));
                     imp.setAtivo("N".equals(rst.getString("inativo")));
@@ -440,10 +501,8 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
         List<ConvenioEmpresaIMP> result = new ArrayList<>();
-        String strDataConvenio = "";
         java.sql.Date dataConvenio;
-        DateFormat fmt = new SimpleDateFormat("yyyy/MM/dd");
-        
+
         dataConvenio = new Date(new java.util.Date().getTime());
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
@@ -469,7 +528,9 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "inativo,\n"
                     + "observacoes,\n"
                     + "baixar_debitos_automaticamente\n"
-                    + "from convenios order by codigo"
+                    + "from convenios \n"
+                    + "where codigo in (select cod_convenio from clientes where nome <> nome_empresa and cod_convenio <> 0)\n"
+                    + "order by codigo"
             )) {
                 while (rst.next()) {
                     ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
@@ -506,10 +567,12 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
+                    "select\n"
                     + "codigo,\n"
                     + "codigo_cliente,\n"
+                    + "cod_convenio,\n"
                     + "nome,\n"
+                    + "nome_empresa,\n"
                     + "endereco,\n"
                     + "numero,\n"
                     + "complemento,\n"
@@ -537,11 +600,12 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "cod_convenio\n"
                     + "from clientes\n"
                     + "where cod_convenio <> 0\n"
-                    + "order by codigo"
+                    + "and nome <> nome_empresa\n"
+                    + "order by cod_convenio, codigo_cliente::bigint"
             )) {
                 while (rst.next()) {
                     ConveniadoIMP imp = new ConveniadoIMP();
-                    imp.setId(rst.getString("codigo"));
+                    imp.setId(rst.getString("codigo_cliente"));
                     imp.setIdEmpresa(rst.getString("cod_convenio"));
                     imp.setNome(rst.getString("nome"));
                     imp.setCnpj(rst.getString("cpf"));
@@ -549,6 +613,47 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setConvenioLimite(rst.getDouble("limite"));
                     imp.setObservacao(rst.getString("observacoes"));
                     imp.setLojaCadastro(getLojaOrigem());
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
+        List<ConvenioTransacaoIMP> result = new ArrayList<>();
+        DateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "cliente,\n"
+                    + "data::date,\n"
+                    + "horario,\n"
+                    + "caixa,\n"
+                    + "cupom,\n"
+                    + "valorcompra,\n"
+                    + "valordebito,\n"
+                    + "observacoes,\n"
+                    + "lancamento\n"
+                    + "from comprascliente \n"
+                    + "where statuscompra = 'D'\n"
+                    + "and loja = '" + getLojaOrigem() + "'\n"
+                    + "and cliente in (\n"
+                    + "select codigo_cliente from clientes \n"
+                    + "where cod_convenio > 0)"
+            )) {
+                while (rst.next()) {
+                    ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
+                    imp.setId(rst.getString("lancamento") + "-" + rst.getString("cliente"));
+                    imp.setIdConveniado(rst.getString("cliente"));
+                    imp.setValor(rst.getDouble("valordebito"));
+                    imp.setNumeroCupom(rst.getString("cupom"));
+                    imp.setDataHora(new Timestamp(format.parse(rst.getString("data") + " " + rst.getString("horario")).getTime()));
+                    imp.setDataMovimento(rst.getDate("data"));
+                    imp.setEcf(rst.getString("caixa"));
+                    imp.setObservacao(rst.getString("observacoes"));
                     result.add(imp);
                 }
             }
