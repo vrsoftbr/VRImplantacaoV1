@@ -29,6 +29,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -172,8 +173,15 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("codigo"));
-                    imp.setEan(rst.getString("codigo_barras"));
+
                     imp.seteBalanca("S".equals(rst.getString("balanca")));
+
+                    if (imp.isBalanca()) {
+                        imp.setEan(rst.getString("codigo_barras").substring(9, rst.getString("codigo_barras").length() - 1));
+                    } else {
+                        imp.setEan(rst.getString("codigo_barras"));
+                    }
+
                     imp.setValidade(rst.getInt("validade"));
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(rst.getString("descricao_reduzida"));
@@ -306,6 +314,35 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
                                 rst.getString("email_vendedor").toLowerCase()
                         );
                     }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "fornecedor, \n"
+                    + "produto, \n"
+                    + "referencia, \n"
+                    + "quantidade_unidade_correspondente_fornecedor as qtdembalagem \n"
+                    + "from referencias\n"
+                    + "order by fornecedor, produto"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("produto"));
+                    imp.setIdFornecedor(rst.getString("fornecedor"));
+                    imp.setCodigoExterno(rst.getString("referencia"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     result.add(imp);
                 }
             }
@@ -623,7 +660,7 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
         List<ConvenioTransacaoIMP> result = new ArrayList<>();
-        DateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
