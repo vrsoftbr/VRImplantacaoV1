@@ -630,6 +630,11 @@ public class HRTechDAO extends InterfaceDAO {
         return result;
     }
 
+    /*
+    O código do fornecedor foi alterado para trazer os títulos de funcionários
+    que está em uma tabela especifica para funcionários. Antes, é necessário importar
+    os funcionários como fornecedor.
+    */
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
@@ -638,10 +643,10 @@ public class HRTechDAO extends InterfaceDAO {
                     "select\n"
                     + "	numerolanc id,\n"
                     + "	case \n" +
-                    " when tipocadast = 'U' \n" +
-                    " then 'U' + codigoenti \n" +
-                    " else \n" +
-                    " codigoenti end idfornecedor,\n"
+                      " when tipocadast = 'U' \n" +
+                      " then 'U' + codigoenti \n" +
+                      " else \n" +
+                      " codigoenti end idfornecedor,\n"
                     + "	notafiscal documento,\n"
                     + "	parcela,\n"
                     + "	datemissao emissao,\n"
@@ -664,17 +669,13 @@ public class HRTechDAO extends InterfaceDAO {
                     imp.setDataEntrada(rs.getDate("emissao"));
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
                     imp.setValor(rs.getDouble("valor"));
-
                     String dataPagamento = rs.getString("pagamento");
-
                     if ((dataPagamento != null) && (!"1900-01-01".equals(dataPagamento))) {
                         imp.setObservacao(rs.getString("observacao").trim() + " - FLAG_BAIXADO");
                     } else {
                         imp.setObservacao(rs.getString("observacao").trim());
                     }
-                    
                     imp.addVencimento(rs.getDate("vencimento"), imp.getValor());
-                    
                     result.add(imp);
                 }
             }
