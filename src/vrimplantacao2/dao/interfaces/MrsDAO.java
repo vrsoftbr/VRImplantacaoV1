@@ -13,8 +13,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -26,6 +29,7 @@ import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -87,6 +91,31 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "codigo, "
+                    + "descricao "
+                    + "from mix_produtos "
+                    + "order by codigo"
+            )) {
+                while (rst.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("codigo"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
 
@@ -141,6 +170,7 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "p.grupo,\n"
                     + "p.familia,\n"
                     + "p.sub_familia,\n"
+                    + "p.codigo_mix_produtos as familiaproduto,\n"
                     + "p.estoque,\n"
                     + "p.estoquemin,\n"
                     + "p.margem,\n"
@@ -168,22 +198,47 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join icms_entrada icm_e on icm_e.codigo = p.icms_entrada\n"
                     + "order by p.codigo"
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("codigo"));
 
-                    imp.seteBalanca("S".equals(rst.getString("balanca")));
+                    if ((rst.getString("codigo_barras") != null)
+                            && (!rst.getString("codigo_barras").trim().isEmpty())) {
 
-                    if (imp.isBalanca()) {
-                        imp.setEan(rst.getString("codigo_barras").substring(9, rst.getString("codigo_barras").length() - 1));
+                        if (rst.getString("codigo_barras").startsWith("000000002")) {
+                        
+                            ProdutoBalancaVO produtoBalanca;
+                            long codigoProduto;
+                            codigoProduto = Long.parseLong(rst.getString("codigo_barras").substring(9, rst.getString("codigo_barras").length() - 1));
+                            
+                            if (codigoProduto <= Integer.MAX_VALUE) {
+                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                            } else {
+                                produtoBalanca = null;
+                            }
+                            
+                            if (produtoBalanca != null) {
+                                imp.seteBalanca(true);
+                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rst.getInt("validade"));
+                                imp.setEan(String.valueOf(codigoProduto));
+                            } else {
+                                imp.setValidade(0);
+                                imp.seteBalanca(false);
+                                imp.setEan(rst.getString("codigo_barras"));
+                            }
+                            
+                        } else {
+                            imp.seteBalanca(false);
+                            imp.setEan(rst.getString("codigo_barras"));
+                        }                        
                     } else {
-                        imp.setEan(rst.getString("codigo_barras"));
+                        imp.seteBalanca(false);
                     }
 
-                    imp.setValidade(rst.getInt("validade"));
-                    imp.setDescricaoCompleta(rst.getString("descricao"));
+                    imp.setDescricaoCompleta(rst.getString("descricao_reduzida"));
                     imp.setDescricaoReduzida(rst.getString("descricao_reduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
@@ -192,6 +247,7 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rst.getString("grupo"));
                     imp.setCodMercadologico2(rst.getString("familia"));
                     imp.setCodMercadologico3(rst.getString("sub_familia"));
+                    imp.setIdFamiliaProduto(rst.getString("familiaproduto"));
                     imp.setMargem(rst.getDouble("margem_fixa"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setCustoComImposto(rst.getDouble("custo"));
