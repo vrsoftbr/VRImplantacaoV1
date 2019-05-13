@@ -18,6 +18,7 @@ import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
+import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.venda.MultiStatementIterator;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
@@ -37,6 +38,7 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -562,6 +564,65 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
 
                     result.add(imp);
+                }
+            }
+            if (importarDeTransportadoras) {
+                System.out.println("Importando transportadores");
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n" +
+                        "  n.id,\n" +
+                        "  n.descritivo razao,\n" +
+                        "  n.fantasia,\n" +
+                        "  n.cnpj_cpf,\n" +
+                        "  n.inscricao_rg,\n" +
+                        "  n.logradouro,\n" +
+                        "  n.endereco,\n" +
+                        "  n.numero,\n" +
+                        "  n.complemento,\n" +
+                        "  n.bairro,\n" +
+                        "  n.cidade,\n" +
+                        "  n.cod_ibge cidadeibge,\n" +
+                        "  n.estado,\n" +
+                        "  n.cep,\n" +
+                        "  n.telefone1,\n" +
+                        "  n.telefone2,\n" +
+                        "  n.datahora_cadastro,\n" +
+                        "  n.observacao,\n" +
+                        "  n.email,\n" +
+                        "  n.site,\n" +
+                        "  n.fax\n" +
+                        "from\n" +
+                        "  transportadoras n\n" +
+                        "order by\n" +
+                        "  n.id"
+                )) {
+                    while (rst.next()) {
+                        FornecedorIMP imp = new FornecedorIMP();
+                        
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportId("TRANSP - " + rst.getString("id"));
+                        imp.setRazao(rst.getString("razao"));
+                        imp.setFantasia(rst.getString("fantasia"));
+                        imp.setCnpj_cpf(rst.getString("cnpj_cpf"));
+                        imp.setIe_rg(rst.getString("inscricao_rg"));
+                        imp.setEndereco((rst.getString("logradouro") + " " + rst.getString("endereco")).trim());
+                        imp.setNumero(rst.getString("numero"));
+                        imp.setComplemento(rst.getString("complemento"));
+                        imp.setBairro(rst.getString("bairro"));
+                        imp.setMunicipio(rst.getString("cidade"));
+                        imp.setIbge_municipio(rst.getInt("cidadeibge"));
+                        imp.setUf(rst.getString("estado"));
+                        imp.setCep(rst.getString("cep"));
+                        imp.setTel_principal(rst.getString("telefone1"));
+                        imp.addTelefone("FONE2", rst.getString("telefone2"));
+                        imp.setDatacadastro(rst.getDate("datahora_cadastro"));
+                        imp.setObservacao(rst.getString("observacao"));
+                        imp.addEmail("EMAIL", rst.getString("email"), TipoContato.COMERCIAL);
+                        imp.addTelefone("FAX", rst.getString("fax"));
+                        
+                        result.add(imp);
+                    }
                 }
             }
         }
@@ -1911,4 +1972,63 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
         return String.format("%s-%s-%.2f-%.2f-%d-%d", uf, ncm, p_iva, v_iva, idIcmsSaida, idIcmsEntrada);
     }
 
+    @Override
+    public List<NutricionalIMP> getNutricional(Set<OpcaoNutricional> opcoes) throws Exception {
+        List<NutricionalIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "  n.id,\n" +
+                    "  n.descritivo,\n" +
+                    "  1 as id_situacaocadastro,\n" +
+                    "  n.valor_calorico caloria,\n" +
+                    "  n.carboidratos,\n" +
+                    "  case when n.med_carboidrato = 'T' then 1 else 0 end as carboidrato_inferior,\n" +
+                    "  n.proteina,\n" +
+                    "  case when n.med_proteina = 'T' then 1 else 0 end as proteina_inferior,\n" +
+                    "  n.gorduras,\n" +
+                    "  n.gorduras_saturada,\n" +
+                    "  n.colesterol,\n" +
+                    "  n.fibra_alimentar,\n" +
+                    "  case when med_fibra = 'T' then 1 else 0 end as fibra_inferior,\n" +
+                    "  n.calcio,\n" +
+                    "  n.ferro,\n" +
+                    "  n.sodio,\n" +
+                    "  n.quantidade porcao,\n" +
+                    "  n.obs mensagemalergico\n" +
+                    "from\n" +
+                    "  nutricional n\n" +
+                    "order by\n" +
+                    "  id"
+            )) {
+                while (rst.next()) {
+                    NutricionalIMP imp = new NutricionalIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descritivo"));
+                    imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+                    imp.setCaloria(rst.getInt("caloria"));
+                    imp.setCarboidrato(rst.getDouble("carboidratos"));
+                    imp.setCarboidratoInferior(rst.getBoolean("carboidrato_inferior"));
+                    imp.setProteina(rst.getDouble("proteina"));
+                    imp.setProteinaInferior(rst.getBoolean("proteina_inferior"));
+                    imp.setGordura(rst.getDouble("gorduras"));
+                    imp.setGorduraSaturada(rst.getDouble("gorduras_saturada"));
+                    imp.setFibra(rst.getDouble("fibra_alimentar"));
+                    imp.setFibraInferior(rst.getBoolean("fibra_inferior"));
+                    imp.setCalcio(rst.getDouble("calcio"));
+                    imp.setFerro(rst.getDouble("ferro"));
+                    imp.setSodio(rst.getDouble("sodio"));
+                    imp.setPorcao(rst.getString("porcao"));
+                    imp.getMensagemAlergico().add(rst.getString("mensagemalergico"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
 }
