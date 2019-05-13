@@ -171,7 +171,7 @@ public class MrsGUI extends VRInternalFrame implements ConexaoEvent {
                         }
                         
                         if (chkClientePreferencial.isSelected()) {
-                            importador.importarClientePreferencial(OpcaoCliente.DADOS,OpcaoCliente.CONTATOS);
+                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.VALOR_LIMITE,OpcaoCliente.CONTATOS);
                         }
                         if (chkEmpresaConvenio.isSelected()) {
                             importador.importarConvenioEmpresa();
