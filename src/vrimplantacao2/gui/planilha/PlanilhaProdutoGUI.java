@@ -1,21 +1,16 @@
 package vrimplantacao2.gui.planilha;
 
-import java.awt.Cursor;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingConstants;
-import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.bean.table.VRColumnTable;
-import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
-import vrimplantacao2.vo.cadastro.ProdutoVO;
-import vrimplantacao2.dao.cadastro.produto2.ProdutoDAO;
 import vrimplantacao2.dao.relatorio.RelatorioProdutoDAO;
 import vrimplantacao2.vo.relatorio.ProdutoRelatorioVO;
 
@@ -103,7 +98,7 @@ public class PlanilhaProdutoGUI extends VRInternalFrame {
             dados[i][6] = vo.getCustoComImposto();
             dados[i][7] = vo.getCustoSemImposto();
             dados[i][8] = vo.getCodMerc1();
-            dados[i][9] = vo.getMerc1();
+            dados[i][9] = vo.getMerc1();   
             dados[i][10] = vo.getCodMerc2();
             dados[i][11] = vo.getMerc2();
             dados[i][12] = vo.getCodMerc3();

@@ -4,6 +4,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.Factory;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 
 public class ProdutoAnteriorVO {
     private String importSistema;
@@ -28,6 +29,7 @@ public class ProdutoAnteriorVO {
     private int contadorImportacao = 0;
     private boolean novo = false;
     private String codigoSped = "";
+    private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
     
     private final MultiMap<String, ProdutoAnteriorEanVO> eans = new MultiMap<>(
         new Factory<ProdutoAnteriorEanVO>() {
@@ -230,5 +232,13 @@ public class ProdutoAnteriorVO {
             this.importLoja,
             this.importId
         };
+    }
+
+    public SituacaoCadastro getSituacaoCadastro() {
+        return situacaoCadastro;
+    }
+
+    public void setSituacaoCadastro(SituacaoCadastro situacaoCadastro) {
+        this.situacaoCadastro = situacaoCadastro;
     }
 }

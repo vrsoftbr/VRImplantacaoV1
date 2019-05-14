@@ -78,6 +78,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
     private boolean pesquisarKGnaDescricao;
     private boolean utilizarIdIcmsNaEntrada = false;
     private boolean utilizarEmbalagemDeCompra = false;
+    public boolean apenasProdutoAtivo = false;
 
     public void setUtilizarEmbalagemDeCompra(boolean utilizarEmbalagemDeCompra) {
         this.utilizarEmbalagemDeCompra = utilizarEmbalagemDeCompra;
@@ -248,8 +249,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
             int qtdBalanca = 0, qtdNormal = 0;
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
+            try (ResultSet rst = stm.executeQuery("select\n" +
                     "	prod.codprod id,\n" +
                     "	prod.dtinclui datacadastro,\n" +
                     "	prod.dtaltera dataalteracao,\n" +
@@ -326,6 +326,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		prod.codprod > 0\n" +
                     "	join aliquota_icms al on\n" +
                     "		al.CODALIQ = prod.codaliq_nf\n" +
+                    (apenasProdutoAtivo == true ? " where ltrim(rtrim(prod.ativo)) = 'S' " : "") +        
                     "order by\n" +
                     "	id"
             )) {
