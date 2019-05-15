@@ -3,6 +3,7 @@ package vrimplantacao2.gui.interfaces;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.event.ListSelectionEvent;
@@ -21,6 +22,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.SysPdvDAO;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoView;
 import vrimplantacao2.gui.interfaces.custom.solidus.Entidade;
 import vrimplantacao2.parametro.Parametros;
 
@@ -54,6 +56,7 @@ public class SysPdvGUI extends VRInternalFrame {
                 carregarLojaCliente();
                 carregarLojaVR();
                 carregarFinalizadora();
+                btnMapaTrib.setEnabled(true);
             }
         });
         conexaoSqlServer.setOnConectar(new ConexaoEvent() {
@@ -64,6 +67,7 @@ public class SysPdvGUI extends VRInternalFrame {
                 carregarLojaCliente();
                 carregarLojaVR();
                 carregarFinalizadora();
+                btnMapaTrib.setEnabled(true);
             }
         });
         carregarParametros();        
@@ -377,6 +381,7 @@ public class SysPdvGUI extends VRInternalFrame {
         pnlOferta = new javax.swing.JPanel();
         chkOfertas = new vrframework.bean.checkBox.VRCheckBox();
         txtDtTerminoOferta = new org.jdesktop.swingx.JXDatePicker();
+        btnMapaTrib = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
         tabImpFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -594,6 +599,14 @@ public class SysPdvGUI extends VRInternalFrame {
         );
 
         tabImpProduto.add(pnlOferta);
+
+        btnMapaTrib.setEnabled(false);
+        btnMapaTrib.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMapaTribActionPerformed(evt);
+            }
+        });
+        tabImpProduto.add(btnMapaTrib);
 
         vRTabbedPane2.addTab("Produtos", tabImpProduto);
 
@@ -947,8 +960,24 @@ public class SysPdvGUI extends VRInternalFrame {
     private void chkOfertasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkOfertasActionPerformed
         txtDtTerminoOferta.setEnabled(chkOfertas.isSelected());
     }//GEN-LAST:event_chkOfertasActionPerformed
+
+    private void btnMapaTribActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaTribActionPerformed
+        try {
+            dao.setComplementoSistema(txtComplNomeSistema.getText());
+            dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+            MapaTributacaoView.exibir(
+                    mdiFrame, 
+                    dao.getSistema(), 
+                    dao.getLojaOrigem(),
+                    dao);
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, "Erro ao exibir o mapa de tributos", ex);
+            Util.exibirMensagemErro(ex, "Erro ao abrir");
+        }
+    }//GEN-LAST:event_btnMapaTribActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTrib;
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkAtacado;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;

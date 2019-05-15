@@ -20,6 +20,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.cadastro.convenio.transacao.SituacaoTransacaoConveniado;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
@@ -34,6 +35,7 @@ import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -43,7 +45,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Leandro
  */
-public class SysPdvDAO extends InterfaceDAO {
+public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private TipoConexao tipoConexao;
     private String complementoSistema = "";
@@ -138,6 +140,38 @@ public class SysPdvDAO extends InterfaceDAO {
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = tipoConexao.getConnection().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    t.trbid,\n" +
+                    "    t.trbdes,\n" +
+                    "    t.trbtabbcfe cst,   \n" +
+                    "    t.trbalq aliquota,\n" +
+                    "    t.trbred reducao\n" +
+                    "from\n" +
+                    "    TRIBUTACAO t\n" +
+                    "order by\n" +
+                    "    1"
+            )) {
+                while (rst.next()) {
+                    result.add(new MapaTributoIMP(
+                            rst.getString("trbid"),
+                            rst.getString("trbdes"),
+                            rst.getInt("cst"),
+                            rst.getDouble("aliquota"),
+                            rst.getDouble("reducao")
+                    ));
+                }
+            }
+        }
+        
         return result;
     }
 
@@ -292,6 +326,7 @@ public class SysPdvDAO extends InterfaceDAO {
                     + "    p.prounid, \n"
                     + "    case when p.proenvbal = 'S' then 1 else 0 end e_balanca,\n"
                     + "    coalesce(p.provld, 0) validade,\n"
+                    + "    p.trbid,\n"
                     + "    i.trbtabb icms_cst, \n"
                     + "    i.trbalq icms_aliquota, \n"
                     + "    i.trbred icms_reducao, \n"
@@ -368,12 +403,16 @@ public class SysPdvDAO extends InterfaceDAO {
                             imp.setIdFamiliaProduto(rst.getString("id_familiaproduto"));
                             imp.setPesoBruto(rst.getDouble("pesobruto"));
                             imp.setPesoLiquido(rst.getDouble("pesoliquido"));
+                            imp.setIcmsCreditoId(rst.getString("trbid"));
+                            imp.setIcmsDebitoId(rst.getString("trbid"));
+                            /*
                             imp.setIcmsCstSaida(Utils.stringToInt(rst.getString("icms_cst")));
                             imp.setIcmsAliqSaida(rst.getDouble("icms_aliquota"));
                             imp.setIcmsReducaoSaida(rst.getDouble("icms_reducao"));
                             imp.setIcmsCstEntrada(Utils.stringToInt(rst.getString("icms_cst")));
                             imp.setIcmsAliqEntrada(rst.getDouble("icms_aliquota"));
                             imp.setIcmsReducaoEntrada(rst.getDouble("icms_reducao"));
+                            */
                             imp.setCest(rst.getString("cest"));
 
                             int[] pis = piscofins.get(rst.getString("id"));
