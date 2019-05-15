@@ -1245,6 +1245,7 @@ public class ProdutoRepository {
         } else {
             destino.setCodigoSped(imp.getImportId());
         }
+        destino.setSituacaoCadastro(imp.getSituacaoCadastro());
         return destino;
     }
 

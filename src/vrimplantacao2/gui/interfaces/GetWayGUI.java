@@ -248,6 +248,7 @@ public class GetWayGUI extends VRInternalFrame {
                     getWayDAO.setUsarQtdEmbDoProduto(chkUsarQtdCotacaoProdFornecedor.isSelected());
                     getWayDAO.usaMargemLiquidaPraticada = chkUsaMargemLiquida.isSelected();
                     getWayDAO.setUtilizarIdIcmsNaEntrada(chkUtilizarIdIcmsNaEntrada.isSelected());
+                    getWayDAO.apenasProdutoAtivo = chkProdutoAtivo.isSelected();
                     
                      if (!"".equals(txtLojaMesmoID.getText()) && !txtLojaMesmoID.getText().isEmpty()) {
                         lojaMesmoId = " - " + txtLojaMesmoID.getText();
@@ -589,6 +590,7 @@ public class GetWayGUI extends VRInternalFrame {
         chkMargem = new vrframework.bean.checkBox.VRCheckBox();
         chkAssociado = new vrframework.bean.checkBox.VRCheckBox();
         chkUsaMargemLiquida = new vrframework.bean.checkBox.VRCheckBox();
+        chkProdutoAtivo = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel9 = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -768,15 +770,15 @@ public class GetWayGUI extends VRInternalFrame {
                                     .addComponent(chkUtilizarIdIcmsNaEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(chkPesquisarKG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(chkUtilizarEmbalagemCompra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(0, 20, Short.MAX_VALUE))
-                    .addGroup(tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(tabParametrosLayout.createSequentialGroup()
-                            .addComponent(jLabel3)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtDataFimOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(tabParametrosLayout.createSequentialGroup()
-                            .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(97, 97, 97))))
+                        .addGap(0, 30, Short.MAX_VALUE))
+                    .addGroup(tabParametrosLayout.createSequentialGroup()
+                        .addGroup(tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(tabParametrosLayout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtDataFimOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addContainerGap())
         );
         tabParametrosLayout.setVerticalGroup(
@@ -948,6 +950,10 @@ public class GetWayGUI extends VRInternalFrame {
 
         chkUsaMargemLiquida.setText("Usa Margem Liquida Praticada");
         vRPanel7.add(chkUsaMargemLiquida);
+
+        chkProdutoAtivo.setText("Apenas Produtos Ativos");
+        chkProdutoAtivo.setToolTipText("Marcando esta opção será importado apenas produtos que estão ativo");
+        vRPanel7.add(chkProdutoAtivo);
 
         vRTabbedPane2.addTab("Produtos", vRPanel7);
 
@@ -1694,6 +1700,7 @@ public class GetWayGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private vrframework.bean.checkBox.VRCheckBox chkPermiteRotativoCheque;
     private vrframework.bean.checkBox.VRCheckBox chkPesquisarKG;
+    private vrframework.bean.checkBox.VRCheckBox chkProdutoAtivo;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdCotacao;
