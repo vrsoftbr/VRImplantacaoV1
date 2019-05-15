@@ -41,6 +41,23 @@ public class NutricionalIMP {
     private String porcao;// character varying(35) NOT NULL,
     private List<String> mensagemAlergico = new ArrayList<>();// character varying(168),
     private Set<String> produtos = new HashSet<>();
+    
+    /**
+     * Executa um cálculo para definir as porcentagens do nutricional.
+     */
+    public void calcularPorcentagens() {
+        double total = caloria + carboidrato + proteina + gordura + gorduraSaturada + fibra + calcio + ferro + sodio;
+        
+        percentualCaloria = Math.round((float)((caloria * 100) / total));
+        percentualCarboidrato = Math.round((float)((carboidrato * 100) / total));
+        percentualProteina = Math.round((float)((proteina * 100) / total));
+        percentualGordura = Math.round((float)((gordura * 100) / total));
+        percentualGorduraSaturada = Math.round((float)((gorduraSaturada * 100) / total));
+        percentualFibra = Math.round((float)((fibra * 100) / total));
+        percentualCalcio = Math.round((float)((calcio * 100) / total));
+        percentualFerro = Math.round((float)((ferro * 100) / total));
+        percentualSodio = Math.round((float)((sodio * 100) / total));
+    }
 
     public String getId() {
         return id;

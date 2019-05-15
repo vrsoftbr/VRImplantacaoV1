@@ -61,7 +61,19 @@ public class NutricionalToledoVO {
     }
 
     public void addMensagemAlergico(String mensagem) {
-        this.mensagemAlergico.add(mensagem);
+        mensagem = Utils.acertarTexto(mensagem);
+        if (!"".equals(mensagem)) {
+            if (mensagem.length() <= 56) {
+                this.mensagemAlergico.add(mensagem);
+            } else {
+                while (!mensagem.equals("")) {
+                    int length = mensagem.length() >= 56 ? 56 : mensagem.length();
+                    String str = mensagem.substring(0, length);
+                    mensagem = mensagem.substring(length, mensagem.length());
+                    this.mensagemAlergico.add(str);
+                }
+            }
+        }
     }
     /**
      * @return the id
