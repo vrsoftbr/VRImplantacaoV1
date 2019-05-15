@@ -7,11 +7,17 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.utils.sql.SQLUtils;
+import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
+import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoInscricao;
@@ -21,6 +27,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -648,4 +655,46 @@ public class GR7DAO extends InterfaceDAO {
         }
         return vResult;
     }
+    
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        if (dataTermino == null) {
+            dataTermino = new Date();
+        }
+        List<OfertaIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "cod_produto,\n"
+                    + "produto, \n"
+                    + "cod_barras,\n"
+                    + "valor_venda1,\n"
+                    + "valor_promocional1,\n"
+                    + "data_promo_inic,\n"
+                    + "data_promo_final\n"
+                    + "from produto\n"
+                    + "where data_promo_inic is not null\n"
+                    + "and data_promo_final is not null\n"
+                    + "and data_promo_inic != '0000-00-00'\n"
+                    + "and data_promo_final != '0000-00-00'\n"
+                    + "and data_promo_final >= " + SQLUtils.stringSQL(
+                            new SimpleDateFormat("yyyy-MM-dd").format(dataTermino))
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    
+                    imp.setIdProduto(rst.getString("cod_produto"));
+                    imp.setDataInicio(rst.getDate("data_promo_inic"));
+                    imp.setDataFim(rst.getDate("data_promo_final"));
+                    imp.setPrecoOferta(rst.getDouble("valor_promocional1"));
+                    imp.setSituacaoOferta(SituacaoOferta.ATIVO);
+                    imp.setTipoOferta(TipoOfertaVO.CAPA);                    
+                    result.add(imp);
+                }
+            }
+        }        
+        return result;
+    }
+    
 }

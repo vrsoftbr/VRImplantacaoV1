@@ -26,7 +26,7 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="vRPanel1" pref="606" max="32767" attributes="0"/>
+                  <Component id="vRPanel1" pref="632" max="32767" attributes="0"/>
                   <Component id="vRImportaArquivBalancaPanel1" alignment="0" max="32767" attributes="0"/>
                   <Component id="vRToolBarPadrao3" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="tabs" alignment="0" max="32767" attributes="0"/>
@@ -428,10 +428,12 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace pref="4" max="32767" attributes="0"/>
+                          <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="chkQtdEmbalagem" min="-2" max="-2" attributes="0"/>
                               <Component id="chkAtacado" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkOfertas" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtDtOferta" alignment="0" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -471,7 +473,10 @@
                                       <Component id="chkAtacado" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkNaturezaReceita" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="chkNaturezaReceita" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkOfertas" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
@@ -480,8 +485,9 @@
                               <Component id="chkFamiliaProdutoProduto" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCest" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkManterKG" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtDtOferta" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -576,6 +582,16 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Atacado"/>
                   </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkOfertas">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Ofetas"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkOfertasActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.textField.VRTextField" name="txtDtOferta">
                 </Component>
               </SubComponents>
             </Container>
@@ -753,7 +769,7 @@
                           <Component id="chkIntegracaoCliente" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="chkIntegracaoCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="444" max="32767" attributes="0"/>
+                      <EmptySpace pref="470" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -807,7 +823,7 @@
                           <Component id="chkCorrigirNaturezaReceita" min="-2" max="-2" attributes="0"/>
                           <Component id="chkAcertarSituacaoCadastro" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="430" max="32767" attributes="0"/>
+                      <EmptySpace pref="456" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
