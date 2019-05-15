@@ -26,7 +26,6 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTipoRecebivelIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
-import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.RecebimentoCaixaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -350,34 +349,6 @@ public class ApolloDAO extends InterfaceDAO implements FinanceiroProvider {
     }
 
     @Override
-    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
-        List<ProdutoFornecedorIMP> result = new ArrayList<>();
-        
-        try (Statement stm = ConexaoOracle.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    idproduto,\n" +
-                    "    codfor\n" +
-                    "from\n" +
-                    "    " + getSchema() + "produtos"
-            )) {
-                while (rst.next()) {
-                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
-                    
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setIdFornecedor(rst.getString("codfor"));
-                    imp.setIdProduto(rst.getString("idproduto"));
-                    
-                    result.add(imp);
-                }
-            }
-        }
-        
-        return result;
-    }
-
-    @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         
@@ -667,25 +638,29 @@ public class ApolloDAO extends InterfaceDAO implements FinanceiroProvider {
 
         private void obterNext() {
             try {
-                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
                 SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("id");
+                        
+                        String id = rst.getString("IDEMPRESA") + "-" + rst.getString("nropedido") + "-" + rst.getString("serie") + "-" + rst.getString("dtvenda") + "-" + rst.getString("nronf");
+                        
                         next.setId(id);
-                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("nronf")));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
-                        next.setData(rst.getDate("data"));
-                        String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
-                        String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horatermino");
-                        next.setHoraInicio(timestamp.parse(horaInicio));
-                        next.setHoraTermino(timestamp.parse(horaTermino));
-                        next.setCancelado(rst.getBoolean("cancelado"));
-                        next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
-                        next.setNumeroSerie(rst.getString("numeroserie"));
+                        next.setIdClientePreferencial(rst.getString("idcliente"));
+                        next.setData(rst.getDate("dtvenda"));
+                        next.setHoraInicio(timestamp.parse(rst.getString("horainicio")));
+                        next.setHoraTermino(timestamp.parse(rst.getString("horatermino")));
+                        next.setSubTotalImpressora(rst.getDouble("TOTAL_VENDA"));
+                        next.setValorAcrescimo(rst.getDouble("ACRESCIMO"));
+                        next.setValorDesconto(rst.getDouble("DESC_PROMOCAO"));
+                        next.setCancelado(rst.getBoolean("cancelada"));
+                        next.setCpf(rst.getString("cnpj_cpf"));
+                        next.setNomeCliente(rst.getString("razao"));
+                        next.setNumeroSerie(rst.getString("nroserie"));
+                        next.setModeloImpressora(rst.getString("modelo"));
                         next.setChaveNfCe(rst.getString("chavenfe"));
-                        next.setXml(rst.getString("xml"));
                     }
                 }
             } catch (SQLException | ParseException ex) {
@@ -695,27 +670,62 @@ public class ApolloDAO extends InterfaceDAO implements FinanceiroProvider {
         }
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
             this.sql
-                    = "select\n" +
-                    "   v.nropedido id,\n" +
-                    "   v.nronf numerocupom,\n" +
-                    "   1 as ecf,\n" +
-                    "   v.dtemissao data,\n" +
-                    "   (select min(dtvenda) from vendas where nropedido = v.nropedido) horainicio,\n" +
-                    "   (select max(dtvenda) from vendas where nropedido = v.nropedido) horatermino,\n" +
-                    "   case when statusnfe = 'C' then 1 else 0 end cancelado,\n" +
-                    "   coalesce(v.totalnf, 0) subtotalimpressora,\n" +
-                    "   coalesce(v.totalprod, 0) totalprod,\n" +
-                    "   coalesce(v.totalfrete, 0) frete,\n" +
-                    "   coalesce(v.totaldesc, 0) totaldesconto,\n" +
-                    "   coalesce(v.totaloutrasdesp, 0) totaloutrasdespesas,\n" +
-                    "   v.serie numeroserie,\n" +
-                    "   v.chavenfe,\n" +
-                    "   v.arquivo_xml xml\n" +
-                    "from nfc v where \n" +
-                    "   v.dtemissao >= '" + FORMAT.format(dataInicio) + " 00:00:00' and\n" +
-                    "   v.dtemissao <= '" + FORMAT.format(dataTermino) + " 23:59:59'\n" +
-                    "order by v.nropedido";
+                    =   "SELECT\n" +
+                        "	A.IDEMPRESA,\n" +
+                        "	A.nropedido, \n" +
+                        "	n.serie,\n" +
+                        "	Trunc(A.DTVENDA) dtvenda,\n" +
+                        "	n.nronf,\n" +
+                        "       max(coalesce(cx.nropdv, 0)) ecf,\n" +
+                        "	max(nullif(a.codparceiro, 0)) idcliente,\n" +
+                        "	min(a.dtvenda) horainicio,\n" +
+                        "	max(a.dtvenda) horatermino,\n" +
+                        "	n.cancelada,\n" +
+                        "	(\n" +
+                        "		SUM(\n" +
+                        "			CASE \n" +
+                        "				WHEN A.IAT = 'A' THEN CAST((A.QTDE * A.VRVENDA) AS NUMERIC(18,2)) \n" +
+                        "				ELSE (CAST(TRUNC((A.QTDE * A.VRVENDA) * 100) AS NUMERIC(18,2)) / 100) \n" +
+                        "			END\n" +
+                        "		) \n" +
+                        "	) TOTAL_VENDA,\n" +
+                        "	sum(n.totalnf) totalnf,\n" +
+                        "	Sum(((CASE WHEN COALESCE(A.DESC_ACRE_MEDIO,0) > 0 THEN (COALESCE(A.DESC_ACRE_MEDIO,0)) ELSE 0 END) + (CASE WHEN COALESCE(A.DESC_ACRE_ITEM,0) > 0 THEN (COALESCE(A.DESC_ACRE_ITEM,0)) ELSE 0 END)   )) ACRESCIMO,\n" +
+                        "	Sum((COALESCE(A.DESC_PROMOCAO,0) + COALESCE(A.DESC_DEPARTAMENTO,0) + (CASE WHEN COALESCE(A.DESC_ACRE_MEDIO,0) < 0 THEN (COALESCE(A.DESC_ACRE_MEDIO,0)*-1) ELSE 0 END) + (CASE WHEN COALESCE(A.DESC_ACRE_ITEM,0) < 0 THEN (COALESCE(A.DESC_ACRE_ITEM,0)*-1) ELSE 0 END))) DESC_PROMOCAO,\n" +
+                        "	a.cnpj_cpf,\n" +
+                        "	a.razao,\n" +
+                        "	pdv.nroserie,\n" +
+                        "	pdv.modelo,\n" +
+                        "	n.chavenfe,\n" +
+                        "	n.protocolo_nfe\n" +
+                        "FROM\n" +
+                        "	VENDAS A\n" +
+                        "	LEFT JOIN NFC N  ON A.NROPEDIDO = N.NROPEDIDO AND A.IDEMPRESA = N.IDEMPRESA AND A.NROSERIE = N.SERIE AND TRUNC(A.DTVENDA) = TRUNC(N.DTEMISSAO) \n" +
+                        "	LEFT JOIN PRODUTOS P ON (P.IDPRODUTO = A.CODPRODUTO) \n" +
+                        "	LEFT JOIN PISCOFINS CPC ON (CPC.IDPISCOFINS = COALESCE(A.IDPISCOFINS, P.IDPISCOFINS))\n" +
+                        "       join empresas e on a.idempresa = e.codempresa \n" +
+                        "       join det_aliquota aliq on a.aliquota = aliq.aliquota and aliq.uf = e.uf \n" +
+                        "	left join cx_vendas cx ON A.NROPEDIDO = cx.NROPEDIDO AND A.DTVENDA = cx.DATA\n" +
+                        "	left join pdv on pdv.nropdv = cx.nropdv and pdv.codempresa = a.idempresa\n" +
+                        "WHERE\n" +
+                        "	TRUNC(A.DTVENDA) BETWEEN '" + format.format(dataInicio) + "' AND '" + format.format(dataTermino) + "' AND\n" +
+                        "	COALESCE(N.STATUSNFE,'P') = 'P' AND A.IDEMPRESA in (" + idLojaCliente + ")\n" +
+                        "GROUP BY  \n" +
+                        "       A.IDEMPRESA,\n" +
+                        "	A.nropedido, \n" +
+                        "	n.serie,\n" +
+                        "	Trunc(A.DTVENDA),\n" +
+                        "	n.nronf,\n" +
+                        "       cx.nropdv,\n" +
+                        "	n.cancelada,\n" +
+                        "       a.cnpj_cpf,\n" +
+                        "       a.razao,\n" +
+                        "	pdv.nroserie,\n" +
+                        "	pdv.modelo,\n" +
+                        "	n.chavenfe,\n" +
+                        "	n.protocolo_nfe";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -753,26 +763,23 @@ public class ApolloDAO extends InterfaceDAO implements FinanceiroProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
-
-                        next.setId(rst.getString("id"));
-                        next.setVenda(id);
-                        next.setProduto(rst.getString("produto"));
-                        next.setDescricaoReduzida(rst.getString("descricao"));
-                        next.setQuantidade(rst.getDouble("quantidade"));
-                        next.setTotalBruto(rst.getDouble("total"));
-                        next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
-                        next.setCodigoBarras(rst.getString("codigobarras"));
-                        next.setUnidadeMedida(rst.getString("unidade"));
                         
-                        String trib = rst.getString("codaliq_venda");
-                        if (trib == null || "".equals(trib)) {
-                            trib = rst.getString("codaliq_produto");
-                        }
+                        String id = rst.getString("IDEMPRESA") + "-" + rst.getString("nropedido") + "-" + rst.getString("serie") + "-" + rst.getString("dtvenda") + "-" + rst.getString("nronf") + "-" + rst.getString("nroitem");
+                        String idVenda = rst.getString("IDEMPRESA") + "-" + rst.getString("nropedido") + "-" + rst.getString("serie") + "-" + rst.getString("dtvenda") + "-" + rst.getString("nronf");
 
-                        obterAliquota(next, trib);
+                        next.setId(id);
+                        next.setVenda(idVenda);
+                        next.setProduto(rst.getString("CODPRODUTO"));
+                        next.setDescricaoReduzida(rst.getString("DESCRICAO"));
+                        next.setQuantidade(rst.getDouble("QTDE"));
+                        next.setTotalBruto(rst.getDouble("TOTAL_VENDA"));
+                        next.setValorAcrescimo(rst.getDouble("ACRESCIMO"));
+                        next.setValorDesconto(rst.getDouble("DESC_PROMOCAO"));
+                        next.setCancelado(rst.getBoolean("CANCELADO"));
+                        next.setCodigoBarras(rst.getString("CODBARRA"));
+                        next.setUnidadeMedida(rst.getString("UNIDADE"));
+                        next.setIcmsCst(rst.getInt("cst"));
+                        next.setIcmsAliq(rst.getDouble("icm_efetivo"));
                     }
                 }
             } catch (Exception ex) {
@@ -781,97 +788,60 @@ public class ApolloDAO extends InterfaceDAO implements FinanceiroProvider {
             }
         }
 
-        /**
-         * Método temporario, desenvolver um mapeamento eficiente da tributação.
-         *
-         * @param item
-         * @throws SQLException
-         */
-        public void obterAliquota(VendaItemIMP item, String icms) throws SQLException {
-            /*
-             TA	7.00	ALIQUOTA 07%
-             TB	12.00	ALIQUOTA 12%
-             TC	18.00	ALIQUOTA 18%
-             TD	25.00	ALIQUOTA 25%
-             TE	11.00	ALIQUOTA 11%
-             I	0.00	ISENTO
-             F	0.00	SUBST TRIBUTARIA
-             N	0.00	NAO INCIDENTE
-             */
-            int cst;
-            double aliq;
-            switch (icms) {
-                case "TA":
-                    cst = 0;
-                    aliq = 7;
-                    break;
-                case "TB":
-                    cst = 0;
-                    aliq = 12;
-                    break;
-                case "TC":
-                    cst = 0;
-                    aliq = 18;
-                    break;
-                case "TD":
-                    cst = 0;
-                    aliq = 25;
-                    break;
-                case "TE":
-                    cst = 0;
-                    aliq = 11;
-                    break;
-                case "F":
-                    cst = 60;
-                    aliq = 0;
-                    break;
-                case "N":
-                    cst = 41;
-                    aliq = 0;
-                    break;
-                default:
-                    cst = 40;
-                    aliq = 0;
-                    break;
-            }
-            item.setIcmsCst(cst);
-            item.setIcmsAliq(aliq);
-        }
-
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
             this.sql
-                    = "select\n"
-                    + "    cx.id,\n"
-                    + "    cx.coo as numerocupom,\n"
-                    + "    cx.codcaixa as ecf,\n"
-                    + "    cx.data as data,\n"
-                    + "    cx.codprod as produto,\n"
-                    + "    pr.DESC_PDV as descricao,    \n"
-                    + "    isnull(cx.qtd, 0) as quantidade,\n"
-                    + "    isnull(cx.totitem, 0) as total,\n"
-                    + "    case when cx.cancelado = 'N' then 0 else 1 end as cancelado,\n"
-                    + "    isnull(cx.descitem, 0) as desconto,\n"
-                    + "    isnull(cx.acrescitem, 0) as acrescimo,\n"
-                    + "    case\n"
-                    + "     when LEN(cx.barra) > 14 \n"
-                    + "     then SUBSTRING(cx.BARRA, 4, LEN(cx.barra))\n"
-                    + "    else cx.BARRA end as codigobarras,\n"
-                    + "    pr.unidade,\n"
-                    + "    cx.codaliq codaliq_venda,\n"
-                    + "    pr.codaliq codaliq_produto,\n"
-                    + "    ic.DESCRICAO trib_desc\n"
-                    + "from\n"
-                    + "    caixageral as cx\n"
-                    + "    join PRODUTOS pr on cx.codprod = pr.codprod\n"
-                    + "    left join creceita c on pr.codcreceita = c.codcreceita\n"
-                    + "    left join clientes cl on cx.cliente = cast(cl.codclie as varchar(20))\n"
-                    + "    left join ALIQUOTA_ICMS ic on pr.codaliq = ic.codaliq\n"
-                    + "where\n"
-                    + "    cx.tipolancto = '' and\n"
-                    + "    (cx.data between convert(date, '" + VendaIterator.FORMAT.format(dataInicio) + "', 23) and convert(date, '" + VendaIterator.FORMAT.format(dataTermino) + "', 23)) and\n"
-                    + "    cx.codloja = " + idLojaCliente + " and\n"
-                    + "    cx.atualizado = 'S' and\n"
-                    + "    (cx.flgrupo = 'S' or cx.flgrupo = 'N')";
+                    =   "SELECT\n" +
+                        "	A.IDEMPRESA,\n" +
+                        "	A.nropedido, \n" +
+                        "	n.serie,\n" +
+                        "	n.nronf,\n" +
+                        "	Trunc(A.DTVENDA) dtvenda, \n" +
+                        "	a.nroitem,  \n" +
+                        "	A.CODPRODUTO,\n" +
+                        "	P.DESCRICAO,  \n" +
+                        "	SUM(A.QTDE) QTDE,  \n" +
+                        "	(\n" +
+                        "		SUM(\n" +
+                        "			CASE \n" +
+                        "				WHEN A.IAT = 'A' THEN CAST((A.QTDE * A.VRVENDA) AS NUMERIC(18,2)) \n" +
+                        "				ELSE (CAST(TRUNC((A.QTDE * A.VRVENDA) * 100) AS NUMERIC(18,2)) / 100) \n" +
+                        "			END\n" +
+                        "		) \n" +
+                        "	) TOTAL_VENDA,\n" +
+                        "	case when A.CANCELADO = 'S' then 1 else 0 end as CANCELADO,\n" +
+                        "        Sum(((CASE WHEN COALESCE(A.DESC_ACRE_MEDIO,0) > 0 THEN (COALESCE(A.DESC_ACRE_MEDIO,0)) ELSE 0 END) + (CASE WHEN COALESCE(A.DESC_ACRE_ITEM,0) > 0 THEN (COALESCE(A.DESC_ACRE_ITEM,0)) ELSE 0 END)   )) ACRESCIMO,\n" +
+                        "	Sum((COALESCE(A.DESC_PROMOCAO,0) + COALESCE(A.DESC_DEPARTAMENTO,0) + (CASE WHEN COALESCE(A.DESC_ACRE_MEDIO,0) < 0 THEN (COALESCE(A.DESC_ACRE_MEDIO,0)*-1) ELSE 0 END) + (CASE WHEN COALESCE(A.DESC_ACRE_ITEM,0) < 0 THEN (COALESCE(A.DESC_ACRE_ITEM,0)*-1) ELSE 0 END))) DESC_PROMOCAO,\n" +
+                        "	P.CODBARRA, \n" +
+                        "	A.UNIDADE,\n" +
+                        "	A.ALIQUOTA,\n" +
+                        "	aliq.cst,\n" +
+                        "	aliq.icm_efetivo\n" +
+                        "FROM\n" +
+                        "	VENDAS A\n" +
+                        "	LEFT JOIN NFC N  ON A.NROPEDIDO = N.NROPEDIDO AND A.IDEMPRESA = N.IDEMPRESA AND A.NROSERIE = N.SERIE AND TRUNC(A.DTVENDA) = TRUNC(N.DTEMISSAO) \n" +
+                        "	LEFT JOIN PRODUTOS P ON (P.IDPRODUTO = A.CODPRODUTO) \n" +
+                        "	LEFT JOIN PISCOFINS CPC ON (CPC.IDPISCOFINS = COALESCE(A.IDPISCOFINS, P.IDPISCOFINS))\n" +
+                        "        join empresas e on a.idempresa = e.codempresa \n" +
+                        "        join det_aliquota aliq on a.aliquota = aliq.aliquota and aliq.uf = e.uf \n" +
+                        "WHERE\n" +
+                        "	TRUNC(A.DTVENDA) BETWEEN '" + format.format(dataInicio) + "' AND '" + format.format(dataTermino) + "' AND\n" +
+                        "	COALESCE(N.STATUSNFE,'P') = 'P' AND A.IDEMPRESA in (" + idLojaCliente + ")\n" +
+                        "GROUP BY  \n" +
+                        "	A.IDEMPRESA,\n" +
+                        "	A.nropedido, \n" +
+                        "	n.serie,\n" +
+                        "	n.nronf,\n" +
+                        "	Trunc(A.DTVENDA), \n" +
+                        "	a.nroitem,  \n" +
+                        "	A.CODPRODUTO,\n" +
+                        "	P.DESCRICAO,  \n" +
+                        "	A.CANCELADO,\n" +
+                        "	P.CODBARRA, \n" +
+                        "	A.UNIDADE,\n" +
+                        "	A.ALIQUOTA,\n" +
+                        "	aliq.cst,\n" +
+                        "	aliq.icm_efetivo";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
