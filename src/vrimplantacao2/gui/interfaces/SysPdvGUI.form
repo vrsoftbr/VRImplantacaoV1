@@ -193,7 +193,8 @@
                               <Component id="chkProdutos" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkManterBalanca" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
+                              <Component id="chkSoAtivos" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -204,6 +205,7 @@
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="chkManterBalanca" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkProdutos" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkSoAtivos" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -224,6 +226,11 @@
                         <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                           <Connection code="true" type="code"/>
                         </Property>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkSoAtivos">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="S&#xf3; ativos"/>
                       </Properties>
                     </Component>
                   </SubComponents>

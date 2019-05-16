@@ -52,6 +52,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
     public String FZDCOD = "";
     public String v_pahtFileXls;
     private boolean gerarEanAtacado = false;
+    private boolean soAtivos = false;
 
     public void setGerarEanAtacado(boolean gerarEanAtacado) {
         this.gerarEanAtacado = gerarEanAtacado;
@@ -173,6 +174,10 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         
         return result;
+    }
+
+    public void setSoAtivos(boolean soAtivos) {
+        this.soAtivos = soAtivos;
     }
 
     private static class Ean {
@@ -340,6 +345,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "        i.trbid = p.trbid\n"
                     + "    left join estoque est on\n"
                     + "        est.PROCOD = p.PROCOD\n"
+                    + (soAtivos ? "where p.proforlin = 'N'\n" : "")
                     + "ORDER BY \n"
                     + "    p.procod"
             )) {
