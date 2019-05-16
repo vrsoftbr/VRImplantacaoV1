@@ -7,11 +7,17 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.utils.sql.SQLUtils;
+import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
+import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoInscricao;
@@ -21,6 +27,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -117,7 +124,8 @@ public class GR7DAO extends InterfaceDAO {
                     + "p.cod_familia id_familia,\n"
                     + "p.lucro1 margem,\n"
                     + "p.cod_barras ean,\n"
-                    + "1 qtd_embalagem,\n"
+                    + "p.qtd_emb,\n"
+                    + "p.qtd_por_emb,\n"
                     + "p.cod_barras_cx ean_caixa,\n"
                     + "p.qtd_por_cx qtd_caixa,\n"
                     + "p.validade,\n"
@@ -139,7 +147,7 @@ public class GR7DAO extends InterfaceDAO {
                     + "automacao.produto p\n"
                     + "join\n"
                     + "automacao.pis_cofins piscofins on p.cod_pis_cofins = piscofins.codigo\n"
-                    + "union all\n"
+                    /*+ "union all\n"
                     + "select\n"
                     + "p.cod_produto id,\n"
                     + "p.produto descricaocompleta,\n"
@@ -176,7 +184,7 @@ public class GR7DAO extends InterfaceDAO {
                     + "automacao.produto p\n"
                     + "join\n"
                     + "automacao.pis_cofins piscofins on p.cod_pis_cofins = piscofins.codigo\n"
-                    + "where cod_barras_emb <> ''"
+                    + "where cod_barras_emb <> ''"*/
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -194,7 +202,8 @@ public class GR7DAO extends InterfaceDAO {
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3("1");
                     imp.setTipoEmbalagem(rst.getString("unidade"));
-                    imp.setQtdEmbalagem(rst.getInt("qtd_embalagem"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("qtd_por_emb"));
+                    imp.setQtdEmbalagem(rst.getInt("qtd_emb"));
                     imp.setPesoBruto(rst.getDouble("peso_bruto"));
                     imp.setPesoLiquido(rst.getDouble("peso_liq"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
@@ -442,7 +451,7 @@ public class GR7DAO extends InterfaceDAO {
                     + "p.conjuge_orgao_exp,\n"
                     + "p.conjuge_rg\n"
                     + "                from\n"
-                    + "                	automacao.participantes p\n"
+                    + "                	automacao.where codigo p\n"
                     + "left join automacao.cidades c on p.cod_cidade = c.codigo\n"
                     + "                where\n"
                     + "                	p.tipo_participante like '%C%'\n"
@@ -606,21 +615,36 @@ public class GR7DAO extends InterfaceDAO {
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "  ch.codigo, ch.codigo_cliente, ch.cliente, c.razao_nome, c.cnpj_cpf,\n"
-                    + "  c.ie_rg, c.fone, ch.comprador, ch.obs, ch.num_venda, ch.num_cheque,\n"
-                    + "  ch.valor, ch.data, ch.data_vcto\n"
+                    + "ch.codigo,\n"
+                    + "ch.codigo_cliente,\n"
+                    + "ch.cliente,\n"
+                    + "c.razao_nome,\n"
+                    + "c.cnpj_cpf,\n"
+                    + "c.ie_rg,\n"
+                    + "c.fone,\n"
+                    + "ch.comprador,\n"
+                    + "ch.obs,\n"
+                    + "ch.num_venda,\n"
+                    + "ch.num_cheque,\n"
+                    + "ch.valor,\n"
+                    + "ch.data,\n"
+                    + "ch.data_vcto,\n"
+                    + "b.banco,\n"
+                    + "b.agencia,\n"
+                    + "b.conta\n"
                     + "from\n"
-                    + "  automacao.cheque ch\n"
-                    + "left join\n"
-                    + "  automacao.participantes c on c.codigo = ch.codigo_cliente\n"
-                    + "and\n"
-                    + "  c.tipo_participante like '%C%'\n"
+                    + "automacao.cheque ch\n"
+                    + "left join automacao.participantes c on c.codigo = ch.codigo_cliente\n"
+                    + "left join automacao.partic_bancos b on b.codigo = ch.codigo_banco\n"
                     + "where\n"
-                    + "  ch.data_baixa1 is null\n"
+                    + "ch.data_baixa1 is null\n"
                     + "and\n"
-                    + "  ch.data_baixa2 is null\n"
+                    + "ch.data_baixa2 is null\n"
                     + "and\n"
-                    + "  ch.data_baixa3 is null"
+                    + "ch.data_baixa3 is null\n"
+                    + "and\n"
+                    + "c.tipo_participante like '%C%'\n"
+                    + "order by ch.codigo_cliente"
             )) {
                 while (rst.next()) {
                     if ((rst.getString("comprador") != null)
@@ -637,7 +661,9 @@ public class GR7DAO extends InterfaceDAO {
                     imp.setTelefone(rst.getString("fone"));
                     imp.setObservacao(comprador + rst.getString("obs"));
                     imp.setNumeroCheque(rst.getString("num_cheque"));
-                    imp.setBanco(804);
+                    imp.setBanco(rst.getInt("banco"));
+                    imp.setAgencia(rst.getString("agencia"));
+                    imp.setConta(rst.getString("conta"));
                     imp.setNumeroCupom(rst.getString("num_venda"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setDate(rst.getDate("data"));
@@ -648,4 +674,46 @@ public class GR7DAO extends InterfaceDAO {
         }
         return vResult;
     }
+    
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        if (dataTermino == null) {
+            dataTermino = new Date();
+        }
+        List<OfertaIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "cod_produto,\n"
+                    + "produto, \n"
+                    + "cod_barras,\n"
+                    + "valor_venda1,\n"
+                    + "valor_promocional1,\n"
+                    + "data_promo_inic,\n"
+                    + "data_promo_final\n"
+                    + "from produto\n"
+                    + "where data_promo_inic is not null\n"
+                    + "and data_promo_final is not null\n"
+                    + "and data_promo_inic != '0000-00-00'\n"
+                    + "and data_promo_final != '0000-00-00'\n"
+                    + "and data_promo_final >= " + SQLUtils.stringSQL(
+                            new SimpleDateFormat("yyyy-MM-dd").format(dataTermino))
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    
+                    imp.setIdProduto(rst.getString("cod_produto"));
+                    imp.setDataInicio(rst.getDate("data_promo_inic"));
+                    imp.setDataFim(rst.getDate("data_promo_final"));
+                    imp.setPrecoOferta(rst.getDouble("valor_promocional1"));
+                    imp.setSituacaoOferta(SituacaoOferta.ATIVO);
+                    imp.setTipoOferta(TipoOfertaVO.CAPA);                    
+                    result.add(imp);
+                }
+            }
+        }        
+        return result;
+    }
+    
 }

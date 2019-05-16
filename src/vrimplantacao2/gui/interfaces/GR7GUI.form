@@ -25,14 +25,16 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="vRPanel1" pref="606" max="32767" attributes="0"/>
-                  <Component id="vRImportaArquivBalancaPanel1" alignment="0" max="32767" attributes="0"/>
-                  <Component id="vRToolBarPadrao3" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="tabs" alignment="0" max="32767" attributes="0"/>
-                  <Component id="vRPanel3" alignment="0" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Component id="vRPanel1" pref="634" max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                      <Component id="vRImportaArquivBalancaPanel1" alignment="0" max="32767" attributes="0"/>
+                      <Component id="vRToolBarPadrao3" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="tabs" alignment="0" min="-2" pref="634" max="-2" attributes="0"/>
+                      <Component id="vRPanel3" alignment="0" max="32767" attributes="0"/>
+                  </Group>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -41,14 +43,14 @@
           <Group type="102" attributes="0">
               <Component id="vRToolBarPadrao3" min="-2" pref="23" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="vRPanel1" min="-2" pref="119" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
+              <Component id="vRPanel1" min="-2" pref="104" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="vRImportaArquivBalancaPanel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabs" pref="343" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <Component id="tabs" min="-2" pref="286" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
               <Component id="vRPanel3" min="-2" pref="34" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -85,32 +87,6 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="vRLabel4" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtUsuario" min="-2" pref="102" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="vRLabel5" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtSenha" min="-2" pref="96" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtPorta" alignment="1" min="-2" pref="65" max="-2" attributes="0"/>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="vRLabel7" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="45" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
-                          <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="txtLojaOrigem" max="32767" attributes="0"/>
-                              <Component id="jLabel2" max="32767" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="32767" attributes="0"/>
-                          <Component id="btnConectarSqlServer" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="vRLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="txtHost" alignment="0" min="-2" pref="104" max="-2" attributes="0"/>
                           </Group>
@@ -122,6 +98,30 @@
                               </Group>
                               <Component id="txtDatabase" max="32767" attributes="0"/>
                           </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="vRLabel4" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtUsuario" min="-2" pref="102" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="vRLabel5" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtSenha" min="-2" pref="96" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="vRLabel7" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtPorta" min="-2" pref="65" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="txtLojaOrigem" max="32767" attributes="0"/>
+                              <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="btnConectarSqlServer" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -131,41 +131,44 @@
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Group type="102" attributes="0">
-                          <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="txtHost" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtDatabase" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                      </Group>
-                      <Group type="102" attributes="0">
-                          <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
-                      </Group>
-                  </Group>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="103" alignment="0" groupAlignment="1" attributes="0">
-                          <Component id="vRLabel5" min="-2" max="-2" attributes="0"/>
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Group type="102" attributes="0">
+                              <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="vRLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtHost" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtDatabase" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
+                          <Group type="102" attributes="0">
+                              <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
-                      <Component id="vRLabel4" alignment="1" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="103" alignment="0" groupAlignment="1" attributes="0">
+                                  <Component id="vRLabel5" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" alignment="0" groupAlignment="3" attributes="0">
+                                      <Component id="vRLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <Component id="vRLabel4" alignment="1" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="txtSenha" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtUsuario" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtPorta" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="txtSenha" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="btnConectarSqlServer" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtUsuario" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtPorta" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="btnConectarSqlServer" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -263,8 +266,8 @@
                   <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="cmbLojaVR" min="-2" pref="90" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <Component id="cmbLojaVR" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnMigrar" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -357,11 +360,13 @@
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="vRPanel2" alignment="0" max="32767" attributes="0"/>
-                          <Component id="vRPanel4" alignment="0" max="32767" attributes="0"/>
-                          <Component id="vRPanel5" alignment="0" max="32767" attributes="0"/>
+                          <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+                              <Component id="vRPanel4" alignment="0" max="32767" attributes="0"/>
+                              <Component id="vRPanel2" alignment="0" max="32767" attributes="0"/>
+                          </Group>
+                          <Component id="vRPanel5" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -369,12 +374,12 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="vRPanel2" max="32767" attributes="0"/>
+                      <Component id="vRPanel2" min="-2" pref="128" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="vRPanel4" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="vRPanel5" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -394,44 +399,56 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkMercadologico" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFamiliaProduto" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkManterKG" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkPreco" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkEstoque" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkCusto" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkCest" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="chkSituacaoCadastro" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="38" max="-2" attributes="0"/>
-                                  <Component id="chkPisCofins" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkMercadologico" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkFamiliaProduto" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkPreco" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkEstoque" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkCusto" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
                               </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="chkEan" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkEanEmBranco" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkFamiliaProdutoProduto" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="chkNaturezaReceita" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkICMS" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkTipoEmbalagem" min="-2" max="-2" attributes="0"/>
-                                  </Group>
+                              <Group type="102" alignment="1" attributes="0">
+                                  <Component id="chkManterKG" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="32767" attributes="0"/>
+                                  <Component id="chkCest" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace pref="4" max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkQtdEmbalagem" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkAtacado" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkSituacaoCadastro" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkEan" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkEanEmBranco" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFamiliaProdutoProduto" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkPisCofins" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkNaturezaReceita" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkICMS" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkTipoEmbalagem" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkOfertas" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="txtDtOferta" max="32767" attributes="0"/>
+                              </Group>
+                              <Group type="102" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkQtdEmbalagemPRO" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkQtdEmbalagem" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkAtacado" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="0" pref="13" max="32767" attributes="0"/>
+                              </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -440,48 +457,69 @@
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
-                          <Group type="103" groupAlignment="1" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
                                   <Group type="103" groupAlignment="3" attributes="0">
                                       <Component id="chkFamiliaProduto" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkPreco" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkSituacaoCadastro" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
                                       <Component id="chkMercadologico" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkCusto" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkEan" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
                                       <Component id="chkProdutos" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkEstoque" alignment="3" max="32767" attributes="0"/>
-                                      <Component id="chkEanEmBranco" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <Group type="102" attributes="0">
+                                  <Component id="chkSituacaoCadastro" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkEan" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkEanEmBranco" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="chkFamiliaProdutoProduto" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkCest" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkManterKG" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <EmptySpace min="-2" pref="158" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <Component id="chkPisCofins" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkICMS" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkNaturezaReceita" min="-2" max="-2" attributes="0"/>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
+                                          <Component id="chkTipoEmbalagem" min="-2" max="-2" attributes="0"/>
+                                      </Group>
                                   </Group>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="3" attributes="0">
-                                      <Component id="chkPisCofins" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkQtdEmbalagem" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  </Group>
+                                  <Component id="chkQtdEmbalagem" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkQtdEmbalagemPRO" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkAtacado" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
-                                      <Component id="chkICMS" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkAtacado" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkOfertas" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="txtDtOferta" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkNaturezaReceita" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="chkTipoEmbalagem" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFamiliaProdutoProduto" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkCest" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkManterKG" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -569,12 +607,27 @@
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkQtdEmbalagem">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Qtd.Embalagem"/>
+                    <Property name="text" type="java.lang.String" value="Qtd.Embalagem EAN"/>
                   </Properties>
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAtacado">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Atacado"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkOfertas">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Ofetas"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkOfertasActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.textField.VRTextField" name="txtDtOferta">
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkQtdEmbalagemPRO">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Qtd.Embalagem PROD"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -593,19 +646,11 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkTelefone" min="-2" max="-2" attributes="0"/>
-                              <Group type="102" attributes="0">
-                                  <Component id="chkContatoFornecedor" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
-                                  <Component id="chkTipoInscricao" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
+                          <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Component id="chkContatoFornecedor" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
@@ -616,14 +661,9 @@
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="chkFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkContatoFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkTipoInscricao" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="chkProdutoFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkTelefone" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="12" max="32767" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -644,16 +684,6 @@
                     <Property name="text" type="java.lang.String" value="Contato Fornecedor"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTelefone">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Telefone"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTipoInscricao">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Tipo Inscricao"/>
-                  </Properties>
-                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="vRPanel5">
@@ -670,33 +700,21 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                  <Component id="chkSituacaoCadastroCliente" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                                  <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                                  <Component id="chkReceberCheque" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                          <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Component id="chkReceberCheque" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="273" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="chkClientePreferencial" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkCreditoRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkReceberCheque" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkSituacaoCadastroCliente" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="32767" attributes="0"/>
-                          <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="chkClientePreferencial" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkCreditoRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkReceberCheque" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -715,19 +733,9 @@
                     <Property name="text" type="java.lang.String" value="Cr&#xe9;dito Rotativo"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkClienteEventual">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Cliente Eventual"/>
-                  </Properties>
-                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkReceberCheque">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cheque"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkSituacaoCadastroCliente">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Situacao Cadastro"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -753,7 +761,7 @@
                           <Component id="chkIntegracaoCliente" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="chkIntegracaoCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="444" max="32767" attributes="0"/>
+                      <EmptySpace pref="472" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -766,7 +774,7 @@
                       <Component id="chkIntegracaoCliente" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkIntegracaoCreditoRotativo" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="234" max="32767" attributes="0"/>
+                      <EmptySpace pref="177" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -807,7 +815,7 @@
                           <Component id="chkCorrigirNaturezaReceita" min="-2" max="-2" attributes="0"/>
                           <Component id="chkAcertarSituacaoCadastro" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="430" max="32767" attributes="0"/>
+                      <EmptySpace pref="458" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -818,7 +826,7 @@
                       <Component id="chkCorrigirNaturezaReceita" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkAcertarSituacaoCadastro" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="257" max="32767" attributes="0"/>
+                      <EmptySpace pref="200" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
