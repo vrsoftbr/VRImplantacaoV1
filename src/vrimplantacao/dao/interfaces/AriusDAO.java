@@ -13,17 +13,22 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.venda.MultiStatementIterator;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.utils.sql.SQLUtils;
+import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -359,7 +364,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
                     if("S".equals(rst.getString("balanca"))){
-                        imp.setEan(rst.getString("id"));
+                        imp.setEan(rst.getString("id").substring(0, rst.getString("id").length() - 1));
                     } else {
                         imp.setEan(rst.getString("codigobarras"));
                     }
@@ -767,39 +772,27 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	pf.id_fornecedor,\n"
-                    + "	pf.id_produto,\n"
-                    + "	pf.codigo_exterior,\n"
-                    + "	p.qtde_embalageme qtdembalagem,\n"
-                    + "	p.unidade_compra\n"
-                    + "from \n"
-                    + "	(select\n"
-                    + "		produto id_produto,\n"
-                    + "		fornecedor id_fornecedor,\n"
-                    + "		trim(coalesce(referencia,'')) codigo_exterior\n"
-                    + "	from\n"
-                    + "		produtos_fornecedor\n"
-                    + "	union\n"
-                    + "	select\n"
-                    + "		produto id_produto,\n"
-                    + "		fornecedor id_fornecedor,\n"
-                    + "		trim(coalesce(referencia,'')) codigo_exterior \n"
-                    + "	from\n"
-                    + "	    produtos_fornecedor_refs) pf\n"
-                    + "	join produtos p on pf.id_produto = p.id\n"
-                    + "order by\n"
-                    + "	pf.id_fornecedor,\n"
-                    + "	pf.id_produto"
+                    "select\n" +
+                    "   tf.fornecedor,\n" +
+                    "   tf.produto,\n" +
+                    "   pf.referencia,\n" +
+                    "   tf.datahora_alteracao,\n" +
+                    "   tf.qtde_embalageme qtdembalagem\n" +
+                    "from\n" +
+                    "   tabela_fornecedor tf \n" +
+                    "join produtos_fornecedor pf on tf.produto = pf.produto and tf.fornecedor = pf.fornecedor \n" +
+                    "where not pf.referencia is null\n" +
+                    "order by tf.fornecedor, tf.produto"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
 
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
-                    imp.setIdProduto(rst.getString("id_produto"));
-                    imp.setCodigoExterno(rst.getString("codigo_exterior"));
+                    imp.setIdFornecedor(rst.getString("fornecedor"));
+                    imp.setIdProduto(rst.getString("produto"));
+                    imp.setCodigoExterno(rst.getString("referencia"));
+                    imp.setDataAlteracao(rst.getDate("datahora_alteracao"));
                     imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
 
                     result.add(imp);
@@ -2029,6 +2022,128 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         
         return result;
+    }
+    
+    
+    private static class FamiliaFornecedorIMP {
+        
+        private String id;
+        private String descricao;
+        private int codigoAtual;
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getDescricao() {
+            return descricao;
+        }
+
+        public void setDescricao(String descricao) {
+            this.descricao = Utils.acertarTexto(descricao, 40);
+        }
+
+        public int getCodigoAtual() {
+            return codigoAtual;
+        }
+
+        public void setCodigoAtual(int codigoAtual) {
+            this.codigoAtual = codigoAtual;
+        }
+        
+    }
+    public void importarFamiliaFornecedor() throws Exception {
+        Map<String, FamiliaFornecedorIMP> result = new LinkedHashMap<>();
+        
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                "select id, descritivo from fornecedores where id in\n" +
+                "(select distinct associado from fornecedores f where not associado is null and id != associado)\n" +
+                "order by id"
+            )) {
+                while (rst.next()) {
+                    FamiliaFornecedorIMP imp = new FamiliaFornecedorIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descritivo"));
+                    result.put(imp.getId(), imp);
+                }
+            }
+        }
+        
+        ProgressBar.setStatus("Importando família de fornecedores....");
+        ProgressBar.setMaximum(result.size());
+        
+        Conexao.begin();
+        try {
+            MultiMap<String, FornecedorAnteriorVO> anteriores = new FornecedorAnteriorDAO().getAnteriores();
+            for (FamiliaFornecedorIMP imp: result.values()) {
+                FornecedorAnteriorVO anterior = anteriores.get(
+                        getSistema(),
+                        getLojaOrigem(),
+                        imp.getId()
+                );
+                if (anterior != null && anterior.getCodigoAtual() != null) {
+                    SQLBuilder sql = new SQLBuilder();
+                    sql.setSchema("public");
+                    sql.setTableName("familiafornecedor");
+                    sql.put("id", anterior.getCodigoAtual().getId());
+                    sql.put("descricao", imp.getDescricao());
+                    sql.put("id_situacaocadastro", 1);
+                    Conexao.createStatement().execute(sql.getInsert());
+                } else {
+                    System.out.println("Família não importada: " + imp.getId() + " - " + imp.getDescricao());
+                }
+                ProgressBar.next();
+            }
+            Conexao.createStatement().execute(
+                    "select setval('familiafornecedor_id_seq'::regclass, coalesce(max(id),1)) from familiafornecedor"
+            );
+            Conexao.commit();
+        } catch (Exception ex) {
+            Conexao.rollback();
+            throw ex;
+        }
+    }
+    
+    public void importarFamiliaFornecedorXProduto() throws Exception {
+        Map<String, String> result = new LinkedHashMap<>();
+        
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                "select id, associado from fornecedores f where not associado is null and id != associado\n" +
+                "union                                                                                               \n" +
+                "select distinct associado id, associado from fornecedores f where not associado is null and id != associado\n" +
+                "order by associado, id"
+            )) {
+                while (rst.next()) {
+                    result.put(rst.getString("id"), rst.getString("associado"));
+                }
+            }
+        }
+        
+        ProgressBar.setStatus("Importando Família X Fornecedores....");
+        ProgressBar.setMaximum(result.size());
+            
+        Conexao.begin();
+        try {
+            MultiMap<String, FornecedorAnteriorVO> anteriores = new FornecedorAnteriorDAO().getAnteriores();
+            for (Map.Entry<String, String> et: result.entrySet()) {
+                FornecedorAnteriorVO fornecedor = anteriores.get(getSistema(), getLojaOrigem(), et.getKey());
+                FornecedorAnteriorVO familia = anteriores.get(getSistema(), getLojaOrigem(), et.getValue());
+                if (fornecedor != null && familia != null && fornecedor.getCodigoAtual() != null && familia.getCodigoAtual() != null) {
+                    Conexao.createStatement().execute("update fornecedor set id_familiafornecedor = " + familia.getCodigoAtual().getId() + " where id = " + fornecedor.getCodigoAtual().getId());
+                }
+                ProgressBar.next();
+            }
+            Conexao.commit();
+        } catch (Exception ex) {
+            Conexao.rollback();
+            throw ex;
+        }
     }
     
 }

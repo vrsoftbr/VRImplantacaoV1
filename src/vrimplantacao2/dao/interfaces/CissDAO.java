@@ -42,6 +42,7 @@ public class CissDAO extends InterfaceDAO {
     
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
+    private boolean soAtivo = false;
 
     public CissDAO() {
         System.setProperty("db2.jcc.charsetDecoderEncoder", "3");
@@ -224,6 +225,7 @@ public class CissDAO extends InterfaceDAO {
                     + "		trib.uforigem = emp.uf\n"
                     + "	left join dba.piscofins_codigo_natureza_receita nat on\n"
                     + "           nat.idnaturezapiscofins = p.IDNATUREZAPISCOFINS\n"
+                    + (this.soAtivo ? "where ean.flaginativo = 'F'\n" : "")
                     + "order by ean"
             )) {
                 while (rst.next()) {
@@ -685,6 +687,10 @@ public class CissDAO extends InterfaceDAO {
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         return new VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+    }
+
+    public void setSoAtivos(boolean soAtivo) {
+        this.soAtivo = soAtivo;
     }
     
     private static class VendaIterator implements Iterator<VendaIMP> {

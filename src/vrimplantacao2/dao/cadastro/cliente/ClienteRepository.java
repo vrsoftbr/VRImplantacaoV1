@@ -61,21 +61,6 @@ public class ClienteRepository {
             clientes = organizarListagem(clientes);        
             System.gc();
 
-            if (opt.isEmpty() || (opt.size() == 1 && opt.contains(OpcaoCliente.IMP_REINICIAR_NUMERACAO))) {
-                opt.add(OpcaoCliente.DADOS);
-                opt.add(OpcaoCliente.CONTATOS);
-                opt.add(OpcaoCliente.OBSERVACOES2);
-                opt.add(OpcaoCliente.OBSERVACOES);                        
-                opt.add(OpcaoCliente.SITUACAO_CADASTRO);
-                opt.add(OpcaoCliente.INSCRICAO_ESTADUAL);
-                opt.add(OpcaoCliente.DATA_NASCIMENTO);
-                opt.add(OpcaoCliente.CELULAR);
-                opt.add(OpcaoCliente.PERMITE_CHEQUE);
-                opt.add(OpcaoCliente.PERMITE_CREDITOROTATIVO);
-                opt.add(OpcaoCliente.RAZAO);
-                opt.add(OpcaoCliente.EMAIL);
-            }
-
             this.provider.begin();
             try {
                 //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
@@ -101,65 +86,43 @@ public class ClienteRepository {
                     ClientePreferencialVO cliente = null;
 
                     //Se o cliente não tiver sido cadastrado anteriormente, executa.
-                    if (anterior == null) {     
-                        if (opt.contains(OpcaoCliente.DADOS)) {
+                    if (anterior == null) {
+                        //Obtem um ID válido.                    
+                        int id = ids.obterID(reiniciarID ? "A": imp.getId());
 
-                            //Obtem um ID válido.                    
-                            int id = ids.obterID(reiniciarID ? "A": imp.getId());
-                            
-                            //Trata o cnpj
-                            long cnpj = Utils.stringToLong(imp.getCnpj(), -2);
-                            //Se o cnpj já estiver cadastrado, coloca -2 para gerar um novo.
-                            if (cnpjCadastrados.containsKey(cnpj)) {
-                                if (cnpjCadastrados.containsKey((long) id)) {
-                                    cnpj = -id;
-                                } else {
-                                    cnpj = id;
-                                }
+                        //Trata o cnpj
+                        long cnpj = Utils.stringToLong(imp.getCnpj(), -2);
+                        //Se o cnpj já estiver cadastrado, coloca -2 para gerar um novo.
+                        if (cnpjCadastrados.containsKey(cnpj)) {
+                            if (cnpjCadastrados.containsKey((long) id)) {
+                                cnpj = -id;
+                            } else {
+                                cnpj = id;
                             }
-
-                            //Converte os dados.
-                            cliente = converterClientePreferencial(imp);                    
-                            cliente.setId(id);
-                            cliente.setCnpj(cnpj);
-
-                            anterior = converterClientePreferencialAnterior(imp);
-                            anterior.setCodigoAtual(cliente);
-
-                            //Grava as informações
-                            gravarClientePreferencial(cliente);
-                            gravarClientePreferencialAnterior(anterior);
-
-                            //Incluindo o produto nas listagens
-                            cnpjCadastrados.put(cnpj, id);
-                            anteriores.put(
-                                    anterior, 
-                                    provider.getSistema(),
-                                    provider.getLojaOrigem(),
-                                    imp.getId()
-                            );
                         }
+
+                        //Converte os dados.
+                        cliente = converterClientePreferencial(imp);                    
+                        cliente.setId(id);
+                        cliente.setCnpj(cnpj);
+
+                        anterior = converterClientePreferencialAnterior(imp);
+                        anterior.setCodigoAtual(cliente);
+
+                        //Grava as informações
+                        gravarClientePreferencial(cliente);
+                        gravarClientePreferencialAnterior(anterior);
+
+                        //Incluindo o produto nas listagens
+                        cnpjCadastrados.put(cnpj, id);
+                        anteriores.put(
+                                anterior, 
+                                provider.getSistema(),
+                                provider.getLojaOrigem(),
+                                imp.getId()
+                        );
                     } else {
-                        if ((opt.contains(OpcaoCliente.OBSERVACOES2))
-                                || (opt.contains(OpcaoCliente.OBSERVACOES))
-                                || (opt.contains(OpcaoCliente.SITUACAO_CADASTRO))
-                                || (opt.contains(OpcaoCliente.VALOR_LIMITE))
-                                || (opt.contains(OpcaoCliente.INSCRICAO_ESTADUAL))
-                                || (opt.contains(OpcaoCliente.DATA_NASCIMENTO))
-                                || (opt.contains(OpcaoCliente.TELEFONE))
-                                || (opt.contains(OpcaoCliente.CELULAR))
-                                || (opt.contains(OpcaoCliente.PERMITE_CHEQUE))
-                                || (opt.contains(OpcaoCliente.PERMITE_CREDITOROTATIVO))
-                                || (opt.contains(OpcaoCliente.RAZAO))
-                                || (opt.contains(OpcaoCliente.EMAIL))
-                                || (opt.contains(OpcaoCliente.ENDERECO_COMPLETO))) {
-
-                            cliente = converterClientePreferencial(imp);
-                            cliente.setId(anterior.getCodigoAtual().getId());
-                            atualizarClientePreferencial(cliente, opt);
-                        } else {
-                            cliente = anterior.getCodigoAtual();
-                        }
+                        cliente = anterior.getCodigoAtual();
                     }
 
                     if (opt.contains(OpcaoCliente.CONTATOS)) {
