@@ -64,6 +64,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
     private Date vendaDataInicio;
     private Date vendaDataTermino;
     private int tipoVenda = 1;
+    private int idEstoque = 1;
 
     public List<PlanoConta> getPlanosSelecionados() {
         return planosSelecionados;
@@ -345,7 +346,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "    join produtos_precos preco on a.id = preco.produto and poli.politica = preco.politica and preco.id = " + tipoVenda + "\n"
                 + "    join produtos_loja loja on a.id = loja.id and poli.politica = loja.politica\n"
                 + "    join estoques e on e.empresa = emp.id and e.troca != 'T'\n"
-                + "    join produtos_estoques estoq on estoq.produto = a.id and estoq.estoque = e.id\n"
+                + "    join produtos_estoques estoq on estoq.produto = a.id and estoq.estoque = e.id and e.id = 1\n"
                 + "    left join produtos_ean ean on ean.produto = a.id\n"
                 + "    left join (select distinct id from vw_produtos_balancas order by id) bal on bal.id = a.id\n"
                 + "    left join familias fam on a.familia = fam.id\n"
@@ -1339,6 +1340,26 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setTipoVenda(int tipoVenda) {
         this.tipoVenda = tipoVenda;
+    }
+
+    public void setEstoque(int idEstoque) {
+        this.idEstoque = idEstoque;
+    }
+
+    public List<ItemComboVO> getEstoques() throws Exception {
+        List<ItemComboVO> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select id, descritivo from estoques order by id"
+            )) {
+                while (rst.next()) {
+                    result.add(new ItemComboVO(rst.getInt("id"), rst.getString("descritivo")));
+                }
+            }
+        }
+        
+        return result;
     }
 
     /**

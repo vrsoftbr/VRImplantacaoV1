@@ -148,9 +148,14 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="vRLabel9" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="cmbEstoque" min="-2" pref="121" max="-2" attributes="0"/>
+                          </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" attributes="0">
@@ -309,7 +314,12 @@
                               </Group>
                           </Group>
                       </Group>
-                      <EmptySpace pref="44" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="vRLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="cmbEstoque" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="29" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="vRPanel2" alignment="1" min="-2" max="-2" attributes="0"/>
                           <Component id="btnMapaTrib" alignment="1" min="-2" pref="34" max="-2" attributes="0"/>
@@ -518,6 +528,13 @@
                 <Property name="text" type="java.lang.String" value="Nutricional"/>
               </Properties>
             </Component>
+            <Component class="vrframework.bean.label.VRLabel" name="vRLabel9">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Estoque"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.comboBox.VRComboBox" name="cmbEstoque">
+            </Component>
           </SubComponents>
         </Container>
         <Container class="vrframework.bean.panel.VRPanel" name="tabFornecedor">
@@ -588,7 +605,7 @@
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="vRPanel4" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="190" max="32767" attributes="0"/>
+                      <EmptySpace pref="191" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -894,7 +911,7 @@
                       <Component id="cbxUnifCliPreferencial" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="cbxUnifCliEventual" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="189" max="32767" attributes="0"/>
+                      <EmptySpace pref="196" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
