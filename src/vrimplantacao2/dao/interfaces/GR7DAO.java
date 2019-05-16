@@ -124,7 +124,8 @@ public class GR7DAO extends InterfaceDAO {
                     + "p.cod_familia id_familia,\n"
                     + "p.lucro1 margem,\n"
                     + "p.cod_barras ean,\n"
-                    + "1 qtd_embalagem,\n"
+                    + "p.qtd_emb,\n"
+                    + "p.qtd_por_emb,\n"
                     + "p.cod_barras_cx ean_caixa,\n"
                     + "p.qtd_por_cx qtd_caixa,\n"
                     + "p.validade,\n"
@@ -146,7 +147,7 @@ public class GR7DAO extends InterfaceDAO {
                     + "automacao.produto p\n"
                     + "join\n"
                     + "automacao.pis_cofins piscofins on p.cod_pis_cofins = piscofins.codigo\n"
-                    + "union all\n"
+                    /*+ "union all\n"
                     + "select\n"
                     + "p.cod_produto id,\n"
                     + "p.produto descricaocompleta,\n"
@@ -183,7 +184,7 @@ public class GR7DAO extends InterfaceDAO {
                     + "automacao.produto p\n"
                     + "join\n"
                     + "automacao.pis_cofins piscofins on p.cod_pis_cofins = piscofins.codigo\n"
-                    + "where cod_barras_emb <> ''"
+                    + "where cod_barras_emb <> ''"*/
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -201,7 +202,8 @@ public class GR7DAO extends InterfaceDAO {
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3("1");
                     imp.setTipoEmbalagem(rst.getString("unidade"));
-                    imp.setQtdEmbalagem(rst.getInt("qtd_embalagem"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("qtd_por_emb"));
+                    imp.setQtdEmbalagem(rst.getInt("qtd_emb"));
                     imp.setPesoBruto(rst.getDouble("peso_bruto"));
                     imp.setPesoLiquido(rst.getDouble("peso_liq"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
@@ -449,7 +451,7 @@ public class GR7DAO extends InterfaceDAO {
                     + "p.conjuge_orgao_exp,\n"
                     + "p.conjuge_rg\n"
                     + "                from\n"
-                    + "                	automacao.participantes p\n"
+                    + "                	automacao.where codigo p\n"
                     + "left join automacao.cidades c on p.cod_cidade = c.codigo\n"
                     + "                where\n"
                     + "                	p.tipo_participante like '%C%'\n"
@@ -613,21 +615,36 @@ public class GR7DAO extends InterfaceDAO {
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "  ch.codigo, ch.codigo_cliente, ch.cliente, c.razao_nome, c.cnpj_cpf,\n"
-                    + "  c.ie_rg, c.fone, ch.comprador, ch.obs, ch.num_venda, ch.num_cheque,\n"
-                    + "  ch.valor, ch.data, ch.data_vcto\n"
+                    + "ch.codigo,\n"
+                    + "ch.codigo_cliente,\n"
+                    + "ch.cliente,\n"
+                    + "c.razao_nome,\n"
+                    + "c.cnpj_cpf,\n"
+                    + "c.ie_rg,\n"
+                    + "c.fone,\n"
+                    + "ch.comprador,\n"
+                    + "ch.obs,\n"
+                    + "ch.num_venda,\n"
+                    + "ch.num_cheque,\n"
+                    + "ch.valor,\n"
+                    + "ch.data,\n"
+                    + "ch.data_vcto,\n"
+                    + "b.banco,\n"
+                    + "b.agencia,\n"
+                    + "b.conta\n"
                     + "from\n"
-                    + "  automacao.cheque ch\n"
-                    + "left join\n"
-                    + "  automacao.participantes c on c.codigo = ch.codigo_cliente\n"
-                    + "and\n"
-                    + "  c.tipo_participante like '%C%'\n"
+                    + "automacao.cheque ch\n"
+                    + "left join automacao.participantes c on c.codigo = ch.codigo_cliente\n"
+                    + "left join automacao.partic_bancos b on b.codigo = ch.codigo_banco\n"
                     + "where\n"
-                    + "  ch.data_baixa1 is null\n"
+                    + "ch.data_baixa1 is null\n"
                     + "and\n"
-                    + "  ch.data_baixa2 is null\n"
+                    + "ch.data_baixa2 is null\n"
                     + "and\n"
-                    + "  ch.data_baixa3 is null"
+                    + "ch.data_baixa3 is null\n"
+                    + "and\n"
+                    + "c.tipo_participante like '%C%'\n"
+                    + "order by ch.codigo_cliente"
             )) {
                 while (rst.next()) {
                     if ((rst.getString("comprador") != null)
@@ -644,7 +661,9 @@ public class GR7DAO extends InterfaceDAO {
                     imp.setTelefone(rst.getString("fone"));
                     imp.setObservacao(comprador + rst.getString("obs"));
                     imp.setNumeroCheque(rst.getString("num_cheque"));
-                    imp.setBanco(804);
+                    imp.setBanco(rst.getInt("banco"));
+                    imp.setAgencia(rst.getString("agencia"));
+                    imp.setConta(rst.getString("conta"));
                     imp.setNumeroCupom(rst.getString("num_venda"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setDate(rst.getDate("data"));
