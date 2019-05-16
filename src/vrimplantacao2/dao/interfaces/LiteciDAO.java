@@ -10,6 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -75,6 +76,7 @@ public class LiteciDAO extends InterfaceDAO {
                     + "p.dtcad,\n"
                     + "p.pesobruto,\n"
                     + "p.pesoliquido,\n"
+                    + "p.margemideal as margem,\n"
                     + "p.valorultcompra as custo,\n"
                     + "p.valor as precovenda,\n"
                     + "p.qtdminima as estminimo,\n"
@@ -86,7 +88,7 @@ public class LiteciDAO extends InterfaceDAO {
                     + "ncm.cstpisentrada,\n"
                     + "ncm.cstcofinsentrada,\n"
                     + "ncm.codnaturezareceita,\n"
-                    + "p.cest_st,\n"
+                    + "p.cest_st as cest,\n"
                     + "ncm.csticms,\n"
                     + "ncm.taxaicms\n"
                     + "from tbitem p\n"
@@ -96,10 +98,45 @@ public class LiteciDAO extends InterfaceDAO {
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("coditem"));
+                    imp.setEan(rst.getString("codbarra"));
+                    imp.seteBalanca("S".equals(rst.getString("debalanca")));
+                    imp.setValidade(rst.getInt("validade"));
+                    imp.setDescricaoCompleta(rst.getString("descricao"));
+                    imp.setDescricaoReduzida(rst.getString("descabrev"));
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setCodMercadologico1(rst.getString("codsecaoi"));
+                    imp.setCodMercadologico2("1");
+                    imp.setCodMercadologico3("1");
+                    imp.setDataCadastro(rst.getDate("dtcad"));
+                    imp.setPesoBruto(rst.getDouble("pesobruto"));
+                    imp.setPesoLiquido(rst.getDouble("pesoliquido"));
+                    imp.setMargem(rst.getDouble("margem"));
+                    imp.setCustoComImposto(rst.getDouble("custo"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setEstoqueMinimo(rst.getDouble("estminimo"));
+                    imp.setEstoque(rst.getDouble("qtddisponivel"));
+                    imp.setSituacaoCadastro("S".equals(rst.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setNcm(rst.getString("codncm"));
+                    imp.setCest(rst.getString("cest"));
+                    imp.setPiscofinsCstDebito(rst.getString("cstpis"));
+                    imp.setPiscofinsCstCredito(rst.getString("cstpisentrada"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("codnaturezareceita"));
+                    imp.setIcmsCstSaida(rst.getInt("csticms"));
+                    imp.setIcmsAliqSaida(rst.getDouble("taxaicms"));
+                    imp.setIcmsReducaoSaida(0);
+                    imp.setIcmsCstEntrada(rst.getInt("csticms"));
+                    imp.setIcmsAliqEntrada(rst.getDouble("taxaicms"));
+                    imp.setIcmsReducaoEntrada(0);
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
