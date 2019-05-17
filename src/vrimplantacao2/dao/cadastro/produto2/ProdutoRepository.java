@@ -973,6 +973,7 @@ public class ProdutoRepository {
         complemento.setEstoqueMinimo(imp.getEstoqueMinimo());
         complemento.setEstoqueMaximo(imp.getEstoqueMaximo());
         complemento.setEstoque(imp.getEstoque());
+        complemento.setTroca(imp.getTroca());
         complemento.setPrecoDiaSeguinte(imp.getPrecovenda());
         complemento.setPrecoVenda(imp.getPrecovenda());
         complemento.setCustoSemImposto(imp.getCustoSemImposto());

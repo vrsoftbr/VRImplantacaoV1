@@ -37,6 +37,7 @@ public class ProdutoIMP {
     private double estoqueMaximo = 0;
     private double estoqueMinimo = 0;
     private double estoque = 0;
+    private double troca = 0;
     
     private double margem = 0;
     private double custoSemImposto = 0;
@@ -774,6 +775,14 @@ public class ProdutoIMP {
 
     public void setIcmsReducaoConsumidor(double icmsReducaoConsumidor) {
         this.icmsReducaoConsumidor = icmsReducaoConsumidor;
+    }
+
+    public double getTroca() {
+        return troca;
+    }
+
+    public void setTroca(double troca) {
+        this.troca = troca;
     }
     
 }

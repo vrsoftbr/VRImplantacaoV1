@@ -12,6 +12,7 @@ public class ProdutoComplementoVO {
     private double estoqueMinimo = 0;
     private double estoqueMaximo = 0;
     private double estoque = 0;
+    private double troca = 0;
     private double custoSemImposto = 0;
     private double custoComImposto = 0;
     private double precoVenda = 0;
@@ -64,6 +65,14 @@ public class ProdutoComplementoVO {
 
     public void setDescontinuado(boolean descontinuado) {
         this.descontinuado = descontinuado;
+    }
+
+    public double getTroca() {
+        return troca;
+    }
+
+    public void setTroca(double troca) {
+        this.troca = MathUtils.round(troca, 3, 9999999D);
     }
 
     public int getId() {
