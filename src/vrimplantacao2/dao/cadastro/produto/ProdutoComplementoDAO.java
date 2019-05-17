@@ -75,7 +75,7 @@ public class ProdutoComplementoDAO {
                     } else {
                         sql.put("estoque", vo.getEstoque());
                     }
-                    sql.put("troca", 0);
+                    sql.put("troca", vo.getTroca());
                     sql.put("emiteetiqueta", true);
                     sql.put("custosemperdasemimposto", 0);
                     sql.put("custosemperdasemimpostoanterior", 0);
@@ -141,7 +141,7 @@ public class ProdutoComplementoDAO {
                 } else {
                     sql.put("estoque", vo.getEstoque());
                 }
-                sql.put("troca", 0);
+                sql.put("troca", vo.getTroca());
                 sql.put("emiteetiqueta", true);
                 sql.put("custosemperdasemimposto", 0);
                 sql.put("custosemperdasemimpostoanterior", 0);
@@ -214,6 +214,9 @@ public class ProdutoComplementoDAO {
                 if (opt.contains(OpcaoProduto.ESTOQUE)) {
                     sql.put("estoque", vo.getEstoque());
                 }
+                if (opt.contains(OpcaoProduto.TROCA)) {
+                    sql.put("troca", vo.getTroca());
+                }
                 if (opt.contains(OpcaoProduto.ATIVO)) {
                     sql.put("id_situacaocadastro", vo.getSituacaoCadastro().getId());
                 }
@@ -267,6 +270,9 @@ public class ProdutoComplementoDAO {
                 } else {
                     sql.put("estoque", complemento.getEstoque());
                 }
+            }
+            if (opt.contains(OpcaoProduto.TROCA)) {
+                sql.put("troca", complemento.getTroca());
             }
             if (opt.contains(OpcaoProduto.ESTOQUE_MINIMO)) {
                 sql.put("estoqueminimo", complemento.getEstoqueMinimo());

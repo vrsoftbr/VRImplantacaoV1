@@ -258,6 +258,12 @@ public enum OpcaoProduto {
             return "Somar estoque(ativo)";
         }        
     },
+    TROCA {
+        @Override
+        public String toString() {
+            return "Troca (prod. complemento)";
+        }
+    },
     FAMILIA_PRODUTO, 
     PRODUTOS, 
     EAN, 

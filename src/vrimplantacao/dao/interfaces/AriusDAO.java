@@ -346,7 +346,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "    join produtos_precos preco on a.id = preco.produto and poli.politica = preco.politica and preco.id = " + tipoVenda + "\n"
                 + "    join produtos_loja loja on a.id = loja.id and poli.politica = loja.politica\n"
                 + "    join estoques e on e.empresa = emp.id and e.troca != 'T'\n"
-                + "    join produtos_estoques estoq on estoq.produto = a.id and estoq.estoque = e.id and e.id = 1\n"
+                + "    join produtos_estoques estoq on estoq.produto = a.id and estoq.estoque = e.id and e.id = " + idEstoque + "\n"
                 + "    left join produtos_ean ean on ean.produto = a.id\n"
                 + "    left join (select distinct id from vw_produtos_balancas order by id) bal on bal.id = a.id\n"
                 + "    left join familias fam on a.familia = fam.id\n"
@@ -763,6 +763,40 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                 
                 return result;
             }
+        } else if (opc == OpcaoProduto.TROCA) {
+            ProgressBar.setStatus("Carregando produtos (TROCA)...");
+            List<ProdutoIMP> result = new ArrayList<>();
+            try(Statement stm = ConexaoOracle.createStatement()){
+                try(ResultSet rs = stm.executeQuery(
+                        "SELECT\n" +
+                        "    a.id,\n" +
+                        "    a.unidade_venda unidade,\n" +
+                        "    a.descritivo descricaocompleta,\n" +
+                        "    estoq.estoque_atual troca\n" +
+                        "FROM \n" +
+                        "    produtos a\n" +
+                        "    join empresas emp on emp.id = " + getLojaOrigem() + "\n" +
+                        "    join produtos_estado pe on a.id = pe.id and pe.estado = emp.estado\n" +
+                        "    join politicas_empresa poli on poli.empresa = emp.id\n" +
+                        "    join produtos_loja loja on a.id = loja.id and poli.politica = loja.politica\n" +
+                        "    join estoques e on e.empresa = emp.id and e.troca != 'T'\n" +
+                        "    join produtos_estoques estoq on estoq.produto = a.id and estoq.estoque = e.id and e.id = " + idEstoque + "\n" +
+                        "order by\n" +
+                        "    a.id")){
+                    while(rs.next()){
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportId(rs.getString("id"));
+                        imp.setTipoEmbalagem(rs.getString("unidade"));
+                        imp.setTroca(rs.getDouble("troca"));
+                        
+                        result.add(imp);
+                    }
+                }
+                
+                return result;
+            }
         }
         return null;
     }
@@ -907,57 +941,64 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoOracle.createStatement()) {
             if (importarDeClientes) {
                 try (ResultSet rst = stm.executeQuery(
-                        "select\n"
-                        + "    c.id,\n"
-                        + "    c.cnpj_cpf,\n"
-                        + "    c.inscricao_rg,\n"
-                        + "    c.orgao_publico,\n"
-                        + "    c.datahora_cadastro datacadastro,\n"
-                        + "    c.descritivo razao,\n"
-                        + "    c.fantasia,\n"
-                        + "    c.situacao as bloqueado,\n"
-                        + "    c.endereco,\n"
-                        + "    c.numero,\n"
-                        + "    c.complemento,\n"
-                        + "    c.bairro,\n"
-                        + "    c.cidade,\n"
-                        + "    c.estado,\n"
-                        + "    c.cod_ibge municipio_ibge,\n"
-                        + "    c.cep,\n"
-                        + "    c.estado_civil,\n"
-                        + "    c.data_nascimento,\n"
-                        + "    case c.sexo when 1 then 0 else 1 end sexo,\n"
-                        + "    c.empresacad,\n"
-                        + "    c.telefoneemp,\n"
-                        + "    c.data_admissao,\n"
-                        + "    c.cargo,\n"
-                        + "    c.salario,\n"
-                        + "    c.limite,\n"
-                        + "    c.conjugue,\n"
-                        + "    c.pai,\n"
-                        + "    c.mae,\n"
-                        + "    c.observacao,\n"
-                        + "    c.dias_vencto,\n"
-                        + "    c.telefone1,\n"
-                        + "    c.telefone2,\n"
-                        + "    c.email,\n"
-                        + "    c.fax,\n"
-                        + "    c.telefone_cobranca,\n"
-                        + "    c.endereco_c,\n"
-                        + "    c.numero_c,\n"
-                        + "    c.complemento_c,\n"
-                        + "    c.bairro_c,\n"
-                        + "    c.cidade_c,\n"
-                        + "    c.estado_c,\n"
-                        + "    c.cep_c,\n"
-                        + "    c.inscricao_municipal,\n"
-                        + "    decode(c.empresa_convenio, '', 3, c.empresa_convenio) as empresa_convenio\n"
-                        + "from\n"
-                        + "    clientes c\n"
-                        + "where\n"
-                        + "    upper(c.descritivo) != 'CADASTRO AUTOMATICO'\n"
-                        + "order by\n"
-                        + "    id"
+                        "select\n" +
+                        "    c.id,\n" +
+                        "    c.cnpj_cpf,\n" +
+                        "    c.inscricao_rg,\n" +
+                        "    c.orgao_publico,\n" +
+                        "    c.datahora_cadastro datacadastro,\n" +
+                        "    c.descritivo razao,\n" +
+                        "    c.fantasia,\n" +
+                        "    c.situacao as bloqueado,\n" +
+                        "    c.endereco,\n" +
+                        "    c.numero,\n" +
+                        "    c.complemento,\n" +
+                        "    c.bairro,\n" +
+                        "    c.cidade,\n" +
+                        "    c.estado,\n" +
+                        "    c.cod_ibge municipio_ibge,\n" +
+                        "    c.cep,\n" +
+                        "    c.estado_civil,\n" +
+                        "    c.data_nascimento,\n" +
+                        "    case c.sexo when 1 then 0 else 1 end sexo,\n" +
+                        "    c.empresacad,\n" +
+                        "    c.telefoneemp,\n" +
+                        "    c.data_admissao,\n" +
+                        "    c.cargo,\n" +
+                        "    c.salario,\n" +
+                        "    c.limite,\n" +
+                        "    c.conjugue,\n" +
+                        "    c.pai,\n" +
+                        "    c.mae,\n" +
+                        "    c.observacao,\n" +
+                        "    c.dias_vencto,\n" +
+                        "    c.telefone1,\n" +
+                        "    c.telefone2,\n" +
+                        "    c.email,\n" +
+                        "    c.fax,\n" +
+                        "    c.telefone_cobranca,\n" +
+                        "    c.endereco_c,\n" +
+                        "    c.numero_c,\n" +
+                        "    c.complemento_c,\n" +
+                        "    c.bairro_c,\n" +
+                        "    c.cidade_c,\n" +
+                        "    c.estado_c,\n" +
+                        "    c.cep_c,\n" +
+                        "    c.inscricao_municipal,\n" +
+                        "    decode(c.empresa_convenio, '', 3, c.empresa_convenio) as empresa_convenio,\n" +
+                        "    case c.estado_civil\n" +
+                        "    when 0 then 'SOLTEIRO'\n" +
+                        "    when 1 then 'CASADO'\n" +
+                        "    when 2 then 'DIVORCIADO'\n" +
+                        "    when 3 then 'VIUVO'\n" +
+                        "    when 4 then 'AMASIADO'\n" +
+                        "    end estadocivil\n" +
+                        "from\n" +
+                        "    clientes c\n" +
+                        "where\n" +
+                        "    upper(c.descritivo) != 'CADASTRO AUTOMATICO'\n" +
+                        "order by\n" +
+                        "    id"
                 )) {
                     while (rst.next()) {
 
@@ -1006,6 +1047,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setCobrancaCep(rst.getString("cep_c"));
                         imp.setInscricaoMunicipal(rst.getString("inscricao_municipal"));
                         imp.setGrupo(rst.getInt("empresa_convenio"));
+                        imp.setEstadoCivil(rst.getString("estadocivil"));
 
                         result.add(imp);
 
