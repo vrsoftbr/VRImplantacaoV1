@@ -25,6 +25,13 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class LiteciDAO extends InterfaceDAO {
 
+    private String idLoja = "";
+    public boolean utilizaArquivoBalanca = false;
+
+    public void setLojaCliente(String idLoja) {
+        this.idLoja = idLoja;
+    }
+    
     @Override
     public String getSistema() {
         return "Liteci";

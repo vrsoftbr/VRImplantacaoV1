@@ -20,6 +20,7 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.GDoorDAO;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.dao.interfaces.LiteciDAO;
 import vrimplantacao2.parametro.Parametros;
 
 public class LiteciGUI extends VRInternalFrame {
@@ -62,7 +63,7 @@ public class LiteciGUI extends VRInternalFrame {
         params.salvar();
     }
 
-    private GDoorDAO dao = new GDoorDAO();
+    private LiteciDAO dao = new LiteciDAO();
     private ConexaoFirebird conn = new ConexaoFirebird();
 
     private LiteciGUI(VRMdiFrame i_mdiFrame) throws Exception {
