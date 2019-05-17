@@ -347,9 +347,49 @@ public class LiteciDAO extends InterfaceDAO {
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("codcli"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj(rst.getString("cpf"));
+                    imp.setInscricaoestadual(rst.getString("rg"));
+                    imp.setOrgaoemissor(rst.getString("orgemissorrg"));
+                    imp.setDataCadastro(rst.getDate("dtcad"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setCep("cep");
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setMunicipioIBGE(rst.getInt("municipio_ibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setUfIBGE(rst.getInt("uf_ibge"));
+                    imp.setTelefone(rst.getString("fone"));
+                    imp.setFax(rst.getString("fax"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setDataNascimento(rst.getDate("dtnasc"));
+                    imp.setValorLimite(rst.getDouble("limite"));
+                    imp.setObservacao(rst.getString("obs"));
+                    imp.setAtivo(rst.getString("ativo").contains("S"));
+                    imp.setEmpresa(rst.getString("nomeempresatrabalho"));
+                    imp.setEmpresaTelefone(rst.getString("foneempresatrabalho"));
+                    imp.setCargo(rst.getString("funcaotrabalho"));
+                    imp.setSalario(rst.getDouble("renda"));
+                    imp.setNomeMae(rst.getString("mae"));
+                    imp.setNomePai(rst.getString("pai"));
+                    imp.setCobrancaEndereco(rst.getString("endcobranca"));
+                    imp.setCobrancaNumero(rst.getString("numendcobranca"));
+                    imp.setCobrancaComplemento(rst.getString("complcobranca"));
+                    imp.setCobrancaCep(rst.getString("cepcobranca"));
+                    imp.setCobrancaBairro(rst.getString("bairrocobranca"));
+                    imp.setCobrancaMunicipio(rst.getString("municipio_cob"));
+                    imp.setCobrancaMunicipioIBGE(rst.getInt("municipio_ibge_cob"));
+                    imp.setCobrancaUf(rst.getString("uf_cobranca"));
+                    imp.setCobrancaUfIBGE(rst.getInt("uf_ibge_cob"));
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 }
