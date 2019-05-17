@@ -47,8 +47,8 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="vRImportaArquivBalancaPanel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabs" min="-2" pref="286" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <Component id="tabs" pref="308" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" pref="34" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
@@ -360,7 +360,7 @@
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
                               <Component id="vRPanel4" alignment="0" max="32767" attributes="0"/>
                               <Component id="vRPanel2" alignment="0" max="32767" attributes="0"/>
                           </Group>
@@ -374,12 +374,12 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="vRPanel2" min="-2" pref="128" max="-2" attributes="0"/>
+                      <Component id="vRPanel2" min="-2" pref="140" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="vRPanel4" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="vRPanel5" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace pref="14" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -433,6 +433,7 @@
                               <Component id="chkNaturezaReceita" min="-2" max="-2" attributes="0"/>
                               <Component id="chkICMS" min="-2" max="-2" attributes="0"/>
                               <Component id="chkTipoEmbalagem" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkTipoEmbalagemPRO" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
@@ -447,7 +448,7 @@
                                       <Component id="chkQtdEmbalagem" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkAtacado" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace min="0" pref="13" max="32767" attributes="0"/>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
@@ -505,6 +506,8 @@
                                           <Component id="chkTipoEmbalagem" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkTipoEmbalagemPRO" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="chkQtdEmbalagem" min="-2" max="-2" attributes="0"/>
@@ -628,6 +631,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkQtdEmbalagemPRO">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Qtd.Embalagem PROD"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTipoEmbalagemPRO">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo Embalagem PRO"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -774,7 +782,7 @@
                       <Component id="chkIntegracaoCliente" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkIntegracaoCreditoRotativo" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="177" max="32767" attributes="0"/>
+                      <EmptySpace pref="199" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -826,7 +834,7 @@
                       <Component id="chkCorrigirNaturezaReceita" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkAcertarSituacaoCadastro" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="200" max="32767" attributes="0"/>
+                      <EmptySpace pref="222" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -174,11 +175,81 @@ public class LiteciDAO extends InterfaceDAO {
                     + "left join tbcidade cid on cid.codigo = f.codcidadei"
             )) {
                 while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("codfor"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("rg"));
+                    imp.setDatacadastro(rst.getDate("dtcad"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setIbge_municipio(rst.getInt("municipio_ibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setIbge_uf(rst.getInt("uf_ibge"));
+                    imp.setTel_principal(rst.getString("fone"));
+                    imp.setObservacao(rst.getString("obsgerais"));
 
+                    if ((rst.getString("fax") != null)
+                            && (!rst.getString("fax").trim().isEmpty())) {
+                        imp.addContato(
+                                "FAX",
+                                rst.getString("fax"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("celular") != null)
+                            && (!rst.getString("celular").trim().isEmpty())) {
+                        imp.addContato(
+                                "CELULAR",
+                                null,
+                                rst.getString("celular"),
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("celularcotacao") != null)
+                            && (!rst.getString("celularcotacao").trim().isEmpty())) {
+                        imp.addContato(
+                                "CEL COTACAO",
+                                null,
+                                rst.getString("celularcotacao"),
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("email") != null)
+                            && (!rst.getString("email").trim().isEmpty())) {
+                        imp.addContato(
+                                null,
+                                null,
+                                null,
+                                TipoContato.NFE,
+                                rst.getString("email").toLowerCase()
+                        );
+                    }
+                    if ((rst.getString("emailcotacao") != null)
+                            && (!rst.getString("emailcotacao").trim().isEmpty())) {
+                        imp.addContato(
+                                "EMAIL COT",
+                                null,
+                                null,
+                                TipoContato.COMERCIAL,
+                                rst.getString("emailcotacao").toLowerCase()
+                        );
+                    }
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
@@ -276,9 +347,49 @@ public class LiteciDAO extends InterfaceDAO {
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("codcli"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj(rst.getString("cpf"));
+                    imp.setInscricaoestadual(rst.getString("rg"));
+                    imp.setOrgaoemissor(rst.getString("orgemissorrg"));
+                    imp.setDataCadastro(rst.getDate("dtcad"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setCep("cep");
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setMunicipioIBGE(rst.getInt("municipio_ibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setUfIBGE(rst.getInt("uf_ibge"));
+                    imp.setTelefone(rst.getString("fone"));
+                    imp.setFax(rst.getString("fax"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setDataNascimento(rst.getDate("dtnasc"));
+                    imp.setValorLimite(rst.getDouble("limite"));
+                    imp.setObservacao(rst.getString("obs"));
+                    imp.setAtivo(rst.getString("ativo").contains("S"));
+                    imp.setEmpresa(rst.getString("nomeempresatrabalho"));
+                    imp.setEmpresaTelefone(rst.getString("foneempresatrabalho"));
+                    imp.setCargo(rst.getString("funcaotrabalho"));
+                    imp.setSalario(rst.getDouble("renda"));
+                    imp.setNomeMae(rst.getString("mae"));
+                    imp.setNomePai(rst.getString("pai"));
+                    imp.setCobrancaEndereco(rst.getString("endcobranca"));
+                    imp.setCobrancaNumero(rst.getString("numendcobranca"));
+                    imp.setCobrancaComplemento(rst.getString("complcobranca"));
+                    imp.setCobrancaCep(rst.getString("cepcobranca"));
+                    imp.setCobrancaBairro(rst.getString("bairrocobranca"));
+                    imp.setCobrancaMunicipio(rst.getString("municipio_cob"));
+                    imp.setCobrancaMunicipioIBGE(rst.getInt("municipio_ibge_cob"));
+                    imp.setCobrancaUf(rst.getString("uf_cobranca"));
+                    imp.setCobrancaUfIBGE(rst.getInt("uf_ibge_cob"));
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 }
