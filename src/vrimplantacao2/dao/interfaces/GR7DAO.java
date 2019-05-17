@@ -139,9 +139,10 @@ public class GR7DAO extends InterfaceDAO {
                     + "p.valor_compra custo,\n"
                     + "p.qtd_estoque estoque,\n"
                     + "p.qtd_minima estoque_minimo,\n"
-                    + "p.cst_rev icms_cst,\n"
+                    + "p.cst_fab icms_cst,\n"
                     + "p.aliq_icms_interna icms_aliq,\n"
-                    + "p.reduc_icms_rev icms_reducao,\n"
+                    + "p.reduc_icms_fab icms_reducao,\n"
+                    + "p.icms as icms_consumidor,\n"
                     + "case when p.pesavel != 'N' then 1 else 0 end pesavel\n"
                     + "from\n"
                     + "automacao.produto p\n"
@@ -201,8 +202,8 @@ public class GR7DAO extends InterfaceDAO {
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3("1");
-                    imp.setTipoEmbalagem(rst.getString("unidade"));
-                    imp.setQtdEmbalagemCotacao(rst.getInt("qtd_por_emb"));
+                    imp.setTipoEmbalagem(rst.getString("unidade").contains("KG") ? "KG" : "UN");
+                    imp.setQtdEmbalagemCotacao(rst.getInt("qtd_emb"));
                     imp.setQtdEmbalagem(rst.getInt("qtd_emb"));
                     imp.setPesoBruto(rst.getDouble("peso_bruto"));
                     imp.setPesoLiquido(rst.getDouble("peso_liq"));
@@ -222,6 +223,21 @@ public class GR7DAO extends InterfaceDAO {
                     imp.setIcmsCst(rst.getInt("icms_cst"));
                     imp.setIcmsAliq(rst.getDouble("icms_aliq"));
                     imp.setIcmsReducao(rst.getDouble("icms_reducao"));
+                                        
+                    if (rst.getString("icms_consumidor").contains("IS")) {
+                        imp.setIcmsCstConsumidor("40");
+                        imp.setIcmsAliqConsumidor(0);
+                    } else if (rst.getString("icms_consumidor").contains("ST")) {
+                        imp.setIcmsCstConsumidor("60");
+                        imp.setIcmsAliqConsumidor(0);
+                    } else if (rst.getString("icms_consumidor").contains("NT")) {
+                        imp.setIcmsCstConsumidor("41");
+                        imp.setIcmsAliqConsumidor(0);
+                    } else {
+                        imp.setIcmsCstConsumidor("0");
+                        imp.setIcmsAliqConsumidor(Double.parseDouble(rst.getString("icms_consumidor").replace(",", ".")));
+                    }
+                    imp.setIcmsReducaoConsumidor(0);
                     vResult.add(imp);
                 }
             }
@@ -392,10 +408,12 @@ public class GR7DAO extends InterfaceDAO {
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "cod_fornecedor id_fornecedor,\n"
-                    + "cod_produto id_produto,\n"
-                    + "cod_prod_fornec codigoexterno\n"
-                    + "from automacao.fornec_prod\n"
+                    + "pf.cod_fornecedor id_fornecedor,\n"
+                    + "pf.cod_produto id_produto,\n"
+                    + "pf.cod_prod_fornec codigoexterno,\n"
+                    + "p.qtd_por_emb as qtdembalagem\n"
+                    + "from automacao.fornec_prod pf\n"
+                    + "inner join automacao.produto p on p.cod_produto = pf.cod_produto\n"
                     + "order by id_fornecedor, id_produto"
             )) {
                 while (rst.next()) {
@@ -405,6 +423,7 @@ public class GR7DAO extends InterfaceDAO {
                     imp.setIdFornecedor(rst.getString("id_fornecedor"));
                     imp.setIdProduto(rst.getString("id_produto"));
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     vResult.add(imp);
                 }
             }
@@ -436,6 +455,7 @@ public class GR7DAO extends InterfaceDAO {
                     + "case p.data_cadastro when '0000-00-00' then current_date() else p.data_cadastro end as datacadastro,\n"
                     + "p.email,\n"
                     + "case when p.limite_geral > 0 then p.limite_geral else p.limite_credito end as limite,\n"
+                    + "p.limite_cheque,\n"
                     + "p.fone_fax fax,\n"
                     + "p.status,\n"
                     + "p.obs observacao,\n"
@@ -451,7 +471,7 @@ public class GR7DAO extends InterfaceDAO {
                     + "p.conjuge_orgao_exp,\n"
                     + "p.conjuge_rg\n"
                     + "                from\n"
-                    + "                	automacao.where codigo p\n"
+                    + "                	automacao.participantes p \n"
                     + "left join automacao.cidades c on p.cod_cidade = c.codigo\n"
                     + "                where\n"
                     + "                	p.tipo_participante like '%C%'\n"
@@ -483,9 +503,9 @@ public class GR7DAO extends InterfaceDAO {
                     imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
                     imp.setCnpj(rst.getString("cnpj"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
-                    imp.setValorLimite(rst.getDouble("limite"));
-                    imp.setPermiteCreditoRotativo(true);
-                    imp.setPermiteCheque(true);
+                    imp.setValorLimite(rst.getDouble("limite") + rst.getDouble("limite_cheque"));
+                    imp.setPermiteCreditoRotativo((rst.getDouble("limite") > 0));
+                    imp.setPermiteCheque((rst.getDouble("limite_cheque") > 0));
                     
                     if ((rst.getString("status") != null)
                             && (!rst.getString("status").trim().isEmpty())) {
