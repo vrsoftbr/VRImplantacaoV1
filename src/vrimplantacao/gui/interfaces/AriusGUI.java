@@ -41,6 +41,7 @@ public class AriusGUI extends VRInternalFrame {
     private int vLojaCliente = -1;
     private int vLojaVR = -1;
     private int vTipoVenda = -1;
+    private int vEstoque = -1;
     
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
@@ -51,7 +52,8 @@ public class AriusGUI extends VRInternalFrame {
         txtSenhaOracle.setText(params.getWithNull("automa", "ARIUS", "SENHA"));
         vLojaCliente = params.getInt("ARIUS", "LOJA_CLIENTE");
         vLojaVR = params.getInt("ARIUS", "LOJA_VR");
-        vTipoVenda = params.getInt("ARIUS", "TIPO_VENDA");        
+        vTipoVenda = params.getInt("ARIUS", "TIPO_VENDA");
+        vEstoque = params.getInt("ARIUS", "ESTOQUE");
         chkClClientes.setSelected(false);
         chkClEmpresas.setSelected(false);
         chkClFornecedores.setSelected(false);
@@ -90,6 +92,11 @@ public class AriusGUI extends VRInternalFrame {
         if (vr != null) {
             params.put(vr.id, "ARIUS", "LOJA_VR");
             vLojaVR = vr.id;
+        }
+        ItemComboVO estoque = (ItemComboVO) cmbEstoque.getSelectedItem();
+        if (estoque != null) {
+            params.put(estoque.id, "ARIUS", "ESTOQUE");
+            vEstoque = estoque.id;
         }
         JSONArray array = new JSONArray();
         if (chkClClientes.isSelected()) { array.put(0); }
@@ -168,6 +175,7 @@ public class AriusGUI extends VRInternalFrame {
         carregarLojaVR();
         carregarLojaCliente();
         carregarTipoVenda();
+        carregarEstoques();
         
         gravarParametros();
         btnMapaTrib.setEnabled(true);
@@ -177,7 +185,20 @@ public class AriusGUI extends VRInternalFrame {
         tabCheque.chkAtivarCheque.setEnabled(true);
         tabCheque.setDao(ariusDAO);
     }
-
+    
+    public void carregarEstoques() throws Exception {
+        cmbEstoque.setModel(new DefaultComboBoxModel());
+        int cont = 0;
+        int index = 0;
+        for (ItemComboVO estoque : ariusDAO.getEstoques()) {
+            cmbEstoque.addItem(new ItemComboVO(estoque.id, estoque.descricao));
+            if (estoque.id == vEstoque) {
+                index = cont;
+            }
+            cont++;
+        }
+        cmbEstoque.setSelectedIndex(index);
+    }
 
     public void carregarLojaVR() throws Exception {
         cmbLojaVR.setModel(new DefaultComboBoxModel());
@@ -244,6 +265,7 @@ public class AriusGUI extends VRInternalFrame {
                     ariusDAO.setImportarDeTransportadoras(chkClTransp.isSelected());
                     ariusDAO.setImportarDeAdminCartao(chkClAdminCard.isSelected());
                     ariusDAO.setTipoVenda(idTipoVenda);
+                    ariusDAO.setEstoque(((ItemComboVO) cmbEstoque.getSelectedItem()).id);
                     
                     if (tab.getSelectedIndex() == 0) {
                         if (chkFamiliaProduto.isSelected()) {                        
@@ -499,6 +521,8 @@ public class AriusGUI extends VRInternalFrame {
         chkPautaFiscalProduto = new vrframework.bean.checkBox.VRCheckBox();
         btnMapaTrib = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
         chkNutricional = new vrframework.bean.checkBox.VRCheckBox();
+        vRLabel9 = new vrframework.bean.label.VRLabel();
+        cmbEstoque = new vrframework.bean.comboBox.VRComboBox();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkContatos = new vrframework.bean.checkBox.VRCheckBox();
@@ -705,6 +729,8 @@ public class AriusGUI extends VRInternalFrame {
 
         chkNutricional.setText("Nutricional");
 
+        vRLabel9.setText("Estoque");
+
         javax.swing.GroupLayout tabDadosLayout = new javax.swing.GroupLayout(tabDados);
         tabDados.setLayout(tabDadosLayout);
         tabDadosLayout.setHorizontalGroup(
@@ -712,6 +738,10 @@ public class AriusGUI extends VRInternalFrame {
             .addGroup(tabDadosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(tabDadosLayout.createSequentialGroup()
+                        .addComponent(vRLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cmbEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(tabDadosLayout.createSequentialGroup()
                         .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(tabDadosLayout.createSequentialGroup()
@@ -832,7 +862,11 @@ public class AriusGUI extends VRInternalFrame {
                                 .addComponent(chkIcmsFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(chkT1ICMS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(vRLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
                 .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(vRPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnMapaTrib, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -960,7 +994,7 @@ public class AriusGUI extends VRInternalFrame {
                         .addComponent(chkFamiliaFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(190, Short.MAX_VALUE))
+                .addContainerGap(191, Short.MAX_VALUE))
         );
 
         tab.addTab("Fornecedores", tabFornecedor);
@@ -1072,7 +1106,7 @@ public class AriusGUI extends VRInternalFrame {
                 .addComponent(cbxUnifCliPreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cbxUnifCliEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(189, Short.MAX_VALUE))
+                .addContainerGap(196, Short.MAX_VALUE))
         );
 
         tab.addTab("Unificação", tabUnificacao);
@@ -1430,6 +1464,7 @@ public class AriusGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagem;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
     private vrframework.bean.checkBox.VRCheckBox chkValidade;
+    private vrframework.bean.comboBox.VRComboBox cmbEstoque;
     private vrframework.bean.comboBox.VRComboBox cmbLojaCliente;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrframework.bean.comboBox.VRComboBox cmbTipoVenda;
@@ -1460,6 +1495,7 @@ public class AriusGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel6;
     private vrframework.bean.label.VRLabel vRLabel7;
     private vrframework.bean.label.VRLabel vRLabel8;
+    private vrframework.bean.label.VRLabel vRLabel9;
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;

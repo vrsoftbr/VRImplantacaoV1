@@ -203,6 +203,7 @@ public class SysPdvGUI extends VRInternalFrame {
                             if (chkManterBalanca.isSelected()) {
                                 opcoes.add(OpcaoProduto.IMPORTAR_MANTER_BALANCA);
                             }
+                            dao.setSoAtivos(chkSoAtivos.isSelected());
                             opcoes.add(OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC);
                             importador.importarProduto(opcoes.toArray(new OpcaoProduto[]{}));
                         }
@@ -356,6 +357,7 @@ public class SysPdvGUI extends VRInternalFrame {
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         chkProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
+        chkSoAtivos = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Custo = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Preco = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Estoque = new vrframework.bean.checkBox.VRCheckBox();
@@ -483,6 +485,8 @@ public class SysPdvGUI extends VRInternalFrame {
         chkManterBalanca.setText("Manter Balança");
         chkManterBalanca.setEnabled(true);
 
+        chkSoAtivos.setText("Só ativos");
+
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
         vRPanel1Layout.setHorizontalGroup(
@@ -492,7 +496,8 @@ public class SysPdvGUI extends VRInternalFrame {
                 .addComponent(chkProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(chkSoAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         vRPanel1Layout.setVerticalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -500,7 +505,8 @@ public class SysPdvGUI extends VRInternalFrame {
                 .addGap(0, 0, 0)
                 .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(chkProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkSoAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         tabImpProduto.add(vRPanel1);
@@ -999,6 +1005,7 @@ public class SysPdvGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
+    private vrframework.bean.checkBox.VRCheckBox chkSoAtivos;
     private vrframework.bean.checkBox.VRCheckBox chkT1AtivoInativo;
     private vrframework.bean.checkBox.VRCheckBox chkT1Custo;
     private vrframework.bean.checkBox.VRCheckBox chkT1DescCompleta;

@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,11 +24,14 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.cadastro.tributacao.AliquotaVO;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -75,7 +79,9 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.PIS_COFINS,
             OpcaoProduto.NATUREZA_RECEITA,
             OpcaoProduto.ICMS,
-            OpcaoProduto.MARGEM
+            OpcaoProduto.MARGEM,
+            OpcaoProduto.PAUTA_FISCAL,
+            OpcaoProduto.PAUTA_FISCAL_PRODUTO
         }));
     }
 
@@ -288,6 +294,7 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
         imp.setPiscofinsNaturezaReceita(rst.getString("piscofinsnatrec"));
         imp.setIcmsDebitoId(rst.getString("id_icms"));
         imp.setIcmsCreditoId(rst.getString("id_icms"));
+        imp.setPautaFiscalId(imp.getImportId());
         return imp;
     }
 
@@ -330,6 +337,54 @@ public class OpenDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+
+    @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        Map<String, PautaFiscalIMP> result = new LinkedHashMap<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	s.sequencia,\n" +
+                    "	s.codpro,\n" +
+                    "	p.ncm,\n" +
+                    "	'RS' uf,\n" +
+                    "	s.PercentMVA iva,\n" +
+                    "	s.PercentMVACalc ivaAjustado,\n" +
+                    "	s.PercentICMSST aliqst,\n" +
+                    "	s.PercentReducao redst	\n" +
+                    "from\n" +
+                    "	logstd s\n" +
+                    "	left join genpro p on s.CodPro = p.CODPRO10"
+            )) {
+                while (rst.next()) {
+                    PautaFiscalIMP imp = new PautaFiscalIMP();
+                    
+                    imp.setId(rst.getString("codpro"));
+                    imp.setNcm(rst.getString("codpro"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setIva(rst.getDouble("iva"));
+                    imp.setIvaAjustado(rst.getDouble("ivaAjustado"));
+                    AliquotaVO aliq;
+                    if (rst.getDouble("redst") > 0) {
+                        aliq = new AliquotaVO(20, rst.getDouble("aliqst"), rst.getDouble("redst"));
+                    } else {
+                        aliq = new AliquotaVO(0, rst.getDouble("aliqst"), 0);
+                    }
+                    imp.setAliquotaCredito(aliq);
+                    imp.setAliquotaCreditoForaEstado(aliq);
+                    imp.setAliquotaDebito(aliq);
+                    imp.setAliquotaDebitoForaEstado(aliq);
+                    
+                    result.put(imp.getId(), imp);
+                }
+            }
+        }
+        
+        return new ArrayList<>(result.values());
+    }
+    
+    
 
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
