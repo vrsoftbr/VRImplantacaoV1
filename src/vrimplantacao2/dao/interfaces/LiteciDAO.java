@@ -10,6 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -24,9 +25,29 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class LiteciDAO extends InterfaceDAO {
 
+    private String idLoja = "";
+    public boolean utilizaArquivoBalanca = false;
+
+    public void setLojaCliente(String idLoja) {
+        this.idLoja = idLoja;
+    }
+    
     @Override
     public String getSistema() {
         return "Liteci";
+    }
+
+    public List<Estabelecimento> getLojas() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select codigo, fantasia from tbempresas order by codigo")) {
+                while (rs.next()) {
+                    result.add(new Estabelecimento(rs.getString("codigo"), rs.getString("fantasia")));
+                }
+            }
+        }
+        return result;
     }
 
     @Override

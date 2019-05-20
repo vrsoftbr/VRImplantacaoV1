@@ -153,6 +153,7 @@ import vrimplantacao2.gui.interfaces.KairosGUI;
 import vrimplantacao2.gui.interfaces.KcmsGUI;
 import vrimplantacao2.gui.interfaces.LinceGUI;
 import vrimplantacao2.gui.interfaces.LinnerGUI;
+import vrimplantacao2.gui.interfaces.LiteciGUI;
 import vrimplantacao2.gui.interfaces.LyncisGUI;
 import vrimplantacao2.gui.interfaces.MSIInforGUI;
 import vrimplantacao2.gui.interfaces.MarketGUI;
@@ -583,6 +584,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSyncTech = new javax.swing.JMenuItem();
         mnuSolutionSupera = new javax.swing.JMenuItem();
         mnuGDoor = new javax.swing.JMenuItem();
+        mnuLiteci = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1268,6 +1270,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird2.add(mnuGDoor);
+
+        mnuLiteci.setText("Liteci");
+        mnuLiteci.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuLiteciActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuLiteci);
 
         mnuDatabase.add(mnuFirebird2);
 
@@ -4251,6 +4261,11 @@ public final class MenuGUI extends VRMdiFrame {
         MrsGUI.exibir(this);
     }//GEN-LAST:event_mnuMrsActionPerformed
 
+    private void mnuLiteciActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuLiteciActionPerformed
+        // TODO add your handling code here:
+        LiteciGUI.exibir(this);
+    }//GEN-LAST:event_mnuLiteciActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4419,6 +4434,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuKcms;
     private javax.swing.JMenuItem mnuLince;
     private javax.swing.JMenuItem mnuLinner;
+    private javax.swing.JMenuItem mnuLiteci;
     private javax.swing.JMenuItem mnuLogus;
     private javax.swing.JMenuItem mnuLyncis;
     private javax.swing.JMenuItem mnuMSIInfor;

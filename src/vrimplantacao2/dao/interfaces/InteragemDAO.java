@@ -61,7 +61,7 @@ public class InteragemDAO extends InterfaceDAO {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "distinct p.codpro as id,\n"
-                    + "coalesce(p.codbarun, '0') as ean,\n"
+                    + "coalesce(p.codbarun, p.codpro) as ean,\n"
                     + "1 as qtdembalagem,\n"
                     + "p.unidade as unidade,\n"
                     + "p.balanca as balanca,\n"
@@ -113,7 +113,7 @@ public class InteragemDAO extends InterfaceDAO {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(Utils.formataNumero(rst.getString("id")));
-                    imp.setEan(rst.getString("ean"));
+                    imp.setEan(Utils.formataNumero(rst.getString("ean")));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
@@ -147,9 +147,7 @@ public class InteragemDAO extends InterfaceDAO {
 
                     if ((rst.getString("ean") != null)
                             && (!rst.getString("ean").trim().isEmpty())
-                            && (rst.getString("ean").trim().length() >= 4)
-                            && (rst.getString("ean").trim().length() <= 6)
-                            && ("S".equals(rst.getString("balanca").trim()))) {
+                            && (rst.getString("ean").trim().length() <= 6)) {
                         ProdutoBalancaVO produtoBalanca;
                         long codigoProduto;
                         codigoProduto = Long.parseLong(imp.getEan());
@@ -162,8 +160,8 @@ public class InteragemDAO extends InterfaceDAO {
                             imp.seteBalanca(true);
                             imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rst.getInt("validade"));
                         } else {
-                            imp.setValidade(0);
-                            imp.seteBalanca(false);
+                            imp.setValidade(rst.getInt("validade"));
+                            imp.seteBalanca(true);
                         }
                     }
 
