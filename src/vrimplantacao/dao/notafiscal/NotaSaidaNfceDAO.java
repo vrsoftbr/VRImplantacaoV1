@@ -382,7 +382,7 @@ public class NotaSaidaNfceDAO {
             }
 
             oVenda.numeroNFCe = Integer.parseInt(nNF.getTextContent());
-            setNumeroCupom(oVenda);
+            oVenda.numeroCupom = oVenda.numeroNFCe;
             dao.gravar();
 
             if (!vDivergencia.isEmpty()) {
@@ -791,60 +791,6 @@ public class NotaSaidaNfceDAO {
         } catch (Exception ex) {
             throw ex;
         }
-    }
-
-    private ArrayList<Integer> getNumeroCupomData(int i_ecf, int i_idLoja, String i_data) throws Exception {
-        Statement stm = null;
-        ResultSet rst = null;
-        StringBuilder sql = null;
-
-        stm = Conexao.createStatement();
-
-        sql = new StringBuilder();
-        sql.append("SELECT numerocupom FROM pdv.venda");
-        sql.append(" WHERE ecf = " + i_ecf);
-        sql.append(" AND id_loja = " + i_idLoja);
-        //sql.append(" AND data = '" + Format.dataBanco(i_data) + "'");
-        sql.append(" AND data = '" + Util.formatDataBanco(i_data) + "'");
-
-        rst = stm.executeQuery(sql.toString());
-
-        ArrayList<Integer> vCupom = new ArrayList();
-
-        while (rst.next()) {
-            vCupom.add(rst.getInt("numerocupom"));
-        }
-
-        return vCupom;
-    }
-
-    private int getNumeroCupomImportacao(int i_numeroCupom) {
-        String numeroCupom = String.valueOf(i_numeroCupom);
-        String noves = "";
-
-        for (int i = 0; i < (6 - numeroCupom.length()); i++) {
-            noves += "9";
-        }
-
-        return Integer.valueOf(noves + numeroCupom);
-    }
-
-    private void setNumeroCupom(VendaVO i_venda) throws Exception {
-        ArrayList<Integer> vCupomDia = getNumeroCupomData(i_venda.ecf, i_venda.idLoja, i_venda.data);
-
-        i_venda.numeroCupom = getNumeroCupomImportacao(i_venda.numeroNFCe);
-
-        if (!vCupomDia.contains(i_venda.numeroCupom)) {
-            return;
-        }
-
-        int numeroVerificar = 1;
-
-        while (vCupomDia.contains(getNumeroCupomImportacao(numeroVerificar))) {
-            numeroVerificar++;
-        }
-
-        i_venda.numeroCupom = getNumeroCupomImportacao(numeroVerificar);
     }
 
     private void baixarEstoqueOnLine(VendaItemVO i_oVenda) throws Exception {
