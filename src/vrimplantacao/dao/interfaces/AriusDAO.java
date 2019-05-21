@@ -1666,7 +1666,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNumeroDocumento(rst.getString("numerodocumento"));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setDataEntrada(rst.getDate("dataentrada"));
-                    imp.setDataHoraAlteracao(new Timestamp(rst.getDate("dataalteracao").getTime()));
+                    imp.setDataHoraAlteracao(rst.getTimestamp("dataalteracao"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setObservacao(rst.getString("observacao"));
                     imp.setVencimento(rst.getDate("vencimento"));
