@@ -643,10 +643,10 @@ public class ApolloDAO extends InterfaceDAO implements FinanceiroProvider {
                     if (rst.next()) {
                         next = new VendaIMP();
                         
-                        String id = rst.getString("IDEMPRESA") + "-" + rst.getString("nropedido") + "-" + rst.getString("serie") + "-" + rst.getString("dtvenda") + "-" + rst.getString("nronf");
+                        String id = rst.getString("IDEMPRESA") + "-" + rst.getString("nropedido") + "-" + rst.getString("serie") + "-" + rst.getString("dtvenda") + "-" + rst.getString("coo");
                         
                         next.setId(id);
-                        next.setNumeroCupom(Utils.stringToInt(rst.getString("nronf")));
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("coo")));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
                         next.setIdClientePreferencial(rst.getString("idcliente"));
                         next.setData(rst.getDate("dtvenda"));
@@ -673,16 +673,16 @@ public class ApolloDAO extends InterfaceDAO implements FinanceiroProvider {
             SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
             this.sql
                     =   "SELECT\n" +
-                        "	A.IDEMPRESA,\n" +
+                        "        A.IDEMPRESA,\n" +
                         "	A.nropedido, \n" +
                         "	n.serie,\n" +
                         "	Trunc(A.DTVENDA) dtvenda,\n" +
-                        "	n.nronf,\n" +
-                        "       max(coalesce(cx.nropdv, 0)) ecf,\n" +
+                        "	n.nronf coo,\n" +
+                        "        pdv.nropdv ecf,   \n" +
                         "	max(nullif(a.codparceiro, 0)) idcliente,\n" +
                         "	min(a.dtvenda) horainicio,\n" +
                         "	max(a.dtvenda) horatermino,\n" +
-                        "	n.cancelada,\n" +
+                        "	n.cancelada,   \n" +
                         "	(\n" +
                         "		SUM(\n" +
                         "			CASE \n" +
@@ -691,7 +691,6 @@ public class ApolloDAO extends InterfaceDAO implements FinanceiroProvider {
                         "			END\n" +
                         "		) \n" +
                         "	) TOTAL_VENDA,\n" +
-                        "	sum(n.totalnf) totalnf,\n" +
                         "	Sum(((CASE WHEN COALESCE(A.DESC_ACRE_MEDIO,0) > 0 THEN (COALESCE(A.DESC_ACRE_MEDIO,0)) ELSE 0 END) + (CASE WHEN COALESCE(A.DESC_ACRE_ITEM,0) > 0 THEN (COALESCE(A.DESC_ACRE_ITEM,0)) ELSE 0 END)   )) ACRESCIMO,\n" +
                         "	Sum((COALESCE(A.DESC_PROMOCAO,0) + COALESCE(A.DESC_DEPARTAMENTO,0) + (CASE WHEN COALESCE(A.DESC_ACRE_MEDIO,0) < 0 THEN (COALESCE(A.DESC_ACRE_MEDIO,0)*-1) ELSE 0 END) + (CASE WHEN COALESCE(A.DESC_ACRE_ITEM,0) < 0 THEN (COALESCE(A.DESC_ACRE_ITEM,0)*-1) ELSE 0 END))) DESC_PROMOCAO,\n" +
                         "	a.cnpj_cpf,\n" +
@@ -701,27 +700,26 @@ public class ApolloDAO extends InterfaceDAO implements FinanceiroProvider {
                         "	n.chavenfe,\n" +
                         "	n.protocolo_nfe\n" +
                         "FROM\n" +
-                        "	VENDAS A\n" +
+                        "	VENDAS A                 \n" +
                         "	LEFT JOIN NFC N  ON A.NROPEDIDO = N.NROPEDIDO AND A.IDEMPRESA = N.IDEMPRESA AND A.NROSERIE = N.SERIE AND TRUNC(A.DTVENDA) = TRUNC(N.DTEMISSAO) \n" +
                         "	LEFT JOIN PRODUTOS P ON (P.IDPRODUTO = A.CODPRODUTO) \n" +
                         "	LEFT JOIN PISCOFINS CPC ON (CPC.IDPISCOFINS = COALESCE(A.IDPISCOFINS, P.IDPISCOFINS))\n" +
-                        "       join empresas e on a.idempresa = e.codempresa \n" +
-                        "       join det_aliquota aliq on a.aliquota = aliq.aliquota and aliq.uf = e.uf \n" +
-                        "	left join cx_vendas cx ON A.NROPEDIDO = cx.NROPEDIDO AND A.DTVENDA = cx.DATA\n" +
-                        "	left join pdv on pdv.nropdv = cx.nropdv and pdv.codempresa = a.idempresa\n" +
+                        "        join empresas e on a.idempresa = e.codempresa \n" +
+                        "        join det_aliquota aliq on a.aliquota = aliq.aliquota and aliq.uf = e.uf\n" +
+                        "        left join pdv on pdv.nropdv = cast(n.serie as integer) and pdv.codempresa = a.idempresa\n" +
                         "WHERE\n" +
                         "	TRUNC(A.DTVENDA) BETWEEN '" + format.format(dataInicio) + "' AND '" + format.format(dataTermino) + "' AND\n" +
                         "	COALESCE(N.STATUSNFE,'P') = 'P' AND A.IDEMPRESA in (" + idLojaCliente + ")\n" +
                         "GROUP BY  \n" +
-                        "       A.IDEMPRESA,\n" +
+                        "        A.IDEMPRESA,\n" +
                         "	A.nropedido, \n" +
                         "	n.serie,\n" +
                         "	Trunc(A.DTVENDA),\n" +
                         "	n.nronf,\n" +
-                        "       cx.nropdv,\n" +
+                        "        pdv.nropdv,\n" +
                         "	n.cancelada,\n" +
-                        "       a.cnpj_cpf,\n" +
-                        "       a.razao,\n" +
+                        "        a.cnpj_cpf,\n" +
+                        "        a.razao,\n" +
                         "	pdv.nroserie,\n" +
                         "	pdv.modelo,\n" +
                         "	n.chavenfe,\n" +
