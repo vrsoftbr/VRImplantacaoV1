@@ -90,9 +90,9 @@ public class Organizador {
         
         if (repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_RESETAR_BALANCA)) {
             //Listagem para os produtos de balança com PLUs válidos.
-            MultiMap<String, ProdutoIMP> validos = new MultiMap<>(4);
+            MultiMap<String, ProdutoIMP> validos = new MultiMap<>();
             //Listagem para os produtos de balança com PLUs inválidos
-            MultiMap<String, ProdutoIMP> invalidos = new MultiMap<>(4);
+            MultiMap<String, ProdutoIMP> invalidos = new MultiMap<>();
             //Separando os produtos e análisando o PLU.
             for (KeyList<String> keys : normais.keySet()) {
                 ProdutoIMP imp = normais.get(keys);
@@ -128,14 +128,14 @@ public class Organizador {
             */
             
             //Listagem para os produtos de balança com PLUs válidos.
-            MultiMap<String, ProdutoIMP> validos = new MultiMap<>(3);
+            MultiMap<String, ProdutoIMP> validos = new MultiMap<>();
             //Listagem para os produtos de balança com PLUs inválidos
-            MultiMap<String, ProdutoIMP> invalidos = new MultiMap<>(3);
+            MultiMap<String, ProdutoIMP> invalidos = new MultiMap<>();
             //Separando os produtos e análisando o PLU.
             for (KeyList<String> keys : balanca.keySet()) {
                 ProdutoIMP imp = balanca.get(keys);
                 long ean = Utils.stringToLong(imp.getEan());
-                String[] chave = new String[]{imp.getImportSistema(), imp.getImportLoja(), String.valueOf(ean)};
+                String[] chave = new String[]{imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), imp.getEan()};//String.valueOf(ean)};
                 if (ean >= 0 && ean <= 999999) {
                     validos.put(imp, chave);
                 } else {
