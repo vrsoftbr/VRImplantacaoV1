@@ -47,7 +47,7 @@ public class VendaIMP {
     private double valorAcrescimo;
     @DatabaseField()
     private boolean canceladoEmVenda = false;
-    @DatabaseField(uniqueCombo = true)
+    @DatabaseField()
     private String numeroSerie;
     @DatabaseField()
     private String modeloImpressora;
