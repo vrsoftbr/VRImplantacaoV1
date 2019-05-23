@@ -60,6 +60,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.FAMILIA_PRODUTO,
             OpcaoProduto.FAMILIA,
             OpcaoProduto.PRODUTOS,
+            OpcaoProduto.IMPORTAR_RESETAR_BALANCA,
             OpcaoProduto.IMPORTAR_MANTER_BALANCA,
             OpcaoProduto.DATA_CADASTRO,
             OpcaoProduto.DATA_ALTERACAO,
@@ -251,13 +252,26 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("cdprod"));
-                    imp.setEan(rst.getString("codbarra"));
+                    imp.setImportId(rst.getString("cdprod").trim());
+                    imp.setEan(rst.getString("codbarra").trim());
                     imp.setTipoEmbalagem(rst.getString("unidadevenda").trim());
-                    imp.seteBalanca(rst.getInt("setor") > 0);
+                    
+                    if (rst.getInt("setor") > 0) {
+                        imp.seteBalanca(true);
+                    }
+                    if ((imp.getEan() != null)
+                            && (!imp.getEan().trim().isEmpty())
+                            && (Double.parseDouble(imp.getEan()) <= 999999)
+                            && (rst.getInt("setor") == 0)
+                            && (imp.getTipoEmbalagem().contains("KG"))) {
+
+                        imp.seteBalanca(true);
+                    }
+                    
+//                    imp.seteBalanca(rst.getInt("setor") > 0);
                     imp.setValidade(rst.getInt("validade"));
-                    imp.setDescricaoCompleta(rst.getString("descricao"));
-                    imp.setDescricaoReduzida(rst.getString("descpdv"));
+                    imp.setDescricaoCompleta(rst.getString("descricao").trim());
+                    imp.setDescricaoReduzida(rst.getString("descpdv").trim());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setDataCadastro(rst.getDate("cadastro"));
                     imp.setPesoBruto(rst.getDouble("pesobru"));

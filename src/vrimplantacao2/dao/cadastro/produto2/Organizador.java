@@ -108,6 +108,7 @@ public class Organizador {
                 } 
             }
             //Ordenando as listagtem.
+            balanca = balanca.getSortedMap();
             validos = validos.getSortedMap();
             invalidos = invalidos.getSortedMap();
             //Reorganizando os produtos e ordenando a listagem           
@@ -224,7 +225,12 @@ public class Organizador {
     public void separarBalancaENormais(MultiMap<String, ProdutoIMP> filtrados, MultiMap<String, ProdutoIMP> balanca, MultiMap<String, ProdutoIMP> normais) throws Exception {
         ProgressBar.setStatus("Produtos - Separando balan\u00e7a e normais...");
         for (ProdutoIMP produto : filtrados.values()) {
-            String[] chave = new String[]{produto.getImportSistema(), produto.getImportLoja(), produto.getImportId(), produto.getEan()};
+            String[] chave = null;
+            if (produto.isBalanca() && (repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_RESETAR_BALANCA))) {
+                chave = new String[]{produto.getImportSistema(), produto.getImportLoja(), produto.getDescricaoCompleta(), produto.getImportId(), produto.getEan()};
+            } else {
+                chave = new String[]{produto.getImportSistema(), produto.getImportLoja(), produto.getImportId(), produto.getEan()};                                
+            }
             
             long ean = Utils.stringToLong(produto.getEan());
             String un = Utils.acertarTexto(produto.getTipoEmbalagem(), 2);
