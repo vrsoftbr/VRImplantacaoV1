@@ -18,6 +18,7 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.dao.interfaces.AriusDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
@@ -50,6 +51,7 @@ public class AriusGUI extends VRInternalFrame {
         txtPortaOracle.setText(params.getWithNull("1521","ARIUS", "PORTA"));
         txtUsuarioOracle.setText(params.getWithNull("PROREG", "ARIUS", "USUARIO"));
         txtSenhaOracle.setText(params.getWithNull("automa", "ARIUS", "SENHA"));
+        txtDtVencContasPagar.setDate(params.getDate("ARIUS", "DT_CONTA_PAGAR"));
         vLojaCliente = params.getInt("ARIUS", "LOJA_CLIENTE");
         vLojaVR = params.getInt("ARIUS", "LOJA_VR");
         vTipoVenda = params.getInt("ARIUS", "TIPO_VENDA");
@@ -78,6 +80,7 @@ public class AriusGUI extends VRInternalFrame {
         params.put(txtPortaOracle.getText(), "ARIUS", "PORTA");
         params.put(txtUsuarioOracle.getText(), "ARIUS", "USUARIO");
         params.put(txtSenhaOracle.getText(), "ARIUS", "SENHA");
+        params.put(txtDtVencContasPagar.getDate(), "ARIUS", "DT_CONTA_PAGAR");
         ItemComboVO cliente = (ItemComboVO) cmbLojaCliente.getSelectedItem();
         if (cliente != null) {
             params.put(cliente.id, "ARIUS", "LOJA_CLIENTE");
@@ -151,6 +154,9 @@ public class AriusGUI extends VRInternalFrame {
         tabCheque.pnlLista.setEnabled(false);
         tabCheque.chkAtivarCheque.setEnabled(false);
 
+        txtDtVencContasPagar.setFormats("dd/MM/yyyy");
+        txtDtIInicioVenda.setFormats("dd/MM/yyyy");
+        txtDtTerminoVenda.setFormats("dd/MM/yyyy");
     }
 
     public void validarDadosAcessoOracle() throws Exception {
@@ -408,6 +414,10 @@ public class AriusGUI extends VRInternalFrame {
                         if (chkFornecedorXFamilia.isSelected()) {
                             ariusDAO.importarFamiliaFornecedorXProduto();
                         }
+                        if (chkContasAPagar.isSelected()) {
+                            ariusDAO.setDataVencimentoContaPagar(txtDtVencContasPagar.getDate());
+                            importador.importarContasPagar(OpcaoContaPagar.NOVOS);
+                        }
                     } else if (tab.getSelectedIndex() == 2) {
                         if (chkClientePreferencial.isSelected()) {                            
                             importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
@@ -544,6 +554,8 @@ public class AriusGUI extends VRInternalFrame {
         chkIPI = new vrframework.bean.checkBox.VRCheckBox();
         chkFamiliaFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkFornecedorXFamilia = new vrframework.bean.checkBox.VRCheckBox();
+        chkContasAPagar = new vrframework.bean.checkBox.VRCheckBox();
+        txtDtVencContasPagar = new org.jdesktop.swingx.JXDatePicker();
         tabCliente = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabClienteDados = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -968,6 +980,14 @@ public class AriusGUI extends VRInternalFrame {
             }
         });
 
+        chkContasAPagar.setText("Contas à Pagar");
+        chkContasAPagar.setEnabled(true);
+        chkContasAPagar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkContasAPagarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
         tabFornecedor.setLayout(tabFornecedorLayout);
         tabFornecedorLayout.setHorizontalGroup(
@@ -985,6 +1005,10 @@ public class AriusGUI extends VRInternalFrame {
                         .addComponent(chkIncluirTransportadores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(tabFornecedorLayout.createSequentialGroup()
                         .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(tabFornecedorLayout.createSequentialGroup()
+                                .addComponent(chkContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtDtVencContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(tabFornecedorLayout.createSequentialGroup()
                                 .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1010,7 +1034,11 @@ public class AriusGUI extends VRInternalFrame {
                         .addComponent(chkFamiliaFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(vRPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(191, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtDtVencContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(161, Short.MAX_VALUE))
         );
 
         tab.addTab("Fornecedores", tabFornecedor);
@@ -1433,6 +1461,13 @@ public class AriusGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFornecedorXFamiliaActionPerformed
 
+    private void chkContasAPagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkContasAPagarActionPerformed
+        txtDtVencContasPagar.setEnabled(chkContasAPagar.isSelected());
+        if (txtDtVencContasPagar.getDate() == null) {
+            txtDtVencContasPagar.setDate(new Date(System.currentTimeMillis()));
+        }
+    }//GEN-LAST:event_chkContasAPagarActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectarOracle;
     private vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTrib;
@@ -1451,6 +1486,7 @@ public class AriusGUI extends VRInternalFrame {
     private javax.swing.JCheckBox chkClTransp;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
+    private vrframework.bean.checkBox.VRCheckBox chkContasAPagar;
     private vrframework.bean.checkBox.VRCheckBox chkContatos;
     private vrframework.bean.checkBox.VRCheckBox chkEstadoCivil;
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
@@ -1508,6 +1544,7 @@ public class AriusGUI extends VRInternalFrame {
     private vrframework.bean.textField.VRTextField txtBancoDadosOracle;
     private org.jdesktop.swingx.JXDatePicker txtDtIInicioVenda;
     private org.jdesktop.swingx.JXDatePicker txtDtTerminoVenda;
+    private org.jdesktop.swingx.JXDatePicker txtDtVencContasPagar;
     private vrframework.bean.textField.VRTextField txtHostOracle;
     private vrframework.bean.textField.VRTextField txtPortaOracle;
     private vrframework.bean.passwordField.VRPasswordField txtSenhaOracle;

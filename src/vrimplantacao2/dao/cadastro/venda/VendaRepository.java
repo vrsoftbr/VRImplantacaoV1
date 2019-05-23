@@ -182,6 +182,7 @@ public class VendaRepository {
                 * foram encontrados e lança-los no mapeamento.
                 */
                 if (haDivergencia) {
+                   provider.notificar();
                    continue;
                 }
 

@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.MathUtils;
@@ -382,6 +381,7 @@ public class PdvVendaDAO {
             "       DELETE FROM pdv.vendapromocaocupom WHERE id_venda = v_id;\n" +
             "       DELETE FROM pdv.vendafinalizadora WHERE id_venda = v_id;\n" +
             "       DELETE FROM pdv.vendaitem WHERE id_venda = v_id;\n" +
+            "       DELETE FROM pdv.vendanfce WHERE id_venda = v_id;\n" +
             "       DELETE FROM pdv.venda WHERE id = v_id;\n" +
             "   end if;" + 
             "end;\n" +

@@ -199,6 +199,7 @@ public class ProdutoRepository {
                         rep.append("01|Produto importado anteriormente (").append("codigoatual:").append(id).append("\n");
                     } else {
                         rep.append("01|Produto sem código atual no VR");
+                        LOG.finer("Produto importado: " + rep.toString());
                         continue;
                     }
 

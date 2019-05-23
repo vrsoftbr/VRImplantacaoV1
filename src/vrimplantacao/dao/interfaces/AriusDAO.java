@@ -3,6 +3,7 @@ package vrimplantacao.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,6 +38,7 @@ import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -1404,6 +1406,11 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    private Date dataVencimentoContaPagar = new Date();
+    public void setDataVencimentoContaPagar(Date dataVencimentoContaPagar) {
+        this.dataVencimentoContaPagar = dataVencimentoContaPagar;
+    }
+
     /**
      * Classe que representa um plano de contas no Arius.
      */
@@ -1622,6 +1629,57 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    id,\n" +
+                    "    id_cadastro id_fornecedor,\n" +
+                    "    nf numerodocumento,\n" +
+                    "    emissao dataemissao,\n" +
+                    "    datahora_cadastro dataentrada,\n" +
+                    "    datahora_alteracao dataalteracao,\n" +
+                    "    liquido valor,\n" +
+                    "    observacao,\n" +
+                    "    vencimento   \n" +
+                    "from\n" +
+                    "    vw_contas\n" +
+                    "where\n" +
+                    "    empresa = " + getLojaOrigem() + " and\n" +
+                    "    tipo_conta = 0 and \n" +
+                    "    parcela <> 0 and\n" +
+                    "    not tipo_cadastro is null and\n" +
+                    "    pagamento is null and\n" +
+                    "    trunc(vencimento) >= '" + new SimpleDateFormat("dd/MM/yyyy").format(dataVencimentoContaPagar)+ "'\n" +
+                    "order by\n" +
+                    "    vencimento"
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("id_fornecedor"));
+                    imp.setNumeroDocumento(rst.getString("numerodocumento"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataEntrada(rst.getDate("dataentrada"));
+                    imp.setDataHoraAlteracao(rst.getTimestamp("dataalteracao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setVencimento(rst.getDate("vencimento"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    
 
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
