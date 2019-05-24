@@ -16,6 +16,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
 
 /**
  *
@@ -24,6 +25,8 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 public class SambaNetDAO extends InterfaceDAO {
     
     private String planilhaFamilia;
+    private String planilhaProdutos;
+    private String planilhaProdutosContador;
 
     @Override
     public String getSistema() {
@@ -34,10 +37,20 @@ public class SambaNetDAO extends InterfaceDAO {
         this.planilhaFamilia = planilhaFamilia;
     }
 
+    public void setPlanilhaProdutos(String planilhaProdutos) {
+        this.planilhaProdutos = planilhaProdutos;
+    }
+
+    public void setPlanilhaProdutosContator(String planilhaProdutosContador) {
+        this.planilhaProdutosContador = planilhaProdutosContador;
+    }
+
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet(Arrays.asList(new OpcaoProduto[]{
-            OpcaoProduto.FAMILIA
+            OpcaoProduto.FAMILIA_PRODUTO,
+            OpcaoProduto.MERCADOLOGICO,
+            OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR
         }));
     }
     
@@ -85,6 +98,51 @@ public class SambaNetDAO extends InterfaceDAO {
             return result;
         } else {
             throw new IOException("Planilha de Família de Produtos não encontrada");
+        }
+    }
+
+    
+    private static class Mercadologico {
+        int id;
+        String descricao;
+    }
+    
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        File file = new File(this.planilhaProdutos);        
+        if (file.exists()) {        
+            List<MercadologicoIMP> result = new ArrayList<>();
+
+            WorkbookSettings settings = new WorkbookSettings();
+            settings.setEncoding("CP1250");
+            settings.setIgnoreBlanks(false);
+
+            Workbook planilha = Workbook.getWorkbook(file, settings);            
+            Sheet sheet = planilha.getSheet(0);
+            
+            ProgressBar.setStatus("Analisando planilha de Mercadológicos");
+            ProgressBar.setMaximum(sheet.getRows());
+            
+            Mercadologico centroReceita;
+            Mercadologico grupo;
+            Mercadologico categoria;
+            
+            for (int i = 1; i < sheet.getRows(); i++) {                
+                if (
+                        sheet.getCell(0, i) == null || !Utils.acertarTexto(sheet.getCell(0, i).getContents()).contains("CENTRO DE RECEITA")
+                ) {
+                    
+                    ProgressBar.next();
+                }
+                
+                
+                
+                ProgressBar.next();
+            }
+
+            return result;
+        } else {
+            throw new IOException("Planilha(s) não encontrada");
         }
     }
     
