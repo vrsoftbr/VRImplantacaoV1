@@ -208,6 +208,12 @@ public class ClienteRepository {
                     if(opt.contains(OpcaoCliente.ESTADO_CIVIL)) {
                         atualizarClientePreferencial(vo, opt);
                     }
+                    if (opt.contains(OpcaoCliente.PERMITE_CHEQUE)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.PERMITE_CREDITOROTATIVO)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
                 }
                 notificar();
             }

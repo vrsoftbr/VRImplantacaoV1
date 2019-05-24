@@ -24,9 +24,9 @@ public class ProdutoAutomacaoDescontoDAO {
                         "	v_desconto numeric(10,2) = " + precoAtacadoDesconto.getDesconto() + ";\n" +
                         "begin\n" +
                         "	if (exists(select id from produtoautomacaodesconto where codigobarras = v_ean and id_loja = v_id_loja)) then\n" +
-                        "		update produtoautomacaodesconto set desconto = v_desconto where codigobarras = v_ean and id_loja = v_id_loja;\n" +
+                        "		update produtoautomacaodesconto set desconto = v_desconto, descontodiaseguinte = v_desconto where codigobarras = v_ean and id_loja = v_id_loja;\n" +
                         "	else\n" +
-                        "		insert into produtoautomacaodesconto (codigobarras, id_loja, desconto) values (v_ean, v_id_loja, v_desconto);\n" +
+                        "		insert into produtoautomacaodesconto (codigobarras, id_loja, desconto, descontodiaseguinte) values (v_ean, v_id_loja, v_desconto, v_desconto);\n" +
                         "	end if;\n" +
                         "end;\n" +
                         "$$;"

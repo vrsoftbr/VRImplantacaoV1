@@ -192,7 +192,15 @@ public class GR7DAO extends InterfaceDAO {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
-                    imp.seteBalanca((rst.getInt("pesavel") == 1));
+                    
+                    if ((rst.getString("ean") != null) &&
+                            (!rst.getString("ean").trim().isEmpty())) {                        
+                        imp.seteBalanca(Long.parseLong(Utils.formataNumero(rst.getString("ean").trim())) <= 999999);
+                    } else {
+                        imp.seteBalanca(false);
+                    }
+                    
+                    //imp.seteBalanca((rst.getInt("pesavel") == 1));
                     imp.setEan(rst.getString("ean"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
@@ -503,9 +511,17 @@ public class GR7DAO extends InterfaceDAO {
                     imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
                     imp.setCnpj(rst.getString("cnpj"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
-                    imp.setValorLimite(rst.getDouble("limite") + rst.getDouble("limite_cheque"));
-                    imp.setPermiteCreditoRotativo((rst.getDouble("limite") > 0));
-                    imp.setPermiteCheque((rst.getDouble("limite_cheque") > 0));
+                    
+                    
+                    if ("5".equals(rst.getString("status"))) {
+                        imp.setPermiteCreditoRotativo(false);
+                        imp.setPermiteCheque(true);
+                        imp.setValorLimite(rst.getDouble("limite_cheque"));
+                    } else {
+                        imp.setPermiteCreditoRotativo(true);
+                        imp.setPermiteCheque(false);
+                        imp.setValorLimite(rst.getDouble("limite"));
+                    }
                     
                     if ((rst.getString("status") != null)
                             && (!rst.getString("status").trim().isEmpty())) {

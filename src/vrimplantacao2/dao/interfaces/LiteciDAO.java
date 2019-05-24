@@ -9,8 +9,15 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoRepositoryProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -31,7 +38,7 @@ public class LiteciDAO extends InterfaceDAO {
     public void setLojaCliente(String idLoja) {
         this.idLoja = idLoja;
     }
-    
+
     @Override
     public String getSistema() {
         return "Liteci";
@@ -118,14 +125,36 @@ public class LiteciDAO extends InterfaceDAO {
                     + "left join tbestoque est on est.coditemi = p.coditem\n"
                     + "where est.codfiliali = " + getLojaOrigem()
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
+                    ProdutoBalancaVO produtoBalanca;
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("coditem"));
                     imp.setEan(rst.getString("codbarra"));
-                    imp.seteBalanca("S".equals(rst.getString("debalanca")));
-                    imp.setValidade(rst.getInt("validade"));
+
+                    if (rst.getInt("codbalanca") > 0) {
+                        long codigoProduto;
+                        codigoProduto = Long.parseLong(Utils.formataNumero(imp.getEan()));
+                        if (codigoProduto <= Integer.MAX_VALUE) {
+                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                        } else {
+                            produtoBalanca = null;
+                        }
+
+                        if (produtoBalanca != null) {
+                            imp.seteBalanca(true);
+                            imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rst.getInt("validade"));
+                        } else {
+                            imp.setValidade(0);
+                            imp.seteBalanca(false);
+                        }
+                    } else {
+                        imp.seteBalanca(false);
+                        imp.setValidade(rst.getInt("validade"));
+                    }
+
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(rst.getString("descabrev"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -161,6 +190,116 @@ public class LiteciDAO extends InterfaceDAO {
         return result;
     }
 
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "b.coditemi,\n"
+                    + "b.codbarra,\n"
+                    + "b.qtd,\n"
+                    + "b.percdesconto,\n"
+                    + "p.valor as precovenda,\n"
+                    + "b.valorunit as precoatacado,\n"
+                    + "p.codundi as tipoembalagem\n"
+                    + "from tbitemcodbarra b\n"
+                    + "inner join tbitem p on p.coditem = b.coditemi\n"
+                    + "where coalesce(b.qtd, 0) > 1\n"
+                    + "and coalesce(b.percdesconto, 0) > 0\n"
+                    + "order by b.coditemi"
+            )) {
+                while (rst.next()) {
+                    
+                    String strEan = "";
+                    long ean;
+                    int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("coditemi"));
+                    
+                    if ((rst.getString("codbarra") != null) &&
+                            (!rst.getString("codbarra").trim().isEmpty())) {
+                        ean = Long.parseLong(Utils.formataNumero(rst.getString("codbarra")));
+                        
+                        if (ean <= 999999) {
+                            strEan = "999999" + String.valueOf(codigoAtual);
+                        } else {
+                            strEan = rst.getString("codbarra");
+                        }
+                        
+                    } else {
+                        strEan = "999999" + String.valueOf(codigoAtual);
+                    }
+                    
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("coditemi"));
+                    imp.setEan(strEan);
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setQtdEmbalagem(rst.getInt("qtd"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;  
+    }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        if (opt == OpcaoProduto.ATACADO) {
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + "b.coditemi,\n"
+                        + "b.codbarra,\n"
+                        + "b.qtd,\n"
+                        + "b.percdesconto,\n"
+                        + "p.valor as precovenda,\n"
+                        + "b.valorunit as precoatacado\n"
+                        + "from tbitemcodbarra b\n"
+                        + "inner join tbitem p on p.coditem = b.coditemi\n"
+                        + "where coalesce(b.qtd, 0) > 1\n"
+                        + "and coalesce(b.percdesconto, 0) > 0\n"
+                        + "order by b.coditemi"
+                )) {
+                    while (rst.next()) {
+                        long ean;
+                        String strEan = "";
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("coditemi"));
+
+                        if ((rst.getString("codbarra") != null)
+                                && (!rst.getString("codbarra").trim().isEmpty())) {
+                            ean = Long.parseLong(Utils.formataNumero(rst.getString("codbarra")));
+
+                            if (ean <= 999999) {
+                                strEan = "999999" + String.valueOf(codigoAtual);
+                            } else {
+                                strEan = rst.getString("codbarra");
+                            }
+                            
+                        } else {
+                            strEan = "999999" + String.valueOf(codigoAtual);
+                        }
+
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("coditemi"));
+                        imp.setEan(strEan);
+                        imp.setQtdEmbalagem(rst.getInt("qtd"));
+                        imp.setPrecovenda(rst.getDouble("precovenda"));
+                        imp.setAtacadoPreco(rst.getDouble("precoatacado"));
+                        result.add(imp);                        
+                    }
+                }
+                return result;
+            }
+        }
+        return null;
+    }
+    
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -209,6 +348,7 @@ public class LiteciDAO extends InterfaceDAO {
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemento"));
                     imp.setCep(rst.getString("cep"));
+                    imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("municipio"));
                     imp.setIbge_municipio(rst.getInt("municipio_ibge"));
                     imp.setUf(rst.getString("uf"));

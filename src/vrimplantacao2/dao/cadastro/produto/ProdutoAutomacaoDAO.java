@@ -11,6 +11,7 @@ import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorEanVO;
 import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
@@ -31,16 +32,29 @@ public class ProdutoAutomacaoDAO {
     
     public Set<Long> getEansCadastradosAtacado(int idLoja) throws Exception {        
         Set<Long> result = new HashSet<>();
-        
-        try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select codigobarras from produtoautomacaoloja where id_loja = " + idLoja + "\n" +
-                    "union\n" +
-                    "select codigobarras from produtoautomacaodesconto where id_loja = " + idLoja + "\n" +
-                    "order by codigobarras"
-            )) {
-                while (rst.next()) {
-                    result.add(rst.getLong("codigobarras"));
+    
+        if (Versao.menorQue(3, 18, 1)) {
+            try (Statement stm = Conexao.createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select codigobarras from produtoautomacaoloja where id_loja = " + idLoja + "\n"
+                        + "union\n"
+                        + "select codigobarras from produtoautomacaodesconto where id_loja = " + idLoja + "\n"
+                        + "order by codigobarras"
+                )) {
+                    while (rst.next()) {
+                        result.add(rst.getLong("codigobarras"));
+                    }
+                }
+            }
+        } else {
+            try (Statement stm = Conexao.createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select codigobarras from produtoautomacaodesconto where id_loja = " + idLoja + "\n"
+                        + "order by codigobarras"
+                )) {
+                    while (rst.next()) {
+                        result.add(rst.getLong("codigobarras"));
+                    }
                 }
             }
         }

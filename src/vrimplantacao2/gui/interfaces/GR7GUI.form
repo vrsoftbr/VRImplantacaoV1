@@ -27,12 +27,10 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="vRPanel1" pref="634" max="32767" attributes="0"/>
-                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                      <Component id="vRImportaArquivBalancaPanel1" alignment="0" max="32767" attributes="0"/>
-                      <Component id="vRToolBarPadrao3" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="tabs" alignment="0" min="-2" pref="634" max="-2" attributes="0"/>
-                      <Component id="vRPanel3" alignment="0" max="32767" attributes="0"/>
-                  </Group>
+                  <Component id="vRImportaArquivBalancaPanel1" alignment="0" max="32767" attributes="0"/>
+                  <Component id="vRToolBarPadrao3" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="tabs" alignment="0" min="-2" pref="634" max="-2" attributes="0"/>
+                  <Component id="vRPanel3" alignment="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -359,12 +357,10 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                              <Component id="vRPanel4" alignment="0" max="32767" attributes="0"/>
-                              <Component id="vRPanel2" alignment="0" max="32767" attributes="0"/>
-                          </Group>
-                          <Component id="vRPanel5" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                          <Component id="vRPanel4" alignment="0" max="32767" attributes="0"/>
+                          <Component id="vRPanel2" alignment="0" max="32767" attributes="0"/>
+                          <Component id="vRPanel5" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="32767" attributes="0"/>
                   </Group>
@@ -709,11 +705,17 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkReceberCheque" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="273" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkValorLimite" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkPermiteRotativo" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkPermiteCheque" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -723,6 +725,9 @@
                           <Component id="chkClientePreferencial" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="chkCreditoRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="chkReceberCheque" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkValorLimite" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkPermiteRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkPermiteCheque" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -744,6 +749,21 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkReceberCheque">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cheque"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkValorLimite">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Valor Limite"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPermiteRotativo">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Permite Rotativo"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPermiteCheque">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Permite Cheque"/>
                   </Properties>
                 </Component>
               </SubComponents>
