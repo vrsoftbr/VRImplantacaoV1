@@ -1248,6 +1248,7 @@ public class ProdutoRepository {
             destino.setCodigoSped(imp.getImportId());
         }
         destino.setSituacaoCadastro(imp.getSituacaoCadastro());
+        destino.setDataHora(Utils.getDataAtual());
         return destino;
     }
 
