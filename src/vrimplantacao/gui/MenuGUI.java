@@ -156,6 +156,7 @@ import vrimplantacao2.gui.interfaces.RMSAutomaHelpGUI;
 import vrimplantacao2.gui.interfaces.RPInfoGUI;
 import vrimplantacao2.gui.interfaces.RepleisGUI;
 import vrimplantacao2.gui.interfaces.SDInformaticaGUI;
+import vrimplantacao2.gui.interfaces.SambaNetGUI;
 import vrimplantacao2.gui.interfaces.SatecfeGUI;
 import vrimplantacao2.gui.interfaces.ScefGUI;
 import vrimplantacao2.gui.interfaces.ShiGUI;
@@ -672,6 +673,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuADT = new javax.swing.JMenu();
         mnuInfoMacStore = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
+        mnuContaPagar1 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem8 = new javax.swing.JMenuItem();
         jMenuItem24 = new javax.swing.JMenuItem();
@@ -2113,10 +2115,19 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuDatabase.add(mnuADT);
 
-        mnuImpSistema.add(mnuDatabase);
+        jMenu3.setText("Planilhas Específicas");
 
-        jMenu3.setText("Planilhas");
-        mnuImpSistema.add(jMenu3);
+        mnuContaPagar1.setText("SambaNet");
+        mnuContaPagar1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuContaPagar1ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(mnuContaPagar1);
+
+        mnuDatabase.add(jMenu3);
+
+        mnuImpSistema.add(mnuDatabase);
 
         jMenu4.setText("Arquivos");
 
@@ -3870,6 +3881,10 @@ public final class MenuGUI extends VRMdiFrame {
         LiteciGUI.exibir(this);
     }//GEN-LAST:event_mnuLiteciActionPerformed
 
+    private void mnuContaPagar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuContaPagar1ActionPerformed
+        SambaNetGUI.exibir(this);
+    }//GEN-LAST:event_mnuContaPagar1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu11;
@@ -3978,6 +3993,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuCerebro;
     private javax.swing.JMenuItem mnuCodigoBarrasAtacado;
     private javax.swing.JMenuItem mnuContaPagar;
+    private javax.swing.JMenuItem mnuContaPagar1;
     private javax.swing.JMenuItem mnuControll;
     private javax.swing.JMenuItem mnuCplus;
     private javax.swing.JMenu mnuDB2;
