@@ -1,5 +1,6 @@
 package vrimplantacao2.vo.cadastro;
 
+import java.util.Date;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.Factory;
 import vrimplantacao2.utils.MathUtils;
@@ -30,6 +31,7 @@ public class ProdutoAnteriorVO {
     private boolean novo = false;
     private String codigoSped = "";
     private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
+    private Date dataHora;
     
     private final MultiMap<String, ProdutoAnteriorEanVO> eans = new MultiMap<>(
         new Factory<ProdutoAnteriorEanVO>() {
@@ -240,5 +242,13 @@ public class ProdutoAnteriorVO {
 
     public void setSituacaoCadastro(SituacaoCadastro situacaoCadastro) {
         this.situacaoCadastro = situacaoCadastro;
+    }
+
+    public Date getDataHora() {
+        return dataHora;
+    }
+
+    public void setDataHora(Date dataHora) {
+        this.dataHora = dataHora;
     }
 }

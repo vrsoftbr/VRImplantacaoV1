@@ -557,6 +557,7 @@ public class ProdutoAnteriorDAO {
             }
             sql.put("contadorimportacao", contador);
             sql.put("situacaocadastro", anterior.getSituacaoCadastro().getId());
+            sql.put("dataimportacao", anterior.getDataHora());
 
             try {
                 stm.execute(sql.getInsert());
