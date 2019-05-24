@@ -3,7 +3,6 @@ package vrimplantacao.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1587,7 +1586,6 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
             LOG.fine("SQL a ser executado:\n" + sql);
 
             try (ResultSet rst = stm.executeQuery(sql)) {
-                SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy");
 
                 while (rst.next()) {
 
@@ -1600,6 +1598,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValor(rst.getDouble("liquido"));
                     imp.setNumeroCheque(rst.getString("cheque"));
                     imp.setBanco(rst.getInt("banco_cheque"));
+                    imp.setAgencia(rst.getString("agencia"));
                     imp.setRg(rst.getString("inscricao_rg"));
                     imp.setTelefone(rst.getString("telefone1"));
                     imp.setObservacao(rst.getString("observacao"));
