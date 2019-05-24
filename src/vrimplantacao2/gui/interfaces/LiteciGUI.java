@@ -173,6 +173,7 @@ public class LiteciGUI extends VRInternalFrame {
                     importador.setLojaVR(idLojaVR);
                     
                     dao.utilizaArquivoBalanca = chkUtilizaBalanca.isSelected();
+                    dao.gerarCodigoAtacado = chkGerarCodigoAtacado.isSelected();
 
                     if (tabs.getSelectedIndex() == 0) {
 
@@ -341,13 +342,14 @@ public class LiteciGUI extends VRInternalFrame {
         chkProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
         chkUtilizaBalanca = new vrframework.bean.checkBox.VRCheckBox();
+        chkT1EAN = new vrframework.bean.checkBox.VRCheckBox();
+        chkT1EANemBranco = new vrframework.bean.checkBox.VRCheckBox();
         chkAtacado = new vrframework.bean.checkBox.VRCheckBox();
+        chkGerarCodigoAtacado = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Custo = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Preco = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Estoque = new vrframework.bean.checkBox.VRCheckBox();
         chkZerarMargem = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1EAN = new vrframework.bean.checkBox.VRCheckBox();
-        chkT1EANemBranco = new vrframework.bean.checkBox.VRCheckBox();
         chkT1PisCofins = new vrframework.bean.checkBox.VRCheckBox();
         chkCest = new vrframework.bean.checkBox.VRCheckBox();
         chkT1NatReceita = new vrframework.bean.checkBox.VRCheckBox();
@@ -479,8 +481,17 @@ public class LiteciGUI extends VRInternalFrame {
         chkUtilizaBalanca.setText("Utiliza Balança");
         tabImpProduto.add(chkUtilizaBalanca);
 
+        chkT1EAN.setText("EAN");
+        tabImpProduto.add(chkT1EAN);
+
+        chkT1EANemBranco.setText("EAN em branco");
+        tabImpProduto.add(chkT1EANemBranco);
+
         chkAtacado.setText("Atacado");
         tabImpProduto.add(chkAtacado);
+
+        chkGerarCodigoAtacado.setText("Gerar Código Atacado");
+        tabImpProduto.add(chkGerarCodigoAtacado);
 
         chkT1Custo.setText("Custo");
         tabImpProduto.add(chkT1Custo);
@@ -493,12 +504,6 @@ public class LiteciGUI extends VRInternalFrame {
 
         chkZerarMargem.setText("Zerar Margem");
         tabImpProduto.add(chkZerarMargem);
-
-        chkT1EAN.setText("EAN");
-        tabImpProduto.add(chkT1EAN);
-
-        chkT1EANemBranco.setText("EAN em branco");
-        tabImpProduto.add(chkT1EANemBranco);
 
         chkT1PisCofins.setText("PIS/COFINS");
         tabImpProduto.add(chkT1PisCofins);
@@ -1013,6 +1018,7 @@ public class LiteciGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkGerarCodigoAtacado;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;

@@ -34,6 +34,8 @@ public class LiteciDAO extends InterfaceDAO {
 
     private String idLoja = "";
     public boolean utilizaArquivoBalanca = false;
+    public boolean gerarCodigoAtacado = false;
+    private ProdutoRepositoryProvider repository = new ProdutoRepositoryProvider();
 
     public void setLojaCliente(String idLoja) {
         this.idLoja = idLoja;
@@ -122,8 +124,7 @@ public class LiteciDAO extends InterfaceDAO {
                     + "ncm.taxaicms\n"
                     + "from tbitem p\n"
                     + "left join tbncm ncm on ncm.chave = p.codncm\n"
-                    + "left join tbestoque est on est.coditemi = p.coditem\n"
-                    + "where est.codfiliali = " + getLojaOrigem()
+                    + "left join tbestoque est on est.coditemi = p.coditem and est.codfiliali = " + getLojaOrigem()
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
@@ -216,18 +217,35 @@ public class LiteciDAO extends InterfaceDAO {
                     long ean;
                     int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("coditemi"));
                     
-                    if ((rst.getString("codbarra") != null) &&
-                            (!rst.getString("codbarra").trim().isEmpty())) {
-                        ean = Long.parseLong(Utils.formataNumero(rst.getString("codbarra")));
-                        
-                        if (ean <= 999999) {
-                            strEan = "999999" + String.valueOf(codigoAtual);
+                    if (!gerarCodigoAtacado) {
+                        if ((rst.getString("codbarra") != null)
+                                && (!rst.getString("codbarra").trim().isEmpty())) {
+                            ean = Long.parseLong(Utils.formataNumero(rst.getString("codbarra")));
+
+                            if (ean <= 999999) {
+                                strEan = "999999" + String.valueOf(codigoAtual);
+                            } else {
+                                strEan = rst.getString("codbarra");
+                            }
+                            
                         } else {
-                            strEan = rst.getString("codbarra");
+                            strEan = "999999" + String.valueOf(codigoAtual);
                         }
-                        
                     } else {
-                        strEan = "999999" + String.valueOf(codigoAtual);
+                        if ((rst.getString("codbarra") != null)
+                                && (!rst.getString("codbarra").trim().isEmpty())) {
+                            ean = Long.parseLong(Utils.formataNumero(rst.getString("codbarra")));
+
+                            if (repository.automacao().cadastrado(ean)) {
+                                if (!repository.automacao().getEanById(ean, codigoAtual)) {
+                                    strEan = "999999" + String.valueOf(codigoAtual);
+                                }
+                            } else {
+                                strEan = rst.getString("codbarra");
+                            }
+                        } else {
+                            strEan = "999999" + String.valueOf(codigoAtual);
+                        }
                     }
                     
                     ProdutoIMP imp = new ProdutoIMP();
@@ -269,17 +287,20 @@ public class LiteciDAO extends InterfaceDAO {
                         String strEan = "";
                         int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("coditemi"));
 
-                        if ((rst.getString("codbarra") != null)
-                                && (!rst.getString("codbarra").trim().isEmpty())) {
-                            ean = Long.parseLong(Utils.formataNumero(rst.getString("codbarra")));
+                        if (!gerarCodigoAtacado) {
+                            if ((rst.getString("codbarra") != null)
+                                    && (!rst.getString("codbarra").trim().isEmpty())) {
+                                ean = Long.parseLong(Utils.formataNumero(rst.getString("codbarra")));
 
-                            if (ean <= 999999) {
-                                strEan = "999999" + String.valueOf(codigoAtual);
+                                if (ean <= 999999) {
+                                    strEan = "999999" + String.valueOf(codigoAtual);
+                                } else {
+                                    strEan = rst.getString("codbarra");
+                                }
                             } else {
-                                strEan = rst.getString("codbarra");
+                                strEan = "999999" + String.valueOf(codigoAtual);
                             }
-                            
-                        } else {
+                        } else {                            
                             strEan = "999999" + String.valueOf(codigoAtual);
                         }
 

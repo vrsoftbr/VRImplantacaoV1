@@ -272,7 +272,11 @@ public class ProdutoRepositoryProvider {
             Integer get = dao.getEansCadastrados().get(ean);
             return get == null ? 0 : get;
         }
-
+        
+        public boolean getEanById(long ean, int prod) throws Exception {
+            return dao.getEanById(ean, prod);
+        }
+        
         public void salvar(ProdutoAutomacaoVO automacao) throws Exception {
             dao.salvar(automacao);
         }

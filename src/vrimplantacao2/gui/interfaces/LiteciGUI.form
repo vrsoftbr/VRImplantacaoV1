@@ -204,9 +204,24 @@
                     <Property name="text" type="java.lang.String" value="Utiliza Balan&#xe7;a"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1EAN">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="EAN"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1EANemBranco">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="EAN em branco"/>
+                  </Properties>
+                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAtacado">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Atacado"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkGerarCodigoAtacado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Gerar C&#xf3;digo Atacado"/>
                   </Properties>
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1Custo">
@@ -227,16 +242,6 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkZerarMargem">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Zerar Margem"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1EAN">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="EAN"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1EANemBranco">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="EAN em branco"/>
                   </Properties>
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1PisCofins">

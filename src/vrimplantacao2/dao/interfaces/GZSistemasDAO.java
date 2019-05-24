@@ -244,16 +244,15 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "s.situacao\n"
                     + "from mercodb.estoque e\n"
                     + "left join mercodb.tributa t on t.codigo = e.tributa\n"
-                    + "left join mercodb.saldos s on s.cdprod = e.cdprod\n"
-                    + "where s.loja = " + getLojaOrigem() + "\n"
+                    + "left join mercodb.saldos s on s.cdprod = e.cdprod and s.loja = " + getLojaOrigem() + "\n"
                     + "order by e.cdprod"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("cdprod").trim());
-                    imp.setEan(rst.getString("codbarra").trim());
+                    imp.setImportId(rst.getString("cdprod"));
+                    imp.setEan(rst.getString("codbarra"));
                     imp.setTipoEmbalagem(rst.getString("unidadevenda").trim());
                     
                     if (rst.getInt("setor") > 0) {
@@ -261,7 +260,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     if ((imp.getEan() != null)
                             && (!imp.getEan().trim().isEmpty())
-                            && (Double.parseDouble(imp.getEan()) <= 999999)
+                            && (Double.parseDouble(imp.getEan().trim()) <= 999999)
                             && (rst.getInt("setor") == 0)
                             && (imp.getTipoEmbalagem().contains("KG"))) {
 
@@ -286,7 +285,14 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estminimo"));
                     imp.setEstoqueMaximo(rst.getDouble("estmaximo"));
-                    imp.setSituacaoCadastro(rst.getString("situacao").contains("A") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    
+                    if ((rst.getString("situacao") != null)
+                            && (!rst.getString("situacao").trim().isEmpty())) {
+                        imp.setSituacaoCadastro(rst.getString("situacao").contains("A") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    } else {
+                        imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
+                    }
+                    
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("stpis"));
@@ -584,43 +590,44 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "codigo,\n"
-                    + "razsoc,\n"
-                    + "nomfan,\n"
-                    + "tipoender,\n"
-                    + "ender,\n"
-                    + "numero,\n"
-                    + "complemen,\n"
-                    + "ibge,\n"
-                    + "bairro,\n"
-                    + "munic,\n"
-                    + "estado,\n"
-                    + "cep,\n"
-                    + "telcom,\n"
-                    + "dddtel,\n"
-                    + "telefone,\n"
-                    + "dddfax,\n"
-                    + "telefax,\n"
-                    + "insest,\n"
-                    + "cgc,\n"
-                    + "dtnasc,\n"
-                    + "obs,\n"
-                    + "email,\n"
-                    + "endwww,\n"
-                    + "emptrab,\n"
-                    + "endemp,\n"
-                    + "bairroemp,\n"
-                    + "municemp,\n"
-                    + "estadoemp,\n"
-                    + "cepemp,\n"
-                    + "dddemp,\n"
-                    + "telemp,\n"
-                    + "cargo,\n"
-                    + "profissao,\n"
-                    + "estcivil,\n"
-                    + "sexo,\n"
-                    + "saldo\n"
-                    + "from mercodb.clientes\n"
+                    + "c.codigo,\n"
+                    + "c.razsoc,\n"
+                    + "c.nomfan,\n"
+                    + "c.tipoender,\n"
+                    + "c.ender,\n"
+                    + "c.numero,\n"
+                    + "c.complemen,\n"
+                    + "c.ibge,\n"
+                    + "c.bairro,\n"
+                    + "c.munic,\n"
+                    + "c.estado,\n"
+                    + "c.cep,\n"
+                    + "c.telcom,\n"
+                    + "c.dddtel,\n"
+                    + "c.telefone,\n"
+                    + "c.dddfax,\n"
+                    + "c.telefax,\n"
+                    + "c.insest,\n"
+                    + "c.cgc,\n"
+                    + "c.dtnasc,\n"
+                    + "c.obs,\n"
+                    + "c.email,\n"
+                    + "c.endwww,\n"
+                    + "c.emptrab,\n"
+                    + "c.endemp,\n"
+                    + "c.bairroemp,\n"
+                    + "c.municemp,\n"
+                    + "c.estadoemp,\n"
+                    + "c.cepemp,\n"
+                    + "c.dddemp,\n"
+                    + "c.telemp,\n"
+                    + "c.cargo,\n"
+                    + "c.profissao,\n"
+                    + "c.estcivil,\n"
+                    + "c.sexo,\n"
+                    + "cc.limite\n"
+                    + "from mercodb.clientes c\n"
+                    + "left join mercodb.clicartao cc on cc.cdcliente = c.codigo\n"
                     + "order by codigo"
             )) {
                 while (rst.next()) {
@@ -650,7 +657,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEmpresaCep(rst.getString("cepemp"));
                     imp.setEmpresaTelefone((rst.getString("dddemp") + rst.getString("telemp")).trim());
                     imp.setCargo(rst.getString("cargo"));
-                    imp.setValorLimite(rst.getDouble("saldo"));
+                    imp.setValorLimite(rst.getDouble("limite"));
                     imp.setSexo("M".equals(rst.getString("sexo")) ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
 
                     if ((rst.getString("endwww") != null)

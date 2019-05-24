@@ -212,4 +212,18 @@ public class ProdutoAutomacaoDAO {
             }
         }
     }
+    
+    public boolean getEanById(long ean, int prod) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select * from produtoautomacao where codigobarras = " + ean + " and id_produto = " + prod
+            )) {
+                if (rst.next()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
 }
