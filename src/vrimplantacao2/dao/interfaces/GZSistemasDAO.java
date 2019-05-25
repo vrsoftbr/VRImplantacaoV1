@@ -20,7 +20,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoMySQL;
-import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -86,7 +85,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.CEST,
             OpcaoProduto.PIS_COFINS,
             OpcaoProduto.NATUREZA_RECEITA,
-            OpcaoProduto.ICMS,            
+            OpcaoProduto.ICMS,
             OpcaoProduto.ICMS_SAIDA,
             OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
             OpcaoProduto.ICMS_ENTRADA,
@@ -144,20 +143,20 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
-        
+
         ProdutoParaFamiliaHelper helper = new ProdutoParaFamiliaHelper(result);
-        
+
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct\n" +
-                    "  eq.codigo,\n" +
-                    "  es.descricao\n" +
-                    "from\n" +
-                    "  equivale eq\n" +
-                    "  join estoque es on\n" +
-                    "    eq.cdprod = es.cdprod\n" +
-                    "order by\n" +
-                    "  eq.codigo"
+                    "select distinct\n"
+                    + "  eq.codigo,\n"
+                    + "  es.descricao\n"
+                    + "from\n"
+                    + "  equivale eq\n"
+                    + "  join estoque es on\n"
+                    + "    eq.cdprod = es.cdprod\n"
+                    + "order by\n"
+                    + "  eq.codigo"
             )) {
                 while (rst.next()) {
                     helper.gerarFamilia(rst.getString("codigo"), rst.getString("descricao"));
@@ -254,7 +253,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rst.getString("cdprod"));
                     imp.setEan(rst.getString("codbarra"));
                     imp.setTipoEmbalagem(rst.getString("unidadevenda").trim());
-                    
+
                     if (rst.getInt("setor") > 0) {
                         imp.seteBalanca(true);
                     }
@@ -266,7 +265,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
                         imp.seteBalanca(true);
                     }
-                    
+
 //                    imp.seteBalanca(rst.getInt("setor") > 0);
                     imp.setValidade(rst.getInt("validade"));
                     imp.setDescricaoCompleta(rst.getString("descricao").trim());
@@ -285,14 +284,14 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setEstoqueMinimo(rst.getDouble("estminimo"));
                     imp.setEstoqueMaximo(rst.getDouble("estmaximo"));
-                    
+
                     if ((rst.getString("situacao") != null)
                             && (!rst.getString("situacao").trim().isEmpty())) {
                         imp.setSituacaoCadastro(rst.getString("situacao").contains("A") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     } else {
                         imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
                     }
-                    
+
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("stpis"));
@@ -310,7 +309,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        
+
         if (opt == OpcaoProduto.FAMILIA) {
             try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -330,9 +329,9 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                 }
                 return result;
-            }            
+            }
         }
-        
+
         if (opt == OpcaoProduto.ICMS_SAIDA) {
             try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -378,7 +377,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                 return result;
             }
         }
-        
+
         if (opt == OpcaoProduto.ICMS_SAIDA_FORA_ESTADO) {
             try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -401,7 +400,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                 return result;
             }
         }
-        
+
         if (opt == OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO) {
             try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -424,10 +423,10 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                 return result;
             }
         }
-        
+
         return null;
-    } 
-    
+    }
+
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -748,7 +747,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
         private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
-        private Statement stm = ConexaoSqlServer.getConexao().createStatement();
+        private Statement stm = ConexaoMySQL.getConexao().createStatement();
         private ResultSet rst;
         private String sql;
         private VendaIMP next;
@@ -768,7 +767,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setId(id);
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
-                        next.setData(rst.getDate("data"));                        
+                        next.setData(rst.getDate("data"));
 
                         String endereco;
 
@@ -825,7 +824,19 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
                         String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
                         String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horatermino");
-                        next.setCancelado(rst.getBoolean("cancelado"));
+                        
+                        if ((rst.getString("cancelado") != null)
+                                && (!rst.getString("cancelado").trim().isEmpty())) {
+
+                            if (rst.getString("cancelado").contains("S")) {
+                                next.setCancelado(true);
+                            } else {
+                                next.setCancelado(false);
+                            }
+                        } else {
+                            next.setCancelado(false);
+                        }
+                        
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
                         next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
@@ -849,29 +860,43 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "vd.data,\n"
                     + "min(hora) as horainicio,\n"
                     + "max(hora) as horatermino,\n"
-                    + "vd.cupom,\n"
+                    + "vd.cupom as numerocupom,\n"
                     + "vd.coo,\n"
-                    + "vd.nfce_chave,\n"
-                    + "sum(coalesce(vd.valortot, 0)) as valortotal,\n"
-                    + "vd.caixa,\n"
-                    + "vd.ecf,\n"
+                    + "vd.nfce_chave as ChaveCfe,\n"
+                    + "sum(coalesce(vd.valortot, 0)) as subtotalimpressora,\n"
+                    + "sum(coalesce(vd.desccupom, 0)) as desconto,\n"
+                    + "sum(coalesce(vd.acrescupom, 0)) as acrescimo,\n"
+                    + "vd.caixa as ecf,\n"
+                    + "vd.ecf as ecf2,\n"
                     + "vd.operador,\n"
-                    + "vd.cliente,\n"
-                    + "vd.cgc as cpfvenda,\n"
-                    + "cli.cgc as cpfcliente,\n"
-                    + "cli.razsoc,\n"
-                    + "cli.ender,\n"
-                    + "cli.numero,\n"
-                    + "cli.complemen,\n"
-                    + "cli.bairro,\n"
-                    + "cli.munic,\n"
-                    + "cli.estado,\n"
-                    + "cli.cep\n"
+                    + "vd.cancelado,\n"
+                    + "vd.cliente as vc_clientepreferencial,\n"
+                    + "vd.cgc as vc_cpf,\n"
+                    + "cli.cgc as cli_cpf,\n"
+                    + "cli.razsoc as cli_nomecliente,\n"
+                    + "cli.ender as cli_endereco,\n"
+                    + "cli.numero as cli_numero,\n"
+                    + "cli.complemen as complemento,\n"
+                    + "cli.bairro as cli_bairro,\n"
+                    + "cli.munic as cli_cidade,\n"
+                    + "cli.estado as cli_estado,\n"
+                    + "cli.cep as cli_cep,\n "
+                    + "cli.cgc as vc_cpf,\n"
+                    + "cli.razsoc as vc_nomecliente,\n"
+                    + "cli.ender as vc_endereco,\n"
+                    + "cli.numero as vc_numero,\n"
+                    + "cli.complemen as complemento,\n"
+                    + "cli.bairro as vc_bairro,\n"
+                    + "cli.munic as vc_cidade,\n"
+                    + "cli.estado as vc_estado,\n"
+                    + "cli.cep as vc_cep,\n "
+                    + "'' as numeroserie, \n"
+                    + "'' as modelo\n"
                     + "from mercodb.movcaixa vd\n"
                     + "left join mercodb.clientes cli on cli.codigo = vd.cliente\n"
                     + "where vd.cdprod <> ''\n"
-                    + "vd.data >= '" + dataInicio + "' and vd.data <= '" + dataTermino + "' \n"
-                    + "and vd.loja = '" + idLojaCliente + "'\n"
+                    + "and vd.data >= '" + dataInicio + "' and vd.data <= '" + dataTermino + "'\n"
+                    + "and vd.loja = " + idLojaCliente + "\n"
                     + "group by\n"
                     + "vd.id,\n"
                     + "vd.data,\n"
@@ -891,7 +916,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "cli.munic,\n"
                     + "cli.estado,\n"
                     + "cli.cep";
-            
+
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -921,7 +946,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
         private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
-        private Statement stm = ConexaoSqlServer.getConexao().createStatement();
+        private Statement stm = ConexaoMySQL.getConexao().createStatement();
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
@@ -932,8 +957,8 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (rst.next()) {
                         next = new VendaItemIMP();
                         String idVenda = rst.getString("id_venda");
-                        String id = rst.getString("id") + "-" + rst.getString("id_venda");
-                        
+                        String id = rst.getString("id_venda");
+
                         next.setId(id);
                         next.setVenda(idVenda);
                         next.setProduto(rst.getString("produto"));
@@ -946,7 +971,30 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setUnidadeMedida(rst.getString("unidade"));
 
-                        String trib = Utils.acertarTexto(rst.getString("codaliq_venda"));
+                        String strTrib = "";
+
+                        if ((rst.getString("codaliq_venda") != null)
+                                && (!rst.getString("codaliq_venda").trim().isEmpty())) {
+                            if (rst.getString("codaliq_venda").contains("F00.00")) {
+                                strTrib = "F";
+                            } else if (rst.getString("codaliq_venda").contains("T18.00")) {
+                                strTrib = "1800";
+                            } else if (rst.getString("codaliq_venda").contains("T07.00")) {
+                                strTrib = "0700";
+                            } else if (rst.getString("codaliq_venda").contains("T12.00")) {
+                                strTrib = "1200";
+                            } else if (rst.getString("codaliq_venda").contains("T11.00")) {
+                                strTrib = "1100";
+                            } else if (rst.getString("codaliq_venda").contains("I00.00")) {
+                                strTrib = "I";
+                            } else if (rst.getString("codaliq_venda").contains("'T25.00'")) {
+                                strTrib = "2500";
+                            }
+                        } else {
+                            strTrib = "I";
+                        }
+
+                        String trib = strTrib;
                         if (trib == null || "".equals(trib)) {
                             trib = Utils.acertarTexto(rst.getString("codaliq_produto"));
                         }
@@ -1019,37 +1067,28 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "select distinct\n"
-                    + "mov.cod_mov as id,\n"
-                    + "vc.Codigo as id_venda,\n"
-                    + "mov.coo as numerocupom,\n"
-                    + "mov.numimpfiscal,\n"
-                    + "mov.caixa_mov as ecf,\n"
-                    + "convert(date, mov.data_mov, 105) as data,\n"
-                    + "pro.CODPROD_PRODUTOS as produto,\n"
-                    + "pro.DescricaoCompleta as descricao,\n"
-                    + "ISNULL(mov.qtd_mov, 0) quantidade,\n"
-                    + "ISNULL(mov.venda_mov, 0) as total,\n"
-                    + "ISNULL(mov.Cancelada, 0) as cancelado,\n"
-                    + "ISNULL(mov.VLACRDESC, 0) as desconto,\n"
-                    + "0 as acrescimo,\n"
-                    + "mov.codbarra_mov as codigobarras,\n"
-                    + "pro.UNIDADE_PRODUTOS as unidade,\n"
-                    + "mov.S_Trib_Aliquota codaliq_venda,\n"
+                    = "select\n"
+                    + "vd.id as id_venda,\n"
+                    + "vd.cupom as numerocupom,\n"
+                    + "vd.cdprod as produto,\n"
+                    + "e.descricao as descricao,\n"
+                    + "coalesce(vd.quant, 0) as quantidade,\n"
+                    + "coalesce(vd.preco, 0) as precovenda,\n"
+                    + "coalesce(vd.valortot, 0) as total,\n"
+                    + "vd.caixa as ecf,\n"
+                    + "vd.data,\n"
+                    + "vd.hora,\n"
+                    + "vd.tributacao as codaliq_venda,\n"
                     + "'I' as codaliq_produto,\n"
-                    + "'' as trib_desc\n"
-                    + "from CE_MOVIMENTACAO mov\n"
-                    + "inner join CE_PRODUTOS pro on pro.CODBARRA_PRODUTOS = mov.codbarra_mov \n"
-                    + "inner join CE_VendasCaixa vc on vc.NumeroCaixa = mov.caixa_mov and vc.COO = mov.coo and vc.numimpfiscal = mov.NumImpFiscal\n"
-                    + "and vc.NumeroOperador = mov.CodOperador\n"
-                    + "and convert(date, vc.Data, 105) = convert(date, mov.data_mov, 105)\n"
-                    + "where vc.CodEmpresa = " + idLojaCliente + "\n"
-                    + "and mov.CodEmpresa = " + idLojaCliente + "\n"
-                    + "and (vc.Data between CONVERT(datetime, '" + FORMAT.format(dataInicio) + "', 103)\n"
-                    + "		and CONVERT(datetime, '" + FORMAT.format(dataTermino) + "', 103))\n"
-                    + "and (mov.data_mov between CONVERT(datetime, '" + FORMAT.format(dataInicio) + "', 103)\n"
-                    + "		and CONVERT(datetime, '" + FORMAT.format(dataTermino) + "', 103))\n"
-                    + "and isnull(mov.VendaUn, 0) > 0";
+                    + "vd.codbarra as codigobarras,\n"
+                    + "vd.descitem as desconto,\n"
+                    + "vd.acresitem as acrescimo,\n"
+                    + "vd.cancelado,\n"
+                    + "vd.nfce_chave as numimpfiscal\n"
+                    + "from mercodb.movcaixa vd\n"
+                    + "inner join mercodb.estoque e on e.cdprod = vd.cdprod and vd.cdprod <> ''\n"
+                    + "where vd.loja = " + idLojaCliente + "\n"
+                    + "and vd.data >= '" + dataInicio + "' and vd.data <= '" + dataTermino + "'";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -1074,5 +1113,4 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
             throw new UnsupportedOperationException("Not supported.");
         }
     }
-    
 }

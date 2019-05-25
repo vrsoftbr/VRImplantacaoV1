@@ -1,6 +1,8 @@
 package vrimplantacao2.gui.interfaces;
 
 import java.awt.Frame;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
@@ -16,6 +18,7 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.GZSistemasDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
@@ -65,7 +68,7 @@ public class GZSistemasGUI extends VRInternalFrame implements ConexaoEvent {
     private GZSistemasGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
-        
+
         tabProdutos.setOpcoesDisponiveis(dao);
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
             @Override
@@ -88,7 +91,7 @@ public class GZSistemasGUI extends VRInternalFrame implements ConexaoEvent {
                 return mdiFrame;
             }
         });
-        
+
         this.title = "Importação " + SISTEMA;
 
         conexaoMySQL.host = "localhost";
@@ -105,6 +108,9 @@ public class GZSistemasGUI extends VRInternalFrame implements ConexaoEvent {
 
         centralizarForm();
         this.setMaximum(false);
+
+        txtDataIniVenda.setEnabled(false);
+        txtDataFimVenda.setEnabled(false);
     }
 
     public void carregarLojaVR() throws Exception {
@@ -149,8 +155,8 @@ public class GZSistemasGUI extends VRInternalFrame implements ConexaoEvent {
         }
     }
 
-    public void importarTabelas() throws Exception {   
-        
+    public void importarTabelas() throws Exception {
+
         Thread thread = new Thread() {
             int idLojaVR;
             String idLojaCliente;
@@ -172,7 +178,7 @@ public class GZSistemasGUI extends VRInternalFrame implements ConexaoEvent {
 
                         tabProdutos.setImportador(importador);
                         tabProdutos.executarImportacao();
-                        
+
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
@@ -191,9 +197,9 @@ public class GZSistemasGUI extends VRInternalFrame implements ConexaoEvent {
                                 importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
                             }
                         }
-                        
+
                         if (chkClientePreferencial.isSelected()) {
-                            importador.importarClientePreferencial(OpcaoCliente.DADOS,OpcaoCliente.CONTATOS);
+                            importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
                         }
                         {
                             List<OpcaoCliente> opt = new ArrayList<>();
@@ -206,6 +212,16 @@ public class GZSistemasGUI extends VRInternalFrame implements ConexaoEvent {
                         }
                         if (chkCreditoRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
+                        }
+
+                        if ((chkVenda.isSelected())
+                                && (!txtDataIniVenda.getText().trim().isEmpty())
+                                && (!txtDataFimVenda.getText().trim().isEmpty())) {
+
+                            DateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
+                            dao.setDataInicioVenda(new java.sql.Date(fmt.parse(txtDataIniVenda.getText()).getTime()));
+                            dao.setDataTerminoVenda(new java.sql.Date(fmt.parse(txtDataFimVenda.getText()).getTime()));
+                            importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                     }
 
@@ -249,6 +265,12 @@ public class GZSistemasGUI extends VRInternalFrame implements ConexaoEvent {
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkValorLimite = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel1 = new vrframework.bean.panel.VRPanel();
+        vRLabel2 = new vrframework.bean.label.VRLabel();
+        txtDataIniVenda = new vrframework.bean.textField.VRTextField();
+        vRLabel3 = new vrframework.bean.label.VRLabel();
+        txtDataFimVenda = new vrframework.bean.textField.VRTextField();
+        chkVenda = new vrframework.bean.checkBox.VRCheckBox();
 
         setTitle("Importação GZ Sistemas");
         setToolTipText("");
@@ -365,6 +387,53 @@ public class GZSistemasGUI extends VRInternalFrame implements ConexaoEvent {
 
         tabImportacao.addTab("Clientes", tabClientes);
 
+        vRLabel2.setText("Data Início");
+
+        vRLabel3.setText("Data Fim");
+
+        chkVenda.setText("Venda");
+        chkVenda.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkVendaActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
+        vRPanel1.setLayout(vRPanel1Layout);
+        vRPanel1Layout.setHorizontalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(vRPanel1Layout.createSequentialGroup()
+                        .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtDataIniVenda, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtDataFimVenda, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(chkVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(283, Short.MAX_VALUE))
+        );
+        vRPanel1Layout.setVerticalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtDataIniVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtDataFimVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(151, Short.MAX_VALUE))
+        );
+
+        tabImportacao.addTab("Vendas", vRPanel1);
+
         tabs.addTab("Importação", tabImportacao);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -414,6 +483,17 @@ public class GZSistemasGUI extends VRInternalFrame implements ConexaoEvent {
         }
     }//GEN-LAST:event_btnMigrarActionPerformed
 
+    private void chkVendaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkVendaActionPerformed
+        // TODO add your handling code here:
+        if (chkVenda.isSelected()) {
+            txtDataIniVenda.setEnabled(true);
+            txtDataFimVenda.setEnabled(true);
+        } else {
+            txtDataIniVenda.setEnabled(false);
+            txtDataFimVenda.setEnabled(false);
+        }
+    }//GEN-LAST:event_chkVendaActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
@@ -422,6 +502,7 @@ public class GZSistemasGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkValorLimite;
+    private vrframework.bean.checkBox.VRCheckBox chkVenda;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel conexaoMySQL;
@@ -433,7 +514,12 @@ public class GZSistemasGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JTabbedPane tabImportacao;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private javax.swing.JTabbedPane tabs;
+    private vrframework.bean.textField.VRTextField txtDataFimVenda;
+    private vrframework.bean.textField.VRTextField txtDataIniVenda;
     private vrframework.bean.label.VRLabel vRLabel1;
+    private vrframework.bean.label.VRLabel vRLabel2;
+    private vrframework.bean.label.VRLabel vRLabel3;
+    private vrframework.bean.panel.VRPanel vRPanel1;
     // End of variables declaration//GEN-END:variables
 
     @Override
