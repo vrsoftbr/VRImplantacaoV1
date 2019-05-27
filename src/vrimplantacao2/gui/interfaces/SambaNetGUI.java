@@ -165,30 +165,48 @@ public class SambaNetGUI extends VRInternalFrame {
                     tabProdutos.setImportador(importador);
 
                     if (tabs.getSelectedIndex() == 0) {
-                        StringBuilder erros = new StringBuilder();
-                        if (tabProdutos.chkFamilia.isSelected()) {
-                            if (txtPlanilhaFamilia.getArquivo().equals("")) {
-                                erros.append("Família Produto - Informe o arquivo RelFamiliaPrecoXtra.xls").append("\n");
+                        if (tabsProduto.getSelectedIndex() == 1) {
+                            StringBuilder erros = new StringBuilder();
+                            if (tabProdutos.chkFamilia.isSelected()) {
+                                if (txtPlanilhaFamilia.getArquivo().equals("")) {
+                                    erros.append("Família Produto - Informe o arquivo RelFamiliaPrecoXtra.xls").append("\n");
+                                }
                             }
-                        }
-                        if (tabProdutos.chkMercadologico.isSelected()) {
-                            if (txtPlanilhaProdutos.getArquivo().equals("")) {
-                                erros.append("Mercadológico - Informe o arquivo RelProdutosXtra.xls").append("\n");
+                            if (tabProdutos.chkMercadologico.isSelected()) {
+                                if (txtPlanilhaProdutos.getArquivo().equals("")) {
+                                    erros.append("Mercadológico - Informe o arquivo RelProdutosXtra.xls").append("\n");
+                                }
                             }
-                        }
-                        if (tabProdutos.chkProdutos.isSelected()) {
-                            if (txtPlanilhaProdutos.getArquivo().equals("")||
-                                    txtPlanilhaProdutosContador.getArquivo().equals("")) {                                
-                                erros.append("Produtos - Informe o arquivo RelProdutosXtra.xls e o RelProdutosListagemContadorXtra.xls").append("\n");
+                            if (tabProdutos.chkProdutos.isSelected()) {
+                                if (
+                                        txtPlanilhaProdutos.getArquivo().equals("")||
+                                        txtPlanilhaProdutosContador.getArquivo().equals("")||
+                                        txtPlanilhaFamilia.getArquivo().equals("")) {
+                                    erros.append("Produtos - Informe o arquivo RelProdutosXtra.xls, RelFamiliaPrecoXtra.xls e o RelProdutosListagemContadorXtra.xls").append("\n");
+                                }
                             }
-                        }
-                        if (erros.toString().equals("")) {
-                            dao.setPlanilhaFamiliaProduto(txtPlanilhaFamilia.getArquivo());
-                            dao.setPlanilhaProdutos(txtPlanilhaProdutos.getArquivo());
-                            dao.setPlanilhaProdutosContator(txtPlanilhaProdutosContador.getArquivo());
-                            tabProdutos.executarImportacao();
-                        } else {
-                            Util.exibirMensagem("Atenção", erros.toString());
+                            if (erros.toString().equals("")) {
+                                dao.setPlanilhaFamiliaProduto(txtPlanilhaFamilia.getArquivo());
+                                dao.setPlanilhaProdutos(txtPlanilhaProdutos.getArquivo());
+                                dao.setPlanilhaProdutosContator(txtPlanilhaProdutosContador.getArquivo());
+                                tabProdutos.executarImportacao();
+                            } else {
+                                Util.exibirMensagem("Atenção", erros.toString());
+                            }
+                        } else if (tabsProduto.getSelectedIndex() == 2) {
+                            if (chkUnifProdutos.isSelected()) {
+                                if (
+                                        txtPlanilhaProdutos.getArquivo().equals("")||
+                                        txtPlanilhaProdutosContador.getArquivo().equals("")||
+                                        txtPlanilhaFamilia.getArquivo().equals("")) {
+                                    Util.exibirMensagem("Atenção", "Produtos - Informe o arquivo RelProdutosXtra.xls, RelFamiliaPrecoXtra.xls e o RelProdutosListagemContadorXtra.xls");
+                                } else {                                    
+                                    dao.setPlanilhaFamiliaProduto(txtPlanilhaFamilia.getArquivo());
+                                    dao.setPlanilhaProdutos(txtPlanilhaProdutos.getArquivo());
+                                    dao.setPlanilhaProdutosContator(txtPlanilhaProdutosContador.getArquivo());
+                                    importador.unificarProdutos();
+                                }
+                            }
                         }
                     }
                     
@@ -217,7 +235,7 @@ public class SambaNetGUI extends VRInternalFrame {
         jLabel1 = new javax.swing.JLabel();
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
-        tabs2 = new vrframework.bean.tabbedPane.VRTabbedPane();
+        tabsProduto = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabPlanilhasProduto = new vrframework.bean.panel.VRPanel();
         txtPlanilhaFamilia = new vrframework.bean.fileChooser.VRFileChooser();
         vRLabel24 = new vrframework.bean.label.VRLabel();
@@ -230,6 +248,9 @@ public class SambaNetGUI extends VRInternalFrame {
         vRLabel38 = new vrframework.bean.label.VRLabel();
         txtPlanilhaProdutosContador = new vrframework.bean.fileChooser.VRFileChooser();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
+        vRPanel2 = new vrframework.bean.panel.VRPanel();
+        chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
+        chkUnifProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
 
         setTitle("Importação Liteci");
         setToolTipText("");
@@ -352,10 +373,37 @@ public class SambaNetGUI extends VRInternalFrame {
                 .addComponent(btnMigrar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        tabs2.addTab("Localização das Planilhas", tabPlanilhasProduto);
-        tabs2.addTab("Produtos", tabProdutos);
+        tabsProduto.addTab("Localização das Planilhas", tabPlanilhasProduto);
+        tabsProduto.addTab("Produtos", tabProdutos);
 
-        tabs.addTab("Produtos", tabs2);
+        chkUnifProdutos.setText("Produtos (Somente com EAN válido)");
+
+        chkUnifProdutoFornecedor.setText("Produto Fornecedor (Somente com CPF/CNPJ)");
+
+        javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
+        vRPanel2.setLayout(vRPanel2Layout);
+        vRPanel2Layout.setHorizontalGroup(
+            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(468, Short.MAX_VALUE))
+        );
+        vRPanel2Layout.setVerticalGroup(
+            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(290, Short.MAX_VALUE))
+        );
+
+        tabsProduto.addTab("Unificação", vRPanel2);
+
+        tabs.addTab("Produtos", tabsProduto);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -416,12 +464,14 @@ public class SambaNetGUI extends VRInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.button.VRButton btnMigrar1;
+    private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private javax.swing.JLabel jLabel1;
     private vrframework.bean.panel.VRPanel tabPlanilhasProduto;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
-    private vrframework.bean.tabbedPane.VRTabbedPane tabs2;
+    private vrframework.bean.tabbedPane.VRTabbedPane tabsProduto;
     private javax.swing.JTextField txtLoja;
     private vrframework.bean.fileChooser.VRFileChooser txtPlanilhaFamilia;
     private vrframework.bean.fileChooser.VRFileChooser txtPlanilhaProdutos;
@@ -433,6 +483,7 @@ public class SambaNetGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel36;
     private vrframework.bean.label.VRLabel vRLabel37;
     private vrframework.bean.label.VRLabel vRLabel38;
+    private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     // End of variables declaration//GEN-END:variables
 
