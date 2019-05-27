@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import jxl.Cell;
@@ -261,7 +263,6 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoIMP> getProdutos() throws Exception {
         File file = new File(this.planilhaProdutos);        
         if (file.exists()) {
-            List<ProdutoIMP> result = new ArrayList<>();
 
             WorkbookSettings settings = new WorkbookSettings();
             settings.setEncoding("CP1250");
@@ -269,9 +270,6 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
 
             Workbook planilha = Workbook.getWorkbook(file, settings);            
             Sheet sheet = planilha.getSheet(0);
-
-            ProgressBar.setStatus("Analisando Planilha de Produtos");
-            ProgressBar.setMaximum(sheet.getRows());
 
             int linha = 0;
             
@@ -282,7 +280,10 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
 
                 String centroReceita = "", grupo = "", categoria = "";
                 
-                
+                Map<String, String> familia = getFamilia();
+
+                ProgressBar.setStatus("Analisando Planilha de Produtos");
+                ProgressBar.setMaximum(sheet.getRows());
                 for (int i = 1; i < sheet.getRows(); i++) {
                     linha++;
                     if (
@@ -300,8 +301,6 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setDescricaoReduzida(sheet.getCell(6, i).getContents());
                         imp.setDescricaoGondola(sheet.getCell(6, i).getContents());
                         imp.setQtdEmbalagemCotacao(Utils.stringToInt(sheet.getCell(11, i).getContents()));
-                        imp.setIcmsDebitoId(sheet.getCell(13, i).getContents());
-                        imp.setIcmsCreditoId(sheet.getCell(13, i).getContents());
                         imp.setEstoque(Utils.stringToDouble(sheet.getCell(14, i).getContents()));
                         imp.setCustoSemImposto(Utils.stringToDouble(sheet.getCell(17, i).getContents()));
                         imp.setCustoComImposto(Utils.stringToDouble(sheet.getCell(17, i).getContents()));
@@ -309,6 +308,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setCodMercadologico1(centroReceita);
                         imp.setCodMercadologico2(grupo);
                         imp.setCodMercadologico3(categoria);
+                        imp.setIdFamiliaProduto(familia.get(imp.getImportId()));
                         produtos.put(imp, imp.getImportId(), imp.getEan());
                         
                     } else if (
@@ -342,18 +342,69 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                 throw ex;
             }
             
-            vincularFamilia(produtos);
-            
             vincularTributos(produtos);
-
-            return result;
+           
+            return new ArrayList<>(produtos.values());
         } else {
             throw new IOException("Planilha(s) não encontrada");
         }
     }
 
-    private void vincularFamilia(MultiMap<String, ProdutoIMP> produtos) throws Exception {
+    private Map<String, String> getFamilia() throws Exception {
         File file = new File(this.planilhaFamilia);        
+        if (!file.exists()) {
+            throw new Exception("");
+        }
+
+        WorkbookSettings settings = new WorkbookSettings();
+        settings.setEncoding("CP1250");
+        settings.setIgnoreBlanks(false);
+
+        Workbook planilha = Workbook.getWorkbook(file, settings);            
+        Sheet sheet = planilha.getSheet(0);
+
+        ProgressBar.setStatus("Analisando Planilha de Produtos (Família de Produtos)");
+        ProgressBar.setMaximum(sheet.getRows());
+
+        int linha = 0;
+
+        try {
+            Map<String, String> result = new HashMap<>();
+            
+            String familia = null;
+            for (int i = 1; i < sheet.getRows(); i++) {
+                //Se a coluna 2 for um número e a coluna 3 for texto, então é um produto.
+                if (
+                        Utils.acertarTexto(sheet.getCell(1, i).getContents()).matches("[0-9]+") &&
+                        Utils.acertarTexto(sheet.getCell(2, i).getContents()).matches("[a-zA-Z0-9 ]+")
+                ) {
+                    result.put(sheet.getCell(1, i).getContents(), familia);
+                    LOG.finer(String.format("Família '%s' vinculado ao produto '%s'-'%s'",
+                            familia,
+                            sheet.getCell(1, i),
+                            sheet.getCell(2, i)
+                    ));
+                } else if (
+                        //Se a primeira coluna é numérica, se a segunda é vazia e se a terceira for um texto
+                        //então é uma família.
+                        Utils.acertarTexto(sheet.getCell(0, i).getContents()).matches("[0-9]+") &&
+                        Utils.acertarTexto(sheet.getCell(1, i).getContents()).equals("") &&
+                        Utils.acertarTexto(sheet.getCell(2, i).getContents()).matches("[a-zA-Z0-9 ]+")
+                ) {
+                    familia = Utils.acertarTexto(sheet.getCell(0, i).getContents());
+                }
+                ProgressBar.next();
+            }
+            
+            return result;
+        } catch (Exception ex) {
+            System.out.println(linha);
+            throw ex;
+        }        
+    }
+
+    private void vincularTributos(MultiMap<String, ProdutoIMP> produtos) throws Exception {
+        File file = new File(this.planilhaProdutosContador);        
         if (file.exists()) {
 
             WorkbookSettings settings = new WorkbookSettings();
@@ -361,36 +412,31 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
             settings.setIgnoreBlanks(false);
 
             Workbook planilha = Workbook.getWorkbook(file, settings);            
-            Sheet sheet = planilha.getSheet(0);
+            Sheet sh = planilha.getSheet(0);
 
-            ProgressBar.setStatus("Analisando Planilha de Produtos (Família de Produtos)");
-            ProgressBar.setMaximum(sheet.getRows());
+            ProgressBar.setStatus("Analisando Planilha de Produtos (Tributação)");
+            ProgressBar.setMaximum(sh.getRows());
 
             int linha = 0;
             
             try {
-                String familia = null;
-                for (int i = 1; i < sheet.getRows(); i++) {
+                for (int i = 1; i < sh.getRows(); i++) {
                     //Se a coluna 2 for um número e a coluna 3 for texto, então é um produto.
                     if (
-                            Utils.acertarTexto(sheet.getCell(1, i).getContents()).matches("[0-9]+") &&
-                            Utils.acertarTexto(sheet.getCell(2, i).getContents()).matches("[a-zA-Z0-9 ]+")
+                            val(sh, 0, i).matches("[0-9]+") &&
+                            val(sh, 1, i).matches("[0-9]+") &&
+                            val(sh, 5, i).matches("[a-zA-Z0-9 ]+")
                     ) {
-                        String id = sheet.getCell(1, i).getContents();
-                        produtos.get(id).setIdFamiliaProduto(familia);
-                        LOG.finer(String.format("Família '%s' vinculado ao produto '%s'-'%s'",
-                                familia,
-                                sheet.getCell(1, i),
-                                sheet.getCell(2, i)
-                        ));
-                    } else if (
-                            //Se a primeira coluna é numérica, se a segunda é vazia e se a terceira for um texto
-                            //então é uma família.
-                            Utils.acertarTexto(sheet.getCell(0, i).getContents()).matches("[0-9]+") &&
-                            Utils.acertarTexto(sheet.getCell(1, i).getContents()).equals("") &&
-                            Utils.acertarTexto(sheet.getCell(2, i).getContents()).matches("[a-zA-Z0-9 ]+")
-                    ) {
-                        familia = Utils.acertarTexto(sheet.getCell(0, i).getContents());
+                        ProdutoIMP imp = produtos.get(val(sh, 0, i),val(sh, 1, i));
+                        
+                        imp.setTipoEmbalagem(val(sh,6,i));
+                        imp.setNcm(val(sh,7,i));
+                        imp.setIcmsDebitoId(val(sh,10, i));
+                        imp.setIcmsCreditoId(val(sh,10, i));
+                        imp.setPiscofinsCstCredito(val(sh,11,i));
+                        imp.setPiscofinsCstDebito(val(sh,12,i));
+                        imp.setPiscofinsNaturezaReceita(val(sh,16,i));
+                        imp.setCest(val(sh,17,i));
                     }
                     
                     ProgressBar.next();
@@ -401,10 +447,6 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                 throw ex;
             }
         }
-    }
-
-    private void vincularTributos(MultiMap<String, ProdutoIMP> produtos) throws Exception {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
     }
     
 }

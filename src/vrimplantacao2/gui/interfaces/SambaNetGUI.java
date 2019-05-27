@@ -1,6 +1,7 @@
 package vrimplantacao2.gui.interfaces;
 
 import java.awt.Frame;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import javax.swing.DefaultComboBoxModel;
 import org.openide.util.Exceptions;
@@ -65,6 +66,9 @@ public class SambaNetGUI extends VRInternalFrame {
             @Override
             public MapaTributoProvider getProvider() {
                 dao.setPlanilhaProdutosContator(txtPlanilhaProdutosContador.getArquivo());
+                if (!new File(txtPlanilhaProdutosContador.getArquivo()).exists()) {
+                    throw new RuntimeException("Arquivo RelProdutosListagemContadorXtra.xls não informado!");
+                }
                 return dao;
             }
 
@@ -75,6 +79,7 @@ public class SambaNetGUI extends VRInternalFrame {
 
             @Override
             public String getLoja() {
+                dao.setLojaOrigem(txtLoja.getText());
                 return dao.getLojaOrigem();
             }
 
@@ -186,6 +191,8 @@ public class SambaNetGUI extends VRInternalFrame {
                             Util.exibirMensagem("Atenção", erros.toString());
                         }
                     }
+                    
+                    gravarParametros();
 
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
@@ -405,7 +412,6 @@ public class SambaNetGUI extends VRInternalFrame {
             Exceptions.printStackTrace(ex);
         }
     }//GEN-LAST:event_btnMigrar1ActionPerformed
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
