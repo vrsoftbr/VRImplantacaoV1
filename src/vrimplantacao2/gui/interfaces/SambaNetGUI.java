@@ -1,5 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.awt.Frame;
 import java.text.SimpleDateFormat;
 import javax.swing.DefaultComboBoxModel;
 import org.openide.util.Exceptions;
@@ -12,6 +13,8 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.planilhas.SambaNetDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
 public class SambaNetGUI extends VRInternalFrame {
@@ -58,6 +61,28 @@ public class SambaNetGUI extends VRInternalFrame {
         this.title = "Importação " + SISTEMA;
         
         tabProdutos.setOpcoesDisponiveis(dao);
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+            @Override
+            public MapaTributoProvider getProvider() {
+                dao.setPlanilhaProdutosContator(txtPlanilhaProdutosContador.getArquivo());
+                return dao;
+            }
+
+            @Override
+            public String getSistema() {
+                return dao.getSistema();
+            }
+
+            @Override
+            public String getLoja() {
+                return dao.getLojaOrigem();
+            }
+
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
+            }
+        });
         carregarParametros();
 
         centralizarForm();
