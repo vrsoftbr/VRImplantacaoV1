@@ -760,7 +760,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("id");
+                        String id = rst.getString("data") + "-" + rst.getString("numerocupom") + "-" + rst.getString("ecf");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
@@ -847,7 +847,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setChaveCfe(rst.getString("ChaveCfe"));
                     }
                 }
-            } catch (SQLException | ParseException ex) {
+            } catch (SQLException | ParseException ex) {                
                 LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
                 throw new RuntimeException(ex);
             }
@@ -856,7 +856,6 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select\n"
-                    + "vd.id,\n"
                     + "vd.data,\n"
                     + "min(hora) as horainicio,\n"
                     + "max(hora) as horatermino,\n"
@@ -898,7 +897,6 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "and vd.data >= '" + dataInicio + "' and vd.data <= '" + dataTermino + "'\n"
                     + "and vd.loja = " + idLojaCliente + "\n"
                     + "group by\n"
-                    + "vd.id,\n"
                     + "vd.data,\n"
                     + "vd.cupom,\n"
                     + "vd.coo,\n"
@@ -956,8 +954,8 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String idVenda = rst.getString("id_venda");
-                        String id = rst.getString("id_venda");
+                        String idVenda = rst.getString("data") + "-" + rst.getString("numerocupom") + "-" + rst.getString("ecf");
+                        String id = rst.getString("id");
 
                         next.setId(id);
                         next.setVenda(idVenda);
@@ -967,7 +965,17 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setTotalBruto(rst.getDouble("total"));
                         next.setValorDesconto(rst.getDouble("desconto"));
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
-                        next.setCancelado(rst.getBoolean("cancelado"));
+                        
+                        boolean cancelado = false;
+                        
+                        if ((rst.getString("cancelado") != null) &&
+                                (!rst.getString("cancelado").trim().isEmpty())) {                            
+                            if (rst.getString("cancelado").contains("S")) {
+                                cancelado = true;
+                            }
+                        }
+                        
+                        next.setCancelado(cancelado);
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setUnidadeMedida(rst.getString("unidade"));
 
@@ -1068,10 +1076,11 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select\n"
-                    + "vd.id as id_venda,\n"
+                    + "vd.id,\n"
                     + "vd.cupom as numerocupom,\n"
                     + "vd.cdprod as produto,\n"
                     + "e.descricao as descricao,\n"
+                    + "e.unidade,\n"
                     + "coalesce(vd.quant, 0) as quantidade,\n"
                     + "coalesce(vd.preco, 0) as precovenda,\n"
                     + "coalesce(vd.valortot, 0) as total,\n"
