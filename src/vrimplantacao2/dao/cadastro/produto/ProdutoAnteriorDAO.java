@@ -94,6 +94,8 @@ public class ProdutoAnteriorDAO {
                     + "                      contadorimportacao integer not null default 0,\n"
                     + "                      novo boolean default false not null,\n"
                     + "                      codigosped varchar,\n"
+                    + "                      situacaocadastro integer,\n"
+                    + "                      dataimportacao timestamp,\n"
                     + "                      primary key (impsistema, imploja, impid),\n"
                     + "                      unique (impsistema, imploja, codigosped)\n"
                     + "                );\n"
