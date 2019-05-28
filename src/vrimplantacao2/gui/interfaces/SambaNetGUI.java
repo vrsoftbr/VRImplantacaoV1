@@ -2,7 +2,6 @@ package vrimplantacao2.gui.interfaces;
 
 import java.awt.Frame;
 import java.io.File;
-import java.text.SimpleDateFormat;
 import javax.swing.DefaultComboBoxModel;
 import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
@@ -12,6 +11,7 @@ import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
+import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.planilhas.SambaNetDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
@@ -34,6 +34,8 @@ public class SambaNetGUI extends VRInternalFrame {
         txtPlanilhaFamilia.setArquivo(params.get(SISTEMA, "PLAN_FAMILIA_PRODUTO"));
         txtPlanilhaProdutos.setArquivo(params.get(SISTEMA, "PRODUTOS"));
         txtPlanilhaProdutosContador.setArquivo(params.get(SISTEMA, "PRODUTOS_CONTADOR"));
+        txtPlanilhaFornecedor.setArquivo(params.get(SISTEMA, "FORNECEDOR"));
+        chkInativacao.setSelected(params.getBool(SISTEMA, "INATIVACAO"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
@@ -45,6 +47,8 @@ public class SambaNetGUI extends VRInternalFrame {
         params.put(txtPlanilhaFamilia.getArquivo(), SISTEMA, "PLAN_FAMILIA_PRODUTO");
         params.put(txtPlanilhaProdutos.getArquivo(), SISTEMA, "PRODUTOS");
         params.put(txtPlanilhaProdutosContador.getArquivo(), SISTEMA, "PRODUTOS_CONTADOR");
+        params.put(txtPlanilhaFornecedor.getArquivo(), SISTEMA, "FORNECEDOR");
+        params.put(chkInativacao.isSelected(), SISTEMA, "INATIVACAO");
         ItemComboVO vr = (ItemComboVO) cmbLojaVR.getSelectedItem();
         if (vr != null) {
             params.put(vr.id, SISTEMA, "LOJA_VR");
@@ -97,24 +101,6 @@ public class SambaNetGUI extends VRInternalFrame {
     }
 
     public void validarDadosAcesso() throws Exception {
-        /*if (tabsConn.getSelectedIndex() == 0) {
-            if (txtHost.getText().isEmpty()) {
-                throw new VRException("Favor informar host do banco de dados " + SERVIDOR_SQL + "!");
-            }
-            if (txtPorta.getText().isEmpty()) {
-                throw new VRException("Favor informar a porta do banco de dados " + SERVIDOR_SQL + "!");
-            }
-            if (txtDatabase.getArquivo().isEmpty()) {
-                throw new VRException("Favor informar nome do banco de dados " + SERVIDOR_SQL + "!");
-            }
-        }
-        if (txtSenha.getText().isEmpty()) {
-            throw new VRException("Favor informar a senha do banco de dados " + SERVIDOR_SQL + "!");
-        }
-        if (txtUsuario.getText().isEmpty()) {
-            throw new VRException("Favor informar o usuário do banco de dados " + SERVIDOR_SQL + "!");
-        }*/
-
         gravarParametros();
     }
 
@@ -163,6 +149,7 @@ public class SambaNetGUI extends VRInternalFrame {
                     importador.setLojaOrigem(txtLoja.getText());
                     importador.setLojaVR(idLojaVR);
                     tabProdutos.setImportador(importador);
+                    dao.setInativacao(chkInativacao.isSelected());
 
                     if (tabs.getSelectedIndex() == 0) {
                         if (tabsProduto.getSelectedIndex() == 1) {
@@ -194,6 +181,32 @@ public class SambaNetGUI extends VRInternalFrame {
                                 Util.exibirMensagem("Atenção", erros.toString());
                             }
                         } else if (tabsProduto.getSelectedIndex() == 2) {
+                            if (chkInativacao.isSelected()) {
+                                if (txtPlanilhaFornecedor.getArquivo().equals("")) {
+                                    Util.exibirMensagem("Atenção", "Fornecedores - Informe o arquivo RelFornecedoresXtra.xls");
+                                } else {
+                                    dao.setPlanilhaFornecedor(txtPlanilhaFornecedor.getArquivo());
+                                    importador.atualizarFornecedor(OpcaoFornecedor.SITUACAO_CADASTRO);
+                                }
+                            } else {
+                                if (chkFornecedor.isSelected()) {
+                                    if (txtPlanilhaFornecedor.getArquivo().equals("")) {
+                                        Util.exibirMensagem("Atenção", "Fornecedores - Informe o arquivo RelFornecedoresXtra.xls");
+                                    } else {
+                                        dao.setPlanilhaFornecedor(txtPlanilhaFornecedor.getArquivo());
+                                        importador.importarFornecedor(OpcaoFornecedor.DADOS);
+                                    }
+                                }
+                                if (chkContatoFornecedor.isSelected()) {
+                                    if (txtPlanilhaFornecedor.getArquivo().equals("")) {
+                                        Util.exibirMensagem("Atenção", "Fornecedores - Informe o arquivo RelFornecedoresXtra.xls");
+                                    } else {
+                                        dao.setPlanilhaFornecedor(txtPlanilhaFornecedor.getArquivo());
+                                        importador.importarFornecedor(OpcaoFornecedor.CONTATOS);
+                                    }
+                                }
+                            }
+                        } else if (tabsProduto.getSelectedIndex() == 3) {
                             if (chkUnifProdutos.isSelected()) {
                                 if (
                                         txtPlanilhaProdutos.getArquivo().equals("")||
@@ -205,6 +218,15 @@ public class SambaNetGUI extends VRInternalFrame {
                                     dao.setPlanilhaProdutos(txtPlanilhaProdutos.getArquivo());
                                     dao.setPlanilhaProdutosContator(txtPlanilhaProdutosContador.getArquivo());
                                     importador.unificarProdutos();
+                                }
+                            }
+                            if (chkUnifFornecedores.isSelected()) {
+                                if (
+                                        txtPlanilhaFornecedor.getArquivo().equals("")) {
+                                    Util.exibirMensagem("Atenção", "Fornecedores - Informe o arquivo RelFornecedoresXtra.xls");
+                                } else {
+                                    dao.setPlanilhaFornecedor(txtPlanilhaFornecedor.getArquivo());
+                                    importador.unificarFornecedor();
                                 }
                             }
                         }
@@ -247,13 +269,24 @@ public class SambaNetGUI extends VRInternalFrame {
         vRLabel37 = new vrframework.bean.label.VRLabel();
         vRLabel38 = new vrframework.bean.label.VRLabel();
         txtPlanilhaProdutosContador = new vrframework.bean.fileChooser.VRFileChooser();
+        vRLabel39 = new vrframework.bean.label.VRLabel();
+        vRLabel40 = new vrframework.bean.label.VRLabel();
+        txtPlanilhaFornecedor = new vrframework.bean.fileChooser.VRFileChooser();
+        chkInativacao = new vrframework.bean.checkBox.VRCheckBox();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
-        vRPanel2 = new vrframework.bean.panel.VRPanel();
+        tabFornecedor = new vrframework.bean.panel.VRPanel();
+        vRPanel1 = new vrframework.bean.panel.VRPanel();
+        chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkContatoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        tabUnificacao = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
 
         setTitle("Importação Liteci");
         setToolTipText("");
+        setMinimumSize(new java.awt.Dimension(683, 494));
 
         vRLabel25.setText("Loja de Origem");
 
@@ -324,6 +357,13 @@ public class SambaNetGUI extends VRInternalFrame {
         vRLabel38.setText("(localizada em Produtos->Produtos->Imprimir->Marque listagem para contador)");
         vRLabel38.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
 
+        vRLabel39.setText("Informe a localização da planilha RelFornecedoresXtra.xls");
+
+        vRLabel40.setText("(localizada em Fornecedores->Fornecedores->Imprimir)");
+        vRLabel40.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
+
+        chkInativacao.setText("Inativação");
+
         javax.swing.GroupLayout tabPlanilhasProdutoLayout = new javax.swing.GroupLayout(tabPlanilhasProduto);
         tabPlanilhasProduto.setLayout(tabPlanilhasProdutoLayout);
         tabPlanilhasProdutoLayout.setHorizontalGroup(
@@ -331,12 +371,14 @@ public class SambaNetGUI extends VRInternalFrame {
             .addGroup(tabPlanilhasProdutoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabPlanilhasProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtPlanilhaFamilia, javax.swing.GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
+                    .addComponent(txtPlanilhaFamilia, javax.swing.GroupLayout.DEFAULT_SIZE, 613, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tabPlanilhasProdutoLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(chkInativacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnMigrar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(txtPlanilhaProdutos, javax.swing.GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
-                    .addComponent(txtPlanilhaProdutosContador, javax.swing.GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
+                    .addComponent(txtPlanilhaProdutos, javax.swing.GroupLayout.DEFAULT_SIZE, 613, Short.MAX_VALUE)
+                    .addComponent(txtPlanilhaProdutosContador, javax.swing.GroupLayout.DEFAULT_SIZE, 613, Short.MAX_VALUE)
+                    .addComponent(txtPlanilhaFornecedor, javax.swing.GroupLayout.DEFAULT_SIZE, 613, Short.MAX_VALUE)
                     .addGroup(tabPlanilhasProdutoLayout.createSequentialGroup()
                         .addGroup(tabPlanilhasProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(vRLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -344,7 +386,9 @@ public class SambaNetGUI extends VRInternalFrame {
                             .addComponent(vRLabel35, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(vRLabel36, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(vRLabel37, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel38, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(vRLabel38, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(vRLabel39, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(vRLabel40, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -369,39 +413,101 @@ public class SambaNetGUI extends VRInternalFrame {
                 .addComponent(vRLabel38, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtPlanilhaProdutosContador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 118, Short.MAX_VALUE)
-                .addComponent(btnMigrar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(vRLabel39, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(1, 1, 1)
+                .addComponent(vRLabel40, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtPlanilhaFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(tabPlanilhasProdutoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnMigrar1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkInativacao, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         tabsProduto.addTab("Localização das Planilhas", tabPlanilhasProduto);
         tabsProduto.addTab("Produtos", tabProdutos);
 
+        vRPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Fornecedores"));
+
+        chkFornecedor.setText("Fornecedores");
+
+        chkContatoFornecedor.setText("Contato Fornecedor");
+
+        chkProdutoFornecedor.setText("Produto Fornecedor");
+
+        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
+        vRPanel1.setLayout(vRPanel1Layout);
+        vRPanel1Layout.setHorizontalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkContatoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(260, Short.MAX_VALUE))
+        );
+        vRPanel1Layout.setVerticalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(chkContatoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
+        tabFornecedor.setLayout(tabFornecedorLayout);
+        tabFornecedorLayout.setHorizontalGroup(
+            tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabFornecedorLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        tabFornecedorLayout.setVerticalGroup(
+            tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabFornecedorLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(241, Short.MAX_VALUE))
+        );
+
+        tabsProduto.addTab("Fornecedores e Clientes", tabFornecedor);
+
         chkUnifProdutos.setText("Produtos (Somente com EAN válido)");
 
         chkUnifProdutoFornecedor.setText("Produto Fornecedor (Somente com CPF/CNPJ)");
 
-        javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
-        vRPanel2.setLayout(vRPanel2Layout);
-        vRPanel2Layout.setHorizontalGroup(
-            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel2Layout.createSequentialGroup()
+        chkUnifFornecedores.setText("Fornecedores (Somente com CPF/CNPJ)");
+
+        javax.swing.GroupLayout tabUnificacaoLayout = new javax.swing.GroupLayout(tabUnificacao);
+        tabUnificacao.setLayout(tabUnificacaoLayout);
+        tabUnificacaoLayout.setHorizontalGroup(
+            tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabUnificacaoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(468, Short.MAX_VALUE))
+                    .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUnifFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(380, Short.MAX_VALUE))
         );
-        vRPanel2Layout.setVerticalGroup(
-            vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel2Layout.createSequentialGroup()
+        tabUnificacaoLayout.setVerticalGroup(
+            tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabUnificacaoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(290, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkUnifFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(222, Short.MAX_VALUE))
         );
 
-        tabsProduto.addTab("Unificação", vRPanel2);
+        tabsProduto.addTab("Unificação", tabUnificacao);
 
         tabs.addTab("Produtos", tabsProduto);
 
@@ -429,7 +535,7 @@ public class SambaNetGUI extends VRInternalFrame {
                     .addComponent(vRLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -464,16 +570,24 @@ public class SambaNetGUI extends VRInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.button.VRButton btnMigrar1;
+    private vrframework.bean.checkBox.VRCheckBox chkContatoFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkInativacao;
+    private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedores;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private javax.swing.JLabel jLabel1;
+    private vrframework.bean.panel.VRPanel tabFornecedor;
     private vrframework.bean.panel.VRPanel tabPlanilhasProduto;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
+    private vrframework.bean.panel.VRPanel tabUnificacao;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private vrframework.bean.tabbedPane.VRTabbedPane tabsProduto;
     private javax.swing.JTextField txtLoja;
     private vrframework.bean.fileChooser.VRFileChooser txtPlanilhaFamilia;
+    private vrframework.bean.fileChooser.VRFileChooser txtPlanilhaFornecedor;
     private vrframework.bean.fileChooser.VRFileChooser txtPlanilhaProdutos;
     private vrframework.bean.fileChooser.VRFileChooser txtPlanilhaProdutosContador;
     private vrframework.bean.label.VRLabel vRLabel24;
@@ -483,7 +597,9 @@ public class SambaNetGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel36;
     private vrframework.bean.label.VRLabel vRLabel37;
     private vrframework.bean.label.VRLabel vRLabel38;
-    private vrframework.bean.panel.VRPanel vRPanel2;
+    private vrframework.bean.label.VRLabel vRLabel39;
+    private vrframework.bean.label.VRLabel vRLabel40;
+    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel3;
     // End of variables declaration//GEN-END:variables
 

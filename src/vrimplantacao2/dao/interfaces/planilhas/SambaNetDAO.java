@@ -20,7 +20,10 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -36,6 +39,8 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
     private String planilhaFamilia;
     private String planilhaProdutos;
     private String planilhaProdutosContador;
+    private String planilhaFornecedor;
+    private boolean inativacao = false;
 
     @Override
     public String getSistema() {
@@ -52,6 +57,14 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setPlanilhaProdutosContator(String planilhaProdutosContador) {
         this.planilhaProdutosContador = planilhaProdutosContador;
+    }
+
+    public void setPlanilhaFornecedor(String planilhaFornecedor) {
+        this.planilhaFornecedor = planilhaFornecedor;
+    }
+
+    public void setInativacao(boolean inativacao) {
+        this.inativacao = inativacao;
     }
 
     @Override
@@ -76,7 +89,8 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.CUSTO,
             OpcaoProduto.PRECO,
             OpcaoProduto.MERCADOLOGICO_PRODUTO,
-            OpcaoProduto.FAMILIA
+            OpcaoProduto.FAMILIA,
+            OpcaoProduto.ATIVO
         }));
     }
     
@@ -147,7 +161,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (
                             val(sheet, 0, i).matches("[0-9]+") &&
                             val(sheet, 1, i).matches("[0-9]+") &&
-                            val(sheet, 5, i).matches("[a-zA-Z0-9 ]+")
+                            !val(sheet, 5, i).equals("")
                     ) {
                         if (tributos.add(val(sheet, 10, i))) {
                             LOG.fine("Tributo '" + val(sheet, 10, i) + "' incluso!");
@@ -293,6 +307,9 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     ) {
                         
                         ProdutoIMP imp = new ProdutoIMP();
+                        if (inativacao) {
+                            imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
+                        }
                         imp.setImportSistema(getSistema());
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportId(sheet.getCell(0, i).getContents());
@@ -309,6 +326,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setCodMercadologico2(grupo);
                         imp.setCodMercadologico3(categoria);
                         imp.setIdFamiliaProduto(familia.get(imp.getImportId()));
+                        
                         produtos.put(imp, imp.getImportId(), imp.getEan());
                         
                     } else if (
@@ -376,7 +394,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                 //Se a coluna 2 for um número e a coluna 3 for texto, então é um produto.
                 if (
                         Utils.acertarTexto(sheet.getCell(1, i).getContents()).matches("[0-9]+") &&
-                        Utils.acertarTexto(sheet.getCell(2, i).getContents()).matches("[a-zA-Z0-9 ]+")
+                        !Utils.acertarTexto(sheet.getCell(2, i).getContents()).equals("")
                 ) {
                     result.put(sheet.getCell(1, i).getContents(), familia);
                     LOG.finer(String.format("Família '%s' vinculado ao produto '%s'-'%s'",
@@ -389,7 +407,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         //então é uma família.
                         Utils.acertarTexto(sheet.getCell(0, i).getContents()).matches("[0-9]+") &&
                         Utils.acertarTexto(sheet.getCell(1, i).getContents()).equals("") &&
-                        Utils.acertarTexto(sheet.getCell(2, i).getContents()).matches("[a-zA-Z0-9 ]+")
+                        !Utils.acertarTexto(sheet.getCell(2, i).getContents()).equals("")
                 ) {
                     familia = Utils.acertarTexto(sheet.getCell(0, i).getContents());
                 }
@@ -425,7 +443,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (
                             val(sh, 0, i).matches("[0-9]+") &&
                             val(sh, 1, i).matches("[0-9]+") &&
-                            val(sh, 5, i).matches("[a-zA-Z0-9 ]+")
+                            !val(sh, 5, i).equals("")
                     ) {
                         ProdutoIMP imp = produtos.get(val(sh, 0, i),val(sh, 1, i));
                         
@@ -447,6 +465,93 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                 throw ex;
             }
         }
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        WorkbookSettings settings = new WorkbookSettings();
+        settings.setEncoding("CP1250");
+        settings.setIgnoreBlanks(false);
+
+        Workbook planilha = Workbook.getWorkbook(new File(this.planilhaFornecedor), settings);            
+        Sheet sh = planilha.getSheet(0);
+
+        ProgressBar.setStatus("Analisando Planilha de Fornecedores");
+        ProgressBar.setMaximum(sh.getRows());
+
+        int linha = 0;
+
+        try {
+            FornecedorIMP imp = null;
+            for (int i = 1; i < sh.getRows(); i++) {
+                //Se a coluna 2 for um número e a coluna 3 for texto, então é um produto.
+                if (
+                        val(sh, 0, i).equals("Cód.") &&
+                        val(sh, 3, i).equals("Razão Social:")                             
+                ) {
+                    if (imp != null) {
+                        result.add(imp);
+                    }
+                    imp = new FornecedorIMP();
+                    if (inativacao) {
+                        imp.setAtivo(false);
+                    }
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(val(sh, 1, i));
+                    imp.setRazao(val(sh, 7, i));
+                    imp.setCnpj_cpf(val(sh, 11, i));
+                    imp.setIe_rg(val(sh, 15, i));
+                    if (!val(sh, 19, i).equals("")) {
+                        imp.addContato(val(sh, 19, i), val(sh, 22, i), "", TipoContato.COMERCIAL, "");
+                    }
+                    if (!val(sh, 24, i).equals("")) {
+                        imp.setTel_principal(val(sh, 24, i));
+                    }
+                } else if (
+                        val(sh, 0, i).equals("") &&
+                        !val(sh, 17, i).equals("") &&
+                        !val(sh, 20, i).equals("")
+                ) {
+                    imp.setBairro(val(sh, 17, i));
+                    imp.setMunicipio(val(sh, 20, i));
+                } else if (
+                        val(sh, 0, i).equals("Fantasia:") &&
+                        val(sh, 8, i).equals("Endereço:")
+                ) {
+                    imp.setFantasia(val(sh, 2, i));
+                    if (imp.getFantasia().equals("")) {
+                        imp.setFantasia(imp.getRazao());
+                    }
+                    imp.setEndereco(val(sh, 9, i));
+                    imp.setComplemento(val(sh, 12, i));
+
+                    if (
+                        !val(sh, 17, i).equals("") &&
+                        !val(sh, 20, i).equals("")
+                    ) {
+                        imp.setBairro(val(sh, 17, i));
+                        imp.setMunicipio(val(sh, 20, i));
+                    }
+                    imp.setUf(val(sh, 25, i));
+                }
+
+                ProgressBar.next();
+            }            
+            
+            if (imp != null) {
+                result.add(imp);
+            }
+
+        } catch (Exception ex) {
+            System.out.println(linha);
+            throw ex;
+        }
+     
+        return result;
     }
     
 }
