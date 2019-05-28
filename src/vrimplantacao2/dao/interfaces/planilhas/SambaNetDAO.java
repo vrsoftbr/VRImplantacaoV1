@@ -22,6 +22,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -40,6 +41,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
     private String planilhaProdutos;
     private String planilhaProdutosContador;
     private String planilhaFornecedor;
+    private String planilhaClientes;
     private boolean inativacao = false;
 
     @Override
@@ -61,6 +63,10 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setPlanilhaFornecedor(String planilhaFornecedor) {
         this.planilhaFornecedor = planilhaFornecedor;
+    }
+
+    public void setPlanilhaClientes(String planilhaClientes) {
+        this.planilhaClientes = planilhaClientes;
     }
 
     public void setInativacao(boolean inativacao) {
@@ -551,6 +557,89 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
             throw ex;
         }
      
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        WorkbookSettings settings = new WorkbookSettings();
+        settings.setEncoding("CP1250");
+        settings.setIgnoreBlanks(false);
+
+        Workbook planilha = Workbook.getWorkbook(new File(this.planilhaClientes), settings);            
+        Sheet sh = planilha.getSheet(0);
+
+        ProgressBar.setStatus("Analisando Planilha de Fornecedores");
+        ProgressBar.setMaximum(sh.getRows());
+
+        int linha = 0;
+
+        try {
+            ClienteIMP imp = null;
+            for (int i = 1; i < sh.getRows(); i++) {
+                //Se a coluna 2 for um número e a coluna 3 for texto, então é um produto.
+                if (
+                        val(sh, 0, i).equals("Cód.") &&
+                        val(sh, 3, i).equals("Razão Social:")                             
+                ) {
+                    if (imp != null) {
+                        result.add(imp);
+                    }
+                    imp = new ClienteIMP();
+                    if (inativacao) {
+                        imp.setAtivo(false);
+                    }
+                    imp.setId(val(sh, 1, i));
+                    imp.setRazao(val(sh, 8, i));
+                    imp.setCnpj(val(sh, 12, i));
+                    imp.setInscricaoestadual(val(sh, 14, i));
+                    if (!val(sh, 18, i).equals("")) {
+                        imp.addContato(val(sh, 18, i), val(sh, 18, i), val(sh, 24, i), "", "");
+                    }
+                    if (!val(sh, 24, i).equals("")) {
+                        imp.setTelefone(val(sh, 24, i));
+                    }
+                } else if (
+                        val(sh, 0, i).equals("") &&
+                        !val(sh, 19, i).equals("") &&
+                        !val(sh, 25, i).equals("")
+                ) {
+                    imp.setBairro(val(sh, 19, i));
+                    imp.setMunicipio(val(sh, 25, i));
+                } else if (
+                        val(sh, 0, i).equals("Fantasia:") &&
+                        val(sh, 9, i).equals("Endereço:")
+                ) {
+                    imp.setFantasia(val(sh, 2, i));
+                    if (imp.getFantasia().equals("")) {
+                        imp.setFantasia(imp.getRazao());
+                    }
+                    imp.setEndereco(val(sh, 10, i));
+
+                    if (!val(sh, 18, i).equals("")) {                    
+                        imp.setBairro(val(sh, 17, i));
+                    }                    
+                    if (
+                        !val(sh, 25, i).equals("")
+                    ) {                        
+                        imp.setUf(val(sh, 25, i));
+                    }
+                }
+
+                ProgressBar.next();
+            }            
+            
+            if (imp != null) {
+                result.add(imp);
+            }
+
+        } catch (Exception ex) {
+            System.out.println(linha);
+            throw ex;
+        }
+        
         return result;
     }
     
