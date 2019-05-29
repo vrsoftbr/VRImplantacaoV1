@@ -17,9 +17,11 @@ import jxl.WorkbookSettings;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -38,6 +40,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
     private static final Logger LOG = Logger.getLogger(SambaNetDAO.class.getName());
     
     private String planilhaFamilia;
+    private String planilhaBalanca;
     private String planilhaProdutos;
     private String planilhaProdutosContador;
     private String planilhaFornecedor;
@@ -55,6 +58,10 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setPlanilhaProdutos(String planilhaProdutos) {
         this.planilhaProdutos = planilhaProdutos;
+    }
+
+    public void setPlanilhaBalanca(String planilhaBalanca) {
+        this.planilhaBalanca = planilhaBalanca;
     }
 
     public void setPlanilhaProdutosContator(String planilhaProdutosContador) {
@@ -195,6 +202,48 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
         str = str == null ? "" : str.trim();
         return str;
     }
+
+    private Map<String, Integer> getProdutoBalanca() throws Exception {
+        File file = new File(this.planilhaBalanca);        
+        if (file.exists()) {        
+            Map<String, Integer> result = new HashMap<>();
+
+            WorkbookSettings settings = new WorkbookSettings();
+            settings.setEncoding("CP1250");
+            settings.setIgnoreBlanks(false);
+
+            Workbook planilha = Workbook.getWorkbook(file, settings);            
+            Sheet sh = planilha.getSheet(0);
+            
+            ProgressBar.setStatus("Analisando Planilha de Balança");
+            ProgressBar.setMaximum(sh.getRows());
+           
+            
+            int linha = 0;
+            try {
+                for (int i = 1; i < sh.getRows(); i++) {
+                    linha++;
+                    if (
+                            val(sh, 1, i).matches("[0-9]+") &&
+                            !val(sh, 6, i).equals("") &&
+                            val(sh, 8, i).matches("[0-9]+") &&
+                            !val(sh, 10, i).equals("")
+                    ) {
+                        result.put(val(sh, 1, i), Utils.stringToInt(val(sh, 8, i)));
+                    }
+                    
+                    ProgressBar.next();
+                }
+            } catch (Exception ex) {
+                System.out.println(linha);
+                throw ex;
+            }
+
+            return result;
+        } else {
+            throw new IOException("Planilha(s) não encontrada");
+        }
+    }
     
     private static class Mercadologico {
         String id;
@@ -295,6 +344,8 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
             
             
             MultiMap<String, ProdutoIMP> produtos = new MultiMap<>();
+            Map<String, Integer> mapaBalanca = getProdutoBalanca();
+            Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
             
             try {
 
@@ -333,7 +384,22 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setCodMercadologico3(categoria);
                         imp.setIdFamiliaProduto(familia.get(imp.getImportId()));
                         
-                        produtos.put(imp, imp.getImportId(), imp.getEan());
+                        Integer plu = mapaBalanca.get(imp.getImportId());
+                        if (plu != null) {
+                            ProdutoBalancaVO prod = produtosBalanca.get(plu);
+                            if (prod != null) {
+                                imp.seteBalanca(true);
+                                imp.setValidade(prod.getValidade());
+                                if ("U".equals(prod.getPesavel())) {
+                                    imp.setTipoEmbalagem("UN");
+                                } else {
+                                    imp.setTipoEmbalagem("KG");
+                                }
+                                imp.setEan(String.valueOf(prod.getCodigo()));
+                            }
+                        }
+                        
+                        produtos.put(imp, imp.getImportId(), sheet.getCell(3, i).getContents());
                         
                     } else if (
                             sheet.getCell(0, i) != null &&
@@ -453,7 +519,9 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     ) {
                         ProdutoIMP imp = produtos.get(val(sh, 0, i),val(sh, 1, i));
                         
-                        imp.setTipoEmbalagem(val(sh,6,i));
+                        if (!imp.isBalanca()) {
+                            imp.setTipoEmbalagem(val(sh,6,i));
+                        }
                         imp.setNcm(val(sh,7,i));
                         imp.setIcmsDebitoId(val(sh,10, i));
                         imp.setIcmsCreditoId(val(sh,10, i));
