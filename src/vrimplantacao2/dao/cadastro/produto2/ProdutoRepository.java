@@ -103,7 +103,9 @@ public class ProdutoRepository {
             if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN)) {
                 this.naoTransformarEANemUN = true;
             }
-
+            
+            java.sql.Date dataHoraImportacao = Utils.getDataAtual();
+            
             setNotify("Gravando os produtos...", organizados.size());
             for (KeyList<String> keys : organizados.keySet()) {
                 StringBuilder rep = new StringBuilder();
@@ -148,6 +150,7 @@ public class ProdutoRepository {
                                     ProdutoVO produtoVO = new ProdutoVO();
                                     produtoVO.setId(id);
                                     anterior.setCodigoAtual(produtoVO);
+                                    anterior.setDataHora(dataHoraImportacao);
                                     provider.anterior().salvar(anterior);
                                     notificar();
                                     continue;
@@ -182,6 +185,7 @@ public class ProdutoRepository {
 
                         anterior = converterImpEmAnterior(imp);
                         anterior.setCodigoAtual(prod);
+                        anterior.setDataHora(dataHoraImportacao);
                         
                         ProdutoAliquotaVO aliquota = converterAliquota(imp);
                         aliquota.setProduto(prod);
@@ -1248,7 +1252,6 @@ public class ProdutoRepository {
             destino.setCodigoSped(imp.getImportId());
         }
         destino.setSituacaoCadastro(imp.getSituacaoCadastro());
-        destino.setDataHora(Utils.getDataAtual());
         return destino;
     }
 

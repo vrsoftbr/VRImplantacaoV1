@@ -63,20 +63,6 @@ import vrimplantacao.gui.interfaces.Maximus_DatasyncGUI;
 import vrimplantacao.gui.interfaces.MilenioGUI;
 import vrimplantacao.gui.interfaces.MobilityGUI;
 import vrimplantacao.gui.interfaces.PCSistemasGUI;
-import vrimplantacao.gui.interfaces.PlanilhaChequeGUI;
-import vrimplantacao.gui.interfaces.PlanilhaClientesGUI;
-import vrimplantacao.gui.interfaces.PlanilhaCodigoBarrasLeaoGUI;
-import vrimplantacao.gui.interfaces.PlanilhaContasPagarGUI;
-import vrimplantacao.gui.interfaces.PlanilhaContasReceberGUI;
-import vrimplantacao.gui.interfaces.PlanilhaConveniadoGUI;
-import vrimplantacao.gui.interfaces.PlanilhaFornecedorGUI;
-import vrimplantacao.gui.interfaces.PlanilhaInventarioGUI;
-import vrimplantacao.gui.interfaces.PlanilhaLogEstoqueGUI;
-import vrimplantacao.gui.interfaces.PlanilhaNCMGUI;
-import vrimplantacao.gui.interfaces.PlanilhaPadraoGUI;
-import vrimplantacao.gui.interfaces.PlanilhaPdvVendaGUI;
-import vrimplantacao.gui.interfaces.PlanilhaProdutosLanchoneteGUI;
-import vrimplantacao.gui.interfaces.PlanilhaVendasGUI;
 import vrimplantacao.gui.interfaces.RMSGUI;
 import vrimplantacao.gui.interfaces.RMSGUI_2;
 import vrimplantacao.gui.interfaces.RootacGUI;
@@ -170,6 +156,7 @@ import vrimplantacao2.gui.interfaces.RMSAutomaHelpGUI;
 import vrimplantacao2.gui.interfaces.RPInfoGUI;
 import vrimplantacao2.gui.interfaces.RepleisGUI;
 import vrimplantacao2.gui.interfaces.SDInformaticaGUI;
+import vrimplantacao2.gui.interfaces.SambaNetGUI;
 import vrimplantacao2.gui.interfaces.SatecfeGUI;
 import vrimplantacao2.gui.interfaces.ScefGUI;
 import vrimplantacao2.gui.interfaces.ShiGUI;
@@ -281,25 +268,10 @@ public final class MenuGUI extends VRMdiFrame {
     public GerarCodigoBarrasAtacadoGUI formImportarGerarCodigoBarrasAtacado = null;
     public NotaSaidaNfceImportacaoArquivoGUI formNotaSaidaNfceImportacaoArquivoGUI = null;
     public AlterarProdutoPdvVendaItemGUI formAlterarProdutoPdvVendaItem = null;    
-
-    public PlanilhaPdvVendaGUI formImportarPlanilhaPdvVenda = null;
-    public PlanilhaLogEstoqueGUI formImportarPlanilhaLogEstoque = null;
-    public PlanilhaPadraoGUI formPlanilhaPadrao = null;
-    public PlanilhaContasPagarGUI formPlanilhaContasPagar = null;
-    public PlanilhaContasReceberGUI formPlanilhaContasReceber = null;
     public ArquivoPadraoGUI formArquivoPadrao = null;
-    public PlanilhaVendasGUI formPlanilhaVendas = null;
-    public PlanilhaChequeGUI formPlanilhaCheque = null;
-    public PlanilhaCodigoBarrasLeaoGUI formPlanilhaCodigoBarrasLeao = null;
-    public PlanilhaClientesGUI formPlanilhaClientes = null;
-    public PlanilhaConveniadoGUI formPlanilhaConveniado = null;
-    public PlanilhaFornecedorGUI formPlanilhaFornecedor = null;
     public PlanilhaV2GUI formPlanilhaV2 = null;
     public AcertarCodigoInternoGUI formAcertarCodigoInterno = null;
     public AcertarIdsProdutoGUI formAcertarIdsProduto = null;
-    public PlanilhaNCMGUI formPlanilhaNCM = null;
-    public PlanilhaInventarioGUI formPlanilhaInventario = null;
-    public PlanilhaProdutosLanchoneteGUI formPlanilhaProdutosLanchonete = null;
 
     public VRBusca txtBusca = null;
 
@@ -701,22 +673,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuADT = new javax.swing.JMenu();
         mnuInfoMacStore = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
-        jMenuItem17 = new javax.swing.JMenuItem();
-        jMenu10 = new javax.swing.JMenu();
-        mnuPlanilhaPadrao = new javax.swing.JMenuItem();
-        jMenuItem20 = new javax.swing.JMenuItem();
-        jMenuItem6 = new javax.swing.JMenuItem();
-        jMenuItem7 = new javax.swing.JMenuItem();
-        jMenuItem30 = new javax.swing.JMenuItem();
-        jMenuItem21 = new javax.swing.JMenuItem();
-        jMenuItem22 = new javax.swing.JMenuItem();
-        jMenuItem10 = new javax.swing.JMenuItem();
-        jMenuItem5 = new javax.swing.JMenuItem();
-        jMenuItem16 = new javax.swing.JMenuItem();
-        mnuPlanilhaForn = new javax.swing.JMenuItem();
-        jMenuItem18 = new javax.swing.JMenuItem();
-        jMenuItem26 = new javax.swing.JMenuItem();
-        jMenuItem31 = new javax.swing.JMenuItem();
+        mnuContaPagar1 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem8 = new javax.swing.JMenuItem();
         jMenuItem24 = new javax.swing.JMenuItem();
@@ -2158,135 +2115,19 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuDatabase.add(mnuADT);
 
+        jMenu3.setText("Planilhas Específicas");
+
+        mnuContaPagar1.setText("SambaNet");
+        mnuContaPagar1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuContaPagar1ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(mnuContaPagar1);
+
+        mnuDatabase.add(jMenu3);
+
         mnuImpSistema.add(mnuDatabase);
-
-        jMenu3.setText("Planilhas");
-
-        jMenuItem17.setText("Produto - Código Barras (Leão)");
-        jMenuItem17.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem17ActionPerformed(evt);
-            }
-        });
-        jMenu3.add(jMenuItem17);
-
-        jMenu10.setText("Padrões");
-
-        mnuPlanilhaPadrao.setText("Produtos Padrão");
-        mnuPlanilhaPadrao.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuPlanilhaPadraoActionPerformed(evt);
-            }
-        });
-        jMenu10.add(mnuPlanilhaPadrao);
-
-        jMenuItem20.setText("Cliente Preferencial");
-        jMenuItem20.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem20ActionPerformed(evt);
-            }
-        });
-        jMenu10.add(jMenuItem20);
-
-        jMenuItem6.setText("Contas a Pagar");
-        jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem6ActionPerformed(evt);
-            }
-        });
-        jMenu10.add(jMenuItem6);
-
-        jMenuItem7.setText("Contas a Receber");
-        jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem7ActionPerformed(evt);
-            }
-        });
-        jMenu10.add(jMenuItem7);
-
-        jMenuItem30.setText("Cheque");
-        jMenuItem30.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem30ActionPerformed(evt);
-            }
-        });
-        jMenu10.add(jMenuItem30);
-
-        jMenuItem21.setText("Cliente Conveniado");
-        jMenuItem21.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem21ActionPerformed(evt);
-            }
-        });
-        jMenu10.add(jMenuItem21);
-
-        jMenuItem22.setText("Receber Conveniado");
-        jMenuItem22.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem22ActionPerformed(evt);
-            }
-        });
-        jMenu10.add(jMenuItem22);
-
-        jMenuItem10.setText("Vendas");
-        jMenuItem10.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem10ActionPerformed(evt);
-            }
-        });
-        jMenu10.add(jMenuItem10);
-
-        jMenuItem5.setText("NCM");
-        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem5ActionPerformed(evt);
-            }
-        });
-        jMenu10.add(jMenuItem5);
-
-        jMenuItem16.setText("Pdv Venda");
-        jMenuItem16.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem16ActionPerformed(evt);
-            }
-        });
-        jMenu10.add(jMenuItem16);
-
-        mnuPlanilhaForn.setText("Fornecedores");
-        mnuPlanilhaForn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuPlanilhaFornActionPerformed(evt);
-            }
-        });
-        jMenu10.add(mnuPlanilhaForn);
-
-        jMenu3.add(jMenu10);
-
-        jMenuItem18.setText("Log Estoque");
-        jMenuItem18.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem18ActionPerformed(evt);
-            }
-        });
-        jMenu3.add(jMenuItem18);
-
-        jMenuItem26.setText("Inventário");
-        jMenuItem26.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem26ActionPerformed(evt);
-            }
-        });
-        jMenu3.add(jMenuItem26);
-
-        jMenuItem31.setText("Produtos Lanchonete");
-        jMenuItem31.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem31ActionPerformed(evt);
-            }
-        });
-        jMenu3.add(jMenuItem31);
-
-        mnuImpSistema.add(jMenu3);
 
         jMenu4.setText("Arquivos");
 
@@ -2663,55 +2504,6 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemJMasterActionPerformed
 
 
-    private void mnuPlanilhaPadraoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPlanilhaPadraoActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formPlanilhaPadrao == null || formPlanilhaPadrao.isClosed()) {
-                formPlanilhaPadrao = new PlanilhaPadraoGUI(this);
-            }
-
-            formPlanilhaPadrao.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
-    }//GEN-LAST:event_mnuPlanilhaPadraoActionPerformed
-
-    private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formPlanilhaContasPagar == null || formPlanilhaContasPagar.isClosed()) {
-                formPlanilhaContasPagar = new PlanilhaContasPagarGUI(this);
-            }
-
-            formPlanilhaContasPagar.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
-    }//GEN-LAST:event_jMenuItem6ActionPerformed
-
-    private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formPlanilhaContasReceber == null || formPlanilhaContasReceber.isClosed()) {
-                formPlanilhaContasReceber = new PlanilhaContasReceberGUI(this);
-            }
-
-            formPlanilhaContasReceber.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
-
-    }//GEN-LAST:event_jMenuItem7ActionPerformed
-
     private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
         try {
             this.setWaitCursor();
@@ -2731,23 +2523,6 @@ public final class MenuGUI extends VRMdiFrame {
     private void jMenuItemSHIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSHIActionPerformed
         ShiGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemSHIActionPerformed
-
-    private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
-
-        try {
-            this.setWaitCursor();
-            if (formPlanilhaVendas == null || formPlanilhaVendas.isClosed()) {
-                formPlanilhaVendas = new PlanilhaVendasGUI(this);
-            }
-
-            formPlanilhaVendas.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
-    }//GEN-LAST:event_jMenuItem10ActionPerformed
 
     private void jMenuItemGetWayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGetWayActionPerformed
         GetWayGUI.exibir(this);
@@ -2792,22 +2567,6 @@ public final class MenuGUI extends VRMdiFrame {
         }
     }//GEN-LAST:event_jMenuItem15ActionPerformed
 
-    private void jMenuItem17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem17ActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formPlanilhaCodigoBarrasLeao == null || formPlanilhaCodigoBarrasLeao.isClosed()) {
-                formPlanilhaCodigoBarrasLeao = new PlanilhaCodigoBarrasLeaoGUI(this);
-            }
-
-            formPlanilhaCodigoBarrasLeao.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
-    }//GEN-LAST:event_jMenuItem17ActionPerformed
-
     private void jMenuItemMobilityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemMobilityActionPerformed
         try {
             this.setWaitCursor();
@@ -2844,42 +2603,6 @@ public final class MenuGUI extends VRMdiFrame {
             this.setDefaultCursor();
         }
     }//GEN-LAST:event_jMenuItemGdoorActionPerformed
-
-    private void jMenuItem20ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem20ActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formPlanilhaClientes == null || formPlanilhaClientes.isClosed()) {
-                formPlanilhaClientes = new PlanilhaClientesGUI(this);
-            }
-
-            formPlanilhaClientes.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
-    }//GEN-LAST:event_jMenuItem20ActionPerformed
-
-    private void jMenuItem21ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem21ActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formPlanilhaConveniado == null || formPlanilhaConveniado.isClosed()) {
-                formPlanilhaConveniado = new PlanilhaConveniadoGUI(this);
-            }
-
-            formPlanilhaConveniado.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
-    }//GEN-LAST:event_jMenuItem21ActionPerformed
-
-    private void jMenuItem22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem22ActionPerformed
-
-    }//GEN-LAST:event_jMenuItem22ActionPerformed
 
     private void jMenuItemWisaSoftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemWisaSoftActionPerformed
         try {
@@ -2986,22 +2709,6 @@ public final class MenuGUI extends VRMdiFrame {
         }
 
     }//GEN-LAST:event_jMenuItem29ActionPerformed
-
-    private void jMenuItem30ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem30ActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formPlanilhaCheque == null || formPlanilhaCheque.isClosed()) {
-                formPlanilhaCheque = new PlanilhaChequeGUI(this);
-            }
-
-            formPlanilhaCheque.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
-    }//GEN-LAST:event_jMenuItem30ActionPerformed
 
     private void jMenuItemPCSistemasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemPCSistemasActionPerformed
         try {
@@ -3203,21 +2910,6 @@ public final class MenuGUI extends VRMdiFrame {
         SisMouraGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemSysMouraActionPerformed
 
-    private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formPlanilhaNCM == null || formPlanilhaNCM.isClosed()) {
-                formPlanilhaNCM = new PlanilhaNCMGUI(this);
-            }
-
-            formPlanilhaNCM.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
-    }//GEN-LAST:event_jMenuItem5ActionPerformed
-
     private void jMenuItem9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem9ActionPerformed
         try {
             this.setWaitCursor();
@@ -3404,51 +3096,6 @@ public final class MenuGUI extends VRMdiFrame {
         SuperusGUI2.exibir(this);
     }//GEN-LAST:event_jMenuItemSuperusActionPerformed
 
-    private void jMenuItem16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem16ActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarPlanilhaPdvVenda == null || formImportarPlanilhaPdvVenda.isClosed()) {
-                formImportarPlanilhaPdvVenda = new PlanilhaPdvVendaGUI(this);
-            }
-
-            formImportarPlanilhaPdvVenda.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
-    }//GEN-LAST:event_jMenuItem16ActionPerformed
-
-    private void jMenuItem18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem18ActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarPlanilhaLogEstoque == null || formImportarPlanilhaLogEstoque.isClosed()) {
-                formImportarPlanilhaLogEstoque = new PlanilhaLogEstoqueGUI(this);
-            }
-
-            formImportarPlanilhaLogEstoque.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
-    }//GEN-LAST:event_jMenuItem18ActionPerformed
-
-    private void mnuPlanilhaFornActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPlanilhaFornActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formPlanilhaFornecedor == null || formPlanilhaFornecedor.isClosed()) {
-                formPlanilhaFornecedor = new PlanilhaFornecedorGUI(this);
-            }
-
-            formPlanilhaFornecedor.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
-    }//GEN-LAST:event_mnuPlanilhaFornActionPerformed
-
     private void jMenuItemSofgceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSofgceActionPerformed
         try {
             this.setWaitCursor();
@@ -3523,21 +3170,6 @@ public final class MenuGUI extends VRMdiFrame {
         PlanilhaV2GUI.Exibir(this);
     }//GEN-LAST:event_mnuPlanilhaV2ActionPerformed
 
-    private void jMenuItem26ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem26ActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formPlanilhaInventario == null || formPlanilhaInventario.isClosed()) {
-                formPlanilhaInventario = new PlanilhaInventarioGUI(this);
-            }
-
-            formPlanilhaInventario.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
-    }//GEN-LAST:event_jMenuItem26ActionPerformed
-
     private void jMenuItem27ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem27ActionPerformed
         try {
             this.setWaitCursor();
@@ -3564,23 +3196,6 @@ public final class MenuGUI extends VRMdiFrame {
     private void jMenuItemActiveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemActiveActionPerformed
         ActiveGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemActiveActionPerformed
-
-    private void jMenuItem31ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem31ActionPerformed
-        // TODO add your handling code here:
-        try {
-            this.setWaitCursor();
-            if (formPlanilhaProdutosLanchonete == null || formPlanilhaProdutosLanchonete.isClosed()) {
-                formPlanilhaProdutosLanchonete = new PlanilhaProdutosLanchoneteGUI(this);
-            }
-
-            formPlanilhaProdutosLanchonete.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
-
-    }//GEN-LAST:event_jMenuItem31ActionPerformed
 
     private void jMenuItem32ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem32ActionPerformed
         // TODO add your handling code here:
@@ -4266,9 +3881,12 @@ public final class MenuGUI extends VRMdiFrame {
         LiteciGUI.exibir(this);
     }//GEN-LAST:event_mnuLiteciActionPerformed
 
+    private void mnuContaPagar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuContaPagar1ActionPerformed
+        SambaNetGUI.exibir(this);
+    }//GEN-LAST:event_mnuContaPagar1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
-    private javax.swing.JMenu jMenu10;
     private javax.swing.JMenu jMenu11;
     private javax.swing.JMenu jMenu12;
     private javax.swing.JMenu jMenu13;
@@ -4280,34 +3898,21 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu jMenu8;
     private javax.swing.JMenu jMenu9;
     private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
     private javax.swing.JMenuItem jMenuItem12;
     private javax.swing.JMenuItem jMenuItem14;
     private javax.swing.JMenuItem jMenuItem15;
-    private javax.swing.JMenuItem jMenuItem16;
-    private javax.swing.JMenuItem jMenuItem17;
-    private javax.swing.JMenuItem jMenuItem18;
     private javax.swing.JMenuItem jMenuItem19;
     private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem20;
-    private javax.swing.JMenuItem jMenuItem21;
-    private javax.swing.JMenuItem jMenuItem22;
     private javax.swing.JMenuItem jMenuItem23;
     private javax.swing.JMenuItem jMenuItem24;
     private javax.swing.JMenuItem jMenuItem25;
-    private javax.swing.JMenuItem jMenuItem26;
     private javax.swing.JMenuItem jMenuItem27;
     private javax.swing.JMenuItem jMenuItem28;
     private javax.swing.JMenuItem jMenuItem29;
     private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JMenuItem jMenuItem30;
-    private javax.swing.JMenuItem jMenuItem31;
     private javax.swing.JMenuItem jMenuItem32;
     private javax.swing.JMenuItem jMenuItem4;
-    private javax.swing.JMenuItem jMenuItem5;
-    private javax.swing.JMenuItem jMenuItem6;
-    private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JMenuItem jMenuItem9;
     private javax.swing.JMenuItem jMenuItemActive;
@@ -4388,6 +3993,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuCerebro;
     private javax.swing.JMenuItem mnuCodigoBarrasAtacado;
     private javax.swing.JMenuItem mnuContaPagar;
+    private javax.swing.JMenuItem mnuContaPagar1;
     private javax.swing.JMenuItem mnuControll;
     private javax.swing.JMenuItem mnuCplus;
     private javax.swing.JMenu mnuDB2;
@@ -4447,8 +4053,6 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuParametros;
     private javax.swing.JMenuItem mnuParametros1;
     private javax.swing.JMenu mnuPlanilha;
-    private javax.swing.JMenuItem mnuPlanilhaForn;
-    private javax.swing.JMenuItem mnuPlanilhaPadrao;
     private javax.swing.JMenuItem mnuPlanilhaProduto;
     private javax.swing.JMenuItem mnuPlanilhaV2;
     private javax.swing.JMenuItem mnuPlanilhaVr;
