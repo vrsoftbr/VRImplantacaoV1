@@ -103,7 +103,12 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.PRECO,
             OpcaoProduto.MERCADOLOGICO_PRODUTO,
             OpcaoProduto.FAMILIA,
-            OpcaoProduto.ATIVO
+            OpcaoProduto.ATIVO,
+            OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+            OpcaoProduto.PESAVEL,
+            OpcaoProduto.TIPO_EMBALAGEM_EAN,
+            OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.VALIDADE
         }));
     }
     
@@ -374,7 +379,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setDescricaoCompleta(sheet.getCell(6, i).getContents());
                         imp.setDescricaoReduzida(sheet.getCell(6, i).getContents());
                         imp.setDescricaoGondola(sheet.getCell(6, i).getContents());
-                        imp.setQtdEmbalagemCotacao(Utils.stringToInt(sheet.getCell(11, i).getContents()));
+                        imp.setQtdEmbalagemCotacao(Math.round(Float.parseFloat(String.valueOf(sheet.getCell(11, i).getContents()).replace(',', '.'))));
                         imp.setEstoque(Utils.stringToDouble(sheet.getCell(14, i).getContents()));
                         imp.setCustoSemImposto(Utils.stringToDouble(sheet.getCell(17, i).getContents()));
                         imp.setCustoComImposto(Utils.stringToDouble(sheet.getCell(17, i).getContents()));
