@@ -33,6 +33,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class LiteciDAO extends InterfaceDAO {
 
     private String idLoja = "";
+    public String v_lojaMesmoId;
     public boolean utilizaArquivoBalanca = false;
     public boolean gerarCodigoAtacado = false;
     private ProdutoRepositoryProvider repository = new ProdutoRepositoryProvider();
@@ -43,7 +44,7 @@ public class LiteciDAO extends InterfaceDAO {
 
     @Override
     public String getSistema() {
-        return "Liteci";
+        return "Liteci" + v_lojaMesmoId;
     }
 
     public List<Estabelecimento> getLojas() throws Exception {
@@ -247,15 +248,17 @@ public class LiteciDAO extends InterfaceDAO {
                             strEan = "999999" + String.valueOf(codigoAtual);
                         }
                     }
-                    
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("coditemi"));
-                    imp.setEan(strEan);
-                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                    imp.setQtdEmbalagem(rst.getInt("qtd"));
-                    result.add(imp);
+
+                    if (codigoAtual > 0) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("coditemi"));
+                        imp.setEan(strEan);
+                        imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                        imp.setQtdEmbalagem(rst.getInt("qtd"));
+                        result.add(imp);
+                    }
                 }
             }
         }
@@ -304,15 +307,17 @@ public class LiteciDAO extends InterfaceDAO {
                             strEan = "999999" + String.valueOf(codigoAtual);
                         }
 
-                        ProdutoIMP imp = new ProdutoIMP();
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("coditemi"));
-                        imp.setEan(strEan);
-                        imp.setQtdEmbalagem(rst.getInt("qtd"));
-                        imp.setPrecovenda(rst.getDouble("precovenda"));
-                        imp.setAtacadoPreco(rst.getDouble("precoatacado"));
-                        result.add(imp);                        
+                        if (codigoAtual > 0) {
+                            ProdutoIMP imp = new ProdutoIMP();
+                            imp.setImportLoja(getLojaOrigem());
+                            imp.setImportSistema(getSistema());
+                            imp.setImportId(rst.getString("coditemi"));
+                            imp.setEan(strEan);
+                            imp.setQtdEmbalagem(rst.getInt("qtd"));
+                            imp.setPrecovenda(rst.getDouble("precovenda"));
+                            imp.setAtacadoPreco(rst.getDouble("precoatacado"));
+                            result.add(imp);
+                        }
                     }
                 }
                 return result;

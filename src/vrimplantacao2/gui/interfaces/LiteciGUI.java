@@ -158,6 +158,7 @@ public class LiteciGUI extends VRInternalFrame {
         Thread thread = new Thread() {
             int idLojaVR;
             String idLojaCliente;
+            String lojaMesmoId;
 
             @Override
             public void run() {
@@ -171,10 +172,17 @@ public class LiteciGUI extends VRInternalFrame {
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
+
+                    if (!"".equals(txtLojaCliente.getText()) && !txtLojaCliente.getText().isEmpty()) {
+                        lojaMesmoId = " - " + txtLojaCliente.getText();
+                    } else {
+                        lojaMesmoId = "";
+                    }
                     
+                    dao.v_lojaMesmoId = lojaMesmoId;
                     dao.utilizaArquivoBalanca = chkUtilizaBalanca.isSelected();
                     dao.gerarCodigoAtacado = chkGerarCodigoAtacado.isSelected();
-
+                    
                     if (tabs.getSelectedIndex() == 0) {
 
                         if (chkProdutos.isSelected()) {
