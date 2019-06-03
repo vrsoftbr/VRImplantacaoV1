@@ -45,6 +45,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(GZSistemasDAO.class.getName());
+    public boolean utilizaPrecoTerminal = false;
 
     @Override
     public String getSistema() {
@@ -172,15 +173,18 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct\n"
-                    + "e.grupo merc1, g.descricao merc1_desc,\n"
-                    + "e.depto merc2, d.descricao merc2_desc\n"
-                    + "from mercodb.estoque e\n"
-                    + "inner join mercodb.grupo g on g.codigo = e.grupo\n"
-                    + "inner join mercodb.depto d on d.codigo = e.depto\n"
-                    + "where e.depto is not null\n"
-                    + "  and e.grupo is not null\n"
-                    + "order by e.grupo, e.depto"
+                    "select\n" +
+                    "	distinct\n" +
+                    "	coalesce(e.grupo, g.codigo) merc1,\n" +
+                    "   g.descricao merc1_desc,\n" +
+                    "	coalesce(e.depto, 1) merc2,\n" +
+                    "   coalesce(d.descricao, g.descricao) merc2_desc\n" +
+                    "from\n" +
+                    "   mercodb.grupo g\n" +
+                    "left join mercodb.estoque e on g.codigo = e.grupo\n" +
+                    "left join mercodb.depto d on d.codigo = e.depto\n" +
+                    "order by\n" +
+                    "	coalesce(e.grupo, g.codigo), e.depto;"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -235,6 +239,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "t.aliquota,\n"
                     + "t.reducao,\n"
                     + "s.precovenda,\n"
+                    + "s.termvenda vendaterminal,\n"        
                     + "s.perclucro,\n"
                     + "s.precocusto,\n"
                     + "s.estminimo,\n"
@@ -266,7 +271,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.seteBalanca(true);
                     }
 
-//                    imp.seteBalanca(rst.getInt("setor") > 0);
+                 // imp.seteBalanca(rst.getInt("setor") > 0);
                     imp.setValidade(rst.getInt("validade"));
                     imp.setDescricaoCompleta(rst.getString("descricao").trim());
                     imp.setDescricaoReduzida(rst.getString("descpdv").trim());
@@ -278,7 +283,11 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico2(rst.getString("depto"));
                     imp.setCodMercadologico3("1");
                     imp.setMargem(rst.getDouble("perclucro"));
-                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    if(utilizaPrecoTerminal) {
+                        imp.setPrecovenda(rst.getDouble("vendaterminal"));
+                    } else {
+                        imp.setPrecovenda(rst.getDouble("precovenda"));
+                    }
                     imp.setCustoComImposto(rst.getDouble("precocusto"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setEstoque(rst.getDouble("estoque"));
@@ -358,12 +367,26 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
         if (opt == OpcaoProduto.ICMS_ENTRADA) {
             try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "select\n"
+                        /*"select\n"
                         + "cdprod,\n"
                         + "tributa\n"
                         + "from mercodb.esttrib\n"
                         + "where uf = 'SP'\n"
-                        + "and loja = " + getLojaOrigem()
+                        + "and loja = " + getLojaOrigem()*/
+                        "select\n" +
+                        "  s.cdprod,\n" +
+                        "  coalesce(t.codigo, 1) tributa\n" +
+                        "from\n" +
+                        "  mercodb.saldos s\n" +
+                        "left join mercodb.tributa t on s.icmcompra = t.aliquota and\n" +
+                        "  (case when s.trbcompra = 'T' and s.baseicmcom != 0\n" +
+                        "  then 20\n" +
+                        "  when s.trbcompra = 'T' and s.baseicmcom = 0\n" +
+                        "  then 00\n" +
+                        "  when s.trbcompra = 'I' and s.baseicmcom = 0\n" +
+                        "  then 40 else 60 end) = t.st \n" +
+                        "where\n" +
+                        "  s.loja = " + getLojaOrigem()        
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
@@ -495,7 +518,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFantasia(rst.getString("nomfan"));
                     imp.setCnpj_cpf(rst.getString("cgc"));
                     imp.setIe_rg(rst.getString("insest"));
-                    imp.setEndereco((rst.getString("tipoender") + rst.getString("ender")).trim());
+                    imp.setEndereco((rst.getString("tipoender") + " " + rst.getString("ender")).trim());
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemen"));
                     imp.setBairro(rst.getString("bairro"));
@@ -624,7 +647,8 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "c.profissao,\n"
                     + "c.estcivil,\n"
                     + "c.sexo,\n"
-                    + "cc.limite\n"
+                    + "cc.limite,\n"
+                    + "cc.situacao bloqueado\n"
                     + "from mercodb.clientes c\n"
                     + "left join mercodb.clicartao cc on cc.cdcliente = c.codigo\n"
                     + "order by codigo"
@@ -636,7 +660,7 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFantasia(rst.getString("nomfan"));
                     imp.setCnpj(rst.getString("cgc"));
                     imp.setInscricaoestadual(rst.getString("insest"));
-                    imp.setEndereco((rst.getString("tipoender") + rst.getString("ender")).trim());
+                    imp.setEndereco((rst.getString("tipoender") + " " + rst.getString("ender")).trim());
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemen"));
                     imp.setCep(rst.getString("cep"));
@@ -658,7 +682,11 @@ public class GZSistemasDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCargo(rst.getString("cargo"));
                     imp.setValorLimite(rst.getDouble("limite"));
                     imp.setSexo("M".equals(rst.getString("sexo")) ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
-
+                    imp.setPermiteCheque(true);
+                    imp.setPermiteCreditoRotativo(true);
+                    if((rst.getString("bloqueado") != null) && (!rst.getString("bloqueado").isEmpty())) {
+                        imp.setBloqueado("B".equals(rst.getString("bloqueado").trim()));
+                    }
                     if ((rst.getString("endwww") != null)
                             && (!rst.getString("endwww").trim().isEmpty())) {
                         imp.addContato(
