@@ -63,6 +63,10 @@ public class VendaRepository {
             
             List<VendaItemIMP> divergentes = new ArrayList<>();
 
+            if (opt.contains(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR)) {
+                provider.vincularMapaDivergenciaComAnteriores();
+            }
+            
             for ( Iterator<VendaIMP> iterator = provider.getVendaIMP(); iterator.hasNext(); ) {
                 
                 VendaIMP impVenda = iterator.next();

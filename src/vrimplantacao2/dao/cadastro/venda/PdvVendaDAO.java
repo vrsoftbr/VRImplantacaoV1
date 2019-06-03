@@ -391,5 +391,38 @@ public class PdvVendaDAO {
             stm.execute(sql);
         }
     }
+
+    public void vincularMapaDivergenciaComAnteriores(String sistema, String loja) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(
+                    "update implantacao.mapavenda a set\n" +
+                    "	codigoatual = b.codigoatual,\n" +
+                    "	novo = b.novo\n" +
+                    "from\n" +
+                    "(select\n" +
+                    "	ant.impsistema,\n" +
+                    "	ant.imploja,\n" +
+                    "	coalesce(ant.impid, mv.codigo) impid,\n" +
+                    "	coalesce(ant.descricao, mv.descricao) descricao,\n" +
+                    "	coalesce(ant.codigoatual, mv.codigoatual) codigoatual,\n" +
+                    "	coalesce(ant.novo, mv.novo) novo\n" +
+                    "from\n" +
+                    "	implantacao.mapavenda mv \n" +
+                    "	join implantacao.codant_produto ant on \n" +
+                    "		mv.sistema = ant.impsistema and \n" +
+                    "		mv.loja = ant.imploja and \n" +
+                    "		mv.codigo = ant.impid\n" +
+                    "where	\n" +
+                    "	ant.impsistema = '" + sistema + "' and\n" +
+                    "	ant.imploja = '" + loja + "'\n" +
+                    ") b\n" +
+                    "where	 \n" +
+                    "	a.sistema = b.impsistema and \n" +
+                    "	a.loja = b.imploja and \n" +
+                    "	a.codigo = b.impid and \n" +
+                    "	a.codigoatual is null"
+            );
+        }
+    }
     
 }

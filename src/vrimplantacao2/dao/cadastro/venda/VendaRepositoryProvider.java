@@ -195,5 +195,9 @@ public class VendaRepositoryProvider {
     public void gerarRegistrosGenericos() throws Exception {
         vendaDAO.gerarRegistrosGenericos();
     }
+
+    public void vincularMapaDivergenciaComAnteriores() throws Exception {
+        vendaDAO.vincularMapaDivergenciaComAnteriores(getSistema(), getLoja());
+    }
     
 }
