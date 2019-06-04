@@ -7,6 +7,8 @@ import vrimplantacao2.dao.cadastro.RepositoryProvider;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.financeiro.ContaPagarAnteriorVO;
+import vrimplantacao2.vo.cadastro.financeiro.PagarFornecedorParcelaVO;
+import vrimplantacao2.vo.cadastro.financeiro.PagarFornecedorVO;
 import vrimplantacao2.vo.cadastro.financeiro.PagarOutrasDespesasVO;
 import vrimplantacao2.vo.cadastro.financeiro.PagarOutrasDespesasVencimentoVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
@@ -23,6 +25,8 @@ public class ContasPagarProvider implements RepositoryProvider {
     private ContaPagarAnteriorDAO anteriorDAO;
     private PagarOutrasDespesasDAO despesaDAO;
     private PagarOutrasDespesasVencimentoDAO vencimentoDAO;
+    private PagarFornecedorDAO pagarFornecedorDAO;
+    private PagarFornecedorParcelaDAO pagarFornecedorParcelaDAO;
 
     public ContasPagarProvider(String sistema, String agrupador, int lojaVR) throws Exception {
         this.sistema = sistema;
@@ -32,6 +36,8 @@ public class ContasPagarProvider implements RepositoryProvider {
         this.despesaDAO = new PagarOutrasDespesasDAO();
         this.vencimentoDAO = new PagarOutrasDespesasVencimentoDAO();
         this.anteriorDAO = new ContaPagarAnteriorDAO();
+        this.pagarFornecedorDAO = new PagarFornecedorDAO();
+        this.pagarFornecedorParcelaDAO = new PagarFornecedorParcelaDAO();
         this.anteriorDAO.createTable();
     }
 
@@ -103,13 +109,24 @@ public class ContasPagarProvider implements RepositoryProvider {
         this.vencimentoDAO.gravar(vc);
     }
 
-    public MultiMap<String, Void> getPagamentos() throws Exception {
-        return this.vencimentoDAO.getPagamentos();
+    public MultiMap<String, Void> getPagamentos(boolean outrasDespesas) throws Exception {
+        if (outrasDespesas) {
+            return this.vencimentoDAO.getPagamentos();
+        } else {
+            return this.pagarFornecedorParcelaDAO.getPagamentos();
+        }
     }
 
     public int getFornecedorLoja() throws Exception {
         return this.despesaDAO.getFornecedorLoja(lojaVR);
     }
-    
+
+    public void gravar(PagarFornecedorVO vo) throws Exception {
+        this.pagarFornecedorDAO.gravar(vo);
+    }    
+
+    public void gravarVencimento(PagarFornecedorParcelaVO parc) throws Exception {
+        this.pagarFornecedorParcelaDAO.gravarPagarFornecedorParcela(parc);
+    }
     
 }

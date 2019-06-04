@@ -1,13 +1,10 @@
 package vrimplantacao2.vo.cadastro.financeiro;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.SituacaoPagarOutrasDespesas;
-import vrimplantacao2.vo.enums.TipoEntrada;
 
 /**
  * Classe que representa o pagar outras despesas no banco de dados.
@@ -18,7 +15,7 @@ public class PagarOutrasDespesasVO {
     private int id;
     private int idFornecedor;
     private int numeroDocumento;
-    private TipoEntrada tipoEntrada = TipoEntrada.OUTRAS;
+    private int id_tipoentrada = 210;
     private Date dataEmissao = new Date();
     private Date dataEntrada = new Date();
     private double valor = 0;// numeric(11,2) NOT NULL,
@@ -27,7 +24,6 @@ public class PagarOutrasDespesasVO {
     private String observacao = "IMPORTACAO VR";// character varying(280),
     private int id_tipopiscofins = -1;// integer,
     private Timestamp dataHoraAlteracao = new Timestamp(new Date().getTime());// timestamp without time zone NOT NULL DEFAULT now(),
-    private List<PagarOutrasDespesasVencimentoVO> vencimentos = new ArrayList<>();
 
     public int getId() {
         return id;
@@ -53,12 +49,12 @@ public class PagarOutrasDespesasVO {
         this.numeroDocumento = numeroDocumento;
     }
 
-    public TipoEntrada getTipoEntrada() {
-        return tipoEntrada;
+    public int getIdTipoEntrada() {
+        return id_tipoentrada;
     }
 
-    public void setTipoEntrada(TipoEntrada tipoEntrada) {
-        this.tipoEntrada = tipoEntrada != null ? tipoEntrada : TipoEntrada.COMPRA_MERCADORIAS;
+    public void setIdTipoEntrada(int id_tipoentrada) {
+        this.id_tipoentrada = id_tipoentrada;
     }
 
     public Date getDataEmissao() {
@@ -129,25 +125,6 @@ public class PagarOutrasDespesasVO {
 
     public void setDataHoraAlteracao(Timestamp dataHoraAlteracao) {
         this.dataHoraAlteracao = dataHoraAlteracao != null ? dataHoraAlteracao : new Timestamp(new Date().getTime());
-    }
-
-    public List<PagarOutrasDespesasVencimentoVO> getVencimentos() {
-        return vencimentos;
-    }    
-    
-    /**
-     * Inclui um vencimento novo na listagem.
-     * @param vencimento Data de vencimento da parcela.
-     * @param valor Valor da parcala.
-     * @return 
-     */
-    public PagarOutrasDespesasVencimentoVO addVencimento(Date vencimento, double valor) {
-        PagarOutrasDespesasVencimentoVO result = new PagarOutrasDespesasVencimentoVO();
-        this.getVencimentos().add(result);
-        result.setPagarOutrasDespesas(this);
-        result.setDataVencimento(vencimento);
-        result.setValor(valor);
-        return result;
     }
     
 }

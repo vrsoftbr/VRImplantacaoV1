@@ -106,7 +106,7 @@ public class ContasPagarRepositoryTest {
         when(provider.getLojaVR()).thenReturn(1);
         when(provider.getFornecedores()).thenReturn(fornecedorList);
         when(provider.getAnteriores()).thenReturn(anteriorList);
-        when(provider.getPagamentos()).thenReturn(vencimentos);
+        when(provider.getPagamentos(eq(true))).thenReturn(vencimentos);
     }
 
     @Test
@@ -124,14 +124,9 @@ public class ContasPagarRepositoryTest {
         assertEquals(expected.getNumeroDocumento(), actual.getNumeroDocumento());
         assertEquals(expected.getObservacao(), actual.getObservacao());
         assertEquals(expected.getSituacaoPagarOutrasDespesas(), actual.getSituacaoPagarOutrasDespesas());
-        assertEquals(expected.getTipoEntrada(), actual.getTipoEntrada());
+        assertEquals(expected.getIdTipoEntrada(), actual.getIdTipoEntrada());
         assertEquals(expected.getValor(), actual.getValor(), 0.01D);
-            
-        assertEquals(expected.getVencimentos().size(), actual.getVencimentos().size());
-        PagarOutrasDespesasVencimentoVO v1_expected = expected.getVencimentos().get(0);            
-        PagarOutrasDespesasVencimentoVO v1_atual = actual.getVencimentos().get(0);
-        assertEquals(v1_expected.getDataVencimento(), v1_atual.getDataVencimento());
-        assertEquals(v1_expected.getValor(), v1_atual.getValor(), 0.01D);
+
         System.out.println("OK");
     }
     
@@ -150,67 +145,6 @@ public class ContasPagarRepositoryTest {
         assertEquals(expected.getId_fornecedor(), atual.getId_fornecedor());
         assertEquals(expected.getSistema(), atual.getSistema());
         assertEquals(expected.getValor(), atual.getValor(), 0.01D);   
-        System.out.println("OK");
-    }
-    
-    @Test
-    public void testGravarNovaConta() throws Exception {
-        System.out.print("ContasPagarRepositoryTest.testGravarNovaConta()...");
-        doAnswer(new Answer<Void> () {
-            int ids = 1;
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
-                PagarOutrasDespesasVO gravar = invocation.getArgumentAt(0, PagarOutrasDespesasVO.class);
-                gravar.setId(ids);
-                ids++;
-                return null;
-            }
-        }).when(provider).gravar(any(PagarOutrasDespesasVO.class));
-        ContasPagarRepository rep = new ContasPagarRepository(provider);
-        {
-            PagarOutrasDespesasVO expected = ContasPagarTestClasses.getOutraDespesa1();
-            
-            PagarOutrasDespesasVO atual = rep.gravarNovaConta(getImp1(), expected.getIdFornecedor());
-
-            assertEquals(1, atual.getId());
-            assertEquals(expected.getDataEmissao(), atual.getDataEmissao());
-            assertEquals(expected.getDataEntrada(), atual.getDataEntrada());
-            assertEquals(expected.getDataHoraAlteracao(), atual.getDataHoraAlteracao());
-            assertEquals(expected.getIdFornecedor(), atual.getIdFornecedor());
-            assertEquals(expected.getId_loja(), atual.getId_loja());
-            assertEquals(expected.getId_tipopiscofins(), atual.getId_tipopiscofins());
-            assertEquals(expected.getNumeroDocumento(), atual.getNumeroDocumento());
-            assertEquals(expected.getObservacao(), atual.getObservacao());
-            assertEquals(expected.getSituacaoPagarOutrasDespesas(), atual.getSituacaoPagarOutrasDespesas());
-            assertEquals(expected.getTipoEntrada(), atual.getTipoEntrada());
-            assertEquals(expected.getValor(), atual.getValor(), 0.01D); 
-            
-            assertEquals(expected.getVencimentos().size(), atual.getVencimentos().size());
-            PagarOutrasDespesasVencimentoVO v1_expected = expected.getVencimentos().get(0);            
-            PagarOutrasDespesasVencimentoVO v1_atual = atual.getVencimentos().get(0);
-            assertEquals(v1_expected.getDataVencimento(), v1_atual.getDataVencimento());
-            assertEquals(v1_expected.getValor(), v1_atual.getValor(), 0.01D);
-        }
-        {
-            PagarOutrasDespesasVO expected = ContasPagarTestClasses.getOutraDespesa2();
-            
-            PagarOutrasDespesasVO atual = rep.gravarNovaConta(getImp2(), expected.getIdFornecedor());
-
-            assertEquals(2, atual.getId());
-            assertEquals(expected.getDataEmissao(), atual.getDataEmissao());
-            assertEquals(expected.getDataEntrada(), atual.getDataEntrada());
-            assertEquals(expected.getDataHoraAlteracao(), atual.getDataHoraAlteracao());
-            assertEquals(expected.getIdFornecedor(), atual.getIdFornecedor());
-            assertEquals(expected.getId_loja(), atual.getId_loja());
-            assertEquals(expected.getId_tipopiscofins(), atual.getId_tipopiscofins());
-            assertEquals(expected.getNumeroDocumento(), atual.getNumeroDocumento());
-            assertEquals(expected.getObservacao(), atual.getObservacao());
-            assertEquals(expected.getSituacaoPagarOutrasDespesas(), atual.getSituacaoPagarOutrasDespesas());
-            assertEquals(expected.getTipoEntrada(), atual.getTipoEntrada());
-            assertEquals(expected.getValor(), atual.getValor(), 0.01D);
-            
-            assertEquals(expected.getVencimentos().size(), atual.getVencimentos().size());
-        }
         System.out.println("OK");
     }
     
@@ -243,14 +177,9 @@ public class ContasPagarRepositoryTest {
             assertEquals(expected.getNumeroDocumento(), atual.getNumeroDocumento());
             assertEquals(expected.getObservacao(), atual.getObservacao());
             assertEquals(expected.getSituacaoPagarOutrasDespesas(), atual.getSituacaoPagarOutrasDespesas());
-            assertEquals(expected.getTipoEntrada(), atual.getTipoEntrada());
+            assertEquals(expected.getIdTipoEntrada(), atual.getIdTipoEntrada());
             assertEquals(expected.getValor(), atual.getValor(), 0.01D); 
-            
-            assertEquals(expected.getVencimentos().size(), atual.getVencimentos().size());
-            PagarOutrasDespesasVencimentoVO v1_expected = expected.getVencimentos().get(0);            
-            PagarOutrasDespesasVencimentoVO v1_atual = atual.getVencimentos().get(0);
-            assertEquals(v1_expected.getDataVencimento(), v1_atual.getDataVencimento());
-            assertEquals(v1_expected.getValor(), v1_atual.getValor(), 0.01D);
+
         }
         {
             PagarOutrasDespesasVO expected = ContasPagarTestClasses.getOutraDespesa2();
@@ -267,43 +196,10 @@ public class ContasPagarRepositoryTest {
             assertEquals(expected.getNumeroDocumento(), atual.getNumeroDocumento());
             assertEquals(expected.getObservacao(), atual.getObservacao());
             assertEquals(expected.getSituacaoPagarOutrasDespesas(), atual.getSituacaoPagarOutrasDespesas());
-            assertEquals(expected.getTipoEntrada(), atual.getTipoEntrada());
+            assertEquals(expected.getIdTipoEntrada(), atual.getIdTipoEntrada());
             assertEquals(expected.getValor(), atual.getValor(), 0.01D);
             
-            assertEquals(expected.getVencimentos().size(), atual.getVencimentos().size());
         }
-        System.out.println("OK");
-    }
-    
-    @Test
-    public void testGravarVencimentos() throws Exception {
-        System.out.print("ContasPagarRepositoryTest.testGravarVencimentos()...");
-        final List<PagarOutrasDespesasVencimentoVO> bd = new ArrayList<>();
-        doAnswer(new Answer<Void> () {
-            int ids = 1;
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
-                PagarOutrasDespesasVencimentoVO gravar = invocation.getArgumentAt(0, PagarOutrasDespesasVencimentoVO.class);
-                gravar.setId(ids);
-                ids++;
-                bd.add(gravar);
-                return null;
-            }
-        }).when(provider).gravarVencimento(any(PagarOutrasDespesasVencimentoVO.class));
-        
-        ContasPagarRepository rep = new ContasPagarRepository(provider) {};
-        
-        MultiMap<String, Void> parcelas = getVencimentos();
-        
-        PagarOutrasDespesasVO despesa = ContasPagarTestClasses.getOutraDespesa1();
-        
-        rep.gravarVencimentos(despesa, parcelas);
-        
-        assertEquals(1, bd.size());
-        PagarOutrasDespesasVencimentoVO expected = despesa.getVencimentos().get(0);
-        PagarOutrasDespesasVencimentoVO actual = bd.get(0);
-        assertEquals(expected.getDataVencimento(), actual.getDataVencimento());
-        assertEquals(expected.getValor(), actual.getValor(), 0.01D);
         System.out.println("OK");
     }
     
@@ -343,7 +239,7 @@ public class ContasPagarRepositoryTest {
         
         ContasPagarRepository rep = new ContasPagarRepository(provider) {};
         
-        rep.salvar(getTestList(), OpcaoContaPagar.NOVOS);
+        rep.salvar(getTestList(), OpcaoContaPagar.NOVOS, OpcaoContaPagar.IMPORTAR_OUTRASDESPESAS);
         
         assertEquals(2, db.size());
         assertEquals(3, dbVenc.size());
@@ -360,7 +256,7 @@ public class ContasPagarRepositoryTest {
             assertEquals(expected.getNumeroDocumento(), actual.getNumeroDocumento());
             assertEquals(expected.getObservacao(), actual.getObservacao());
             assertEquals(expected.getSituacaoPagarOutrasDespesas(), actual.getSituacaoPagarOutrasDespesas());
-            assertEquals(expected.getTipoEntrada(), actual.getTipoEntrada());
+            assertEquals(expected.getIdTipoEntrada(), actual.getIdTipoEntrada());
             assertEquals(expected.getValor(), actual.getValor(), 0.01D);        
         }
         
@@ -376,7 +272,7 @@ public class ContasPagarRepositoryTest {
             assertEquals(expected.getNumeroDocumento(), actual.getNumeroDocumento());
             assertEquals(expected.getObservacao(), actual.getObservacao());
             assertEquals(expected.getSituacaoPagarOutrasDespesas(), actual.getSituacaoPagarOutrasDespesas());
-            assertEquals(expected.getTipoEntrada(), actual.getTipoEntrada());
+            assertEquals(expected.getIdTipoEntrada(), actual.getIdTipoEntrada());
             assertEquals(expected.getValor(), actual.getValor(), 0.01D);        
         }
         
@@ -432,8 +328,8 @@ public class ContasPagarRepositoryTest {
         
         ContasPagarRepository rep = new ContasPagarRepository(provider) {};
         
-        rep.salvar(getTestList(), OpcaoContaPagar.NOVOS);
-        rep.salvar(getTestList(), OpcaoContaPagar.NOVOS);
+        rep.salvar(getTestList(), OpcaoContaPagar.NOVOS, OpcaoContaPagar.IMPORTAR_OUTRASDESPESAS);
+        rep.salvar(getTestList(), OpcaoContaPagar.NOVOS, OpcaoContaPagar.IMPORTAR_OUTRASDESPESAS);
         
         assertEquals(2, db.size());
         assertEquals(3, dbVenc.size());
@@ -450,7 +346,7 @@ public class ContasPagarRepositoryTest {
             assertEquals(expected.getNumeroDocumento(), actual.getNumeroDocumento());
             assertEquals(expected.getObservacao(), actual.getObservacao());
             assertEquals(expected.getSituacaoPagarOutrasDespesas(), actual.getSituacaoPagarOutrasDespesas());
-            assertEquals(expected.getTipoEntrada(), actual.getTipoEntrada());
+            assertEquals(expected.getIdTipoEntrada(), actual.getIdTipoEntrada());
             assertEquals(expected.getValor(), actual.getValor(), 0.01D);        
         }
         
@@ -466,7 +362,7 @@ public class ContasPagarRepositoryTest {
             assertEquals(expected.getNumeroDocumento(), actual.getNumeroDocumento());
             assertEquals(expected.getObservacao(), actual.getObservacao());
             assertEquals(expected.getSituacaoPagarOutrasDespesas(), actual.getSituacaoPagarOutrasDespesas());
-            assertEquals(expected.getTipoEntrada(), actual.getTipoEntrada());
+            assertEquals(expected.getIdTipoEntrada(), actual.getIdTipoEntrada());
             assertEquals(expected.getValor(), actual.getValor(), 0.01D);        
         }
         

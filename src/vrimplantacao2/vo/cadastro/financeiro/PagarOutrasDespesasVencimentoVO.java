@@ -9,7 +9,7 @@ import vrimplantacao2.utils.MathUtils;
  */
 public class PagarOutrasDespesasVencimentoVO {
     private int id;
-    private PagarOutrasDespesasVO pagarOutrasDespesas;
+    private int idPagarOutrasDespesas;
     private Date dataVencimento = new Date();
     private double valor = 0;
 
@@ -21,12 +21,12 @@ public class PagarOutrasDespesasVencimentoVO {
         this.id = id;
     }
 
-    public PagarOutrasDespesasVO getPagarOutrasDespesas() {
-        return pagarOutrasDespesas;
+    public int getIdPagarOutrasDespesas() {
+        return idPagarOutrasDespesas;
     }
 
-    public void setPagarOutrasDespesas(PagarOutrasDespesasVO pagarOutrasDespesas) {
-        this.pagarOutrasDespesas = pagarOutrasDespesas;
+    public void setIdPagarOutrasDespesas(int idPagarOutrasDespesas) {
+        this.idPagarOutrasDespesas = idPagarOutrasDespesas;
     }
 
     public Date getDataVencimento() {
@@ -36,12 +36,6 @@ public class PagarOutrasDespesasVencimentoVO {
     public void setDataVencimento(Date dataVencimento) {
         if (dataVencimento != null) {
             this.dataVencimento = dataVencimento;
-        } else {
-            if (pagarOutrasDespesas != null) {
-                this.dataVencimento = this.pagarOutrasDespesas.getDataEmissao();
-            } else {
-                this.dataVencimento = new Date();
-            } 
         }
     }
 

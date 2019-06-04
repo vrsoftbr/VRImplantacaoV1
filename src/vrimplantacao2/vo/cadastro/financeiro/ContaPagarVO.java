@@ -16,7 +16,7 @@ public class ContaPagarVO {
     private int idOutrasDespesas;
     private FornecedorVO fornecedor;
     private int numeroDocumento;
-    private TipoEntradaVO tipoEntrada;
+    private int idTipoEntrada = 210;
     private Date dataEmissao = new Date();
     private Date dataEntrada = new Date();
     private Date vencimento = new Date();
@@ -59,12 +59,12 @@ public class ContaPagarVO {
         this.numeroDocumento = numeroDocumento;
     }
 
-    public TipoEntradaVO getTipoEntrada() {
-        return tipoEntrada;
+    public int getIdTipoEntrada() {
+        return idTipoEntrada;
     }
 
-    public void setTipoEntrada(TipoEntradaVO tipoEntrada) {
-        this.tipoEntrada = tipoEntrada;
+    public void setIdTipoEntrada(int idTipoEntrada) {
+        this.idTipoEntrada = idTipoEntrada;
     }
 
     public Date getDataEmissao() {

@@ -72,7 +72,7 @@ public class ContasPagarTestClasses {
         vo.setId_loja(1);
         vo.setNumeroDocumento(123);
         vo.setValor(140.65);
-        vo.addVencimento(format.parse("10/01/2017"), 140.65);
+        //vo.addVencimento(format.parse("10/01/2017"), 140.65);
         return vo;
     }
     
@@ -101,8 +101,8 @@ public class ContasPagarTestClasses {
         vo.setObservacao("IMPORTADO VR DESPESA 3");
         vo.setNumeroDocumento(8974);
         vo.setValor(120.00);
-        vo.addVencimento(format.parse("10/01/2017"), 60);
-        vo.addVencimento(format.parse("10/02/2017"), 60);
+        //vo.addVencimento(format.parse("10/01/2017"), 60);
+        //vo.addVencimento(format.parse("10/02/2017"), 60);
         return vo;
     }
     
@@ -112,7 +112,7 @@ public class ContasPagarTestClasses {
         vo.setAgrupador("1");
         vo.setId("ASD123");
         PagarOutrasDespesasVO atual = getOutraDespesa1();
-        vo.setCodigoAtual(vazio ? null : atual);
+        vo.setCodigoAtual(vazio ? null : atual.getId());
         vo.setDataEmissao(format.parse("01/01/2017"));
         vo.setDocumento("ADD123");
         vo.setId_fornecedor(FornecedorTestClasses.getAnterior1().getImportId());
@@ -126,7 +126,7 @@ public class ContasPagarTestClasses {
         vo.setAgrupador("1");
         vo.setId("2");
         PagarOutrasDespesasVO atual = getOutraDespesa2();
-        vo.setCodigoAtual(vazio ? null : atual);
+        vo.setCodigoAtual(vazio ? null : atual.getId());
         vo.setDataEmissao(atual.getDataEmissao());
         vo.setDocumento(String.valueOf(atual.getNumeroDocumento()));
         vo.setId_fornecedor(FornecedorTestClasses.getAnterior1().getImportId());
@@ -140,7 +140,7 @@ public class ContasPagarTestClasses {
         vo.setAgrupador("1");
         vo.setId("78934531134");
         PagarOutrasDespesasVO atual = getOutraDespesa3();
-        vo.setCodigoAtual(vazio ? null : atual);
+        vo.setCodigoAtual(vazio ? null : atual.getId());
         vo.setDataEmissao(atual.getDataEmissao());
         vo.setDocumento(String.valueOf(atual.getNumeroDocumento()));
         vo.setId_fornecedor(FornecedorTestClasses.getAnterior3().getImportId());

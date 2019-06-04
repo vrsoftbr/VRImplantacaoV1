@@ -9,11 +9,13 @@ import vrimplantacao2.utils.MathUtils;
  */
 public class ContaPagarAnteriorVO {
     
+    
     private String sistema;
     private String agrupador;
     private String id;
+    private ContaPagarAnteriorTipo tipo = ContaPagarAnteriorTipo.OUTRASDESPESAS;
     private String id_fornecedor;
-    private PagarOutrasDespesasVO codigoAtual;
+    private Integer codigoAtual;
     private Date dataEmissao;
     private Date dataVencimento;
     private double valor;
@@ -43,6 +45,14 @@ public class ContaPagarAnteriorVO {
         this.id = id;
     }
 
+    public ContaPagarAnteriorTipo getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(ContaPagarAnteriorTipo tipo) {
+        this.tipo = tipo == null ? ContaPagarAnteriorTipo.PAGARFORNECEDOR : tipo;
+    }
+
     public String getId_fornecedor() {
         return id_fornecedor;
     }
@@ -51,11 +61,11 @@ public class ContaPagarAnteriorVO {
         this.id_fornecedor = id_fornecedor;
     }
 
-    public PagarOutrasDespesasVO getCodigoAtual() {
+    public Integer getCodigoAtual() {
         return codigoAtual;
     }
 
-    public void setCodigoAtual(PagarOutrasDespesasVO codigoAtual) {
+    public void setCodigoAtual(Integer codigoAtual) {
         this.codigoAtual = codigoAtual;
     }
 

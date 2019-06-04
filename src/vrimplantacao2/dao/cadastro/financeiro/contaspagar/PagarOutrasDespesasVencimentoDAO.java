@@ -19,7 +19,7 @@ public class PagarOutrasDespesasVencimentoDAO {
     public void gravar(PagarOutrasDespesasVencimentoVO vo) throws Exception {
         SQLBuilder sql = new SQLBuilder();
         sql.setTableName("pagaroutrasdespesasvencimento");
-        sql.put("id_pagaroutrasdespesas", vo.getPagarOutrasDespesas().getId());
+        sql.put("id_pagaroutrasdespesas", vo.getIdPagarOutrasDespesas());
         sql.put("datavencimento", vo.getDataVencimento());
         sql.put("valor", vo.getValor());
         try (Statement stm = Conexao.createStatement()) {

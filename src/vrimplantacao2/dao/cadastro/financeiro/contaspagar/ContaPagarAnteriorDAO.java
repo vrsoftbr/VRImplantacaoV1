@@ -6,8 +6,8 @@ import vrframework.classe.Conexao;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.utils.sql.SQLUtils;
+import vrimplantacao2.vo.cadastro.financeiro.ContaPagarAnteriorTipo;
 import vrimplantacao2.vo.cadastro.financeiro.ContaPagarAnteriorVO;
-import vrimplantacao2.vo.cadastro.financeiro.PagarOutrasDespesasVO;
 
 /**
  *
@@ -23,6 +23,7 @@ public class ContaPagarAnteriorDAO {
                     "	sistema varchar not null,\n" +
                     "	agrupador varchar not null,\n" +
                     "	id varchar not null,\n" +
+                    "	tipo varchar(20) default 'OUTRASDESPESAS' not null,\n" +
                     "	id_fornecedor varchar not null,\n" +
                     "	codigoatual integer,\n" +
                     "	emissao date,\n" +
@@ -45,6 +46,7 @@ public class ContaPagarAnteriorDAO {
                     "	sistema, \n" +
                     "	agrupador, \n" +
                     "	id, \n" +
+                    "	tipo, \n" +
                     "	id_fornecedor, \n" +
                     "	codigoatual, \n" +
                     "	emissao, \n" +
@@ -67,10 +69,13 @@ public class ContaPagarAnteriorDAO {
                     ant.setSistema(rst.getString("sistema"));
                     ant.setAgrupador(rst.getString("agrupador"));
                     ant.setId(rst.getString("id"));
+                    switch (rst.getString("tipo")) {
+                        case "PAGARFORNECEDOR": ant.setTipo(ContaPagarAnteriorTipo.PAGARFORNECEDOR); break;
+                        default: ant.setTipo(ContaPagarAnteriorTipo.OUTRASDESPESAS); break;
+                    }
                     ant.setId_fornecedor(rst.getString("id_fornecedor"));
                     if (rst.getString("codigoatual") != null) {
-                        ant.setCodigoAtual(new PagarOutrasDespesasVO());
-                        ant.getCodigoAtual().setId(rst.getInt("codigoatual"));
+                        ant.setCodigoAtual(rst.getInt("codigoatual"));
                     }
                     ant.setDataEmissao(rst.getDate("emissao"));
                     ant.setDataVencimento(rst.getDate("vencimento"));
@@ -99,8 +104,9 @@ public class ContaPagarAnteriorDAO {
                 "agrupador = " + SQLUtils.stringSQL(anterior.getAgrupador()) + " and\n" +
                 "id = " + SQLUtils.stringSQL(anterior.getId())
         );
+        sql.put("tipo", anterior.getTipo().toString());
         if (anterior.getCodigoAtual() != null) {
-            sql.put("codigoatual", anterior.getCodigoAtual().getId());
+            sql.put("codigoatual", anterior.getCodigoAtual());
         }
         sql.put("id_fornecedor", anterior.getId_fornecedor());
         sql.put("emissao", anterior.getDataEmissao());
@@ -120,8 +126,9 @@ public class ContaPagarAnteriorDAO {
         sql.put("sistema", anterior.getSistema());
         sql.put("agrupador", anterior.getAgrupador());
         sql.put("id", anterior.getId());
+        sql.put("tipo", anterior.getTipo().toString());
         if (anterior.getCodigoAtual() != null) {
-            sql.put("codigoatual", anterior.getCodigoAtual().getId());
+            sql.put("codigoatual", anterior.getCodigoAtual());
         }
         sql.put("id_fornecedor", anterior.getId_fornecedor());
         sql.put("emissao", anterior.getDataEmissao());

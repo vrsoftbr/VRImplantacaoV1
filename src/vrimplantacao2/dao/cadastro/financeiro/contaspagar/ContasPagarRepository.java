@@ -2,19 +2,23 @@ package vrimplantacao2.dao.cadastro.financeiro.contaspagar;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.multimap.KeyList;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.cadastro.financeiro.ContaPagarAnteriorTipo;
 import vrimplantacao2.vo.cadastro.financeiro.ContaPagarAnteriorVO;
+import vrimplantacao2.vo.cadastro.financeiro.PagarFornecedorParcelaVO;
+import vrimplantacao2.vo.cadastro.financeiro.PagarFornecedorVO;
 import vrimplantacao2.vo.cadastro.financeiro.PagarOutrasDespesasVO;
 import vrimplantacao2.vo.cadastro.financeiro.PagarOutrasDespesasVencimentoVO;
+import vrimplantacao2.vo.cadastro.financeiro.SituacaoPagarFornecedorParcela;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorVO;
 import vrimplantacao2.vo.enums.SituacaoPagarOutrasDespesas;
-import vrimplantacao2.vo.enums.TipoEntrada;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 
@@ -27,27 +31,33 @@ public class ContasPagarRepository {
     private static final SimpleDateFormat FORMATER = new SimpleDateFormat("yyyy-MM-dd");
     
     private final ContasPagarProvider provider;
+    private boolean importarOutrasDespesas;
 
     public ContasPagarRepository(ContasPagarProvider provider) {
         this.provider = provider;        
     }
 
     public void salvar(List<ContaPagarIMP> contas, OpcaoContaPagar... opcoes) throws Exception {
+        
         Set<OpcaoContaPagar> opt = new HashSet<>(Arrays.asList(opcoes));
         MultiMap<String, ContaPagarIMP> organizados = organizar(contas);
         provider.notificar("Contas à Pagar - Preparando a importação...");
         MultiMap<String, FornecedorAnteriorVO> fornecedores = provider.getFornecedores();
         MultiMap<String, ContaPagarAnteriorVO> anteriores = provider.getAnteriores();
-        MultiMap<String, Void> pagamentos = provider.getPagamentos();
-        
-        System.out.println(String.format("SISTEMA: %s; LOJA: %s;", provider.getSistema(), provider.getAgrupador()));
-        System.out.println(String.format(" forn_ant: %d; ant: %d; pagamentos: %d; organizados: %d", fornecedores.size(), anteriores.size(), pagamentos.size(), organizados.size()));
         
         provider.notificar("Contas à Pagar - Importando...", organizados.size());
         provider.begin();
         int fornecedorLoja = provider.getFornecedorLoja();
         try {
             int cont = 0;
+            this.importarOutrasDespesas = opt.contains(OpcaoContaPagar.IMPORTAR_OUTRASDESPESAS);
+            boolean importarSemFornecedor = opt.contains(OpcaoContaPagar.IMPORTAR_SEM_FORNECEDOR);            
+            
+            MultiMap<String, Void> pagamentos = provider.getPagamentos(importarOutrasDespesas);
+            
+            System.out.println(String.format("SISTEMA: %s; LOJA: %s;", provider.getSistema(), provider.getAgrupador()));
+            System.out.println(String.format(" forn_ant: %d; ant: %d; pagamentos: %d; organizados: %d", fornecedores.size(), anteriores.size(), pagamentos.size(), organizados.size()));
+            
             for (ContaPagarIMP imp: organizados.values()) {            
                 ContaPagarAnteriorVO anterior = anteriores.get(
                         provider.getSistema(),
@@ -75,23 +85,49 @@ public class ContasPagarRepository {
                     }
                 }
                 
-                if (fornecedor == null && opt.contains(OpcaoContaPagar.IMPORTAR_SEM_FORNECEDOR)) {
+                if (fornecedor == null && importarSemFornecedor) {
                     fornecedor = new FornecedorVO();
                     fornecedor.setId(fornecedorLoja);
                 }
 
                 //Se for uma conta nova
-                if (anterior == null) {
+                if (anterior == null || anterior.getCodigoAtual() == null) {
                     if (opt.contains(OpcaoContaPagar.NOVOS)) {
-                        anterior = converterAnterior(imp);
+                        boolean anteriorExistente = anterior != null;
+                        
+                        if (!anteriorExistente) {
+                            anterior = converterAnterior(imp);
+                        }
+                        
+                        if (importarOutrasDespesas) {
+                            anterior.setTipo(ContaPagarAnteriorTipo.OUTRASDESPESAS);                        
+                        } else {
+                            anterior.setTipo(ContaPagarAnteriorTipo.PAGARFORNECEDOR);
+                        }
+                        
                         //Se o fornecedor existir no cadastro
                         if (fornecedor != null) {
-                            PagarOutrasDespesasVO vo = gravarNovaConta(imp, fornecedor.getId());
-                            gravarVencimentos(vo, pagamentos);
-                            anterior.setCodigoAtual(vo);
+                            if (importarOutrasDespesas) {
+                                //Gravando o outras despesas
+                                PagarOutrasDespesasVO vo = converterEmOutrasDispesas(imp);
+                                vo.setIdFornecedor(fornecedor.getId());
+                                provider.gravar(vo);
+                                //Set código anterior
+                                anterior.setCodigoAtual(vo.getId());
+                            } else {
+                                //Converte e grava o pagar fornecedor
+                                PagarFornecedorVO vo = converterPagarFornecedor(imp);
+                                vo.setId_fornecedor(fornecedor.getId());
+                                provider.gravar(vo);
+                                anterior.setCodigoAtual(vo.getId());
+                            }
                         }
                         //Grava o código anterior e o registra na listagem.
-                        provider.gravarAnterior(anterior);
+                        if (!anteriorExistente) {
+                            provider.gravarAnterior(anterior);
+                        } else {
+                            provider.atualizarAnterior(anterior);
+                        }
                         anteriores.put(
                                 anterior,
                                 anterior.getSistema(),
@@ -99,38 +135,32 @@ public class ContasPagarRepository {
                                 anterior.getId()
                         );
                     }
-                } else {
-                    //Se já estiver cadastrado, atualiza as informações da despesa existente.
-                    if (anterior.getCodigoAtual() != null) {
-                        if (fornecedor != null) {
-                            PagarOutrasDespesasVO vo = atualizarConta(
-                                    anterior.getCodigoAtual().getId(),
-                                    imp, 
-                                    fornecedor.getId(), 
-                                    opt
-                            );
-                            gravarVencimentos(vo, pagamentos);
-                            anterior = converterAnterior(imp);
-                            anterior.setCodigoAtual(vo);
-                            provider.atualizarAnterior(anterior);
+                }
+                
+                for (ContaPagarVencimentoIMP cp: imp.getVencimentos()) {
+                    KeyList<String> keys = getKeys(
+                            anterior.getCodigoAtual(),
+                            cp.getVencimento(),
+                            cp.getValor()
+                    );
+                    if (!pagamentos.containsKey(keys)) {
+                        if (importarOutrasDespesas) {
+                            //Converte e grava a parcela
+                            PagarOutrasDespesasVencimentoVO parc = converterEmOutrasDespesasVencimento(cp);
+                            parc.setIdPagarOutrasDespesas(anterior.getCodigoAtual());
+                            provider.gravarVencimento(parc);
+                        } else {
+                            //Converte e grava a parcela do pagar fornecedor
+                            PagarFornecedorParcelaVO parc = converterPagarFornecedorParcela(cp);
+                            parc.setId_pagarfornecedor(anterior.getCodigoAtual());
+                            provider.gravarVencimento(parc);
                         }
-                    } else {
-                        if (opt.contains(OpcaoContaPagar.NOVOS)) {
-                            if (fornecedor != null) {
-                                PagarOutrasDespesasVO vo = gravarNovaConta(imp, fornecedor.getId());
-                                gravarVencimentos(vo, pagamentos);
-                                anterior.setCodigoAtual(vo);
-                                provider.atualizarAnterior(anterior);
-                                anteriores.put(
-                                        anterior,
-                                        anterior.getSistema(),
-                                        anterior.getAgrupador(),
-                                        anterior.getId()
-                                );
-                            }
-                        }
+
+                        //Inclui na listagem de parcelas (UK)
+                        pagamentos.put(null, keys);
                     }
                 }
+                
                 provider.notificar();
             }
             System.out.println("Contagem: " + cont);
@@ -140,6 +170,14 @@ public class ContasPagarRepository {
             throw e;
         }
         
+    }
+    
+    private KeyList<String> getKeys(int id, Date vencimento, double valor) {
+        return new KeyList<> (
+                String.valueOf(id),
+                FORMATER.format(vencimento),
+                String.format("%.2f", valor)
+        );
     }
 
     private MultiMap<String, ContaPagarIMP> organizar(List<ContaPagarIMP> pagamentos) throws Exception {
@@ -170,13 +208,9 @@ public class ContasPagarRepository {
         vo.setId_tipopiscofins(-1);
         vo.setNumeroDocumento(Utils.stringToInt(imp.getNumeroDocumento()));
         vo.setObservacao("IMPORTADO VR" + (imp.getObservacao() != null ? " " + imp.getObservacao() : ""));
-        vo.setSituacaoPagarOutrasDespesas(imp.isFinalizada() ? SituacaoPagarOutrasDespesas.FINALIZADO : SituacaoPagarOutrasDespesas.NAO_FINALIZADO);
-        vo.setTipoEntrada(TipoEntrada.OUTRAS);
+        vo.setSituacaoPagarOutrasDespesas(SituacaoPagarOutrasDespesas.NAO_FINALIZADO);
+        vo.setIdTipoEntrada(imp.getIdTipoEntradaVR() == null ? 210 : imp.getIdTipoEntradaVR());
         vo.setValor(imp.getValor());
-        
-        for (ContaPagarVencimentoIMP venc: imp.getVencimentos()) {
-            vo.addVencimento(venc.getVencimento(), venc.getValor());
-        }
         
         return vo;
     }
@@ -195,29 +229,6 @@ public class ContasPagarRepository {
         return vo;
     }
 
-    public void gravarVencimentos(PagarOutrasDespesasVO vo, MultiMap<String, Void> parcelas) throws Exception {
-        for (PagarOutrasDespesasVencimentoVO vc: vo.getVencimentos()) {
-            KeyList<String> keys = new KeyList<> (
-                    String.valueOf(vo.getId()),
-                    FORMATER.format(vc.getDataVencimento()),
-                    String.format("%.2f", vc.getValor())
-            );
-            if (!parcelas.containsKey(keys)) {
-                provider.gravarVencimento(vc);
-                parcelas.put(null, keys);
-            }
-        }
-    }
-
-    public PagarOutrasDespesasVO gravarNovaConta(ContaPagarIMP imp, int idFornecedor) throws Exception {
-        
-        PagarOutrasDespesasVO vo = converterEmOutrasDispesas(imp);
-        vo.setIdFornecedor(idFornecedor);
-        provider.gravar(vo);
-
-        return vo;
-    }
-
     public PagarOutrasDespesasVO atualizarConta(int id, ContaPagarIMP imp, int idFornecedor, Set<OpcaoContaPagar> opt) throws Exception {
         
         PagarOutrasDespesasVO vo = converterEmOutrasDispesas(imp);
@@ -227,5 +238,53 @@ public class ContasPagarRepository {
         
         return vo;
         
+    }
+
+    private PagarFornecedorVO converterPagarFornecedor(ContaPagarIMP imp) {
+        PagarFornecedorVO vo = new PagarFornecedorVO();
+        
+        vo.setId_loja(provider.getLojaVR());
+        vo.setId_tipoentrada(imp.getIdTipoEntradaVR() == null ? 210 : imp.getIdTipoEntradaVR());
+        vo.setDataemissao(imp.getDataEmissao());
+        vo.setDataentrada(imp.getDataEntrada() == null ? imp.getDataEmissao() : imp.getDataEntrada());
+        vo.setNumerodocumento(Utils.stringToInt(imp.getNumeroDocumento()));
+        
+        double total = 0;
+        for (ContaPagarVencimentoIMP vc: imp.getVencimentos()) {
+            total += vc.getValor();
+        }
+        
+        vo.setValor(total);
+        
+        return vo;        
+    }
+
+    private PagarFornecedorParcelaVO converterPagarFornecedorParcela(ContaPagarVencimentoIMP cp) {
+        PagarFornecedorParcelaVO vo = new PagarFornecedorParcelaVO();
+        
+        vo.setAgencia(cp.getAgencia());
+        vo.setConferido(cp.isConferido());
+        vo.setConta(cp.getConta());
+        vo.setDatapagamento(cp.getDataPagamento());
+        vo.setDatavencimento(cp.getVencimento());
+        vo.setId_banco(cp.getId_banco());
+        vo.setId_tipopagamento(cp.getIdTipoPagamentoVR() == null ? 0 : cp.getIdTipoPagamentoVR());
+        vo.setNumerocheque(cp.getNumerocheque());
+        vo.setNumeroparcela(cp.getNumeroParcela());
+        vo.setObservacao("IMPORTADO VR " + cp.getObservacao());
+        vo.setSituacaopagarfornecedorparcela(cp.isPago() ? SituacaoPagarFornecedorParcela.PAGO : SituacaoPagarFornecedorParcela.ABERTO);
+        vo.setValor(cp.getValor());
+        vo.setDatahoraalteracao(new Date());
+        
+        return vo;
+    }
+
+    private PagarOutrasDespesasVencimentoVO converterEmOutrasDespesasVencimento(ContaPagarVencimentoIMP cp) {
+        PagarOutrasDespesasVencimentoVO venc = new PagarOutrasDespesasVencimentoVO();
+        
+        venc.setDataVencimento(cp.getVencimento());
+        venc.setValor(cp.getValor());
+        
+        return venc;
     }
 }

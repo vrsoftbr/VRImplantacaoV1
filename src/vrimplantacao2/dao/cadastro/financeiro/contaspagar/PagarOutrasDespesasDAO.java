@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.Util;
-import vrimplantacao2.vo.cadastro.financeiro.TipoEntradaVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorVO;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.financeiro.ContaPagarVO;
@@ -24,7 +23,7 @@ public class PagarOutrasDespesasDAO {
         sql.setTableName("pagaroutrasdespesas");
         sql.put("id_fornecedor", vo.getIdFornecedor());
         sql.put("numerodocumento", vo.getNumeroDocumento());
-        sql.put("id_tipoentrada", vo.getTipoEntrada().getId());
+        sql.put("id_tipoentrada", vo.getIdTipoEntrada());
         sql.put("dataemissao", vo.getDataEmissao());
         sql.put("dataentrada", vo.getDataEntrada());
         sql.put("valor", vo.getValor());
@@ -117,10 +116,7 @@ public class PagarOutrasDespesasDAO {
                     vo.setDataEntrada(rs.getDate("dataentrada"));
                     vo.setDataEmissao(rs.getDate("dataemissao"));
                     vo.setVencimento(rs.getDate("datavencimento"));
-                    TipoEntradaVO tipoEntrada = new TipoEntradaVO();
-                    tipoEntrada.setId(rs.getInt("id_tipoentrada"));
-                    tipoEntrada.setDescricao(rs.getString("descricao"));
-                    vo.setTipoEntrada(tipoEntrada);
+                    vo.setIdTipoEntrada(rs.getInt("id_tipoentrada"));
                     vo.setValor(rs.getDouble("valor"));
                     vo.setObservacao(rs.getString("observacao"));
 
@@ -138,7 +134,7 @@ public class PagarOutrasDespesasDAO {
                 sql.setTableName("pagarfornecedor");
                 sql.put("id_loja", idLoja);
                 sql.put("id_fornecedor", vo.getFornecedor().getId());
-                sql.put("id_tipoentrada", vo.getTipoEntrada().getId());
+                sql.put("id_tipoentrada", vo.getIdTipoEntrada());
                 sql.put("numerodocumento", vo.getNumeroDocumento());
                 sql.put("dataentrada", vo.getDataEntrada());
                 sql.put("dataemissao", vo.getDataEmissao());
