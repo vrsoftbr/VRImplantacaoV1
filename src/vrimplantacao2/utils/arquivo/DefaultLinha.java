@@ -4,21 +4,26 @@ import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.InputMismatchException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class DefaultLinha implements LinhaArquivo {
-    public static final SimpleDateFormat DATA_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
-    public static final SimpleDateFormat DATA_FORMAT_SM = new SimpleDateFormat("dd/MM/yy");
-    public static final SimpleDateFormat DATA_FORMAT_STAMP = new SimpleDateFormat("yyyy-MM-dd");
-    public static final SimpleDateFormat DATA_FORMAT_STAMP2 = new SimpleDateFormat("dd/MM/yy hh:mm");
-    public static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("hh:mm:ss");
     
-    private final Map<String, String> linha;
-
+    private final Map<String, String> linha = new LinkedHashMap<>();
+    
+    private final static SimpleDateFormat DEFAULT_DATA_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private final static SimpleDateFormat DEFAULT_TIME_FORMAT = new SimpleDateFormat("hh:mm:ss");
+    
+    private SimpleDateFormat dataFormat;
+    private SimpleDateFormat timeFormat;
+    
     public DefaultLinha() {
-        this.linha = new LinkedHashMap<>();
+        this(DEFAULT_DATA_FORMAT, DEFAULT_TIME_FORMAT);
+    }
+    
+    public DefaultLinha(SimpleDateFormat dataFormat, SimpleDateFormat timeFormat) {        
+        this.dataFormat = dataFormat;
+        this.timeFormat = timeFormat;    
     }
 
     @Override
@@ -104,20 +109,7 @@ public class DefaultLinha implements LinhaArquivo {
         String string = getString(campo);
         try {
             if (string != null && !"".equals(string.trim())) {
-                String val = string.trim();
-                if (val.length() == 10) {
-                    return DATA_FORMAT.parse(string);
-                } else if (val.length() == 8) {
-                    return DATA_FORMAT_SM.parse(string);
-                } else if (val.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}.*")){
-                    return DATA_FORMAT_STAMP.parse(string);
-                } else if (val.matches("[0-9]{2}/[0-9]{2}/[0-9]{2,4}")) {
-                    return DATA_FORMAT.parse(string);
-                } else if (val.matches("[0-9]{2}/[0-9]{2}/[0-9]{2} [0-9]{2}:[0-9]{2}.*")){
-                    return DATA_FORMAT_STAMP2.parse(string);
-                } else {
-                    throw new InputMismatchException();
-                }
+                return this.dataFormat.parse(string);
             } else {
                 return null;
             }
@@ -128,7 +120,7 @@ public class DefaultLinha implements LinhaArquivo {
 
     @Override
     public void putData(String campo, Date contents) {        
-        putString(trataCampo(campo), DATA_FORMAT.format(contents));
+        putString(trataCampo(campo), this.dataFormat.format(contents));
     }
 
     @Override
@@ -141,12 +133,7 @@ public class DefaultLinha implements LinhaArquivo {
         String string = getString(campo);
         try {
             if (string != null && !"".equals(string.trim())) {
-                String val = string.trim();
-                if (val.length() == 8) {
-                    return new Time(TIME_FORMAT.parse(string).getTime());
-                } else {
-                    throw new InputMismatchException();
-                }
+                return new Time(this.timeFormat.parse(string).getTime());
             } else {
                 return null;
             }
@@ -157,7 +144,7 @@ public class DefaultLinha implements LinhaArquivo {
 
     @Override
     public void putTime(String campo, Time contents) {
-        putString(campo, TIME_FORMAT.format(contents));
+        putString(campo, this.timeFormat.format(contents));
     }
 
     @Override

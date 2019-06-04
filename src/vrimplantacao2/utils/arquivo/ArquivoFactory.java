@@ -31,8 +31,14 @@ public enum ArquivoFactory {
      */
     XLS {
         @Override
-        public Arquivo load(String arquivo, Map<String, String> opcoes) throws Exception {
-            return new Planilha(arquivo);
+        public Arquivo load(String arquivo, Map<String, String> opcoes) throws Exception {            
+            String dateFormat = "yyyy-MM-dd";
+            String timeFormat = "hh:mm:ss";
+            if (opcoes != null) {
+                dateFormat = opcoes.get("dateformat") != null ? opcoes.get("dateformat") : "yyyy-MM-ddd";
+                timeFormat = opcoes.get("timeformat") != null ? opcoes.get("timeformat") : "hh:mm:ss";
+            }
+            return new Planilha(arquivo, dateFormat, timeFormat);
         }
     };
 

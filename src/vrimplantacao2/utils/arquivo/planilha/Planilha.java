@@ -1,6 +1,7 @@
 package vrimplantacao2.utils.arquivo.planilha;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import jxl.Cell;
 import jxl.Sheet;
@@ -11,7 +12,7 @@ import vrimplantacao2.utils.arquivo.DefaultLinha;
 
 public class Planilha extends AbstractArquivo {
 
-    public Planilha(String arquivo) throws Exception {
+    public Planilha(String arquivo, String dateFormat, String timeFormat) throws Exception {
         WorkbookSettings settings = new WorkbookSettings();
         settings.setEncoding("CP1250");
         
@@ -26,9 +27,12 @@ public class Planilha extends AbstractArquivo {
             cabecalho.add(column.getContents());
         }
         
+        SimpleDateFormat sDate = new SimpleDateFormat(dateFormat);
+        SimpleDateFormat sTime = new SimpleDateFormat(timeFormat);
+        
         //Obtem os dados.
         for (int i = 1; i < sheet.getRows(); i++) {
-            DefaultLinha linha = new DefaultLinha();
+            DefaultLinha linha = new DefaultLinha(sDate, sTime);
             Cell[] columns = sheet.getRow(i);
             for (int j = 0; j < columns.length; j++) {
                 String contents = columns[j].getContents();
