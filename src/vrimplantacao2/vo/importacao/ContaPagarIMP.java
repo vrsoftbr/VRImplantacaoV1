@@ -10,14 +10,19 @@ import java.util.List;
  * @author Leandro
  */
 public class ContaPagarIMP {
+    
     private String id;
     private String idFornecedor;
     private String numeroDocumento;
+    /**
+     * Utilize este campo para informar um tipo de entrada especifico para vincular ao pagarfornecedor.
+     */
+    private Integer idTipoEntradaVR;
     private Date dataEmissao;
     private Date dataEntrada;
     private Timestamp dataHoraAlteracao;
+    @Deprecated
     private double valor = 0;
-    private boolean finalizada = false;
     private String observacao;
     private List<ContaPagarVencimentoIMP> vencimentos = new ArrayList<>();
 
@@ -69,20 +74,14 @@ public class ContaPagarIMP {
         this.dataHoraAlteracao = dataHoraAlteracao;
     }
 
+    @Deprecated
     public double getValor() {
         return valor;
     }
 
+    @Deprecated
     public void setValor(double valor) {
         this.valor = valor;
-    }
-
-    public boolean isFinalizada() {
-        return finalizada;
-    }
-
-    public void setFinalizada(boolean finalizada) {
-        this.finalizada = finalizada;
     }
 
     public String getObservacao() {
@@ -103,12 +102,21 @@ public class ContaPagarIMP {
         imp.setContaPagar(this);
         imp.setVencimento(vencimento);
         imp.setValor(valor);
+        imp.setNumeroParcela(getVencimentos().size());
         return imp;
     }
 
-    public void setVencimento(Date vencimento) {
+    public ContaPagarVencimentoIMP setVencimento(Date vencimento) {
         this.vencimentos.clear();
-        this.addVencimento(vencimento, this.valor);
+        return this.addVencimento(vencimento, this.valor);
+    }
+
+    public Integer getIdTipoEntradaVR() {
+        return idTipoEntradaVR;
+    }
+
+    public void setIdTipoEntradaVR(Integer idTipoEntradaVR) {
+        this.idTipoEntradaVR = idTipoEntradaVR;
     }
     
 }
