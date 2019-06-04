@@ -1213,7 +1213,7 @@ public class GdoorDAO extends AbstractIntefaceDao {
         List<ReceberCreditoRotativoVO> result = new ArrayList<>();
         
         Pattern p = Pattern.compile("CUPOM.*[0-9]");
-        for (LinhaArquivo rst: new Planilha(arquivo)) {
+        for (LinhaArquivo rst: new Planilha(arquivo, "yyyy-MM-dd", "hh:mm:ss")) {
             ReceberCreditoRotativoVO oReceberCreditoRotativo = new ReceberCreditoRotativoVO();
 
             oReceberCreditoRotativo.setId_clientepreferencial(rst.getInt("Cod.Cliente"));
