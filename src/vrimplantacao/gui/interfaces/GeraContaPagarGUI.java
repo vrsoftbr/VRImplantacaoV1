@@ -79,7 +79,7 @@ public class GeraContaPagarGUI extends VRInternalFrame {
             dados[i][4] = vo.getDataEntrada();
             dados[i][5] = vo.getDataEmissao();
             dados[i][6] = vo.getVencimento();
-            dados[i][7] = vo.getTipoEntrada().getDescricao();
+            dados[i][7] = vo.getIdTipoEntrada();
             dados[i][8] = Util.formatDecimal2(vo.getValor());
             dados[i][9] = vo.getObservacao();
             i++;

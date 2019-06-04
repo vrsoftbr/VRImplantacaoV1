@@ -36,6 +36,7 @@ import vrimplantacao2.vo.enums.TipoOrgaoPublico;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -590,27 +591,42 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     
     @Override
     public List<ContaPagarIMP> getContasPagar()throws Exception {
-        List<ContaPagarIMP> result = new ArrayList<>();
         Arquivo arq = ArquivoFactory.getArquivo(this.arquivoContaPagar, getOpcoes());
         
+        Map<String, ContaPagarIMP> contas = new LinkedHashMap<>();
+        
         for(LinhaArquivo linha : arq) {
-            if(linha.getString("id") != null && !"".equals(linha.getString("id").trim())) {
-                ContaPagarIMP imp = new ContaPagarIMP();
-                imp.setId(linha.getString("id"));
-                imp.setIdFornecedor(linha.getString("idfornecedor"));
-                imp.setDataEmissao(getData(linha.getString("dataemissao")));
-                imp.setDataEntrada(getData(linha.getString("dataemissao")));
-                imp.setNumeroDocumento(linha.getString("nota"));
-                imp.setValor(linha.getDouble("valor"));
-                imp.setObservacao(linha.getString("observacao"));
-                imp.addVencimento(getData(linha.getString("datavencimento")), imp.getValor());
+            if(linha.getString("faturaid") != null && !"".equals(linha.getString("faturaid").trim())) {
+                ContaPagarIMP imp = contas.get(linha.getString("faturaid"));
+                if (imp == null) {
+                    imp = new ContaPagarIMP();
+                    imp.setId(linha.getString("faturaid"));
+                    imp.setIdFornecedor(linha.getString("idfornecedor"));
+                    imp.setIdTipoEntradaVR(linha.getString("tipoentradavr") != null ? linha.getInt("tipoentradavr") : null);
+                    imp.setNumeroDocumento(linha.getString("numerodocumento"));
+                    imp.setDataEntrada(getData(linha.getString("entrada")));
+                    imp.setDataEmissao(getData(linha.getString("emissao")));
+                    imp.setObservacao(linha.getString("observacaofatura"));
+                    contas.put(imp.getId(), imp);
+                }
+                
+                ContaPagarVencimentoIMP parc = imp.addVencimento(linha.getData("vencimento"), linha.getDouble("valor"));
+                parc.setAgencia(linha.getString("agencia"));
+                parc.setConferido(false);
+                parc.setConta(linha.getString("conta"));
+                parc.setDataPagamento(linha.getData("pagoem"));
+                parc.setId(linha.getString("parcelaid"));
+                parc.setIdTipoPagamentoVR(linha.getString("tipopagamentovr") != null ? linha.getInt("tipopagamentovr") : null);
+                parc.setId_banco(linha.getInt("banco"));
+                parc.setNumeroParcela(linha.getInt("numeroparcela"));
+                parc.setNumerocheque(linha.getInt("numerocheque"));
+                parc.setObservacao(linha.getString("observacao"));
+                parc.setPago(linha.getBoolean("pago"));
                 
                 System.out.println("ID: " + imp.getId() + " - Valor: " + imp.getValor() + " Emissão: " + imp.getDataEmissao());
-            
-                result.add(imp);
             }
         }
-        return result;
+        return new ArrayList<>(contas.values());
     }
 
     @Override
