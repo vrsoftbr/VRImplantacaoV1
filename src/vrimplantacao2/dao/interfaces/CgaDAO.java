@@ -632,7 +632,6 @@ public class CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataEmissao(rst.getDate("pagcmp"));
                     imp.setDataEntrada(rst.getDate("pagcmp"));
                     imp.setNumeroDocumento(rst.getString("PAGDoc"));
-                    imp.setFinalizada(false);
                     imp.setValor(rst.getDouble("pagvlr"));
                     imp.setObservacao(observacao);
                     imp.setDataHoraAlteracao(rst.getTimestamp("pagcmp"));

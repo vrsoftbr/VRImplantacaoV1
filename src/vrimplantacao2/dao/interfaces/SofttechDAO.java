@@ -460,7 +460,6 @@ public class SofttechDAO extends InterfaceDAO {
                     imp.setDataEmissao(rst.getDate("data"));
                     imp.setDataEntrada(rst.getDate("data"));
                     imp.setValor(rst.getDouble("valor"));
-                    imp.setFinalizada(rst.getBoolean("finalizado"));
                     String obs = "";
                     if (rst.getString("descricao") != null) {
                         obs += "DESCR: " + rst.getString("descricao");

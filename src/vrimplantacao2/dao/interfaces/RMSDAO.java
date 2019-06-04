@@ -1564,7 +1564,6 @@ public class RMSDAO extends InterfaceDAO {
                     vo.setDataEmissao(new Date(format.parse(rst.getString("dataemissao")).getTime()));
                     vo.setDataEntrada(new Date(format.parse(rst.getString("dataentrada")).getTime()));
                     vo.setNumeroDocumento(rst.getString("numerodocumento"));
-                    vo.setFinalizada(false);
                     vo.setValor(rst.getDouble("valor"));
                     vo.addVencimento(new Date(format.parse(rst.getString("datavencimento")).getTime()), vo.getValor());
                     

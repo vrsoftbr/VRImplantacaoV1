@@ -1456,7 +1456,6 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao("PARCELA " + rst.getString("parcela") + " OBS " + rst.getString("observacao"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"));
-                    imp.setFinalizada(rst.getBoolean("pago"));
                     
                     result.add(imp);
                 }
