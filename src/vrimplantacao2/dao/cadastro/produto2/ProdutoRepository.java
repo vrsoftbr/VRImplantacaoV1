@@ -1049,7 +1049,7 @@ public class ProdutoRepository {
         }
         vo.setDescricaoReduzida(imp.getDescricaoReduzida());
         vo.setDescricaoGondola(imp.getDescricaoGondola());
-        vo.setQtdEmbalagem(imp.getQtdEmbalagemCotacao());
+        vo.setQtdEmbalagem(imp.getQtdEmbalagemCotacao() == 0 ? 1 : imp.getQtdEmbalagemCotacao());
         vo.setSugestaoCotacao(imp.isSugestaoCotacao());
         vo.setSugestaoPedido(imp.isSugestaoPedido());
         vo.setCest(provider.tributo().getCest(imp.getCest()));
