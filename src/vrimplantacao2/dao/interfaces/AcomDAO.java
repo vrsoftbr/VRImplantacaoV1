@@ -8,7 +8,9 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -267,7 +269,95 @@ public class AcomDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
-    
-    
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	f.Pes_cod6 id,\n" +
+                    "	f.Pes_nome45 razao,\n" +
+                    "	f.Pes_nome25 fantasia,\n" +
+                    "	coalesce(f.Pes_cnpj, f.Pes_cpf) cnpj,\n" +
+                    "	coalesce(f.Pes_ie, f.Pes_rg) ie,\n" +
+                    "	f.Pes_suframa suframa,\n" +
+                    "	f.Pes_bloqueado bloqueado,\n" +
+                    "	f.Pes_end endereco,\n" +
+                    "	f.Pes_nrend numero,\n" +
+                    "	f.Pes_compl complemento,\n" +
+                    "	f.Pes_bai bairro,\n" +
+                    "	f.Pes_cidade cidade,\n" +
+                    "	f.Pes_uf uf,\n" +
+                    "	f.Pes_cep cep,\n" +
+                    "	f.Pes_endcob cob_endereco,\n" +
+                    "	f.Pes_nrendcob cob_numero,\n" +
+                    "	'' cob_complemento,\n" +
+                    "	f.Pes_baicob cob_bairro,\n" +
+                    "	f.Pes_cidcob cob_cidade,\n" +
+                    "	f.Pes_ufcob cob_uf,\n" +
+                    "	f.Pes_cepcob cob_cep,\n" +
+                    "	f.Pes_fone1,\n" +
+                    "	f.Pes_fone2,\n" +
+                    "	f.Pes_fone3,\n" +
+                    "	f.Pes_celular,\n" +
+                    "	f.Pes_maxcompra compra,\n" +
+                    "	f.Pes_ptoref email,\n" +
+                    "	f.Pes_email,\n" +
+                    "	f.Dtinc datacadastro,\n" +
+                    "	f.Dtalt dataalteracao,\n" +
+                    "	f.Pes_obs observacao,\n" +
+                    "	f.Pes_prazoentrega prazoentrega\n" +
+                    "from\n" +
+                    "	Pessoal f\n" +
+                    "where\n" +
+                    "	Pes_tipo = '002'\n" +
+                    "order by\n" +
+                    "	id"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("ie"));
+                    imp.setSuframa(rst.getString("suframa"));
+                    imp.setAtivo(!rst.getBoolean("bloqueado"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setCob_endereco(rst.getString("cob_endereco"));
+                    imp.setCob_numero(rst.getString("cob_numero"));
+                    imp.setCob_complemento(rst.getString("cob_complemento"));
+                    imp.setCob_bairro(rst.getString("cob_bairro"));
+                    imp.setCob_municipio(rst.getString("cob_cidade"));
+                    imp.setCob_uf(rst.getString("cob_uf"));
+                    imp.setCob_cep(rst.getString("cob_cep"));
+                    imp.setTel_principal(rst.getString("Pes_fone1"));
+                    imp.addTelefone("FONE 2", rst.getString("Pes_fone2"));
+                    imp.addTelefone("FONE 3", rst.getString("Pes_fone3"));
+                    imp.addCelular("CELULAR", rst.getString("Pes_celular"));
+                    imp.addEmail("E-MAIL", rst.getString("email"), TipoContato.COMERCIAL);
+                    imp.addEmail("E-MAIL", rst.getString("Pes_email"), TipoContato.NFE);
+                    imp.setDatacadastro(rst.getDate("datacadastro"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setPrazoEntrega(rst.getInt("prazoentrega"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
     
 }
