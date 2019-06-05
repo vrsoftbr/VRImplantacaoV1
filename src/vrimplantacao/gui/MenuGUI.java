@@ -91,6 +91,7 @@ import vrimplantacao2.gui.planilha.PlanilhaProdutoGUI;
 import vrimplantacao.vo.Formulario;
 import vrimplantacao2.gui.component.sqleditor.SQLEditor;
 import vrimplantacao2.gui.interfaces.ASoftGUI;
+import vrimplantacao2.gui.interfaces.AcomGUI;
 import vrimplantacao2.gui.interfaces.AlphaSysGUI;
 import vrimplantacao2.gui.interfaces.ApolloGUI;
 import vrimplantacao2.gui.interfaces.AsefeGUI;
@@ -598,6 +599,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuDataSync = new javax.swing.JMenuItem();
         mnuWinNexus = new javax.swing.JMenuItem();
         mnuHRTech = new javax.swing.JMenuItem();
+        mnuAcom = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1549,6 +1551,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuHRTech);
+
+        mnuAcom.setText("ACOM");
+        mnuAcom.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAcomActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuAcom);
 
         mnuDatabase.add(mnuSqlServer2);
 
@@ -3899,6 +3909,10 @@ public final class MenuGUI extends VRMdiFrame {
         TGAGUI.exibir(this);
     }//GEN-LAST:event_jMenuItem5ActionPerformed
 
+    private void mnuAcomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAcomActionPerformed
+        AcomGUI.exibir(this);
+    }//GEN-LAST:event_mnuAcomActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu11;
@@ -3987,6 +4001,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu mnuADT;
     private javax.swing.JMenuItem mnuASoft;
     private javax.swing.JMenuItem mnuAcertarIdsProdutos;
+    private javax.swing.JMenuItem mnuAcom;
     private javax.swing.JMenu mnuAjuda;
     private javax.swing.JMenuItem mnuAjudaSobre;
     private javax.swing.JMenuItem mnuAlphaSys;
