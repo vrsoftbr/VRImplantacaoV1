@@ -290,15 +290,15 @@ public class TGAGUI extends VRInternalFrame {
                             importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS, OpcaoCliente.VALOR_LIMITE, OpcaoCliente.SITUACAO_CADASTRO, OpcaoCliente.BLOQUEADO);
                         }
 
-                        if (chkValorLimite.isSelected()) {
+                        if (chkValorLimite.isSelected()) { 
                             importador.atualizarClientePreferencial(OpcaoCliente.VALOR_LIMITE);
                         }
                         
-                        /*if(chkPdvVendas.isSelected()) {
-                            intelliconDAO.setDataInicioVenda(edtDtVendaIni.getDate());
-                            intelliconDAO.setDataTerminoVenda(edtDtVendaFim.getDate());
+                        if(chkPdvVendas.isSelected()) {
+                            tgaDAO.setDataInicioVenda(edtDtVendaIni.getDate());
+                            tgaDAO.setDataTerminoVenda(edtDtVendaFim.getDate());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
-                        }*/
+                        }
                         
                         if (chkIE.isSelected()) {
                             importador.atualizarClientePreferencial(OpcaoCliente.INSCRICAO_ESTADUAL);
@@ -414,7 +414,6 @@ public class TGAGUI extends VRInternalFrame {
         chkT1PisCofinsIndividual = new vrframework.bean.checkBox.VRCheckBox();
         chkT1NcmIndividual = new vrframework.bean.checkBox.VRCheckBox();
         chkUsarMargemBruta = new vrframework.bean.checkBox.VRCheckBox();
-        chkUsarBalanca = new vrframework.bean.checkBox.VRCheckBox();
         chkCest = new vrframework.bean.checkBox.VRCheckBox();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -609,8 +608,6 @@ public class TGAGUI extends VRInternalFrame {
 
         chkUsarMargemBruta.setText("Usar Margem Bruta");
 
-        chkUsarBalanca.setText("Tem Balança");
-
         chkCest.setText("Cest");
 
         javax.swing.GroupLayout tabDadosLayout = new javax.swing.GroupLayout(tabDados);
@@ -682,8 +679,6 @@ public class TGAGUI extends VRInternalFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(chkUsarMargemBruta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(chkUsarBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(chkCest, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
@@ -729,11 +724,10 @@ public class TGAGUI extends VRInternalFrame {
                 .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkT1NcmIndividual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUsarMargemBruta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkUsarBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCest, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         tab.addTab("Dados", tabDados);
@@ -1138,8 +1132,6 @@ public class TGAGUI extends VRInternalFrame {
                 .addContainerGap())
         );
 
-        getAccessibleContext().setAccessibleName("TGA");
-
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
@@ -1299,7 +1291,6 @@ public class TGAGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkT1Preco;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagem;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
-    private vrframework.bean.checkBox.VRCheckBox chkUsarBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkUsarMargemBruta;
     private vrframework.bean.checkBox.VRCheckBox chkValorLimite;
     private javax.swing.JComboBox cmbLojaOrigem;
