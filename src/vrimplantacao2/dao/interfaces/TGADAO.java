@@ -598,7 +598,12 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String id = rst.getString("coo") + "-" + rst.getString("ecf") + "-" + rst.getString("dataemissao") + "-" + rst.getDouble("sequencia");
+                        String id = rst.getString("idvenda") + "-" + 
+                                rst.getString("coo") + "-" + 
+                                rst.getString("ecf") + "-" + 
+                                rst.getString("dataemissao") + "-" + 
+                                rst.getInt("sequencia") + "-" + 
+                                rst.getDouble("valortotal");
 
                         next.setId(id);
                         next.setVenda(rst.getString("idvenda"));
@@ -606,7 +611,11 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setTotalBruto(rst.getDouble("valortotal"));
-                        next.setCodigoBarras(rst.getString("ean"));
+                        if((rst.getString("ean")) != null && (rst.getString("ean").length() > 14)) {
+                            next.setCodigoBarras(rst.getString("ean").substring(1, rst.getString("ean").length()));
+                        } else {
+                            next.setCodigoBarras(rst.getString("ean"));
+                        }
                         next.setUnidadeMedida(rst.getString("unidade"));
                         next.setSequencia(rst.getInt("sequencia"));
 
@@ -650,7 +659,7 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = "select\n"
                     + "    m.dataemissao,\n"
-                    + "    m.codcaixa ecf,\n"
+                    + "    coalesce(m.codcaixa, 77) ecf,\n"
                     + "    mv.idmov idvenda,\n"
                     + "    m.numeromov coo,\n"
                     + "    nseq sequencia,\n"
@@ -669,7 +678,8 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
                     + "join tproduto p on (mv.codprd = p.codprd)\n"
                     + "where\n"
                     + "    mv.codempresa = " + idLojaCliente + " and\n"
-                    + "    m.dataemissao between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "'\n"
+                    + "    m.dataemissao between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "' and\n"
+                    + "    m.codtmv in ('2.2.01', '2.2.03', '2.2.05', '2.3.01', '2.3.03')\n" 
                     + "order by\n"
                     + "    mv.idmov, mv.nseq";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
