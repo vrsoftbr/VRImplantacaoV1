@@ -78,6 +78,8 @@ public class ProdutoIMP {
     private double icmsReducaoConsumidor;
     
     private String icmsDebitoId;
+    private String icmsDebitoForaEstadoId;
+    private String icmsDebitoForaEstadoNfId;
     private String icmsCreditoId;
     private String icmsCreditoForaEstadoId;
     
@@ -783,6 +785,22 @@ public class ProdutoIMP {
 
     public void setTroca(double troca) {
         this.troca = troca;
+    }
+
+    public String getIcmsDebitoForaEstadoId() {
+        return icmsDebitoForaEstadoId;
+    }
+
+    public void setIcmsDebitoForaEstadoId(String icmsDebitoForaEstadoId) {
+        this.icmsDebitoForaEstadoId = icmsDebitoForaEstadoId;
+    }
+
+    public String getIcmsDebitoForaEstadoNfId() {
+        return icmsDebitoForaEstadoNfId;
+    }
+
+    public void setIcmsDebitoForaEstadoNfId(String icmsDebitoForaEstadoNfId) {
+        this.icmsDebitoForaEstadoNfId = icmsDebitoForaEstadoNfId;
     }
     
 }

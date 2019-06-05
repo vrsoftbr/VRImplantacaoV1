@@ -166,7 +166,7 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
                     tabProdutos.setImportador(importador);
                     dao.setComplemento(txtDescAdic.getText());
 
-                    if (tabOperacoes.getSelectedIndex() == 0) {
+                    if (tabOperacoes.getSelectedIndex() == 1) {
 
                         tabProdutos.executarImportacao();
                         
@@ -235,7 +235,7 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkCheque.isSelected()) {
                             importador.importarCheque();
                         }
-                    } else if (tabOperacoes.getSelectedIndex() == 1) {
+                    } else if (tabOperacoes.getSelectedIndex() == 2) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
                         }

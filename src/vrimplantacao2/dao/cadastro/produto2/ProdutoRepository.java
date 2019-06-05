@@ -859,14 +859,24 @@ public class ProdutoRepository {
         Icms consumidor;
 
         String idIcmsDebito = imp.getIcmsDebitoId();
+        String idIcmsDebitoForaEstado = imp.getIcmsDebitoForaEstadoId();
+        String idIcmsDebitoForaEstadoNf = imp.getIcmsDebitoForaEstadoNfId();
         String idIcmsCredito = imp.getIcmsCreditoId();
+        String idIcmsCreditoForaEstado = imp.getIcmsCreditoForaEstadoId();
         String idIcmsCreditoFornecedor = imp.getIcmsCreditoId();
 
         if (idIcmsDebito != null) {
 
             aliqDebito = provider.tributo().getAliquotaByMapaId(idIcmsDebito);
-            debitoForaEstado = provider.tributo().getAliquotaByMapaId(idIcmsDebito);
-            debitoForaEstadoNfe = provider.tributo().getAliquotaByMapaId(idIcmsDebito);
+            debitoForaEstado = provider.tributo().getAliquotaByMapaId(idIcmsDebitoForaEstado);
+            debitoForaEstadoNfe = provider.tributo().getAliquotaByMapaId(idIcmsDebitoForaEstadoNf);
+            
+            if (debitoForaEstado == null) {
+                debitoForaEstado = aliqDebito;
+            }
+            if (debitoForaEstadoNfe == null) {
+                debitoForaEstadoNfe = aliqDebito;
+            }
 
             int icmsCstSaida = aliqDebito.getCst();
             double icmsAliqSaida = aliqDebito.getAliquota();
@@ -925,7 +935,10 @@ public class ProdutoRepository {
         
         if (idIcmsCredito != null) {
             aliqCredito = provider.tributo().getAliquotaByMapaId(idIcmsCredito);
-            creditoForaEstado = provider.tributo().getAliquotaByMapaId(idIcmsCredito);            
+            creditoForaEstado = provider.tributo().getAliquotaByMapaId(idIcmsCreditoForaEstado);
+            if (creditoForaEstado == null) {
+                creditoForaEstado = aliqCredito;
+            }
         } else {
             
             int icmsCstEntrada = imp.getIcmsCstEntrada();
