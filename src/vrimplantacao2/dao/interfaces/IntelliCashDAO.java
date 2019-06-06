@@ -11,6 +11,7 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,6 +22,8 @@ import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -29,6 +32,7 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -43,9 +47,58 @@ public class IntelliCashDAO extends InterfaceDAO {
     public boolean i_importarCodigoCliente;
     private static final Logger LOG = Logger.getLogger(IntelliCashDAO.class.getName());
 
+    private String complemento = "";
+    
     @Override
     public String getSistema() {
-        return "IntelliCash";
+        if ("".equals(complemento)) {
+            return "IntelliCash";
+        } else {
+            return "IntelliCash - " + complemento;
+        }
+    }
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento == null ? "" : complemento.trim();
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                new OpcaoProduto[] {
+                    OpcaoProduto.MERCADOLOGICO,
+                    OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                    OpcaoProduto.FAMILIA,
+                    OpcaoProduto.FAMILIA_PRODUTO,
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.PRODUTOS,
+                    OpcaoProduto.EAN,
+                    OpcaoProduto.EAN_EM_BRANCO,
+                    OpcaoProduto.DATA_CADASTRO,
+                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                    OpcaoProduto.PESAVEL,
+                    OpcaoProduto.VALIDADE,
+                    OpcaoProduto.DESC_COMPLETA,
+                    OpcaoProduto.DESC_GONDOLA,
+                    OpcaoProduto.DESC_REDUZIDA,
+                    OpcaoProduto.ESTOQUE_MAXIMO,
+                    OpcaoProduto.ESTOQUE_MINIMO,
+                    OpcaoProduto.PRECO,
+                    OpcaoProduto.CUSTO,
+                    OpcaoProduto.ESTOQUE,
+                    OpcaoProduto.ATIVO,
+                    OpcaoProduto.NCM,
+                    OpcaoProduto.CEST,
+                    OpcaoProduto.PIS_COFINS,
+                    OpcaoProduto.NATUREZA_RECEITA,
+                    OpcaoProduto.ICMS,
+                    OpcaoProduto.PAUTA_FISCAL,
+                    OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                    OpcaoProduto.MARGEM
+                }
+        ));
     }
 
     @Override
@@ -111,6 +164,48 @@ public class IntelliCashDAO extends InterfaceDAO {
 
         return result;
     }
+
+    @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    p.id,\n" +
+                    "    fisco.ncm,\n" +
+                    "    pst.MVA iva,\n" +
+                    "    pst.VALIQ aliq,\n" +
+                    "    pst.MVAAJUSTADO ivaajustado\n" +
+                    "from\n" +
+                    "    produtos p\n" +
+                    "    join prodst pst on p.id = pst.id \n" +
+                    "    left join mxf_vw_pis_cofins fisco on fisco.codigo_produto = p.id\n" +
+                    "order by\n" +
+                    "    id"
+            )) {
+                while (rst.next()) {
+                    PautaFiscalIMP imp = new PautaFiscalIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setIva(rst.getDouble("iva"));
+                    imp.setIvaAjustado(rst.getDouble("ivaajustado"));
+                    imp.setAliquotaDebito(0, rst.getDouble("aliq"), 0);
+                    imp.setAliquotaDebitoForaEstado(0, rst.getDouble("aliq"), 0);
+                    imp.setAliquotaCredito(0, rst.getDouble("aliq"), 0);
+                    imp.setAliquotaCreditoForaEstado(0, rst.getDouble("aliq"), 0);
+                    
+                    result.add(imp);
+                    
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    
 
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
@@ -200,9 +295,11 @@ public class IntelliCashDAO extends InterfaceDAO {
                     imp.setEstoqueMinimo(rst.getInt("estoqueMinimo"));
                     imp.setEstoqueMaximo(rst.getInt("estoqueMaximo"));
                     imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setPautaFiscalId(rst.getString("id"));
                     if(rst.getDouble("custocomimposto") != 0) {
-                        margem = (((rst.getDouble("precovenda") == 0 ? rst.getDouble("preco") : rst.getDouble("precovenda")
-                                / rst.getDouble("custocomimposto")) - 1) * 100);
+                        double preco = rst.getDouble("preco") == 0 ? rst.getDouble("precovenda") : rst.getDouble("preco");
+                        double custo = rst.getDouble("custocomimposto");
+                        margem = ((preco - custo) * 100) / custo;
                     }
                     imp.setMargem(Utils.arredondar(margem, 2));
                     imp.setCustoSemImposto(rst.getDouble("custoSemImposto"));
@@ -403,7 +500,7 @@ public class IntelliCashDAO extends InterfaceDAO {
                     "    cid.uf res_uf,\n" +
                     "    en.cep res_cep,   \n" +
                     "    a.doc cnpj,\n" +
-                    "    dcie.doc as inscricaoestadual,\n" +
+                    "    coalesce(dcie.doc, dcrg.doc) as inscricaoestadual,\n" +
                     "    (select first 1 coalesce('('||ddd||')', '') || telefone from telefones where agente = a.id order by id desc) fone1,\n" +
                     "    (select first 1 skip 1 coalesce('('||ddd||')', '') || telefone from telefones where agente = a.id order by id desc) fone2,\n" +
                     "    (select first 1 skip 2 coalesce('('||ddd||')', '') || telefone from telefones where agente = a.id order by id desc) celular,\n" +
