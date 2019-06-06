@@ -116,6 +116,13 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
                     
+                    String lojaAuxiliar = "";
+                    if((!"".equals(txtLojaAux.getText())) && (!txtLojaAux.getText().isEmpty())) {
+                        lojaAuxiliar = txtLojaAux.getText();
+                    }
+                    
+                    dao.auxiliar = lojaAuxiliar;
+                    
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
                     importador.setLojaVR(idLojaVR);
@@ -144,6 +151,22 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
                         }
                         if (chkCreditoRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
+                        }
+                    } else if (tabs.getSelectedIndex() == 2) {
+                        if(chkUnificacaoProduto.isSelected()) {
+                            importador.unificarProdutos();
+                        }
+                        if(chkUnificacaoProdForn.isSelected()) {
+                            importador.unificarProdutoFornecedor();
+                        }
+                        if(chkUnificacaoCliente.isSelected()) {
+                            importador.unificarClientePreferencial();
+                        }
+                        if(chkUnificacaoCliEventual.isSelected()) {
+                            importador.unificarClienteEventual();
+                        }
+                        if(chkUnificacaoForn.isSelected()) {
+                            importador.unificarFornecedor();
                         }
                     }
                     gravarParametros();
@@ -198,11 +221,19 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        tabUnificacao = new vrframework.bean.panel.VRPanel();
+        chkUnificacaoProduto = new vrframework.bean.checkBox.VRCheckBox();
+        chkUnificacaoProdForn = new vrframework.bean.checkBox.VRCheckBox();
+        chkUnificacaoCliente = new vrframework.bean.checkBox.VRCheckBox();
+        chkUnificacaoForn = new vrframework.bean.checkBox.VRCheckBox();
+        chkUnificacaoCliEventual = new vrframework.bean.checkBox.VRCheckBox();
         tabBalanca = new vrframework.bean.panel.VRPanel();
         vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         vRLabel1 = new vrframework.bean.label.VRLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
         conexao = new vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel();
+        lblLojaAux = new vrframework.bean.label.VRLabel();
+        txtLojaAux = new vrframework.bean.textField.VRTextField();
 
         setTitle("Uniplus");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
@@ -346,6 +377,48 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
 
         tabs.addTab("Fornecedor e Cliente", tabFornecedorCliente);
 
+        chkUnificacaoProduto.setText("Produtos (Somente com EAN válido)");
+
+        chkUnificacaoProdForn.setText("Produto Fornecedor (Somente com CPF/CNPJ válido)");
+
+        chkUnificacaoCliente.setText("Cliente Preferencial (Somente com CPF/CNPJ válido)");
+
+        chkUnificacaoForn.setText("Fornecedor (Somente com CPF/CNPJ válido)");
+
+        chkUnificacaoCliEventual.setText("Cliente Eventual (Somente com CPF/CNPJ válido)");
+
+        javax.swing.GroupLayout tabUnificacaoLayout = new javax.swing.GroupLayout(tabUnificacao);
+        tabUnificacao.setLayout(tabUnificacaoLayout);
+        tabUnificacaoLayout.setHorizontalGroup(
+            tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabUnificacaoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkUnificacaoProdForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUnificacaoProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUnificacaoCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUnificacaoForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkUnificacaoCliEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(287, Short.MAX_VALUE))
+        );
+        tabUnificacaoLayout.setVerticalGroup(
+            tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabUnificacaoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkUnificacaoProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkUnificacaoProdForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkUnificacaoCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkUnificacaoCliEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkUnificacaoForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(178, Short.MAX_VALUE))
+        );
+
+        tabs.addTab("Unificação", tabUnificacao);
+
         vRImportaArquivBalancaPanel1.setSistema("GetWay");
 
         javax.swing.GroupLayout tabBalancaLayout = new javax.swing.GroupLayout(tabBalanca);
@@ -369,6 +442,8 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
 
         vRLabel1.setText("Loja (Cliente):");
 
+        lblLojaAux.setText("Loja Aux:");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -379,6 +454,10 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(tabs, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE)
                     .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblLojaAux, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtLojaAux, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -393,9 +472,11 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(11, 11, 11)
-                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 332, Short.MAX_VALUE)
+                    .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblLojaAux, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtLojaAux, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 336, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -431,15 +512,23 @@ public class SofttechGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedorContato;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkUnificacaoCliEventual;
+    private vrframework.bean.checkBox.VRCheckBox chkUnificacaoCliente;
+    private vrframework.bean.checkBox.VRCheckBox chkUnificacaoForn;
+    private vrframework.bean.checkBox.VRCheckBox chkUnificacaoProdForn;
+    private vrframework.bean.checkBox.VRCheckBox chkUnificacaoProduto;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.postgresql.ConexaoPostgreSQLPanel conexao;
+    private vrframework.bean.label.VRLabel lblLojaAux;
     private vrframework.bean.panel.VRPanel pnlClientes;
     private vrframework.bean.panel.VRPanel pnlFornecedores;
     private vrframework.bean.panel.VRPanel tabBalanca;
     private vrframework.bean.panel.VRPanel tabFornecedorCliente;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
+    private vrframework.bean.panel.VRPanel tabUnificacao;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
+    private vrframework.bean.textField.VRTextField txtLojaAux;
     private vrframework.bean.consultaContaContabil.VRConsultaContaContabil vRConsultaContaContabil1;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel1;
