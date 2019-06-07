@@ -9,6 +9,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -48,33 +49,25 @@ public class AcomDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select distinct\n" +
-                    "	t.Tes_cod, \n" +
-                    "	t.Tes_texto, \n" +
-                    "	t.Tes_tipo,\n" +
-                    "	t.Tes_sittrib,\n" +
-                    "	t.Tes_aliquota_icms,\n" +
-                    "	t.Tes_reducao_percentual\n" +
-                    "from \n" +
-                    "	Tipo_entrada_saida t\n" +
-                    "	join Produto p on\n" +
-                    "		t.Tes_cod = p.Pro_te or\n" +
-                    "		t.Tes_cod = p.Pro_ts\n" +
+                    "	p.Pro_sittrib id,\n" +
+                    "	p.Pro_aliquota_ecf aliquota\n" +
+                    "from\n" +
+                    "	Produto p\n" +
                     "order by\n" +
-                    "	t.Tes_cod"
+                    "	id"
             )) {
                 while (rst.next()) {
                     result.add(new MapaTributoIMP(
-                            rst.getString("Tes_cod"), 
                             String.format(
-                                    "Tipo: '%s' CST: '%s' Aliq: '%.2f' Red: '%.2f'",
-                                    rst.getString("Tes_tipo"),
-                                    rst.getString("Tes_sittrib"),
-                                    rst.getDouble("Tes_aliquota_icms"),
-                                    rst.getDouble("Tes_reducao_percentual")
-                            ),
-                            Utils.stringToInt(rst.getString("Tes_sittrib")),
-                            rst.getDouble("Tes_aliquota_icms"), 
-                            rst.getDouble("Tes_reducao_percentual")
+                                    "%s - %.2f",
+                                    rst.getString("id"),
+                                    rst.getDouble("aliquota")
+                            ), 
+                            String.format(
+                                    "Tipo: '%s' Aliq: '%.2f'",
+                                    rst.getString("id"),
+                                    rst.getDouble("aliquota")
+                            )
                     ));
                 }
             }
@@ -213,7 +206,9 @@ public class AcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.Pro_pis_cofins_saida piscofins_saida,\n" +
                     "	p.Pro_natureza_receita piscofins_natureza_receita,\n" +
                     "	p.Pro_te,\n" +
-                    "	p.Pro_ts\n" +
+                    "	p.Pro_ts,\n" +
+                    "	p.Pro_sittrib,\n" +
+                    "	p.Pro_aliquota_ecf\n" +
                     "from\n" +
                     "	Filiais f\n" +
                     "	join Produto p on	 \n" +
@@ -259,8 +254,16 @@ public class AcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstCredito(rst.getString("piscofins_entrada"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofins_saida"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("piscofins_natureza_receita"));
-                    imp.setIcmsDebitoId(rst.getString("Pro_te"));
-                    imp.setIcmsCreditoId(rst.getString("Pro_ts"));
+                    imp.setIcmsDebitoId(String.format(
+                            "%s - %.2f",
+                            rst.getString("Pro_sittrib"),
+                            rst.getDouble("Pro_aliquota_ecf")
+                    ));
+                    imp.setIcmsCreditoId(String.format(
+                            "%s - %.2f",
+                            rst.getString("Pro_sittrib"),
+                            rst.getDouble("Pro_aliquota_ecf")
+                    ));
                     
                     result.add(imp);
                 }
@@ -351,6 +354,11 @@ public class AcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDatacadastro(rst.getDate("datacadastro"));
                     imp.setObservacao(rst.getString("observacao"));
                     imp.setPrazoEntrega(rst.getInt("prazoentrega"));
+                    if (Utils.stringToLong(imp.getCnpj_cpf()) > 99999999999L) {
+                        imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
+                    } else {
+                        imp.setTipoEmpresa(TipoEmpresa.PESSOA_FISICA);
+                    }
                     
                     result.add(imp);
                 }

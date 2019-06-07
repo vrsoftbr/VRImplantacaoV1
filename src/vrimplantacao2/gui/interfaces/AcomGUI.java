@@ -11,7 +11,6 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
-import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
@@ -38,6 +37,7 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
+        tabProdutos.carregarParametros(params, SISTEMA);
         conexao.carregarParametros();
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
@@ -47,6 +47,7 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
 
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
+        tabProdutos.gravarParametros(params, SISTEMA);
         params.put(txtDescAdic.getText(), SISTEMA, "DESC_ADIC");
         params.put(txtCodigoMercadologico.getText(), SISTEMA, "COD_MERCADOLOGICO");
         conexao.atualizarParametros();
@@ -165,6 +166,7 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
                     importador.setLojaVR(idLojaVR);
                     tabProdutos.setImportador(importador);
                     dao.setComplemento(txtDescAdic.getText());
+                    dao.setCodigoMercadologico(txtCodigoMercadologico.getText());
 
                     if (tabOperacoes.getSelectedIndex() == 1) {
 
@@ -200,6 +202,12 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
                             }
                             if (chkFSituacaoCadastro.isSelected()) {
                                 opcoes.add(OpcaoFornecedor.SITUACAO_CADASTRO);
+                            }
+                            if (chkFCnpjCpf.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.CNPJ_CPF);
+                            }
+                            if (chkFIeRg.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.INSCRICAO_ESTADUAL);
                             }
 
                             if (!opcoes.isEmpty()) {
@@ -254,6 +262,9 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
                     }
 
                     ProgressBar.dispose();
+                    
+                    gravarParametros();
+                    
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
                     try {
@@ -299,6 +310,8 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkFNumero = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor1 = new vrframework.bean.checkBox.VRCheckBox();
         chkFSituacaoCadastro = new vrframework.bean.checkBox.VRCheckBox();
+        chkFCnpjCpf = new vrframework.bean.checkBox.VRCheckBox();
+        chkFIeRg = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -402,6 +415,12 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkFSituacaoCadastro.setText("Situação Cadastro");
         tabFornecedor.add(chkFSituacaoCadastro);
+
+        chkFCnpjCpf.setText("CNPJ/CPF");
+        tabFornecedor.add(chkFCnpjCpf);
+
+        chkFIeRg.setText("IE/RG");
+        tabFornecedor.add(chkFIeRg);
 
         tabImportacao.addTab("Fornecedores", tabFornecedor);
 
@@ -624,8 +643,10 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
+    private vrframework.bean.checkBox.VRCheckBox chkFCnpjCpf;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFEndereco;
+    private vrframework.bean.checkBox.VRCheckBox chkFIeRg;
     private vrframework.bean.checkBox.VRCheckBox chkFNumero;
     private vrframework.bean.checkBox.VRCheckBox chkFSituacaoCadastro;
     private vrframework.bean.checkBox.VRCheckBox chkFTipoEmp;

@@ -237,6 +237,16 @@
                     <Property name="text" type="java.lang.String" value="Situa&#xe7;&#xe3;o Cadastro"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFCnpjCpf">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="CNPJ/CPF"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFIeRg">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="IE/RG"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="tabClientes">
