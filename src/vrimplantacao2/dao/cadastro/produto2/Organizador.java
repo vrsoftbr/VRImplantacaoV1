@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.utils.multimap.KeyList;
@@ -35,8 +34,7 @@ public class Organizador {
      * @throws java.lang.Exception
      */
     public void organizarIds(MultiMap<String, ProdutoIMP> filtrados) throws Exception {
-        ProgressBar.setStatus("Produtos - Organizando e filtrando...");
-        ProgressBar.setMaximum(filtrados.size());
+        repository.setNotify("Produtos - Organizando e filtrando...", filtrados.size());
         
         List<ProdutoIMP> idsValidos = new ArrayList<>();
         List<ProdutoIMP> idsInvalidos = new ArrayList<>();
@@ -58,12 +56,12 @@ public class Organizador {
         for (ProdutoIMP produto : idsValidos) {
             String[] chave = new String[]{produto.getImportSistema(), produto.getImportLoja(), produto.getImportId(), produto.getEan()};
             filtrados.put(produto, chave);
-            ProgressBar.next();
+            repository.notificar();
         }
         for (ProdutoIMP produto : idsInvalidos) {
             String[] chave = new String[]{produto.getImportSistema(), produto.getImportLoja(), produto.getImportId(), produto.getEan()};
             filtrados.put(produto, chave);
-            ProgressBar.next();
+            repository.notificar();
         }
     }
 
@@ -75,15 +73,16 @@ public class Organizador {
      */
     public MultiMap<String, ProdutoIMP> organizarListagem(List<ProdutoIMP> produtos) throws Exception {
         LOG.info("Organizando a listagem de produtos. Total: " + produtos.size());
-        ProgressBar.setStatus("Produtos - Organizando produtos");
+        repository.setNotify("Produtos - Organizando produtos", produtos.size());
         MultiMap<String, ProdutoIMP> result = new MultiMap<>();
         MultiMap<String, ProdutoIMP> balanca = new MultiMap<>();
         MultiMap<String, ProdutoIMP> normais = new MultiMap<>();
+        MultiMap<String, ProdutoIMP> manterEAN = new MultiMap<>();
         
         {
             MultiMap<String, ProdutoIMP> filtrados = eliminarDuplicados(produtos);
             organizarIds(filtrados);
-            separarBalancaENormais(filtrados, balanca, normais);
+            separarBalancaNormaisManterEAN(filtrados, balanca, normais, manterEAN);
             
             filtrados.clear();
         }
@@ -158,7 +157,52 @@ public class Organizador {
             validos.clear();
             invalidos.clear();
         }
+        
+        
+        if (!manterEAN.isEmpty()) {
+            /**
+            * Tratamento dos produtos que forçam o manter o EAN.
+            */
+
+            //Listagem para os produtos de balança com PLUs válidos.
+            MultiMap<String, ProdutoIMP> validos = new MultiMap<>();
+            //Listagem para os produtos de balança com PLUs inválidos
+            MultiMap<String, ProdutoIMP> invalidos = new MultiMap<>();
+            //Separando os produtos e análisando o PLU.
+            for (KeyList<String> keys : manterEAN.keySet()) {
+                ProdutoIMP imp = manterEAN.get(keys);
+                long ean = Utils.stringToLong(imp.getEan());
+                String[] chave = new String[]{imp.getImportSistema(), imp.getImportLoja(), imp.getImportId(), imp.getEan()};//String.valueOf(ean)};
+                if (ean >= 0 && ean <= 999999) {
+                    validos.put(imp, chave);
+                } else {
+                    invalidos.put(imp, chave);
+                }
+            }
+            //Ordenando as listagtem.
+            validos = validos.getSortedMap();
+            invalidos = invalidos.getSortedMap();
+            //Reorganizando os produtos e ordenando a listagem           
+            manterEAN.clear();
+            for (ProdutoIMP prod : validos.values()) {
+                manterEAN.put(prod, prod.getImportSistema(), prod.getImportLoja(), prod.getImportId(), prod.getEan());
+            }
+            //Aqueles com código EAN inválido é colocado com os normais para receber uma nova numeração e o manter
+            //Código é desmarcado
+            for (ProdutoIMP prod : invalidos.values()) {
+                normais.put(prod, prod.getImportSistema(), prod.getImportLoja(), prod.getImportId());
+            }
+
+            validos.clear();
+            invalidos.clear();
+        }
+        
+        
         LOG.fine("QTDs Balanca: " + balanca.size() + "|Normais: " + normais.size());
+        for (ProdutoIMP produto : manterEAN.values()) {
+            String[] chave = new String[]{produto.getImportSistema(), produto.getImportLoja(), produto.getImportId(), produto.getEan()};
+            result.put(produto, chave);
+        }
         for (ProdutoIMP produto : balanca.values()) {
             String[] chave = new String[]{produto.getImportSistema(), produto.getImportLoja(), produto.getImportId(), produto.getEan()};
             result.put(produto, chave);
@@ -178,7 +222,7 @@ public class Organizador {
      */
     public MultiMap<String, ProdutoIMP> eliminarDuplicados(List<ProdutoIMP> produtos) throws Exception {
         LOG.info("Eliminando produtos duplicados");
-        ProgressBar.setStatus("Produtos - Eliminando duplicados...");
+        repository.setNotify("Produtos - Eliminando duplicados...", 0);
         MultiMap<String, ProdutoIMP> result = new MultiMap<>();
         for (ProdutoIMP produto : produtos) {
             if (
@@ -222,8 +266,8 @@ public class Organizador {
      * @param normais
      * @throws java.lang.Exception
      */
-    public void separarBalancaENormais(MultiMap<String, ProdutoIMP> filtrados, MultiMap<String, ProdutoIMP> balanca, MultiMap<String, ProdutoIMP> normais) throws Exception {
-        ProgressBar.setStatus("Produtos - Separando balan\u00e7a e normais...");
+    public void separarBalancaNormaisManterEAN(MultiMap<String, ProdutoIMP> filtrados, MultiMap<String, ProdutoIMP> balanca, MultiMap<String, ProdutoIMP> normais, MultiMap<String, ProdutoIMP> manterEAN) throws Exception {
+        repository.setNotify("Produtos - Separando balan\u00e7a e normais...", 0);
         for (ProdutoIMP produto : filtrados.values()) {
             String[] chave = null;
             if (produto.isBalanca() && (repository.getOpcoes().contains(OpcaoProduto.IMPORTAR_RESETAR_BALANCA))) {
@@ -234,7 +278,9 @@ public class Organizador {
             
             long ean = Utils.stringToLong(produto.getEan());
             String un = Utils.acertarTexto(produto.getTipoEmbalagem(), 2);
-            if (ean >= 1 && ean <= 999999 && (produto.isBalanca() || ("KG".equals(un != null ? un.toUpperCase() : "UN")))) {
+            if (produto.isManterEAN()) {
+                manterEAN.put(produto, chave);
+            } else if (ean >= 1 && ean <= 999999 && (produto.isBalanca() || ("KG".equals(un != null ? un.toUpperCase() : "UN")))) {
                 balanca.put(produto, chave);
             } else {
                 normais.put(produto, chave);

@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.cadastro.produto2;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -13,8 +14,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
+import org.mockito.Matchers;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyDouble;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import org.mockito.Mock;
@@ -191,7 +195,7 @@ public class ProdutoRepositoryTest {
         imp.setMargem(70);
         imp.setCustoSemImposto(3.65);
         imp.setCustoComImposto(4.02);    
-        imp.setPrecovenda(7.12);    
+        imp.setPrecovenda(7.12);
 
         imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
         imp.setNcm("0402.99.00");
@@ -806,5 +810,28 @@ public class ProdutoRepositoryTest {
         assertEquals("3214", strID);
         assertTrue(eBalanca);
         assertEquals(TipoEmbalagem.KG, unidade);
+    }
+    
+    @Test
+    public void testSalvar() throws Exception {
+        final ArrayList<String> evts = new ArrayList<>();
+        ProdutoRepository rep = new ProdutoRepository(provider) {      
+
+            @Override
+            public void notificar() throws Exception {
+                super.notificar();
+            }
+            
+        };
+        
+        ArrayList<ProdutoIMP> lista = new ArrayList<>();
+        ProdutoIMP imp = getProdutoIMP_MOCA();
+        imp.setEan("0001517");
+        imp.setManterEAN(true);
+        lista.add(imp);
+        lista.add(getProdutoIMP_MOCA2());
+        lista.add(getProdutoIMP_ACEM());
+        
+        rep.salvar(lista);
     }
 }

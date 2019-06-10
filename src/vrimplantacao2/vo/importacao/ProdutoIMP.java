@@ -100,6 +100,7 @@ public class ProdutoIMP {
     private String codigoGIA;
     private TipoProduto tipoProduto =  TipoProduto.MERCADORIA_REVENDA;
     private boolean fabricacaoPropria = false;
+    private boolean manterEAN = false;
     
     public String getImportSistema() {
         return importSistema;
@@ -801,6 +802,14 @@ public class ProdutoIMP {
 
     public void setIcmsDebitoForaEstadoNfId(String icmsDebitoForaEstadoNfId) {
         this.icmsDebitoForaEstadoNfId = icmsDebitoForaEstadoNfId;
+    }
+
+    public void setManterEAN(boolean manterEAN) {
+        this.manterEAN = manterEAN;
+    }
+    
+    public boolean isManterEAN() {
+        return this.manterEAN;
     }
     
 }

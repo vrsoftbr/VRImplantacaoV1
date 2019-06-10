@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import vrframework.classe.Conexao;
-import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -68,18 +66,6 @@ public class ProdutoRepository {
         return provider.getLojaVR();
     }
 
-    public void begin() throws Exception {
-        Conexao.begin();
-    }
-
-    public void commit() throws Exception {
-        Conexao.commit();
-    }
-
-    public void rollback() throws Exception {
-        Conexao.rollback();
-    }
-
     public Set<OpcaoProduto> getOpcoes() {
         return provider.getOpcoes();
     }
@@ -88,7 +74,7 @@ public class ProdutoRepository {
         usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
         
         LOG.finest("Abrindo a transação");
-        begin();        
+        provider.begin();        
         try {
             /**
              * Organizando a listagem de dados antes de efetuar a gravação.
@@ -176,6 +162,8 @@ public class ProdutoRepository {
                                 }
                             } else if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_MANTER_BALANCA) && eBalanca) {
                                 strID = String.valueOf(ean);
+                            } else if (imp.isManterEAN() && ean >= 1 && ean <= 999999) {
+                                strID = String.valueOf(ean);
                             }
                             
                             id = idStack.obterID(strID, eBalanca);
@@ -237,9 +225,9 @@ public class ProdutoRepository {
                     provider.complemento().copiarProdutoComplemento(getLojaVR(), loja.getId());
                 }
             }
-            commit();
+            provider.commit();
         } catch (Exception e) {
-            rollback();
+            provider.rollback();
             LOG.log(Level.SEVERE, "Erro ao importar os produtos", e);
             throw e;
         }
@@ -268,7 +256,7 @@ public class ProdutoRepository {
 
         if (!optSimples.isEmpty()) {
 
-            ProgressBar.setStatus("Produtos - Organizando produtos");
+            provider.setStatus("Produtos - Organizando produtos");
             LOG.finer("Lista de produtos antes do Garbage Collector: " + produtos.size());
             System.gc();
             MultiMap<String, ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
@@ -278,7 +266,7 @@ public class ProdutoRepository {
             System.gc();
 
             try {
-                Conexao.begin();
+                provider.begin();
                 
                 LOG.info("Produtos a serem atualizados: " + organizados.size());
 
@@ -288,8 +276,8 @@ public class ProdutoRepository {
                     strOpt.append(next.toString()).append(iterator.hasNext() ? ", " : "");
                 }
 
-                ProgressBar.setStatus("Produtos - Gravando alterações - " + strOpt);
-                ProgressBar.setMaximum(organizados.size());
+                provider.setStatus("Produtos - Gravando alterações - " + strOpt);
+                provider.setMaximum(organizados.size());
 
                 if (optSimples.contains(OpcaoProduto.ESTOQUE)) {
                     provider.complemento().criarEstoqueAnteriorTemporario();
@@ -385,16 +373,16 @@ public class ProdutoRepository {
                             provider.atacado().atualizarDesconto(precoAtacadoDesconto, optSimples);
                         }
                     }
-                    ProgressBar.next();
+                    provider.next();
                 }
 
                 if (optSimples.contains(OpcaoProduto.ESTOQUE)) {
                     provider.complemento().gerarLogDeImportacaoDeEstoque();
                 }
 
-                Conexao.commit();
+                provider.commit();
             } catch (Exception e) {
-                Conexao.rollback();
+                provider.rollback();
                 throw e;
             }
         }
@@ -416,7 +404,7 @@ public class ProdutoRepository {
     public void unificar(List<ProdutoIMP> produtos) throws Exception {
         usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
         
-        begin();
+        provider.begin();
         try {
             System.gc();
             MultiMap<String, ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
@@ -546,9 +534,9 @@ public class ProdutoRepository {
 
                 notificar();
             }
-            commit();
+            provider.commit();
         } catch (Exception e) {
-            rollback();
+            provider.rollback();
             throw e;
         }
     }
@@ -562,7 +550,7 @@ public class ProdutoRepository {
     public void unificar2(List<ProdutoIMP> produtos) throws Exception {
         usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
         
-        begin();
+        provider.begin();
         try {
             System.gc();
             MultiMap<String, ProdutoIMP> organizados = new Organizador(this).organizarListagem(produtos);
@@ -728,9 +716,9 @@ public class ProdutoRepository {
 
                 notificar();
             }
-            commit();
+            provider.commit();
         } catch (Exception e) {
-            rollback();
+            provider.rollback();
             throw e;
         }
     }
@@ -1288,12 +1276,12 @@ public class ProdutoRepository {
     }
 
     public void notificar() throws Exception {
-        ProgressBar.next();
+        provider.next();
     }
 
     public void setNotify(String descricao, int size) throws Exception {
-        ProgressBar.setStatus(descricao);
-        ProgressBar.setMaximum(size);
+        provider.setStatus(descricao);
+        provider.setMaximum(size);
     }
 
     public int converterCreditoParaDebito(int piscofinsCstDebito) {
@@ -1374,7 +1362,7 @@ public class ProdutoRepository {
         System.gc();
 
         try {
-            begin();
+            provider.begin();
             setNotify("Ofertas...Gravando...", filtrados.size());
 
             for (OfertaIMP imp : filtrados.values()) {
@@ -1412,9 +1400,9 @@ public class ProdutoRepository {
                 System.out.println("3");
                 notificar();
             }
-            commit();
+            provider.commit();
         } catch (Exception e) {
-            rollback();
+            provider.rollback();
             throw e;
         }
     }
@@ -1468,6 +1456,7 @@ public class ProdutoRepository {
         public long ean;
         public String strID;
         public boolean eBalanca;
+        public boolean manterEAN;
         public TipoEmbalagem unidade;
     }
 
@@ -1480,6 +1469,7 @@ public class ProdutoRepository {
         to.strID = imp.getImportId();
         to.eBalanca = imp.isBalanca();
         to.unidade = TipoEmbalagem.getTipoEmbalagem(imp.getTipoEmbalagem());
+        to.manterEAN = imp.isManterEAN();
 
         //<editor-fold defaultstate="collapsed" desc="Tratando EAN">  
         if (to.eBalanca || to.unidade == TipoEmbalagem.KG) {
@@ -1488,6 +1478,11 @@ public class ProdutoRepository {
                 to.unidade = TipoEmbalagem.UN;
             } else {
                 to.eBalanca = true;
+            }
+        } else if (to.manterEAN) {
+            if (!(to.ean >= 1 && to.ean <= 999999)) {
+                to.manterEAN = false;
+                to.ean = -2;
             }
         } else {
             if (to.ean <= 999999) {

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import vrframework.classe.Conexao;
+import vrframework.classe.ProgressBar;
 import vrimplantacao.dao.cadastro.CestDAO;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.utils.Utils;
@@ -86,6 +87,18 @@ public class ProdutoRepositoryProvider {
 
     public void setLojaVR(int lojaVR) {
         this.lojaVR = lojaVR;
+    }
+    
+    public void begin() throws Exception {
+        Conexao.begin();
+    }
+
+    public void commit() throws Exception {
+        Conexao.commit();
+    }
+
+    public void rollback() throws Exception {
+        Conexao.rollback();
     }
 
     public Set<OpcaoProduto> getOpcoes() {
@@ -178,6 +191,18 @@ public class ProdutoRepositoryProvider {
 
     Map<Long, Integer> getEansCadastrados() {
         throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    }
+
+    public void setStatus(String mensagem) throws Exception {
+        ProgressBar.setStatus(mensagem);
+    }
+
+    public void setMaximum(int size) throws Exception {
+        ProgressBar.setMaximum(size);
+    }
+
+    public void next() throws Exception {
+        ProgressBar.next();
     }
     
     public class Anterior {

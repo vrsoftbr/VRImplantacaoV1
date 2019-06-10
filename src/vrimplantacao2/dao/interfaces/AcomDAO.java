@@ -266,6 +266,10 @@ public class AcomDAO extends InterfaceDAO implements MapaTributoProvider {
                             rst.getString("Pro_sittrib"),
                             rst.getDouble("Pro_aliquota_ecf")
                     ));
+                    long ean = Utils.stringToLong(imp.getEan());
+                    if (ean >= 1517L && ean <= 1525L) {
+                        imp.setManterEAN(true);
+                    }
                     
                     result.add(imp);
                 }
