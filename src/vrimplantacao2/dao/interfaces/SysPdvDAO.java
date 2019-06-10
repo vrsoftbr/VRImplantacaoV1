@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,7 +54,50 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
     public String v_pahtFileXls;
     private boolean gerarEanAtacado = false;
     private boolean soAtivos = false;
+    private Date dtOfertas;
 
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.IMPORTAR_GERAR_SUBNIVEL_MERC,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.ESTOQUE_MAXIMO,
+                OpcaoProduto.ESTOQUE_MINIMO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.NCM,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.CUSTO,
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.CEST,
+                OpcaoProduto.ATACADO,
+                OpcaoProduto.OFERTA
+        ));
+    }
+    
     public void setGerarEanAtacado(boolean gerarEanAtacado) {
         this.gerarEanAtacado = gerarEanAtacado;
     }
@@ -178,6 +222,10 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setSoAtivos(boolean soAtivos) {
         this.soAtivos = soAtivos;
+    }
+
+    public void setDtOfertas(Date dtOfertas) {
+        this.dtOfertas = dtOfertas;
     }
 
     private static class Ean {
@@ -923,7 +971,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from\n"
                     + "    preco_programado oft\n"
                     + "where\n"
-                    + "    oft.pprdatfim >= '" + new SimpleDateFormat("yyyy-MM-dd").format(dataTermino) + "'\n"
+                    + "    oft.pprdatfim >= '" + new SimpleDateFormat("yyyy-MM-dd").format(dtOfertas) + "'\n"
                     + "order by\n"
                     + "    id_produto"
             )) {
