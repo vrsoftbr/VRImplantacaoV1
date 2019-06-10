@@ -10,6 +10,8 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
+import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -359,6 +361,114 @@ public class AcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setTipoEmpresa(TipoEmpresa.PESSOA_FISICA);
                     }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	p.Pes_cod6 id,\n" +
+                    "	coalesce(p.Pes_cnpj, p.Pes_cpf) cnpjcpf,\n" +
+                    "	p.Pes_nome45 razaosocial,\n" +
+                    "	p.Pes_natural nomefantasia,\n" +
+                    "	coalesce(p.Pes_ie, p.Pes_rg) ie_rg,\n" +
+                    "	p.Pes_emissor emissor,\n" +
+                    "	p.Pes_bloqueado,\n" +
+                    "	p.Pes_end endereco,\n" +
+                    "	p.Pes_nrend numero,\n" +
+                    "	p.Pes_compl complemento,\n" +
+                    "	p.Pes_bai bairro,\n" +
+                    "	p.Pes_cidade municipio,\n" +
+                    "	p.Pes_uf uf,\n" +
+                    "	p.Pes_cep cep,\n" +
+                    "	p.Pes_estciv estadocivil,\n" +
+                    "	p.Pes_dtnasc datanascimento,\n" +
+                    "	p.Dtinc datacadastro,\n" +
+                    "	p.Dtalt dataalteracao,\n" +
+                    "	p.Pes_sexo sexo,\n" +
+                    "	p.Pes_loctrab empresa,\n" +
+                    "	p.Pes_endtrab empresaendereco,\n" +
+                    "	p.Pes_nrendtra empresanumero,\n" +
+                    "	p.Pes_baicob empresabairro,\n" +
+                    "	p.Pes_cidcob empresacidade,\n" +
+                    "	p.Pes_ufcob empresauf,\n" +
+                    "	p.Pes_cepcob empresacep,\n" +
+                    "	p.Pes_fonetrab empresatelefone,\n" +
+                    "	p.Pes_dtadmis dataadmissao,\n" +
+                    "	p.Pes_profissao cargo,\n" +
+                    "	p.Pes_renda salario,\n" +
+                    "	p.Pes_saldorestante + p.Pes_saldodisponivel valorlimite,\n" +
+                    "	p.Pes_conjuge conjuge,\n" +
+                    "	p.Pes_pai pai,\n" +
+                    "	p.Pes_mae mae,\n" +
+                    "	p.Pes_obs observacao,\n" +
+                    "	p.Pes_diavenc diavencimento,\n" +
+                    "	p.Pes_fone1,\n" +
+                    "	p.Pes_fone2,\n" +
+                    "	p.Pes_fone3,\n" +
+                    "	p.Pes_celular,\n" +
+                    "	p.Pes_email,\n" +
+                    "	p.Pes_fax\n" +
+                    "from\n" +
+                    "	Pessoal p\n" +
+                    "where\n" +
+                    "	Pes_tipo = '001'\n" +
+                    "order by\n" +
+                    "	id"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setCnpj(rst.getString("cnpjcpf"));
+                    imp.setRazao(rst.getString("razaosocial"));
+                    imp.setFantasia(rst.getString("nomefantasia"));
+                    imp.setInscricaoestadual(rst.getString("ie_rg"));
+                    imp.setBloqueado(rst.getInt("Pes_bloqueado") == 2);
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setEstadoCivil(rst.getString("estadocivil"));
+                    imp.setDataNascimento(rst.getDate("datanascimento"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setSexo(rst.getInt("sexo") == 0 ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
+                    imp.setEmpresa(rst.getString("empresa"));
+                    imp.setEmpresaEndereco(rst.getString("empresaendereco"));
+                    imp.setEmpresaNumero(rst.getString("empresanumero"));
+                    imp.setEmpresaBairro(rst.getString("empresabairro"));
+                    imp.setEmpresaMunicipio(rst.getString("empresacidade"));
+                    imp.setEmpresaUf(rst.getString("empresauf"));
+                    imp.setEmpresaCep(rst.getString("empresacep"));
+                    imp.setEmpresaTelefone(rst.getString("empresatelefone"));
+                    imp.setDataAdmissao(rst.getDate("dataadmissao"));
+                    imp.setCargo(rst.getString("cargo"));
+                    imp.setSalario(rst.getDouble("salario"));
+                    imp.setValorLimite(rst.getDouble("valorlimite"));
+                    imp.setNomeConjuge(rst.getString("conjuge"));
+                    imp.setNomePai(rst.getString("pai"));
+                    imp.setNomeMae(rst.getString("mae"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setDiaVencimento(Utils.stringToInt(rst.getString("diavencimento")));
+                    imp.setTelefone(rst.getString("Pes_fone1"));
+                    imp.addTelefone("FONE 2", rst.getString("Pes_fone2"));
+                    imp.addTelefone("FONE 3", rst.getString("Pes_fone3"));
+                    imp.setCelular(rst.getString("Pes_celular"));
+                    imp.setEmail(rst.getString("Pes_email"));
+                    imp.setFax(rst.getString("Pes_fax"));
                     
                     result.add(imp);
                 }
