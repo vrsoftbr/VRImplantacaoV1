@@ -12,6 +12,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -474,6 +475,74 @@ public class AcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEmail(rst.getString("Pes_email"));
                     imp.setFax(rst.getString("Pes_fax"));
                     
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	c.Cre_prefixo,\n" +
+                    "	c.Cre_numero,\n" +
+                    "	c.Cre_parcela,\n" +
+                    "	c.Cre_tipo,\n" +
+                    "	c.Cre_dtemissao emissao,\n" +
+                    "	c.Cre_caixa ecf,\n" +
+                    "	c.Cre_total,\n" +
+                    "	c.Cre_desconto,\n" +
+                    "	c.Cre_vlpago,\n" +
+                    "	c.Cre_juros juros,\n" +
+                    "	c.Cre_clifor id_cliente,\n" +
+                    "	c.Cre_historico obs,\n" +
+                    "	c.Cre_dtvenc vencimento,\n" +
+                    "	c.Cre_multap,\n" +
+                    "	c.Cre_multav\n" +
+                    "from\n" +
+                    "	Contas_receber c\n" +
+                    "where\n" +
+                    "	c.Filial = '" + getLojaOrigem() + "' and \n" +
+                    "	(c.Cre_desconto + c.Cre_vlpago) < c.Cre_total\n" +
+                    "order by vencimento"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                
+                    imp.setId(String.format(
+                            "%s-%s-%s-%s",
+                            rst.getString("Cre_prefixo"),
+                            rst.getString("Cre_numero"),
+                            rst.getString("Cre_parcela"),
+                            rst.getString("Cre_tipo")
+                    ));
+                    imp.setNumeroCupom(rst.getString("Cre_numero"));
+                    imp.setParcela(Utils.stringToInt(rst.getString("Cre_parcela")));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setValor(rst.getDouble("Cre_total"));
+                    imp.setJuros(rst.getDouble("juros"));
+                    imp.setIdCliente(rst.getString("id_cliente"));
+                    imp.setObservacao(rst.getString("obs"));
+                    imp.setMulta(rst.getDouble("Cre_multav"));
+                    if (rst.getDouble("Cre_vlpago") > 0) {
+                        imp.addPagamento(
+                                imp.getId(), 
+                                rst.getDouble("Cre_vlpago"), 
+                                rst.getDouble("Cre_desconto"),
+                                0, 
+                                rst.getDate("vencimento"), 
+                                ""
+                        );
+                    }
+
                     result.add(imp);
                 }
             }
