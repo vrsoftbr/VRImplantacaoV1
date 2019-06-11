@@ -196,10 +196,14 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="chkSoAtivos" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" attributes="0">
+                                      <Component id="chkSoAtivos" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="chkIgnorarEnviaBalanca" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                                   <Component id="chkGerarEANAtacado" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="231" max="32767" attributes="0"/>
+                              <EmptySpace pref="126" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -209,6 +213,7 @@
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="vRLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkSoAtivos" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkIgnorarEnviaBalanca" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -235,6 +240,12 @@
                     <Component class="vrframework.bean.label.VRLabel" name="vRLabel8">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Data oferta"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIgnorarEnviaBalanca">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Ignorar flag &quot;Enviar p/ Balan&#xe7;a&quot;"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Ao ignorar essa flag, s&#xf3; &#xe9; considerado o par&#xe2;metro &quot;Fracionado&quot;"/>
                       </Properties>
                     </Component>
                   </SubComponents>

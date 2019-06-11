@@ -55,6 +55,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
     private boolean gerarEanAtacado = false;
     private boolean soAtivos = false;
     private Date dtOfertas;
+    private boolean ignorarEnviaBalanca = false;
 
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
@@ -226,6 +227,10 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setDtOfertas(Date dtOfertas) {
         this.dtOfertas = dtOfertas;
+    }
+
+    public void setIgnorarEnviaBalanca(boolean ignorarEnviaBalanca) {
+        this.ignorarEnviaBalanca = ignorarEnviaBalanca;
     }
 
     private static class Ean {
@@ -419,28 +424,38 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setCodMercadologico2(rst.getString("merc2"));
                             imp.setCodMercadologico3(rst.getString("merc3"));
                             ProdutoBalancaVO bal = balanca.get(Utils.stringToInt(rst.getString("id")));
-                            if (bal != null) {
-                                imp.seteBalanca(true);
-                                if (null != bal.getPesavel()) {
-                                    switch (bal.getPesavel()) {
-                                        case "P":
-                                            imp.setTipoEmbalagem("KG");
-                                            break;
-                                        case "U":
-                                            imp.setTipoEmbalagem("UN");
-                                            break;
-                                    }
-                                }
-                                imp.setValidade(bal.getValidade());
-                            } else {
-                                if (balanca.isEmpty()) {
-                                    imp.seteBalanca(rst.getBoolean("e_balanca"));
-                                    imp.setTipoEmbalagem(rst.getString("prounid"));
+                            if (ignorarEnviaBalanca) {                                
+                                imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                                if ("KG".equals(imp.getTipoEmbalagem())) {
+                                    imp.seteBalanca(true);
                                 } else {
-                                    imp.seteBalanca(false);
-                                    imp.setTipoEmbalagem(rst.getString("prounid"));
+                                    imp.seteBalanca(rst.getBoolean("e_balanca"));
                                 }
                                 imp.setValidade(Utils.stringToInt(rst.getString("validade")));
+                            } else {
+                                if (bal != null) {
+                                    imp.seteBalanca(true);
+                                    if (null != bal.getPesavel()) {
+                                        switch (bal.getPesavel()) {
+                                            case "P":
+                                                imp.setTipoEmbalagem("KG");
+                                                break;
+                                            case "U":
+                                                imp.setTipoEmbalagem("UN");
+                                                break;
+                                        }
+                                    }
+                                    imp.setValidade(bal.getValidade());
+                                } else {
+                                    if (balanca.isEmpty()) {
+                                        imp.seteBalanca(rst.getBoolean("e_balanca"));
+                                        imp.setTipoEmbalagem(rst.getString("prounid"));
+                                    } else {
+                                        imp.seteBalanca(false);
+                                        imp.setTipoEmbalagem(rst.getString("prounid"));
+                                    }
+                                    imp.setValidade(Utils.stringToInt(rst.getString("validade")));
+                                }
                             }
 
                             imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
