@@ -205,8 +205,8 @@ public class AcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	case when p.Pro_status = 1 then 0 else 1 end situacaocadastro,\n" +
                     "	p.Pro_ncm ncm,\n" +
                     "	p.Pro_cest cest,\n" +
-                    "	p.Pro_pis_cofins_entrada piscofins_entrada,\n" +
-                    "	p.Pro_pis_cofins_saida piscofins_saida,\n" +
+                    "	p.Pro_cst_pis_ent piscofins_entrada,\n" +
+                    "	p.Pro_cst_pis piscofins_saida,\n" +
                     "	p.Pro_natureza_receita piscofins_natureza_receita,\n" +
                     "	p.Pro_te,\n" +
                     "	p.Pro_ts,\n" +
