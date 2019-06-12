@@ -641,7 +641,7 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
                                     cst = 40;
                                 default:
                                     icms = 0;
-                                    cst = 60;
+                                    cst = 40;
                             }
                         }
                         next.setIcmsAliq(icms);
