@@ -230,6 +230,9 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
                             if (chkCIeRg.isSelected()) {
                                 opt.add(OpcaoCliente.INSCRICAO_ESTADUAL);
                             }
+                            if (chkCAtivo.isSelected()) {
+                                opt.add(OpcaoCliente.SITUACAO_CADASTRO);
+                            }
                             if (!opt.isEmpty()) {
                                 importador.atualizarClientePreferencial(opt.toArray(new OpcaoCliente[]{}));
                             }
@@ -321,6 +324,7 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkCObservacoes = new vrframework.bean.checkBox.VRCheckBox();
         chkCIeRg = new vrframework.bean.checkBox.VRCheckBox();
         chkCApenasObservacoes = new vrframework.bean.checkBox.VRCheckBox();
+        chkCAtivo = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -441,6 +445,8 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkCApenasObservacoes.setText("Apenas Observações");
         chkCApenasObservacoes.setToolTipText("Esta opção foi criada para importar somente clientes que possuem observações gerenciais.");
 
+        chkCAtivo.setText("Ativo");
+
         javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
         tabClientes.setLayout(tabClientesLayout);
         tabClientesLayout.setHorizontalGroup(
@@ -456,7 +462,10 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
                                 .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(chkCBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(tabClientesLayout.createSequentialGroup()
+                                .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(chkCAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chkCApenasObservacoes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -478,7 +487,8 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCApenasObservacoes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkCApenasObservacoes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -636,6 +646,7 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkCApenasObservacoes;
+    private vrframework.bean.checkBox.VRCheckBox chkCAtivo;
     private vrframework.bean.checkBox.VRCheckBox chkCBloqueado;
     private vrframework.bean.checkBox.VRCheckBox chkCIeRg;
     private vrframework.bean.checkBox.VRCheckBox chkCObservacoes;

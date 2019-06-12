@@ -268,12 +268,16 @@
                               <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" alignment="0" attributes="0">
+                                      <Group type="102" attributes="0">
                                           <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkCBloqueado" min="-2" max="-2" attributes="0"/>
                                       </Group>
-                                      <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Group type="102" attributes="0">
+                                          <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                                          <Component id="chkCAtivo" min="-2" max="-2" attributes="0"/>
+                                      </Group>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
@@ -304,6 +308,7 @@
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="chkClienteEventual" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCApenasObservacoes" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCAtivo" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
@@ -354,6 +359,11 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Apenas Observa&#xe7;&#xf5;es"/>
                     <Property name="toolTipText" type="java.lang.String" value="Esta op&#xe7;&#xe3;o foi criada para importar somente clientes que possuem observa&#xe7;&#xf5;es gerenciais."/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCAtivo">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Ativo"/>
                   </Properties>
                 </Component>
               </SubComponents>

@@ -293,7 +293,15 @@ public class AcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	coalesce(f.Pes_cnpj, f.Pes_cpf) cnpj,\n" +
                     "	coalesce(f.Pes_ie, f.Pes_rg) ie,\n" +
                     "	f.Pes_suframa suframa,\n" +
-                    "	f.Pes_bloqueado bloqueado,\n" +
+                    "	case f.Pes_bloqueado\n" +
+                    "	when 1 then 1\n" +
+                    "	else 0\n" +
+                    "	end bloqueado,\n" +
+                    "	case f.Pes_bloqueado\n" +
+                    "	when 0 then 1\n" +
+                    "	when 1 then 1\n" +
+                    "	when 2 then 0\n" +
+                    "	end situacaocadastro,\n" +
                     "	f.Pes_end endereco,\n" +
                     "	f.Pes_nrend numero,\n" +
                     "	f.Pes_compl complemento,\n" +
@@ -337,7 +345,7 @@ public class AcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCnpj_cpf(rst.getString("cnpj"));
                     imp.setIe_rg(rst.getString("ie"));
                     imp.setSuframa(rst.getString("suframa"));
-                    imp.setAtivo(!rst.getBoolean("bloqueado"));
+                    imp.setAtivo(rst.getBoolean("situacaocadastro"));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemento"));
@@ -388,7 +396,15 @@ public class AcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.Pes_natural nomefantasia,\n" +
                     "	coalesce(p.Pes_ie, p.Pes_rg) ie_rg,\n" +
                     "	p.Pes_emissor emissor,\n" +
-                    "	p.Pes_bloqueado,\n" +
+                    "	case p.Pes_bloqueado\n" +
+                    "	when 1 then 1\n" +
+                    "	else 0\n" +
+                    "	end bloqueado,\n" +
+                    "	case p.Pes_bloqueado\n" +
+                    "	when 0 then 1\n" +
+                    "	when 1 then 1\n" +
+                    "	when 2 then 0\n" +
+                    "	end situacaocadastro,\n" +
                     "	p.Pes_end endereco,\n" +
                     "	p.Pes_nrend numero,\n" +
                     "	p.Pes_compl complemento,\n" +
@@ -439,7 +455,8 @@ public class AcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setRazao(rst.getString("razaosocial"));
                     imp.setFantasia(rst.getString("nomefantasia"));
                     imp.setInscricaoestadual(rst.getString("ie_rg"));
-                    imp.setBloqueado(rst.getInt("Pes_bloqueado") == 2);
+                    imp.setBloqueado(rst.getBoolean("bloqueado"));
+                    imp.setAtivo(rst.getBoolean("situacaocadastro"));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemento"));
