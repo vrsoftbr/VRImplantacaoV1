@@ -26,6 +26,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
@@ -142,6 +143,36 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEan(rs.getString("codigobarras"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
 
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    codprd,\n" +
+                    "    codcfo,\n" +
+                    "    codnofornec, \n" +
+                    "    qtd \n" +        
+                    "from\n" +
+                    "    tprodcfo\n" +
+                    "order by\n" +
+                    "    1, 2")) {
+                while(rs.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rs.getString("codprd"));
+                    imp.setIdFornecedor(rs.getString("codcfo"));
+                    imp.setCodigoExterno(rs.getString("codnofornec"));
+                    imp.setQtdEmbalagem(rs.getDouble("qtd"));
+                    
                     result.add(imp);
                 }
             }
