@@ -405,7 +405,9 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                 Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 System.out.println(eans.size());
                 while (rst.next()) {
-                    Set<Ean> e = eans.get(rst.getString("id"));
+                    
+                    
+                    Set<Ean> e = eans.get(!rst.getString("id").trim().isEmpty() ? rst.getString("id") : null);
 
                     if (e != null) {
                         for (Ean ean : e) {
@@ -467,7 +469,13 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                             imp.setDataCadastro(rst.getDate("datacadastro"));
                             imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem"));
-                            imp.setMargem(rst.getDouble("margem2"));
+                            
+                            if (rst.getDouble("margem2") > 99999999) {
+                                imp.setMargem(0);
+                            } else {
+                                imp.setMargem(rst.getDouble("margem2"));
+                            }
+                            
                             imp.setPrecovenda(rst.getDouble("precovenda"));
                             imp.setIdFamiliaProduto(rst.getString("id_familiaproduto"));
                             imp.setPesoBruto(rst.getDouble("pesobruto"));
@@ -950,7 +958,21 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "FROM CONTARECEBER\n"
                     + "WHERE \n" //(COALESCE(CTRVLRPAG,0) < CTRVLRNOM)
                     + "COALESCE(ctrvlrdev,0) > 0 "
-                    + "AND FZDCOD IN (" + FZDCOD + ") " //+ "    (COALESCE(FZDCOD,'005') IN ('005'))"
+                    + "AND FZDCOD IN (" + FZDCOD + ") "
+                    + "union all\n"
+                    + "SELECT\n"
+                    + "     CTRID,\n"
+                    + "     ctrnum,\n"
+                    + "     clicod,\n"
+                    + "     cxanum,\n"
+                    + "     ctrdatemi,\n"
+                    + "     ctrdatvnc,\n"
+                    + "     ctrvlrdev,\n"
+                    + "     ctrobs\n"
+                    + "FROM CONTARECEBER\n"
+                    + "WHERE COALESCE(ctrvlrdev,0) > 0\n"
+                    + "AND FZDCOD is null\n"
+                    + "" //+ "    (COALESCE(FZDCOD,'005') IN ('005'))"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
