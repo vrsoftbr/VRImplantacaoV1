@@ -213,6 +213,10 @@
                                       <Component id="chkUsarMargemBruta" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                       <Component id="chkCest" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="chkAtacado" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="chkGerarEANAtacado" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                               <EmptySpace max="32767" attributes="0"/>
@@ -270,6 +274,8 @@
                           <Component id="chkT1NcmIndividual" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="chkUsarMargemBruta" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="chkCest" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkAtacado" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkGerarEANAtacado" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnMapaTrib" min="-2" pref="45" max="-2" attributes="0"/>
@@ -454,6 +460,16 @@
                 <Property name="text" type="java.lang.String" value="Cest"/>
               </Properties>
             </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAtacado">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Atacado"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkGerarEANAtacado">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Gerar EAN Atacado"/>
+              </Properties>
+            </Component>
           </SubComponents>
         </Container>
         <Container class="vrframework.bean.panel.VRPanel" name="tabFornecedor">
@@ -567,17 +583,22 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
-                                  <Component id="chkBloqueado" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Component id="chkValorLimite" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCnpj" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkIE" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkAtivo" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkValorLimite" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkEstadoCivil" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkBloqueado" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
                           </Group>
-                          <EmptySpace pref="269" max="32767" attributes="0"/>
+                          <EmptySpace pref="263" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -590,7 +611,10 @@
                               <Component id="chkBloqueado" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkValorLimite" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkValorLimite" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkEstadoCivil" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="chkCnpj" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
@@ -637,6 +661,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkBloqueado">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Bloqueado"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkEstadoCivil">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Estado Civil"/>
                   </Properties>
                 </Component>
               </SubComponents>
