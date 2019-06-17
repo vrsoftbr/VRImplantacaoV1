@@ -33,6 +33,7 @@ import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
@@ -507,7 +508,9 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    f.frequencia prazovisita,\n"
                     + "    f.entrega prazoentrega,\n"
                     + "    f.email,\n"
-                    + "    f.condpagto\n"
+                    + "    f.condpagto,\n"
+                    + "    f.produtor,\n"
+                    + "    f.simples_nacional\n"
                     + "from\n"
                     + "    fornecedores f\n"
                     + "order by\n"
@@ -543,6 +546,16 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCondicaoPagamento(Utils.stringToInt(rst.getString("dias_vencto")));
                     imp.setPrazoVisita(rst.getInt("prazovisita"));
                     imp.setPrazoEntrega(rst.getInt("prazoentrega"));
+                    if ("T".equals(rst.getString("produtor"))) {
+                        if (Utils.stringToLong(imp.getCnpj_cpf()) <= 99999999999L) {
+                            imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_FISICA);
+                        } else {
+                            imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_JURIDICO);
+                        }
+                    } else if ("T".equals(rst.getString("simples_nacional"))) {                        
+                        imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
+                    }
+                    
                     String email = Utils.acertarTexto(rst.getString("email")).toLowerCase();
                     if (!"".equals(email)) {
                         imp.addContato("1", "Email", "", "", TipoContato.COMERCIAL, email);

@@ -599,12 +599,12 @@
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="txtDtVencContasPagar" min="-2" pref="92" max="-2" attributes="0"/>
                                   </Group>
-                                  <Component id="vRPanel4" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="chkFornecedorXFamilia" min="-2" max="-2" attributes="0"/>
                                   </Group>
+                                  <Component id="vRPanel4" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
@@ -639,7 +639,7 @@
                           <Component id="chkContasAPagar" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="txtDtVencContasPagar" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="161" max="32767" attributes="0"/>
+                      <EmptySpace pref="165" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -704,7 +704,11 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkQtdeEmb" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkQtdeEmb" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="chkFTipoEmpresa" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <Component id="chkIPI" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="32767" attributes="0"/>
@@ -715,7 +719,10 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkQtdeEmb" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkQtdeEmb" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFTipoEmpresa" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="chkIPI" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="32767" attributes="0"/>
@@ -733,6 +740,17 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="IPI Fornecedor"/>
                   </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFTipoEmpresa">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo Empresa"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
+                    </Property>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFTipoEmpresaActionPerformed"/>
+                  </Events>
                 </Component>
               </SubComponents>
             </Container>
