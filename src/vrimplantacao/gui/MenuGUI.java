@@ -187,6 +187,7 @@ import vrimplantacao2.gui.interfaces.TstiGUI;
 import vrimplantacao2.gui.interfaces.UmPontoDoisGUI;
 import vrimplantacao2.gui.interfaces.UniplusGUI;
 import vrimplantacao2.gui.interfaces.UpFortiGUI;
+import vrimplantacao2.gui.interfaces.ViaSoftGUI;
 import vrimplantacao2.gui.interfaces.VisualComercioGUI;
 import vrimplantacao2.gui.interfaces.WShopGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
@@ -616,6 +617,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuWmsi = new javax.swing.JMenuItem();
         mnuWmsi1 = new javax.swing.JMenuItem();
         mnuCefas = new javax.swing.JMenuItem();
+        mnuViaSoft = new javax.swing.JMenuItem();
         jMenu8 = new javax.swing.JMenu();
         jMenuItemControlWare = new javax.swing.JMenuItem();
         mnuFlatan = new javax.swing.JMenuItem();
@@ -1684,6 +1686,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu7.add(mnuCefas);
+
+        mnuViaSoft.setText("Via Soft");
+        mnuViaSoft.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuViaSoftActionPerformed(evt);
+            }
+        });
+        jMenu7.add(mnuViaSoft);
 
         mnuDatabase.add(jMenu7);
 
@@ -3913,6 +3923,10 @@ public final class MenuGUI extends VRMdiFrame {
         AcomGUI.exibir(this);
     }//GEN-LAST:event_mnuAcomActionPerformed
 
+    private void mnuViaSoftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuViaSoftActionPerformed
+        ViaSoftGUI.exibir(this);
+    }//GEN-LAST:event_mnuViaSoftActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu11;
@@ -4119,6 +4133,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuUmPontoDois;
     private javax.swing.JMenuItem mnuUniplus;
     private javax.swing.JMenuItem mnuUpForti;
+    private javax.swing.JMenuItem mnuViaSoft;
     private javax.swing.JMenuItem mnuVisualComercio;
     private javax.swing.JMenuItem mnuWebsaq;
     private javax.swing.JMenuItem mnuWinNexus;
