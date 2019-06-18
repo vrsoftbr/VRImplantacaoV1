@@ -1,169 +1,136 @@
 package vrimplantacao2.dao.interfaces;
 
-import javax.xml.bind.DatatypeConverter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.text.DecimalFormat;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+import vrimplantacao.classe.ConexaoMySQL;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
- * Sistema da empresa G3 Tecnológia
- * @author Leandro
+ *
+ * @author Importacao
  */
-public class GTechDAO {
-    
-    public static String decodeSenha(String senha) {
-        return Decriptar.decode(senha);
-    }
-    
-    public static void main(String[] args) {
-        System.out.println(decodeSenha("00081f6ZHowOQ==5e165MVhOVzFK3351U1RKamVr93ad"));
-    }
-    
-}
+public class GTechDAO extends InterfaceDAO implements MapaTributoProvider {
 
-class Decriptar
-{
-  public static String decode(String s)
-    throws ArrayIndexOutOfBoundsException
-  {
-    try
-    {
-      Integer divisor = Integer.valueOf(Integer.parseInt(s.substring(0, 4)));
-      
-      int M1 = 4;
-      int M2 = 5;
-      s = s.substring(7, s.length() - 4);
-      String b1 = s.substring(s.length() - divisor.intValue(), s.length());
-      String b2 = s.substring(s.length() - M1 - divisor.intValue() - divisor.intValue(), s.length() - divisor.intValue() - M1);
-      String b3 = s.substring(0, s.length() - M1 - M2 - divisor.intValue() - divisor.intValue());
-      s = new String(DatatypeConverter.parseBase64Binary(new String(DatatypeConverter.parseBase64Binary(new String(DatatypeConverter.parseBase64Binary(b1 + b2 + b3))))));
+    /*
+     Para localizar a senha do banco de dados do GTech ou G3 Informática,
+     localizar a classe GTechEncriptDAO, passar o texto encriptografado no método Main 
+     para retornar a senha do atual banco de dados.
+     */
+    @Override
+    public String getSistema() {
+        return "GTech";
     }
-    catch (Exception e)
-    {
-      try
-      {
-        s = decode(Encriptar.encode(s));
-      }
-      catch (Exception ex)
-      {
-        Logger.getLogger(Decriptar.class.getName()).log(Level.SEVERE, null, ex);
-        return s;
-      }
-    }
-    return s;
-  }
-  
-  public static String basicDecode(String s)
-    throws ArrayIndexOutOfBoundsException
-  {
-    try
-    {
-      String tmp = s.substring(5);
-      tmp = tmp.substring(0, tmp.length() - 5);
-      return new String(DatatypeConverter.parseBase64Binary(tmp));
-    }
-    catch (Exception e) {}
-    return s;
-  }
-}
 
-class Encriptar
-{
-  public static String encode(String s)
-    throws NoSuchAlgorithmException, UnsupportedEncodingException
-  {
-    if (s == null) {
-      return "";
-    }
-    String MD5Quebrado = Biblioteca.MD5String(s).substring(0, 16);
-    
-    String base643Vezes = DatatypeConverter.printBase64Binary(
-      DatatypeConverter.printBase64Binary(
-      DatatypeConverter.printBase64Binary(s.getBytes()).getBytes()).getBytes());
-    Integer divisor = Integer.valueOf(Integer.valueOf(base643Vezes.length()).intValue() / 3);
-    String b1 = base643Vezes.substring(0, divisor.intValue());
-    String b2 = base643Vezes.substring(divisor.intValue(), divisor.intValue() + divisor.intValue());
-    String b3 = base643Vezes.substring(divisor.intValue() + divisor.intValue(), base643Vezes.length());
-    return String.format("%04d", new Object[] { divisor }) + MD5Quebrado.substring(0, 3) + b3 + MD5Quebrado
-      .substring(3, 8) + b2 + MD5Quebrado
-      .substring(8, 12) + b1 + MD5Quebrado
-      .substring(12, 16);
-  }
-  
-  public static String basicEncode(String s)
-    throws NoSuchAlgorithmException, UnsupportedEncodingException
-  {
-    if (s == null) {
-      return "";
-    }
-    String md5 = Biblioteca.MD5String(s);
-    String md5part1 = md5.substring(0, 5);
-    String md5part2 = md5.substring(10, 15);
-    String b1 = DatatypeConverter.printBase64Binary(s.getBytes());
-    return md5part1 + b1 + md5part2;
-  }
-}
-
-class Biblioteca
-{
-  private static String convertToHex(byte[] data)
-  {
-    StringBuilder buf = new StringBuilder();
-    for (int i = 0; i < data.length; i++)
-    {
-      int halfbyte = data[i] >>> 4 & 0xF;
-      int two_halfs = 0;
-      do
-      {
-        if ((0 <= halfbyte) && (halfbyte <= 9)) {
-          buf.append((char)(48 + halfbyte));
-        } else {
-          buf.append((char)(97 + (halfbyte - 10)));
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "SELECT \n"
+                    + "	 aliquota id,\n"
+                    + "    descricao\n"
+                    + "FROM \n"
+                    + "	aliquotas_icms\n"
+                    + "order by\n"
+                    + "	2")) {
+                while (rs.next()) {
+                    result.add(new MapaTributoIMP(rs.getString("id"), rs.getString("descricao")));
+                }
+            }
         }
-        halfbyte = data[i] & 0xF;
-      } while (two_halfs++ < 1);
+        return result;
     }
-    return buf.toString();
-  }
-  
-  public static String formatoDecimal(String tipo, double valor)
-  {
-    String mascara = "0.";
-    switch (tipo)
-    {
-    case "Q": 
-      for (int i = 0; i < 3; i++) {
-        mascara = mascara + "0";
-      }
-      break;
-    case "V": 
-      for (int i = 0; i < 2; i++) {
-        mascara = mascara + "0";
-      }
-    }
-    DecimalFormat formato = new DecimalFormat(mascara);
-    return formato.format(valor);
-  }
-  
-  public static String MD5String(String text)
-    throws NoSuchAlgorithmException, UnsupportedEncodingException
-  {
-    MessageDigest md = MessageDigest.getInstance("MD5");
     
-    md.update(text.getBytes("iso-8859-1"), 0, text.length());
-    byte[] md5hash = md.digest();
-    return convertToHex(md5hash);
-  }
-  
-  public static String repete(String string, int quantidade)
-  {
-    StringBuilder retorno = new StringBuilder();
-    for (int j = 0; j < quantidade; j++) {
-      retorno.append(string);
+    public List<Estabelecimento> getLojas() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select 1 id, 'Mercado e Sacolao da Economia' razao")) {
+                while(rs.next()) {
+                    result.add(new Estabelecimento(rs.getString("id"), rs.getString("razao")));
+                }
+            }
+        }
+        return result;
     }
-    return retorno.toString();
-  }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	 p.id,\n" +
+                    "    p.codigo_interno,\n" +
+                    "    p.ean,\n" +
+                    "    p.descricao_pdv descricaocompleta,\n" +
+                    "    p.id_grupo,\n" +
+                    "    p.valor_custo,\n" +
+                    "    p.valor_venda,\n" +
+                    "    p.data_cadastro,\n" +
+                    "    p.estoque_max,\n" +
+                    "    p.estoque_min,\n" +
+                    "    p.qtd_estoque estoque,\n" +
+                    "    un.nome unidade,\n" +
+                    "    p.ncm,\n" +
+                    "    p.aliquota_icms_dentro icmsdebito,\n" +
+                    "    p.cod_cst_dentro cstdebito,\n" +
+                    "    p.reducao_bc_dentro icmsreducaodebito,\n" +
+                    "    coalesce(p.balanca_integrada, 0) isBalanca,\n" +
+                    "    p.excluido,\n" +
+                    "    p.desativado,\n" +
+                    "    p.cod_nat_rec naturezareceita,\n" +
+                    "    p.cest,\n" +
+                    "    ce.cst cofinsdebito,\n" +
+                    "    cs.cst cofinscredito,\n" +
+                    "    p.ECF_ICMS_ST idaliquota\n" +
+                    "from\n" +
+                    "	produto p\n" +
+                    "left join unidade_produto un on (p.id_unidade_produto = un.id)\n" +
+                    "left join grupocofins ce on (p.id_grupo_pis_saida = ce.id)\n" +
+                    "left join grupocofins cs on (p.id_grupo_pis_entrada = cs.id)\n" +
+                    "order by\n" +
+                    "	p.id")) {
+                while(rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setEan(rs.getString("ean"));
+                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(imp.getDescricaoCompleta());
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setCustoComImposto(rs.getDouble("valor_custo"));
+                    imp.setCustoSemImposto(rs.getDouble("valor_custo"));
+                    imp.setPrecovenda(rs.getDouble("valor_venda"));
+                    imp.setDataCadastro(rs.getDate("data_cadastro"));
+                    imp.setEstoqueMaximo(rs.getDouble("estoque_max"));
+                    imp.setEstoqueMinimo(rs.getDouble("estoque_min"));
+                    imp.setEstoque(rs.getDouble("estoque"));
+                    imp.setTipoEmbalagem(rs.getString("unidade"));
+                    imp.setNcm(rs.getString("ncm"));
+                    if(rs.getInt("isBalanca") == 1) {
+                        imp.seteBalanca(true);
+                        imp.setEan(imp.getImportId());
+                    }
+                    imp.setSituacaoCadastro(rs.getInt("desativado") == 1 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
+                    imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
+                    imp.setCest(rs.getString("cest"));
+                    imp.setPiscofinsCstCredito(rs.getString("cofinscredito"));
+                    imp.setPiscofinsCstDebito(rs.getString("cofinsdebito"));
+                    imp.setIcmsDebitoId(rs.getString("idaliquota"));
+                    imp.setIcmsCreditoId(rs.getString("idaliquota"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 }
