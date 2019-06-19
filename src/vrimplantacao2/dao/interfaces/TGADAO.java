@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -38,6 +39,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(IntelliconDAO.class.getName());
+    public boolean gerarEANAtacado = false;
 
     @Override
     public String getSistema() {
@@ -125,46 +127,87 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "    codprd id,\n"
-                    + "    codbarras codigobarras,\n"
-                    + "    codund unidade\n"
-                    + "from\n"
-                    + "    tprodbarras\n"
-                    + "where\n"
-                    + "    codempresa = " + getLojaOrigem())) {
-                while (rs.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rs.getString("id"));
-                    imp.setEan(rs.getString("codigobarras"));
-                    imp.setTipoEmbalagem(rs.getString("unidade"));
+        if (gerarEANAtacado) {
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select\n"
+                        + "    codbarras codigobarras,\n"
+                        + "    codprd eaninterno,\n"
+                        + "    codprdprincipal idproduto,\n"
+                        + "    unidade,\n"
+                        + "    preco1 precoatacado,\n"
+                        + "    qtdembalagem\n"
+                        + "from\n"
+                        + "    tproduto\n"
+                        + "where\n"
+                        + "    codempresa = " + getLojaOrigem() + " and\n"
+                        + "    codprdprincipal is not null\n"
+                        + "order by\n"
+                        + "    codprdprincipal, codprd")) {
+                    while (rs.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportId(rs.getString("idproduto"));
+                        if ((rs.getString("codigobarras") == null)
+                                || ("".equals(rs.getString("codigobarras").trim()))) {
+                            imp.setEan("99" + rs.getString("eaninterno"));
+                        } else {
+                            imp.setEan(rs.getString("codigobarras"));
+                        }
+                        imp.setTipoEmbalagem(rs.getString("unidade"));
+                        imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
 
-                    result.add(imp);
+                        result.add(imp);
+                    }
+                }
+            }
+        } else {
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select\n"
+                        + "    codprd idproduto,\n"
+                        + "    codbarras codigobarras,\n"
+                        + "    codund unidade,\n"
+                        + "    1 qtdembalagem\n"
+                        + "from\n"
+                        + "    tprodbarras\n"
+                        + "where\n"
+                        + "    codempresa = " + getLojaOrigem())) {
+                    while (rs.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportId(rs.getString("idproduto"));
+                        imp.setEan(rs.getString("codigobarras"));
+                        imp.setTipoEmbalagem(rs.getString("unidade"));
+                        imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+
+                        result.add(imp);
+                    }
                 }
             }
         }
         return result;
     }
-    
+
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
-        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "    codprd,\n" +
-                    "    codcfo,\n" +
-                    "    codnofornec, \n" +
-                    "    qtd \n" +        
-                    "from\n" +
-                    "    tprodcfo\n" +
-                    "order by\n" +
-                    "    1, 2")) {
-                while(rs.next()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "    pf.codprd,\n"
+                    + "    pf.codcfo,\n"
+                    + "    pfc.codnofornec,\n"
+                    + "    qtd\n"
+                    + "from\n"
+                    + "    tprodcfo pf\n"
+                    + "left join tprodcfonfe pfc on pf.codprd = pfc.codprd and\n"
+                    + "    pf.codcfo = pfc.codcfo\n"
+                    + "order by\n"
+                    + "    1, 2")) {
+                while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
@@ -172,7 +215,7 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFornecedor(rs.getString("codcfo"));
                     imp.setCodigoExterno(rs.getString("codnofornec"));
                     imp.setQtdEmbalagem(rs.getDouble("qtd"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -187,6 +230,9 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "    p.codprd id,\n"
+                    + "    p.codprdprincipal,\n"
+                    + "    case when p.codprdprincipal is not null\n"
+                    + "    then 'S' else 'N' end idprincipal,\n"
                     + "    p.codbarras codigobarras,\n"
                     + "    p.nomefantasia descricaocompleta,\n"
                     + "    p.dtcadastramento datacadastro,\n"
@@ -225,7 +271,12 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("id"));
-                    if ("T".equals(rs.getString("exportabalanca").trim())) {
+                    if ((rs.getString("codigobarras") != null)
+                            && !"".equals(rs.getString("codigobarras"))
+                            && ("S".equals(rs.getString("idprincipal")))
+                            && rs.getString("codigobarras").length() > 6) {
+                        imp.setEan(imp.getImportId());
+                    } else if ("T".equals(rs.getString("exportabalanca").trim())) {
                         imp.setEan(imp.getImportId());
                         imp.seteBalanca(true);
                     } else {
@@ -265,6 +316,54 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        if (opt == OpcaoProduto.ATACADO) {
+            List<ProdutoIMP> vResult = new ArrayList<>();
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select\n"
+                        + "    filho.codbarras codigobarras,\n"
+                        + "    filho.codprd eaninterno,\n"
+                        + "    filho.codprdprincipal idproduto,\n"
+                        + "    filho.nomefantasia descricaocompleta,\n"
+                        + "    filho.unidade,\n"
+                        + "    pai.preco1 precovenda,\n"
+                        + "    filho.preco1 precoatacado,\n"
+                        + "    filho.qtdembalagem\n"
+                        + "from\n"
+                        + "    tproduto filho\n"
+                        + "join tproduto pai on (filho.codprdprincipal = pai.codprd)\n"
+                        + "where\n"
+                        + "    filho.codempresa = " + getLojaOrigem() + " and\n"
+                        + "    filho.codprdprincipal is not null\n"
+                        + "order by\n"
+                        + "    filho.codprdprincipal, filho.codprd"
+                )) {
+                    while (rs.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rs.getString("idproduto"));
+                        if ((rs.getString("codigobarras") == null)
+                                || ("".equals(rs.getString("codigobarras")))) {
+                            imp.setEan("99" + rs.getString("eaninterno"));
+                        } else {
+                            imp.setEan(rs.getString("codigobarras"));
+                        }
+                        imp.setPrecovenda(rs.getDouble("precovenda"));
+                        imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                        imp.setAtacadoPreco(rs.getDouble("precoatacado") / rs.getInt("qtdembalagem"));
+                        vResult.add(imp);
+                    }
+                }
+            }
+            return vResult;
+        }
+
+        return null;
     }
 
     @Override
@@ -352,6 +451,7 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.nomefantasia,\n"
                     + "	c.cgccfo cnpj,\n"
                     + "	c.inscrestadual ie,\n"
+                    + " c.ci_numero rg,\n"
                     + "	c.rua endereco,\n"
                     + "	c.numero,\n"
                     + "	c.complemento,\n"
@@ -385,7 +485,11 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setRazao(rs.getString("nome"));
                     imp.setFantasia(rs.getString("nomefantasia"));
                     imp.setCnpj(rs.getString("cnpj"));
-                    imp.setInscricaoestadual(rs.getString("ie"));
+                    if ((rs.getString("rg") == null) && ("".equals(rs.getString("rg")))) {
+                        imp.setInscricaoestadual(rs.getString("ie"));
+                    } else {
+                        imp.setInscricaoestadual(rs.getString("rg"));
+                    }
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setComplemento(rs.getString("complemento"));
@@ -412,21 +516,28 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     imp.setSexo("F".equals(rs.getString("sexo")) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
                     if ((rs.getString("estadocivil") != null) && (!"".equals(rs.getString("estadocivil")))) {
-                        switch (rs.getString("estadocivil")) {
+                        switch (rs.getString("estadocivil").trim().toUpperCase()) {
                             case "C":
                                 imp.setEstadoCivil(TipoEstadoCivil.CASADO);
+                                break;
                             case "A":
                                 imp.setEstadoCivil(TipoEstadoCivil.AMAZIADO);
+                                break;
                             case "S":
                                 imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
+                                break;
                             case "V":
                                 imp.setEstadoCivil(TipoEstadoCivil.VIUVO);
+                                break;
                             case "D":
                                 imp.setEstadoCivil(TipoEstadoCivil.DIVORCIADO);
+                                break;
                             default:
-                                imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
+                                imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
+                                break;
                         }
                     }
+                    imp.setValorLimite(rs.getDouble("limitecredito"));
                     result.add(imp);
                 }
             }
@@ -454,7 +565,8 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where\n"
                     + "    codempresa = " + getLojaOrigem() + " and\n"
                     + "    pagrec = 'R' and\n"
-                    + "    statuslan = 'A'\n"
+                    + "    statuslan = 'A' and\n"
+                    + "    codtdo in ('DP', 'PROM', 'CH DEV')\n"        
                     + "order by\n"
                     + "    dataemissao")) {
                 while (rs.next()) {
@@ -549,50 +661,51 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
-                    = "select\n" +
-                    "    max(idmov) id,\n" +
-                    "    codcaixa ecf,\n" +
-                    "    numeromov documento,\n" +
-                    "    dataemissao,\n" +
-                    "    max(m.codcfo) idcliente,\n" +
-                    "    max(c.nome) nome,\n" +
-                    "    max(c.cgccfo) cnpj,\n" +
-                    "    max(c.rua) rua,\n" +
-                    "    max(c.bairro) bairro,\n" +
-                    "    max(c.numero) numero,\n" +
-                    "    c.cidade,\n" +
-                    "    c.codetd estado,\n" +
-                    "    c.cep,\n" +
-                    "    serie,\n" +
-                    "    max(status) status,\n" +
-                    "    m.datasaida,\n" +
-                    "    max(valorliquido) valorliquido,\n" +
-                    "    max(extract(hour from horarioemissao) ||':'||\n" +
-                    "    extract(minute from horarioemissao) ||':'||\n" +
-                    "    extract(second from horarioemissao)) horaemissao,\n" +
-                    "    m.codtmv idtipomov,\n" +
-                    "    tm.nome tipomov\n" +
-                    "from\n" +
-                    "    tmov m\n" +
-                    "join ttipomov tm on (m.codtmv = tm.codtipomov)\n" +
-                    "join fcfo c on (m.codcfo = c.codcfo)\n" +
-                    "where\n" +
-                    "    m.codempresa = " + idLojaCliente + "and\n" +
-                    "    m.dataemissao between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "' and\n" +
-                    "    m.codtmv in ('2.2.01', '2.2.03', '2.2.05', '2.3.01', '2.3.03')\n" +
-                    "group by\n" +
-                    "    codcaixa,\n" +
-                    "    numeromov,\n" +
-                    "    dataemissao,\n" +
-                    "    c.cidade,\n" +
-                    "    c.codetd,\n" +
-                    "    c.cep,\n" +
-                    "    serie,\n" +
-                    "    m.datasaida,\n" +
-                    "    m.codtmv,\n" +
-                    "    tm.nome\n" +
-                    "order by\n" +
-                    "    m.dataemissao";
+                    = "select\n"
+                    + "    max(idmov) id,\n"
+                    + "    codcaixa ecf,\n"
+                    + "    numeromov documento,\n"
+                    + "    dataemissao,\n"
+                    + "    max(m.codcfo) idcliente,\n"
+                    + "    max(c.nome) nome,\n"
+                    + "    max(c.cgccfo) cnpj,\n"
+                    + "    max(c.rua) rua,\n"
+                    + "    max(c.bairro) bairro,\n"
+                    + "    max(c.numero) numero,\n"
+                    + "    c.cidade,\n"
+                    + "    c.codetd estado,\n"
+                    + "    c.cep,\n"
+                    + "    serie,\n"
+                    + "    max(status) status,\n"
+                    + "    m.datasaida,\n"
+                    + "    max(valorliquido) valorliquido,\n"
+                    + "    max(m.valordesc) desconto,\n"
+                    + "    max(extract(hour from horarioemissao) ||':'||\n"
+                    + "    extract(minute from horarioemissao) ||':'||\n"
+                    + "    extract(second from horarioemissao)) horaemissao,\n"
+                    + "    m.codtmv idtipomov,\n"
+                    + "    tm.nome tipomov\n"
+                    + "from\n"
+                    + "    tmov m\n"
+                    + "join ttipomov tm on (m.codtmv = tm.codtipomov)\n"
+                    + "join fcfo c on (m.codcfo = c.codcfo)\n"
+                    + "where\n"
+                    + "    m.codempresa = " + idLojaCliente + "and\n"
+                    + "    m.dataemissao between '" + FORMAT.format(dataInicio) + "' and '" + FORMAT.format(dataTermino) + "' and\n"
+                    + "    m.codtmv in ('2.2.01', '2.2.03', '2.2.05', '2.3.01', '2.3.03')\n"
+                    + "group by\n"
+                    + "    codcaixa,\n"
+                    + "    numeromov,\n"
+                    + "    dataemissao,\n"
+                    + "    c.cidade,\n"
+                    + "    c.codetd,\n"
+                    + "    c.cep,\n"
+                    + "    serie,\n"
+                    + "    m.datasaida,\n"
+                    + "    m.codtmv,\n"
+                    + "    tm.nome\n"
+                    + "order by\n"
+                    + "    m.dataemissao";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -629,12 +742,12 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String id = rst.getString("idvenda") + "-" + 
-                                rst.getString("coo") + "-" + 
-                                rst.getString("ecf") + "-" + 
-                                rst.getString("dataemissao") + "-" + 
-                                rst.getInt("sequencia") + "-" + 
-                                rst.getDouble("valortotal");
+                        String id = rst.getString("idvenda") + "-"
+                                + rst.getString("coo") + "-"
+                                + rst.getString("ecf") + "-"
+                                + rst.getString("dataemissao") + "-"
+                                + rst.getInt("sequencia") + "-"
+                                + rst.getDouble("valortotal");
 
                         next.setId(id);
                         next.setVenda(rst.getString("idvenda"));
@@ -642,8 +755,9 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setTotalBruto(rst.getDouble("valortotal"));
-                        if((rst.getString("ean")) != null && (rst.getString("ean").length() > 14)) {
-                            next.setCodigoBarras(rst.getString("ean").substring(1, rst.getString("ean").length()));
+                        next.setValorDesconto(rst.getDouble("desconto"));
+                        if ((rst.getString("ean")) != null && (rst.getString("ean").length() > 14)) {
+                            next.setCodigoBarras(rst.getString("ean").substring(2, rst.getString("ean").length()));
                         } else {
                             next.setCodigoBarras(rst.getString("ean"));
                         }
@@ -699,6 +813,7 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.codbarras ean,\n"
                     + "    p.unidade,\n"
                     + "    mv.quantidade,\n"
+                    + "    mv.rateiodesc desconto,\n"
                     + "    precounitario,\n"
                     + "    m.dataemissao,\n"
                     + "    valortotalitem valortotal,\n"
@@ -710,7 +825,7 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where\n"
                     + "    mv.codempresa = " + idLojaCliente + " and\n"
                     + "    m.dataemissao between '" + VendaIterator.FORMAT.format(dataInicio) + "' and '" + VendaIterator.FORMAT.format(dataTermino) + "' and\n"
-                    + "    m.codtmv in ('2.2.01', '2.2.03', '2.2.05', '2.3.01', '2.3.03')\n" 
+                    + "    m.codtmv in ('2.2.01', '2.2.03', '2.2.05', '2.3.01', '2.3.03')\n"
                     + "order by\n"
                     + "    mv.idmov, mv.nseq";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
