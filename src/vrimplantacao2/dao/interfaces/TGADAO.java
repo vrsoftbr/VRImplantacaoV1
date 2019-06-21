@@ -40,10 +40,11 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(IntelliconDAO.class.getName());
     public boolean gerarEANAtacado = false;
+    public String lojaComplemento = "";
 
     @Override
     public String getSistema() {
-        return "TGA";
+        return "TGA" + lojaComplemento;
     }
 
     public List<Estabelecimento> getLojas() throws SQLException {
