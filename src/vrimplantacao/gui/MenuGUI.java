@@ -107,6 +107,7 @@ import vrimplantacao2.gui.interfaces.CefasGUI;
 import vrimplantacao2.gui.interfaces.CerebroGUI;
 import vrimplantacao2.gui.interfaces.CgaGUI;
 import vrimplantacao2.gui.interfaces.CissGUI;
+import vrimplantacao2.gui.interfaces.ClickGUI;
 import vrimplantacao2.gui.interfaces.ContechGUI;
 import vrimplantacao2.gui.interfaces.DataSyncGUI;
 import vrimplantacao2.gui.interfaces.DestroGUI;
@@ -655,6 +656,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuOpen = new javax.swing.JMenuItem();
         mnuSuperLoja10 = new javax.swing.JMenuItem();
         mnuGTech = new javax.swing.JMenuItem();
+        mnuClick = new javax.swing.JMenuItem();
         mnuOrion = new javax.swing.JMenu();
         jMenuItemOrion = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -1976,6 +1978,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu9.add(mnuGTech);
+
+        mnuClick.setText("Click");
+        mnuClick.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuClickActionPerformed(evt);
+            }
+        });
+        jMenu9.add(mnuClick);
 
         mnuDatabase.add(jMenu9);
 
@@ -3941,6 +3951,10 @@ public final class MenuGUI extends VRMdiFrame {
         GTechGUI.exibir(this);
     }//GEN-LAST:event_mnuGTechActionPerformed
 
+    private void mnuClickActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuClickActionPerformed
+        ClickGUI.exibir(this);
+    }//GEN-LAST:event_mnuClickActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu11;
@@ -4049,6 +4063,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenu mnuCaixa;
     private javax.swing.JMenuItem mnuCefas;
     private javax.swing.JMenuItem mnuCerebro;
+    private javax.swing.JMenuItem mnuClick;
     private javax.swing.JMenuItem mnuCodigoBarrasAtacado;
     private javax.swing.JMenuItem mnuContaPagar;
     private javax.swing.JMenuItem mnuContaPagar1;

@@ -3,9 +3,13 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -50,22 +54,38 @@ public class ViaSoftDAO extends InterfaceDAO {
         List<MercadologicoIMP> result = new ArrayList<>();
         try(Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "  distinct\n" +
-                    "  iddepto merc1,\n" +
-                    "  dsdepto descmerc1,\n" +
-                    "  idsetor merc2,\n" +
-                    "  dssetor descmerc2,\n" +
-                    "  idgrupoitem merc3,\n" +
-                    "  dsgrupoitem descmerc3,\n" +
-                    "  idfamilia merc4,\n" +
-                    "  dsfamilia descmerc4,\n" +
-                    "  idsubfamilia merc5,\n" +
-                    "  dssubfamilia descmerc5\n" +
-                    "from\n" +
-                    "   VIASOFTMERC.V_ITEMCATEGORIA\n" +
-                    "order by\n" +
-                    "  iddepto, idsetor, idgrupoitem, idfamilia")) {
+                    "SELECT\n" +
+                    "  IC.IDDEPTO MERC1, \n" +
+                    "  DEP.DESCRICAO AS DESCMERC1,\n" +
+                    "  IC.IDSETOR MERC2, \n" +
+                    "  STR.DESCRICAO AS DESCMERC2,\n" +
+                    "  IC.IDGRUPOITEM MERC3, \n" +
+                    "  GRU.DESCRICAO AS DESCMERC3,\n" +
+                    "  COALESCE(IC.IDFAMILIA, 1) MERC4,\n" +
+                    "  COALESCE(FAM.DESCRICAO, GRU.DESCRICAO) AS DESCMERC4,\n" +
+                    "  COALESCE(IC.IDSUBFAMILIA, 1) MERC5,\n" +
+                    "  COALESCE(SFAM.DESCRICAO, COALESCE(FAM.DESCRICAO, GRU.DESCRICAO)) AS DESCMERC5\n" +
+                    "FROM VIASOFTMERC.ITEMCATEGORIA IC\n" +
+                    "LEFT JOIN VIASOFTMERC.DEPARTAMENTO DEP ON DEP.ESTAB=IC.ESTAB AND DEP.IDDEPTO=IC.IDDEPTO \n" +
+                    "LEFT JOIN VIASOFTMERC.SETOR STR        ON STR.ESTAB=IC.ESTAB AND STR.IDSETOR=IC.IDSETOR \n" +
+                    "LEFT JOIN VIASOFTBASE.GRUPOITEM GRU    ON GRU.ESTAB=IC.ESTAB AND GRU.IDGRUPOITEM=IC.IDGRUPOITEM \n" +
+                    "LEFT JOIN VIASOFTMERC.FAMILIA FAM      ON FAM.ESTAB=IC.ESTAB AND FAM.IDFAMILIA=IC.IDFAMILIA \n" +
+                    "LEFT JOIN VIASOFTMERC.SUBFAMILIA SFAM  ON SFAM.ESTAB=IC.ESTAB AND SFAM.IDSUBFAMILIA=IC.IDSUBFAMILIA \n" +
+                    "WHERE \n" +
+                    "  IC.IDDEPTO IS NOT NULL \n" +        
+                    "GROUP BY\n" +
+                    "  IC.IDDEPTO, \n" +
+                    "  DEP.DESCRICAO,\n" +
+                    "  IC.IDSETOR, \n" +
+                    "  STR.DESCRICAO,\n" +
+                    "  IC.IDGRUPOITEM, \n" +
+                    "  GRU.DESCRICAO,\n" +
+                    "  IC.IDFAMILIA, \n" +
+                    "  FAM.DESCRICAO,\n" +
+                    "  IC.IDSUBFAMILIA, \n" +
+                    "  SFAM.DESCRICAO\n" +
+                    "ORDER BY\n" +
+                    " 1, 3, 5, 7, 9")) {
                 while(rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportSistema(getSistema());
@@ -178,11 +198,12 @@ public class ViaSoftDAO extends InterfaceDAO {
                     "    V.COFINS_CST,\n" +
                     "    NAT.COFINS_NATOPISEN NATUREZARECEITA,\n" +
                     "    V.ATIVO,\n" +
+                    "    GP.IDFAMILIA,\n" +        
                     "    GP.IDDEPTO MERC1,\n" +
                     "    GP.IDSETOR MERC2,\n" +
                     "    GP.IDGRUPOITEM MERC3,\n" +
-                    "    GP.IDFAMILIA MERC4,\n" +
-                    "    GP.IDSUBFAMILIA MERC5\n" +
+                    "    COALESCE(GP.IDFAMILIA, 1) MERC4,\n" +
+                    "    COALESCE(GP.IDSUBFAMILIA, 1) MERC5\n" +
                     "  FROM VIASOFTMCP.ITEMESTAB IE\n" +
                     "  LEFT JOIN VIASOFTBASE.ITEM I\n" +
                     "    ON I.ESTAB  = IE.ESTABITEM\n" +
@@ -232,14 +253,14 @@ public class ViaSoftDAO extends InterfaceDAO {
                    imp.setImportId(rs.getString("id"));
                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                    imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
-                   imp.setDescricaoGondola(rs.getString("descricaogondola"));
+                   imp.setDescricaoGondola(rs.getString("descricaoreduzida"));
                    imp.setEan(rs.getString("codigobarras"));
                    imp.setTipoEmbalagem(rs.getString("unidade"));
                    imp.setNcm(rs.getString("ncm"));
                    imp.setCest(rs.getString("codcest"));
                    imp.setPesoLiquido(rs.getDouble("pesoliquido"));
                    imp.setPesoBruto(rs.getDouble("pesobruto"));
-                   imp.setIdFamiliaProduto(rs.getString("idfamiliapreco"));
+                   imp.setIdFamiliaProduto(rs.getString("idfamilia"));
                    imp.setPrecovenda(rs.getDouble("preco"));
                    imp.setEstoque(rs.getDouble("estoque"));
                    imp.setMargem(rs.getDouble("margempreco"));
@@ -249,7 +270,7 @@ public class ViaSoftDAO extends InterfaceDAO {
                    }
                    imp.setCustoComImposto(rs.getDouble("custo"));
                    imp.setCustoSemImposto(rs.getDouble("custo"));
-                   imp.setIcmsAliq(rs.getDouble("icns"));
+                   imp.setIcmsAliq(rs.getDouble("icms"));
                    imp.setIcmsCst(rs.getString("cst"));
                    imp.setIcmsReducao(0);
                    imp.setPiscofinsCstCredito(rs.getString("pis_cst"));
@@ -356,7 +377,7 @@ public class ViaSoftDAO extends InterfaceDAO {
                     if(rs.getString("email") != null && !"".equals(rs.getString("email"))) {
                         imp.addContato("1", "EMAIL", null, null, TipoContato.COMERCIAL, rs.getString("email"));
                     }
-                    imp.setAtivo(rs.getString("datainativo") != null ? false : true);
+                    imp.setAtivo(rs.getString("dtinativo") != null ? false : true);
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numend"));
                     imp.setBairro(rs.getString("bairro"));
@@ -425,7 +446,7 @@ public class ViaSoftDAO extends InterfaceDAO {
                     imp.setInscricaoestadual(rs.getString("rg"));
                     imp.setInscricaoMunicipal(rs.getString("inscmun"));
                     imp.setEmail(rs.getString("email"));
-                    imp.setAtivo(rs.getString("datainativo") != null ? false : true);
+                    imp.setAtivo(rs.getString("dtinativo") != null ? false : true);
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numend"));
                     imp.setBairro(rs.getString("bairro"));
@@ -481,5 +502,44 @@ public class ViaSoftDAO extends InterfaceDAO {
             }
         }
         return result;
+    }
+    
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                new OpcaoProduto[] {
+                    OpcaoProduto.MERCADOLOGICO,
+                    OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                    OpcaoProduto.FAMILIA,
+                    OpcaoProduto.FAMILIA_PRODUTO,
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.PRODUTOS,
+                    OpcaoProduto.EAN,
+                    OpcaoProduto.EAN_EM_BRANCO,
+                    OpcaoProduto.DATA_CADASTRO,
+                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                    OpcaoProduto.PESAVEL,
+                    OpcaoProduto.VALIDADE,
+                    OpcaoProduto.DESC_COMPLETA,
+                    OpcaoProduto.DESC_GONDOLA,
+                    OpcaoProduto.DESC_REDUZIDA,
+                    OpcaoProduto.ESTOQUE_MAXIMO,
+                    OpcaoProduto.ESTOQUE_MINIMO,
+                    OpcaoProduto.PRECO,
+                    OpcaoProduto.CUSTO,
+                    OpcaoProduto.ESTOQUE,
+                    OpcaoProduto.ATIVO,
+                    OpcaoProduto.NCM,
+                    OpcaoProduto.CEST,
+                    OpcaoProduto.PIS_COFINS,
+                    OpcaoProduto.NATUREZA_RECEITA,
+                    OpcaoProduto.ICMS,
+                    OpcaoProduto.PAUTA_FISCAL,
+                    OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                    OpcaoProduto.MARGEM
+                }
+        ));
     }
 }

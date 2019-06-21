@@ -210,9 +210,13 @@
                                       <Component id="chkAtacado" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
-                              <Component id="chkPautaFiscalProduto" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Component id="chkPautaFiscalProduto" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="chkUtilizarViewMixFiscal" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
-                          <EmptySpace pref="45" max="32767" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -299,9 +303,10 @@
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="chkPautaFiscal" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkPautaFiscalProduto" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkUtilizarViewMixFiscal" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace pref="28" max="32767" attributes="0"/>
+                          <EmptySpace pref="32" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -460,6 +465,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPautaFiscalProduto">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Pauta x Produto"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUtilizarViewMixFiscal">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Utilizar View de Mix Fiscal"/>
                   </Properties>
                 </Component>
               </SubComponents>

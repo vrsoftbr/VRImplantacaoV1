@@ -245,6 +245,7 @@ public class SambaNetGUI extends VRInternalFrame {
                                 dao.setPlanilhaFamiliaProduto(txtPlanilhaFamilia.getArquivo());
                                 dao.setPlanilhaProdutos(txtPlanilhaProdutos.getArquivo());
                                 dao.setPlanilhaProdutosContator(txtPlanilhaProdutosContador.getArquivo());
+                                dao.setPlanilhaBalanca(txtPlanilhaBalanca.getArquivo());
                                 importador.unificarProdutos();
                             }
                         }
