@@ -195,16 +195,16 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try (Statement stm = tipoConexao.getConnection().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    t.trbid,\n" +
-                    "    t.trbdes,\n" +
-                    "    t.trbtabbcfe cst,   \n" +
-                    "    t.trbalq aliquota,\n" +
-                    "    t.trbred reducao\n" +
-                    "from\n" +
-                    "    TRIBUTACAO t\n" +
-                    "order by\n" +
-                    "    1"
+                    "select\n"
+                    + "t.trbid,\n"
+                    + "t.trbdes,\n"
+                    + "t.trbtabbcfe cst,\n"
+                    + "t.trbalq aliquota,\n"
+                    + "t.trbred reducao\n"
+                    + "from\n"
+                    + "TRIBUTACAO t\n"
+                    + "where t.trbid in (select trbid from produto)\n"
+                    + "order by 1"
             )) {
                 while (rst.next()) {
                     result.add(new MapaTributoIMP(
@@ -539,6 +539,30 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                 }
             }
+            
+            try (Statement stm = tipoConexao.getConnection().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + "procod,\n"
+                        + "proprc1,\n"
+                        + "proprc3,\n"
+                        + "proqtdminprc3\n"
+                        + "from produto\n"
+                        + "where proqtdminprc3 > 1"
+                )) {
+                    while (rst.next()) {
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("procod"));
+
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("procod"));
+                        imp.setEan("88888" + String.valueOf(codigoAtual));
+                        imp.setQtdEmbalagem(rst.getInt("proqtdminprc3"));
+                        result.add(imp);
+                    }
+                }
+            }
         } else {
             result = getProdutos();
         }
@@ -572,6 +596,32 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setPrecovenda(rst.getDouble("proprc1"));
                         imp.setAtacadoPreco(rst.getDouble("proprc2"));
                         imp.setQtdEmbalagem(rst.getInt("proqtdminprc2"));
+                        result.add(imp);
+                    }
+                }
+            }
+            
+            try (Statement stm = tipoConexao.getConnection().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + "procod,\n"
+                        + "proprc1,\n"
+                        + "proprc3,\n"
+                        + "proqtdminprc3\n"
+                        + "from produto\n"
+                        + "where proqtdminprc3 > 1"
+                )) {
+                    while (rst.next()) {
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("procod"));
+
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("procod"));
+                        imp.setEan("88888" + String.valueOf(codigoAtual));
+                        imp.setPrecovenda(rst.getDouble("proprc1"));
+                        imp.setAtacadoPreco(rst.getDouble("proprc3"));
+                        imp.setQtdEmbalagem(rst.getInt("proqtdminprc3"));
                         result.add(imp);
                     }
                 }
