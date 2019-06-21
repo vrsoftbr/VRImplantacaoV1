@@ -113,19 +113,21 @@ public class ViaSoftDAO extends InterfaceDAO {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
         try(Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "  idfamilia,\n" +
-                    "  descricao\n" +
-                    "from\n" +
-                    "  viasoftmcp.familia\n" +
-                    "order by\n" +
-                    "  idfamilia")) {
+                    "SELECT\n" +
+                    "    IDFAMILIAPRECO,\n" +
+                    "    DESCRICAO\n" +
+                    "  FROM \n" +
+                    "    VIASOFTMCP.FAMILIAPRECO\n" +
+                    "  WHERE\n" +
+                    "    IDBANDEIRA = 1\n" +
+                    "  ORDER BY\n" +
+                    "    DESCRICAO")) {
                 while(rs.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rs.getString("idfamilia"));
-                    imp.setDescricao(rs.getString("descricao"));
+                    imp.setImportId(rs.getString("IDFAMILIAPRECO"));
+                    imp.setDescricao(rs.getString("DESCRICAO"));
                     
                     result.add(imp);
                 }
@@ -197,8 +199,7 @@ public class ViaSoftDAO extends InterfaceDAO {
                     "    V.PIS_CST,\n" +
                     "    V.COFINS_CST,\n" +
                     "    NAT.COFINS_NATOPISEN NATUREZARECEITA,\n" +
-                    "    V.ATIVO,\n" +
-                    "    GP.IDFAMILIA,\n" +        
+                    "    V.ATIVO,\n" +        
                     "    GP.IDDEPTO MERC1,\n" +
                     "    GP.IDSETOR MERC2,\n" +
                     "    GP.IDGRUPOITEM MERC3,\n" +
@@ -260,7 +261,7 @@ public class ViaSoftDAO extends InterfaceDAO {
                    imp.setCest(rs.getString("codcest"));
                    imp.setPesoLiquido(rs.getDouble("pesoliquido"));
                    imp.setPesoBruto(rs.getDouble("pesobruto"));
-                   imp.setIdFamiliaProduto(rs.getString("idfamilia"));
+                   imp.setIdFamiliaProduto(rs.getString("IDFAMILIAPRECO"));
                    imp.setPrecovenda(rs.getDouble("preco"));
                    imp.setEstoque(rs.getDouble("estoque"));
                    imp.setMargem(rs.getDouble("margempreco"));
@@ -282,10 +283,10 @@ public class ViaSoftDAO extends InterfaceDAO {
                        imp.setSituacaoCadastro(0);
                    }
                    imp.setCodMercadologico1(rs.getString("merc1"));
-                   imp.setCodMercadologico1(rs.getString("merc2"));
-                   imp.setCodMercadologico1(rs.getString("merc3"));
-                   imp.setCodMercadologico1(rs.getString("merc4"));
-                   imp.setCodMercadologico1(rs.getString("merc5"));
+                   imp.setCodMercadologico2(rs.getString("merc2"));
+                   imp.setCodMercadologico3(rs.getString("merc3"));
+                   imp.setCodMercadologico4(rs.getString("merc4"));
+                   imp.setCodMercadologico5(rs.getString("merc5"));
                    
                    result.add(imp);
                 }
