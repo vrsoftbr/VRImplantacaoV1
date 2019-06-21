@@ -71,6 +71,12 @@ public class RMSDAO extends InterfaceDAO {
     public static String tabela_venda = "";
     public static int digito;
     
+    private boolean utilizarViewMixFiscal = true;
+
+    public void setUtilizarViewMixFiscal(boolean utilizarViewMixFiscal) {
+        this.utilizarViewMixFiscal = utilizarViewMixFiscal;
+    }
+    
     @Override
     public String getSistema() {
         return "RMS";
@@ -356,8 +362,8 @@ public class RMSDAO extends InterfaceDAO {
                     "	    (case when coalesce(preco.preco, 0) != 0 \n" +
                     "	    then preco.preco\n" +
                     "	    else coalesce(est.get_preco_venda,0) end)\n" +
-                    "	) precoatac,\n" +
-                    "  vwfis.Icms_Aliq_E,\n" +
+                    "	) precoatac\n" +
+                    (utilizarViewMixFiscal ? "  ,vwfis.Icms_Aliq_E,\n" +
                     "  vwfis.icms_cst_e,\n" +
                     "  vwfis.ICMS_RBC_E,\n" +
                     "  vwfis.icms_aliq_s,\n" +
@@ -369,7 +375,7 @@ public class RMSDAO extends InterfaceDAO {
                     "  vwfis.cofins_cst_s,\n" +
                     "  vwfis.iva,\n" +
                     "  vwfis.tipo_iva,\n" +
-                    "  replace(det.DET_CLASS_FIS || vwfis.Icms_Aliq_E || vwfis.ICMS_RBC_E || vwfis.icms_aliq_s || vwfis.ICMS_RBC_S || vwfis.iva, '.', ',') idpautafiscal\n" +
+                    "  replace(det.DET_CLASS_FIS || vwfis.Icms_Aliq_E || vwfis.ICMS_RBC_E || vwfis.icms_aliq_s || vwfis.ICMS_RBC_S || vwfis.iva, '.', ',') idpautafiscal\n" : "") +
                     "from\n" +
                     "	AA3CCEAN ean\n" +
                     "join AA3CITEM p on\n" +
@@ -431,8 +437,8 @@ public class RMSDAO extends InterfaceDAO {
                     "	    ) atac on\n" +
                     "	    atac.filial = loja.LOJ_CODIGO and\n" +
                     "	    atac.ean = ean.EAN_COD_EAN\n" +
-                    "left join\n" +
-                    "       vw_fis_mxf_produtos vwfis on vwfis.codigo_produto = p.git_cod_item || p.git_digito\n" +
+                    (utilizarViewMixFiscal ? "left join\n" +
+                    "       vw_fis_mxf_produtos vwfis on vwfis.codigo_produto = p.git_cod_item || p.git_digito\n" : "") +
                     "order by \n" +
                     "	  p.git_cod_item"
             )) {
@@ -444,7 +450,7 @@ public class RMSDAO extends InterfaceDAO {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
                     imp.setCodigoSped(rst.getString("codigosped"));
-                    imp.setDataCadastro(format.parse(rst.getString("datacadastro")));
+                    imp.setDataCadastro(format.parse(String.format("%06d", Utils.stringToInt(rst.getString("datacadastro")))));
                     imp.setEan(rst.getString("ean"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagemcotacao"));
                     imp.setQtdEmbalagem(rst.getInt("qtdEmbalagem"));
@@ -470,19 +476,23 @@ public class RMSDAO extends InterfaceDAO {
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstDebito(rst.getInt("pis_cst_s"));
-                    imp.setPiscofinsNaturezaReceita(rst.getInt("nat_rec"));
-                    //imp.setIcmsCst(rst.getInt("cstfiscal"));
-                    imp.setIcmsCstSaida(rst.getInt("icms_cst_s"));
-                    imp.setIcmsCstEntrada(rst.getInt("icms_cst_e"));
-                    //imp.setIcmsAliq(rst.getDouble("aliqicmfiscal"));
-                    imp.setIcmsAliqEntrada(rst.getDouble("icms_aliq_e"));
-                    imp.setIcmsAliqSaida(rst.getDouble("icms_aliq_s"));
-                    imp.setIcmsReducaoEntrada(rst.getDouble("icms_rbc_e"));
-                    imp.setIcmsReducaoSaida(rst.getDouble("icms_rbc_s"));
-                    imp.setAtacadoPreco(rst.getDouble("precoatac"));
                     
-                    imp.setPautaFiscalId(rst.getString("idpautafiscal"));           
+                    if (utilizarViewMixFiscal) {
+                        imp.setPiscofinsCstDebito(rst.getInt("pis_cst_s"));
+                        imp.setPiscofinsNaturezaReceita(rst.getInt("nat_rec"));
+                        
+                        imp.setIcmsCstSaida(rst.getInt("icms_cst_s"));
+                        imp.setIcmsCstEntrada(rst.getInt("icms_cst_e"));
+                        
+                        imp.setIcmsAliqEntrada(rst.getDouble("icms_aliq_e"));
+                        imp.setIcmsAliqSaida(rst.getDouble("icms_aliq_s"));
+                        imp.setIcmsReducaoEntrada(rst.getDouble("icms_rbc_e"));
+                        imp.setIcmsReducaoSaida(rst.getDouble("icms_rbc_s"));
+                        imp.setAtacadoPreco(rst.getDouble("precoatac"));
+
+                        imp.setPautaFiscalId(rst.getString("idpautafiscal"));
+                    }
+                    
                     result.add(imp);
                 }
             }

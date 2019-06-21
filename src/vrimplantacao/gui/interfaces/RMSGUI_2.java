@@ -1,7 +1,5 @@
 package vrimplantacao.gui.interfaces;
 
-import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
@@ -15,7 +13,6 @@ import vrframework.classe.VRException;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.dao.cadastro.LojaDAO;
-import vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
@@ -45,6 +42,7 @@ public class RMSGUI_2 extends VRInternalFrame {
         txtUsuario.setText(params.get(SISTEMA, "USUARIO"));
         txtSenha.setText(params.get(SISTEMA, "SENHA"));
         txtStrConexao.setText(params.get(SISTEMA, "STR_CONN"));
+        chkUtilizarViewMixFiscal.setSelected(params.getBool(true, SISTEMA, "UTILIZAR_VIEW_FISCAL"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
         if (params.getBool(SISTEMA, "USAR_STRING_CONN")) {
@@ -63,6 +61,7 @@ public class RMSGUI_2 extends VRInternalFrame {
         params.put(txtSenha.getText(), SISTEMA, "SENHA");
         params.put(txtStrConexao.getText(), SISTEMA, "STR_CONN");
         params.put(tabsConn.getSelectedIndex() == 1, SISTEMA, "USAR_STRING_CONN");
+        params.put(chkUtilizarViewMixFiscal.isSelected(), SISTEMA, "UTILIZAR_VIEW_FISCAL");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
             params.put(cliente.cnpj, SISTEMA, "LOJA_CLIENTE");
@@ -191,7 +190,8 @@ public class RMSGUI_2 extends VRInternalFrame {
                     
                     Importador importador = new Importador(RmsDAO);
                     importador.setLojaOrigem(idLojaCliente);
-                    importador.setLojaVR(idLojaVR);     
+                    importador.setLojaVR(idLojaVR);
+                    RmsDAO.setUtilizarViewMixFiscal(chkUtilizarViewMixFiscal.isSelected());
 
                     if (tabs.getSelectedIndex() == 0) {
                     
@@ -437,6 +437,7 @@ public class RMSGUI_2 extends VRInternalFrame {
         chkQtdEmbCotacao = new vrframework.bean.checkBox.VRCheckBox();
         chkPautaFiscal = new vrframework.bean.checkBox.VRCheckBox();
         chkPautaFiscalProduto = new vrframework.bean.checkBox.VRCheckBox();
+        chkUtilizarViewMixFiscal = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel9 = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -613,6 +614,8 @@ public class RMSGUI_2 extends VRInternalFrame {
 
         chkPautaFiscalProduto.setText("Pauta x Produto");
 
+        chkUtilizarViewMixFiscal.setText("Utilizar View de Mix Fiscal");
+
         javax.swing.GroupLayout vRPanel7Layout = new javax.swing.GroupLayout(vRPanel7);
         vRPanel7.setLayout(vRPanel7Layout);
         vRPanel7Layout.setHorizontalGroup(
@@ -659,8 +662,11 @@ public class RMSGUI_2 extends VRInternalFrame {
                             .addComponent(chkTipoEmbalagemEAN, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkFamilia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(chkPautaFiscalProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(45, Short.MAX_VALUE))
+                    .addGroup(vRPanel7Layout.createSequentialGroup()
+                        .addComponent(chkPautaFiscalProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(chkUtilizarViewMixFiscal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         vRPanel7Layout.setVerticalGroup(
             vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -726,8 +732,9 @@ public class RMSGUI_2 extends VRInternalFrame {
                     .addComponent(chkQtdEmbCotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(chkPautaFiscal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(chkPautaFiscalProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(28, Short.MAX_VALUE))
+                        .addComponent(chkPautaFiscalProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(chkUtilizarViewMixFiscal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(32, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Produtos", vRPanel7);
@@ -1387,6 +1394,7 @@ public class RMSGUI_2 extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
+    private vrframework.bean.checkBox.VRCheckBox chkUtilizarViewMixFiscal;
     private vrframework.bean.checkBox.VRCheckBox chkValidade;
     private vrframework.bean.checkBox.VRCheckBox chkVendas;
     private javax.swing.JComboBox cmbLojaOrigem;
