@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -15,6 +16,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -443,7 +445,7 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setDiaVencimento(rst.getInt("diavencimento"));
                     imp.setPermiteCreditoRotativo("S".equals(rst.getString("permitecreditorotativo")));
                     imp.setPermiteCheque("S".equals(rst.getString("permitecheque")));
-                    imp.setSenha(rst.getInt("senhapdv"));
+                    imp.setSenha(Integer.valueOf(Utils.formataNumero(rst.getString("senhapdv"))));
                     imp.setLimiteCompra(rst.getDouble("limite"));
                     
                     result.add(imp);
@@ -583,6 +585,47 @@ public class RPInfoDAO extends InterfaceDAO {
         return result;
     }
     
-    
-    
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	pfin_operacao id,\n" +
+                    "	pfin_dataemissao emissao,\n" +
+                    "	pfin_datavcto vencimento,\n" +
+                    "	pfin_pdvs_codigo ecf,\n" +
+                    "	pfin_codentidade idcliente,\n" +
+                    "	c.clie_razaosocial razao,\n" +
+                    "	c.clie_cnpjcpf cnpj,\n" +
+                    "	pfin_complemento observacao,\n" +
+                    "	pfin_numerodcto cupom,\n" +
+                    "	pfin_parcela parcela,\n" +
+                    "	pfin_valor valor\n" +
+                    "from \n" +
+                    "	pendfin\n" +
+                    "left join clientes c on (pendfin.pfin_codentidade = c.clie_codigo)\n" +
+                    "where\n" +
+                    "	pfin_unid_codigo = '" + getLojaOrigem() + "' and\n" +
+                    "	pfin_pr = 'R' and\n" +
+                    "	pfin_status = 'P' and\n" +
+                    "	pfin_pger_conta in (112202, 112203, 112204, 112205, 112206, 112207, 112208, 112209)")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setCnpjCliente(rs.getString("cnpj"));
+                    imp.setParcela(rs.getInt("parcela"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setNumeroCupom(rs.getString("cupom"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 }

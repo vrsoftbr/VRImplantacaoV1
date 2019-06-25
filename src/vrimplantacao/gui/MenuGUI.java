@@ -19,6 +19,7 @@ import vrframework.gui.SobreGUI;
 import vrframework.remote.Arquivo;
 import vrimplantacao.classe.Global;
 import vrimplantacao.dao.DataProcessamentoDAO;
+import vrimplantacao.gui.LoginGUI;
 import vrimplantacao.gui.assistente.mapamercadologico.MapaMercadologicoGUI;
 import vrimplantacao.gui.assistente.parametro.ParametroGUI;
 import vrimplantacao.gui.cadastro.LojaConsultaGUI;
@@ -154,6 +155,7 @@ import vrimplantacao2.gui.interfaces.OrionGUI;
 import vrimplantacao2.gui.interfaces.PdvVrGUI;
 import vrimplantacao2.gui.interfaces.PlanilhaVrGUI;
 import vrimplantacao2.gui.interfaces.PomaresGUI;
+import vrimplantacao2.gui.interfaces.PwGestorGUI;
 import vrimplantacao2.gui.interfaces.PwsGUI;
 import vrimplantacao2.gui.interfaces.RCNetGUI;
 import vrimplantacao2.gui.interfaces.RMSAutomaHelpGUI;
@@ -563,6 +565,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSolutionSupera = new javax.swing.JMenuItem();
         mnuGDoor = new javax.swing.JMenuItem();
         mnuLiteci = new javax.swing.JMenuItem();
+        mnuPwGestor = new javax.swing.JMenuItem();
         mnuTga = new javax.swing.JMenuItem();
         mnuAutomaq = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
@@ -1263,6 +1266,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird2.add(mnuAutomaq);
+
+        mnuPwGestor.setText("PwGestor");
+        mnuPwGestor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuPwGestorActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuPwGestor);
 
         mnuDatabase.add(mnuFirebird2);
 
@@ -3965,6 +3976,10 @@ public final class MenuGUI extends VRMdiFrame {
         ClickGUI.exibir(this);
     }//GEN-LAST:event_mnuClickActionPerformed
 
+    private void mnuPwGestorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPwGestorActionPerformed
+        // TODO add your handling code here:
+        PwGestorGUI.exibir(this);
+    }//GEN-LAST:event_mnuPwGestorActionPerformed
     private void mnuAutomaqActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAutomaqActionPerformed
         AutomaqGUI.exibir(this);
     }//GEN-LAST:event_mnuAutomaqActionPerformed
@@ -4144,6 +4159,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuPlanilhaProduto;
     private javax.swing.JMenuItem mnuPlanilhaV2;
     private javax.swing.JMenuItem mnuPlanilhaVr;
+    private javax.swing.JMenuItem mnuPwGestor;
     private javax.swing.JMenuItem mnuPws;
     private javax.swing.JMenuItem mnuRCNet;
     private javax.swing.JMenuItem mnuRMS_2;
