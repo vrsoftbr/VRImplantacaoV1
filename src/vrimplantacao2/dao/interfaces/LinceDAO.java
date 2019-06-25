@@ -612,4 +612,35 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+    
+/*
+select
+r.COD_PROD,
+p.DESCRICAO as DESC_PROD,
+coalesce(r.NOME_ETIQUETA, p.DESCRICAO) as NOMERECEITA,
+r.VLR_TOTAL,
+r.VLR_PRECO_UND,
+r.VLR_PRECO_KG,
+r.VLR_TOTAL_EMBALAGEM,
+r.QTDE_PRODUCAO_KG,
+r.QTDE_INGREDIENTE,
+r.QTDE_PRODUCAO_UND,
+r.QTDE_MINIMA,
+r.QTDE_MAXIMA,
+r.QTDE_PERDA,
+r.PERC_PERDA,
+r.OBS1 as RECEITA,
+r.OBS_ETIQUETA,
+pc.COD_PROD as ITEM,
+pc.DESCRICAO as DESC_PROD_ITEM,
+c.PESO,
+c.VALOR,
+c.PERCENTUAL
+from RECEITA r
+inner join PRODUTO p on p.COD_PROD = r.COD_PROD
+inner join COMPOSICAO c on c.COD_PROD = r.COD_PROD
+inner join PRODUTO pc on pc.COD_PROD = c.COD_PROD_COMP
+order by r.COD_PROD
+    
+*/    
 }
