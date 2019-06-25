@@ -2,17 +2,14 @@ package vrimplantacao2.dao.cadastro.produto2;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.Util;
-import vrframework.remote.ItemComboVO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.parametro.Versao;
 import vrimplantacao2.utils.collection.IDStack;
@@ -21,7 +18,6 @@ import vrimplantacao2.vo.cadastro.MercadologicoVO;
 import vrimplantacao2.vo.cadastro.ProdutoVO;
 import vrimplantacao2.vo.enums.NaturezaReceitaVO;
 import vrimplantacao2.vo.enums.NcmVO;
-import vrimplantacao2.vo.enums.TipoEmbalagem;
 
 /**
  * Classe que faz a interface entre o sistema e o banco de dados.

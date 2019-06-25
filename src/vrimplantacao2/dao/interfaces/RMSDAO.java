@@ -8,6 +8,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,6 +31,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.CreditoRotativoDAO;
 import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.CreditoRotativoItemAnteriorDAO;
 import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.CreditoRotativoItemDAO;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLUtils;
@@ -313,6 +315,52 @@ public class RMSDAO extends InterfaceDAO {
         }
         return result;
     }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.VENDA_PDV,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.CUSTO,
+                OpcaoProduto.NCM,
+                OpcaoProduto.EXCECAO,
+                OpcaoProduto.CEST,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.ATACADO,
+                OpcaoProduto.PAUTA_FISCAL,
+                OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE,
+                OpcaoProduto.NUTRICIONAL,
+                OpcaoProduto.OFERTA,
+                OpcaoProduto.DESCONTINUADO
+        ));
+    }
     
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
@@ -327,8 +375,9 @@ public class RMSDAO extends InterfaceDAO {
                     "	ean.EAN_COD_EAN ean,\n" +
                     "	ean.EAN_EMB_VENDA qtdEmbalagem,\n" +
                     "	ean.EAN_TPO_EMB_VENDA tipoEmbalagem,\n" +
+                    "	nullif(trim(p.GIT_TPO_EMB_FOR),'') tipoEmbalagemCotacao,\n" +
                     "	case when bal.balcol_codigo is null then 0 else 1 end e_balanca,\n" +
-                    "	coalesce(bal.BALCOL_VALIDADE, 0) validade,\n" +
+                    "	coalesce(bal.BALCOL_VALIDADE, p.GIT_PRZ_VALIDADE, 0) validade,\n" +
                     "	p.GIT_DESCRICAO descricaocompleta,\n" +
                     "	p.GIT_DESC_REDUZ descricaoreduzida,\n" +
                     "	p.GIT_DESCRICAO descricaogondola,\n" +
@@ -338,17 +387,18 @@ public class RMSDAO extends InterfaceDAO {
                     "	p.GIT_CATEGORIA merc4,\n" +
                     "	coalesce((select fam_pai from AA1FITEM where fam_filho = p.git_cod_item and rownum = 1), (select fam_pai from AA1FITEM where fam_pai = p.git_cod_item and rownum = 1)) id_familia,\n" +
                     "	coalesce(preco.id_situacaocadastral, 1) id_situacaocadastral,\n" +
-                    "	det.DET_PESO_VND pesoliquido,\n" +
-                    "	det.DET_PESO_TRF pesobruto,\n" +
+                    "	coalesce(det.DET_PESO_VND, p.GIT_PESO) pesoliquido,\n" +
+                    "	coalesce(det.DET_PESO_TRF, p.GIT_PESO) pesobruto,\n" +
                     "	0 estoqueminimo,\n" +
                     "	0 estoquemaximo,    \n" +
                     "	est.GET_ESTOQUE estoque,\n" +
                     "	p.GIT_MRG_LUCRO_1 margem,\n" +
+                    "	p.git_envia_pdv,\n" +
                     "	case when coalesce(preco.preco, 0) != 0 \n" +
                     "	then preco.preco\n" +
                     "	else coalesce(est.get_preco_venda,0) end precovenda,\n" +
-                    "	est.GET_CUS_ULT_ENT custocomimposto,\n" +
-                    "	est.GET_CUS_ULT_ENT custosemimposto,\n" +
+                    "	coalesce(p.GIT_CUS_ULT_ENT_BRU, est.GET_CUS_ULT_ENT) custocomimposto,\n" +
+                    "	coalesce(p.GIT_CUS_ULT_ENT_BRU, est.GET_CUS_ULT_ENT) custosemimposto,\n" +
                     "	det.DET_CLASS_FIS ncm,\n" +
                     "	det.DET_NCM_EXCECAO excecao,\n" +
                     "	det.DET_CEST cest,\n" +
@@ -454,8 +504,9 @@ public class RMSDAO extends InterfaceDAO {
                     imp.setEan(rst.getString("ean"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagemcotacao"));
                     imp.setQtdEmbalagem(rst.getInt("qtdEmbalagem"));
-                    imp.setTipoEmbalagem(rst.getString("tipoEmbalagem"));
                     imp.seteBalanca(rst.getBoolean("e_balanca"));
+                    imp.setTipoEmbalagemCotacao(rst.getString("tipoEmbalagemCotacao"));
+                    imp.setTipoEmbalagem(rst.getString("tipoEmbalagem"));
                     imp.setValidade(rst.getInt("validade"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
@@ -476,6 +527,8 @@ public class RMSDAO extends InterfaceDAO {
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
+                    
+                    imp.setVendaPdv("S".equals(rst.getString("git_envia_pdv")));
                     
                     if (utilizarViewMixFiscal) {
                         imp.setPiscofinsCstDebito(rst.getInt("pis_cst_s"));
@@ -701,7 +754,8 @@ public class RMSDAO extends InterfaceDAO {
                     if (Utils.stringToLong(rst.getString("fax")) > 0) {
                         imp.addContato("2", "FAX", Utils.stringLong(rst.getString("fax")), "", "");
                     }
-                    imp.setPrazoPagamento(rst.getInt("prazoPagamento"));                         
+                    imp.setPrazoPagamento(rst.getInt("prazoPagamento"));   
+                    
 
                     result.add(imp);
                 }                

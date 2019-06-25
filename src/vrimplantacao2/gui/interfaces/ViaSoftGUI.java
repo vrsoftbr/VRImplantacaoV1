@@ -182,6 +182,15 @@ public class ViaSoftGUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }
+                        if (chkConvEmpresa.isSelected()) {
+                            importador.importarConvenioEmpresa();
+                        }
+                        if (chkConveniado.isSelected()) {
+                            importador.importarConvenioConveniado();
+                        }
+                        if (chkConvRecebimento.isSelected()) {
+                            importador.importarConvenioTransacao();
+                        }
                     } else if (tab.getSelectedIndex() == 3) {
                         if (cbxUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -235,6 +244,10 @@ public class ViaSoftGUI extends VRInternalFrame implements ConexaoEvent {
         chkCliIERG = new vrframework.bean.checkBox.VRCheckBox();
         tablCreditoRotativo = new javax.swing.JPanel();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        tabConvenio = new javax.swing.JPanel();
+        chkConvEmpresa = new vrframework.bean.checkBox.VRCheckBox();
+        chkConveniado = new vrframework.bean.checkBox.VRCheckBox();
+        chkConvRecebimento = new vrframework.bean.checkBox.VRCheckBox();
         tabUnificacao = new vrframework.bean.panel.VRPanel();
         cbxUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
@@ -384,6 +397,38 @@ public class ViaSoftGUI extends VRInternalFrame implements ConexaoEvent {
 
         tabCliente.addTab("Crédito Rotativo", tablCreditoRotativo);
 
+        chkConvEmpresa.setText("Empresas");
+
+        chkConveniado.setText("Conveniados");
+
+        chkConvRecebimento.setText("Recebimentos em Aberto");
+
+        javax.swing.GroupLayout tabConvenioLayout = new javax.swing.GroupLayout(tabConvenio);
+        tabConvenio.setLayout(tabConvenioLayout);
+        tabConvenioLayout.setHorizontalGroup(
+            tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabConvenioLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkConvEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkConvRecebimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(393, Short.MAX_VALUE))
+        );
+        tabConvenioLayout.setVerticalGroup(
+            tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabConvenioLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkConvEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkConvRecebimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(166, Short.MAX_VALUE))
+        );
+
+        tabCliente.addTab("Convênio", tabConvenio);
+
         tab.addTab("Clientes", tabCliente);
 
         cbxUnifProdutos.setText("Unificar produtos (Somente EANs válidos)");
@@ -484,6 +529,9 @@ public class ViaSoftGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkBloqueado;
     private vrframework.bean.checkBox.VRCheckBox chkCliIERG;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
+    private vrframework.bean.checkBox.VRCheckBox chkConvEmpresa;
+    private vrframework.bean.checkBox.VRCheckBox chkConvRecebimento;
+    private vrframework.bean.checkBox.VRCheckBox chkConveniado;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
@@ -495,6 +543,7 @@ public class ViaSoftGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.tabbedPane.VRTabbedPane tab;
     private vrframework.bean.tabbedPane.VRTabbedPane tabCliente;
     private vrframework.bean.panel.VRPanel tabClienteDados;
+    private javax.swing.JPanel tabConvenio;
     private vrframework.bean.panel.VRPanel tabFornecedor;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.panel.VRPanel tabUnificacao;

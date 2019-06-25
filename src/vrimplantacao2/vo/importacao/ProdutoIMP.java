@@ -18,6 +18,7 @@ public class ProdutoIMP {
     private int qtdEmbalagemCotacao = 1;
     private int qtdEmbalagem = 1;
     private String tipoEmbalagem = "UN";
+    private String tipoEmbalagemCotacao = null;
     private boolean eBalanca = false;
     private int validade = 0;
     
@@ -810,6 +811,14 @@ public class ProdutoIMP {
     
     public boolean isManterEAN() {
         return this.manterEAN;
+    }
+
+    public String getTipoEmbalagemCotacao() {
+        return tipoEmbalagemCotacao;
+    }
+
+    public void setTipoEmbalagemCotacao(String tipoEmbalagemCotacao) {
+        this.tipoEmbalagemCotacao = tipoEmbalagemCotacao;
     }
     
 }

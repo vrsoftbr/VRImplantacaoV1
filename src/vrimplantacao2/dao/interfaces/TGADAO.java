@@ -197,7 +197,16 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
+                    "select\n" +
+                    "    codprd,\n" +
+                    "    codcfo,\n" +
+                    "    codnofornec,\n" +
+                    "    1 qtd\n" +
+                    "from\n" +
+                    "    tprodcfonfe\n" +
+                    "order by\n" +
+                    "    1, 2"
+                    /*"select\n"
                     + "    pf.codprd,\n"
                     + "    pf.codcfo,\n"
                     + "    pfc.codnofornec,\n"
@@ -207,7 +216,7 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join tprodcfonfe pfc on pf.codprd = pfc.codprd and\n"
                     + "    pf.codcfo = pfc.codcfo\n"
                     + "order by\n"
-                    + "    1, 2")) {
+                    + "    1, 2"*/)) {
                 while (rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
