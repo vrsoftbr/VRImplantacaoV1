@@ -9,7 +9,7 @@
   </NonVisualComponents>
   <Properties>
     <Property name="resizable" type="boolean" value="true"/>
-    <Property name="title" type="java.lang.String" value="Importa&#xe7;&#xe3;o Intellicash"/>
+    <Property name="title" type="java.lang.String" value="Importa&#xe7;&#xe3;o Automaq"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
@@ -34,10 +34,9 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="tab" alignment="0" max="32767" attributes="0"/>
-                  <Component id="vRTabbedPane1" alignment="0" max="32767" attributes="0"/>
-                  <Component id="vRPanel3" alignment="0" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="tab" min="-2" max="-2" attributes="0"/>
+                  <Component id="vRPanel3" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -45,14 +44,12 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" attributes="0">
-              <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
-              <Component id="vRTabbedPane1" min="-2" pref="156" max="-2" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="tab" pref="328" max="32767" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="tab" pref="234" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -66,19 +63,24 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="vRLabel6" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="cmbLojaVR" max="32767" attributes="0"/>
-                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="cmbLojaVR" pref="473" max="32767" attributes="0"/>
+                  <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
                   <Component id="btnMigrar" min="-2" pref="88" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="btnMigrar" alignment="1" min="-2" max="-2" attributes="0"/>
-              <Group type="103" alignment="1" groupAlignment="3" attributes="0">
-                  <Component id="vRLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="cmbLojaVR" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Component id="btnMigrar" alignment="1" max="32767" attributes="0"/>
+                      <Component id="cmbLojaVR" max="32767" attributes="0"/>
+                      <Component id="vRLabel6" alignment="1" max="32767" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -146,21 +148,21 @@
                                   <Group type="102" alignment="0" attributes="0">
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Component id="vRLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="txtHostFirebird" alignment="0" min="-2" pref="100" max="-2" attributes="0"/>
+                                          <Component id="txtHost" alignment="0" min="-2" pref="100" max="-2" attributes="0"/>
                                       </Group>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="txtUsuarioFirebird" min="-2" pref="88" max="-2" attributes="0"/>
+                                          <Component id="txtUsuario" min="-2" pref="88" max="-2" attributes="0"/>
                                           <Component id="vRLabel4" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Component id="vRLabel5" min="-2" max="-2" attributes="0"/>
-                                          <Component id="txtSenhaFirebird" min="-2" pref="84" max="-2" attributes="0"/>
+                                          <Component id="txtSenha" min="-2" pref="84" max="-2" attributes="0"/>
                                       </Group>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="txtPortaFirebird" alignment="0" min="-2" pref="45" max="-2" attributes="0"/>
+                                          <Component id="txtPorta" alignment="0" min="-2" pref="45" max="-2" attributes="0"/>
                                           <Component id="vRLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <EmptySpace max="-2" attributes="0"/>
@@ -176,7 +178,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="txtBancoDadosFirebird" max="32767" attributes="0"/>
+                              <Component id="txtBancoDadosProduto" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
                               <Component id="vRLabel9" min="-2" max="-2" attributes="0"/>
@@ -205,15 +207,15 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="2" attributes="0">
-                                  <Component id="txtSenhaFirebird" alignment="2" min="-2" max="-2" attributes="0"/>
-                                  <Component id="txtUsuarioFirebird" alignment="2" min="-2" max="-2" attributes="0"/>
-                                  <Component id="txtHostFirebird" alignment="2" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtSenha" alignment="2" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtUsuario" alignment="2" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtHost" alignment="2" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="vRLabel7" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="txtPortaFirebird" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtPorta" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="vRLabel8" min="-2" max="-2" attributes="0"/>
@@ -223,7 +225,7 @@
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="txtBancoDadosFirebird" max="32767" attributes="0"/>
+                          <Component id="txtBancoDadosProduto" max="32767" attributes="0"/>
                           <Component id="vRLabel3" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -236,7 +238,7 @@
                           <Component id="txtBancoDadosFirebird2" alignment="0" max="32767" attributes="0"/>
                           <Component id="vRLabel10" alignment="0" max="32767" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="100" max="32767" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                       <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="2" attributes="0">
@@ -249,35 +251,35 @@
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Component class="vrframework.bean.textField.VRTextField" name="txtHostFirebird">
+            <Component class="vrframework.bean.textField.VRTextField" name="txtHost">
               <Properties>
                 <Property name="caixaAlta" type="boolean" value="false"/>
               </Properties>
             </Component>
-            <Component class="vrframework.bean.textField.VRTextField" name="txtUsuarioFirebird">
+            <Component class="vrframework.bean.textField.VRTextField" name="txtUsuario">
               <Properties>
                 <Property name="caixaAlta" type="boolean" value="false"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtUsuarioFirebirdActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtUsuarioActionPerformed"/>
               </Events>
             </Component>
-            <Component class="vrframework.bean.passwordField.VRPasswordField" name="txtSenhaFirebird">
+            <Component class="vrframework.bean.passwordField.VRPasswordField" name="txtSenha">
               <Properties>
                 <Property name="caixaAlta" type="boolean" value="false"/>
                 <Property name="mascara" type="java.lang.String" value=""/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtSenhaFirebirdActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtSenhaActionPerformed"/>
               </Events>
             </Component>
-            <Component class="vrframework.bean.textField.VRTextField" name="txtPortaFirebird">
+            <Component class="vrframework.bean.textField.VRTextField" name="txtPorta">
               <Properties>
                 <Property name="text" type="java.lang.String" value="1521"/>
                 <Property name="caixaAlta" type="boolean" value="false"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtPortaFirebirdActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtPortaActionPerformed"/>
               </Events>
             </Component>
             <Component class="vrframework.bean.textField.VRTextField" name="txtComplemento">
@@ -338,7 +340,7 @@
                 <Property name="text" type="java.lang.String" value="Complemento"/>
               </Properties>
             </Component>
-            <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtBancoDadosFirebird">
+            <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtBancoDadosProduto">
             </Component>
             <Component class="vrframework.bean.label.VRLabel" name="vRLabel9">
               <Properties>
@@ -401,7 +403,7 @@
                       <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="238" max="32767" attributes="0"/>
+                      <EmptySpace pref="148" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -485,7 +487,7 @@
                           <Component id="chkIMportarCodCliente" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="chkCliIERG" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="184" max="32767" attributes="0"/>
+                          <EmptySpace pref="94" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -543,7 +545,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                           <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="235" max="32767" attributes="0"/>
+                          <EmptySpace pref="145" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -580,7 +582,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="233" max="32767" attributes="0"/>
+                          <EmptySpace pref="143" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -617,7 +619,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="pnlDadosDataVenda" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="180" max="32767" attributes="0"/>
+                          <EmptySpace pref="90" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -739,7 +741,7 @@
                       <Component id="cbxUnifFornecedores" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="cbxUnifCliPreferencial" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="215" max="32767" attributes="0"/>
+                      <EmptySpace pref="125" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -763,10 +765,6 @@
           </SubComponents>
         </Container>
       </SubComponents>
-    </Container>
-    <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="vRTabbedPane1">
-
-      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
     </Container>
   </SubComponents>
 </Form>
