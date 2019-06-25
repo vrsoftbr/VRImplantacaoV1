@@ -1,5 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.awt.Frame;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,6 +20,8 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.AutomaqDAO;
 import vrimplantacao2.dao.interfaces.Importador;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
 public class AutomaqGUI extends VRInternalFrame {
@@ -28,8 +31,6 @@ public class AutomaqGUI extends VRInternalFrame {
     private static AutomaqGUI instance;
 
     private final AutomaqDAO dao = new AutomaqDAO();
-    
-    private Connection conexaoProduto;
 
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
@@ -80,6 +81,29 @@ public class AutomaqGUI extends VRInternalFrame {
         carregarParametros();
 
         tabProdutos.setOpcoesDisponiveis(dao);
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+            @Override
+            public MapaTributoProvider getProvider() {
+                return dao;
+            }
+
+            @Override
+            public String getSistema() {
+                dao.setComplemento(txtComplemento.getText());
+                return dao.getSistema();
+            }
+
+            @Override
+            public String getLoja() {
+                dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+                return dao.getLojaOrigem();
+            }
+
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
+            }
+        });
         
         centralizarForm();
         this.setMaximum(false);
@@ -87,14 +111,14 @@ public class AutomaqGUI extends VRInternalFrame {
 
     public void validarDadosAcessoPostgres() throws Exception {
         
-        this.conexaoProduto = ConexaoFirebird.getNewConnection(
+        this.dao.setConexaoProduto(ConexaoFirebird.getNewConnection(
                 txtHost.getText(), 
                 txtPorta.getInt(),
                 txtBancoDadosProduto.getArquivo(), 
                 txtUsuario.getText(), 
                 txtSenha.getText(),
                 ConexaoFirebird.encoding
-        );
+        ));
         
         carregarLojaVR();
         carregarLojaCliente();
@@ -145,7 +169,6 @@ public class AutomaqGUI extends VRInternalFrame {
 
                     Importador importador = new Importador(dao);
                     dao.setComplemento(txtComplemento.getText());
-                    dao.setConexaoProduto(conexaoProduto);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
                     importador.setLojaVR(idLojaVR);
 
