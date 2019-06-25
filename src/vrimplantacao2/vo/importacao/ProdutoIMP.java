@@ -102,6 +102,8 @@ public class ProdutoIMP {
     private TipoProduto tipoProduto =  TipoProduto.MERCADORIA_REVENDA;
     private boolean fabricacaoPropria = false;
     private boolean manterEAN = false;
+    private boolean emiteEtiqueta = true;
+    private boolean aceitaMultiplicacaoPDV = true;
     
     public String getImportSistema() {
         return importSistema;
@@ -819,6 +821,22 @@ public class ProdutoIMP {
 
     public void setTipoEmbalagemCotacao(String tipoEmbalagemCotacao) {
         this.tipoEmbalagemCotacao = tipoEmbalagemCotacao;
+    }
+
+    public boolean isEmiteEtiqueta() {
+        return emiteEtiqueta;
+    }
+
+    public void setEmiteEtiqueta(boolean emiteEtiqueta) {
+        this.emiteEtiqueta = emiteEtiqueta;
+    }
+
+    public boolean isAceitaMultiplicacaoPDV() {
+        return aceitaMultiplicacaoPDV;
+    }
+
+    public void setAceitaMultiplicacaoPDV(boolean aceitaMultiplicacaoPDV) {
+        this.aceitaMultiplicacaoPDV = aceitaMultiplicacaoPDV;
     }
     
 }
