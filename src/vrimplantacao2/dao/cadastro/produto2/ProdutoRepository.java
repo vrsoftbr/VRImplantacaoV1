@@ -1131,14 +1131,21 @@ public class ProdutoRepository {
         }
         //<editor-fold defaultstate="collapsed" desc="Tratamento dos produtos de Kilo e Unitário Pesável">
 
-        vo.setTipoEmbalagem(unidade);
+        
         if (eBalanca) {
             if (TipoEmbalagem.UN.equals(unidade)) {
                 vo.setPesavel(true);
             } else {
                 vo.setPesavel(false);
             }
+            vo.setTipoEmbalagem(unidade);
         } else {
+            TipoEmbalagem unidadeCotacao = TipoEmbalagem.getTipoEmbalagem(imp.getTipoEmbalagemCotacao(), true);
+            if (unidadeCotacao != null) {
+                vo.setTipoEmbalagem(unidadeCotacao);
+            } else {
+                vo.setTipoEmbalagem(unidade);
+            }
             vo.setPesavel(false);
         }
 

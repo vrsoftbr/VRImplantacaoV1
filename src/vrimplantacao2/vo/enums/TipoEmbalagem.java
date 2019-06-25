@@ -46,9 +46,10 @@ public enum TipoEmbalagem {
      * Retorna o tipo da embalagem correspondente baseando-se na sigla e na 
      * descricao.
      * @param siglaDescricao Sigla ou Descrição da unidade de medida.
+     * @param returnNull Quando marcado true, retorna nulo.
      * @return TipoEmbalagem encontrado ou UN ca
      */
-    public static TipoEmbalagem getTipoEmbalagem(String siglaDescricao) {
+    public static TipoEmbalagem getTipoEmbalagem(String siglaDescricao, boolean returnNull) {
         if (siglaDescricao == null) {
             siglaDescricao = "";
         } else {
@@ -66,7 +67,17 @@ public enum TipoEmbalagem {
                 return a;
             }
         }
-        return UN;
+        return returnNull ? null : UN;
+    }
+    
+    /**
+     * Retorna o tipo da embalagem correspondente baseando-se na sigla e na 
+     * descricao.
+     * @param siglaDescricao Sigla ou Descrição da unidade de medida.
+     * @return TipoEmbalagem encontrado ou UN ca
+     */
+    public static TipoEmbalagem getTipoEmbalagem(String siglaDescricao) {
+        return getTipoEmbalagem(siglaDescricao, false);
     }
     
     /**
