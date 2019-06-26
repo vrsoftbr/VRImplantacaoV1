@@ -572,14 +572,14 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "r.COD_PROD, \n"
+                    "select\n"
+                    + "r.COD_PROD,\n"
                     + "p.DESCRICAO as DESC_PROD,\n"
-                    + "coalesce(r.NOME_ETIQUETA, p.DESCRICAO) as NOMERECEITA, \n"
-                    + "r.VLR_TOTAL, \n"
-                    + "r.VLR_PRECO_UND, \n"
+                    + "coalesce(r.NOME_ETIQUETA, p.DESCRICAO) as NOMERECEITA,\n"
+                    + "r.VLR_TOTAL,\n"
+                    + "r.VLR_PRECO_UND,\n"
                     + "r.VLR_PRECO_KG,\n"
-                    + "r.VLR_TOTAL_EMBALAGEM, \n"
+                    + "r.VLR_TOTAL_EMBALAGEM,\n"
                     + "r.QTDE_PRODUCAO_KG,\n"
                     + "r.QTDE_INGREDIENTE,\n"
                     + "r.QTDE_PRODUCAO_UND,\n"
@@ -588,11 +588,18 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "r.QTDE_PERDA,\n"
                     + "r.PERC_PERDA,\n"
                     + "r.OBS1 as RECEITA,\n"
-                    + "r.OBS_ETIQUETA\n"
-                    + "from RECEITA r \n"
+                    + "r.OBS_ETIQUETA,\n"
+                    + "pc.COD_PROD as ITEM,\n"
+                    + "pc.DESCRICAO as DESC_PROD_ITEM,\n"
+                    + "c.PESO,\n"
+                    + "c.VALOR,\n"
+                    + "c.PERCENTUAL\n"
+                    + "from RECEITA r\n"
                     + "inner join PRODUTO p on p.COD_PROD = r.COD_PROD\n"
+                    + "inner join COMPOSICAO c on c.COD_PROD = r.COD_PROD\n"
+                    + "inner join PRODUTO pc on pc.COD_PROD = c.COD_PROD_COMP\n"
                     + "where r.COD_LOJA = " + getLojaOrigem() + "\n"
-                    + "order by r.COD_PROD"
+                    + "order by r.COD_PROD\n"
             )) {
                 while (rst.next()) {
                     ReceitaIMP imp = new ReceitaIMP();
@@ -602,10 +609,10 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdproduto(rst.getString("COD_PROD"));
                     imp.setDescricao(rst.getString("NOMERECEITA"));
                     imp.setFichatecnica(rst.getString("RECEITA"));
-                    imp.setQtdembalagemreceita(rst.getInt("QTDE_INGREDIENTE"));
+                    imp.setQtdembalagemreceita(rst.getInt("PESO"));
                     imp.setQtdembalagemproduto(rst.getInt("QTDE_PRODUCAO_UND") == 0 ? 1 : rst.getInt("QTDE_PRODUCAO_UND"));
                     imp.setRendimento(rst.getInt("QTDE_PRODUCAO_KG"));
-                    imp.getProdutos().add(rst.getString("COD_PROD"));
+                    imp.getProdutos().add(rst.getString("ITEM"));
                     result.add(imp);
                 }
             }

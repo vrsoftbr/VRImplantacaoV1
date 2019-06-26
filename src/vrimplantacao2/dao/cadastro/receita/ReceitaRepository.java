@@ -8,9 +8,11 @@ package vrimplantacao2.dao.cadastro.receita;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.vo.cadastro.receita.ReceitaVO;
 import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.cadastro.ProdutoVO;
 import vrimplantacao2.vo.cadastro.receita.ReceitaAnteriorVO;
 import vrimplantacao2.vo.cadastro.receita.ReceitaItemVO;
 import vrimplantacao2.vo.cadastro.receita.ReceitaLojaVO;
@@ -41,6 +43,9 @@ public class ReceitaRepository {
         MultiMap<Integer, Void> receitaItem = provider.getReceitaItem();
         MultiMap<Integer, Void> receitaProduto = provider.getReceitaProduto();
         MultiMap<Integer, Void> receitaLoja = provider.getReceitaLoja();
+        ProdutoAnteriorDAO prodAntDAO = new ProdutoAnteriorDAO();
+        prodAntDAO.setImportSistema(provider.getSistema());
+        prodAntDAO.setImportLoja(provider.getLoja());
 
         provider.setMessage("Receita...Gravando receitas...", receita.size());
 
@@ -60,33 +65,6 @@ public class ReceitaRepository {
                     vo.setId(id);
                     provider.gravar(vo);
 
-                    /* gravando item */
-                    ReceitaItemVO voItem = converterReceitaItem(imp);
-                    voItem.setId_receita(vo.getId());
-
-                    /* gavando produtos */
-                    ReceitaProdutoVO voProduto = converterReceitaProduto(imp);
-                    voProduto.setId_receita(vo.getId());
-
-                    for (String produto : imp.getProdutos()) {
-                        Integer idProduto = produtos.get(produto);
-                        if (idProduto != null) {
-
-                            if (!receitaItem.containsKey(vo.getId(), idProduto)) {
-                                voItem.setId_produto(idProduto);
-                                provider.gravarItem(voItem);
-                            }
-
-                            if (!receitaProduto.containsKey(idProduto, idProduto)) {
-                                voProduto.setId_produto(idProduto);
-                                provider.gravarProduto(voProduto);
-                            }
-
-                            receitaItem.put(null, vo.getId(), idProduto);
-                            receitaProduto.put(null, idProduto, idProduto);
-                        }
-                    }
-
                     if (!receitaLoja.containsKey(vo.getId(), provider.getLojaVR())) {
                         ReceitaLojaVO voLoja = new ReceitaLojaVO();
                         voLoja.setId_receita(vo.getId());
@@ -99,14 +77,55 @@ public class ReceitaRepository {
                     anterior = converterAnterior(imp);
                     anterior.setCodigoAtual(vo.getId());
                     provider.gravar(anterior);
-                    anteriores.put(anterior.getImportid(), anterior);
-
-                    provider.setMessage();
+                    anteriores.put(anterior.getImportid(), anterior);                    
                 }
+                
+                /* gravando item */
+                ReceitaItemVO voItem = converterReceitaItem(imp);
+                voItem.setId_receita(anterior.getCodigoAtual());
+
+                /* gavando produtos */
+                ReceitaProdutoVO voProduto = converterReceitaProduto(imp);
+                voProduto.setId_receita(anterior.getCodigoAtual());
+
+                ProdutoVO prod = null;
+                for (String produto : imp.getProdutos()) {
+                    Integer idProduto = null;
+                    idProduto = produtos.get(produto);
+                    prod = prodAntDAO.getCodigoAnterior().get(
+                            imp.getImportsistema(),
+                            imp.getImportloja(),
+                            String.valueOf(idProduto)
+                    ).getCodigoAtual();
+                     
+                    Integer prodItem = prod.getId();
+                    
+                    if (idProduto != null) {
+
+                        if (!receitaItem.containsKey(anterior.getCodigoAtual(), prodItem)) {
+                            voItem.setId_produto(idProduto);
+                            provider.gravarItem(voItem);
+                        }
+                        receitaItem.put(null, anterior.getCodigoAtual(), prodItem);
+                    }
+                }
+                 
+                prod = prodAntDAO.getCodigoAnterior().get(
+                            imp.getImportsistema(),
+                            imp.getImportloja(),
+                            imp.getIdproduto()
+                    ).getCodigoAtual();
+                
+                Integer prodReceita = prod.getId();
+                
+                if (!receitaProduto.containsKey(prodReceita, prodReceita)) {
+                    voProduto.setId_produto(prodReceita);
+                    provider.gravarProduto(voProduto);
+                }
+                receitaProduto.put(null, prodReceita, prodReceita);
+                provider.setMessage();
             }
-
             provider.commit();
-
         } catch (Exception ex) {
             provider.rollback();
             throw ex;
