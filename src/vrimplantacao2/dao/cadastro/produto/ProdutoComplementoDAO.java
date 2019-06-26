@@ -76,7 +76,7 @@ public class ProdutoComplementoDAO {
                         sql.put("estoque", vo.getEstoque());
                     }
                     sql.put("troca", vo.getTroca());
-                    sql.put("emiteetiqueta", true);
+                    sql.put("emiteetiqueta", vo.isEmiteEtiqueta());
                     sql.put("custosemperdasemimposto", 0);
                     sql.put("custosemperdasemimpostoanterior", 0);
                     sql.put("customediocomimposto", 0);
@@ -142,7 +142,7 @@ public class ProdutoComplementoDAO {
                     sql.put("estoque", vo.getEstoque());
                 }
                 sql.put("troca", vo.getTroca());
-                sql.put("emiteetiqueta", true);
+                sql.put("emiteetiqueta", vo.isEmiteEtiqueta());
                 sql.put("custosemperdasemimposto", 0);
                 sql.put("custosemperdasemimpostoanterior", 0);
                 sql.put("customediocomimposto", 0);
@@ -206,6 +206,9 @@ public class ProdutoComplementoDAO {
                 }
                 if (opt.contains(OpcaoProduto.FABRICACAO_PROPRIA)) {
                     sql.put("fabricacaopropria", vo.isFabricacaoPropria());
+                }                
+                if (opt.contains(OpcaoProduto.EMITE_ETIQUETA)) {
+                    sql.put("emiteetiqueta", vo.isEmiteEtiqueta());
                 }
                 if (opt.contains(OpcaoProduto.CUSTO)) {
                     sql.put("custocomimposto", vo.getCustoComImposto());
@@ -291,6 +294,9 @@ public class ProdutoComplementoDAO {
             }
             if (opt.contains(OpcaoProduto.FABRICACAO_PROPRIA)) {
                 sql.put("fabricacaopropria", complemento.isFabricacaoPropria());
+            }
+            if (opt.contains(OpcaoProduto.EMITE_ETIQUETA)) {
+                sql.put("emiteetiqueta", complemento.isEmiteEtiqueta());
             }
             if (opt.contains(OpcaoProduto.ICMS)) {
                 sql.put("id_aliquotacredito", complemento.getIdAliquotaCredito());

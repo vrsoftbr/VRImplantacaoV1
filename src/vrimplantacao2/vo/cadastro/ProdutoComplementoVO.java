@@ -20,6 +20,7 @@ public class ProdutoComplementoVO {
     private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
     private boolean descontinuado = false;
     private boolean fabricacaoPropria = false;
+    private boolean emiteEtiqueta = true;
     private TipoProduto tipoProduto = TipoProduto.MERCADORIA_REVENDA;
     private int idAliquotaCredito = 0;
 
@@ -141,6 +142,14 @@ public class ProdutoComplementoVO {
 
     public void setFabricacaoPropria(boolean fabricacaoPropria) {
         this.fabricacaoPropria = fabricacaoPropria;
+    }
+
+    public boolean isEmiteEtiqueta() {
+        return emiteEtiqueta;
+    }
+
+    public void setEmiteEtiqueta(boolean emiteEtiqueta) {
+        this.emiteEtiqueta = emiteEtiqueta;
     }
 
     public int getIdAliquotaCredito() {

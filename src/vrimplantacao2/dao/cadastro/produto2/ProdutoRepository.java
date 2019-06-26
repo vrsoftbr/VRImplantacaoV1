@@ -988,6 +988,7 @@ public class ProdutoRepository {
         complemento.setSituacaoCadastro(imp.getSituacaoCadastro());
         complemento.setTipoProduto(imp.getTipoProduto());
         complemento.setFabricacaoPropria(imp.isFabricacaoPropria());
+        complemento.setEmiteEtiqueta(imp.isEmiteEtiqueta());
 
         return complemento;
     }
@@ -1159,6 +1160,7 @@ public class ProdutoRepository {
         vo.setValidade(imp.getValidade());
         vo.setExcecao(obterPautaFiscal(imp.getPautaFiscalId()));
         vo.setVendaPdv(imp.isVendaPdv());
+        vo.setAceitaMultiplicacaoPDV(imp.isAceitaMultiplicacaoPDV());
 
         /**
          * Busca e se existir, relaciona o produto com o comprador.

@@ -288,6 +288,18 @@ public enum OpcaoProduto {
     PESO_LIQUIDO, 
     IMPORTAR_PDV_VR,
     RECEITA,
+    ACEITA_MULTIPLICACAO_PDV {
+        @Override
+        public String toString() {
+            return "Aceita Multiplicação PDV (Prod.)";
+        }
+    },
+    EMITE_ETIQUETA {
+        @Override
+        public String toString() {
+            return "Emite Etiqueta (Prod. Compl.)";
+        }
+    },
     /**
         Em alguns sistemas o produto pode ser vendido tanto pelo EAN13 quanto na balança.
         Isso para o VR pode causar problemas, por essa razão o VRImplantação trata esse
