@@ -6,9 +6,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -182,7 +185,12 @@ public class RPInfoDAO extends InterfaceDAO {
                     "	case un.prun_ativo when 'S' then 1 else 0 end situacaocadastro,\n" +
                     "	case un.prun_bloqueado when 'N' then 0 else 1 end descontinuado,\n" +
                     "	p.prod_codigoncm ncm,\n" +
-                    "	ax.prau_cest cest\n" +
+                    "	ax.prau_cest cest,\n" +
+                    "	tr.trib_codnf cst,\n" +
+                    "	tr.trib_icms icms,\n" +
+                    "	tr.trib_redbc icmsreducao,\n" +
+                    "	tr.trib_cstpis cstpiscofins,\n" +
+                    "	tr.trib_natpiscof naturezareceita\n" +
                     "from\n" +
                     "	produtos p\n" +
                     "	left join prodaux ax on ax.prau_prod_codigo = p.prod_codigo\n" +
@@ -214,11 +222,14 @@ public class RPInfoDAO extends InterfaceDAO {
                     "		from\n" +
                     "			cbalt\n" +
                     "	) ean on ean.id = p.prod_codigo\n" +
+                    "	left join tributacao tr on (p.prod_trib_codigo = tr.trib_codigo)\n" +
                     "where\n" +
-                    "	un.prun_unid_codigo = '" + getLojaOrigem() + "'\n" +
+                    "	un.prun_unid_codigo = '" + getLojaOrigem() + "' and\n" +
+                    "	tr.trib_mvtos = 'EVP'\n" +
                     "order by\n" +
                     "	id"
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     
@@ -227,7 +238,16 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setImportId(rst.getString("id"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
-                    imp.setEan(rst.getString("ean"));
+                    if(rst.getInt("e_balanca") == 1) {
+                        long codigoProduto;
+                        codigoProduto = Long.parseLong(rst.getString("ean"));
+                        String pBalanca = String.valueOf(codigoProduto);
+                        if(pBalanca.length() <= 7) {
+                            imp.setEan(pBalanca.substring(0, pBalanca.length() - 1));
+                        }
+                    } else {
+                        imp.setEan(rst.getString("ean"));
+                    }
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.seteBalanca(rst.getBoolean("e_balanca"));
@@ -251,13 +271,11 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setDescontinuado(rst.getBoolean("descontinuado"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstDebito(7);
-                    imp.setPiscofinsCstCredito(71);
-                    imp.setIcmsCstEntrada(40);
-                    imp.setIcmsCstEntradaForaEstado(40);
-                    imp.setIcmsCstSaida(40);
-                    imp.setIcmsCstSaidaForaEstado(40);
-                    imp.setIcmsCstSaidaForaEstadoNF(40);
+                    imp.setPiscofinsCstDebito(rst.getString("cstpiscofins"));
+                    imp.setIcmsAliq(rst.getDouble("icms"));
+                    imp.setIcmsReducao(rst.getDouble("icmsreducao"));
+                    imp.setIcmsCst(rst.getInt("cst"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
                     
                     result.add(imp);
                 }
