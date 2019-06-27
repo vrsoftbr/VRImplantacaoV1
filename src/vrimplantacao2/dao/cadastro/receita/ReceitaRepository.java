@@ -77,52 +77,55 @@ public class ReceitaRepository {
                     anterior = converterAnterior(imp);
                     anterior.setCodigoAtual(vo.getId());
                     provider.gravar(anterior);
-                    anteriores.put(anterior.getImportid(), anterior);                    
+                    anteriores.put(anterior.getImportid(), anterior);
                 }
-                
-                /* gravando item */
-                ReceitaItemVO voItem = converterReceitaItem(imp);
-                voItem.setId_receita(anterior.getCodigoAtual());
 
-                /* gavando produtos */
-                ReceitaProdutoVO voProduto = converterReceitaProduto(imp);
-                voProduto.setId_receita(anterior.getCodigoAtual());
+                if (anterior.getCodigoAtual() > 0) {
 
-                ProdutoVO prod = null;
-                for (String produto : imp.getProdutos()) {
-                    Integer idProduto = null;
-                    idProduto = produtos.get(produto);
-                    prod = prodAntDAO.getCodigoAnterior().get(
-                            imp.getImportsistema(),
-                            imp.getImportloja(),
-                            String.valueOf(idProduto)
-                    ).getCodigoAtual();
-                     
-                    Integer prodItem = prod.getId();
-                    
-                    if (idProduto != null) {
+                    /* gravando item */
+                    ReceitaItemVO voItem = converterReceitaItem(imp);
+                    voItem.setId_receita(anterior.getCodigoAtual());
 
-                        if (!receitaItem.containsKey(anterior.getCodigoAtual(), prodItem)) {
-                            voItem.setId_produto(idProduto);
-                            provider.gravarItem(voItem);
+                    /* gavando produtos */
+                    ReceitaProdutoVO voProduto = converterReceitaProduto(imp);
+                    voProduto.setId_receita(anterior.getCodigoAtual());
+
+                    ProdutoVO prodItemVO = null;
+                    for (String produto : imp.getProdutos()) {
+                        Integer idProduto = null;
+                        idProduto = produtos.get(produto);
+                        prodItemVO = prodAntDAO.getCodigoAnterior().get(
+                                imp.getImportsistema(),
+                                imp.getImportloja(),
+                                String.valueOf(idProduto)
+                        ).getCodigoAtual();
+
+                        Integer prodItem = prodItemVO.getId();
+
+                        if (idProduto != null) {
+
+                            if (!receitaItem.containsKey(anterior.getCodigoAtual(), prodItem)) {
+                                voItem.setId_produto(idProduto);
+                                provider.gravarItem(voItem);
+                            }
+                            receitaItem.put(null, anterior.getCodigoAtual(), prodItem);
                         }
-                        receitaItem.put(null, anterior.getCodigoAtual(), prodItem);
                     }
-                }
-                 
-                prod = prodAntDAO.getCodigoAnterior().get(
+
+                    ProdutoVO prodReceVO = null;
+                    prodReceVO = prodAntDAO.getCodigoAnterior().get(
                             imp.getImportsistema(),
                             imp.getImportloja(),
                             imp.getIdproduto()
                     ).getCodigoAtual();
-                
-                Integer prodReceita = prod.getId();
-                
-                if (!receitaProduto.containsKey(prodReceita, prodReceita)) {
-                    voProduto.setId_produto(prodReceita);
-                    provider.gravarProduto(voProduto);
+
+                    Integer prodReceita = prodReceVO.getId();
+                    if (!receitaProduto.containsKey(prodReceita, prodReceita)) {
+                        voProduto.setId_produto(prodReceita);
+                        provider.gravarProduto(voProduto);
+                        receitaProduto.put(null, prodReceita, prodReceita);
+                    }
                 }
-                receitaProduto.put(null, prodReceita, prodReceita);
                 provider.setMessage();
             }
             provider.commit();
