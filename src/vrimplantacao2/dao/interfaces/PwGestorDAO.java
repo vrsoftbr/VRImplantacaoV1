@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -270,7 +271,7 @@ public class PwGestorDAO extends InterfaceDAO {
                             imp.setIcmsCst(rst.getInt("cst"));
                         }
                     } else {
-                        imp.setIcmsCst(rst.getInt("cst"));
+                        imp.setIcmsCst(Integer.parseInt(Utils.formataNumero(rst.getString("cst"))));
                     }
 
                     imp.setIcmsAliq(rst.getDouble("icms"));
