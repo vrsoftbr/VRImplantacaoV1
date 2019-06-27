@@ -583,18 +583,19 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkCnpj" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkIE" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkAtivo" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkValorLimite" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkCnpj" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="chkEstadoCivil" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkBloqueado" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkValorLimite" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
@@ -612,16 +613,19 @@
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="chkValorLimite" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkEstadoCivil" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkClienteEventual" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="chkCnpj" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkCnpj" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkValorLimite" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkIE" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="chkAtivo" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="57" max="32767" attributes="0"/>
+                          <EmptySpace pref="61" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -666,6 +670,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkEstadoCivil">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Estado Civil"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkClienteEventual">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cliente Eventual"/>
                   </Properties>
                 </Component>
               </SubComponents>
