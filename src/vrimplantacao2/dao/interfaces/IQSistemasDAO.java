@@ -15,6 +15,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -272,5 +273,35 @@ public class IQSistemasDAO extends InterfaceDAO {
             }
             return result;
         }
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n"
+                    + "codigo AS idproduto, \n"
+                    + "idfornecedor, \n"
+                    + "documento,\n"
+                    + "custofornecedor\n"
+                    + "FROM produtos\n"
+                    + "WHERE idfornecedor IS NOT NULL\n"
+                    + "AND CodigoFilial = '" + getLojaOrigem() + "'"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setCodigoExterno(rst.getString("documento"));
+                    imp.setCustoTabela(rst.getDouble("custofornecedor"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 }
