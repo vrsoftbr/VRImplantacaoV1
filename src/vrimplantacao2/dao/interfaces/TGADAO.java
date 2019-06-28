@@ -575,8 +575,7 @@ public class TGADAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where\n"
                     + "    codempresa = " + getLojaOrigem() + " and\n"
                     + "    pagrec = 'R' and\n"
-                    + "    statuslan = 'A' and\n"
-                    + "    codtdo in ('DP', 'PROM', 'CH DEV')\n"        
+                    + "    statuslan = 'A'\n"      
                     + "order by\n"
                     + "    dataemissao")) {
                 while (rs.next()) {
