@@ -12,7 +12,9 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -25,9 +27,19 @@ public class AutomaqDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private String complemento = "";
     private Connection conexaoProduto;
+    private Connection conexaoFornecedor;
+    private Connection conexaoCliente;
 
     public void setConexaoProduto(Connection conexaoProduto) {
         this.conexaoProduto = conexaoProduto;
+    }
+
+    public void setConexaoFornecedor(Connection conexaoFornecedor) {
+        this.conexaoFornecedor = conexaoFornecedor;
+    }
+
+    public void setConexaoCliente(Connection conexaoCliente) {
+        this.conexaoCliente = conexaoCliente;
     }
     
     @Override
@@ -308,7 +320,78 @@ public class AutomaqDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
-    
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = conexaoFornecedor.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    f.codinterno id,\n" +
+                    "    f.razaosocial,\n" +
+                    "    f.nomefantasia,\n" +
+                    "    f.cnpj,\n" +
+                    "    f.ie,\n" +
+                    "    case f.ativo when 'N' then 0 else 1 end ativo,\n" +
+                    "    f.suframa,\n" +
+                    "    f.endereco,\n" +
+                    "    f.numero,\n" +
+                    "    f.complemento,\n" +
+                    "    f.bairro,\n" +
+                    "    f.cidade,\n" +
+                    "    f.codmun cidadeibge,\n" +
+                    "    f.estado,\n" +
+                    "    f.cep,\n" +
+                    "    f.contato,\n" +
+                    "    f.celular,\n" +
+                    "    f.fone1,\n" +
+                    "    f.fone2,\n" +
+                    "    f.email,\n" +
+                    "    f.dataalteracao,\n" +
+                    "    f.observacao1,\n" +
+                    "    f.prazoentrega,\n" +
+                    "    f.prazopagamento\n" +
+                    "from\n" +
+                    "    tblfornecedor f\n" +
+                    "order by\n" +
+                    "    f.codinterno"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razaosocial"));
+                    imp.setFantasia(rst.getString("nomefantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("ie"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setSuframa(rst.getString("suframa"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.addContato("1", rst.getString("contato"), rst.getString("fone2"), rst.getString("celular"), TipoContato.COMERCIAL, rst.getString("email"));
+                    imp.setTel_principal(rst.getString("fone1"));
+                    imp.setIbge_municipio(rst.getInt("cidadeibge"));
+                    imp.setObservacao(rst.getString("observacao1"));
+                    imp.setPrazoEntrega(rst.getInt("prazoentrega"));
+                    if (rst.getInt("prazopagamento") > 0) {
+                        imp.addCondicaoPagamento(rst.getInt("prazopagamento"));
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
     
     
 }
