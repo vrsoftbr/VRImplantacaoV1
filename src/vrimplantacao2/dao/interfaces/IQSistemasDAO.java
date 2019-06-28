@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -149,5 +151,126 @@ public class IQSistemasDAO extends InterfaceDAO {
             }
         }
         return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "f.Codigo,\n"
+                    + "f.razaosocial AS razao,\n"
+                    + "f.empresa AS fantasia,\n"
+                    + "f.CGC AS cnpj,\n"
+                    + "f.INSCRICAO AS ie_rg,\n"
+                    + "f.CPF,\n"
+                    + "f.ENDERECO,\n"
+                    + "f.numero,\n"
+                    + "f.CEP,\n"
+                    + "f.BAIRRO,\n"
+                    + "f.CIDADE,\n"
+                    + "f.ESTADO,\n"
+                    + "f.TELEFONE,\n"
+                    + "f.TELEFONE2,\n"
+                    + "f.TELEFONE3,\n"
+                    + "f.FAX,\n"
+                    + "f.FAX2,\n"
+                    + "f.FAX3,\n"
+                    + "f.EMAIL,\n"
+                    + "f.DATACAD,\n"
+                    + "f.situacao,\n"
+                    + "f.OBSERVACAO\n"
+                    + "FROM fornecedores f\n"
+                    + "WHERE f.fornecedor = 'S'\n"
+                    + "AND f.CodigoFilial = '" + getLojaOrigem() + "'\n"
+                    + "ORDER BY f.Codigo;"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("Codigo"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("ie_rg"));
+                    imp.setEndereco(rst.getString("ENDERECO"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setCep(rst.getString("CEP"));
+                    imp.setBairro(rst.getString("BAIRRO"));
+                    imp.setMunicipio(rst.getString("CIDADE"));
+                    imp.setUf(rst.getString("ESTADO"));
+                    imp.setTel_principal(rst.getString("TELEFONE"));
+                    imp.setDatacadastro(rst.getDate("DATACAD"));
+                    imp.setAtivo(rst.getString("situacao").contains("Ativo"));
+                    imp.setObservacao(rst.getString("OBSERVACAO"));
+
+                    if ((rst.getString("TELEFONE2") != null)
+                            && (!rst.getString("TELEFONE2").trim().isEmpty())) {
+                        imp.addContato(
+                                "TELEFONE 2",
+                                rst.getString("TELEFONE2"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("TELEFONE3") != null)
+                            && (!rst.getString("TELEFONE3").trim().isEmpty())) {
+                        imp.addContato(
+                                "TELEFONE 3",
+                                rst.getString("TELEFONE3"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("FAX") != null)
+                            && (!rst.getString("FAX").trim().isEmpty())) {
+                        imp.addContato(
+                                "FAX",
+                                rst.getString("FAX"),
+                                null,
+                                TipoContato.NFE,
+                                null
+                        );
+                    }
+                    if ((rst.getString("FAX2") != null)
+                            && (!rst.getString("FAX2").trim().isEmpty())) {
+                        imp.addContato(
+                                "FAX2",
+                                rst.getString("FAX2"),
+                                null,
+                                TipoContato.NFE,
+                                null
+                        );
+                    }
+                    if ((rst.getString("FAX3") != null)
+                            && (!rst.getString("FAX3").trim().isEmpty())) {
+                        imp.addContato(
+                                "FAX3",
+                                rst.getString("FAX3"),
+                                null,
+                                TipoContato.NFE,
+                                null
+                        );
+                    }
+                    if ((rst.getString("EMAIL") != null)
+                            && (!rst.getString("EMAIL").trim().isEmpty())) {
+                        imp.addContato(
+                                "EMAIL",
+                                null,
+                                null,
+                                TipoContato.NFE,
+                                rst.getString("EMAIL").toLowerCase()
+                        );
+                    }
+                    result.add(imp);
+                }
+            }
+            return result;
+        }
     }
 }
