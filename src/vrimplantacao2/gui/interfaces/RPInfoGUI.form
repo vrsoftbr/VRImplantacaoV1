@@ -118,7 +118,7 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
+                      <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
@@ -129,6 +129,8 @@
                               <Component id="chkFContatos" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFCnpj" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFTipoEmpresa" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFEmail" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFTipoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="289" max="32767" attributes="0"/>
                       </Group>
@@ -150,7 +152,11 @@
                               </Group>
                               <Component id="chkProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="157" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkFEmail" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkFTipoFornecedor" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="115" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -211,6 +217,16 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFTipoEmpresaActionPerformed"/>
                   </Events>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFEmail">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="E-mail"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFTipoFornecedor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo Fornecedor"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="tabClientes">
@@ -246,13 +262,21 @@
                           <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="chkCDataNascimento" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                                      <Component id="chkImportarFuncionario" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                                   <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkLimiteCredito" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="367" max="32767" attributes="0"/>
+                              <EmptySpace pref="156" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -260,16 +284,22 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="chkClientePreferencial" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkCDataNascimento" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="chkClienteEventual" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkImportarFuncionario" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkLimiteCredito" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="92" max="32767" attributes="0"/>
+                              <EmptySpace pref="110" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -329,6 +359,16 @@
                       <Events>
                         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkLimiteCreditoActionPerformed"/>
                       </Events>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCDataNascimento">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Data Nascimento"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkImportarFuncionario">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Importar Funcion&#xe1;rio junto com cliente"/>
+                      </Properties>
                     </Component>
                   </SubComponents>
                 </Container>

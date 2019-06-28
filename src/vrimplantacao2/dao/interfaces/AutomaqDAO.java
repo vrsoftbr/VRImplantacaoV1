@@ -12,7 +12,13 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEstadoCivil;
+import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -25,9 +31,19 @@ public class AutomaqDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private String complemento = "";
     private Connection conexaoProduto;
+    private Connection conexaoFornecedor;
+    private Connection conexaoCliente;
 
     public void setConexaoProduto(Connection conexaoProduto) {
         this.conexaoProduto = conexaoProduto;
+    }
+
+    public void setConexaoFornecedor(Connection conexaoFornecedor) {
+        this.conexaoFornecedor = conexaoFornecedor;
+    }
+
+    public void setConexaoCliente(Connection conexaoCliente) {
+        this.conexaoCliente = conexaoCliente;
     }
     
     @Override
@@ -295,7 +311,7 @@ public class AutomaqDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    t.codinterno"
             )) {
                 while (rst.next()) {
-                    result.add(new MapaTributoIMP(
+                   result.add(new MapaTributoIMP(
                             rst.getString("id"),
                             rst.getString("descricao"),
                             Utils.stringToInt(rst.getString("cst")),
@@ -308,7 +324,212 @@ public class AutomaqDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = conexaoFornecedor.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    f.codinterno id,\n" +
+                    "    f.razaosocial,\n" +
+                    "    f.nomefantasia,\n" +
+                    "    f.cnpj,\n" +
+                    "    f.ie,\n" +
+                    "    case f.ativo when 'N' then 0 else 1 end ativo,\n" +
+                    "    f.suframa,\n" +
+                    "    f.endereco,\n" +
+                    "    f.numero,\n" +
+                    "    f.complemento,\n" +
+                    "    f.bairro,\n" +
+                    "    f.cidade,\n" +
+                    "    f.codmun cidadeibge,\n" +
+                    "    f.estado,\n" +
+                    "    f.cep,\n" +
+                    "    f.contato,\n" +
+                    "    f.celular,\n" +
+                    "    f.fone1,\n" +
+                    "    f.fone2,\n" +
+                    "    f.email,\n" +
+                    "    f.dataalteracao,\n" +
+                    "    f.observacao1,\n" +
+                    "    f.prazoentrega,\n" +
+                    "    f.prazopagamento\n" +
+                    "from\n" +
+                    "    tblfornecedor f\n" +
+                    "order by\n" +
+                    "    f.codinterno"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razaosocial"));
+                    imp.setFantasia(rst.getString("nomefantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("ie"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setSuframa(rst.getString("suframa"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.addContato("1", rst.getString("contato"), rst.getString("fone2"), rst.getString("celular"), TipoContato.COMERCIAL, rst.getString("email"));
+                    imp.setTel_principal(rst.getString("fone1"));
+                    imp.setIbge_municipio(rst.getInt("cidadeibge"));
+                    imp.setObservacao(rst.getString("observacao1"));
+                    imp.setPrazoEntrega(rst.getInt("prazoentrega"));
+                    if (rst.getInt("prazopagamento") > 0) {
+                        imp.addCondicaoPagamento(rst.getInt("prazopagamento"));
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
     
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        try(Statement stm = conexaoCliente.createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    codinterno id,\n" +
+                    "    nomecliente,\n" +
+                    "    razaosocial,\n" +
+                    "    cpf,\n" +
+                    "    rg,\n" +
+                    "    cidade,\n" +
+                    "    endereco,\n" +
+                    "    bairro,\n" +
+                    "    estado,\n" +
+                    "    cep,\n" +
+                    "    complemento,\n" +
+                    "    numero,\n" +
+                    "    foneresidencial,\n" +
+                    "    fonecomercial,\n" +
+                    "    fonecelular,\n" +
+                    "    bloqueado,\n" +
+                    "    datanascimento,\n" +
+                    "    nomedopai,\n" +
+                    "    nomedamae,\n" +
+                    "    limite,\n" +
+                    "    sexo,\n" +
+                    "    estadocivil,\n" +
+                    "    datacadastro,\n" +
+                    "    nomeconjuge,\n" +
+                    "    email,\n" +
+                    "    cliente_ativo ativo\n" +
+                    "from\n" +
+                    "    tblcliente\n" +
+                    "order by\n" +
+                    "    codinterno")) {
+                while(rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setRazao(rs.getString("razaosocial"));
+                    imp.setCnpj(rs.getString("cpf"));
+                    imp.setInscricaoestadual(rs.getString("rg"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setUf(rs.getString("estado"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setNumero(rs.getString("numero"));
+                    if((rs.getString("foneresidencial") != null) && (!"".equals(rs.getString("foneresidencial")))) {
+                        imp.addContato("RESIDENCIAL", null, rs.getString("foneresidencial"), null, null);
+                    }
+                    imp.setTelefone(rs.getString("fonecomercial"));
+                    imp.setCelular(rs.getString("fonecelular"));
+                    imp.setBloqueado("S".equals(rs.getString("bloqueado")));
+                    imp.setDataNascimento(rs.getDate("datanascimento"));
+                    imp.setNomePai(rs.getString("nomedopai"));
+                    imp.setNomeMae(rs.getString("nomedamae"));
+                    imp.setValorLimite(rs.getDouble("limite"));
+                    if((rs.getString("sexo") != null) && (!"".equals(rs.getString("sexo")))) {
+                        imp.setSexo("FEMININO".equals(rs.getString("sexo").trim()) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                    } 
+                    if((rs.getString("estadocivil") != null) && (!"".equals(rs.getString("estadocivil")))) {
+                        switch(rs.getString("estadocivil").trim()) {
+                            case "CASADO":
+                                imp.setEstadoCivil(TipoEstadoCivil.CASADO);
+                                break;
+                            case "DIVORCIADO":
+                                imp.setEstadoCivil(TipoEstadoCivil.DIVORCIADO);
+                                break;
+                            case "SOLTEIRO":
+                                imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
+                                break;
+                            case "VIUVO":
+                                imp.setEstadoCivil(TipoEstadoCivil.VIUVO);
+                                break;
+                            default:
+                                imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
+                                break;
+                        }
+                    }
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+                    imp.setNomeConjuge(rs.getString("nomeconjuge"));
+                    imp.setEmail(rs.getString("email"));
+                    imp.setAtivo("S".equals(rs.getString("ativo")));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
     
-    
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        try(Statement stm = conexaoCliente.createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    cr.codinterno id,\n" +
+                    "    codcliente idcliente,\n" +
+                    "    dataconta emissao,\n" +
+                    "    datavencimento vencimento,\n" +
+                    "    cr.valorgasto valor,\n" +
+                    "    c.cpf cnpj,\n" +
+                    "    c.razaosocial,\n" +
+                    "    caixa ecf,\n" +
+                    "    numcupom cupom,\n" +
+                    "    juros\n" +
+                    "from\n" +
+                    "    tblconta cr\n" +
+                    "left join tblcliente c on (cr.codcliente = c.codinterno)\n" +
+                    "where\n" +
+                    "    cr.codfilial = " + getLojaOrigem() + " and\n" +
+                    "    datapagamento is null\n" +
+                    "order by\n" +
+                    "    dataconta")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setCnpjCliente(rs.getString("cnpj"));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setNumeroCupom(rs.getString("cupom"));
+                    imp.setJuros(rs.getDouble("juros"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 }

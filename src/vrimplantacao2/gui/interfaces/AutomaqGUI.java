@@ -1,7 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
 import java.awt.Frame;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,7 +26,6 @@ import vrimplantacao2.parametro.Parametros;
 public class AutomaqGUI extends VRInternalFrame {
 
     private static final String NOME_SISTEMA = "Automaq";
-    private static final String SERVIDOR_SQL = "Firebird";
     private static AutomaqGUI instance;
 
     private final AutomaqDAO dao = new AutomaqDAO();
@@ -40,10 +38,12 @@ public class AutomaqGUI extends VRInternalFrame {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, NOME_SISTEMA);
         txtHost.setText(params.getWithNull("localhost", NOME_SISTEMA, "HOST"));
-        txtBancoDadosProduto.setArquivo(params.getWithNull("c:/automaq/servidor/produto.fdb", NOME_SISTEMA, "DB_PRODUTO"));
-        txtPorta.setText(params.getWithNull("5432", NOME_SISTEMA, "PORTA"));
+        txtBancoDadosProduto.setArquivo(params.getWithNull("C:\\Autoimp\\servidor\\PRODUTO.FDB", NOME_SISTEMA, "DB_PRODUTO"));
+        txtBancoDadosFornecedor.setArquivo(params.getWithNull("C:\\Autoimp\\servidor\\FORNECEDOR.FDB", NOME_SISTEMA, "DB_FORNECEDOR"));
+        txtBancoDadosCliente.setArquivo(params.getWithNull("C:\\Autoimp\\servidor\\CLIENTE.FDB", NOME_SISTEMA, "DB_CLIENTE"));
+        txtPorta.setText(params.getWithNull("3050", NOME_SISTEMA, "PORTA"));
         txtUsuario.setText(params.getWithNull("sysdba", NOME_SISTEMA, "USUARIO"));
-        txtSenha.setText(params.getWithNull("L$5a7*(B", NOME_SISTEMA, "SENHA"));
+        txtSenha.setText(params.getWithNull("masterkey", NOME_SISTEMA, "SENHA"));
         vLojaCliente = params.get(NOME_SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(NOME_SISTEMA, "LOJA_VR");
         vTipoVenda = params.getInt(NOME_SISTEMA, "TIPO_VENDA");
@@ -54,6 +54,8 @@ public class AutomaqGUI extends VRInternalFrame {
         tabProdutos.gravarParametros(params, NOME_SISTEMA);
         params.put(txtHost.getText(), NOME_SISTEMA, "HOST");
         params.put(txtBancoDadosProduto.getArquivo(), NOME_SISTEMA, "DB_PRODUTO");
+        params.put(txtBancoDadosFornecedor.getArquivo(), NOME_SISTEMA, "DB_FORNECEDOR");
+        params.put(txtBancoDadosCliente.getArquivo(), NOME_SISTEMA, "DB_CLIENTE");
         params.put(txtPorta.getText(), NOME_SISTEMA, "PORTA");
         params.put(txtUsuario.getText(), NOME_SISTEMA, "USUARIO");
         params.put(txtSenha.getText(), NOME_SISTEMA, "SENHA");
@@ -115,6 +117,22 @@ public class AutomaqGUI extends VRInternalFrame {
                 txtHost.getText(), 
                 txtPorta.getInt(),
                 txtBancoDadosProduto.getArquivo(), 
+                txtUsuario.getText(), 
+                txtSenha.getText(),
+                ConexaoFirebird.encoding
+        ));
+        this.dao.setConexaoFornecedor(ConexaoFirebird.getNewConnection(
+                txtHost.getText(), 
+                txtPorta.getInt(),
+                txtBancoDadosFornecedor.getArquivo(), 
+                txtUsuario.getText(), 
+                txtSenha.getText(),
+                ConexaoFirebird.encoding
+        ));
+        this.dao.setConexaoCliente(ConexaoFirebird.getNewConnection(
+                txtHost.getText(), 
+                txtPorta.getInt(),
+                txtBancoDadosCliente.getArquivo(), 
                 txtUsuario.getText(), 
                 txtSenha.getText(),
                 ConexaoFirebird.encoding
@@ -282,9 +300,9 @@ public class AutomaqGUI extends VRInternalFrame {
         vRLabel8 = new vrframework.bean.label.VRLabel();
         txtBancoDadosProduto = new vrframework.bean.fileChooser.VRFileChooser();
         vRLabel9 = new vrframework.bean.label.VRLabel();
-        txtBancoDadosFirebird1 = new vrframework.bean.fileChooser.VRFileChooser();
+        txtBancoDadosFornecedor = new vrframework.bean.fileChooser.VRFileChooser();
         vRLabel10 = new vrframework.bean.label.VRLabel();
-        txtBancoDadosFirebird2 = new vrframework.bean.fileChooser.VRFileChooser();
+        txtBancoDadosCliente = new vrframework.bean.fileChooser.VRFileChooser();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -423,9 +441,9 @@ public class AutomaqGUI extends VRInternalFrame {
 
         vRLabel8.setText("Complemento");
 
-        vRLabel9.setText("Produtos");
+        vRLabel9.setText("Fornecedores");
 
-        vRLabel10.setText("Produtos");
+        vRLabel10.setText("Clientes");
 
         javax.swing.GroupLayout pnlConexaoLayout = new javax.swing.GroupLayout(pnlConexao);
         pnlConexao.setLayout(pnlConexaoLayout);
@@ -463,17 +481,15 @@ public class AutomaqGUI extends VRInternalFrame {
                             .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 166, Short.MAX_VALUE))
                     .addGroup(pnlConexaoLayout.createSequentialGroup()
-                        .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(vRLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(vRLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtBancoDadosProduto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(pnlConexaoLayout.createSequentialGroup()
-                        .addComponent(vRLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtBancoDadosFirebird1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(pnlConexaoLayout.createSequentialGroup()
-                        .addComponent(vRLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtBancoDadosFirebird2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtBancoDadosCliente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtBancoDadosProduto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtBancoDadosFornecedor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         pnlConexaoLayout.setVerticalGroup(
@@ -504,11 +520,11 @@ public class AutomaqGUI extends VRInternalFrame {
                     .addComponent(vRLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtBancoDadosFirebird1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtBancoDadosFornecedor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(vRLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlConexaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtBancoDadosFirebird2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtBancoDadosCliente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(vRLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -886,8 +902,8 @@ public class AutomaqGUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel tabUnificacao;
     private vrframework.bean.panel.VRPanel tabVenda;
     private javax.swing.JPanel tablCreditoRotativo;
-    private vrframework.bean.fileChooser.VRFileChooser txtBancoDadosFirebird1;
-    private vrframework.bean.fileChooser.VRFileChooser txtBancoDadosFirebird2;
+    private vrframework.bean.fileChooser.VRFileChooser txtBancoDadosCliente;
+    private vrframework.bean.fileChooser.VRFileChooser txtBancoDadosFornecedor;
     private vrframework.bean.fileChooser.VRFileChooser txtBancoDadosProduto;
     private vrframework.bean.textField.VRTextField txtComplemento;
     private vrframework.bean.textField.VRTextField txtHost;
