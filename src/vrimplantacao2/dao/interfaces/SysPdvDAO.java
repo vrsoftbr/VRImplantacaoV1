@@ -534,7 +534,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setImportLoja(getLojaOrigem());
                             imp.setImportSistema(getSistema());
                             imp.setImportId(rst.getString("procod"));
-                            imp.setEan(complementoSistema + "99999" + String.valueOf(codigoAtual));
+                            imp.setEan("99999" + String.valueOf(codigoAtual));
                             imp.setQtdEmbalagem(rst.getInt("proqtdminprc2"));
                             result.add(imp);
                         }
@@ -560,7 +560,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setImportLoja(getLojaOrigem());
                             imp.setImportSistema(getSistema());
                             imp.setImportId(rst.getString("procod"));
-                            imp.setEan(complementoSistema + "88888" + String.valueOf(codigoAtual));
+                            imp.setEan("88888" + String.valueOf(codigoAtual));
                             imp.setQtdEmbalagem(rst.getInt("proqtdminprc3"));
                             result.add(imp);
                         }
@@ -597,7 +597,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setImportLoja(getLojaOrigem());
                             imp.setImportSistema(getSistema());
                             imp.setImportId(rst.getString("procod"));
-                            imp.setEan(complementoSistema + "99999" + String.valueOf(codigoAtual));
+                            imp.setEan("99999" + String.valueOf(codigoAtual));
                             imp.setPrecovenda(rst.getDouble("proprc1"));
                             imp.setAtacadoPreco(rst.getDouble("proprc2"));
                             imp.setQtdEmbalagem(rst.getInt("proqtdminprc2"));
@@ -625,7 +625,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setImportLoja(getLojaOrigem());
                             imp.setImportSistema(getSistema());
                             imp.setImportId(rst.getString("procod"));
-                            imp.setEan(complementoSistema + "88888" + String.valueOf(codigoAtual));
+                            imp.setEan("88888" + String.valueOf(codigoAtual));
                             imp.setPrecovenda(rst.getDouble("proprc1"));
                             imp.setAtacadoPreco(rst.getDouble("proprc3"));
                             imp.setQtdEmbalagem(rst.getInt("proqtdminprc3"));
