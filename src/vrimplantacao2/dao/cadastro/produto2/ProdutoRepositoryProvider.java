@@ -214,6 +214,10 @@ public class ProdutoRepositoryProvider {
             dao.setImportLoja(getLoja());
             return dao.getCodigoAnterior().get(keys);
         }
+        
+        public Map<String, Integer> getAnteriores() throws Exception {
+            return dao.getAnteriores(getSistema(), getLoja());
+        }
 
         public ProdutoAnteriorVO getLojaImp(String... keys) throws Exception {
             dao.setImportSistema(getSistema());

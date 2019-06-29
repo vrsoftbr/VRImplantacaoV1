@@ -13,7 +13,8 @@ public class OfertaIMP {
     private String idProduto;
     private Date dataInicio;
     private Date dataFim;
-    private double precoOferta;
+    private double precoOferta = 0;
+    private double precoNormal = 0;
     private SituacaoOferta situacaoOferta = SituacaoOferta.ATIVO;
     private TipoOfertaVO tipoOferta = TipoOfertaVO.CAPA;
 
@@ -47,6 +48,14 @@ public class OfertaIMP {
 
     public void setPrecoOferta(double precoOferta) {
         this.precoOferta = precoOferta;
+    }
+
+    public double getPrecoNormal() {
+        return precoNormal;
+    }
+
+    public void setPrecoNormal(double precoNormal) {
+        this.precoNormal = precoNormal;
     }
 
     public SituacaoOferta getSituacaoOferta() {

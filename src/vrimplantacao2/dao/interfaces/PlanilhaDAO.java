@@ -24,6 +24,8 @@ import vrimplantacao2.utils.arquivo.ArquivoFactory;
 import vrimplantacao2.utils.arquivo.LinhaArquivo;
 import vrimplantacao2.utils.arquivo.csv.ArquivoCSV2;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
+import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoCancelamento;
@@ -45,6 +47,7 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.InventarioIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -75,6 +78,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         result.add(OpcaoProduto.PAUTA_FISCAL);
         result.add(OpcaoProduto.PAUTA_FISCAL_PRODUTO);
         result.add(INVENTARIO);
+        result.add(OpcaoProduto.OFERTA);
         
         return result;
     }
@@ -262,11 +266,62 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 produto.setPiscofinsCstCredito(linha.getString("piscofins_cst_credito"));
                 produto.setPiscofinsCstDebito(linha.getString("piscofins_cst_debito"));
                 produto.setPiscofinsNaturezaReceita(linha.getString("piscofins_natureza_receita"));
+                
                 produto.setIcmsCst(linha.getInt("icms_cst"));
                 produto.setIcmsAliq(linha.getDouble("icms_aliquota"));
                 produto.setIcmsReducao(linha.getDouble("icms_reduzido"));
-                produto.setIcmsCreditoId(linha.getString("icms_credito_id"));
-                produto.setIcmsDebitoId(linha.getString("icms_debito_id"));
+                
+                //ICMS ENTRADA
+                
+                if (linha.existsColumn("icms_cst_entrada")) {
+                    produto.setIcmsCstEntrada(linha.getInt("icms_cst_entrada"));
+                    produto.setIcmsAliqEntrada(linha.getDouble("icms_aliquota_entrada"));
+                    produto.setIcmsReducaoEntrada(linha.getDouble("icms_reduzido_entrada"));
+                }
+                
+                if (linha.existsColumn("icms_cst_entrada_foraestado")) {
+                    produto.setIcmsCstEntradaForaEstado(linha.getInt("icms_cst_entrada_foraestado"));
+                    produto.setIcmsAliqEntradaForaEstado(linha.getDouble("icms_aliquota_entrada_foraestado"));
+                    produto.setIcmsReducaoEntradaForaEstado(linha.getDouble("icms_reduzido_entrada_foraestado"));
+                }
+                
+                if (linha.existsColumn("icms_credito_id")) {
+                    produto.setIcmsCreditoId(linha.getString("icms_credito_id"));
+                }
+                if (linha.existsColumn("icms_credito_foraestado_id")) {
+                    produto.setIcmsCreditoForaEstadoId(linha.getString("icms_credito_foraestado_id"));
+                }
+                
+                //ICMS SAIDA
+                if (linha.existsColumn("icms_cst_saida")) {
+                    produto.setIcmsCstSaida(linha.getInt("icms_cst_saida"));
+                    produto.setIcmsAliqSaida(linha.getDouble("icms_aliquota_saida"));
+                    produto.setIcmsReducaoSaida(linha.getDouble("icms_reduzido_saida"));
+                }
+                
+                if (linha.existsColumn("icms_cst_saida_foraestado")) {
+                    produto.setIcmsCstSaidaForaEstado(linha.getInt("icms_cst_saida_foraestado"));
+                    produto.setIcmsAliqSaidaForaEstado(linha.getDouble("icms_aliquota_saida_foraestado"));
+                    produto.setIcmsReducaoSaidaForaEstado(linha.getDouble("icms_reduzido_saida_foraestado"));
+                }
+                
+                if (linha.existsColumn("icms_cst_saida_foraestadonf")) {
+                    produto.setIcmsCstSaidaForaEstadoNF(linha.getInt("icms_cst_saida_foraestadonf"));
+                    produto.setIcmsAliqSaidaForaEstadoNF(linha.getDouble("icms_aliquota_saida_foraestadonf"));
+                    produto.setIcmsReducaoSaidaForaEstadoNF(linha.getDouble("icms_reduzido_saida_foraestadonf"));
+                }
+                
+                if (linha.existsColumn("icms_debito_id")) {
+                    produto.setIcmsDebitoId(linha.getString("icms_debito_id"));
+                }
+                if (linha.existsColumn("icms_debito_foraestado_id")) {
+                    produto.setIcmsDebitoForaEstadoId(linha.getString("icms_debito_foraestado_id"));
+                }
+                if (linha.existsColumn("icms_debito_foraestadonf_id")) {
+                    produto.setIcmsDebitoForaEstadoNfId(linha.getString("icms_debito_foraestadonf_id"));
+                }                
+                
+                //ID PAUTA FISCAL                
                 produto.setPautaFiscalId(linha.getString("id_pautafiscal"));
 
                 result.add(produto);
@@ -423,7 +478,12 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             try {
             imp.setId(linha.getString("id"));
             imp.setCnpj(linha.getString("cnpj"));
-            imp.setInscricaoestadual(linha.getString("inscricaoestadual"));
+            long cnpj = Utils.stringToLong(linha.getString("cnpj"));
+            if (cnpj > 99999999999L) {                
+                imp.setInscricaoestadual(linha.getString("inscricaoestadual"));
+            } else {
+                imp.setInscricaoestadual(linha.getString("rg"));
+            }
             imp.setOrgaoemissor(linha.getString("orgaoemissor"));
             imp.setRazao(linha.getString("razao"));
             imp.setFantasia(linha.getString("fantasia"));
@@ -957,5 +1017,31 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        
+        Arquivo inventario = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());  
+        
+        ProgressBar.setStatus("Carregando ofertas...");
+        for (LinhaArquivo linha: inventario) {            
+            OfertaIMP imp = new OfertaIMP();
+            
+            imp.setIdProduto(linha.getString("id"));
+            imp.setDataInicio(getData(linha.getString("datainicio")));
+            imp.setDataFim(getData(linha.getString("datatermino")));
+            imp.setPrecoOferta(linha.getDouble("precooferta"));
+            imp.setPrecoNormal(linha.getDouble("preconormal"));
+            imp.setSituacaoOferta(SituacaoOferta.ATIVO);
+            imp.setTipoOferta(TipoOfertaVO.CAPA);
+            
+            result.add(imp);
+        }
+        
+        return result;
+    }
+    
+    
     
 }

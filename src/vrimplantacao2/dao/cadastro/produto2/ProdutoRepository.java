@@ -906,6 +906,13 @@ public class ProdutoRepository {
             aliqDebito = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, icmsReducaoSaida);
             debitoForaEstado = provider.tributo().getIcms(icmsCstSaidaForaEstado, icmsAliqSaidaForaEstado, icmsReducaoSaidaForaEstado);
             debitoForaEstadoNfe = provider.tributo().getIcms(icmsCstSaidaForaEstadoNF, icmsAliqSaidaForaEstadoNF, icmsReducaoSaidaForaEstadoNF);
+            
+            if (debitoForaEstado == null) {
+                debitoForaEstado = aliqDebito;
+            }
+            if (debitoForaEstadoNfe == null) {
+                debitoForaEstadoNfe = aliqDebito;
+            }
 
             if (imp.getIcmsCstConsumidor() == null) {
                 if (icmsCstSaida == 20) {
@@ -948,6 +955,10 @@ public class ProdutoRepository {
             
             aliqCredito = provider.tributo().getIcms(icmsCstEntrada, icmsAliqEntrada, icmsReducaoEntrada);
             creditoForaEstado = provider.tributo().getIcms(icmsCstEntradaForaEstado, icmsAliqEntradaForaEstado, icmsReducaoEntradaForaEstado);
+            
+            if (creditoForaEstado == null) {
+                creditoForaEstado = aliqCredito;
+            }
         }
 
         aliquota.setAliquotaCredito(aliqCredito);
@@ -1372,28 +1383,31 @@ public class ProdutoRepository {
 
         try {
             provider.begin();
+            
+            setNotify("Ofertas...Carregando anteriores do produto", 0);
+            
+            Map<String, Integer> anteriores = provider.anterior().getAnteriores();
+            
             setNotify("Ofertas...Gravando...", filtrados.size());
 
             for (OfertaIMP imp : filtrados.values()) {
                 System.out.print("0");
                 //Produto existente
-                ProdutoAnteriorVO anterior = provider.anterior().get(
-                        provider.getSistema(),
-                        provider.getLoja(),
-                        imp.getIdProduto()
-                );
-                if (anterior != null && anterior.getCodigoAtual() != null) {
+                Integer codigoAtual = anteriores.get(imp.getIdProduto());
+                if (codigoAtual != null) {
                     System.out.print("1");
                     //Oferta não existe
                     if (!cadastradas.containsKey(
-                            anterior.getCodigoAtual().getId(),
+                            codigoAtual,
                             imp.getDataInicio(),
                             imp.getDataTermino(),
                             imp.getSituacaoOferta().getId()
                     )) {
                         System.out.print("2");
                         OfertaVO vo = converterOferta(imp);
-                        vo.setProduto(anterior.getCodigoAtual());
+                        ProdutoVO p = new ProdutoVO();
+                        p.setId(codigoAtual);
+                        vo.setProduto(p);
 
                         provider.oferta().gravar(vo);
 
@@ -1439,6 +1453,7 @@ public class ProdutoRepository {
         vo.setDataTermino(imp.getDataTermino());
         vo.setIdLoja(provider.getLojaVR());
         vo.setPrecoOferta(imp.getPrecoOferta());
+        vo.setPrecoNormal(imp.getPrecoNormal());
         vo.setSituacaoOferta(imp.getSituacaoOferta());
         vo.setTipoOferta(imp.getTipoOferta());
 

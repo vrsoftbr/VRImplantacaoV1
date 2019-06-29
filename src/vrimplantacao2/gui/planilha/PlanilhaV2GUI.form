@@ -862,7 +862,7 @@
                           <Component id="txtClienteFile" alignment="2" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="tabsCliente" min="-2" pref="208" max="-2" attributes="0"/>
+                      <Component id="tabsCliente" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -915,8 +915,8 @@
                           <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="vRPanel2" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="vRPanel3" max="32767" attributes="0"/>
+                                  <Component id="vRPanel2" max="32767" attributes="0"/>
+                                  <Component id="vRPanel3" alignment="0" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -929,7 +929,7 @@
                               <Component id="vRPanel2" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="66" max="32767" attributes="0"/>
+                              <EmptySpace pref="164" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -949,23 +949,34 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkCliPrefDados" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkCliPrefContatos" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkCliPrefRotativo" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkCliPrefRotativoBaixas" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Component id="chkCliPrefDados" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkCliPrefContatos" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkCliPrefRotativo" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkCliPrefRotativoBaixas" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Component id="chkCliPrefInscricaoEstadual" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                                   <EmptySpace pref="202" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
                         <DimensionLayout dim="1">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkCliPrefDados" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkCliPrefContatos" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkCliPrefRotativo" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkCliPrefRotativoBaixas" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkCliPrefDados" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkCliPrefContatos" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkCliPrefRotativo" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkCliPrefRotativoBaixas" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCliPrefInscricaoEstadual" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
                         </DimensionLayout>
                       </Layout>
@@ -988,6 +999,11 @@
                         <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliPrefRotativoBaixas">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Cr&#xe9;dito Rotativo (Baixas)"/>
+                          </Properties>
+                        </Component>
+                        <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliPrefInscricaoEstadual">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Inscricao Estadual"/>
                           </Properties>
                         </Component>
                       </SubComponents>
@@ -1064,7 +1080,7 @@
                               <Component id="vRPanel4" min="-2" pref="55" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="vRPanel5" min="-2" pref="55" max="-2" attributes="0"/>
-                              <EmptySpace pref="48" max="32767" attributes="0"/>
+                              <EmptySpace pref="169" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -1205,7 +1221,7 @@
                               <Component id="chkClientePrefUnificar" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkClienteEvtUnificar" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="122" max="32767" attributes="0"/>
+                              <EmptySpace pref="243" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
