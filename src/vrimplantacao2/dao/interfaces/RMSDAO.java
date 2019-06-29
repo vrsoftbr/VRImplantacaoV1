@@ -21,10 +21,8 @@ import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoOracle;
-import vrimplantacao.dao.cadastro.OfertaDAO;
 import vrimplantacao.dao.cadastro.PagarOutrasDespesasDAO;
 import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.vrimplantacao.OfertaVO;
 import vrimplantacao.vo.vrimplantacao.PagarOutrasDespesasVO;
 import vrimplantacao.vo.vrimplantacao.PagarOutrasDespesasVencimentoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -38,6 +36,8 @@ import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
+import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoIva;
@@ -51,6 +51,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -74,9 +75,14 @@ public class RMSDAO extends InterfaceDAO {
     public static int digito;
     
     private boolean utilizarViewMixFiscal = true;
+    private boolean incluirNivel4 = true;
 
     public void setUtilizarViewMixFiscal(boolean utilizarViewMixFiscal) {
         this.utilizarViewMixFiscal = utilizarViewMixFiscal;
+    }
+
+    public void setIncluirNivel4(boolean incluirNivel4) {
+        this.incluirNivel4 = incluirNivel4;
     }
     
     @Override
@@ -211,33 +217,34 @@ public class RMSDAO extends InterfaceDAO {
                     }
                 }
             }
-            
-            try (ResultSet rst = stm.executeQuery(
-                    "select distinct \n" +
-                    "    nvl(m.ncc_secao, 0) AS merc1,\n" +
-                    "    nvl(m.ncc_grupo, 0) as merc2,\n" +
-                    "    nvl(m.ncc_subgrupo, 0) as merc3,\n" +
-                    "    nvl(m.ncc_categoria, 0) as merc4,\n" +
-                    "    nvl(m.ncc_descricao,'MERCADOLOGICO VR') AS merc4_desc " +
-                    "from \n" +
-                    "    aa3cnvcc m\n" +
-                    "where\n" +
-                    "    m.ncc_secao != 0 and\n" +
-                    "    m.ncc_grupo != 0 and\n" +
-                    "    m.ncc_subgrupo != 0 and\n" +
-                    "    m.ncc_categoria != 0" 
-            )) {
-                while (rst.next()) { 
-                    MercadologicoNivelIMP merc1 = merc.get(rst.getString("merc1"));
-                    if (merc1 != null) {
-                        MercadologicoNivelIMP merc2 = merc1.getNiveis().get(rst.getString("merc2"));
-                        if (merc2 != null) {
-                            MercadologicoNivelIMP merc3 = merc2.getNiveis().get(rst.getString("merc3"));
-                            if (merc3 != null) {
-                                merc3.addFilho(
-                                    rst.getString("merc4"),
-                                    rst.getString("merc4_desc")
-                                );
+            if (incluirNivel4) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select distinct \n" +
+                        "    nvl(m.ncc_secao, 0) AS merc1,\n" +
+                        "    nvl(m.ncc_grupo, 0) as merc2,\n" +
+                        "    nvl(m.ncc_subgrupo, 0) as merc3,\n" +
+                        "    nvl(m.ncc_categoria, 0) as merc4,\n" +
+                        "    nvl(m.ncc_descricao,'MERCADOLOGICO VR') AS merc4_desc " +
+                        "from \n" +
+                        "    aa3cnvcc m\n" +
+                        "where\n" +
+                        "    m.ncc_secao != 0 and\n" +
+                        "    m.ncc_grupo != 0 and\n" +
+                        "    m.ncc_subgrupo != 0 and\n" +
+                        "    m.ncc_categoria != 0" 
+                )) {
+                    while (rst.next()) { 
+                        MercadologicoNivelIMP merc1 = merc.get(rst.getString("merc1"));
+                        if (merc1 != null) {
+                            MercadologicoNivelIMP merc2 = merc1.getNiveis().get(rst.getString("merc2"));
+                            if (merc2 != null) {
+                                MercadologicoNivelIMP merc3 = merc2.getNiveis().get(rst.getString("merc3"));
+                                if (merc3 != null) {
+                                    merc3.addFilho(
+                                        rst.getString("merc4"),
+                                        rst.getString("merc4_desc")
+                                    );
+                                }
                             }
                         }
                     }
@@ -387,13 +394,14 @@ public class RMSDAO extends InterfaceDAO {
                     "	p.GIT_CATEGORIA merc4,\n" +
                     "	coalesce((select fam_pai from AA1FITEM where fam_filho = p.git_cod_item and rownum = 1), (select fam_pai from AA1FITEM where fam_pai = p.git_cod_item and rownum = 1)) id_familia,\n" +
                     "	coalesce(preco.id_situacaocadastral, 1) id_situacaocadastral,\n" +
-                    "	coalesce(det.DET_PESO_VND, p.GIT_PESO) pesoliquido,\n" +
-                    "	coalesce(det.DET_PESO_TRF, p.GIT_PESO) pesobruto,\n" +
+                    "	coalesce(nullif(det.DET_PESO_VND, 0), p.GIT_PESO) pesoliquido,\n" +
+                    "	coalesce(nullif(det.DET_PESO_TRF, 0), p.GIT_PESO) pesobruto,\n" +
                     "	0 estoqueminimo,\n" +
                     "	0 estoquemaximo,    \n" +
                     "	est.GET_ESTOQUE estoque,\n" +
                     "	p.GIT_MRG_LUCRO_1 margem,\n" +
                     "	p.git_envia_pdv,\n" +
+                    "	p.git_dat_sai_lin saidadelinha,\n" +
                     "	case when coalesce(preco.preco, 0) != 0 \n" +
                     "	then preco.preco\n" +
                     "	else coalesce(est.get_preco_venda,0) end precovenda,\n" +
@@ -493,6 +501,8 @@ public class RMSDAO extends InterfaceDAO {
                     "	  p.git_cod_item"
             )) {
                 SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
+                SimpleDateFormat format2 = new SimpleDateFormat("yyyyMMdd");
+                int dataatual = Utils.stringToInt(format2.format(new java.util.Date()));
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     
@@ -514,12 +524,17 @@ public class RMSDAO extends InterfaceDAO {
                     imp.setCodMercadologico1("0".equals(rst.getString("merc1")) ? "" : rst.getString("merc1"));
                     imp.setCodMercadologico2("0".equals(rst.getString("merc2")) ? "" : rst.getString("merc2"));
                     imp.setCodMercadologico3("0".equals(rst.getString("merc3")) ? "" : rst.getString("merc3"));
-                    imp.setCodMercadologico4("0".equals(rst.getString("merc4")) ? "" : rst.getString("merc4"));
+                    if (incluirNivel4) {
+                        imp.setCodMercadologico4("0".equals(rst.getString("merc4")) ? "" : rst.getString("merc4"));
+                    }
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(Utils.stringToInt(rst.getString("id_situacaocadastral"))));
                     imp.setPesoBruto(rst.getDouble("pesoliquido"));
                     imp.setPesoLiquido(rst.getDouble("pesobruto"));
-                    
+                    if (rst.getInt("saidadelinha") > 0) {
+                        int dataForaDeLinha = Utils.stringToInt(format2.format(format.parse(rst.getString("saidadelinha"))));
+                        imp.setDescontinuado(dataForaDeLinha < dataatual);
+                    }                    
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
@@ -1468,16 +1483,12 @@ public class RMSDAO extends InterfaceDAO {
         }
         return result;
     }
-    
-    public void importarOfertas(int idLojaVR, int idLojaCliente) throws Exception {
-        ProgressBar.setStatus("Carregando dados das ofertas");
-        List<OfertaVO> ofertas = carregarOfertas(idLojaVR, idLojaCliente);
-        
-        new OfertaDAO().salvar(ofertas, idLojaVR);
-    }
-    
-    public List<OfertaVO> carregarOfertas(int idLojaVR, int idLojaCliente) throws Exception{
-        List<OfertaVO> ofertas = new ArrayList<>();
+
+    @Override
+    public List<OfertaIMP> getOfertas(java.util.Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        SimpleDateFormat format = new SimpleDateFormat("ddMMyy");
+        SimpleDateFormat format2 = new SimpleDateFormat("yyyyMMdd");
         
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -1497,20 +1508,56 @@ public class RMSDAO extends InterfaceDAO {
                     "        lpad(extract(day from current_date), 2, '0'))\n" +
                     "    and i.POF_LOJA = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1)
             )) {
-                SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
+
                 while (rst.next()) {
-                    OfertaVO vo = new OfertaVO();
-                    vo.setId_loja(idLojaVR);
-                    vo.setId_produto(rst.getInt("id_produto"));
-                    vo.setDatainicio(new Date(format.parse(rst.getString("datainicio")).getTime()));
-                    vo.setDatatermino(new Date(format.parse(rst.getString("datafim")).getTime()));
-                    vo.setPrecooferta(rst.getDouble("precooferta"));
-                    ofertas.add(vo);
+                    OfertaIMP imp = new OfertaIMP();
+                    
+                    imp.setIdProduto(rst.getString("id_produto"));
+                    imp.setDataInicio(format.parse(String.format("%06d", Utils.stringToInt(rst.getString("datainicio")))));
+                    imp.setDataFim(format.parse(String.format("%06d", Utils.stringToInt(rst.getString("datafim")))));
+                    imp.setPrecoOferta(rst.getDouble("precooferta"));
+                    imp.setSituacaoOferta(SituacaoOferta.ATIVO);
+                    imp.setTipoOferta(TipoOfertaVO.CAPA);
+                    
+                    result.add(imp);
+                }
+            }
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "  git_cod_item id_produto,\n" +
+                    "  p.git_cod_item||p.git_digito cod_sped,\n" +
+                    "  p.git_ini_oft_1 datainiciooferta,\n" +
+                    "  p.git_fim_oft_1 datafimoferta,\n" +
+                    "  p.git_prc_oft_1 precooferta\n" +
+                    "from \n" +
+                    "  AA3CITEM p \n" +
+                    "where\n" +
+                    "  p.git_fim_oft_1 > 0 and\n" +
+                    "  p.git_prc_oft_1 > 0" //Provavelmente são as ofertas da loja 1
+            )) {
+                long dataAtual = Utils.stringToLong(format2.format(new java.util.Date()));
+                while (rst.next()) {
+                    
+                    java.util.Date parse = format.parse(rst.getString("datafimoferta"));
+                    long dataTerm = Utils.stringToLong(format2.format(parse));
+                    
+                    if (dataTerm >= dataAtual) {
+                        OfertaIMP imp = new OfertaIMP();
+                    
+                        imp.setIdProduto(rst.getString("id_produto"));
+                        imp.setDataInicio(format.parse(String.format("%06d", Utils.stringToInt(rst.getString("datainiciooferta")))));
+                        imp.setDataFim(format.parse(String.format("%06d", Utils.stringToInt(rst.getString("datafimoferta")))));
+                        imp.setPrecoOferta(rst.getDouble("precooferta"));
+                        imp.setSituacaoOferta(SituacaoOferta.ATIVO);
+                        imp.setTipoOferta(TipoOfertaVO.CAPA);
+
+                        result.add(imp);
+                    }
                 }
             }
         }
         
-        return ofertas;
+        return result;
     }
 
     public void importarContasAPagar(int idLojaVR) throws Exception {
