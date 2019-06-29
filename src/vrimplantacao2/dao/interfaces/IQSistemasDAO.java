@@ -13,6 +13,10 @@ import java.util.List;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEstadoCivil;
+import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -298,6 +302,215 @@ public class IQSistemasDAO extends InterfaceDAO {
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
                     imp.setCodigoExterno(rst.getString("documento"));
                     imp.setCustoTabela(rst.getDouble("custofornecedor"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n"
+                    + "c.Codigo,\n"
+                    + "c.Nome,\n"
+                    + "c.apelido,\n"
+                    + "c.cnpj,\n"
+                    + "c.inscricao,\n"
+                    + "c.cpf,\n"
+                    + "c.identidade AS rg,\n"
+                    + "c.endereco,\n"
+                    + "c.numero,\n"
+                    + "c.cep,\n"
+                    + "c.bairro,\n"
+                    + "c.cidade,\n"
+                    + "c.estado,\n"
+                    + "c.telefone,\n"
+                    + "c.telefone2,\n"
+                    + "c.telefone3,\n"
+                    + "c.fax,\n"
+                    + "c.celular,\n"
+                    + "c.email,\n"
+                    + "c.datacadastro,\n"
+                    + "c.nascimento,\n"
+                    + "c.localtrabalho,\n"
+                    + "c.profissao,\n"
+                    + "c.salario,\n"
+                    + "c.enderecotrab,\n"
+                    + "c.bairrotrab,\n"
+                    + "c.ceptrab,\n"
+                    + "c.cidadetrab,\n"
+                    + "c.estadotrab,\n"
+                    + "c.telefonetrab,\n"
+                    + "c.cnpjtrab,\n"
+                    + "c.credito,\n"
+                    + "c.situacao AS situacaocadastro,\n"
+                    + "c.sexo,\n"
+                    + "c.estadocivil,\n"
+                    + "c.conjuge,\n"
+                    + "c.cpfconj,\n"
+                    + "c.identidadeconj,\n"
+                    + "c.nascimentoconj,\n"
+                    + "c.pai,\n"
+                    + "c.mae,\n"
+                    + "c.ultcompra,\n"
+                    + "c.ultpagamento,\n"
+                    + "c.ultvrpago,\n"
+                    + "c.observacao\n"
+                    + "FROM clientes c;"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("Codigo"));
+                    imp.setRazao(rst.getString("Nome"));
+                    imp.setFantasia(rst.getString("apelido"));
+                    imp.setCnpj(rst.getString("cpf"));
+                    imp.setInscricaoestadual(rst.getString("rg"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade"));
+                    imp.setUf(rst.getString("estado"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setDataNascimento(rst.getDate("nascimento"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setFax(rst.getString("fax"));
+                    imp.setEmail(rst.getString("email") != null ? rst.getString("email").toLowerCase() : null);
+
+                    if ((rst.getString("telefone2") != null)
+                            && (!rst.getString("telefone2").trim().isEmpty())) {
+                        imp.addContato(
+                                "1",
+                                "TELEFONE 2",
+                                rst.getString("telefone2"),
+                                null,
+                                null
+                        );
+                    }
+                    if ((rst.getString("telefone3") != null)
+                            && (!rst.getString("telefone3").trim().isEmpty())) {
+                        imp.addContato(
+                                "2",
+                                "TELEFONE 3",
+                                rst.getString("telefone3"),
+                                null,
+                                null
+                        );
+                    }
+
+                    imp.setEmpresa(rst.getString("localhosttrabalho"));
+                    imp.setCargo(rst.getString("profissao"));
+                    imp.setSalario(rst.getDouble("salario"));
+                    imp.setEmpresaEndereco(rst.getString("enderecotrab"));
+                    imp.setEmpresaCep(rst.getString("ceptrab"));
+                    imp.setEmpresaBairro(rst.getString("bairrotrab"));
+                    imp.setEmpresaMunicipio(rst.getString("cidadetrab"));
+                    imp.setEmpresaUf(rst.getString("estadotrab"));
+                    imp.setEmpresaTelefone(rst.getString("telefonetrab"));
+                    imp.setValorLimite(rst.getDouble("credito"));
+
+                    if ((rst.getString("situacaocadastro") != null)
+                            && (!rst.getString("situacaocadastro").trim().isEmpty())) {
+
+                        if (rst.getString("situacaocadastro").contains("CANCEL")) {
+                            imp.setAtivo(false);
+                            imp.setBloqueado(true);
+                            imp.setPermiteCheque(false);
+                            imp.setPermiteCreditoRotativo(false);
+                        } else if (rst.getString("situacaocadastro").contains("EXCLU")) {
+                            imp.setAtivo(false);
+                            imp.setBloqueado(true);
+                            imp.setPermiteCheque(false);
+                            imp.setPermiteCreditoRotativo(false);
+                        } else if (rst.getString("situacaocadastro").contains("LIBERA")) {
+                            imp.setAtivo(true);
+                            imp.setBloqueado(false);
+                            imp.setPermiteCheque(true);
+                            imp.setPermiteCreditoRotativo(true);
+                        } else if (rst.getString("situacaocadastro").contains("BLOQUE")) {
+                            imp.setAtivo(true);
+                            imp.setBloqueado(true);
+                            imp.setPermiteCheque(true);
+                            imp.setPermiteCreditoRotativo(true);
+                        } else {
+                            imp.setAtivo(true);
+                            imp.setBloqueado(false);
+                            imp.setPermiteCheque(true);
+                            imp.setPermiteCreditoRotativo(true);
+                        }
+                    } else {
+                        imp.setAtivo(false);
+                        imp.setBloqueado(true);
+                        imp.setPermiteCheque(false);
+                        imp.setPermiteCreditoRotativo(false);
+                    }
+
+                    imp.setSexo(rst.getString("sexo").contains("F") ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+
+                    if ((rst.getString("estadocivil") != null)
+                            && (!rst.getString("estadocivil").trim().isEmpty())) {
+
+                        if (rst.getString("estadocivil").contains("Solte")) {
+                            imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
+                        } else if (rst.getString("estadocivil").contains("casa")) {
+                            imp.setEstadoCivil(TipoEstadoCivil.CASADO);
+                        } else if (rst.getString("estadocivil").contains("viú")) {
+                            imp.setEstadoCivil(TipoEstadoCivil.VIUVO);
+                        } else if (rst.getString("estadocivil").contains("Sepera")) {
+                            imp.setEstadoCivil(TipoEstadoCivil.DIVORCIADO);
+                        } else {
+                            imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
+                        }
+                    } else {
+                        imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
+                    }
+
+                    imp.setNomeMae(rst.getString("mae"));
+                    imp.setNomePai(rst.getString("pai"));
+                    imp.setNomeConjuge(rst.getString("conjuge"));
+                    imp.setObservacao(rst.getString("observacao"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + "sequenciainc AS id, \n"
+                    + "codigo AS codcliente,\n"
+                    + "documento AS cupom,\n"
+                    + "datacompra AS emissao,\n"
+                    + "vencimento,\n"
+                    + "parcela,\n"
+                    + "valor,\n"
+                    + "valoratual\n"
+                    + "FROM crmovclientes \n"
+                    + "WHERE CodigoFilial = '" + getLojaOrigem() + "'\n"
+                    + "AND quitado = 'N'"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdCliente(rst.getString("codcliente"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setValor(rst.getDouble("valoratual"));
+                    imp.setNumeroCupom(rst.getString("cupom"));
+                    imp.setParcela(rst.getInt("parcela"));
                     result.add(imp);
                 }
             }
