@@ -260,18 +260,28 @@ public class PwGestorDAO extends InterfaceDAO {
                     imp.setPiscofinsCstDebito(rst.getString("pis"));
                     imp.setPiscofinsCstCredito(rst.getString("cofins"));
 
-                    if ((rst.getString("cst") != null)
-                            && (!rst.getString("cst").trim().isEmpty())) {
-
-                        if (rst.getString("cst").contains("500")) {
-                            imp.setIcmsCst(60);
-                        } else if (rst.getString("cst").contains("102")) {
-                            imp.setIcmsCst(40);
-                        } else {
-                            imp.setIcmsCst(rst.getInt("cst"));
-                        }
+                    if ((rst.getInt("icms") > 0)
+                            && (rst.getDouble("reducao_icms") == 0)) {
+                        imp.setIcmsCst(0);
+                    } else if ((rst.getInt("icms") > 0)
+                            && (rst.getDouble("reducao_icms") > 0)) {
+                        imp.setIcmsCst(20);
                     } else {
-                        imp.setIcmsCst(Integer.parseInt(Utils.formataNumero(rst.getString("cst"))));
+
+                        if ((rst.getString("cst") != null)
+                                && (!rst.getString("cst").trim().isEmpty())) {
+
+                            if (rst.getString("cst").contains("500")) {
+                                imp.setIcmsCst(60);
+                            } else if (rst.getString("cst").contains("102")) {
+                                imp.setIcmsCst(40);
+                            } else {
+                                imp.setIcmsCst(Integer.parseInt(Utils.formataNumero(rst.getString("cst"))));
+                            }
+                        } else {
+                            imp.setIcmsCst(Integer.parseInt(Utils.formataNumero(rst.getString("cst"))));
+                        }
+
                     }
 
                     imp.setIcmsAliq(rst.getDouble("icms"));
