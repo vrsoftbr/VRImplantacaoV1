@@ -259,6 +259,11 @@
                     <Property name="toolTipText" type="java.lang.String" value="Corrige o relacionamento entre o produto e a fam&#xed;lia."/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTipoEmbalagemPROD">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo Emb. Prod"/>
+                  </Properties>
+                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTipoEmbalagemEAN">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Tipo Emb. EAN"/>

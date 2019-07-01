@@ -219,6 +219,9 @@ public class ClickGUI extends VRInternalFrame implements ConexaoEvent {
                             if (chkQtdEmbalagemEAN.isSelected()) {
                                 opcoes.add(OpcaoProduto.QTD_EMBALAGEM_EAN);
                             }
+                            if (chkTipoEmbalagemPROD.isSelected()) {
+                                opcoes.add(OpcaoProduto.TIPO_EMBALAGEM_PRODUTO);
+                            }
                             if (chkPautaFiscalProduto.isSelected()) {
                                 opcoes.add(OpcaoProduto.EXCECAO);
                             }
@@ -349,6 +352,7 @@ public class ClickGUI extends VRInternalFrame implements ConexaoEvent {
         chkProdMercadologico = new vrframework.bean.checkBox.VRCheckBox();
         chkValidade = new vrframework.bean.checkBox.VRCheckBox();
         chkFamilia = new vrframework.bean.checkBox.VRCheckBox();
+        chkTipoEmbalagemPROD = new vrframework.bean.checkBox.VRCheckBox();
         chkTipoEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkMargem = new vrframework.bean.checkBox.VRCheckBox();
@@ -481,6 +485,9 @@ public class ClickGUI extends VRInternalFrame implements ConexaoEvent {
         chkFamilia.setText("Família X Produto");
         chkFamilia.setToolTipText("Corrige o relacionamento entre o produto e a família.");
         tabProdutos.add(chkFamilia);
+
+        chkTipoEmbalagemPROD.setText("Tipo Emb. Prod");
+        tabProdutos.add(chkTipoEmbalagemPROD);
 
         chkTipoEmbalagemEAN.setText("Tipo Emb. EAN");
         tabProdutos.add(chkTipoEmbalagemEAN);
@@ -730,6 +737,7 @@ public class ClickGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
+    private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemPROD;
     private vrframework.bean.checkBox.VRCheckBox chkValidade;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;

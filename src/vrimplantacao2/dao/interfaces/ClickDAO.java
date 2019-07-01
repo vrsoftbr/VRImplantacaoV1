@@ -91,30 +91,31 @@ public class ClickDAO extends InterfaceDAO {
         List<ProdutoIMP> result = new ArrayList<>();
         try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	 p.id,\n" +
-                    "    pc.codigo ean,\n" +
-                    "    p.nome descricaocompleta,\n" +
-                    "    pc.custo,\n" +
-                    "    pc.venda,\n" +
-                    "    p.datacadastro,\n" +
-                    "    p.dataalteracao,\n" +        
-                    "    p.idgrupo merc1,\n" +
-                    "    1 merc2,\n" +
-                    "    1 merc3,\n" +
-                    "    p.validade,\n" +
-                    "    p.estoqueminimo,\n" +
-                    "    pn.ncm,\n" +
-                    "    pn.cest,\n" +
-                    "    pn.cofins_cst,\n" +
-                    "    pn.pis_cst,\n" +
-                    "    pn.icms_cst\n" +
-                    "from\n" +
-                    "	proddetalhes p\n" +
-                    "join prodcodigos pc on (p.id = pc.idproduto)\n" +
-                    "join prodnfe pn on (p.id = pn.idproduto)\n" +
-                    "order by\n" +
-                    "	p.nome")) {
+                    "select\n"
+                    + "	p.id,\n"
+                    + "	pc.codigo ean,\n"
+                    + "	p.nome descricaocompleta,\n"
+                    + " emb.um as tipoembalagem,\n"
+                    + "	pc.custo,\n"
+                    + "	pc.venda,\n"
+                    + "	p.datacadastro,\n"
+                    + "	p.dataalteracao,\n"
+                    + "	p.idgrupo merc1,\n"
+                    + "	1 merc2,\n"
+                    + "	1 merc3,\n"
+                    + "	p.validade,\n"
+                    + "	p.estoqueminimo,\n"
+                    + "	pn.ncm,\n"
+                    + "	pn.cest,\n"
+                    + "	pn.cofins_cst,\n"
+                    + "	pn.pis_cst,\n"
+                    + "	pn.icms_cst\n"
+                    + "from\n"
+                    + "	proddetalhes p\n"
+                    + "join prodcodigos pc on (p.id = pc.idproduto)\n"
+                    + "join prodnfe pn on (p.id = pn.idproduto)\n"
+                    + "join tab_um emb on emb.id = pc.idum\n"
+                    + "order by p.nome")) {
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -125,6 +126,7 @@ public class ClickDAO extends InterfaceDAO {
                         imp.seteBalanca(true);
                         imp.setValidade(rs.getInt("validade"));
                     }
+                    imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
