@@ -34,8 +34,12 @@
                   <Component id="vRPanel6" alignment="0" pref="554" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="chkUtilizarViewMixFiscal" min="-2" max="-2" attributes="0"/>
                           <Component id="vRToolBarPadrao3" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="chkUtilizarViewMixFiscal" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="chkIncluirNivel4" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
@@ -51,9 +55,12 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="vRPanel6" min="-2" pref="152" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
-              <Component id="chkUtilizarViewMixFiscal" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="chkUtilizarViewMixFiscal" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="chkIncluirNivel4" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="tabs" pref="212" max="32767" attributes="0"/>
+              <Component id="tabs" pref="216" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -866,6 +873,11 @@
     <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUtilizarViewMixFiscal">
       <Properties>
         <Property name="text" type="java.lang.String" value="Utilizar View de Mix Fiscal"/>
+      </Properties>
+    </Component>
+    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIncluirNivel4">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Incluir Mercadol&#xf3;gico nivel 4"/>
       </Properties>
     </Component>
   </SubComponents>
