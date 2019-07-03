@@ -199,6 +199,7 @@ public class IQSistemasGUI extends VRInternalFrame implements ConexaoEvent {
         tabs = new javax.swing.JTabbedPane();
         conexaoMySQL = new vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel();
         tabImportacao = new javax.swing.JTabbedPane();
+        vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -254,6 +255,7 @@ public class IQSistemasGUI extends VRInternalFrame implements ConexaoEvent {
         conexaoMySQL.setSistema(getSISTEMA());
         tabs.addTab("Conexão", conexaoMySQL);
 
+        tabImportacao.addTab("Balança", vRImportaArquivBalancaPanel1);
         tabImportacao.addTab("Produtos", tabProdutos);
 
         chkFornecedor.setText("Fornecedor");
@@ -376,6 +378,7 @@ public class IQSistemasGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JTabbedPane tabImportacao;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private javax.swing.JTabbedPane tabs;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel1;
     // End of variables declaration//GEN-END:variables
 
