@@ -28,8 +28,8 @@ public class ProdutoBalancaDAO {
             for (LinhaArquivo linha: balanca) {
                 ProdutoBalancaVO vo = new ProdutoBalancaVO();
                 
-                vo.setCodigo(linha.getInt("codigo"));
-                vo.setDescricao(linha.getString("descricao"));
+                vo.setCodigo(Integer.parseInt(Utils.formataNumero(linha.getString("codigo"))));
+                vo.setDescricao(Utils.acertarTexto(linha.getString("descricao")));
                 String pesavel = Utils.acertarTexto(linha.getString("pesavel"), 2);
                 switch (pesavel) {
                     case "UN": vo.setPesavel("U"); break;

@@ -12,10 +12,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoMySQL;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -92,10 +97,11 @@ public class IQSistemasDAO extends InterfaceDAO {
             OpcaoProduto.PIS_COFINS,
             OpcaoProduto.NATUREZA_RECEITA,
             OpcaoProduto.ICMS,
-            OpcaoProduto.MARGEM
+            OpcaoProduto.MARGEM,
+            OpcaoProduto.ATIVO
         }));
     }
-    
+
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -138,7 +144,7 @@ public class IQSistemasDAO extends InterfaceDAO {
                     + "p.codigo AS id,\n"
                     + "p.codigobarras,\n"
                     + "p.descricao,\n"
-                    + "p.unidade AS tipoembalagem,\n"
+                    + "p.unidembalagem AS tipoembalagem,\n"
                     + "p.embalagem AS qtdembalagem,\n"
                     + "p.datacadastro AS datacadastro,\n"
                     + "p.tributacao AS csticms,\n"
@@ -151,7 +157,9 @@ public class IQSistemasDAO extends InterfaceDAO {
                     + "p.cstpisEntrada,\n"
                     + "p.cstcofinsEntrada,\n"
                     + "p.codigosuspensaopis as naturezareceita,\n"
+                    + "g.codigo as codigogrupo,\n"
                     + "p.grupo,\n"
+                    + "s.codigosubgrupo,\n"
                     + "p.subgrupo,\n"
                     + "p.custo,\n"
                     + "p.margemlucro,\n"
@@ -160,18 +168,49 @@ public class IQSistemasDAO extends InterfaceDAO {
                     + "p.saldofinalestoque AS estoque,\n"
                     + "p.validade,\n"
                     + "p.pesobruto,\n"
-                    + "p.pesoliquido\n"
+                    + "p.pesoliquido,\n"
+                    + "p.situacao,\n"
+                    + "p.unidade\n"
                     + "FROM produtos p\n"
+                    + "LEFT JOIN grupos g ON g.grupo = p.grupo\n"
+                    + "LEFT JOIN subgrupos s ON s.subgrupo = p.subgrupo\n"
                     + "WHERE p.CodigoFilial = '" + getLojaOrigem() + "'\n"
                     + "ORDER BY p.codigo"
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
+
                     ProdutoIMP imp = new ProdutoIMP();
+                    ProdutoBalancaVO produtoBalanca;
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
-                    imp.setEan(rst.getString("codigobarras"));
-                    imp.setValidade(rst.getInt("validade"));
+                    imp.setEan(Utils.formataNumero(rst.getString("codigobarras")));
+
+                    if ((imp.getEan() != null)
+                            && (!imp.getEan().trim().isEmpty())
+                            && (imp.getEan().length() < 7)
+                            && (rst.getString("situacao").contains("Item da Bala"))) {
+                        long codigoProduto;
+                        codigoProduto = Long.parseLong(imp.getEan());
+                        if (codigoProduto <= Integer.MAX_VALUE) {
+                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                        } else {
+                            produtoBalanca = null;
+                        }
+
+                        if (produtoBalanca != null) {
+                            imp.seteBalanca(true);
+                            imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
+                        } else {
+                            imp.setValidade(0);
+                            imp.seteBalanca(false);
+                        }
+                    } else {
+                        imp.setValidade(0);
+                        imp.seteBalanca(false);
+                    }
+
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -180,12 +219,16 @@ public class IQSistemasDAO extends InterfaceDAO {
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
+                    imp.setCodMercadologico1(rst.getString("codigogrupo"));
+                    imp.setCodMercadologico2(rst.getString("codigosubgrupo"));
+                    imp.setCodMercadologico3("1");
                     imp.setMargem(rst.getDouble("margemlucro"));
                     imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setEstoqueMinimo(rst.getDouble("estminimo"));
                     imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setSituacaoCadastro(rst.getString("situacao").contains("Inativo") ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("tributacaoPIS"));
@@ -447,7 +490,7 @@ public class IQSistemasDAO extends InterfaceDAO {
                         );
                     }
 
-                    imp.setEmpresa(rst.getString("localhosttrabalho"));
+                    imp.setEmpresa(rst.getString("localtrabalho"));
                     imp.setCargo(rst.getString("profissao"));
                     imp.setSalario(rst.getDouble("salario"));
                     imp.setEmpresaEndereco(rst.getString("enderecotrab"));
@@ -525,11 +568,11 @@ public class IQSistemasDAO extends InterfaceDAO {
         }
         return result;
     }
-    
+
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
