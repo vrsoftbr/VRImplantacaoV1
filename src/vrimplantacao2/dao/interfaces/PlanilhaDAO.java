@@ -28,6 +28,7 @@ import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.SituacaoCheque;
 import vrimplantacao2.vo.enums.TipoCancelamento;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoDesconto;
@@ -36,6 +37,8 @@ import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoIndicadorIE;
 import vrimplantacao2.vo.enums.TipoOrgaoPublico;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.enums.TipoVistaPrazo;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
@@ -1041,7 +1044,45 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        
+        Arquivo inventario = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());  
+        
+        ProgressBar.setStatus("Carregando cheques...");
+        for (LinhaArquivo linha: inventario) {            
+            ChequeIMP imp = new ChequeIMP();
+            
+            imp.setId(linha.getString("id"));
+            imp.setCpf(linha.getString("cnpjcpf"));
+            imp.setNumeroCheque(linha.getString("numerocheque"));
+            imp.setBanco(Utils.stringToInt(linha.getString("banco")));
+            imp.setAgencia(linha.getString("agencia"));
+            imp.setConta(linha.getString("conta"));
+            imp.setDate(getData(linha.getString("data")));
+            imp.setDataDeposito(getData(linha.getString("datadeposito")));
+            imp.setNumeroCupom(linha.getString("numerocupom"));
+            imp.setEcf(linha.getString("ecf"));
+            imp.setValor(linha.getDouble("valor"));
+            imp.setRg(linha.getString("rg"));
+            imp.setTelefone(linha.getString("telefone"));
+            imp.setNome(linha.getString("nome"));
+            imp.setObservacao(linha.getString("observacao"));
+            imp.setSituacaoCheque(linha.getBoolean("baixado") ? SituacaoCheque.BAIXADO : SituacaoCheque.ABERTO);
+            imp.setCmc7(linha.getString("cmc7"));
+            imp.setAlinea(Utils.stringToInt(linha.getString("alinea")));
+            imp.setValorJuros(linha.getDouble("valorjuros"));
+            imp.setValorAcrescimo(linha.getDouble("valoracrescimo"));
+            imp.setVistaPrazo(linha.getBoolean("aprazo") ? TipoVistaPrazo.PRAZO : TipoVistaPrazo.A_VISTA);
+            
+            result.add(imp);
+        }
+        
+        return result;
+    }
     
-    
+
     
 }

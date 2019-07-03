@@ -138,6 +138,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         chkCliPrefRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkCliPrefRotativoBaixas = new vrframework.bean.checkBox.VRCheckBox();
         chkCliPrefInscricaoEstadual = new vrframework.bean.checkBox.VRCheckBox();
+        chkCliCheques = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         chkCliEvenDados = new vrframework.bean.checkBox.VRCheckBox();
         chkCliEvenContatos = new vrframework.bean.checkBox.VRCheckBox();
@@ -624,6 +625,8 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkCliPrefInscricaoEstadual, "Inscricao Estadual");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkCliCheques, "Cheques");
+
         javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
         vRPanel2.setLayout(vRPanel2Layout);
         vRPanel2Layout.setHorizontalGroup(
@@ -638,9 +641,11 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkCliPrefRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkCliPrefRotativoBaixas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(chkCliPrefRotativoBaixas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCliCheques, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkCliPrefInscricaoEstadual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(202, Short.MAX_VALUE))
+                .addContainerGap(135, Short.MAX_VALUE))
         );
         vRPanel2Layout.setVerticalGroup(
             vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -649,7 +654,8 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                     .addComponent(chkCliPrefDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCliPrefContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCliPrefRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCliPrefRotativoBaixas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkCliPrefRotativoBaixas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCliCheques, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCliPrefInscricaoEstadual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -1143,6 +1149,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.button.VRButton btnMapaTribut;
     private vrframework.bean.button.VRButton btnMigrar;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI checksProdutoPanelGUI1;
+    private vrframework.bean.checkBox.VRCheckBox chkCliCheques;
     private vrframework.bean.checkBox.VRCheckBox chkCliEvenContatos;
     private vrframework.bean.checkBox.VRCheckBox chkCliEvenDados;
     private vrframework.bean.checkBox.VRCheckBox chkCliPrefContatos;
@@ -1335,6 +1342,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                     }
                                     if (chkCliPrefRotativoBaixas.isSelected()) {
                                         importador.importarCreditoRotativoBaixasAgrupadas();
+                                    }
+                                    if(chkCliCheques.isSelected()) {
+                                        importador.importarCheque();
                                     }
                                     if (chkCliEvenDados.isSelected()) {
                                         List<OpcaoCliente> opcoes = new ArrayList<>();

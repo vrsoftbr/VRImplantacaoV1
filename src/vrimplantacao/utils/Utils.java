@@ -707,7 +707,7 @@ public class Utils {
     public static String acertarTexto(String texto) {
         if (texto != null && !texto.isEmpty()) {
             String vRetorno = "", textoAcertado = "",
-                    strPode = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ?!@#%*()-_=+[{]}.>,<'|'";
+                    strPode = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ?!@#%()-_=+[{]}.>,<'|'";
 
             if (!"".equals(texto)) {
                 texto = texto.replace("$", " ");
@@ -783,6 +783,7 @@ public class Utils {
                 texto = texto.replace("'", "");
                 texto = texto.replace("`", "");
                 texto = texto.replace("´", "");
+                texto = texto.replace("*", "");
 
                 for (int i = 0; i < texto.length(); i++) {
                     if (strPode.indexOf(texto.charAt(i)) != -1) {
@@ -812,7 +813,7 @@ public class Utils {
     public static String acertarTextoMultiLinha(String texto) {
         if (texto != null && !texto.isEmpty()) {
             String vRetorno = "", textoAcertado = "",
-                    strPode = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ?!@#%*()-_=+[{]}.>,<'|'\n\r";
+                    strPode = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ?!@#%()-_=+[{]}.>,<'|'\n\r";
 
             if (!"".equals(texto)) {
                 texto = texto.replace("$", " ");
@@ -888,6 +889,7 @@ public class Utils {
                 texto = texto.replace("'", "");
                 texto = texto.replace("`", "");
                 texto = texto.replace("´", "");
+                texto = texto.replace("*", "");
 
                 for (int i = 0; i < texto.length(); i++) {
                     if (strPode.indexOf(texto.charAt(i)) != -1) {
