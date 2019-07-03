@@ -91,70 +91,87 @@ public class ClickDAO extends InterfaceDAO {
         List<ProdutoIMP> result = new ArrayList<>();
         try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	 p.id,\n" +
-                    "    pc.codigo ean,\n" +
-                    "    p.nome descricaocompleta,\n" +
-                    "    pc.custo,\n" +
-                    "    pc.venda,\n" +
-                    "    p.datacadastro,\n" +
-                    "    p.dataalteracao,\n" +        
-                    "    p.idgrupo merc1,\n" +
-                    "    1 merc2,\n" +
-                    "    1 merc3,\n" +
-                    "    p.validade,\n" +
-                    "    p.estoqueminimo,\n" +
-                    "    pn.ncm,\n" +
-                    "    pn.cest,\n" +
-                    "    pn.cofins_cst,\n" +
-                    "    pn.pis_cst,\n" +
-                    "    pn.icms_cst\n" +
-                    "from\n" +
-                    "	proddetalhes p\n" +
-                    "join prodcodigos pc on (p.id = pc.idproduto)\n" +
-                    "join prodnfe pn on (p.id = pn.idproduto)\n" +
-                    "order by\n" +
-                    "	p.nome")) {
+                    "select\n"
+                    + "	p.id,\n"
+                    + "	pc.codigo ean,\n"
+                    + "	p.nome descricaocompleta,\n"
+                    + " emb.um as tipoembalagem,\n"
+                    + "	pc.custo,\n"
+                    + "	pc.venda,\n"
+                    + "	p.datacadastro,\n"
+                    + "	p.dataalteracao,\n"
+                    + "	p.idgrupo merc1,\n"
+                    + "	1 merc2,\n"
+                    + "	1 merc3,\n"
+                    + "	p.validade,\n"
+                    + "	p.estoqueminimo,\n"
+                    + "	pn.ncm,\n"
+                    + "	pn.cest,\n"
+                    + "	pn.cofins_cst,\n"
+                    + "	pn.pis_cst,\n"
+                    + "	pn.icms_cst\n"
+                    + "from\n"
+                    + "	proddetalhes p\n"
+                    + "right join prodcodigos pc on (p.id = pc.idproduto)\n"
+                    + "right join prodnfe pn on (p.id = pn.idproduto)\n"
+                    + "right join tab_um emb on emb.id = pc.idum\n"
+                    + "order by p.nome")) {
                 while(rs.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rs.getString("id"));
-                    imp.setEan(Utils.formataNumero(rs.getString("ean")));
-                    if((imp.getEan() != null) && (imp.getEan().length() < 7)) {
-                        imp.seteBalanca(true);
-                        imp.setValidade(rs.getInt("validade"));
-                    }
-                    imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(imp.getDescricaoCompleta());
-                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    imp.setCustoComImposto(rs.getDouble("custo"));
-                    imp.setCustoSemImposto(imp.getCustoComImposto());
-                    imp.setPrecovenda(rs.getDouble("venda"));
-                    imp.setDataCadastro(rs.getDate("datacadastro"));
-                    imp.setDataAlteracao(rs.getDate("dataalteracao"));
-                    imp.setCodMercadologico1(rs.getString("merc1"));
-                    imp.setCodMercadologico2(rs.getString("merc2"));
-                    imp.setCodMercadologico3(rs.getString("merc3"));
-                    imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
-                    imp.setNcm(rs.getString("ncm"));
-                    imp.setCest(rs.getString("cest"));
-                    imp.setPiscofinsCstCredito(rs.getString("cofins_cst"));
-                    imp.setPiscofinsCstDebito(rs.getString("pis_cst"));
-                    if((rs.getString("icms_cst") != null) && (!"".equals(rs.getString("icms_cst")))) {
-                        switch(rs.getString("icms_cst").trim()) {
-                            case "500": 
-                                    imp.setIcmsAliq(0); 
+                    
+                    //if (!Utils.encontrouLetraCampoNumerico(rs.getString("ean"))
+                    //        && (!rs.getString("ean").startsWith("0"))) {
+
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rs.getString("id"));
+                        
+                        if ((rs.getString("ean") != null)
+                                && (!rs.getString("ean").trim().isEmpty())) {
+                            imp.setEan(rs.getString("ean").trim());
+                        } else {
+                            imp.setEan("0");
+                        }
+
+                        if ((imp.getEan() != null)
+                                && (imp.getEan().length() < 7)
+                                && (!Utils.encontrouLetraCampoNumerico(imp.getEan()))) {
+                            imp.seteBalanca(true);
+                            imp.setValidade(rs.getInt("validade"));
+                        }
+
+                        imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
+                        imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
+                        imp.setDescricaoReduzida(imp.getDescricaoCompleta());
+                        imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                        imp.setCustoComImposto(rs.getDouble("custo"));
+                        imp.setCustoSemImposto(imp.getCustoComImposto());
+                        imp.setPrecovenda(rs.getDouble("venda"));
+                        imp.setDataCadastro(rs.getDate("datacadastro"));
+                        imp.setDataAlteracao(rs.getDate("dataalteracao"));
+                        imp.setCodMercadologico1(rs.getString("merc1"));
+                        imp.setCodMercadologico2(rs.getString("merc2"));
+                        imp.setCodMercadologico3(rs.getString("merc3"));
+                        imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
+                        imp.setNcm(rs.getString("ncm"));
+                        imp.setCest(rs.getString("cest"));
+                        imp.setPiscofinsCstCredito(rs.getString("cofins_cst"));
+                        imp.setPiscofinsCstDebito(rs.getString("pis_cst"));
+                        if ((rs.getString("icms_cst") != null) && (!"".equals(rs.getString("icms_cst")))) {
+                            switch (rs.getString("icms_cst").trim()) {
+                                case "500":
+                                    imp.setIcmsAliq(0);
                                     imp.setIcmsCst(60);
                                     break;
-                            default:
-                                    imp.setIcmsAliq(0); 
+                                default:
+                                    imp.setIcmsAliq(0);
                                     imp.setIcmsCst(40);
                                     break;
-                            
+
+                            }
                         }
-                    }
-                    result.add(imp);
+                        result.add(imp);
+                    //}
                 }
             }
         }

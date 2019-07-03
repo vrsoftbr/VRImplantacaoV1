@@ -9,9 +9,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -53,6 +57,45 @@ public class IQSistemasDAO extends InterfaceDAO {
         return result;
     }
 
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(new OpcaoProduto[]{
+            OpcaoProduto.MERCADOLOGICO,
+            OpcaoProduto.MAPA_TRIBUTACAO,
+            OpcaoProduto.FAMILIA_PRODUTO,
+            OpcaoProduto.FAMILIA,
+            OpcaoProduto.PRODUTOS,
+            OpcaoProduto.IMPORTAR_RESETAR_BALANCA,
+            OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+            OpcaoProduto.DATA_CADASTRO,
+            OpcaoProduto.DATA_ALTERACAO,
+            OpcaoProduto.EAN,
+            OpcaoProduto.EAN_EM_BRANCO,
+            OpcaoProduto.TIPO_EMBALAGEM_EAN,
+            OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.PESAVEL,
+            OpcaoProduto.VALIDADE,
+            OpcaoProduto.DESC_COMPLETA,
+            OpcaoProduto.DESC_GONDOLA,
+            OpcaoProduto.ATIVO,
+            OpcaoProduto.DESC_REDUZIDA,
+            OpcaoProduto.MERCADOLOGICO_PRODUTO,
+            OpcaoProduto.PESO_BRUTO,
+            OpcaoProduto.PESO_LIQUIDO,
+            OpcaoProduto.ESTOQUE_MINIMO,
+            OpcaoProduto.ESTOQUE_MAXIMO,
+            OpcaoProduto.ESTOQUE,
+            OpcaoProduto.CUSTO,
+            OpcaoProduto.PRECO,
+            OpcaoProduto.NCM,
+            OpcaoProduto.CEST,
+            OpcaoProduto.PIS_COFINS,
+            OpcaoProduto.NATUREZA_RECEITA,
+            OpcaoProduto.ICMS,
+            OpcaoProduto.MARGEM
+        }));
+    }
+    
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();

@@ -57,7 +57,7 @@
                   <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="tabOperacoes" pref="295" max="32767" attributes="0"/>
+              <Component id="tabOperacoes" pref="322" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="pnlLoja" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -259,6 +259,11 @@
                     <Property name="toolTipText" type="java.lang.String" value="Corrige o relacionamento entre o produto e a fam&#xed;lia."/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTipoEmbalagemPROD">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo Emb. Prod"/>
+                  </Properties>
+                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTipoEmbalagemEAN">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Tipo Emb. EAN"/>
@@ -364,7 +369,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jPanel3" pref="149" max="32767" attributes="0"/>
+                          <Component id="jPanel3" pref="176" max="32767" attributes="0"/>
                           <EmptySpace min="-2" pref="74" max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -423,7 +428,7 @@
                           <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="158" max="32767" attributes="0"/>
+                          <EmptySpace pref="185" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>

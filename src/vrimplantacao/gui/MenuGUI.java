@@ -19,7 +19,6 @@ import vrframework.gui.SobreGUI;
 import vrframework.remote.Arquivo;
 import vrimplantacao.classe.Global;
 import vrimplantacao.dao.DataProcessamentoDAO;
-import vrimplantacao.gui.LoginGUI;
 import vrimplantacao.gui.assistente.mapamercadologico.MapaMercadologicoGUI;
 import vrimplantacao.gui.assistente.parametro.ParametroGUI;
 import vrimplantacao.gui.cadastro.LojaConsultaGUI;
@@ -132,6 +131,7 @@ import vrimplantacao2.gui.interfaces.HRTechGUI;
 import vrimplantacao2.gui.interfaces.HipcomGUI;
 import vrimplantacao2.gui.interfaces.HiperGUI;
 import vrimplantacao2.gui.interfaces.ICommerceGUI;
+import vrimplantacao2.gui.interfaces.IQSistemasGUI;
 import vrimplantacao2.gui.interfaces.InfoBrasilGUI;
 import vrimplantacao2.gui.interfaces.InfoMacGUI;
 import vrimplantacao2.gui.interfaces.IntelliCashGUI;
@@ -565,9 +565,9 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSolutionSupera = new javax.swing.JMenuItem();
         mnuGDoor = new javax.swing.JMenuItem();
         mnuLiteci = new javax.swing.JMenuItem();
-        mnuPwGestor = new javax.swing.JMenuItem();
         mnuTga = new javax.swing.JMenuItem();
         mnuAutomaq = new javax.swing.JMenuItem();
+        mnuPwGestor = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -662,6 +662,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSuperLoja10 = new javax.swing.JMenuItem();
         mnuGTech = new javax.swing.JMenuItem();
         mnuClick = new javax.swing.JMenuItem();
+        mnuIQSistemas = new javax.swing.JMenuItem();
         mnuOrion = new javax.swing.JMenu();
         jMenuItemOrion = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -2007,6 +2008,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu9.add(mnuClick);
+
+        mnuIQSistemas.setText("IQSistemas");
+        mnuIQSistemas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuIQSistemasActionPerformed(evt);
+            }
+        });
+        jMenu9.add(mnuIQSistemas);
 
         mnuDatabase.add(jMenu9);
 
@@ -3984,6 +3993,11 @@ public final class MenuGUI extends VRMdiFrame {
         AutomaqGUI.exibir(this);
     }//GEN-LAST:event_mnuAutomaqActionPerformed
 
+    private void mnuIQSistemasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuIQSistemasActionPerformed
+        // TODO add your handling code here:
+        IQSistemasGUI.exibir(this);
+    }//GEN-LAST:event_mnuIQSistemasActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu11;
@@ -4126,6 +4140,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuHiper;
     private javax.swing.JMenuItem mnuHipicom;
     private javax.swing.JMenuItem mnuHostMundo;
+    private javax.swing.JMenuItem mnuIQSistemas;
     private javax.swing.JMenuItem mnuIcommerce;
     private javax.swing.JMenuItem mnuIdealSoft;
     private javax.swing.JMenu mnuImpSistema;
