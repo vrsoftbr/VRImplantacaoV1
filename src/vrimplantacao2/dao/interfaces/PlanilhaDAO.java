@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.interfaces;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import vrimplantacao2.utils.arquivo.ArquivoFactory;
 import vrimplantacao2.utils.arquivo.LinhaArquivo;
 import vrimplantacao2.utils.arquivo.csv.ArquivoCSV2;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
+import vrimplantacao2.vo.cadastro.convenio.transacao.SituacaoTransacaoConveniado;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
@@ -42,6 +44,9 @@ import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
+import vrimplantacao2.vo.importacao.ConveniadoIMP;
+import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
+import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -1082,7 +1087,106 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
-    
 
+    @Override
+    public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
+        List<ConvenioEmpresaIMP> result = new ArrayList<>();
+        
+        Arquivo empresas = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());  
+        
+        ProgressBar.setStatus("Carregando empresas do convênio...");
+        for (LinhaArquivo linha: empresas) {            
+            ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
+            
+            imp.setId(linha.getString("id_empresaconvenio"));
+            imp.setRazao(linha.getString("razao"));
+            imp.setCnpj(linha.getString("cnpj"));
+            imp.setInscricaoEstadual(linha.getString("inscricaoestadual"));
+            imp.setEndereco(linha.getString("endereco"));
+            imp.setNumero(linha.getString("numero"));
+            imp.setComplemento(linha.getString("complemento"));
+            imp.setBairro(linha.getString("bairro"));
+            imp.setMunicipio(linha.getString("municipio"));
+            imp.setUf(linha.getString("uf"));
+            imp.setIbgeMunicipio(Utils.stringToInt(linha.getString("ibgemunicipio")));
+            imp.setCep(linha.getString("cep"));
+            imp.setTelefone(linha.getString("telefone"));
+            imp.setDataInicio(getData(linha.getString("datainicio")));
+            imp.setDataTermino(getData(linha.getString("datatermino")));
+            imp.setSituacaoCadastro(linha.getBoolean("ativo") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+            imp.setDesconto(linha.getDouble("desconto"));
+            imp.setRenovacaoAutomatica(linha.getBoolean("renovacaoautomatica"));
+            imp.setDiaPagamento(Utils.stringToInt(linha.getString("diapagamento")));
+            imp.setBloqueado(linha.getBoolean("bloqueado"));
+            imp.setDataBloqueio(getData(linha.getString("databloqueio")));
+            imp.setDiaInicioRenovacao(Utils.stringToInt(linha.getString("diainiciorenovacao")));
+            imp.setDiaFimRenovacao(Utils.stringToInt(linha.getString("diafimrenovacao")));
+            imp.setObservacoes(linha.getString("observacoes"));
+            
+            result.add(imp);
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ConveniadoIMP> getConveniado() throws Exception {
+        List<ConveniadoIMP> result = new ArrayList<>();
+        
+        Arquivo conveniados = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());  
+        
+        ProgressBar.setStatus("Carregando conveniados...");
+        for (LinhaArquivo linha: conveniados) {            
+            ConveniadoIMP imp = new ConveniadoIMP();
+            
+            imp.setId(linha.getString("id"));
+            imp.setNome(linha.getString("nome"));
+            imp.setIdEmpresa(linha.getString("id_empresaconvenio"));
+            imp.setBloqueado(linha.getBoolean("bloqueado"));
+            imp.setSituacaoCadastro(linha.getBoolean("ativo") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+            imp.setSenha(Utils.stringToInt(linha.getString("senha")));
+            imp.setCnpj(linha.getString("cnpj"));
+            imp.setObservacao(linha.getString("observacao"));
+            imp.setValidadeCartao(getData(linha.getString("validadecartao")));
+            imp.setDataDesbloqueio(getData(linha.getString("datadesbloqueio")));
+            imp.setVisualizaSaldo(linha.getBoolean("visualizasaldo"));
+            imp.setDataBloqueio(getData(linha.getString("databloqueio")));
+            imp.setConvenioLimite(linha.getDouble("conveniolimite"));
+            imp.setConvenioDesconto(linha.getDouble("conveniodesconto"));
+            imp.setLojaCadastro(linha.getString("lojacadastro"));
+            
+            result.add(imp);
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
+        List<ConvenioTransacaoIMP> result = new ArrayList<>();
+        
+        Arquivo conveniados = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());  
+        
+        ProgressBar.setStatus("Carregando transação convenio...");
+        for (LinhaArquivo linha: conveniados) {            
+            ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
+            
+            imp.setId(linha.getString("id"));
+            imp.setIdConveniado(linha.getString("id_conveniado"));
+            imp.setEcf(linha.getString("ecf"));
+            imp.setNumeroCupom(linha.getString("numeroCupom"));
+            imp.setDataHora(new Timestamp(getData(linha.getString("dataHora")).getTime()));
+            imp.setValor(linha.getDouble("valor"));
+            SituacaoTransacaoConveniado byNome = SituacaoTransacaoConveniado.getByNome(linha.getString("situacaotransacao"));
+            imp.setSituacaoTransacaoConveniado(byNome == null ? SituacaoTransacaoConveniado.OK : byNome);
+            imp.setDataMovimento(getData(linha.getString("datamovimento")));
+            imp.setFinalizado(linha.getBoolean("finalizado"));
+            imp.setObservacao(linha.getString("observacao"));
+            
+            result.add(imp);
+        }
+        
+        return result;
+    }
     
 }
