@@ -26,26 +26,19 @@ public class ConvenioEmpresaRepository {
     public void salvar(List<ConvenioEmpresaIMP> empresas) throws Exception {
         try {
             this.provider.setStatus("Gravando empresas (Convênio)...");
-            
-
             this.provider.begin();
         
             Set<Long> cnpjExistentes = this.provider.getCnpjExistentes();
             ConvenioEmpresaIDStack ids = this.provider.getIds();
-            MultiMap<String, ConvenioEmpresaAnteriorVO> anteriores = this.provider.getAnteriores();
+            Map<String, ConvenioEmpresaAnteriorVO> anteriores = this.provider.getAnteriores();
             
             Map<String, ConvenioEmpresaIMP> filtrados = filtrar(empresas, ids);
             empresas.clear();
             System.gc();
-            this.provider.setMaximum(filtrados.size());
-            
+            this.provider.setMaximum(filtrados.size());            
             
             for (ConvenioEmpresaIMP imp: filtrados.values()) {
-                ConvenioEmpresaAnteriorVO anterior = anteriores.get(
-                        provider.getSistema(),
-                        provider.getLojaOrigem(),
-                        imp.getId()
-                );
+                ConvenioEmpresaAnteriorVO anterior = anteriores.get(imp.getId());
                 
                 if (anterior == null) {
                 
@@ -61,7 +54,7 @@ public class ConvenioEmpresaRepository {
                     
                     ConvenioEmpresaVO vo = converterEmpresa(imp);
                     anterior = converterEmpresaAnterior(imp);
-                    anterior.setCodigoAtual(vo);
+                    anterior.setCodigoAtual(vo.getId());
                     
                     vo.setId(id);
                     vo.setCnpj(cnpj);
@@ -69,15 +62,9 @@ public class ConvenioEmpresaRepository {
                     gravarEmpresa(vo);
                     gravarEmpresaAnterior(anterior);
                     cnpjExistentes.add(cnpj);
-                    anteriores.put(
-                            anterior, 
-                            provider.getSistema(),
-                            provider.getLojaOrigem(),
-                            imp.getId()
-                    );                
+                    anteriores.put( imp.getId(), anterior );
                 }
-                
-                
+                                
                 this.provider.next();
             }
             this.provider.commit();            

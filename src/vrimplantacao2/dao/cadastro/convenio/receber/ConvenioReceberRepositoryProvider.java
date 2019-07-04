@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.cadastro.convenio.receber;
 
+import java.util.Map;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao2.dao.cadastro.convenio.conveniado.ConveniadoAnteriorDAO;
@@ -58,11 +59,11 @@ public class ConvenioReceberRepositoryProvider {
         Conexao.rollback();
     }
 
-    public MultiMap<String, ConvenioTransacaoAnteriorVO> getAnteriores() throws Exception {
+    public Map<String, ConvenioTransacaoAnteriorVO> getAnteriores() throws Exception {
         return convenioTransacaoAnteriorDAO.getAnteriores(getSistema(), getLojaOrigem());
     }
 
-    public MultiMap<String, ConveniadoAnteriorVO> getConveniados() throws Exception {
+    public Map<String, ConveniadoAnteriorVO> getConveniados() throws Exception {
         return conveniadosDAO.getAnteriores(getSistema(), getLojaOrigem());
     }
 

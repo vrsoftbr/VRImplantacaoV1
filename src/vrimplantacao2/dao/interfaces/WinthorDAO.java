@@ -12,7 +12,6 @@ import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoFornecedor;
@@ -892,7 +891,6 @@ public class WinthorDAO extends InterfaceDAO {
                     imp.setBloqueado(rst.getBoolean("bloqueado"));
                     imp.setConvenioLimite(rst.getDouble("limite_convenio"));
                     imp.setConvenioDesconto(rst.getDouble("desconto"));    
-                    imp.setLojaCadastro(rst.getString("loja"));
                     result.add(imp);
                 }
             }

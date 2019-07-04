@@ -705,7 +705,6 @@ public class MrsDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSituacaoCadastro("N".equals(rst.getString("inativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setConvenioLimite(rst.getDouble("limite"));
                     imp.setObservacao(rst.getString("observacoes"));
-                    imp.setLojaCadastro(getLojaOrigem());
                     result.add(imp);
                 }
             }

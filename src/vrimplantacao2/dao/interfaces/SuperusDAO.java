@@ -775,7 +775,6 @@ public class SuperusDAO extends InterfaceDAO {
                     imp.setIdEmpresa(rst.getString("codigoconvenio"));
                     imp.setBloqueado(rst.getBoolean("bloqueado"));
                     imp.setConvenioLimite(rst.getDouble("limite"));
-                    imp.setLojaCadastro("1");
                     result.add(imp);
                 }
             }

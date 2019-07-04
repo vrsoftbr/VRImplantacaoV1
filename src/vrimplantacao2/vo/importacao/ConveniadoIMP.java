@@ -22,7 +22,7 @@ public class ConveniadoIMP {
     private Date dataBloqueio;
     private double convenioLimite = 0;
     private double convenioDesconto = 0;
-    private String lojaCadastro;
+    private int lojaCadastro = -1;
 
     public void setId(String id) {
         this.id = id;
@@ -80,7 +80,7 @@ public class ConveniadoIMP {
         this.convenioDesconto = convenioDesconto;
     }
 
-    public void setLojaCadastro(String lojaCadastro) {
+    public void setLojaCadastro(int lojaCadastro) {
         this.lojaCadastro = lojaCadastro;
     }
 
@@ -140,7 +140,7 @@ public class ConveniadoIMP {
         return convenioDesconto;
     }
 
-    public String getLojaCadastro() {
+    public int getLojaCadastro() {
         return lojaCadastro;
     }    
     

@@ -463,7 +463,6 @@ public class ScefDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdEmpresa(v_empresaConvenio);
                     imp.setBloqueado(false);
                     imp.setConvenioLimite(rst.getDouble("pcllimitecredito"));
-                    imp.setLojaCadastro(v_lojaVR);
                     result.add(imp);
                 }
             }

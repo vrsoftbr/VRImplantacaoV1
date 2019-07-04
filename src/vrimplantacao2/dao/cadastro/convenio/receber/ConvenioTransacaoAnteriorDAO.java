@@ -2,8 +2,9 @@ package vrimplantacao2.dao.cadastro.convenio.receber;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import vrframework.classe.Conexao;
-import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.convenio.transacao.ConvenioTransacaoAnteriorVO;
@@ -32,8 +33,8 @@ public class ConvenioTransacaoAnteriorDAO {
         }
     }
 
-    public MultiMap<String, ConvenioTransacaoAnteriorVO> getAnteriores(String sistema, String lojaOrigem) throws Exception {
-        MultiMap<String, ConvenioTransacaoAnteriorVO> result = new MultiMap<>();
+    public Map<String, ConvenioTransacaoAnteriorVO> getAnteriores(String sistema, String lojaOrigem) throws Exception {
+        Map<String, ConvenioTransacaoAnteriorVO> result = new HashMap<>();
         
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -69,10 +70,8 @@ public class ConvenioTransacaoAnteriorDAO {
                     ant.setValor(rst.getDouble("valor"));
                     ant.setPago(rst.getBoolean("pago"));
                     result.put(
-                            ant,
-                            ant.getSistema(),
-                            ant.getLoja(),
-                            ant.getId()
+                            ant.getId(),
+                            ant
                     );
                 }
             }

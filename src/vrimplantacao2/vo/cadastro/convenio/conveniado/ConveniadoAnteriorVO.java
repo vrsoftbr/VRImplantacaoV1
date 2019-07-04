@@ -9,7 +9,7 @@ public class ConveniadoAnteriorVO {
     private String sistema;
     private String loja;
     private String id;
-    private ConveniadoVO codigoAtual;
+    private int codigoAtual = -1;
     private String cnpj;
     private String razao;
     private String lojaCadastro;
@@ -26,7 +26,7 @@ public class ConveniadoAnteriorVO {
         this.id = id;
     }
 
-    public void setCodigoAtual(ConveniadoVO codigoAtual) {
+    public void setCodigoAtual(int codigoAtual) {
         this.codigoAtual = codigoAtual;
     }
 
@@ -54,7 +54,7 @@ public class ConveniadoAnteriorVO {
         return id;
     }
 
-    public ConveniadoVO getCodigoAtual() {
+    public int getCodigoAtual() {
         return codigoAtual;
     }
 

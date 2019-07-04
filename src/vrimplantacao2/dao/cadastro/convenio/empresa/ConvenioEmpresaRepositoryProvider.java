@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.cadastro.convenio.empresa;
 
+import java.util.Map;
 import java.util.Set;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
@@ -76,7 +77,7 @@ public class ConvenioEmpresaRepositoryProvider {
         return new ConvenioEmpresaIDStack();
     }
 
-    public MultiMap<String, ConvenioEmpresaAnteriorVO> getAnteriores() throws Exception {
+    public Map<String, ConvenioEmpresaAnteriorVO> getAnteriores() throws Exception {
         return empresaAnteriorDAO.getAnteriores(getSistema(), getLojaOrigem());
     }
 

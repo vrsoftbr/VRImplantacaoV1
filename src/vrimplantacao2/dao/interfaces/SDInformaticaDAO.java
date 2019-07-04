@@ -672,7 +672,6 @@ public class SDInformaticaDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setId(rst.getString("id"));
                     imp.setNome(rst.getString("nome"));
                     imp.setIdEmpresa(rst.getString("filial"));
-                    imp.setLojaCadastro(rst.getString("filial"));
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(rst.getInt("situacaocadastro")));
                     imp.setCnpj(rst.getString("cpf"));
                     imp.setObservacao(rst.getString("obs"));

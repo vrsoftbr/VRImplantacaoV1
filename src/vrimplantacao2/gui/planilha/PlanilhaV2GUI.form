@@ -1251,6 +1251,155 @@
             </Container>
           </SubComponents>
         </Container>
+        <Container class="vrframework.bean.panel.VRPanel" name="tabConvenio">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Conv&#xea;nio">
+                <Property name="tabTitle" type="java.lang.String" value="Conv&#xea;nio"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
+                              <Component id="vRLabel7" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="txtConvEmpresas" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                  <Component id="vRLabel22" max="32767" attributes="0"/>
+                                  <Component id="vRLabel21" max="32767" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="txtConvConveniados" alignment="0" pref="471" max="32767" attributes="0"/>
+                                  <Component id="txtConvTransacoes" max="32767" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="chkConvEmpresas" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="vRLabel19" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="txtConvDelimitador" min="-2" pref="15" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="vRLabel20" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="txtConvQuote" min="-2" pref="15" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Component id="chkConvConveniados" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkConvTransacao" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="2" attributes="0">
+                          <Component id="vRLabel19" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtConvDelimitador" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="vRLabel20" alignment="2" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtConvQuote" alignment="2" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="txtConvEmpresas" max="32767" attributes="0"/>
+                          <Component id="vRLabel7" max="32767" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="txtConvConveniados" max="32767" attributes="0"/>
+                          <Component id="vRLabel21" max="32767" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="2" attributes="0">
+                          <Component id="vRLabel22" alignment="2" min="-2" pref="21" max="-2" attributes="0"/>
+                          <Component id="txtConvTransacoes" alignment="2" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="chkConvEmpresas" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="chkConvConveniados" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="chkConvTransacao" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="219" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Component class="javax.swing.JTextField" name="txtConvDelimitador">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="^"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JTextField" name="txtConvQuote">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="&quot;"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtConvEmpresas">
+            </Component>
+            <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtConvConveniados">
+            </Component>
+            <Component class="vrframework.bean.fileChooser.VRFileChooser" name="txtConvTransacoes">
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkConvEmpresas">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Empresas conv&#xea;niadas"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkConvConveniados">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Conveniados"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkConvTransacao">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Transa&#xe7;&#xf5;es dos conv&#xea;niados"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.label.VRLabel" name="vRLabel7">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Arquivo Empresas Conv&#xea;nio"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.label.VRLabel" name="vRLabel19">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Delimitador"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.label.VRLabel" name="vRLabel20">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Str. Quote"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.label.VRLabel" name="vRLabel21">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Arquivo Conveniados Conv&#xea;nio"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.label.VRLabel" name="vRLabel22">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Arquivo Transa&#xe7;&#xf5;es Conv&#xea;nio"/>
+              </Properties>
+            </Component>
+          </SubComponents>
+        </Container>
         <Container class="vrframework.bean.panel.VRPanel" name="tabParametro">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
