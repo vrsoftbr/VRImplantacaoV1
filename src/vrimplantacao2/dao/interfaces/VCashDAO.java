@@ -15,6 +15,7 @@ import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  *
@@ -29,6 +30,7 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
         return "VCash";
     }
 
+    @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
         ConexaoDBF.abrirConexao(i_arquivo);
@@ -114,5 +116,63 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return new ArrayList<>(merc.values());
+    }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        ConexaoDBF.abrirConexao(i_arquivo);
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "p.cod_pro, "
+                    + "p.nome,"
+                    + "p.unidade,"
+                    + "p.st as cst,"
+                    + "p.cod_tip,"
+                    + "p.sub_tip,"
+                    + "p.cod_trib,"
+                    + "p.nbm,"
+                    + "p.cest,"
+                    + "p.nat_rec,"
+                    + "p.pesoliq,"
+                    + "p.pesobruto,"
+                    + "t.minmarkup as margem,"
+                    + "p.cod_trib,"
+                    + "p.data_incl\n"
+                    + "from produtos p"
+                    + "left join tip_prod t on t.cod_trib = p.cod_tip and t.sub_tip = p.sub_tip"
+            )) {
+                while (rst.next()) {
+                    
+                }
+            }
+        }
+        return null;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        ConexaoDBF.abrirConexao(i_arquivo);
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "cod_pro,"
+                    + "codbar "
+                    + "from prod_bar"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("cod_pro"));
+                    imp.setEan(rst.getString("codbar"));
+                    imp.setQtdEmbalagem(1);
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 }
