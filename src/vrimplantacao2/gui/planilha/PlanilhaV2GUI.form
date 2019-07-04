@@ -958,10 +958,12 @@
                                           <Component id="chkCliPrefRotativo" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkCliPrefRotativoBaixas" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkCliCheques" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Component id="chkCliPrefInscricaoEstadual" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace pref="202" max="32767" attributes="0"/>
+                                  <EmptySpace pref="135" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -973,6 +975,7 @@
                                       <Component id="chkCliPrefContatos" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkCliPrefRotativo" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkCliPrefRotativoBaixas" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkCliCheques" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkCliPrefInscricaoEstadual" min="-2" max="-2" attributes="0"/>
@@ -1004,6 +1007,11 @@
                         <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliPrefInscricaoEstadual">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Inscricao Estadual"/>
+                          </Properties>
+                        </Component>
+                        <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliCheques">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Cheques"/>
                           </Properties>
                         </Component>
                       </SubComponents>

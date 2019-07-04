@@ -115,22 +115,26 @@ public class RMSDAO extends InterfaceDAO {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT DISTINCT \n" +
-                    "    F.FAM_PAI AS CODIGO,\n" +
-                    "    P.GIT_DESCRICAO AS DESCRICAO\n" +
-                    "FROM \n" +
-                    "    AA1FITEM  F\n" +
-                    "    JOIN AA3CITEM  P ON P.GIT_COD_ITEM = F.FAM_PAI\n" +
+                    "select\n" +
+                    "	p.git_cod_item||p.git_digito id,\n" +
+                    "	p.git_descricao descricao\n" +
+                    "from\n" +
+                    "	AA3CITEM p\n" +
                     "where\n" +
-                    "    (select count(*) from AA1FITEM where FAM_PAI = F.FAM_PAI) > 1\n" +
-                    "ORDER BY \n" +
-                    "    F.FAM_PAI"
+                    "	p.git_cod_item||p.git_digito in (	  \n" +
+                    "		select distinct\n" +
+                    "			it_pai\n" +
+                    "		from\n" +
+                    "			AA1CHELI\n" +
+                    "		where\n" +
+                    "			it_pai > 0\n" +
+                    "	)"
             )) {
                 while (rst.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rst.getString("codigo"));
+                    imp.setImportId(rst.getString("id"));
                     imp.setDescricao(rst.getString("descricao"));
                     result.add(imp);
                 }
@@ -392,7 +396,7 @@ public class RMSDAO extends InterfaceDAO {
                     "	p.GIT_GRUPO merc2,\n" +
                     "	p.GIT_SUBGRUPO merc3,\n" +
                     "	p.GIT_CATEGORIA merc4,\n" +
-                    "	coalesce((select fam_pai from AA1FITEM where fam_filho = p.git_cod_item and rownum = 1), (select fam_pai from AA1FITEM where fam_pai = p.git_cod_item and rownum = 1)) id_familia,\n" +
+                    "	coalesce(cast(nullif(familia.it_pai, 0) as varchar(20)),p.git_cod_item||p.git_digito) id_familia,\n" +
                     "	coalesce(preco.id_situacaocadastral, 1) id_situacaocadastral,\n" +
                     "	coalesce(nullif(det.DET_PESO_VND, 0), p.GIT_PESO) pesoliquido,\n" +
                     "	coalesce(nullif(det.DET_PESO_TRF, 0), p.GIT_PESO) pesobruto,\n" +
@@ -438,6 +442,9 @@ public class RMSDAO extends InterfaceDAO {
                     "	AA3CCEAN ean\n" +
                     "join AA3CITEM p on\n" +
                     "	    ean.EAN_COD_PRO_ALT = p.GIT_COD_ITEM || p.git_digito\n" +
+                    "left join AA1CHELI familia on\n" +
+                    "       p.git_cod_item = familia.it_codigo and\n" +
+                    "       p.git_digito = familia.it_digito\n" +
                     "left join AA2CLOJA loja on\n" +
                     "	    loja.loj_codigo || loja.loj_digito = " + SQLUtils.stringSQL(getLojaOrigem()) + "\n" +
                     "left join AG1PBACO bal on\n" +
