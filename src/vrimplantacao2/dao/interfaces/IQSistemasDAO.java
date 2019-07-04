@@ -371,14 +371,12 @@ public class IQSistemasDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
-                    + "codigo AS idproduto, \n"
-                    + "idfornecedor, \n"
-                    + "documento,\n"
-                    + "custofornecedor\n"
-                    + "FROM produtos\n"
-                    + "WHERE idfornecedor IS NOT NULL\n"
-                    + "AND CodigoFilial = '" + getLojaOrigem() + "'"
+                    "SELECT codigo as idproduto, idfornecedor, custo, documento,\n"
+                    + "  MAX(dataultent) AS dataalteracao\n"
+                    + " FROM produtosinventario \n"
+                    + "WHERE codigo IS NOT NULL\n"
+                    + "  AND idfornecedor IS NOT NULL\n"
+                    + "GROUP BY codigo, idfornecedor"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -387,7 +385,8 @@ public class IQSistemasDAO extends InterfaceDAO {
                     imp.setIdProduto(rst.getString("idproduto"));
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
                     imp.setCodigoExterno(rst.getString("documento"));
-                    imp.setCustoTabela(rst.getDouble("custofornecedor"));
+                    imp.setCustoTabela(rst.getDouble("custo"));
+                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
                     result.add(imp);
                 }
             }
