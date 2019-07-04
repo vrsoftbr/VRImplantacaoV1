@@ -126,6 +126,7 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select "
                     + "p.cod_pro, "
+                    + "p.codbar, "
                     + "p.nome,"
                     + "p.unidade,"
                     + "p.st as cst,"
@@ -139,16 +140,51 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "p.pesobruto,"
                     + "t.minmarkup as margem,"
                     + "p.cod_trib,"
-                    + "p.data_incl\n"
+                    + "p.data_incl,"
+                    + "e.p_custo,"
+                    + "e.p_venda,"
+                    + "e.qte as estoque,"
+                    + "e.qte_min "
                     + "from produtos p"
-                    + "left join tip_prod t on t.cod_trib = p.cod_tip and t.sub_tip = p.sub_tip"
+                    + "left join tip_prod t on t.cod_trib = p.cod_tip and t.sub_tip = p.sub_tip\n"
+                    + "left join estoques e on e.cod_pro = p.cod_pro "
+                    + "order by p.cod_pro"
             )) {
                 while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("cod_pro"));
+                    imp.setEan(rst.getString("codbar"));
                     
+                    if (imp.getEan().trim().isEmpty()) {
+                        imp.seteBalanca(true);
+                    }
+                    
+                    imp.setDescricaoCompleta(rst.getString("nome"));
+                    imp.setDescricaoReduzida(imp.getDescricaoCompleta());
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setTipoEmbalagem(rst.getString("unidade"));
+                    imp.setCodMercadologico1(rst.getString("cod_tip"));
+                    imp.setCodMercadologico2(rst.getString("sub_tip"));
+                    imp.setCodMercadologico3("1");
+                    imp.setMargem(rst.getDouble("margem"));
+                    imp.setCustoComImposto(rst.getDouble("p_custo"));
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setPrecovenda(rst.getDouble("p_venda"));
+                    imp.setEstoqueMinimo(rst.getDouble("qte_min"));
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setPesoBruto(rst.getDouble("pesobruto"));
+                    imp.setPesoLiquido(rst.getDouble("pesoliq"));
+                    imp.setNcm(rst.getString("nbm"));
+                    imp.setCest(rst.getString("cest"));
+                    imp.setIcmsDebitoId(rst.getString("cod_trib"));
+                    imp.setIcmsCreditoId(rst.getString("cod_trib"));
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
     
     @Override
