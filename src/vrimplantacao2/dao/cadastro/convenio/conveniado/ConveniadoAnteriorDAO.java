@@ -2,8 +2,9 @@ package vrimplantacao2.dao.cadastro.convenio.conveniado;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import vrframework.classe.Conexao;
-import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.convenio.conveniado.ConveniadoAnteriorVO;
@@ -32,8 +33,8 @@ public class ConveniadoAnteriorDAO {
         }
     }
 
-    public MultiMap<String, ConveniadoAnteriorVO> getAnteriores(String sistema, String lojaOrigem) throws Exception {
-        MultiMap<String, ConveniadoAnteriorVO> result = new MultiMap<>();
+    public Map<String, ConveniadoAnteriorVO> getAnteriores(String sistema, String lojaOrigem) throws Exception {
+        Map<String, ConveniadoAnteriorVO> result = new HashMap<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
@@ -58,21 +59,12 @@ public class ConveniadoAnteriorDAO {
                     vo.setSistema(rst.getString("sistema"));
                     vo.setLoja(rst.getString("loja"));
                     vo.setId(rst.getString("id"));
-                    if (rst.getString("codigoatual") != null) {
-                        ConveniadoVO atual = new ConveniadoVO();
-                        atual.setId(rst.getInt("codigoatual"));
-                        vo.setCodigoAtual(atual);
-                    }
+                    vo.setCodigoAtual(rst.getInt("codigoatual"));
                     vo.setCnpj(rst.getString("cnpj"));
                     vo.setRazao(rst.getString("razao"));
                     vo.setLojaCadastro(rst.getString("lojacadastro"));
                     
-                    result.put(
-                            vo,
-                            rst.getString("sistema"),
-                            rst.getString("loja"),
-                            rst.getString("id")
-                    );
+                    result.put( rst.getString("id"), vo );
                 }
             }
         }
@@ -87,9 +79,7 @@ public class ConveniadoAnteriorDAO {
             sql.put("sistema", anterior.getSistema());
             sql.put("loja", anterior.getLoja());
             sql.put("id", anterior.getId());
-            if (anterior.getCodigoAtual() != null) {
-                sql.put("codigoatual", anterior.getCodigoAtual().getId());
-            }
+            sql.put("codigoatual", anterior.getCodigoAtual());
             sql.put("cnpj", anterior.getCnpj());
             sql.put("razao", anterior.getRazao());
             sql.put("lojacadastro", anterior.getLojaCadastro());

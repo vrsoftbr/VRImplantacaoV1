@@ -152,6 +152,20 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         pnlUnificacao = new vrframework.bean.panel.VRPanel();
         chkClientePrefUnificar = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEvtUnificar = new vrframework.bean.checkBox.VRCheckBox();
+        tabConvenio = new vrframework.bean.panel.VRPanel();
+        txtConvDelimitador = new javax.swing.JTextField();
+        txtConvQuote = new javax.swing.JTextField();
+        txtConvEmpresas = new vrframework.bean.fileChooser.VRFileChooser();
+        txtConvConveniados = new vrframework.bean.fileChooser.VRFileChooser();
+        txtConvTransacoes = new vrframework.bean.fileChooser.VRFileChooser();
+        chkConvEmpresas = new vrframework.bean.checkBox.VRCheckBox();
+        chkConvConveniados = new vrframework.bean.checkBox.VRCheckBox();
+        chkConvTransacao = new vrframework.bean.checkBox.VRCheckBox();
+        vRLabel7 = new vrframework.bean.label.VRLabel();
+        vRLabel19 = new vrframework.bean.label.VRLabel();
+        vRLabel20 = new vrframework.bean.label.VRLabel();
+        vRLabel21 = new vrframework.bean.label.VRLabel();
+        vRLabel22 = new vrframework.bean.label.VRLabel();
         tabParametro = new vrframework.bean.panel.VRPanel();
         txtFormatoData = new javax.swing.JTextField();
         vRLabel16 = new vrframework.bean.label.VRLabel();
@@ -871,6 +885,94 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
         tabModel.addTab("Clientes", tabClientes);
 
+        txtConvDelimitador.setText("^");
+
+        txtConvQuote.setText("\"");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkConvEmpresas, "Empresas convêniadas");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkConvConveniados, "Conveniados");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkConvTransacao, "Transações dos convêniados");
+
+        org.openide.awt.Mnemonics.setLocalizedText(vRLabel7, "Arquivo Empresas Convênio");
+
+        org.openide.awt.Mnemonics.setLocalizedText(vRLabel19, "Delimitador");
+
+        org.openide.awt.Mnemonics.setLocalizedText(vRLabel20, "Str. Quote");
+
+        org.openide.awt.Mnemonics.setLocalizedText(vRLabel21, "Arquivo Conveniados Convênio");
+
+        org.openide.awt.Mnemonics.setLocalizedText(vRLabel22, "Arquivo Transações Convênio");
+
+        javax.swing.GroupLayout tabConvenioLayout = new javax.swing.GroupLayout(tabConvenio);
+        tabConvenio.setLayout(tabConvenioLayout);
+        tabConvenioLayout.setHorizontalGroup(
+            tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabConvenioLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(tabConvenioLayout.createSequentialGroup()
+                        .addGap(16, 16, 16)
+                        .addComponent(vRLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtConvEmpresas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(tabConvenioLayout.createSequentialGroup()
+                        .addGroup(tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(vRLabel22, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(vRLabel21, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtConvConveniados, javax.swing.GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)
+                            .addComponent(txtConvTransacoes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(tabConvenioLayout.createSequentialGroup()
+                        .addGroup(tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkConvEmpresas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(tabConvenioLayout.createSequentialGroup()
+                                .addComponent(vRLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtConvDelimitador, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(vRLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtConvQuote, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(chkConvConveniados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkConvTransacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        tabConvenioLayout.setVerticalGroup(
+            tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabConvenioLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(vRLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtConvDelimitador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtConvQuote, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txtConvEmpresas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(vRLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txtConvConveniados, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(vRLabel21, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(vRLabel22, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtConvTransacoes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkConvEmpresas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkConvConveniados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkConvTransacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(219, Short.MAX_VALUE))
+        );
+
+        tabModel.addTab("Convênio", tabConvenio);
+
         txtFormatoData.setText("yyyy-MM-dd");
 
         org.openide.awt.Mnemonics.setLocalizedText(vRLabel16, "Formato de Data");
@@ -1160,6 +1262,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkClienteEvtUnificar;
     private vrframework.bean.checkBox.VRCheckBox chkClientePrefUnificar;
     private vrframework.bean.checkBox.VRCheckBox chkContaPagar;
+    private vrframework.bean.checkBox.VRCheckBox chkConvConveniados;
+    private vrframework.bean.checkBox.VRCheckBox chkConvEmpresas;
+    private vrframework.bean.checkBox.VRCheckBox chkConvTransacao;
     private vrframework.bean.checkBox.VRCheckBox chkEANAtual;
     private vrframework.bean.checkBox.VRCheckBox chkFornContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFornDados;
@@ -1178,6 +1283,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel pnlUnificacao;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel tabArquivoBalanca;
     private vrframework.bean.panel.VRPanel tabClientes;
+    private vrframework.bean.panel.VRPanel tabConvenio;
     private javax.swing.JPanel tabFornEspecial;
     private vrframework.bean.panel.VRPanel tabFornImportacao;
     private vrframework.bean.panel.VRPanel tabFornUnificacao;
@@ -1198,6 +1304,11 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private javax.swing.JTextField txtClienteStrQuote;
     private javax.swing.JTextField txtCodLojaOrigem;
     private vrframework.bean.fileChooser.VRFileChooser txtContaPagarFile;
+    private vrframework.bean.fileChooser.VRFileChooser txtConvConveniados;
+    private javax.swing.JTextField txtConvDelimitador;
+    private vrframework.bean.fileChooser.VRFileChooser txtConvEmpresas;
+    private javax.swing.JTextField txtConvQuote;
+    private vrframework.bean.fileChooser.VRFileChooser txtConvTransacoes;
     private javax.swing.JTextField txtDelimitadorForn;
     private javax.swing.JTextField txtDelimitadorProd;
     private javax.swing.JTextField txtDelimitadorTribut;
@@ -1221,11 +1332,16 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel16;
     private vrframework.bean.label.VRLabel vRLabel17;
     private vrframework.bean.label.VRLabel vRLabel18;
+    private vrframework.bean.label.VRLabel vRLabel19;
     private vrframework.bean.label.VRLabel vRLabel2;
+    private vrframework.bean.label.VRLabel vRLabel20;
+    private vrframework.bean.label.VRLabel vRLabel21;
+    private vrframework.bean.label.VRLabel vRLabel22;
     private vrframework.bean.label.VRLabel vRLabel3;
     private vrframework.bean.label.VRLabel vRLabel4;
     private vrframework.bean.label.VRLabel vRLabel5;
     private vrframework.bean.label.VRLabel vRLabel6;
+    private vrframework.bean.label.VRLabel vRLabel7;
     private vrframework.bean.label.VRLabel vRLabel8;
     private vrframework.bean.label.VRLabel vRLabel9;
     private vrframework.bean.panel.VRPanel vRPanel2;
@@ -1364,6 +1480,23 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                 }
                             }
                             break;
+                            case 4: {
+                                dao.setArquivoConvenioEmpresas(txtConvEmpresas.getArquivo());
+                                dao.setArquivoConvenioConveniados(txtConvConveniados.getArquivo());
+                                dao.setArquivoConvenioTransacoes(txtConvTransacoes.getArquivo());
+                                dao.getOpcoes().put("delimiter", txtConvDelimitador.getText());
+                                dao.getOpcoes().put("quote", txtConvQuote.getText());
+                                
+                                if (chkConvEmpresas.isSelected()) {
+                                    importador.importarConvenioEmpresa();
+                                }
+                                if (chkConvConveniados.isSelected()) {
+                                    importador.importarConvenioConveniado();
+                                }
+                                if (chkConvTransacao.isSelected()) {
+                                    importador.importarConvenioTransacao();
+                                }
+                            }
                         }
 
                         gravarParametros();
@@ -1461,6 +1594,11 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         parametros.put(txtVendaStrQuote.getText(), "IMPORTACAO", "PLANILHA", "VENDA", "QUOTE");
         parametros.put(txtFormatoData.getText(), "IMPORTACAO", "PLANILHA", "FORMATO_DATA");
         parametros.put(txtFormatoDataCompleta.getText(), "IMPORTACAO", "PLANILHA", "FORMATO_DATA_COMPLETA");
+        parametros.put(txtConvEmpresas.getArquivo(), "IMPORTACAO", "PLANILHA", "CONVENIO_EMPRESAS");
+        parametros.put(txtConvConveniados.getArquivo(), "IMPORTACAO", "PLANILHA", "CONVENIO_CONVENIADOS");
+        parametros.put(txtConvTransacoes.getArquivo(), "IMPORTACAO", "PLANILHA", "CONVENIO_TRANSACOES");
+        parametros.put(txtConvDelimitador.getText(), "IMPORTACAO", "PLANILHA", "CONVENIO_DELIMITADOR");
+        parametros.put(txtConvQuote.getText(), "IMPORTACAO", "PLANILHA", "CONVENIO_QUOTE");
         parametros.salvar();
     }
 
@@ -1512,6 +1650,11 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         txtVendaStrQuote.setText(quoteVend != null ? quoteVend : "");
         txtFormatoData.setText(parametros.getWithNull("yyyy-MM-dd", "IMPORTACAO", "PLANILHA", "FORMATO_DATA"));
         txtFormatoDataCompleta.setText(parametros.getWithNull("yyyy-MM-dd hh:mm:ss.SSS", "IMPORTACAO", "PLANILHA", "FORMATO_DATA_COMPLETA"));
+        txtConvEmpresas.setArquivo(parametros.getWithNull("", "IMPORTACAO", "PLANILHA", "CONVENIO_EMPRESAS"));
+        txtConvConveniados.setArquivo(parametros.getWithNull("", "IMPORTACAO", "PLANILHA", "CONVENIO_CONVENIADOS"));
+        txtConvTransacoes.setArquivo(parametros.getWithNull("", "IMPORTACAO", "PLANILHA", "CONVENIO_TRANSACOES"));
+        txtConvDelimitador.setText(parametros.getWithNull("^","IMPORTACAO", "PLANILHA", "CONVENIO_DELIMITADOR"));
+        txtConvQuote.setText(parametros.getWithNull("\"","IMPORTACAO", "PLANILHA", "CONVENIO_QUOTE"));
 
     }
 

@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.convenio.conveniado.ConveniadoAnteriorVO;
@@ -18,6 +19,9 @@ import vrimplantacao2.vo.importacao.ConveniadoIMP;
  * @author Leandro
  */
 public class ConvenioConveniadoRepository {
+    
+    private static final Logger LOG = Logger.getLogger(ConvenioConveniadoRepository.class.getName());
+    
     private final ConvenioConveniadoRepositoryProvider provider;
 
     public ConvenioConveniadoRepository(ConvenioConveniadoRepositoryProvider provider) throws Exception {        
@@ -28,56 +32,60 @@ public class ConvenioConveniadoRepository {
         provider.setStatus("Gravando conveniados (Convênio)...");
         provider.begin();
         try {
-            Set<Long> cnpjCadastrados = provider.getCnpjCadastrado();
+            MultiMap<Long, Integer> cnpjCadastrados = provider.getCnpjCadastrado();
             ConveniadoIDStack ids = provider.getIds();
-            MultiMap<String, ConveniadoAnteriorVO> anteriores = provider.getAnteriores();
-            MultiMap<String, ConvenioEmpresaAnteriorVO> empresas = provider.getEmpresas(); 
+            Map<String, ConveniadoAnteriorVO> anteriores = provider.getAnteriores();
+            Map<String, ConvenioEmpresaAnteriorVO> empresas = provider.getEmpresas(); 
             
             Map<String, ConveniadoIMP> filtrados = filtrar(conveniados, ids.obterIdsExistentes());
             System.gc();
             
             provider.setMaximum(filtrados.size());
             for (ConveniadoIMP imp: filtrados.values()) {
-                ConveniadoAnteriorVO anterior = anteriores.get(
-                        provider.getSistema(),
-                        provider.getLojaOrigem(),
-                        imp.getId()
-                );
-                ConvenioEmpresaAnteriorVO empresa = empresas.get(
-                        provider.getSistema(),
-                        provider.getLojaOrigem(),
-                        imp.getIdEmpresa()
-                );                
+                ConveniadoAnteriorVO anterior = anteriores.get(imp.getId());
+                ConvenioEmpresaAnteriorVO empresa = empresas.get(imp.getIdEmpresa());
                 
-                if (anterior == null && empresa != null && empresa.getCodigoAtual() != null) {
+                if ( empresa == null || empresa.getCodigoAtual() < 1 ) {
+                    LOG.warning("Código de empresa não existe '" + imp.getIdEmpresa() + "'");
+                    provider.next();
+                    continue;
+                }
                 
+                if (anterior == null) {
+                    
                     int id = ids.obterID(imp.getId());
-
                     long cnpj = Utils.stringToLong(imp.getCnpj());
                     if (cnpj > 99999999999999L || cnpj < 0L) {
                         cnpj = id;
                     }
-
-                    ConveniadoVO vo = converterConveniado(imp);
-                    vo.setId(id);
-                    vo.setCnpj(cnpj);
-                    vo.setId_empresa(empresa.getCodigoAtual().getId());
+                    long id_empresa = (long) empresa.getCodigoAtual();
+                    
+                    Integer idByCnpj = cnpjCadastrados.get(id_empresa, cnpj);
+                    
                     anterior = converterConveniadoAnterior(imp);
-                    anterior.setCodigoAtual(vo);
-                    ConveniadoServicoVO servico = converterServicoConvenio(imp);
-                    servico.setId_conveniado(vo.getId());                    
+                    
+                    if (idByCnpj != null) {
+                        anterior.setCodigoAtual(id);
+                    } else {                    
+                        ConveniadoVO vo = converterConveniado(imp);
+                        vo.setId(id);
+                        vo.setCnpj(cnpj);
+                        vo.setId_empresa((int) id_empresa);
+                        ConveniadoServicoVO servico = converterServicoConvenio(imp);
+                        servico.setId_conveniado(vo.getId());                    
 
-                    gravarConveniado(vo);
-                    gravarConveniadoServico(servico);
+                        gravarConveniado(vo);
+                        gravarConveniadoServico(servico);
+                        
+                        anterior.setCodigoAtual(vo.getId());
+
+                        cnpjCadastrados.put(vo.getId(), (long) vo.getId_empresa(), (long) vo.getCnpj());
+                    }
                     gravarConveniadoAnterior(anterior);
-
-                    cnpjCadastrados.add(cnpj);
                     anteriores.put(
-                            anterior,
-                            provider.getSistema(),
-                            provider.getLojaOrigem(),
-                            imp.getId()
-                    );                    
+                            imp.getId(),
+                            anterior
+                    );
                 }
                 
                 provider.next();
@@ -126,7 +134,7 @@ public class ConvenioConveniadoRepository {
         vo.setNome(imp.getNome());
         vo.setBloqueado(imp.isBloqueado());
         vo.setSituacaoCadastro(imp.getSituacaoCadastro());
-        vo.setId_loja(Utils.stringToInt(imp.getLojaCadastro()));
+        vo.setId_loja(imp.getLojaCadastro() > 0 ? imp.getLojaCadastro() : provider.getLojaVR());
         vo.setObservacao("IMPORTADO VR " + Utils.acertarTexto(imp.getObservacao()));
         vo.setDataValidadeCartao(imp.getValidadeCartao());
         vo.setDataDesbloqueio(imp.getDataDesbloqueio());
@@ -142,7 +150,7 @@ public class ConvenioConveniadoRepository {
         vo.setId(imp.getId());
         vo.setCnpj(imp.getCnpj());
         vo.setRazao(imp.getNome());
-        vo.setLojaCadastro(imp.getLojaCadastro());
+        vo.setLojaCadastro(String.valueOf(imp.getLojaCadastro()));
         return vo;
     }
 

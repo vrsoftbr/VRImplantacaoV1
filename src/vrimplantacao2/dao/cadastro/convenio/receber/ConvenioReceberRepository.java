@@ -4,7 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import vrimplantacao.utils.Utils;
-import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.convenio.conveniado.ConveniadoAnteriorVO;
 import vrimplantacao2.vo.cadastro.convenio.conveniado.TipoServicoConvenio;
 import vrimplantacao2.vo.cadastro.convenio.transacao.ConvenioTransacaoAnteriorVO;
@@ -32,29 +31,19 @@ public class ConvenioReceberRepository {
             
             System.gc();
                 
-            MultiMap<String, ConvenioTransacaoAnteriorVO> anteriores = provider.getAnteriores();
-            MultiMap<String, ConveniadoAnteriorVO> conveniados = provider.getConveniados();            
+            Map<String, ConvenioTransacaoAnteriorVO> anteriores = provider.getAnteriores();
+            Map<String, ConveniadoAnteriorVO> conveniados = provider.getConveniados();            
             
             provider.setMaximum(filtrados.size());
             for (ConvenioTransacaoIMP imp: filtrados.values()) {
-            
-                String[] chave = new String[] {
-                    provider.getSistema(),
-                    provider.getLojaOrigem(),
-                    imp.getId()
-                };
                 
-                ConvenioTransacaoAnteriorVO anterior = anteriores.get(chave);
-                ConveniadoAnteriorVO conveniado = conveniados.get(
-                        provider.getSistema(),
-                        provider.getLojaOrigem(),
-                        imp.getIdConveniado()
-                );
+                ConvenioTransacaoAnteriorVO anterior = anteriores.get(imp.getId());
+                ConveniadoAnteriorVO conveniado = conveniados.get(imp.getIdConveniado());
                 
-                if (anterior == null && conveniado != null && conveniado.getCodigoAtual() != null) {
+                if (anterior == null && conveniado != null && conveniado.getCodigoAtual() > 0) {
                     
                     ConvenioTransacaoVO vo = converterTransacao(imp);
-                    vo.setId_conveniado(conveniado.getCodigoAtual().getId());
+                    vo.setId_conveniado(conveniado.getCodigoAtual());
                     anterior = converterTransacaoAnterior(imp);
                     anterior.setCodigoAtual(vo);
                     

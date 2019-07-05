@@ -9,7 +9,7 @@ public class ConvenioEmpresaAnteriorVO {
     private String sistema;
     private String loja;
     private String id;
-    private ConvenioEmpresaVO codigoAtual;
+    private int codigoAtual = -1;
     private String cnpj;
     private String razao;
 
@@ -25,7 +25,7 @@ public class ConvenioEmpresaAnteriorVO {
         this.id = id;
     }
 
-    public void setCodigoAtual(ConvenioEmpresaVO codigoAtual) {
+    public void setCodigoAtual(int codigoAtual) {
         this.codigoAtual = codigoAtual;
     }
 
@@ -49,7 +49,7 @@ public class ConvenioEmpresaAnteriorVO {
         return id;
     }
 
-    public ConvenioEmpresaVO getCodigoAtual() {
+    public int getCodigoAtual() {
         return codigoAtual;
     }
 

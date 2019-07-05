@@ -2,9 +2,8 @@ package vrimplantacao2.dao.cadastro.convenio.conveniado;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.LinkedHashSet;
-import java.util.Set;
 import vrframework.classe.Conexao;
+import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.convenio.conveniado.ConveniadoVO;
 
@@ -14,15 +13,15 @@ import vrimplantacao2.vo.cadastro.convenio.conveniado.ConveniadoVO;
  */
 public class ConveniadoDAO {
 
-    public Set<Long> getCnpjCadastrado() throws Exception {
-        Set<Long> result = new LinkedHashSet<>();
+    public MultiMap<Long, Integer> getCnpjCadastrado() throws Exception {
+        MultiMap<Long, Integer> result = new MultiMap<>();
         
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select cnpj from conveniado"
+                    "select id, id_empresa, cnpj from conveniado"
             )) {
                 while (rst.next()) {
-                    result.add(rst.getLong("cnpj"));
+                    result.put(rst.getInt("id"), rst.getLong("id_empresa"), rst.getLong("cnpj"));
                 }
             }
         }

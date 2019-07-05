@@ -1087,12 +1087,28 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+    
+    private String arquivoConvenioEmpresas = "";
+    private String arquivoConvenioConveniados = "";
+    private String arquivoConvenioTransacoes = "";
+
+    public void setArquivoConvenioEmpresas(String arquivoConvenioEmpresas) {
+        this.arquivoConvenioEmpresas = arquivoConvenioEmpresas;
+    }
+
+    public void setArquivoConvenioConveniados(String arquivoConvenioConveniados) {
+        this.arquivoConvenioConveniados = arquivoConvenioConveniados;
+    }
+
+    public void setArquivoConvenioTransacoes(String arquivoConvenioTransacoes) {
+        this.arquivoConvenioTransacoes = arquivoConvenioTransacoes;
+    }
 
     @Override
     public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
         List<ConvenioEmpresaIMP> result = new ArrayList<>();
         
-        Arquivo empresas = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());  
+        Arquivo empresas = ArquivoFactory.getArquivo(this.arquivoConvenioEmpresas, getOpcoes());  
         
         ProgressBar.setStatus("Carregando empresas do convênio...");
         for (LinhaArquivo linha: empresas) {            
@@ -1133,7 +1149,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ConveniadoIMP> getConveniado() throws Exception {
         List<ConveniadoIMP> result = new ArrayList<>();
         
-        Arquivo conveniados = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());  
+        Arquivo conveniados = ArquivoFactory.getArquivo(this.arquivoConvenioConveniados, getOpcoes());  
         
         ProgressBar.setStatus("Carregando conveniados...");
         for (LinhaArquivo linha: conveniados) {            
@@ -1153,7 +1169,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setDataBloqueio(getData(linha.getString("databloqueio")));
             imp.setConvenioLimite(linha.getDouble("conveniolimite"));
             imp.setConvenioDesconto(linha.getDouble("conveniodesconto"));
-            imp.setLojaCadastro(linha.getString("lojacadastro"));
+            imp.setLojaCadastro(Utils.stringToInt(linha.getString("lojacadastro")));
             
             result.add(imp);
         }
@@ -1165,7 +1181,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
         List<ConvenioTransacaoIMP> result = new ArrayList<>();
         
-        Arquivo conveniados = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());  
+        Arquivo conveniados = ArquivoFactory.getArquivo(this.arquivoConvenioTransacoes, getOpcoes());  
         
         ProgressBar.setStatus("Carregando transação convenio...");
         for (LinhaArquivo linha: conveniados) {            
@@ -1174,8 +1190,10 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setId(linha.getString("id"));
             imp.setIdConveniado(linha.getString("id_conveniado"));
             imp.setEcf(linha.getString("ecf"));
-            imp.setNumeroCupom(linha.getString("numeroCupom"));
-            imp.setDataHora(new Timestamp(getData(linha.getString("dataHora")).getTime()));
+            imp.setNumeroCupom(linha.getString("numerocupom"));
+            imp.setDataHora(new Timestamp(
+                    (linha.getString("datahora") != null ? getData(linha.getString("datahora")): new Date()).getTime()
+            ));
             imp.setValor(linha.getDouble("valor"));
             SituacaoTransacaoConveniado byNome = SituacaoTransacaoConveniado.getByNome(linha.getString("situacaotransacao"));
             imp.setSituacaoTransacaoConveniado(byNome == null ? SituacaoTransacaoConveniado.OK : byNome);

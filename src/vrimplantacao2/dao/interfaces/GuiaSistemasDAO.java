@@ -561,8 +561,7 @@ public class GuiaSistemasDAO extends InterfaceDAO {
                     imp.setIdEmpresa(rst.getString("vfd_CodEmpresa"));
                     imp.setBloqueado(false);
                     imp.setConvenioLimite(rst.getDouble("vfd_LimiteConvenio"));
-                    imp.setConvenioDesconto(0);    
-                    imp.setLojaCadastro("10");
+                    imp.setConvenioDesconto(0); 
                     vResult.add(imp);
                 }
             }

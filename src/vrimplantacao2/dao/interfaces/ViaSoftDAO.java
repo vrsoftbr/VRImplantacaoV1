@@ -583,7 +583,6 @@ public class ViaSoftDAO extends InterfaceDAO {
                     imp.setCnpj(rs.getString("cnpjf"));
                     imp.setConvenioLimite(rs.getDouble("limite"));
                     imp.setSituacaoCadastro("S".equals(rs.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-                    imp.setLojaCadastro("1");
                     imp.setValidadeCartao(rs.getDate("validade"));
 
                     result.add(imp);

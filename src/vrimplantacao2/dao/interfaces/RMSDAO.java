@@ -1417,8 +1417,7 @@ public class RMSDAO extends InterfaceDAO {
                     imp.setIdEmpresa(rst.getString("idEmpresa"));
                     imp.setBloqueado(rst.getBoolean("bloqueado"));
                     imp.setConvenioLimite(rst.getDouble("limite_convenio"));
-                    imp.setConvenioDesconto(rst.getDouble("desconto"));    
-                    imp.setLojaCadastro(rst.getString("loja"));
+                    imp.setConvenioDesconto(rst.getDouble("desconto"));
                     result.add(imp);
                 }
             }

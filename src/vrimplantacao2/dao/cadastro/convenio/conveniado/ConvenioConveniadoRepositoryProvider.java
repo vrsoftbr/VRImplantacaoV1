@@ -1,6 +1,6 @@
 package vrimplantacao2.dao.cadastro.convenio.conveniado;
 
-import java.util.Set;
+import java.util.Map;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao2.dao.cadastro.convenio.empresa.EmpresaAnteriorDAO;
@@ -62,7 +62,7 @@ public class ConvenioConveniadoRepositoryProvider {
         Conexao.rollback();
     }
 
-    public Set<Long> getCnpjCadastrado() throws Exception {
+    public MultiMap<Long, Integer> getCnpjCadastrado() throws Exception {
         return conveniadoDAO.getCnpjCadastrado();
     }
 
@@ -70,7 +70,7 @@ public class ConvenioConveniadoRepositoryProvider {
         return new ConveniadoIDStack();
     }
 
-    public MultiMap<String, ConveniadoAnteriorVO> getAnteriores() throws Exception {
+    public Map<String, ConveniadoAnteriorVO> getAnteriores() throws Exception {
         return conveniadoAnteriorDAO.getAnteriores(getSistema(), getLojaOrigem());
     }
 
@@ -82,7 +82,7 @@ public class ConvenioConveniadoRepositoryProvider {
         ProgressBar.next();
     }
 
-    public MultiMap<String, ConvenioEmpresaAnteriorVO> getEmpresas() throws Exception {
+    public Map<String, ConvenioEmpresaAnteriorVO> getEmpresas() throws Exception {
         return empresaDAO.getAnteriores(sistema, lojaOrigem, true);
     }
 
