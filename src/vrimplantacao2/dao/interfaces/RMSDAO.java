@@ -1644,7 +1644,6 @@ public class RMSDAO extends InterfaceDAO {
                     "    F.TIP_CODIGO||F.TIP_DIGITO id_fornecedor,\n" +
                     "    cp.cpd_forne,\n" +
                     "    cp.cpd_ntfis numerodocumento,\n" +
-                    "    210 tipoentrada,\n" +
                     "    cp.cpd_emissao dataemissao,\n" +
                     "    cp.cpd_dt_emi,\n" +
                     "    cp.cpd_recep dataentrada,\n" +
@@ -1656,33 +1655,44 @@ public class RMSDAO extends InterfaceDAO {
                     "    cp.cpd_serie,\n" +
                     "    cp.cpd_ntfis,\n" +
                     "    cp.cpd_vlr_pago_cheque,\n" +
-                    "    cp.cpd_vlr_pago_dinhei,\n" +
+                    "    cp.cpd_vlr_pago_dinhei,    \n" +
+                    "    case when cp.cpd_vlr_pago_cheque + cp.cpd_vlr_pago_dinhei >= cp.cpd_vrnota then 'PAGO' else 'ABERTO' end situacao,\n" +
                     "    cp.cpm_banco,\n" +
                     "    cp.cpd_agencia_emp,\n" +
                     "    cp.cpd_conta_emp,\n" +
                     "    cp.cpm_ncheq,\n" +
-                    "    cp.cpm_venc datavencimento\n" +
+                    "    cp.cpm_venc datavencimento,\n" +
+                    "    cp.cpd_duplicata duplicata\n" +
                     "from\n" +
                     "    ag1pagcp cp\n" +
                     "    join AA2CTIPO F on\n" +
                     "         cp.cpd_forne = f.TIP_CODIGO\n" +
-                    "where cp.cpd_loja = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n" +
-                    "   and cp.cpd_emissao >= 170601\n" +
+                    "where cp.cpd_loja = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + " and CPD_DTA_BAIXA = 0\n" +
                     "order by\n" +
                     "    cp.cpd_emissao"
             )) {
                 SimpleDateFormat format = new SimpleDateFormat("yyMMdd");
+                SimpleDateFormat format2 = new SimpleDateFormat("1yyMMdd");
                 while (rst.next()) {
                     ContaPagarIMP vo = new ContaPagarIMP();
                     
-                    vo.setId(rst.getString("id_fornecedor") );
+                    vo.setId(String.format(
+                            "%s-%s-%s-%s-%s-%s",
+                            rst.getString("id_fornecedor"),
+                            rst.getString("numerodocumento"),
+                            rst.getString("dataemissao"),
+                            rst.getString("valor"),
+                            rst.getString("datavencimento"),
+                            rst.getString("duplicata")
+                    ));
                     vo.setIdFornecedor(rst.getString("id_fornecedor"));
                     vo.setDataHoraAlteracao(new Timestamp(format.parse(rst.getString("dataemissao")).getTime()));
-                    vo.setDataEmissao(new Date(format.parse(rst.getString("dataemissao")).getTime()));
-                    vo.setDataEntrada(new Date(format.parse(rst.getString("dataentrada")).getTime()));
+                    vo.setDataEmissao(format.parse(rst.getString("dataemissao")));
+                    vo.setDataEntrada(format.parse(rst.getString("dataentrada")));
                     vo.setNumeroDocumento(rst.getString("numerodocumento"));
+                    vo.setObservacao("DUPLICATA " + rst.getString("duplicata"));
                     vo.setValor(rst.getDouble("valor"));
-                    vo.addVencimento(new Date(format.parse(rst.getString("datavencimento")).getTime()), vo.getValor());
+                    vo.addVencimento(format2.parse(rst.getString("datavencimento")), vo.getValor()).setObservacao("DUPLICATA " + rst.getString("duplicata"));
                     
                     result.add(vo);
                 }

@@ -271,7 +271,7 @@ public class ContasPagarRepository {
         vo.setId_tipopagamento(cp.getIdTipoPagamentoVR() == null ? 0 : cp.getIdTipoPagamentoVR());
         vo.setNumerocheque(cp.getNumerocheque());
         vo.setNumeroparcela(cp.getNumeroParcela());
-        vo.setObservacao("IMPORTADO VR " + cp.getObservacao());
+        vo.setObservacao("IMPORTADO VR" + (cp.getObservacao() == null ? "" : " " + cp.getObservacao()));
         vo.setSituacaopagarfornecedorparcela(cp.isPago() ? SituacaoPagarFornecedorParcela.PAGO : SituacaoPagarFornecedorParcela.ABERTO);
         vo.setValor(cp.getValor());
         vo.setDatahoraalteracao(new Date());
