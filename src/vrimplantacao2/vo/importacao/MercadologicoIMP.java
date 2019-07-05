@@ -51,23 +51,23 @@ public class MercadologicoIMP {
     }
 
     public void setMerc1Descricao(String Merc1Descricao) {
-        this.Merc1Descricao = Merc1Descricao;
+        this.Merc1Descricao = Utils.acertarTexto(Merc1Descricao);
     }
 
     public void setMerc2Descricao(String Merc2Descricao) {
-        this.Merc2Descricao = Merc2Descricao;
+        this.Merc2Descricao = Utils.acertarTexto(Merc2Descricao);
     }
 
     public void setMerc3Descricao(String Merc3Descricao) {
-        this.Merc3Descricao = Merc3Descricao;
+        this.Merc3Descricao = Utils.acertarTexto(Merc3Descricao);
     }
 
     public void setMerc4Descricao(String Merc4Descricao) {
-        this.Merc4Descricao = Merc4Descricao;
+        this.Merc4Descricao = Utils.acertarTexto(Merc4Descricao);
     }
 
     public void setMerc5Descricao(String Merc5Descricao) {
-        this.Merc5Descricao = Merc5Descricao;
+        this.Merc5Descricao = Utils.acertarTexto(Merc5Descricao);
     }
 
     public String getImportSistema() {
