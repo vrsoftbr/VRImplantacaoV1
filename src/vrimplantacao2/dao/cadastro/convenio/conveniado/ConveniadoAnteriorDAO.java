@@ -59,7 +59,7 @@ public class ConveniadoAnteriorDAO {
                     vo.setSistema(rst.getString("sistema"));
                     vo.setLoja(rst.getString("loja"));
                     vo.setId(rst.getString("id"));
-                    vo.setCodigoAtual(rst.getObject("codigoatual", Integer.class));
+                    vo.setCodigoAtual(rst.getInt("codigoatual"));
                     vo.setCnpj(rst.getString("cnpj"));
                     vo.setRazao(rst.getString("razao"));
                     vo.setLojaCadastro(rst.getString("lojacadastro"));

@@ -40,7 +40,7 @@ public class ConvenioReceberRepository {
                 ConvenioTransacaoAnteriorVO anterior = anteriores.get(imp.getId());
                 ConveniadoAnteriorVO conveniado = conveniados.get(imp.getIdConveniado());
                 
-                if (anterior == null && conveniado != null && conveniado.getCodigoAtual() < 1) {
+                if (anterior == null && conveniado != null && conveniado.getCodigoAtual() > 0) {
                     
                     ConvenioTransacaoVO vo = converterTransacao(imp);
                     vo.setId_conveniado(conveniado.getCodigoAtual());
