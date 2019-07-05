@@ -14,6 +14,7 @@ import java.util.Map;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -210,5 +211,41 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
+    }
+    
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        ConexaoDBF.abrirConexao(i_arquivo);
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "cod_for, "
+                    + "nome as razao, "
+                    + "fantasia, "
+                    + "endereco, "
+                    + "bairro, "
+                    + "cidade, "
+                    + "cep, "
+                    + "estado, "
+                    + "cgc_cpf, "
+                    + "insc_rg, "
+                    + "ins_mun, "
+                    + "fone, "
+                    + "fax, "
+                    + "e_mail, "
+                    + "nomev, "
+                    + "fonev, "
+                    + "obs1, "
+                    + "obs2, "
+                    + "data_incl"
+                    + "from forneced "
+            )) {
+                while (rst.next()) {
+                    
+                }
+            }
+        }
+        return null;
     }
 }
