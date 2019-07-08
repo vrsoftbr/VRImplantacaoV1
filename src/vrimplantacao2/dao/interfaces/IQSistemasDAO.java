@@ -108,13 +108,13 @@ public class IQSistemasDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
+                    "SELECT\n"
                     + "g.codigo,\n"
                     + "g.grupo AS descgrupo,\n"
                     + "sg.codigosubgrupo,\n"
                     + "sg.subgrupo AS descsubgrupo\n"
                     + "FROM grupos g\n"
-                    + "INNER JOIN subgrupos sg ON sg.codigogrupo = g.codigo\n"
+                    + "INNER JOIN subgrupos sg ON sg.grupo = g.grupo\n"
                     + "ORDER BY g.codigo, sg.codigosubgrupo"
             )) {
                 while (rst.next()) {

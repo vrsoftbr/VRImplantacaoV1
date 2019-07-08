@@ -378,6 +378,8 @@ public class CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValorLimite(rst.getDouble("CLILIMCred") > 0 ? rst.getDouble("CLILIMCred") : rst.getDouble("clilimcc"));
                     imp.setDataCadastro(rst.getDate("CLICadastro"));
                     imp.setDataNascimento(rst.getDate("CLINasc"));
+                    imp.setTelefone(rst.getString("CLIFone1"));
+                    imp.setFax(rst.getString("CLIFax"));
                     if ((rst.getString("clicpf") != null)
                             && (!rst.getString("clicpf").trim().isEmpty())) {
                         imp.setCnpj(rst.getString("clicpf"));
@@ -471,16 +473,6 @@ public class CgaDAO extends InterfaceDAO implements MapaTributoProvider {
                                 "1",
                                 "TELEFONE 2",
                                 rst.getString("CLIFone2"),
-                                null,
-                                null
-                        );
-                    }
-                    if ((rst.getString("CLIFax") != null)
-                            && (!rst.getString("CLIFax").trim().isEmpty())) {
-                        imp.addContato(
-                                "2",
-                                "FAX",
-                                rst.getString("CLIFax"),
                                 null,
                                 null
                         );
@@ -659,10 +651,10 @@ public class CgaDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(
-                            rs.getString("ALIQCod"), 
-                            rs.getString("ALIQDesc") + 
-                                    " ALIQ. " + rs.getString("ALIQNFPerc") + 
-                                    " RED. " + rs.getString("ALIQRedNF")));
+                            rs.getString("ALIQCod"),
+                            rs.getString("ALIQDesc")
+                            + " ALIQ. " + rs.getString("ALIQNFPerc")
+                            + " RED. " + rs.getString("ALIQRedNF")));
                 }
             }
         }
