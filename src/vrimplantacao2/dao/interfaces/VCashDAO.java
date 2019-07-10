@@ -17,6 +17,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -359,6 +360,40 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEmpresa(rst.getString("trabalho"));
                     imp.setCargo(rst.getString("profissao"));
                     imp.setObservacao(rst.getString("obs"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        ConexaoDBF.abrirConexao(i_arquivo);
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "n_docto, "
+                    + "cod_cli, "
+                    + "parcela, "
+                    + "data_vend as emissao, "
+                    + "data_venc as vencimento, "
+                    + "vr_liquid, "
+                    + "observacao "
+                    + "from CT_RC001 "
+                    + "where data_rec = ''"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("n_docto") + rst.getString("cod_cli"));
+                    imp.setIdCliente(rst.getString("cod_cli"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setNumeroCupom(rst.getString("n_docto"));
+                    imp.setParcela(rst.getInt("parcela"));
+                    imp.setValor(rst.getDouble("vr_liquid"));
+                    imp.setObservacao(rst.getString("observacao"));
                     result.add(imp);
                 }
             }
