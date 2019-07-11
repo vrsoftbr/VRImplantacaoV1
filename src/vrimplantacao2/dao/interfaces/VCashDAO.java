@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -35,6 +36,23 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
         return "VCash";
     }
 
+    public List<Estabelecimento> getLojas() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "cod_est,\n"
+                    + "nome\n"
+                    + "from\n"
+                    + "EMPR_USU")) {
+                while (rs.next()) {
+                    result.add(new Estabelecimento(rs.getString("cod_est"), rs.getString("nome")));
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
