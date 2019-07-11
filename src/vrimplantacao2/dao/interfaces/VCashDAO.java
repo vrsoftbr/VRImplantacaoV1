@@ -7,10 +7,12 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -29,7 +31,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
 
-    public String i_arquivo;
+    private SimpleDateFormat fmt = new SimpleDateFormat("yyyyMM-dd");
+    private static final Logger LOG = Logger.getLogger(DtComDAO.class.getName());
 
     @Override
     public String getSistema() {
@@ -56,13 +59,13 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-        ConexaoDBF.abrirConexao(i_arquivo);
+        
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "cod_trib,\n"
                     + "descricao\n"
-                    + "from tributac\n"
+                    + "from TRIBUTAC\n"
                     + "order by cod_trib"
             )) {
                 while (rst.next()) {
@@ -76,14 +79,13 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
         Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
-        ConexaoDBF.abrirConexao(i_arquivo);
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "cod_tip,\n"
                     + "nome\n"
                     + "from tip_prod\n"
-                    + "where sub_tip = 0\n"
+                    + "where sub_tip = '000'\n"
                     + "order by cod_tip"
             )) {
                 while (rst.next()) {
@@ -100,7 +102,7 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "sub_tip,\n"
                     + "nome\n"
                     + "from tip_prod "
-                    + "where sub_tip > 0"
+                    + "where sub_tip > '000'\n"
                     + "order by cod_tip, sub_tip"
             )) {
                 while (rst.next()) {
@@ -118,10 +120,10 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select\n"
                     + "cod_tip,\n"
                     + "sub_tip,\n"
-                    + "'1' as merc3"
+                    + "'1' as merc3, "
                     + "nome\n"
                     + "from tip_prod "
-                    + "where sub_tip > 0"
+                    + "where sub_tip > '000'\n"
                     + "order by cod_tip, sub_tip"
             )) {
                 while (rst.next()) {
@@ -144,7 +146,8 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        ConexaoDBF.abrirConexao(i_arquivo);
+        String dataCadastro = null;
+        java.sql.Date dataCad;
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
@@ -168,12 +171,18 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "e.p_venda,"
                     + "e.qte as estoque,"
                     + "e.qte_min "
-                    + "from produtos p"
-                    + "left join tip_prod t on t.cod_trib = p.cod_tip and t.sub_tip = p.sub_tip\n"
-                    + "left join estoques e on e.cod_pro = p.cod_pro "
+                    + "from produtos p\n"
+                    + "left join tip_prod t on t.cod_tip = p.cod_tip and t.sub_tip = p.sub_tip\n"
+                    + "left join estoques e on e.cod_pro = p.cod_pro and e.cod_est = '" + getLojaOrigem() + "'\n"
                     + "order by p.cod_pro"
             )) {
                 while (rst.next()) {
+                                        
+                    dataCadastro = rst.getString("data_incl").substring(0, 4);
+                    dataCadastro = dataCadastro + "-" + rst.getString("data_incl").substring(4, 6);
+                    dataCadastro = dataCadastro + "-" + rst.getString("data_incl").substring(6, 8);
+                    dataCad = new java.sql.Date(fmt.parse(dataCadastro).getTime());
+                                        
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
@@ -191,6 +200,7 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodMercadologico1(rst.getString("cod_tip"));
                     imp.setCodMercadologico2(rst.getString("sub_tip"));
                     imp.setCodMercadologico3("1");
+                    imp.setDataCadastro(dataCad);
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setCustoComImposto(rst.getDouble("p_custo"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
@@ -213,7 +223,6 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        ConexaoDBF.abrirConexao(i_arquivo);
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
@@ -238,7 +247,6 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-        ConexaoDBF.abrirConexao(i_arquivo);
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
@@ -325,7 +333,6 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        ConexaoDBF.abrirConexao(i_arquivo);
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
@@ -388,7 +395,6 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-        ConexaoDBF.abrirConexao(i_arquivo);
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "

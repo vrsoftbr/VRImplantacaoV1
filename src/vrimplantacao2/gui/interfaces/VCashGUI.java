@@ -181,7 +181,7 @@ public class VCashGUI extends VRInternalFrame {
                         }
                         
                         if(chkMercadologico.isSelected()) {
-                            importador.importarMercadologico();
+                             importador.importarMercadologicoPorNiveis();
                         }
                         
                         {
@@ -233,6 +233,9 @@ public class VCashGUI extends VRInternalFrame {
                             }
                             if (chkQtdEmbCotacao.isSelected()) {
                                 opcoes.add(OpcaoProduto.QTD_EMBALAGEM_COTACAO);
+                            }
+                            if (chkDataCadastro.isSelected()) {
+                                opcoes.add(OpcaoProduto.DATA_CADASTRO);
                             }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
@@ -366,6 +369,7 @@ public class VCashGUI extends VRInternalFrame {
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         btnMapaTrib = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
         chkQtdEmbCotacao = new vrframework.bean.checkBox.VRCheckBox();
+        chkDataCadastro = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel5 = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -513,6 +517,9 @@ public class VCashGUI extends VRInternalFrame {
 
         chkQtdEmbCotacao.setText("Qtd. Emb. (Cotação)");
         vRPanel7.add(chkQtdEmbCotacao);
+
+        chkDataCadastro.setText("Data Cadastro");
+        vRPanel7.add(chkDataCadastro);
 
         tpDadosMigracao.addTab("Produtos", vRPanel7);
 
@@ -862,6 +869,7 @@ public class VCashGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCliente;
     private vrframework.bean.checkBox.VRCheckBox chkCpfCnpj;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
+    private vrframework.bean.checkBox.VRCheckBox chkDataCadastro;
     private vrframework.bean.checkBox.VRCheckBox chkFCondicaoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFPrazoFornecedor;
