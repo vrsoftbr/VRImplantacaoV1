@@ -153,6 +153,11 @@
                 <Property name="verticalGap" type="int" value="2"/>
               </Layout>
               <SubComponents>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMercadologico">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Mercadol&#xf3;gico"/>
+                  </Properties>
+                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutos">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Produtos"/>
@@ -234,11 +239,6 @@
                     <Property name="text" type="java.lang.String" value="Prod. Mercadol&#xf3;gico"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMercadologico">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Mercadol&#xf3;gico"/>
-                  </Properties>
-                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkValidade">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Validade"/>
@@ -259,6 +259,11 @@
                     <Property name="text" type="java.lang.String" value="Qtd. Emb. EAN"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkQtdEmbCotacao">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Qtd. Emb. (Cota&#xe7;&#xe3;o)"/>
+                  </Properties>
+                </Component>
                 <Component class="vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton" name="btnMapaTrib">
                   <Properties>
                     <Property name="enabled" type="boolean" value="false"/>
@@ -266,11 +271,6 @@
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMapaTribActionPerformed"/>
                   </Events>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkQtdEmbCotacao">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Qtd. Emb. (Cota&#xe7;&#xe3;o)"/>
-                  </Properties>
                 </Component>
               </SubComponents>
             </Container>

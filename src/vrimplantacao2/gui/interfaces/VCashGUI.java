@@ -176,12 +176,13 @@ public class VCashGUI extends VRInternalFrame {
                     importador.setLojaVR(idLojaVR);     
 
                     if (tabs.getSelectedIndex() == 0) {
-                        if (chkProdutos.isSelected()) {
-                            importador.importarProduto(chkManterBalanca.isSelected());
-                        }
-                        
+
                         if(chkMercadologico.isSelected()) {
                              importador.importarMercadologicoPorNiveis();
+                        }
+                        
+                        if (chkProdutos.isSelected()) {
+                            importador.importarProduto(chkManterBalanca.isSelected());
                         }
                         
                         {
@@ -318,6 +319,7 @@ public class VCashGUI extends VRInternalFrame {
         tabs = new vrframework.bean.tabbedPane.VRTabbedPane();
         tpDadosMigracao = new vrframework.bean.tabbedPane.VRTabbedPane();
         vRPanel7 = new vrframework.bean.panel.VRPanel();
+        chkMercadologico = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Custo = new vrframework.bean.checkBox.VRCheckBox();
@@ -333,13 +335,12 @@ public class VCashGUI extends VRInternalFrame {
         chkT1DescReduzida = new vrframework.bean.checkBox.VRCheckBox();
         chkT1DescGondola = new vrframework.bean.checkBox.VRCheckBox();
         chkT1ProdMercadologico = new vrframework.bean.checkBox.VRCheckBox();
-        chkMercadologico = new vrframework.bean.checkBox.VRCheckBox();
         chkValidade = new vrframework.bean.checkBox.VRCheckBox();
         chkAtacado = new vrframework.bean.checkBox.VRCheckBox();
         chkTipoEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
-        btnMapaTrib = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
         chkQtdEmbCotacao = new vrframework.bean.checkBox.VRCheckBox();
+        btnMapaTrib = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
         vRPanel5 = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel4 = new vrframework.bean.panel.VRPanel();
@@ -404,6 +405,9 @@ public class VCashGUI extends VRInternalFrame {
         vRPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         vRPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 2, 2));
 
+        chkMercadologico.setText("Mercadológico");
+        vRPanel7.add(chkMercadologico);
+
         chkProdutos.setText("Produtos");
         chkProdutos.setEnabled(true);
         vRPanel7.add(chkProdutos);
@@ -451,9 +455,6 @@ public class VCashGUI extends VRInternalFrame {
         chkT1ProdMercadologico.setText("Prod. Mercadológico");
         vRPanel7.add(chkT1ProdMercadologico);
 
-        chkMercadologico.setText("Mercadológico");
-        vRPanel7.add(chkMercadologico);
-
         chkValidade.setText("Validade");
         vRPanel7.add(chkValidade);
 
@@ -466,6 +467,9 @@ public class VCashGUI extends VRInternalFrame {
         chkQtdEmbalagemEAN.setText("Qtd. Emb. EAN");
         vRPanel7.add(chkQtdEmbalagemEAN);
 
+        chkQtdEmbCotacao.setText("Qtd. Emb. (Cotação)");
+        vRPanel7.add(chkQtdEmbCotacao);
+
         btnMapaTrib.setEnabled(false);
         btnMapaTrib.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -473,9 +477,6 @@ public class VCashGUI extends VRInternalFrame {
             }
         });
         vRPanel7.add(btnMapaTrib);
-
-        chkQtdEmbCotacao.setText("Qtd. Emb. (Cotação)");
-        vRPanel7.add(chkQtdEmbCotacao);
 
         tpDadosMigracao.addTab("Produtos", vRPanel7);
 
