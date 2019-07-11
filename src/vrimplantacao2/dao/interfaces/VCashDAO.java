@@ -31,7 +31,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
 
-    private SimpleDateFormat fmt = new SimpleDateFormat("yyyyMM-dd");
+    private SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
+    private SimpleDateFormat fmt2 = new SimpleDateFormat("dd/MM/yy");
     private static final Logger LOG = Logger.getLogger(DtComDAO.class.getName());
 
     @Override
@@ -55,11 +56,11 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -177,12 +178,12 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by p.cod_pro"
             )) {
                 while (rst.next()) {
-                                        
+
                     dataCadastro = rst.getString("data_incl").substring(0, 4);
                     dataCadastro = dataCadastro + "-" + rst.getString("data_incl").substring(4, 6);
                     dataCadastro = dataCadastro + "-" + rst.getString("data_incl").substring(6, 8);
                     dataCad = new java.sql.Date(fmt.parse(dataCadastro).getTime());
-                                        
+
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
@@ -247,6 +248,8 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
+        String dataCadastro = null;
+        java.sql.Date dataCad;
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
@@ -268,10 +271,20 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "fonev, "
                     + "obs1, "
                     + "obs2, "
-                    + "data_incl"
-                    + "from forneced "
+                    + "data_incl\n"
+                    + "from FORNECED "
             )) {
                 while (rst.next()) {
+
+                    if (!rst.getString("data_incl").contains("/")) {
+                        dataCadastro = rst.getString("data_incl").substring(0, 4);
+                        dataCadastro = dataCadastro + "-" + rst.getString("data_incl").substring(4, 6);
+                        dataCadastro = dataCadastro + "-" + rst.getString("data_incl").substring(6, 8);
+                        dataCad = new java.sql.Date(fmt.parse(dataCadastro).getTime());
+                    } else {
+                        dataCad = new java.sql.Date(fmt2.parse(rst.getString("data_incl")).getTime());
+                    }
+
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
@@ -287,7 +300,7 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(rst.getString("cidade"));
                     imp.setUf(rst.getString("estado"));
                     imp.setTel_principal(rst.getString("fone"));
-                    imp.setDatacadastro(rst.getDate("data_incl"));
+                    imp.setDatacadastro(dataCad);
                     imp.setObservacao(rst.getString("obs1"));
 
                     if ((rst.getString("fax") != null)
@@ -333,6 +346,8 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
+        String dataCadastro = null;
+        java.sql.Date dataCad;
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
@@ -358,11 +373,18 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "fonecom, "
                     + "obs, "
                     + "profissao, "
+                    + "data_incl, "
                     + "conjuge "
                     + "from CLIENTES "
                     + "order by cod_cli"
             )) {
                 while (rst.next()) {
+
+                    dataCadastro = rst.getString("data_incl").substring(0, 4);
+                    dataCadastro = dataCadastro + "-" + rst.getString("data_incl").substring(4, 6);
+                    dataCadastro = dataCadastro + "-" + rst.getString("data_incl").substring(6, 8);
+                    dataCad = new java.sql.Date(fmt.parse(dataCadastro).getTime());
+
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rst.getString("cod_cli"));
                     imp.setRazao(rst.getString("nome"));
@@ -381,10 +403,11 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValorLimite(rst.getDouble("lim_cred"));
                     imp.setNomePai(rst.getString("pai"));
                     imp.setNomeMae(rst.getString("mae"));
-                    imp.setNomeConjuge(rst.getString("conuge"));
+                    imp.setNomeConjuge(rst.getString("conjuge"));
                     imp.setEmpresa(rst.getString("trabalho"));
                     imp.setCargo(rst.getString("profissao"));
                     imp.setObservacao(rst.getString("obs"));
+                    imp.setDataCadastro(dataCad);
                     result.add(imp);
                 }
             }
@@ -395,6 +418,8 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
+        String dataEmissao = null, dataVencimento = null;
+        java.sql.Date dataEmi, dataVenc;
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select "
@@ -404,20 +429,36 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "data_vend as emissao, "
                     + "data_venc as vencimento, "
                     + "vr_liquid, "
-                    + "observacao "
+                    + "obs "
                     + "from CT_RC001 "
                     + "where data_rec = ''"
             )) {
                 while (rst.next()) {
+
+                    dataEmissao = rst.getString("emissao").substring(0, 4);
+                    dataEmissao = dataEmissao + "-" + rst.getString("emissao").substring(4, 6);
+                    dataEmissao = dataEmissao + "-" + rst.getString("emissao").substring(6, 8);
+                    dataEmi = new java.sql.Date(fmt.parse(dataEmissao).getTime());
+
+                    if ((rst.getString("vencimento") != null)
+                            && (!rst.getString("vencimento").trim().isEmpty())) {
+                        dataVencimento = rst.getString("vencimento").substring(0, 4);
+                        dataVencimento = dataVencimento + "-" + rst.getString("vencimento").substring(4, 6);
+                        dataVencimento = dataVencimento + "-" + rst.getString("vencimento").substring(6, 8);
+                        dataVenc = new java.sql.Date(fmt.parse(dataVencimento).getTime());
+                    } else {
+                        dataVenc = dataEmi;
+                    }
+
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rst.getString("n_docto") + rst.getString("cod_cli"));
                     imp.setIdCliente(rst.getString("cod_cli"));
-                    imp.setDataEmissao(rst.getDate("emissao"));
-                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setDataEmissao(dataEmi);
+                    imp.setDataVencimento(dataVenc);
                     imp.setNumeroCupom(rst.getString("n_docto"));
                     imp.setParcela(rst.getInt("parcela"));
                     imp.setValor(rst.getDouble("vr_liquid"));
-                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setObservacao(rst.getString("obs"));
                     result.add(imp);
                 }
             }
