@@ -165,7 +165,7 @@ public class IQSistemasDAO extends InterfaceDAO {
                     + "p.margemlucro,\n"
                     + "p.precovenda,\n"
                     + "p.estminimo,\n"
-                    + "p.saldofinalestoque AS estoque,\n"
+                    + "p.quantidade AS estoque,\n"
                     + "p.validade,\n"
                     + "p.pesobruto,\n"
                     + "p.pesoliquido,\n"
