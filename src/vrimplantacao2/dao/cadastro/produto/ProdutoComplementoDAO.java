@@ -226,10 +226,18 @@ public class ProdutoComplementoDAO {
                 if (opt.contains(OpcaoProduto.ICMS)) {
                     sql.put("id_aliquotacredito", vo.getIdAliquotaCredito());
                 }
-                sql.setWhere(
-                        "id_produto = " + vo.getProduto().getId() + " and " +
-                        "id_loja = " + vo.getIdLoja()
-                );
+                if (opt.contains(OpcaoProduto.CUSTO)) {
+                    sql.setWhere(
+                            "id_produto = " + vo.getProduto().getId() + " and "
+                            + "id_loja = " + vo.getIdLoja() + " and "
+                            + "dataultimaentrada is null"
+                    );
+                } else {
+                    sql.setWhere(
+                            "id_produto = " + vo.getProduto().getId() + " and "
+                            + "id_loja = " + vo.getIdLoja()
+                    );
+                }
                 if (!sql.isEmpty()) {
                     stm.execute(sql.getUpdate());
                 }
@@ -302,7 +310,8 @@ public class ProdutoComplementoDAO {
                 sql.put("id_aliquotacredito", complemento.getIdAliquotaCredito());
             }
             if ((opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO))
-                    || (opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO))) {
+                    || (opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO))
+                    || (opt.contains(OpcaoProduto.CUSTO))) {
                 sql.setWhere(
                         "id_produto = " + complemento.getProduto().getId() + " and "
                         + "id_loja = " + complemento.getIdLoja() + " and "

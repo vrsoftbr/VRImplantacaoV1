@@ -264,6 +264,11 @@
                     <Property name="text" type="java.lang.String" value="Qtd. Emb. (Cota&#xe7;&#xe3;o)"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMargem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Margem"/>
+                  </Properties>
+                </Component>
                 <Component class="vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton" name="btnMapaTrib">
                   <Properties>
                     <Property name="enabled" type="boolean" value="false"/>
@@ -288,7 +293,10 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFornMunicipio" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace pref="501" max="32767" attributes="0"/>
                       </Group>
                   </Group>
@@ -298,7 +306,9 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="115" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkFornMunicipio" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="92" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -307,6 +317,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornecedor">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Fornecedor"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFornMunicipio">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Munic&#xed;pio"/>
                   </Properties>
                 </Component>
               </SubComponents>

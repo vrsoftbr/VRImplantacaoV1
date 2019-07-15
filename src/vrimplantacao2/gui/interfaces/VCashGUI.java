@@ -235,6 +235,9 @@ public class VCashGUI extends VRInternalFrame {
                             if (chkQtdEmbCotacao.isSelected()) {
                                 opcoes.add(OpcaoProduto.QTD_EMBALAGEM_COTACAO);
                             }
+                            if (chkMargem.isSelected()) {
+                                opcoes.add(OpcaoProduto.MARGEM);
+                            }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
                             }
@@ -248,12 +251,18 @@ public class VCashGUI extends VRInternalFrame {
                         }
                         
                         if(chkFornecedor.isSelected()) {
-                            importador.importarFornecedor(OpcaoFornecedor.CONTATOS);
+                            importador.importarFornecedor();
                         }
                         
-                        List<OpcaoFornecedor> opcoes = new ArrayList<>();
-                        if (!opcoes.isEmpty()) {
-                            importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
+                        {
+                            List<OpcaoFornecedor> opt = new ArrayList<>();
+                            if (chkFornMunicipio.isSelected()) {
+                                opt.add(OpcaoFornecedor.MUNICIPIO);
+                            }
+                            
+                            if (!opt.isEmpty()) {
+                                importador.atualizarFornecedor(opt.toArray(new OpcaoFornecedor[]{}));
+                            }
                         }
                         
                         if(chkCliente.isSelected()) {
@@ -340,9 +349,11 @@ public class VCashGUI extends VRInternalFrame {
         chkTipoEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkQtdEmbalagemEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkQtdEmbCotacao = new vrframework.bean.checkBox.VRCheckBox();
+        chkMargem = new vrframework.bean.checkBox.VRCheckBox();
         btnMapaTrib = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
         vRPanel5 = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkFornMunicipio = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel4 = new vrframework.bean.panel.VRPanel();
         chkCliente = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
@@ -470,6 +481,9 @@ public class VCashGUI extends VRInternalFrame {
         chkQtdEmbCotacao.setText("Qtd. Emb. (Cotação)");
         vRPanel7.add(chkQtdEmbCotacao);
 
+        chkMargem.setText("Margem");
+        vRPanel7.add(chkMargem);
+
         btnMapaTrib.setEnabled(false);
         btnMapaTrib.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -482,13 +496,17 @@ public class VCashGUI extends VRInternalFrame {
 
         chkFornecedor.setText("Fornecedor");
 
+        chkFornMunicipio.setText("Município");
+
         javax.swing.GroupLayout vRPanel5Layout = new javax.swing.GroupLayout(vRPanel5);
         vRPanel5.setLayout(vRPanel5Layout);
         vRPanel5Layout.setHorizontalGroup(
             vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkFornMunicipio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(501, Short.MAX_VALUE))
         );
         vRPanel5Layout.setVerticalGroup(
@@ -496,7 +514,9 @@ public class VCashGUI extends VRInternalFrame {
             .addGroup(vRPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(115, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkFornMunicipio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(92, Short.MAX_VALUE))
         );
 
         tpDadosMigracao.addTab("Fornecedores", vRPanel5);
@@ -730,8 +750,10 @@ public class VCashGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkAtacado;
     private vrframework.bean.checkBox.VRCheckBox chkCliente;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
+    private vrframework.bean.checkBox.VRCheckBox chkFornMunicipio;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
+    private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbCotacao;

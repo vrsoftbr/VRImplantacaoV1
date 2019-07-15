@@ -161,7 +161,7 @@ public class IQSistemasDAO extends InterfaceDAO {
                     + "p.grupo,\n"
                     + "s.codigosubgrupo,\n"
                     + "p.subgrupo,\n"
-                    + "p.custo,\n"
+                    + "p.custofornecedor as custo,\n"
                     + "p.margemlucro,\n"
                     + "p.precovenda,\n"
                     + "p.estminimo,\n"

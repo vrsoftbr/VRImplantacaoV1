@@ -65,7 +65,8 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "cod_trib,\n"
-                    + "descricao\n"
+                    + "descricao, "
+                    + "valor\n"
                     + "from TRIBUTAC\n"
                     + "order by cod_trib"
             )) {
@@ -297,7 +298,11 @@ public class VCashDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setCep(rst.getString("cep"));
                     imp.setBairro(rst.getString("bairro"));
-                    imp.setMunicipio(rst.getString("cidade"));
+                    
+                    if ((rst.getString("cidade") != null)
+                            && (!rst.getString("cidade").trim().isEmpty())) {
+                        imp.setMunicipio(rst.getString("cidade").replace(" SP", ""));
+                    }
                     imp.setUf(rst.getString("estado"));
                     imp.setTel_principal(rst.getString("fone"));
                     imp.setDatacadastro(dataCad);
