@@ -2,6 +2,7 @@ package vrimplantacao2.vo.cadastro.mercadologico;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import vrimplantacao.utils.Utils;
 
 /**
  *
@@ -52,7 +53,7 @@ public class MercadologicoNivelIMP {
     }
 
     public void setDescricao(String descricao) {
-        this.descricao = descricao;
+        this.descricao = Utils.acertarTexto(descricao);
     }
 
     public void setMercadologicoPai(MercadologicoNivelIMP mercadologicoPai) {

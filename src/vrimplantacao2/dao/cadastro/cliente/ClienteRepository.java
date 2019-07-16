@@ -214,6 +214,12 @@ public class ClienteRepository {
                     if (opt.contains(OpcaoCliente.PERMITE_CREDITOROTATIVO)) {
                         atualizarClientePreferencial(vo, opt);
                     }
+                    if (opt.contains(OpcaoCliente.TELEFONE)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.CELULAR)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
                 }
                 notificar();
             }

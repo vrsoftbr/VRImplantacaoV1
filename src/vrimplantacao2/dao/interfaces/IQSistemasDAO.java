@@ -108,13 +108,13 @@ public class IQSistemasDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
+                    "SELECT\n"
                     + "g.codigo,\n"
                     + "g.grupo AS descgrupo,\n"
                     + "sg.codigosubgrupo,\n"
                     + "sg.subgrupo AS descsubgrupo\n"
                     + "FROM grupos g\n"
-                    + "INNER JOIN subgrupos sg ON sg.codigogrupo = g.codigo\n"
+                    + "INNER JOIN subgrupos sg ON sg.grupo = g.grupo\n"
                     + "ORDER BY g.codigo, sg.codigosubgrupo"
             )) {
                 while (rst.next()) {
@@ -161,11 +161,11 @@ public class IQSistemasDAO extends InterfaceDAO {
                     + "p.grupo,\n"
                     + "s.codigosubgrupo,\n"
                     + "p.subgrupo,\n"
-                    + "p.custo,\n"
+                    + "p.custofornecedor as custo,\n"
                     + "p.margemlucro,\n"
                     + "p.precovenda,\n"
                     + "p.estminimo,\n"
-                    + "p.saldofinalestoque AS estoque,\n"
+                    + "p.quantidade AS estoque,\n"
                     + "p.validade,\n"
                     + "p.pesobruto,\n"
                     + "p.pesoliquido,\n"
@@ -462,7 +462,7 @@ public class IQSistemasDAO extends InterfaceDAO {
                     imp.setMunicipio(rst.getString("cidade"));
                     imp.setUf(rst.getString("estado"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
-                    imp.setDataNascimento(rst.getDate("nascimento"));
+                    //imp.setDataNascimento(rst.getDate("nascimento"));
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setCelular(rst.getString("celular"));
                     imp.setFax(rst.getString("fax"));

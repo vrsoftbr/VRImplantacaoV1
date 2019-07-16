@@ -193,6 +193,7 @@ import vrimplantacao2.gui.interfaces.TstiGUI;
 import vrimplantacao2.gui.interfaces.UmPontoDoisGUI;
 import vrimplantacao2.gui.interfaces.UniplusGUI;
 import vrimplantacao2.gui.interfaces.UpFortiGUI;
+import vrimplantacao2.gui.interfaces.VCashGUI;
 import vrimplantacao2.gui.interfaces.ViaSoftGUI;
 import vrimplantacao2.gui.interfaces.VisualComercioGUI;
 import vrimplantacao2.gui.interfaces.WShopGUI;
@@ -677,6 +678,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuMSIInfor = new javax.swing.JMenuItem();
         mnuDtCom = new javax.swing.JMenuItem();
         mnuSiaCriareDbf = new javax.swing.JMenuItem();
+        mnuVCash = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuCache = new javax.swing.JMenu();
@@ -2115,6 +2117,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuOrion.add(mnuSiaCriareDbf);
+
+        mnuVCash.setText("VCash");
+        mnuVCash.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuVCashActionPerformed(evt);
+            }
+        });
+        mnuOrion.add(mnuVCash);
 
         mnuDatabase.add(mnuOrion);
 
@@ -4015,6 +4025,10 @@ public final class MenuGUI extends VRMdiFrame {
         DLinkGUI.exibir(this);
     }//GEN-LAST:event_mnuDLinkActionPerformed
 
+    private void mnuVCashActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuVCashActionPerformed
+        VCashGUI.exibir(this);
+    }//GEN-LAST:event_mnuVCashActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4228,6 +4242,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuUmPontoDois;
     private javax.swing.JMenuItem mnuUniplus;
     private javax.swing.JMenuItem mnuUpForti;
+    private javax.swing.JMenuItem mnuVCash;
     private javax.swing.JMenuItem mnuViaSoft;
     private javax.swing.JMenuItem mnuVisualComercio;
     private javax.swing.JMenuItem mnuWebsaq;

@@ -391,7 +391,7 @@ public class MercadologicoDAO {
         int result = 1;
         try (Statement stm = Conexao.createStatement()) {
             if (!opt.contains(OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR)) {
-                stm.execute("delete from mercadologico where id > 0; delete from implantacao.codant_mercadologico;");
+                stm.execute("delete from mercadologico where mercadologico1 > 0; delete from implantacao.codant_mercadologico;");
             }
             for (KeyList<String> key : organizados.keySet()) {
                 String[] chave = key.toArray();
