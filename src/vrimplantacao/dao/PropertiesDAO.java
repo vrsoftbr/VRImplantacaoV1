@@ -9,7 +9,7 @@ import vrimplantacao.gui.ConfiguracaoGUI;
 public class PropertiesDAO {
 
     public void verficarConfiguracao() throws Exception {
-        if (!Arquivo.exists(Util.getRoot() + "vr/Implantacao/vrImplantacao.properties")) {
+        if (!Arquivo.exists(Util.getRoot() + "vr/implantacao/vrimplantacao.properties")) {
             ConfiguracaoGUI form = new ConfiguracaoGUI();
             form.setVisible(true);
 
