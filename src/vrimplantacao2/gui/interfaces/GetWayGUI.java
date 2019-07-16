@@ -130,6 +130,7 @@ public class GetWayGUI extends VRInternalFrame {
 
             @Override
             public String getLoja() {
+                vLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
                 return vLojaCliente;
             }
 
