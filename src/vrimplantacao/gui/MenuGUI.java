@@ -110,6 +110,7 @@ import vrimplantacao2.gui.interfaces.CgaGUI;
 import vrimplantacao2.gui.interfaces.CissGUI;
 import vrimplantacao2.gui.interfaces.ClickGUI;
 import vrimplantacao2.gui.interfaces.ContechGUI;
+import vrimplantacao2.gui.interfaces.DLinkGUI;
 import vrimplantacao2.gui.interfaces.DataSyncGUI;
 import vrimplantacao2.gui.interfaces.DestroGUI;
 import vrimplantacao2.gui.interfaces.DtComGUI;
@@ -663,6 +664,8 @@ public final class MenuGUI extends VRMdiFrame {
         mnuGTech = new javax.swing.JMenuItem();
         mnuClick = new javax.swing.JMenuItem();
         mnuIQSistemas = new javax.swing.JMenuItem();
+        jMenu10 = new javax.swing.JMenu();
+        mnuDLink = new javax.swing.JMenuItem();
         mnuOrion = new javax.swing.JMenu();
         jMenuItemOrion = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -2018,6 +2021,18 @@ public final class MenuGUI extends VRMdiFrame {
         jMenu9.add(mnuIQSistemas);
 
         mnuDatabase.add(jMenu9);
+
+        jMenu10.setText("MySQL 2");
+
+        mnuDLink.setText("DLink");
+        mnuDLink.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuDLinkActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuDLink);
+
+        mnuDatabase.add(jMenu10);
 
         mnuOrion.setText("DBF");
 
@@ -3986,7 +4001,6 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuClickActionPerformed
 
     private void mnuPwGestorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPwGestorActionPerformed
-        // TODO add your handling code here:
         PwGestorGUI.exibir(this);
     }//GEN-LAST:event_mnuPwGestorActionPerformed
     private void mnuAutomaqActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAutomaqActionPerformed
@@ -3994,12 +4008,16 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuAutomaqActionPerformed
 
     private void mnuIQSistemasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuIQSistemasActionPerformed
-        // TODO add your handling code here:
         IQSistemasGUI.exibir(this);
     }//GEN-LAST:event_mnuIQSistemasActionPerformed
 
+    private void mnuDLinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuDLinkActionPerformed
+        DLinkGUI.exibir(this);
+    }//GEN-LAST:event_mnuDLinkActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
+    private javax.swing.JMenu jMenu10;
     private javax.swing.JMenu jMenu11;
     private javax.swing.JMenu jMenu12;
     private javax.swing.JMenu jMenu13;
@@ -4113,6 +4131,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuControll;
     private javax.swing.JMenuItem mnuCplus;
     private javax.swing.JMenu mnuDB2;
+    private javax.swing.JMenuItem mnuDLink;
     private javax.swing.JMenuItem mnuDataSync;
     private javax.swing.JMenu mnuDatabase;
     private javax.swing.JMenuItem mnuDelfi;

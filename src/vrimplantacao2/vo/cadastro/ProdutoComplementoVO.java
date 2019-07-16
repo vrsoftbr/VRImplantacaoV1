@@ -37,11 +37,11 @@ public class ProdutoComplementoVO {
     }
 
     public void setEstoqueMinimo(double estoqueMinimo) {
-        this.estoqueMinimo = MathUtils.round(estoqueMinimo, 0, 99999999D);
+        this.estoqueMinimo = MathUtils.round(estoqueMinimo, 0, 9999999D);
     }
 
     public void setEstoqueMaximo(double estoqueMaximo) {
-        this.estoqueMaximo = MathUtils.round(estoqueMaximo, 0, 99999999D);
+        this.estoqueMaximo = MathUtils.round(estoqueMaximo, 0, 9999999D);
     }
 
     public void setEstoque(double estoque) {
@@ -49,15 +49,15 @@ public class ProdutoComplementoVO {
     }
 
     public void setCustoSemImposto(double custoSemImposto) {
-        this.custoSemImposto = MathUtils.round(custoSemImposto, 4);
+        this.custoSemImposto = MathUtils.round(custoSemImposto, 4, 9999999D);
     }
 
     public void setCustoComImposto(double custoComImposto) {
-        this.custoComImposto = MathUtils.round(custoComImposto, 4);
+        this.custoComImposto = MathUtils.round(custoComImposto, 4, 9999999D);
     }
 
     public void setPrecoVenda(double precoVenda) {
-        this.precoVenda = MathUtils.round(precoVenda, 4);
+        this.precoVenda = MathUtils.round(precoVenda, 4, 9999999D);
     }
 
     public void setPrecoDiaSeguinte(double precoDiaSeguinte) {

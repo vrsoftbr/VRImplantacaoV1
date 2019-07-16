@@ -25,7 +25,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Leandro
  */
-public class RCNetDAO extends InterfaceDAO implements MapaTributoProvider {
+public class DLinkDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
@@ -37,8 +37,7 @@ public class RCNetDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    //"select CodLoja as Filial, concat(nome, \" - \", local) as Nome from loja"
-                    "select CodLoja as Filial, nome from loja"
+                    "select CodLoja as Filial, concat(nome, \" - \", local) as Nome from loja"
             )) {
                 while (rst.next()) {
                     result.add(
