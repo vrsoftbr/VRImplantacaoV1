@@ -454,7 +454,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setIdFornecedor(linha.getString("id_fornecedor"));
             imp.setIdProduto(linha.getString("id_produto"));
             imp.setDataAlteracao(getData(linha.getString("dataalteracao")));
-            imp.setCodigoExterno(linha.getString("cod_produto_fornecedor"));
+            imp.setCodigoExterno(linha.getString("codigoexterno"));
             imp.setPesoEmbalagem(linha.getDouble("pesoembalagem"));
             imp.setQtdEmbalagem(linha.getInt("qtdembalagem"));
             imp.setCustoTabela(linha.getDouble("custo_tabelado"));

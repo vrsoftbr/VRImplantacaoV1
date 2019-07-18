@@ -36,7 +36,7 @@ public class Main {
             SplashScreen.setSobre("VR Implantação", Global.VERSAO, Global.DATA);
             SplashScreen.setStatus("Inicializando sistema...");
 
-            Properties oProperties = new Properties(Util.getRoot() + "vr/Implantacao/vrImplantacao.properties");
+            Properties oProperties = new Properties(Util.getRoot() + "vr/implantacao/vrimplantacao.properties");
             //Properties oProperties = new Properties(Util.getRoot() + "vr/vrImplantacao.properties");            
 
             //conecta banco
