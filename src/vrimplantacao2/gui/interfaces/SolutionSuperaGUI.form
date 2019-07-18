@@ -33,6 +33,10 @@
                       <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="cmbLojaOrigem" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="txtLojaMesmoID" min="-2" pref="70" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -48,9 +52,11 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="vRLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtLojaMesmoID" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabs" pref="271" max="32767" attributes="0"/>
+              <Component id="tabs" pref="298" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="vRPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -202,7 +208,7 @@
                               </Group>
                               <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="111" max="32767" attributes="0"/>
+                          <EmptySpace pref="138" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -318,7 +324,7 @@
                               <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="83" max="32767" attributes="0"/>
+                              <EmptySpace pref="110" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -417,7 +423,7 @@
                       <Component id="chkUnifClientePreferencial" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkUnifClienteEventual" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="84" max="32767" attributes="0"/>
+                      <EmptySpace pref="111" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="chkReiniciarIDClienteUnif" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="txtReiniciarIDClienteUnif" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -474,6 +480,13 @@
       </SubComponents>
     </Container>
     <Component class="vrimplantacao2.gui.component.conexao.firebird.ConexaoFirebirdPanel" name="conexao">
+    </Component>
+    <Component class="vrframework.bean.label.VRLabel" name="vRLabel1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Id Loja (Cliente)"/>
+      </Properties>
+    </Component>
+    <Component class="vrframework.bean.textField.VRTextField" name="txtLojaMesmoID">
     </Component>
   </SubComponents>
 </Form>

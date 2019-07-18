@@ -266,10 +266,7 @@ public class VCashGUI extends VRInternalFrame {
                         }
                         
                         if(chkCliente.isSelected()) {
-                            importador.importarClientePreferencial(OpcaoCliente.DADOS, 
-                                                                   OpcaoCliente.CONTATOS, 
-                                                                   OpcaoCliente.VALOR_LIMITE, 
-                                                                   OpcaoCliente.SITUACAO_CADASTRO);
+                            importador.importarClientePreferencial();
                         }
                         
                         if(chkCreditoRotativo.isSelected()) {
