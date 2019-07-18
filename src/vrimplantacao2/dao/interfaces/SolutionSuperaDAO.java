@@ -16,6 +16,8 @@ import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -31,10 +33,13 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class SolutionSuperaDAO extends InterfaceDAO {
 
     private static final Logger LOG = Logger.getLogger(SolutionSuperaDAO.class.getName());
-    
+
+    public String v_lojaMesmoId;
+    public boolean gerarCodigoAtacado = false;
+
     @Override
     public String getSistema() {
-        return "SolutionSupera";
+        return "SolutionSupera" + v_lojaMesmoId;
     }
 
     @Override
@@ -70,16 +75,17 @@ public class SolutionSuperaDAO extends InterfaceDAO {
             OpcaoProduto.CEST,
             OpcaoProduto.PIS_COFINS,
             OpcaoProduto.NATUREZA_RECEITA,
-            OpcaoProduto.ICMS,            
+            OpcaoProduto.ICMS,
             OpcaoProduto.ICMS_SAIDA,
             OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
             OpcaoProduto.ICMS_ENTRADA,
             OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
             OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA,
-            OpcaoProduto.MARGEM
+            OpcaoProduto.MARGEM,
+            OpcaoProduto.ATACADO
         }));
     }
-    
+
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
@@ -196,22 +202,88 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setEstoqueMaximo(rst.getDouble("estoque_max"));
                     imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setSituacaoCadastro(rst.getString("situacaocadastro").contains("A") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("cst_pis_saida"));
                     imp.setPiscofinsCstCredito(rst.getString("cst_pis_entrada"));
-                    imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));                    
+                    imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
                     imp.setIcmsCstSaida(rst.getInt("cst_aliquota_credito"));
                     imp.setIcmsAliqSaida(rst.getDouble("aliquota_debito"));
                     imp.setIcmsCstSaidaForaEstado(rst.getInt("cst_aliquota_debito_fora"));
                     imp.setIcmsAliqSaidaForaEstado(rst.getDouble("aliquota_debito_fora"));
                     imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("cst_aliquota_debito_fora"));
-                    imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("aliquota_debito_fora"));                    
+                    imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("aliquota_debito_fora"));
                     imp.setIcmsCstEntrada(rst.getInt("cst_aliquota_credito"));
                     imp.setIcmsAliqEntrada(rst.getDouble("aliquota_credito"));
                     imp.setIcmsCstEntradaForaEstado(rst.getInt("cst_aliquota_credito_fora"));
                     imp.setIcmsAliqEntradaForaEstado(rst.getDouble("aliquota_credito_fora"));
                     result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.ATACADO) {
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + "pr.codigo_pro,\n"
+                        + "pr.qtde,\n"
+                        + "p.preco_venda as preconormal,\n"
+                        + "pr.preco as precoatacado\n"
+                        + "from produto_preco_reduzido pr\n"
+                        + "inner join produtos p on p.codigo_pro = pr.codigo_pro and pr.qtde > 1"
+                )) {
+                    while (rst.next()) {
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("codigo_pro"));
+                        if (codigoAtual > 0) {
+                            ProdutoIMP imp = new ProdutoIMP();
+                            imp.setImportLoja(getLojaOrigem());
+                            imp.setImportSistema(getSistema());
+                            imp.setImportId(rst.getString("codigo_pro"));
+                            imp.setQtdEmbalagem(rst.getInt("qtde"));
+                            imp.setEan(String.valueOf(imp.getQtdEmbalagem()) + "99999" + String.valueOf(codigoAtual));
+                            imp.setPrecovenda(rst.getDouble("preconormal"));
+                            imp.setAtacadoPreco(rst.getDouble("precoatacado"));
+                            result.add(imp);
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "codigo_pro,\n"
+                    + "qtde,\n"
+                    + "preco\n"
+                    + "from produto_preco_reduzido\n"
+                    + "where qtde > 1"
+            )) {
+                while (rst.next()) {
+                    int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("codigo_pro"));
+                    if (codigoAtual > 0) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("codigo_pro"));
+                        imp.setQtdEmbalagem(rst.getInt("qtde"));
+                        imp.setEan(String.valueOf(imp.getQtdEmbalagem()) + "99999" + String.valueOf(codigoAtual));
+                        result.add(imp);
+                    }
                 }
             }
         }
@@ -428,6 +500,7 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     + "from clientes c\n"
                     + "left join municipios_ibge m on m.cod_municipio_ibge = c.codigo_cid\n"
                     + "inner join uf_ibge u on u.cod_uf = m.cod_uf_ibge\n"
+                    + "where c.codigo_cli in (select codigo_cli from contasreceber where data_pgt is null)\n"
                     + "order by c.codigo_cli"
             )) {
                 while (rst.next()) {

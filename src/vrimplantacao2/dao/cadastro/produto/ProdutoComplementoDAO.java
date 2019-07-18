@@ -183,6 +183,7 @@ public class ProdutoComplementoDAO {
 
     public void atualizar(Collection<ProdutoComplementoVO> complementos, OpcaoProduto... opcoes) throws Exception {
         Set<OpcaoProduto> opt = new LinkedHashSet<>(Arrays.asList(opcoes));
+        String oft = "";
         try (Statement stm = Conexao.createStatement()) {
             for (ProdutoComplementoVO vo: complementos) {
                 SQLBuilder sql = new SQLBuilder();
@@ -198,7 +199,8 @@ public class ProdutoComplementoDAO {
                             sql.put("precodiaseguinte", oferta.getPrecoOferta());
                         } else {
                             sql.put("precodiaseguinte", vo.getPrecoDiaSeguinte());
-                        }
+                        }                        
+                        oft = "update oferta set preconormal = " + MathUtils.round(vo.getPrecoVenda(), 2) + " where id = " + oferta.getId();
                     }
                 }
                 if (opt.contains(OpcaoProduto.TIPO_PRODUTO)) {
@@ -240,6 +242,9 @@ public class ProdutoComplementoDAO {
                 }
                 if (!sql.isEmpty()) {
                     stm.execute(sql.getUpdate());
+                    if (!"".equals(oft)) {
+                        stm.execute(oft);
+                    }                    
                 }
             }
         }
