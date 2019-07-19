@@ -776,6 +776,10 @@ public class NotaSaidaNfceDAO {
     private int getIdAliquotaICMS(int i_situacaoTributaria, double i_porcentagem) throws Exception {
         Statement stm = null;
         ResultSet rst = null;
+        
+        if (i_situacaoTributaria == 0 && i_porcentagem == 0) {
+            i_situacaoTributaria = 40;
+        }
 
         try {
             stm = Conexao.createStatement();
