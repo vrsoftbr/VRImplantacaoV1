@@ -1,6 +1,5 @@
 package vrimplantacao2.dao.interfaces;
 
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -9,6 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,6 +30,7 @@ import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.CreditoRotativoDAO
 import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.CreditoRotativoItemAnteriorDAO;
 import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.CreditoRotativoItemDAO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.venda.VendaHistoricoIMP;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLUtils;
@@ -76,6 +77,8 @@ public class RMSDAO extends InterfaceDAO {
     
     private boolean utilizarViewMixFiscal = true;
     private boolean incluirNivel4 = true;
+    
+    private boolean importarVendasAntigas = false;
 
     public void setUtilizarViewMixFiscal(boolean utilizarViewMixFiscal) {
         this.utilizarViewMixFiscal = utilizarViewMixFiscal;
@@ -83,6 +86,10 @@ public class RMSDAO extends InterfaceDAO {
 
     public void setIncluirNivel4(boolean incluirNivel4) {
         this.incluirNivel4 = incluirNivel4;
+    }
+
+    public void setImportarVendasAntigas(boolean importarVendasAntigas) {
+        this.importarVendasAntigas = importarVendasAntigas;
     }
     
     @Override
@@ -1616,11 +1623,11 @@ public class RMSDAO extends InterfaceDAO {
                     vo.setId_fornecedor(rst.getInt("id_fornecedor"));
                     vo.setNumerodocumento(rst.getInt("numerodocumento"));
                     vo.setId_tipoentrada(rst.getInt("tipoentrada"));
-                    vo.setDataemissao(new Date(format.parse(rst.getString("dataemissao")).getTime()));
-                    vo.setDataentrada(new Date(format.parse(rst.getString("dataentrada")).getTime()));
+                    vo.setDataemissao(new java.sql.Date(format.parse(rst.getString("dataemissao")).getTime()));
+                    vo.setDataentrada(new java.sql.Date(format.parse(rst.getString("dataentrada")).getTime()));
                     vo.setValor(rst.getDouble("valor"));
                     PagarOutrasDespesasVencimentoVO dup = new PagarOutrasDespesasVencimentoVO();
-                    dup.setDatavencimento(new Date(format.parse(rst.getString("datavencimento")).getTime()));
+                    dup.setDatavencimento(new java.sql.Date(format.parse(rst.getString("datavencimento")).getTime()));
                     dup.setValor(vo.getValor());
                     vo.getvPagarOutrasDespesasVencimento().add(dup);
                     vo.setObservacao("IMPORTADO VR");
@@ -1723,9 +1730,9 @@ public class RMSDAO extends InterfaceDAO {
         return new VendaItemIterator(getLojaOrigem().substring(0, getLojaOrigem().length() - 1), dataInicioVenda, dataTerminoVenda);
     }
     
-    private static class VendaIterator implements Iterator<VendaIMP> {
+    private class VendaIterator implements Iterator<VendaIMP> {
 
-        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+        final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
         private Statement stm = ConexaoOracle.getConexao().createStatement();
         private ResultSet rst;
@@ -1786,8 +1793,45 @@ public class RMSDAO extends InterfaceDAO {
         }
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
-            this.sql
-                    = "select distinct\n" +
+            SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
+            if (importarVendasAntigas) {
+                sql = "select distinct\n" +
+                    "	vda.mag60i_loja_a id_loja,\n" +
+                    "	vda.mag60i_aaammdd data,\n" +
+                    "	vda.mag60i_caixa caixa,\n" +
+                    "	vda.mag60i_caixa ecf,\n" +
+                    "	vda.mag60i_cupom coo,\n" +
+                    "	'00:00:0000' horainicio,\n" +
+                    "	'00:00:0000' horafim,\n" +
+                    "	sum(vda.mag60i_vlr_base) vltotal,\n" +
+                    "	0 vldesconto,\n" +
+                    "	min(vda.mag60i_situacao) situacao,\n" +
+                    "	'' modeloecf,\n" +
+                    "	vda.mag60i_seri_ecf seriecf,\n" +
+                    "	'' chave,\n" +
+                    "	'' id_cliente,\n" +
+                    "	'' cnpj,\n" +
+                    "	'' razaosocial,\n" +
+                    "	'' endereco,\n" +
+                    "	'' bairro,\n" +
+                    "	'' municipio,\n" +
+                    "	'' uf,\n" +
+                    "	'' cep,\n" +
+                    "	'' chave	\n" +
+                    "from\n" +
+                    "	ag2vr60i vda\n" +
+                    "where\n" +
+                    "	vda.mag60i_loja_a = " + idLojaCliente + " and\n" +
+                    "	vda.mag60i_aaammdd >= " + format.format(dataInicio) + " and\n" +
+                    "	vda.mag60i_aaammdd <= " + format.format(dataTermino) + "\n" +
+                    "group by\n" +
+                    "	vda.mag60i_loja_a,\n" +
+                    "	vda.mag60i_aaammdd,\n" +
+                    "	vda.mag60i_caixa,\n" +
+                    "	vda.mag60i_seri_ecf,\n" +
+                    "	vda.mag60i_cupom";
+            } else {
+                    sql = "select distinct\n" +
                     "       vda.r60i_fil idloja,\n" +
                     "       vda.r60i_dta data,\n" +
                     "       vda.r60i_cxa caixa,\n" +
@@ -1802,7 +1846,7 @@ public class RMSDAO extends InterfaceDAO {
                     "       min(vda.r60i_sit) situacao,\n" +
                     "       vda.r60i_ecf_mdl modeloecf,\n" +
                     "       vda.r60i_ecf_ser seriecf,\n" +
-                    "       vda.r60i_chv_cel chave,\n" +
+                    "       vda.r60i_chv_cel ,\n" +
                     "       tip.tip_codigo as id_cliente,\n" +
                     "       tip.tip_cgc_cpf cnpj,\n" +
                     "       tip.tip_razao_social razaosocial,\n" +
@@ -1838,6 +1882,7 @@ public class RMSDAO extends InterfaceDAO {
                     "       tip.tip_estado,\n" +
                     "       tip.tip_cep,\n" +
                     "       vda.r60i_chv_cel";
+            }
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
             System.out.println("Loja Digito: " + digito + "; Tabela: " + tabela_venda);
@@ -1863,7 +1908,7 @@ public class RMSDAO extends InterfaceDAO {
         }
     }
     
-    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+    private class VendaItemIterator implements Iterator<VendaItemIMP> {
 
         private Statement stm = ConexaoOracle.getConexao().createStatement();
         private ResultSet rst;
@@ -2015,4 +2060,201 @@ public class RMSDAO extends InterfaceDAO {
             throw new UnsupportedOperationException("Not supported.");
         }
     }
+
+    private class ProdutoComplementoParcial {
+        int id;
+        String impId;
+        double pisDeb = 0;
+        double pisCred = 0;
+        double pisRed = 0;
+        double icmsDebCst = 0;
+        double icmsDebAliq = 0;
+        double icmsDebRed = 0;
+        double icmsCredCst = 0;
+        double icmsCredAliq = 0;
+        double icmsCredRed = 0;
+    }
+    
+    @Override
+    public List<VendaHistoricoIMP> getHistoricoVenda() throws Exception {
+        List<VendaHistoricoIMP> result = new ArrayList<>();
+        
+        Map<String, String> eans = new HashMap<>();        
+        Map<String, ProdutoComplementoParcial> aliquotas = new HashMap<>();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n" +
+                    "	ant.impid,\n" +
+                    "	min(ean.codigobarras) codigobarras\n" +
+                    "from\n" +
+                    "	produtoautomacao ean\n" +
+                    "	join implantacao.codant_produto ant on\n" +
+                    "		ant.codigoatual = ean.id_produto and\n" +
+                    "		ant.impsistema = 'RMS'\n" +
+                    "group by\n" +
+                    "	ant.impid"
+            )) {
+                while (rst.next()) {
+                    eans.put(rst.getString("impid"), rst.getString("codigobarras"));
+                }
+            }
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	ant.impid,\n" +
+                    "	ant.codigoatual,\n" +
+                    "	pisdeb.valorpis pisdeb,\n" +
+                    "	piscred.valorpis piscred,\n" +
+                    "	piscred.reduzidocredito pisred,\n" +
+                    "	aliqdeb.situacaotributaria icmsdeb_cst,\n" +
+                    "	aliqdeb.porcentagem icmsdeb_aliq,\n" +
+                    "	aliqdeb.reduzido icmsdeb_red,\n" +
+                    "	aliqcred.situacaotributaria icmscred_cst,\n" +
+                    "	aliqcred.porcentagem icmscred_aliq,\n" +
+                    "	aliqcred.reduzido icmscred_red\n" +
+                    "from\n" +
+                    "	produtoaliquota al\n" +
+                    "	join (\n" +
+                    "			select \n" +
+                    "				loja.id, \n" +
+                    "				f.id_estado\n" +
+                    "			from\n" +
+                    "				loja\n" +
+                    "				join fornecedor f on\n" +
+                    "					loja.id_fornecedor = f.id\n" +
+                    "	) loja on\n" +
+                    "		loja.id = 1 and\n" +
+                    "		loja.id_estado = al.id_estado\n" +
+                    "	join produto p on\n" +
+                    "		al.id_produto = p.id\n" +
+                    "	join implantacao.codant_produto ant on\n" +
+                    "		ant.impsistema = 'RMS' and\n" +
+                    "		ant.imploja = '" + getLojaOrigem() + "' and\n" +
+                    "		ant.codigoatual = al.id_produto\n" +
+                    "	join tipopiscofins pisdeb on\n" +
+                    "		p.id_tipopiscofins = pisdeb.id\n" +
+                    "	join tipopiscofins piscred on\n" +
+                    "		p.id_tipopiscofinscredito = piscred.id\n" +
+                    "	join aliquota aliqdeb on\n" +
+                    "		al.id_aliquotadebito = aliqdeb.id\n" +
+                    "	join aliquota aliqcred on\n" +
+                    "		al.id_aliquotacredito = aliqcred.id\n" +
+                    "order by\n" +
+                    "	1"
+            )) {
+                while (rst.next()) {
+                    ProdutoComplementoParcial pcp = new ProdutoComplementoParcial();
+                    pcp.id = rst.getInt("codigoatual");
+                    pcp.impId = rst.getString("impid");
+                    pcp.pisDeb = rst.getDouble("pisdeb");
+                    pcp.pisCred = rst.getDouble("piscred");
+                    pcp.pisRed = rst.getDouble("pisred");
+                    pcp.icmsDebCst = rst.getDouble("icmsdeb_cst");
+                    pcp.icmsDebAliq = rst.getDouble("icmsdeb_aliq");
+                    pcp.icmsDebRed = rst.getDouble("icmsdeb_red");
+                    pcp.icmsCredCst = rst.getDouble("icmscred_cst");
+                    pcp.icmsCredAliq = rst.getDouble("icmscred_aliq");
+                    pcp.icmsCredRed = rst.getDouble("icmscred_red");
+                    aliquotas.put(pcp.impId, pcp);
+                }
+            }
+        }
+            
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n" +
+                    "	I.ESITC_CODIGO id_produto, \n" +
+                    "	I.ESITC_DIGITO digito,\n" +
+                    "	I.ESCHC_DATA data,\n" +
+                    "	I.ENTSAIC_PRC_UN precovenda,  \n" +
+                    "	I.ENTSAIC_PRC_EMB precovenda2,\n" +
+                    "	I.ENTSAIC_QUANTI_UN quantidade,\n" +
+                    "	I.ENTSAIC_CUS_UN custo\n" +
+                    "FROM\n" +
+                    "	AG1IENSA I,\n" +
+                    "	AA1CFISC FIS,\n" +
+                    "	AA2CTIPO,\n" +
+                    "	AA1CTCON \n" +
+                    "WHERE\n" +
+                    "	ROWNUM >= 0 \n" +
+                    "	AND I.ESCHC_DATA >= " + format.format(dataInicioVenda) + " \n" +
+                    "	AND I.ESCHC_DATA <= " + format.format(dataTerminoVenda) + " \n" +
+                    "	AND FIS.FIS_OPER in (231,238)\n" + //TUDO QUE NÃO FOR VENDA PDV
+                    "	AND NVL(I.ENTSAIC_SITUACAO, ' ') <> 'E' \n" +
+                    "	AND NVL(I.ENTSAIC_SITUACAO, ' ') <> '9' \n" +
+                    "	AND I.ESCHC_AGENDA IN (\n" +
+                    "		SELECT \n" +
+                    "			FIG_AGD AGD  \n" +
+                    "		FROM\n" +
+                    "			AA2CFIGS \n" +
+                    "		WHERE\n" +
+                    "			FIG_DTA = I.ESCHC_DATA \n" +
+                    "			AND FIG_SER = I.ESCHC_SER_NOTA \n" +
+                    "			AND FIG_NTA = I.ESCHC_NRO_NOTA \n" +
+                    "			AND FIG_ORG = I.ESCHLJC_CODIGO \n" +
+                    "			AND FIG_AGE = I.ESCHC_AGENDA \n" +
+                    "		UNION \n" +
+                    "		SELECT\n" +
+                    "			REF_DEP_OPER AGD \n" +
+                    "		FROM\n" +
+                    "			AA1CRFIS \n" +
+                    "		WHERE\n" +
+                    "			REF_DEP_DTA_AGENDA = I.ESCHC_DATA \n" +
+                    "			AND REF_DEP_SERIE = I.ESCHC_SER_NOTA \n" +
+                    "			AND REF_DEP_NRO_NOTA = I.ESCHC_NRO_NOTA \n" +
+                    "			AND REF_DEP_LOJ_ORG = I.ESCHLJC_CODIGO \n" +
+                    "			AND REF_DEP_OPER = I.ESCHC_AGENDA \n" +
+                    "		UNION \n" +
+                    "		SELECT\n" +
+                    "			I.ESCHC_AGENDA AGD \n" +
+                    "		FROM DUAL\n" +
+                    "	)   \n" +
+                    "	AND FIS.FIS_LOJ_ORG = I.ESCHLJC_CODIGO \n" +
+                    "	AND FIS.FIS_DIG_ORG = I.ESCHLJC_DIGITO \n" +
+                    "	AND FIS.FIS_NRO_NOTA = I.ESCHC_NRO_NOTA \n" +
+                    "	AND FIS.FIS_DTA_AGENDA = I.ESCHC_DATA \n" +
+                    "	AND DECODE(FIS.FIS_ENT_SAI,'E',FIS_LOJ_DST,FIS_LOJ_ORG) = 1 \n" +
+                    "	AND FIS.FIS_SITUACAO <> '9' \n" +
+                    "	AND TIP_CODIGO = DECODE(TBC_INTG_3,'E',I.ESCHLJC_CODIGO,I.ESCLC_CODIGO) \n" +
+                    "	AND TIP_DIGITO = DECODE(TBC_INTG_3,'E',I.ESCHLJC_DIGITO,I.ESCLC_DIGITO) \n" +
+                    "	AND TBC_AGENDA = I.ESCHC_AGENDA  \n" +
+                    "	AND TBC_CODIGO = 0 \n" +
+                    "	AND TBC_INTG_13 <> '4' \n" +
+                    "	AND TBC_INTG_11 IN('V') \n" +
+                    "	AND TBC_INTG_3 IN('S') \n" +
+                    " ORDER BY\n" +
+                    "	ESCHC_DATA DESC,\n" +
+                    "	ESCHC_AGENDA DESC"
+            )) {
+                while (rst.next()) {
+                    VendaHistoricoIMP imp = new VendaHistoricoIMP();
+                    imp.setIdProduto(rst.getString("id_produto"));
+                    
+                    String ean = eans.get(imp.getIdProduto());
+                    if (ean == null) {ean = imp.getIdProduto();}                    
+                    imp.setEan(ean);
+                    
+                    ProdutoComplementoParcial pcp = aliquotas.get(imp.getIdProduto());                    
+                    
+                    imp.setData(format.parse(rst.getString("data")));
+                    imp.setCustoComImposto(rst.getDouble("custo"));
+                    imp.setCustoSemImposto(rst.getDouble("custo"));
+                    imp.setPrecoVenda(rst.getDouble("precovenda"));
+                    imp.setQuantidade(rst.getDouble("quantidade"));
+                    imp.setValorTotal(imp.getPrecoVenda() * imp.getQuantidade());
+                    imp.setIcmsCredito(MathUtils.round((imp.getValorTotal() * ((100 - pcp.icmsCredRed) / 100)) * pcp.icmsCredAliq / 100, 2));
+                    imp.setIcmsDebito(MathUtils.round((imp.getValorTotal() * ((100 - pcp.icmsDebRed) / 100)) * pcp.icmsDebAliq / 100, 2));
+                    imp.setPisCofinsCredito(MathUtils.round((imp.getValorTotal() * ((100 - pcp.pisRed) / 100)) * pcp.pisCred / 100, 2));
+                    imp.setPisCofinsDebito(MathUtils.round(imp.getValorTotal() * pcp.pisDeb / 100, 2));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    
 }
