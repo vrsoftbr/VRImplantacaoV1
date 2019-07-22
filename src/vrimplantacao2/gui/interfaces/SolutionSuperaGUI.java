@@ -160,6 +160,7 @@ public class SolutionSuperaGUI extends VRInternalFrame {
                     }
                     
                     dao.v_lojaMesmoId = lojaMesmoId;
+                    dao.idLojaVR = idLojaVR;
                     
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);

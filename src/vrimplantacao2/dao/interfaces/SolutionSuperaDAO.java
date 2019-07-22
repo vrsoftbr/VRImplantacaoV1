@@ -17,6 +17,7 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoRepositoryProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -36,6 +37,8 @@ public class SolutionSuperaDAO extends InterfaceDAO {
 
     public String v_lojaMesmoId;
     public boolean gerarCodigoAtacado = false;
+    private ProdutoRepositoryProvider repository = new ProdutoRepositoryProvider();
+    public int idLojaVR;
 
     @Override
     public String getSistema() {
@@ -176,6 +179,7 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     + "p.aliquota_icms_saida_interno as aliquota_debito,\n"
                     + "p.aliquota_icms_saida_externo as aliquota_debito_fora\n"
                     + "from produtos p\n"
+                    + "where p.status = 'A'"
                     + "order by p.codigo_pro"
             )) {
                 while (rst.next()) {
@@ -248,7 +252,7 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                             imp.setImportSistema(getSistema());
                             imp.setImportId(rst.getString("codigo_pro"));
                             imp.setQtdEmbalagem(rst.getInt("qtde"));
-                            imp.setEan(String.valueOf(imp.getQtdEmbalagem()) + "99999" + String.valueOf(codigoAtual));
+                            imp.setEan(String.valueOf(idLojaVR) + "99999" + String.valueOf(codigoAtual));
                             imp.setPrecovenda(rst.getDouble("preconormal"));
                             imp.setAtacadoPreco(rst.getDouble("precoatacado"));
                             result.add(imp);
@@ -281,7 +285,7 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("codigo_pro"));
                         imp.setQtdEmbalagem(rst.getInt("qtde"));
-                        imp.setEan(String.valueOf(imp.getQtdEmbalagem()) + "99999" + String.valueOf(codigoAtual));
+                        imp.setEan(String.valueOf(idLojaVR) + "99999" + String.valueOf(codigoAtual));
                         result.add(imp);
                     }
                 }
@@ -500,7 +504,6 @@ public class SolutionSuperaDAO extends InterfaceDAO {
                     + "from clientes c\n"
                     + "left join municipios_ibge m on m.cod_municipio_ibge = c.codigo_cid\n"
                     + "inner join uf_ibge u on u.cod_uf = m.cod_uf_ibge\n"
-                    + "where c.codigo_cli in (select codigo_cli from contasreceber where data_pgt is null)\n"
                     + "order by c.codigo_cli"
             )) {
                 while (rst.next()) {
