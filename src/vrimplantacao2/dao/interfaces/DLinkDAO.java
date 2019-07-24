@@ -29,7 +29,7 @@ public class DLinkDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "RCNet";
+        return "DLink";
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {

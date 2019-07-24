@@ -17,14 +17,14 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.interfaces.DLinkDAO;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.RCNetDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoView;
 import vrimplantacao2.parametro.Parametros;
 
 public class DLinkGUI extends VRInternalFrame {
     
-    private static final String SISTEMA = "RCNet";
+    private static final String SISTEMA = "DLink";
     private static final String SERVIDOR_SQL = "MySQL";
     private static DLinkGUI instance;
     
@@ -62,7 +62,7 @@ public class DLinkGUI extends VRInternalFrame {
         params.salvar();
     }
     
-    private RCNetDAO rcNetDAO = new RCNetDAO();
+    private DLinkDAO dLinkDAO = new DLinkDAO();
     private ConexaoMySQL conn = new ConexaoMySQL();
     
     private DLinkGUI(VRMdiFrame i_mdiFrame) throws Exception {
@@ -121,7 +121,7 @@ public class DLinkGUI extends VRInternalFrame {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja: rcNetDAO.getLojasCliente()) {
+        for (Estabelecimento loja: dLinkDAO.getLojasCliente()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -160,7 +160,7 @@ public class DLinkGUI extends VRInternalFrame {
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;                                        
                     
-                    Importador importador = new Importador(rcNetDAO);
+                    Importador importador = new Importador(dLinkDAO);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);     
 
@@ -943,11 +943,10 @@ public class DLinkGUI extends VRInternalFrame {
 
     private void btnMapaTributActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMapaTributActionPerformed
         try {
-            MapaTributacaoView.exibir(
-                mdiFrame,
+            MapaTributacaoView.exibir(mdiFrame,
                 SISTEMA,
                 ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj,
-                rcNetDAO);
+                dLinkDAO);
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, "Erro ao abrir");
         }

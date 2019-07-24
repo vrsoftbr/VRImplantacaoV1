@@ -163,6 +163,7 @@ import vrimplantacao2.gui.interfaces.RMSAutomaHelpGUI;
 import vrimplantacao2.gui.interfaces.RPInfoGUI;
 import vrimplantacao2.gui.interfaces.RepleisGUI;
 import vrimplantacao2.gui.interfaces.SDInformaticaGUI;
+import vrimplantacao2.gui.interfaces.STI3GUI;
 import vrimplantacao2.gui.interfaces.SambaNetGUI;
 import vrimplantacao2.gui.interfaces.SatecfeGUI;
 import vrimplantacao2.gui.interfaces.ScefGUI;
@@ -667,6 +668,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuIQSistemas = new javax.swing.JMenuItem();
         jMenu10 = new javax.swing.JMenu();
         mnuDLink = new javax.swing.JMenuItem();
+        mnuSTI3 = new javax.swing.JMenuItem();
         mnuOrion = new javax.swing.JMenu();
         jMenuItemOrion = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -2033,6 +2035,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu10.add(mnuDLink);
+
+        mnuSTI3.setText("STI3");
+        mnuSTI3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSTI3ActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuSTI3);
 
         mnuDatabase.add(jMenu10);
 
@@ -4029,6 +4039,10 @@ public final class MenuGUI extends VRMdiFrame {
         VCashGUI.exibir(this);
     }//GEN-LAST:event_mnuVCashActionPerformed
 
+    private void mnuSTI3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSTI3ActionPerformed
+        STI3GUI.exibir(this);
+    }//GEN-LAST:event_mnuSTI3ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4215,6 +4229,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuRPInfo;
     private javax.swing.JMenuItem mnuRepleis;
     private javax.swing.JMenuItem mnuSDInformatica;
+    private javax.swing.JMenuItem mnuSTI3;
     private javax.swing.JMenuItem mnuSaac;
     private javax.swing.JMenuItem mnuSatecfe;
     private javax.swing.JMenuItem mnuScef;
