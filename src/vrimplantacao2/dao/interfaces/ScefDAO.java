@@ -71,7 +71,7 @@ public class ScefDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -93,10 +93,10 @@ public class ScefDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        
+
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -108,6 +108,7 @@ public class ScefDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "p.cifcodigo,\n"
                     + "e.prequantidade,\n"
                     + "p.prodescricao,\n"
+                    + "p.prodesc_imp_fiscal as descricaoreduzida,\n"
                     + "p.prodesc_imp_fiscal,\n"
                     + "p.propreco_custo_sem_icms custocomimposto,\n"
                     + "p.propreco_custo_com_icms custosemimposto,\n"
@@ -120,6 +121,7 @@ public class ScefDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "case p.status when 'A' then '1' else '0' end status,\n"
                     + "p.embcodigo,\n"
                     + "p.embcodigo_unidade,\n"
+                    + "e.embcodigo as embalagem_ean,\n"
                     + "p.proicms,\n"
                     + "p.proreducao_base_icms,\n"
                     + "p.prodiasvencimento,\n"
@@ -141,28 +143,33 @@ public class ScefDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "left join cest c on c.cestcodigo = p.cestcodigo\n"
                     + "left join prosituacao_tributaria s on s.prosit_tributaria = p.prosit_tributaria\n"
                     + "left join proembala e on e.procodigo = p.procodigo\n"
-                    + "left join procodbarra b on b.precodigo = e.precodigo\n"
-                    + "where p.status = 'A'"
+                    + "left join procodbarra b on b.precodigo = e.precodigo"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
-                while (rst.next()) {                   
-                    
+                while (rst.next()) {
+
                     ProdutoIMP imp = new ProdutoIMP();
                     ProdutoBalancaVO produtoBalanca;
                     String ean;
                     long codigoProduto;
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("procodigo"));
-                    
+
                     ean = rst.getString("codbarra");
-                    
+
                     if ((ean != null)
                             && (!ean.trim().isEmpty())) {
+
                         if ((ean.trim().length() > 7) && (ean.contains("0000000"))) {
-                            ean = ean.substring(1, 5);
-                            
+                            ean = ean.substring(1, 6);
+
+                            System.out.println(
+                                    "EAN " + ean
+                                    + ", EANANTIGO " + rst.getString("codbarra")
+                                    + ", DESCRICAO " + rst.getString("prodescricao"));
+
                             codigoProduto = Long.parseLong(ean);
                             if (codigoProduto <= Integer.MAX_VALUE) {
                                 produtoBalanca = produtosBalanca.get((int) codigoProduto);
@@ -178,16 +185,16 @@ public class ScefDAO extends InterfaceDAO implements MapaTributoProvider {
                                 imp.setValidade(0);
                                 imp.seteBalanca(false);
                                 imp.setEan(rst.getString("codbarra"));
-                            }                            
+                            }
                         } else if ((ean.trim().length() > 7) && (!ean.contains("0000000"))) {
-                          
+
                             imp.setEan(ean);
                             imp.seteBalanca(false);
-                            
+
                         } else if (ean.trim().length() < 7) {
-                            
+
                             imp.seteBalanca(false);
-                            
+
                             if ((rst.getInt("prequantidade") > 1)) {
 
                                 if (ean.trim().length() == 1) {
@@ -203,28 +210,37 @@ public class ScefDAO extends InterfaceDAO implements MapaTributoProvider {
                                 } else {
                                     ean = "99" + ean.trim();
                                 }
-                                
+
                                 imp.setEan(ean);
                             }
                         }
-                    } else {                        
-                        imp.seteBalanca(false);                        
+                    } else {
+                        imp.seteBalanca(false);
                         if (rst.getInt("prequantidade") > 1) {
                             imp.setEan(StringUtils.leftPad(imp.getImportId(), 8, "9"));
                         }
                     }
-                    
+
                     imp.setSituacaoCadastro(rst.getInt("status") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-                    imp.setTipoEmbalagem(rst.getString("embcodigo"));
+                    imp.setTipoEmbalagemCotacao(rst.getString("embcodigo"));
+                    imp.setTipoEmbalagem(rst.getString("embalagem_ean"));
+                    imp.setQtdEmbalagemCotacao(1);
                     imp.setQtdEmbalagem(rst.getInt("prequantidade"));
                     imp.setDataCadastro(rst.getDate("proinclusao"));
                     imp.setDescricaoCompleta(rst.getString("prodescricao"));
-                    imp.setDescricaoReduzida(imp.getDescricaoCompleta());
+
+                    if ((rst.getString("descricaoreduzida") != null)
+                            && (!rst.getString("descricaoreduzida").trim().isEmpty())) {
+
+                        imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    } else {
+                        imp.setDescricaoReduzida(imp.getDescricaoCompleta());
+                    }
+
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setMargem(rst.getDouble("promargem"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                    imp.setAtacadoPorcentagem(rst.getDouble("porcentagem_desconto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setPiscofinsCstDebito(rst.getString("stpcodigo"));
                     imp.setPiscofinsCstCredito(rst.getString("stpcodigo_entrada"));
@@ -238,10 +254,11 @@ public class ScefDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opcao) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
         if (opcao == OpcaoProduto.ESTOQUE) {
-            List<ProdutoIMP> result = new ArrayList<>();
             try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select\n"
@@ -262,7 +279,66 @@ public class ScefDAO extends InterfaceDAO implements MapaTributoProvider {
                 return result;
             }
         }
-        return null;
+
+        if (opcao == OpcaoProduto.ATACADO) {
+            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select\n"
+                        + "p.procodigo,\n"
+                        + "b.codbarra,\n"
+                        + "p.prodescricao,\n"
+                        + "e.prequantidade,\n"
+                        + "e.embcodigo,\n"
+                        + "p.propreco_venda precovenda_un,\n"
+                        + "(((p.propreco_venda * e.prequantidade))) preco_venda,\n"
+                        + "(((p.propreco_venda * e.prequantidade) * (pr.prppercentualdesconto * 1)) / 100) as valor_desconto,\n"
+                        + "((((p.propreco_venda * e.prequantidade) * (pr.prppercentualdesconto * 1)) / 100) / e.prequantidade) as valor_desconto_unitario\n"
+                        + "from produto p\n"
+                        + "left join proembala e on e.procodigo = p.procodigo\n"
+                        + "left join procodbarra b on b.precodigo = e.precodigo\n"
+                        + "left join proprecos pr on pr.procodigo = p.procodigo\n"
+                        + "where e.prequantidade > 1"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("procodigo"));
+
+                        String ean;
+                        ean = rst.getString("codbarra");                        
+
+                        if ((ean != null)
+                                && (!ean.trim().isEmpty())) {
+
+                            if (ean.trim().length() < 7) {
+                                if (ean.trim().length() == 1) {
+                                    ean = "9999999" + ean.trim();
+                                } else if (ean.trim().length() == 2) {
+                                    ean = "999999" + ean.trim();
+                                } else if (ean.trim().length() == 3) {
+                                    ean = "99999" + ean.trim();
+                                } else if (ean.trim().length() == 4) {
+                                    ean = "9999" + ean.trim();
+                                } else if (ean.trim().length() == 5) {
+                                    ean = "999" + ean.trim();
+                                } else {
+                                    ean = "99" + ean.trim();
+                                }
+                            }
+                        } else {
+                            ean = StringUtils.leftPad(imp.getImportId(), 8, "9");
+                        }
+
+                        imp.setEan(ean);
+                        imp.setAtacadoPreco(rst.getDouble("precovenda_un") - rst.getDouble("valor_desconto_unitario"));
+                        imp.setPrecovenda(rst.getDouble("precovenda_un"));
+                        result.add(imp);
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -469,7 +545,7 @@ public class ScefDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
         List<ConvenioTransacaoIMP> result = new ArrayList<>();
