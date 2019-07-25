@@ -1180,6 +1180,14 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuDLinkActionPerformed"/>
                           </Events>
                         </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuSTI3">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="STI3"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuSTI3ActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                       </SubComponents>
                     </Menu>
                     <Menu class="javax.swing.JMenu" name="mnuOrion">
