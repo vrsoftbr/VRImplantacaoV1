@@ -179,6 +179,8 @@
                                   <Component id="cbxMercadologico" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
                                   <Component id="cbxPreco" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
+                                  <Component id="chkIcms" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
@@ -190,10 +192,11 @@
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="cbxCusto" min="-2" max="-2" attributes="0"/>
                                       <Component id="cbxEstoque" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkPiscofins" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace pref="287" max="32767" attributes="0"/>
+                          <EmptySpace pref="219" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -204,6 +207,7 @@
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="cbxPreco" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="cbxMercadologico" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkIcms" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
@@ -216,7 +220,10 @@
                               <Component id="cbxEstoque" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="cbxEanEmBranco" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="cbxEanEmBranco" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkPiscofins" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace pref="27" max="32767" attributes="0"/>
                       </Group>
                   </Group>
@@ -269,6 +276,16 @@
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cbxEstoqueActionPerformed"/>
                   </Events>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPiscofins">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Piscofins"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIcms">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Icms"/>
+                  </Properties>
                 </Component>
               </SubComponents>
             </Container>

@@ -21,14 +21,14 @@ public class SIMSGUI extends VRInternalFrame {
     private final SIMSDAO dao = new SIMSDAO();
     private static final String SISTEMA = "SIMS";
     private static SIMSGUI instance;
-    
+
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
 
     public SIMSGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
-        
+
         txtCBMER.setArquivo("C:\\vr\\UNIAO\\CBMER.gsa");
         txtMER.setArquivo("C:\\vr\\UNIAO\\MER.gsa");
         txtNIVE1.setArquivo("C:\\vr\\UNIAO\\NIVE1.gsa");
@@ -37,7 +37,7 @@ public class SIMSGUI extends VRInternalFrame {
         txtNIVE4.setArquivo("C:\\vr\\UNIAO\\NIVE4.gsa");
         txtCLIENTE.setArquivo("C:\\vr\\UNIAO\\CLIENTE.gsa");
         txtFORNECEDOR.setArquivo("C:\\vr\\UNIAO\\FORNECEDOR.gsa");
-        
+
         carregarLojaDestino();
 
         centralizarForm();
@@ -78,18 +78,19 @@ public class SIMSGUI extends VRInternalFrame {
             i_mdiFrame.setDefaultCursor();
         }
     }
-    
+
     public void importarTabelas() throws Exception {
         Thread thread = new Thread() {
             int idLojaVR;
             String idLojaCliente = "1";
+
             @Override
             public void run() {
                 try {
                     ProgressBar.show();
                     ProgressBar.setCancel(true);
-                    
-                    idLojaVR = ((ItemComboVO) cmbLojaDestino.getSelectedItem()).id;  
+
+                    idLojaVR = ((ItemComboVO) cmbLojaDestino.getSelectedItem()).id;
                     dao.setCBMERFile(txtCBMER.getArquivo());
                     dao.setMERFile(txtMER.getArquivo());
                     dao.setNIVE1File(txtNIVE1.getArquivo());
@@ -98,27 +99,27 @@ public class SIMSGUI extends VRInternalFrame {
                     dao.setNIVE4File(txtNIVE4.getArquivo());
                     dao.setCLIENTEFile(txtCLIENTE.getArquivo());
                     dao.setFORNECEDORFile(txtFORNECEDOR.getArquivo());
-                    
+
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
-                    importador.setLojaVR(idLojaVR);                    
-                    
+                    importador.setLojaVR(idLojaVR);
+
                     if (cbxMercadologico.isSelected()) {
                         importador.importarMercadologico();
                     }
-                    
+
                     if (cbxProduto.isSelected()) {
                         importador.importarProduto();
                     }
-                    
+
                     if (cbxEan.isSelected()) {
                         importador.importarEAN();
                     }
-                    
+
                     if (cbxEanEmBranco.isSelected()) {
                         importador.importarEANemBranco();
                     }
-                    
+
                     {
                         List<OpcaoProduto> opt = new ArrayList<>();
                         if (cbxPreco.isSelected()) {
@@ -130,19 +131,25 @@ public class SIMSGUI extends VRInternalFrame {
                         if (cbxEstoque.isSelected()) {
                             opt.add(OpcaoProduto.ESTOQUE);
                         }
+                        if (chkPiscofins.isSelected()) {
+                            opt.add(OpcaoProduto.PIS_COFINS);
+                        }
+                        if (chkIcms.isSelected()) {
+                            opt.add(OpcaoProduto.ICMS);
+                        }
                         if (!opt.isEmpty()) {
                             importador.atualizarProdutos(opt);
                         }
                     }
-                    
+
                     if (cbxFornecedor.isSelected()) {
                         importador.importarFornecedor();
                     }
-                    
+
                     if (cbxClientePreferencial.isSelected()) {
                         importador.importarClientePreferencial(OpcaoCliente.DADOS);
                     }
-                    
+
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação SimSoft realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
@@ -174,6 +181,8 @@ public class SIMSGUI extends VRInternalFrame {
         cbxPreco = new vrframework.bean.checkBox.VRCheckBox();
         cbxCusto = new vrframework.bean.checkBox.VRCheckBox();
         cbxEstoque = new vrframework.bean.checkBox.VRCheckBox();
+        chkPiscofins = new vrframework.bean.checkBox.VRCheckBox();
+        chkIcms = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         txtMER = new vrframework.bean.fileChooser.VRFileChooser();
         vRLabel6 = new vrframework.bean.label.VRLabel();
@@ -285,6 +294,10 @@ public class SIMSGUI extends VRInternalFrame {
             }
         });
 
+        chkPiscofins.setText("Piscofins");
+
+        chkIcms.setText("Icms");
+
         javax.swing.GroupLayout vRPanel0Layout = new javax.swing.GroupLayout(vRPanel0);
         vRPanel0.setLayout(vRPanel0Layout);
         vRPanel0Layout.setHorizontalGroup(
@@ -295,7 +308,9 @@ public class SIMSGUI extends VRInternalFrame {
                     .addGroup(vRPanel0Layout.createSequentialGroup()
                         .addComponent(cbxMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(20, 20, 20)
-                        .addComponent(cbxPreco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(cbxPreco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(33, 33, 33)
+                        .addComponent(chkIcms, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(vRPanel0Layout.createSequentialGroup()
                         .addGroup(vRPanel0Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(cbxProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -304,8 +319,9 @@ public class SIMSGUI extends VRInternalFrame {
                         .addGap(14, 14, 14)
                         .addGroup(vRPanel0Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(cbxCusto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(cbxEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(287, Short.MAX_VALUE))
+                            .addComponent(cbxEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkPiscofins, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(219, Short.MAX_VALUE))
         );
         vRPanel0Layout.setVerticalGroup(
             vRPanel0Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -313,7 +329,8 @@ public class SIMSGUI extends VRInternalFrame {
                 .addGap(12, 12, 12)
                 .addGroup(vRPanel0Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cbxPreco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbxMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cbxMercadologico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkIcms, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(1, 1, 1)
                 .addGroup(vRPanel0Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cbxProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -323,7 +340,9 @@ public class SIMSGUI extends VRInternalFrame {
                     .addComponent(cbxEan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbxEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cbxEanEmBranco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(vRPanel0Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cbxEanEmBranco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkPiscofins, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(27, Short.MAX_VALUE))
         );
 
@@ -552,11 +571,11 @@ public class SIMSGUI extends VRInternalFrame {
 
         } finally {
             this.setDefaultCursor();
-        }            
+        }
     }//GEN-LAST:event_btnMigrarActionPerformed
 
     private void cmbLojaDestinoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbLojaDestinoActionPerformed
-        
+
     }//GEN-LAST:event_cmbLojaDestinoActionPerformed
 
     private void cbxPrecoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxPrecoActionPerformed
@@ -586,6 +605,8 @@ public class SIMSGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox cbxMercadologico;
     private vrframework.bean.checkBox.VRCheckBox cbxPreco;
     private vrframework.bean.checkBox.VRCheckBox cbxProduto;
+    private vrframework.bean.checkBox.VRCheckBox chkIcms;
+    private vrframework.bean.checkBox.VRCheckBox chkPiscofins;
     private javax.swing.JComboBox cmbLojaDestino;
     private javax.swing.JLabel jLabel1;
     private vrframework.bean.panel.VRPanel pnlPagina1;
