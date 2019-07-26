@@ -339,6 +339,7 @@ public class SIMSDAO extends InterfaceDAO {
             } else {
                 imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
             }
+            result.add(imp);
         }
         return result;
     }

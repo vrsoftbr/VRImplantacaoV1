@@ -12,6 +12,7 @@ import vrframework.remote.ItemComboVO;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao2.dao.interfaces.SIMSDAO;
 import vrimplantacao.vo.loja.LojaVO;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.Importador;
 
@@ -81,7 +82,7 @@ public class SIMSGUI extends VRInternalFrame {
     public void importarTabelas() throws Exception {
         Thread thread = new Thread() {
             int idLojaVR;
-            String idLojaCliente;
+            String idLojaCliente = "1";
             @Override
             public void run() {
                 try {
@@ -139,7 +140,7 @@ public class SIMSGUI extends VRInternalFrame {
                     }
                     
                     if (cbxClientePreferencial.isSelected()) {
-                        importador.importarClientePreferencial();
+                        importador.importarClientePreferencial(OpcaoCliente.DADOS);
                     }
                     
                     ProgressBar.dispose();
