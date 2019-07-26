@@ -67,7 +67,7 @@ import vrimplantacao.gui.interfaces.RMSGUI;
 import vrimplantacao.gui.interfaces.RMSGUI_2;
 import vrimplantacao.gui.interfaces.RootacGUI;
 import vrimplantacao.gui.interfaces.SBOMarketGUI;
-import vrimplantacao.gui.interfaces.SIMSGUI;
+import vrimplantacao2.gui.interfaces.SIMSGUI;
 import vrimplantacao.gui.interfaces.SaacGUI;
 import vrimplantacao.gui.interfaces.SacLumiGUI;
 import vrimplantacao.gui.interfaces.SciGUI;
@@ -3151,18 +3151,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItem14ActionPerformed
 
     private void jMenuItemSIMSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSIMSActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarSIMS == null || formImportarSIMS.isClosed()) {
-                formImportarSIMS = new SIMSGUI(this);
-            }
-
-            formImportarSIMS.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
+        SIMSGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemSIMSActionPerformed
 
     private void jMenuItemGR7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGR7ActionPerformed
