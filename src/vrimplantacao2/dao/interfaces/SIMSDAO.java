@@ -212,6 +212,74 @@ public class SIMSDAO extends InterfaceDAO {
             imp.setEstoque(estoque);
             imp.setSituacaoCadastro(idSituacaoCadastral);
             imp.setNcm(ncm);
+
+            if ((piscofins != null)
+                    && (!piscofins.trim().isEmpty())) {
+                if (null != piscofins.trim()) switch (piscofins.trim()) {
+                    case "0":
+                        imp.setPiscofinsCstDebito(1);
+                        imp.setPiscofinsCstCredito(50);
+                        break;
+                    case "1":
+                        imp.setPiscofinsCstDebito(6);
+                        imp.setPiscofinsCstCredito(73);
+                        break;
+                    case "2":
+                        imp.setPiscofinsCstDebito(4);
+                        imp.setPiscofinsCstCredito(70);
+                        break;
+                    case "3":
+                        imp.setPiscofinsCstDebito(5);
+                        imp.setPiscofinsCstCredito(75);
+                        break;
+                    case "4":
+                        imp.setPiscofinsCstDebito(8);
+                        imp.setPiscofinsCstCredito(74);
+                        break;
+                    default:
+                        imp.setPiscofinsCstDebito(7);
+                        imp.setPiscofinsCstCredito(71);
+                        break;
+                }
+            } else {
+                imp.setPiscofinsCstDebito(7);
+                imp.setPiscofinsCstCredito(71);
+            }
+            
+            if (aliqPdv == 2) {
+                imp.setIcmsCst(51);
+                imp.setIcmsAliq(0);
+                imp.setIcmsReducao(0);
+            } else if (aliqPdv == 4) {
+                imp.setIcmsCst(60);
+                imp.setIcmsAliq(0);
+                imp.setIcmsReducao(0);
+            } else if (aliqPdv == 5) {
+                imp.setIcmsCst(40);
+                imp.setIcmsAliq(0);
+                imp.setIcmsReducao(0);
+            } else if (aliqPdv == 0) {
+                imp.setIcmsCst(0);
+                imp.setIcmsAliq(18);
+                imp.setIcmsReducao(0);
+            } else if (aliqPdv == 7) {
+                imp.setIcmsCst(0);
+                imp.setIcmsAliq(7);
+                imp.setIcmsReducao(0);
+            } else if (aliqPdv == 8) {
+                imp.setIcmsCst(0);
+                imp.setIcmsAliq(25);
+                imp.setIcmsReducao(0);
+            } else if (aliqPdv == 9) {
+                imp.setIcmsCst(0);
+                imp.setIcmsAliq(12);
+                imp.setIcmsReducao(0);
+            } else {
+                imp.setIcmsCst(40);
+                imp.setIcmsAliq(0);
+                imp.setIcmsReducao(0);
+            }
+
             result.add(imp);
         }
         return result;
