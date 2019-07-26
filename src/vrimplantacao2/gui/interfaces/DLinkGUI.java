@@ -364,7 +364,7 @@ public class DLinkGUI extends VRInternalFrame {
         txtDatabase = new vrframework.bean.textField.VRTextField();
         cmbLojaOrigem = new javax.swing.JComboBox();
 
-        setTitle("Importação RCNet");
+        setTitle("Importação DLink");
         setToolTipText("");
 
         vRToolBarPadrao3.setRollover(true);
