@@ -22,6 +22,8 @@ import vrimplantacao.classe.file.ArquivoLeitura;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEstadoCivil;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -286,6 +288,61 @@ public class SIMSDAO extends InterfaceDAO {
         return result;
     }
 
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+
+        for (List<String> rst : carregarCLIENTE()) {
+            ClienteIMP imp = new ClienteIMP();
+            imp.setId(rst.get(0));
+            imp.setRazao(rst.get(1));
+            imp.setFantasia(imp.getRazao());
+            imp.setCnpj(rst.get(2));
+            imp.setInscricaoestadual(rst.get(3));
+            imp.setEndereco((rst.get(19) + " " + rst.get(20)).trim());
+            imp.setComplemento(rst.get(21));
+            imp.setCep(rst.get(25));
+            imp.setBairro(rst.get(22));
+            imp.setMunicipio(rst.get(23));
+            imp.setUf(rst.get(24));
+            Date dataCadastro;
+            try {
+                dataCadastro = new Date(new SimpleDateFormat("dd/MM/yyyy").parse(rst.get(14)).getTime());
+            } catch (ParseException e) {
+                dataCadastro = new Date(new java.util.Date().getTime());
+            }
+            imp.setDataCadastro(dataCadastro);
+            imp.setTelefone(rst.get(4));
+            imp.setFax(rst.get(12));
+            imp.setEmail(rst.get(48));
+            imp.setCelular(rst.get(9));
+            imp.setValorLimite(Utils.stringToDouble(rst.get(16)));
+            imp.setBloqueado(Utils.acertarTexto(rst.get(13)).startsWith("5"));
+
+            Date dataNasc;
+            try {
+                dataNasc = new Date(new SimpleDateFormat("dd/MM/yyyy").parse(rst.get(5)).getTime());
+            } catch (ParseException e) {
+                dataNasc = new Date(new java.util.Date().getTime());
+            }
+            imp.setDataNascimento(dataNasc);
+            imp.setCargo(rst.get(10));
+            imp.setSalario(Utils.stringToDouble(rst.get(15)));
+
+            String strCivil = Utils.acertarTexto(rst.get(6));
+            if (strCivil.contains("CASADO")) {
+                imp.setEstadoCivil(TipoEstadoCivil.CASADO);
+            } else if (strCivil.contains("SOLTEI")) {
+                imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
+            } else if (strCivil.contains("AMAZ")) {
+                imp.setEstadoCivil(TipoEstadoCivil.AMAZIADO);
+            } else {
+                imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
+            }
+        }
+        return result;
+    }
+
     private List<List<String>> carregarNIVE(int level) throws Exception {
         List<List<String>> result = new ArrayList<>();
 
@@ -517,6 +574,40 @@ public class SIMSDAO extends InterfaceDAO {
             }
         }
 
+        return result;
+    }
+
+    private List<List<String>> carregarCLIENTE() throws Exception {
+        List<List<String>> result = new ArrayList<>();
+
+        File f;
+        f = new File(this.CLIENTEFile);
+        try (FileReader fr = new FileReader(f)) {
+            try (BufferedReader br = new BufferedReader(fr)) {
+                //Salta as duas primeiras linhas que é o cabeçalho.
+                br.readLine();
+                br.readLine();
+                String recordId = null;
+
+                for (String linha = br.readLine(); linha != null; linha = br.readLine()) {
+                    if (linha.startsWith("^")) {
+                        recordId = getId(linha)[0];
+                    } else {
+                        List<String> cliente = new ArrayList<>(Arrays.asList(linha.split("\\^")));
+                        cliente.add(0, recordId);
+
+                        if (cliente.size() < 55) {
+                            int cont = 55 - cliente.size();
+                            while (cont > 0) {
+                                cliente.add("");
+                                cont--;
+                            }
+                        }
+                        result.add(cliente);
+                    }
+                }
+            }
+        }
         return result;
     }
 }
