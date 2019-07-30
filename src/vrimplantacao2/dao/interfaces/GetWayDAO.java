@@ -433,7 +433,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else if (v_usar_arquivoBalanca) {
                         ProdutoBalancaVO produtoBalanca;
                         long codigoProduto;
-                        codigoProduto = Long.parseLong(imp.getEan().trim());
+                        codigoProduto = Long.parseLong(Utils.formataNumero(imp.getEan().trim()));
                         if (codigoProduto <= Integer.MAX_VALUE) {
                             produtoBalanca = produtosBalanca.get((int) codigoProduto);
                         } else {
