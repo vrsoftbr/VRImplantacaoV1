@@ -7,8 +7,10 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +26,7 @@ import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -599,4 +602,43 @@ public class SolutionSuperaDAO extends InterfaceDAO {
         }
         return result;
     }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+
+        System.out.println("select\n"
+                    + "codigo_pro,\n"
+                    + "inicio,\n"
+                    + "final,\n"
+                    + "preco,\n"
+                    + "promocao\n"
+                    + "from promocaoprodutos\n"
+                    + "where final >= '" + new SimpleDateFormat("yyyy-MM-dd").format(dataTermino) + "'");
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "codigo_pro,\n"
+                    + "inicio,\n"
+                    + "final,\n"
+                    + "preco,\n"
+                    + "promocao\n"
+                    + "from promocaoprodutos\n"
+                    + "where final >= '" + new SimpleDateFormat("yyyy-MM-dd").format(dataTermino) + "'"
+            )) {
+                while (rst.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    imp.setIdProduto(rst.getString("codigo_pro"));
+                    imp.setDataInicio(rst.getDate("inicio"));
+                    imp.setDataFim(rst.getDate("final"));
+                    imp.setPrecoNormal(rst.getDouble("preco"));
+                    imp.setPrecoOferta(rst.getDouble("promocao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
 }

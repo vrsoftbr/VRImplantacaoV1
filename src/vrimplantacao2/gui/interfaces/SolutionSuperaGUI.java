@@ -203,6 +203,9 @@ public class SolutionSuperaGUI extends VRInternalFrame {
                         }
                         if (chkCheque.isSelected()) {
                             importador.importarCheque();
+                        }                        
+                        if (chkOfertas.isSelected()) {
+                            importador.importarOfertas(txtDataFimOferta.getDate());
                         }
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
@@ -282,6 +285,9 @@ public class SolutionSuperaGUI extends VRInternalFrame {
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel1 = new vrframework.bean.panel.VRPanel();
+        chkOfertas = new vrframework.bean.checkBox.VRCheckBox();
+        txtDataFimOferta = new org.jdesktop.swingx.JXDatePicker();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -483,6 +489,31 @@ public class SolutionSuperaGUI extends VRInternalFrame {
 
         vRTabbedPane2.addTab("Clientes", tabClientes);
 
+        chkOfertas.setText("Ofertas");
+
+        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
+        vRPanel1.setLayout(vRPanel1Layout);
+        vRPanel1Layout.setHorizontalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkOfertas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtDataFimOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(355, Short.MAX_VALUE))
+        );
+        vRPanel1Layout.setVerticalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkOfertas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtDataFimOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(207, Short.MAX_VALUE))
+        );
+
+        vRTabbedPane2.addTab("Especiais", vRPanel1);
+
         tabs.addTab("Importação", vRTabbedPane2);
 
         chkUnifProdutos.setText("Produtos (Somente com EAN válido)");
@@ -651,6 +682,7 @@ public class SolutionSuperaGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFTipoEmpresa;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkOfertas;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkReiniciarIDClienteUnif;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
@@ -668,9 +700,11 @@ public class SolutionSuperaGUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel tabImpFornecedor;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
+    private org.jdesktop.swingx.JXDatePicker txtDataFimOferta;
     private vrframework.bean.textField.VRTextField txtLojaMesmoID;
     private vrframework.bean.textField.VRTextField txtReiniciarIDClienteUnif;
     private vrframework.bean.label.VRLabel vRLabel1;
+    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;

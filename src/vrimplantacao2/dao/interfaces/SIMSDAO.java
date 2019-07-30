@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.classe.file.ArquivoLeitura;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -26,6 +27,7 @@ import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
