@@ -606,16 +606,6 @@ public class SolutionSuperaDAO extends InterfaceDAO {
     @Override
     public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
-
-        System.out.println("select\n"
-                    + "codigo_pro,\n"
-                    + "inicio,\n"
-                    + "final,\n"
-                    + "preco,\n"
-                    + "promocao\n"
-                    + "from promocaoprodutos\n"
-                    + "where final >= '" + new SimpleDateFormat("yyyy-MM-dd").format(dataTermino) + "'");
-        
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
