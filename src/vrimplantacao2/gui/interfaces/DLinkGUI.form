@@ -473,16 +473,18 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Component id="chkFContatos" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFPrazoFornecedor" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkFCondicaoPagamento" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFContatos" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFPrazoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFCondicaoPagamento" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="332" max="32767" attributes="0"/>
+                          <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkTelefone" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFantasia" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="274" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -492,7 +494,10 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
-                                  <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="chkFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkProdutoFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkFContatos" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -500,9 +505,14 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkFCondicaoPagamento" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
+                                  <Component id="chkFantasia" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="chkTelefone" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
-                          <EmptySpace pref="104" max="32767" attributes="0"/>
+                          <EmptySpace pref="108" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -562,6 +572,16 @@
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFCondicaoPagamentoActionPerformed"/>
                   </Events>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkFantasia">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Fantasia"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkTelefone">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Telefone"/>
+                  </Properties>
                 </Component>
               </SubComponents>
             </Container>
