@@ -118,8 +118,8 @@ public class AcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		m1.tgi_cod = m2.Tgs_cod and\n" +
                     "		m1.Tgi_item = m2.Tgs_item\n" +
                     "where\n" +
-                    "	m1.Tgi_cod = '" + this.codigoMercadologico +"' and\n" +
-                    "	m1.Filial = '" + getLojaOrigem() + "'\n" +
+                    "	m1.Tgi_cod = '" + this.codigoMercadologico + "'" +
+                    //"	m1.Filial = '" + getLojaOrigem() + "'\n" +
                     "order by\n" +
                     "	1,3"
             )) {
