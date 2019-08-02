@@ -246,7 +246,7 @@ public class RPInfoDAO extends InterfaceDAO {
                     + "	left join tributacao tr on (p.prod_trib_codigo = tr.trib_codigo)\n"
                     + "where\n"
                     + "	un.prun_unid_codigo = '" + getLojaOrigem() + "' and\n"
-                    + "	tr.trib_mvtos = 'EVP'\n"
+                    + "	tr.trib_mvtos like '%EVP%'\n"
                     + "order by\n"
                     + "	id"
             )) {
@@ -259,24 +259,43 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
                     if (rst.getInt("e_balanca") == 1) {
-                        imp.setManterEAN(true);
                         long codigoProduto;
                         codigoProduto = Long.parseLong(rst.getString("ean"));
                         String pBalanca = String.valueOf(codigoProduto);
 
-                        if (pBalanca.length() <= 7) {
-                            imp.setEan(pBalanca.substring(0, pBalanca.length() - 1));
+                        if (pBalanca.length() < 7) {
+                            imp.seteBalanca(true);
+                            imp.setEan(rst.getString("ean"));
+                            //imp.setEan(pBalanca.substring(0, pBalanca.length() - 1));
+                        } else {
+                            imp.seteBalanca(false);
+                            imp.setEan(rst.getString("ean"));
                         }
                     } else {
+                        imp.seteBalanca(false);
                         imp.setEan(rst.getString("ean"));
                     }
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                    imp.seteBalanca(rst.getBoolean("e_balanca"));
+                    //imp.seteBalanca(rst.getBoolean("e_balanca"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.setValidade(rst.getInt("validade"));
-                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                    imp.setDescricaoGondola(rst.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    
+                    if ((rst.getString("descricaocompleta") != null) &&
+                            (!rst.getString("descricaocompleta").trim().isEmpty())) {
+                        imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                        imp.setDescricaoGondola(rst.getString("descricaocompleta"));
+                    } else {
+                        imp.setDescricaoCompleta(rst.getString("descricaoreduzida"));
+                        imp.setDescricaoGondola(rst.getString("descricaoreduzida"));
+                    }
+                    
+                    if ((rst.getString("descricaoreduzida") != null) &&
+                            (!rst.getString("descricaoreduzida").trim().isEmpty())) {
+                        imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    } else {
+                        imp.setDescricaoReduzida(rst.getString("descricaocompleta"));
+                    }
+                    
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
