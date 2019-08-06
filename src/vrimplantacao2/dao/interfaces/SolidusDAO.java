@@ -139,7 +139,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
+                    "select distinct\n" +
                     "    t.cod_tributacao id,\n" +
                     "    t.des_tributacao descricao,\n" +
                     "    t.cod_sit_tributaria cst,\n" +
@@ -147,6 +147,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    t.val_reducao_base_calculo reducao\n" +
                     "from\n" +
                     "    TAB_TRIBUTACAO t\n" +
+                    "    join tab_produto_loja pl on\n" +
+                    "        pl.cod_tributacao = t.cod_tributacao\n" +
                     "order by\n" +
                     "    t.cod_sit_tributaria,\n" +
                     "    t.val_icms,\n" +
@@ -368,14 +370,6 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "        pl.cod_tributacao = trib.cod_tributacao\n" +
                     "    left join tab_tributacao tribent on\n" +
                     "        pl.cod_trib_entrada = tribent.cod_tributacao\n" +
-                    //"where \n" +
-                    //"   (p.flg_envia_balanca = 'S') and\n" +
-                    //"    p.status = 0 and\n" +
-                    //"    cast(p.cod_barra_principal as numeric(18,0)) <= 999999\n" +
-                    //"    (not p.des_produto  like 'MP %' or\n" +
-                    //"    not p.des_produto  like 'EMB %' or\n" +
-                    //"    not p.des_produto  like 'USO %')\n" +
-                    //"    and pl.inativo != 'S'\n" +
                     "order by\n" +
                     "    id"
             )) {
