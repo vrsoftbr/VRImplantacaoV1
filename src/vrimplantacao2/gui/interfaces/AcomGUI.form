@@ -227,11 +227,6 @@
                     <Property name="text" type="java.lang.String" value="N&#xfa;mero"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoFornecedor1">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Produto Fornecedor"/>
-                  </Properties>
-                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFSituacaoCadastro">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Situa&#xe7;&#xe3;o Cadastro"/>

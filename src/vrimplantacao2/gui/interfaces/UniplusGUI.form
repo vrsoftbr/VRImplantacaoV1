@@ -207,7 +207,7 @@
                               </Group>
                           </Group>
                       </Group>
-                      <EmptySpace min="21" max="32767" attributes="0"/>
+                      <EmptySpace min="33" pref="34" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -296,7 +296,7 @@
                               <Component id="btnMapaTrib" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace pref="19" max="32767" attributes="0"/>
+                      <EmptySpace pref="23" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -455,7 +455,7 @@
             </Container>
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTemBalanca">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Tem Balanca"/>
+                <Property name="text" type="java.lang.String" value="Utiliza ID interno p/ balan&#xe7;a"/>
               </Properties>
             </Component>
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAtacado">

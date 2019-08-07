@@ -24,7 +24,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
 
-    public boolean v_usar_arquivoBalanca;
+    public boolean usaIDInternoBalanca = false;
     public String idAtacado = "0";
     public String lojaID;
     
@@ -152,7 +152,18 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("codigo"));
-                    imp.setEan(rs.getString("ean"));
+                    if(rs.getString("ean") != null && !"".equals(rs.getString("ean"))) {
+                        if(rs.getString("ean").length() > 14) {
+                            imp.setEan(rs.getString("ean").substring(0, 14));
+                        } else {
+                            imp.setEan(rs.getString("ean"));
+                        }
+                    }
+                    if(usaIDInternoBalanca) {
+                        if(rs.getInt("pesavel") == 1) {
+                            imp.setEan(imp.getImportId());
+                        }
+                    }
                     imp.setSituacaoCadastro(rs.getInt("inativo") == 1 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
@@ -313,7 +324,13 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("idproduto"));
-                    imp.setEan(rs.getString("ean"));
+                    if(rs.getString("ean") != null && !"".equals(rs.getString("ean"))) {
+                        if(rs.getString("ean").length() > 14) {
+                            imp.setEan(rs.getString("ean").substring(0, 14));
+                        } else {
+                            imp.setEan(rs.getString("ean"));
+                        }
+                    }
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     
                     result.add(imp);

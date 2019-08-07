@@ -806,7 +806,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rst.getString("id"));
                     imp.setTipoInscricao("J".equals(rst.getString("tipoempresa")) ? TipoInscricao.JURIDICA: TipoInscricao.FISICA);
                     imp.setCnpj(rst.getString("cnpj"));
-                    imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
+                    imp.setInscricaoestadual(Utils.formataNumero(rst.getString("inscricaoestadual")));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setAtivo(rst.getBoolean("ativo"));
