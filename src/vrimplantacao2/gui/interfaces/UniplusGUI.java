@@ -172,7 +172,7 @@ public class UniplusGUI extends VRInternalFrame {
                     
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
-                    uniplusDAO.v_usar_arquivoBalanca = chkTemBalanca.isSelected();
+                    uniplusDAO.usaIDInternoBalanca = chkTemBalanca.isSelected();
                     uniplusDAO.idAtacado = txtIDAtacado.getText();
                     
                     if (!"".equals(txtLojaID.getText()) && !txtLojaID.getText().isEmpty()) {
@@ -543,7 +543,7 @@ public class UniplusGUI extends VRInternalFrame {
         chkManterBalanca.setEnabled(true);
         pnlImpProd.add(chkManterBalanca);
 
-        chkTemBalanca.setText("Tem Balanca");
+        chkTemBalanca.setText("Utiliza ID interno p/ balança");
 
         chkAtacado.setText("Atacado");
 
@@ -605,7 +605,7 @@ public class UniplusGUI extends VRInternalFrame {
                                     .addGroup(tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                         .addComponent(lblAtacadoID, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(txtIDAtacado)))))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(33, 34, Short.MAX_VALUE))
         );
         tabDadosLayout.setVerticalGroup(
             tabDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -673,7 +673,7 @@ public class UniplusGUI extends VRInternalFrame {
                                     .addComponent(chkTemBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
 
         tab.addTab("Dados", tabDados);

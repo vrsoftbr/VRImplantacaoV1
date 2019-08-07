@@ -311,7 +311,6 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkFEndereco = new vrframework.bean.checkBox.VRCheckBox();
         chkFNumero = new vrframework.bean.checkBox.VRCheckBox();
-        chkProdutoFornecedor1 = new vrframework.bean.checkBox.VRCheckBox();
         chkFSituacaoCadastro = new vrframework.bean.checkBox.VRCheckBox();
         chkFCnpjCpf = new vrframework.bean.checkBox.VRCheckBox();
         chkFIeRg = new vrframework.bean.checkBox.VRCheckBox();
@@ -413,9 +412,6 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkFNumero.setText("Número");
         tabFornecedor.add(chkFNumero);
-
-        chkProdutoFornecedor1.setText("Produto Fornecedor");
-        tabFornecedor.add(chkProdutoFornecedor1);
 
         chkFSituacaoCadastro.setText("Situação Cadastro");
         tabFornecedor.add(chkFSituacaoCadastro);
@@ -665,7 +661,6 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkFTipoPagamento;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
-    private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor1;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
