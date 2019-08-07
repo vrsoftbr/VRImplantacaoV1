@@ -24,6 +24,7 @@ public class FornecedorIMP {
     private String insc_municipal;
     private String suframa;
     private boolean ativo = true;
+    private boolean bloqueado = false;
     private TipoInscricao tipo_inscricao = TipoInscricao.VAZIO;
 
     private String endereco;
@@ -137,6 +138,10 @@ public class FornecedorIMP {
 
     public boolean isAtivo() {
         return ativo;
+    }
+
+    public boolean isBloqueado() {
+        return bloqueado;
     }
 
     public String getEndereco() {
@@ -285,6 +290,10 @@ public class FornecedorIMP {
 
     public void setAtivo(boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public void setBloqueado(boolean bloqueado) {
+        this.bloqueado = bloqueado;
     }
 
     public void setEndereco(String endereco) {

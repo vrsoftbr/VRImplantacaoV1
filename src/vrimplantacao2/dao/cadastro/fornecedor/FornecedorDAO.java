@@ -659,6 +659,8 @@ public class FornecedorDAO {
                 }
                 if (opt.contains(OpcaoFornecedor.SITUACAO_CADASTRO)) {
                     sql.put("id_situacaocadastro", vo.getSituacaoCadastro().getId());
+                }
+                if (opt.contains(OpcaoFornecedor.BLOQUEADO)) {
                     sql.put("bloqueado", vo.isBloqueado());
                 }
                 if (opt.contains(OpcaoFornecedor.TIPO_EMPRESA)) {

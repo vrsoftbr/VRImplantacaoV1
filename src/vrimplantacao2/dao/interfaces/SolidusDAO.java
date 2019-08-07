@@ -443,7 +443,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    f.num_cgc cnpj,\n" +
                     "    f.num_insc_est ie,\n" +
                     "    f.flg_simples,\n" +
-                    "    case bloq.flg_bloqueado when 'S' then 0 else 1 end ativo,\n" +
+                    "    case bloq.flg_bloqueado when 'S' then 0 else 1 end bloqueado,\n" +
                     "    f.des_endereco endereco,\n" +
                     "    f.num_endereco numero,\n" +
                     "    f.des_bairro bairro,\n" +
@@ -481,7 +481,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setCnpj_cpf(rst.getString("cnpj"));
                     imp.setIe_rg(rst.getString("ie"));
-                    imp.setAtivo(rst.getBoolean("ativo"));
+                    imp.setBloqueado(rst.getBoolean("bloqueado"));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
                     imp.setBairro(rst.getString("bairro"));

@@ -19,6 +19,7 @@ import vrimplantacao2.vo.cadastro.local.MunicipioVO;
  * @author Leandro
  */
 public class FornecedorRepositoryProvider {
+    
     private String sistema;
     private String lojaOrigem;
     private int lojaVR;
