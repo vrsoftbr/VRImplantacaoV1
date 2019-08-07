@@ -37,6 +37,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class IQSistemasDAO extends InterfaceDAO {
 
+    public boolean arquivoBalanca = false;
+    
     @Override
     public String getSistema() {
         return "IQSistemas";
@@ -144,7 +146,11 @@ public class IQSistemasDAO extends InterfaceDAO {
                     + "p.codigo AS id,\n"
                     + "p.codigobarras,\n"
                     + "p.descricao,\n"
-                    + "p.unidembalagem AS tipoembalagem,\n"
+                    + "CASE p.unidembalagem \n"
+                    + "WHEN 'GR' THEN 'KG'\n"
+                    + "WHEN 'KG' THEN 'KG'\n"
+                    + "ELSE 'UN'\n"
+                    + "END tipoembalagem,\n"
                     + "p.embalagem AS qtdembalagem,\n"
                     + "p.datacadastro AS datacadastro,\n"
                     + "p.tributacao AS csticms,\n"
@@ -175,42 +181,18 @@ public class IQSistemasDAO extends InterfaceDAO {
                     + "LEFT JOIN grupos g ON g.grupo = p.grupo\n"
                     + "LEFT JOIN subgrupos s ON s.subgrupo = p.subgrupo\n"
                     + "WHERE p.CodigoFilial = '" + getLojaOrigem() + "'\n"
+                    //+ "AND p.situacao LIKE '%Balança%'\n"
+                    //+ "AND p.codigo NOT LIKE '0000%'\n"
+                    //+ "AND CHAR_LENGTH(p.codigo) < 7\n"
                     + "ORDER BY p.codigo"
             )) {
-                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
-
                     ProdutoIMP imp = new ProdutoIMP();
-                    ProdutoBalancaVO produtoBalanca;
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(Utils.formataNumero(rst.getString("codigobarras")));
-
-                    if ((imp.getEan() != null)
-                            && (!imp.getEan().trim().isEmpty())
-                            && (imp.getEan().length() < 7)
-                            && (rst.getString("situacao").contains("Item da Bala"))) {
-                        long codigoProduto;
-                        codigoProduto = Long.parseLong(imp.getEan());
-                        if (codigoProduto <= Integer.MAX_VALUE) {
-                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                        } else {
-                            produtoBalanca = null;
-                        }
-
-                        if (produtoBalanca != null) {
-                            imp.seteBalanca(true);
-                            imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
-                        } else {
-                            imp.setValidade(0);
-                            imp.seteBalanca(false);
-                        }
-                    } else {
-                        imp.setValidade(0);
-                        imp.seteBalanca(false);
-                    }
-
+                    imp.seteBalanca(rst.getString("situacao").contains("Item da Bala"));
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -536,7 +518,10 @@ public class IQSistemasDAO extends InterfaceDAO {
                         imp.setPermiteCreditoRotativo(false);
                     }
 
-                    imp.setSexo(rst.getString("sexo").contains("F") ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                    if ((rst.getString("sexo") != null)
+                            && (!rst.getString("sexo").trim().isEmpty())) {
+                        imp.setSexo(rst.getString("sexo").contains("F") ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                    }
 
                     if ((rst.getString("estadocivil") != null)
                             && (!rst.getString("estadocivil").trim().isEmpty())) {
@@ -592,7 +577,13 @@ public class IQSistemasDAO extends InterfaceDAO {
                     imp.setId(rst.getString("id"));
                     imp.setIdCliente(rst.getString("codcliente"));
                     imp.setDataEmissao(rst.getDate("emissao"));
-                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    
+                    if (rst.getString("vencimento").contains("0000-00-00")) {
+                        imp.setDataVencimento(rst.getDate("emissao"));
+                    } else {
+                        imp.setDataVencimento(rst.getDate("vencimento"));
+                    }
+                    
                     imp.setValor(rst.getDouble("valoratual"));
                     imp.setNumeroCupom(rst.getString("cupom"));
                     imp.setParcela(rst.getInt("parcela"));
