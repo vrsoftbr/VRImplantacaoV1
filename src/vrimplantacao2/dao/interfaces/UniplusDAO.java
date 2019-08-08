@@ -14,6 +14,7 @@ import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -507,5 +508,90 @@ public class UniplusDAO extends InterfaceDAO {
             }
         }
         return result;
-    } 
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	f.id,\n" +
+                    "	f.emissao,\n" +
+                    "	f.documento cupom,\n" +
+                    "	0 ecf,\n" +
+                    "	f.valor,\n" +
+                    "	f.historico observacao,\n" +
+                    "	f.identidade id_cliente,\n" +
+                    "	f.vencimento,\n" +
+                    "	f.parcela,\n" +
+                    "	f.juros,\n" +
+                    "	f.multa\n" +
+                    "from\n" +
+                    "	financeiro f\n" +
+                    "where\n" +
+                    "	f.tipo = 'R'\n" +
+                    "	and f.idfilial = " + getLojaOrigem() + "\n" +
+                    "	and f.idtipodocumentofinanceiro in (1,8)\n" +
+                    "order by\n" +
+                    "	f.id"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(complemento);
+                    imp.setId(rst.getString("id"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setNumeroCupom(rst.getString("cupom"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setIdCliente(rst.getString("id_cliente"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setParcela(rst.getInt("parcela"));
+                    imp.setJuros(rst.getDouble("juros"));
+                    imp.setMulta(rst.getDouble("multa"));
+                    
+                    incluirLancamentos(imp);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    private void incluirLancamentos(CreditoRotativoIMP imp) throws Exception {
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	fl.id,\n" +
+                    "	fl.valor,\n" +
+                    "	fl.desconto,\n" +
+                    "	fl.multa,\n" +
+                    "	fl.baixa datapagamento,\n" +
+                    "	fl.historico observacao\n" +
+                    "from\n" +
+                    "	financeirolancamento fl\n" +
+                    "where\n" +
+                    "	fl.idfinanceiro = " + imp.getId() + "\n" +
+                    "order by\n" +
+                    "	fl.id"
+            )) {
+                while (rst.next()) {
+                    imp.addPagamento(
+                            rst.getString("id"),
+                            rst.getDouble("valor"),
+                            rst.getDouble("desconto"),
+                            rst.getDouble("multa"),
+                            rst.getDate("datapagamento"),
+                            rst.getString("observacao")
+                    );
+                }
+            }
+        }
+    }
+    
 }
