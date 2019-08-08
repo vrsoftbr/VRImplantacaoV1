@@ -94,7 +94,8 @@ public class UniplusDAO extends InterfaceDAO {
             OpcaoProduto.CEST,
             OpcaoProduto.ICMS,
             OpcaoProduto.PIS_COFINS,
-            OpcaoProduto.NATUREZA_RECEITA            
+            OpcaoProduto.NATUREZA_RECEITA,
+            OpcaoProduto.ATACADO
         }));
     }
     

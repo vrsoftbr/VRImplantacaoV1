@@ -38,6 +38,8 @@ public class UniplusGUI extends VRInternalFrame {
         txtPortaPostgres.setText(params.getWithNull("5432", NOME_SISTEMA, "PORTA"));
         txtUsuarioPostgres.setText(params.getWithNull("postgres", NOME_SISTEMA, "USUARIO"));
         txtSenhaPostgres.setText(params.getWithNull("620568", NOME_SISTEMA, "SENHA"));
+        txtIDAtacado.setText(params.getWithNull("999", NOME_SISTEMA, "PREFIXO_ATACADO"));
+        chkForcarIdProdutoQuandoPesavel.setSelected(params.getBool(NOME_SISTEMA, "FORCAR_ID_PLU"));
         vLojaCliente = params.get(NOME_SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(NOME_SISTEMA, "LOJA_VR");
     }
@@ -50,6 +52,8 @@ public class UniplusGUI extends VRInternalFrame {
         params.put(txtPortaPostgres.getText(), NOME_SISTEMA, "PORTA");
         params.put(txtUsuarioPostgres.getText(), NOME_SISTEMA, "USUARIO");
         params.put(txtSenhaPostgres.getText(), NOME_SISTEMA, "SENHA");
+        params.put(txtIDAtacado.getText(), NOME_SISTEMA, "PREFIXO_ATACADO");
+        params.put(chkForcarIdProdutoQuandoPesavel.isSelected(), NOME_SISTEMA, "FORCAR_ID_PLU");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
             params.put(cliente.cnpj, NOME_SISTEMA, "LOJA_CLIENTE");
