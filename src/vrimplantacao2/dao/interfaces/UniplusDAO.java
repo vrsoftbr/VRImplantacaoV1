@@ -17,6 +17,7 @@ import vrimplantacao2.vo.enums.SituacaoCheque;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -399,6 +400,7 @@ public class UniplusDAO extends InterfaceDAO {
                     "	estado est on est.id = e.idestado\n" +
                     "where\n" +
                     "	e.fornecedor = 1\n" +
+                    "	or e.id in (select distinct identidade from financeiro where tipo = 'P')\n" +
                     "order by\n" +
                     "	e.codigo::integer")) {
                 while(rs.next()) {
@@ -658,6 +660,69 @@ public class UniplusDAO extends InterfaceDAO {
                     } else {
                         imp.setSituacaoCheque(SituacaoCheque.BAIXADO);
                     }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	f.id,\n" +
+                    "	e.codigo identidade,\n" +
+                    "	f.documento,\n" +
+                    "	case\n" +
+                    "		when f.pagamento is null then 210\n" +
+                    "		else 211\n" +
+                    "	end idTipoEntradaVR,\n" +
+                    "	f.emissao,\n" +
+                    "	f.entrada,\n" +
+                    "	f.historico observacao,\n" +
+                    "	doc.descricao tipodocumento,\n" +
+                    "	f.vencimento,\n" +
+                    "	f.valor,\n" +
+                    "	f.saldo\n" +
+                    "from\n" +
+                    "	financeiro f\n" +
+                    "	join entidade e on\n" +
+                    "		f.identidade = e.id\n" +
+                    "	left join tipodocumentofinanceiro doc on\n" +
+                    "		f.idtipodocumentofinanceiro = doc.id\n" +
+                    "where\n" +
+                    "	f.tipo = 'P'\n" +
+                    "	and f.idfilial = 1\n" +
+                    "	and not (not f.pagamento is null or not f.baixa is null)\n" +
+                    "order by\n" +
+                    "	f.id"
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("identidade"));
+                    imp.setNumeroDocumento(rst.getString("documento"));
+                    imp.setIdTipoEntradaVR(rst.getInt("idTipoEntradaVR"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setDataEntrada(rst.getDate("entrada"));
+                    imp.setObservacao(
+                            new StringBuilder(rst.getString("tipodocumento"))
+                                    .append(rst.getDouble("saldo") > 0 ? " - Valor original RS" + rst.getDouble("valor"): "")
+                                    .append(" - ")
+                                    .append(rst.getString("observacao"))
+                                    .toString()
+                    );
+                    imp.addVencimento(
+                            rst.getDate("vencimento"), 
+                            (rst.getDouble("saldo") > 0 ? rst.getDouble("saldo") : rst.getDouble("valor"))
+                    );
                     
                     result.add(imp);
                 }
