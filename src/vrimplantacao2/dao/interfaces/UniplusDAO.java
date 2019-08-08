@@ -526,13 +526,15 @@ public class UniplusDAO extends InterfaceDAO {
                     "	0 ecf,\n" +
                     "	f.valor,\n" +
                     "	f.historico observacao,\n" +
-                    "	f.identidade id_cliente,\n" +
+                    "	e.codigo id_cliente,\n" +
                     "	f.vencimento,\n" +
                     "	f.parcela,\n" +
                     "	f.juros,\n" +
                     "	f.multa\n" +
                     "from\n" +
                     "	financeiro f\n" +
+                    "	join entidade e on\n" +
+                    "           f.identidade = e.id\n" +
                     "where\n" +
                     "	f.tipo = 'R'\n" +
                     "	and f.idfilial = " + getLojaOrigem() + "\n" +
@@ -679,10 +681,6 @@ public class UniplusDAO extends InterfaceDAO {
                     "	f.id,\n" +
                     "	e.codigo identidade,\n" +
                     "	f.documento,\n" +
-                    "	case\n" +
-                    "		when f.pagamento is null then 210\n" +
-                    "		else 211\n" +
-                    "	end idTipoEntradaVR,\n" +
                     "	f.emissao,\n" +
                     "	f.entrada,\n" +
                     "	f.historico observacao,\n" +
@@ -699,7 +697,7 @@ public class UniplusDAO extends InterfaceDAO {
                     "where\n" +
                     "	f.tipo = 'P'\n" +
                     "	and f.idfilial = 1\n" +
-                    "	and not (not f.pagamento is null or not f.baixa is null)\n" +
+                    "	and (select sum(valor) from financeirolancamento where idfinanceiro = f.id) < f.valor\n" +
                     "order by\n" +
                     "	f.id"
             )) {
@@ -709,7 +707,7 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setId(rst.getString("id"));
                     imp.setIdFornecedor(rst.getString("identidade"));
                     imp.setNumeroDocumento(rst.getString("documento"));
-                    imp.setIdTipoEntradaVR(rst.getInt("idTipoEntradaVR"));
+                    imp.setIdTipoEntradaVR(210);
                     imp.setDataEmissao(rst.getDate("emissao"));
                     imp.setDataEntrada(rst.getDate("entrada"));
                     imp.setObservacao(
