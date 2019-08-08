@@ -27,6 +27,7 @@ public class UniplusDAO extends InterfaceDAO {
 
     private int prefixoAtacado = 999;
     private String complemento = "";
+    private boolean forcarIdProdutoQuandoPesavel = false;
 
     public void setComplemento(String complemento) {
         this.complemento = complemento != null ? complemento.trim() : "";
@@ -34,6 +35,10 @@ public class UniplusDAO extends InterfaceDAO {
     
     public void setPrefixoAtacado(int prefixoAtacado) {
         this.prefixoAtacado = prefixoAtacado;
+    }
+
+    public void setForcarIdProdutoQuandoPesavel(boolean forcarIdProdutoQuandoPesavel) {
+        this.forcarIdProdutoQuandoPesavel = forcarIdProdutoQuandoPesavel;
     }
     
     @Override
@@ -188,7 +193,18 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("codigo"));
-                    imp.setEan(rs.getString("ean"));
+                    if(rs.getString("ean") != null && !"".equals(rs.getString("ean"))) {
+                        if(rs.getString("ean").length() > 14) {
+                            imp.setEan(rs.getString("ean").substring(0, 14));
+                        } else {
+                            imp.setEan(rs.getString("ean"));
+                        }
+                    }
+                    if(forcarIdProdutoQuandoPesavel) {
+                        if(rs.getInt("pesavel") == 1) {
+                            imp.setEan(imp.getImportId());
+                        }
+                    }
                     imp.setSituacaoCadastro(rs.getInt("inativo") == 1 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
@@ -317,7 +333,13 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("idproduto"));
-                    imp.setEan(rs.getString("ean"));
+                    if(rs.getString("ean") != null && !"".equals(rs.getString("ean"))) {
+                        if(rs.getString("ean").length() > 14) {
+                            imp.setEan(rs.getString("ean").substring(0, 14));
+                        } else {
+                            imp.setEan(rs.getString("ean"));
+                        }
+                    }
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     
                     result.add(imp);

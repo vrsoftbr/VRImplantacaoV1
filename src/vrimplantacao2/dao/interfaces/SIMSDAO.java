@@ -18,16 +18,16 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.classe.file.ArquivoLeitura;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
-import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -151,7 +151,7 @@ public class SIMSDAO extends InterfaceDAO {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-
+        Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
         for (List<String> prod : carregarMER()) {
 
             String id = prod.get(0);
@@ -164,6 +164,7 @@ public class SIMSDAO extends InterfaceDAO {
                 }
             }
             String ncm = Utils.formataNumero(prod.get(30));
+            String cest = Utils.formataNumero(prod.get(94));
             String tipoEmbalagem = prod.get(3);
             double peso = Utils.truncar2(Utils.stringToDouble(prod.get(10)), 2);
             double preco = Utils.truncar2(converterValor("".equals(prod.get(105)) ? prod.get(12) : prod.get(105)), 2);
@@ -191,98 +192,134 @@ public class SIMSDAO extends InterfaceDAO {
                 eBalanca = (Long.parseLong(ean) > 0 || Long.parseLong(ean) <= 999999) && (Utils.stringToBool(prod.get(107)));
             }
 
-            ProdutoIMP imp = new ProdutoIMP();
-            imp.setImportLoja(getLojaOrigem());
-            imp.setImportSistema(getSistema());
-            imp.setImportId(id);
-            imp.setEan(ean);
-            imp.seteBalanca(eBalanca);
-            imp.setTipoEmbalagem(tipoEmbalagem);
-            imp.setValidade(validade);
-            imp.setDescricaoCompleta(descricao);
-            imp.setDescricaoReduzida(descricaoReduzida);
-            imp.setDescricaoGondola(descricao);
-            imp.setCodMercadologico1(merc1);
-            imp.setCodMercadologico2(merc2);
-            imp.setCodMercadologico3(merc3);
-            imp.setCodMercadologico4(merc4);
-            imp.setPesoBruto(peso);
-            imp.setPesoLiquido(peso);
-            imp.setPrecovenda(preco);
-            imp.setCustoComImposto(custoComImposto);
-            imp.setCustoSemImposto(custoSemImposto);
-            imp.setEstoque(estoque);
-            imp.setSituacaoCadastro(idSituacaoCadastral);
-            imp.setNcm(ncm);
+            if ((ean != null)
+                    && (!ean.trim().isEmpty())) {
 
-            if ((piscofins != null)
-                    && (!piscofins.trim().isEmpty())) {
-                if (null != piscofins.trim()) switch (piscofins.trim()) {
-                    case "0":
-                        imp.setPiscofinsCstDebito(1);
-                        imp.setPiscofinsCstCredito(50);
-                        break;
-                    case "1":
-                        imp.setPiscofinsCstDebito(6);
-                        imp.setPiscofinsCstCredito(73);
-                        break;
-                    case "2":
-                        imp.setPiscofinsCstDebito(4);
-                        imp.setPiscofinsCstCredito(70);
-                        break;
-                    case "3":
-                        imp.setPiscofinsCstDebito(5);
-                        imp.setPiscofinsCstCredito(75);
-                        break;
-                    case "4":
-                        imp.setPiscofinsCstDebito(8);
-                        imp.setPiscofinsCstCredito(74);
-                        break;
-                    default:
-                        imp.setPiscofinsCstDebito(7);
-                        imp.setPiscofinsCstCredito(71);
-                        break;
+                ProdutoIMP imp = new ProdutoIMP();
+                //ProdutoBalancaVO produtoBalanca;
+                imp.setImportLoja(getLojaOrigem());
+                imp.setImportSistema(getSistema());
+                imp.setImportId(id);
+                imp.setEan(ean);
+
+                /*if ((imp.getEan() != null)
+                 && (!imp.getEan().trim().isEmpty())) {
+
+                 long codigoProduto;
+                 codigoProduto = Long.parseLong(imp.getEan());
+                 if (codigoProduto <= 999999) {
+                 if (codigoProduto <= Integer.MAX_VALUE) {
+                 produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                 } else {
+                 produtoBalanca = null;
+                 }
+
+                 if (produtoBalanca != null) {
+                 imp.seteBalanca(true);
+                 imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : Utils.stringToInt(prod.get(106)));
+                 } else {
+                 imp.setValidade(0);
+                 imp.seteBalanca(false);
+                 }
+                 } else {
+                 imp.setValidade(Utils.stringToInt(prod.get(106)));
+                 imp.seteBalanca(false);
+                 }
+                 } else {
+                 imp.setValidade(Utils.stringToInt(prod.get(106)));
+                 imp.seteBalanca(false);
+                 }*/
+                imp.seteBalanca(eBalanca);
+                imp.setTipoEmbalagem(tipoEmbalagem);
+                imp.setValidade(validade);
+                imp.setDescricaoCompleta(descricao);
+                imp.setDescricaoReduzida(descricaoReduzida);
+                imp.setDescricaoGondola(descricao);
+                imp.setCodMercadologico1(merc1);
+                imp.setCodMercadologico2(merc2);
+                imp.setCodMercadologico3(merc3);
+                imp.setCodMercadologico4(merc4);
+                imp.setPesoBruto(peso);
+                imp.setPesoLiquido(peso);
+                imp.setPrecovenda(preco);
+                imp.setCustoComImposto(custoComImposto);
+                imp.setCustoSemImposto(custoSemImposto);
+                imp.setEstoque(estoque);
+                imp.setSituacaoCadastro(idSituacaoCadastral);
+                imp.setNcm(ncm);
+                imp.setCest(cest);
+
+                if ((piscofins != null)
+                        && (!piscofins.trim().isEmpty())) {
+                    if (null != piscofins.trim()) {
+                        switch (piscofins.trim()) {
+                            case "0":
+                                imp.setPiscofinsCstDebito(1);
+                                imp.setPiscofinsCstCredito(50);
+                                break;
+                            case "1":
+                                imp.setPiscofinsCstDebito(6);
+                                imp.setPiscofinsCstCredito(73);
+                                break;
+                            case "2":
+                                imp.setPiscofinsCstDebito(4);
+                                imp.setPiscofinsCstCredito(70);
+                                break;
+                            case "3":
+                                imp.setPiscofinsCstDebito(5);
+                                imp.setPiscofinsCstCredito(75);
+                                break;
+                            case "4":
+                                imp.setPiscofinsCstDebito(8);
+                                imp.setPiscofinsCstCredito(74);
+                                break;
+                            default:
+                                imp.setPiscofinsCstDebito(7);
+                                imp.setPiscofinsCstCredito(71);
+                                break;
+                        }
+                    }
+                } else {
+                    imp.setPiscofinsCstDebito(7);
+                    imp.setPiscofinsCstCredito(71);
                 }
-            } else {
-                imp.setPiscofinsCstDebito(7);
-                imp.setPiscofinsCstCredito(71);
-            }
-            
-            if (aliqPdv == 2) {
-                imp.setIcmsCst(51);
-                imp.setIcmsAliq(0);
-                imp.setIcmsReducao(0);
-            } else if (aliqPdv == 4) {
-                imp.setIcmsCst(60);
-                imp.setIcmsAliq(0);
-                imp.setIcmsReducao(0);
-            } else if (aliqPdv == 5) {
-                imp.setIcmsCst(40);
-                imp.setIcmsAliq(0);
-                imp.setIcmsReducao(0);
-            } else if (aliqPdv == 0) {
-                imp.setIcmsCst(0);
-                imp.setIcmsAliq(18);
-                imp.setIcmsReducao(0);
-            } else if (aliqPdv == 7) {
-                imp.setIcmsCst(0);
-                imp.setIcmsAliq(7);
-                imp.setIcmsReducao(0);
-            } else if (aliqPdv == 8) {
-                imp.setIcmsCst(0);
-                imp.setIcmsAliq(25);
-                imp.setIcmsReducao(0);
-            } else if (aliqPdv == 9) {
-                imp.setIcmsCst(0);
-                imp.setIcmsAliq(12);
-                imp.setIcmsReducao(0);
-            } else {
-                imp.setIcmsCst(40);
-                imp.setIcmsAliq(0);
-                imp.setIcmsReducao(0);
-            }
 
-            result.add(imp);
+                if (aliqPdv == 2) {
+                    imp.setIcmsCst(51);
+                    imp.setIcmsAliq(0);
+                    imp.setIcmsReducao(0);
+                } else if (aliqPdv == 4) {
+                    imp.setIcmsCst(60);
+                    imp.setIcmsAliq(0);
+                    imp.setIcmsReducao(0);
+                } else if (aliqPdv == 5) {
+                    imp.setIcmsCst(40);
+                    imp.setIcmsAliq(0);
+                    imp.setIcmsReducao(0);
+                } else if (aliqPdv == 0) {
+                    imp.setIcmsCst(0);
+                    imp.setIcmsAliq(18);
+                    imp.setIcmsReducao(0);
+                } else if (aliqPdv == 7) {
+                    imp.setIcmsCst(0);
+                    imp.setIcmsAliq(7);
+                    imp.setIcmsReducao(0);
+                } else if (aliqPdv == 8) {
+                    imp.setIcmsCst(0);
+                    imp.setIcmsAliq(25);
+                    imp.setIcmsReducao(0);
+                } else if (aliqPdv == 9) {
+                    imp.setIcmsCst(0);
+                    imp.setIcmsAliq(12);
+                    imp.setIcmsReducao(0);
+                } else {
+                    imp.setIcmsCst(40);
+                    imp.setIcmsAliq(0);
+                    imp.setIcmsReducao(0);
+                }
+
+                result.add(imp);
+            }
         }
         return result;
     }
@@ -484,7 +521,7 @@ public class SIMSDAO extends InterfaceDAO {
         }
         return result;
     }
-
+    
     private List<List<String>> carregarMER() throws Exception {
         List<List<String>> result = new ArrayList<>();
 
@@ -492,8 +529,8 @@ public class SIMSDAO extends InterfaceDAO {
         try (FileReader fr = new FileReader(f)) {
             try (BufferedReader br = new BufferedReader(fr)) {
                 //Salta as duas primeiras linhas que é o cabeçalho.
-                br.readLine();
-                br.readLine();
+                //br.readLine();
+                //br.readLine();
                 Long recordId = null;
 
                 Map<Long, Map<Long, List<String>>> cb = carregarCBMER();
@@ -553,12 +590,13 @@ public class SIMSDAO extends InterfaceDAO {
         try (FileReader fr = new FileReader(f)) {
             try (BufferedReader br = new BufferedReader(fr)) {
                 //Salta as duas primeiras linhas que é o cabeçalho.
-                br.readLine();
-                br.readLine();
+                //br.readLine();
+                //br.readLine();
                 long recordId = -1;
                 long ean = -2;
                 for (String linha = br.readLine(); linha != null; linha = br.readLine()) {
                     if (linha.startsWith("^CBMER")) {
+                        System.out.println(linha);
                         erro = linha;
                         String[] ids = getId(linha);
                         recordId = Long.parseLong(ids[1]);
@@ -622,8 +660,8 @@ public class SIMSDAO extends InterfaceDAO {
 
         try (ArquivoLeitura arquivo = new ArquivoLeitura(this.FORNECEDORFile)) {
             //Salta as duas primeiras linhas que é o cabeçalho.
-            arquivo.remove(0);
-            arquivo.remove(0);
+            //arquivo.remove(0);
+            //arquivo.remove(0);
             String recordId = null;
 
             for (String linha : arquivo) {
@@ -656,8 +694,8 @@ public class SIMSDAO extends InterfaceDAO {
         try (FileReader fr = new FileReader(f)) {
             try (BufferedReader br = new BufferedReader(fr)) {
                 //Salta as duas primeiras linhas que é o cabeçalho.
-                br.readLine();
-                br.readLine();
+                //br.readLine();
+                //br.readLine();
                 String recordId = null;
 
                 for (String linha = br.readLine(); linha != null; linha = br.readLine()) {

@@ -40,8 +40,8 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="vRImportaArquivBalancaPanel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tab" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <Component id="tab" min="-2" pref="413" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
               <Component id="vRPanel3" min="-2" pref="34" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -153,8 +153,8 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="vRPanel1" min="-2" pref="190" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="vRPanel0" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="vRPanel0" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="38" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -175,14 +175,12 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
                                   <Component id="cbxMercadologico" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
                                   <Component id="cbxPreco" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
-                                  <Component id="chkIcms" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Group type="102" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="cbxProduto" min="-2" max="-2" attributes="0"/>
                                       <Component id="cbxEan" min="-2" max="-2" attributes="0"/>
@@ -196,7 +194,12 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace pref="219" max="32767" attributes="0"/>
+                          <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkCest" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkIcms" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="175" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -213,6 +216,7 @@
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="cbxProduto" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="cbxCusto" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCest" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
@@ -224,7 +228,7 @@
                               <Component id="cbxEanEmBranco" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkPiscofins" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="27" max="32767" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -285,6 +289,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIcms">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Icms"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCest">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cest"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -443,7 +452,7 @@
                       <Component id="vRPanel4" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="vRPanel5" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="167" max="32767" attributes="0"/>
+                      <EmptySpace pref="194" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>

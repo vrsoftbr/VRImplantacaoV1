@@ -17,6 +17,7 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -241,6 +242,7 @@ public class AcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
+                    imp.setCodMercadologico3("1");
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
@@ -379,6 +381,38 @@ public class AcomDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
+    
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	Ext_codint idproduto,\n" +
+                    "	Ext_codfor idfornecedor,\n" +
+                    "	Ext_codext codigoexterno,\n" +
+                    "	Ext_qembcom qtdembalagem \n" +
+                    "from \n" +
+                    "	Codigo_externo\n" +
+                    "where\n" +
+                    "	Filial = '" + getLojaOrigem() + "'\n" +
+                    "order by\n" +
+                    "	2, 1")) {
+                while(rs.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setCodigoExterno(rs.getString("codigoexterno"));
+                    imp.setIdProduto(rs.getString("idproduto"));
+                    imp.setIdFornecedor(rs.getString("idfornecedor"));
+                    imp.setQtdEmbalagem(rs.getDouble("qtdembalagem"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
@@ -388,7 +422,7 @@ public class AcomDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
                     "	p.Pes_cod6 id,\n" +
-                    "	coalesce(p.Pes_cnpj, p.Pes_cpf) cnpjcpf,\n" +
+                    "	case when p.Pes_cnpj = '' then p.Pes_cpf else p.Pes_cnpj end cnpjcpf,\n" +
                     "	p.Pes_nome45 razaosocial,\n" +
                     "	p.Pes_natural nomefantasia,\n" +
                     "	coalesce(p.Pes_ie, p.Pes_rg) ie_rg,\n" +
@@ -449,6 +483,9 @@ public class AcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     imp.setId(rst.getString("id"));
                     imp.setCnpj(rst.getString("cnpjcpf"));
+                    if(imp.getCnpj() == null || "".equals(imp.getCnpj())) {
+                        imp.setCnpj(imp.getId());
+                    }
                     imp.setRazao(rst.getString("razaosocial"));
                     imp.setFantasia(rst.getString("nomefantasia"));
                     imp.setInscricaoestadual(rst.getString("ie_rg"));
