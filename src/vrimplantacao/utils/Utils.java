@@ -586,11 +586,24 @@ public class Utils {
      * válido.
      */
     public static int stringToInt(String texto) {
-        long result = Utils.stringToLong(texto, 0);
+        return stringToInt(texto, 0);
+    }    
+
+    /**
+     * Conver uma String em um número inteiro (int). No processo todos os
+     * caracteres não numéricos são removidos da String.
+     *
+     * @param texto Valor a ser convertido.
+     * @param valorPadrao Valor padrão caso não seja possível converter em número.
+     * @return valor convertido ou 0 caso o valor informado não seja um Interger
+     * válido.
+     */
+    public static int stringToInt(String texto, int valorPadrao) {
+        long result = Utils.stringToLong(texto, valorPadrao);
         if (result >= Integer.MIN_VALUE && result <= Integer.MAX_VALUE) {
             return (int) result;
         } else {
-            return 0;
+            return valorPadrao;
         }
     }
 

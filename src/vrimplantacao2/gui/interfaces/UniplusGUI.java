@@ -13,6 +13,7 @@ import vrframework.classe.VRException;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.dao.cadastro.LojaDAO;
+import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
@@ -172,16 +173,9 @@ public class UniplusGUI extends VRInternalFrame {
                     
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
-                    uniplusDAO.v_usar_arquivoBalanca = chkTemBalanca.isSelected();
-                    uniplusDAO.idAtacado = txtIDAtacado.getText();
                     
-                    if (!"".equals(txtLojaID.getText()) && !txtLojaID.getText().isEmpty()) {
-                        lojaMesmoID = " - " + txtLojaID.getText();
-                    } else {
-                        lojaMesmoID = "";
-                    }
-                     
-                    uniplusDAO.lojaID = lojaMesmoID;
+                    uniplusDAO.setPrefixoAtacado(Utils.stringToInt(txtIDAtacado.getText(), 999));                     
+                    uniplusDAO.setComplemento(txtLojaID.getText());
                     
                     Importador importador = new Importador(uniplusDAO);
                     importador.setLojaOrigem(String.valueOf(idLojaCliente));
