@@ -3,7 +3,10 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -55,6 +58,39 @@ public class UniplusDAO extends InterfaceDAO {
         }
         
         return result;
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet(Arrays.asList(new OpcaoProduto[]{
+            OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+            OpcaoProduto.MERCADOLOGICO,
+            OpcaoProduto.MERCADOLOGICO_PRODUTO,
+            OpcaoProduto.PRODUTOS,
+            OpcaoProduto.ATIVO,
+            OpcaoProduto.DESC_COMPLETA,
+            OpcaoProduto.DESC_GONDOLA,
+            OpcaoProduto.DESC_REDUZIDA,
+            OpcaoProduto.DATA_CADASTRO,
+            OpcaoProduto.EAN,
+            OpcaoProduto.EAN_EM_BRANCO,
+            OpcaoProduto.TIPO_EMBALAGEM_EAN,
+            OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.CUSTO,
+            OpcaoProduto.CUSTO_COM_IMPOSTO,
+            OpcaoProduto.CUSTO_SEM_IMPOSTO,
+            OpcaoProduto.MARGEM,
+            OpcaoProduto.PRECO,
+            OpcaoProduto.ESTOQUE_MAXIMO,
+            OpcaoProduto.ESTOQUE_MINIMO,
+            OpcaoProduto.ESTOQUE,
+            OpcaoProduto.PESAVEL,
+            OpcaoProduto.NCM,
+            OpcaoProduto.CEST,
+            OpcaoProduto.ICMS,
+            OpcaoProduto.PIS_COFINS,
+            OpcaoProduto.NATUREZA_RECEITA            
+        }));
     }
     
     @Override
@@ -157,7 +193,7 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
-                    imp.seteBalanca(rs.getInt("pesavel") == 1 ? true : false);
+                    imp.seteBalanca((rs.getInt("pesavel") == 1));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
@@ -370,7 +406,7 @@ public class UniplusDAO extends InterfaceDAO {
                         imp.addContato("Email", null, null, TipoContato.COMERCIAL, rs.getString("email"));
                     }
                     imp.setDatacadastro(rs.getDate("datacadastro"));
-                    imp.setAtivo(rs.getInt("inativo") == 0 ? true : false);
+                    imp.setAtivo((rs.getInt("inativo") == 0));
                     
                     result.add(imp);
                 }
@@ -441,7 +477,7 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setDataNascimento(rs.getDate("nascimento"));
                     imp.setValorLimite(rs.getDouble("limitecredito"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
-                    imp.setAtivo(rs.getInt("inativo") == 0 ? true : false);
+                    imp.setAtivo((rs.getInt("inativo") == 0));
                     
                     result.add(imp);
                 }
