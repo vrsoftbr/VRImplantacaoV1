@@ -8,11 +8,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.SituacaoCheque;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -202,16 +205,14 @@ public class UniplusDAO extends InterfaceDAO {
                             imp.setEan(rs.getString("ean"));
                         }
                     }
-                    if(forcarIdProdutoQuandoPesavel) {
-                        if(rs.getInt("pesavel") == 1) {
-                            imp.setEan(imp.getImportId());
-                        }
-                    }
                     imp.setSituacaoCadastro(rs.getInt("inativo") == 1 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
                     imp.seteBalanca((rs.getInt("pesavel") == 1));
+                    if (imp.isBalanca() && (forcarIdProdutoQuandoPesavel || "".equals(Utils.acertarTexto(imp.getEan())))) {
+                        imp.setEan(imp.getImportId()); 
+                    }
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
@@ -592,6 +593,78 @@ public class UniplusDAO extends InterfaceDAO {
                 }
             }
         }
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	f.id,\n" +
+                    "	e.cnpjcpf cpf,\n" +
+                    "	f.numerocheque,\n" +
+                    "	b.codigo banco,\n" +
+                    "	f.agencia,\n" +
+                    "	f.numerocontacorrente,\n" +
+                    "	f.numerocheque,\n" +
+                    "	f.emissao date,\n" +
+                    "	f.baixa datadeposito,\n" +
+                    "	f.documento cupom,\n" +
+                    "	0 ecf,\n" +
+                    "	e.rg,\n" +
+                    "	e.telefone,\n" +
+                    "	e.nome,\n" +
+                    "	f.historico observacao,\n" +
+                    "	f.valor,\n" +
+                    "	f.juros,\n" +
+                    "	f.pagamento\n" +
+                    "from\n" +
+                    "	financeiro f\n" +
+                    "	left join entidade e on\n" +
+                    "		f.identidade = e.id\n" +
+                    "	left join banco b on\n" +
+                    "		f.idbanco = b.id\n" +
+                    "where\n" +
+                    "	f.tipo = 'R'\n" +
+                    "	and f.idfilial = " + getLojaOrigem() + "\n" +
+                    "	and f.idtipodocumentofinanceiro in (5)\n" +
+                    "order by\n" +
+                    "	f.id"
+            )) {
+                while (rst.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setCpf(rst.getString("cpf"));
+                    imp.setNumeroCheque(rst.getString("numerocheque"));
+                    imp.setBanco(rst.getInt("banco"));
+                    imp.setAgencia(rst.getString("agencia"));
+                    imp.setConta(rst.getString("numerocontacorrente"));
+                    imp.setNumeroCheque(rst.getString("numerocheque"));
+                    imp.setDate(rst.getDate("date"));
+                    imp.setDataDeposito(rst.getDate("datadeposito"));
+                    imp.setNumeroCupom(rst.getString("cupom"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setRg(rst.getString("rg"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setNome(rst.getString("nome"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setValorJuros(rst.getDouble("juros"));
+                    if (rst.getString("pagamento") == null || rst.getString("pagamento").trim().equals("")) {
+                        imp.setSituacaoCheque(SituacaoCheque.ABERTO);
+                    } else {
+                        imp.setSituacaoCheque(SituacaoCheque.BAIXADO);
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
     }
     
 }
