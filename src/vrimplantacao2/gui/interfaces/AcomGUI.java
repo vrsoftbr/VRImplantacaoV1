@@ -233,6 +233,9 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
                             if (chkCAtivo.isSelected()) {
                                 opt.add(OpcaoCliente.SITUACAO_CADASTRO);
                             }
+                            if(chkCNPJ.isSelected()) {
+                                opt.add(OpcaoCliente.CNPJ);
+                            }
                             if (!opt.isEmpty()) {
                                 importador.atualizarClientePreferencial(opt.toArray(new OpcaoCliente[]{}));
                             }
@@ -324,6 +327,7 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkCIeRg = new vrframework.bean.checkBox.VRCheckBox();
         chkCApenasObservacoes = new vrframework.bean.checkBox.VRCheckBox();
         chkCAtivo = new vrframework.bean.checkBox.VRCheckBox();
+        chkCNPJ = new javax.swing.JCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -443,6 +447,8 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkCAtivo.setText("Ativo");
 
+        chkCNPJ.setText("CPF / CNPJ");
+
         javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
         tabClientes.setLayout(tabClientesLayout);
         tabClientesLayout.setHorizontalGroup(
@@ -450,7 +456,6 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
             .addGroup(tabClientesLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(tabClientesLayout.createSequentialGroup()
                         .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -468,7 +473,11 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
                             .addGroup(tabClientesLayout.createSequentialGroup()
                                 .addComponent(chkCObservacoes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(chkCIeRg, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(chkCIeRg, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(tabClientesLayout.createSequentialGroup()
+                        .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(16, 16, 16)
+                        .addComponent(chkCNPJ)))
                 .addContainerGap(96, Short.MAX_VALUE))
         );
         tabClientesLayout.setVerticalGroup(
@@ -486,7 +495,9 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
                     .addComponent(chkCApenasObservacoes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCAtivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCNPJ))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(184, Short.MAX_VALUE))
@@ -645,6 +656,7 @@ public class AcomGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkCAtivo;
     private vrframework.bean.checkBox.VRCheckBox chkCBloqueado;
     private vrframework.bean.checkBox.VRCheckBox chkCIeRg;
+    private javax.swing.JCheckBox chkCNPJ;
     private vrframework.bean.checkBox.VRCheckBox chkCObservacoes;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;

@@ -259,7 +259,6 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
@@ -284,6 +283,11 @@
                                       </Group>
                                   </Group>
                               </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
+                                  <Component id="chkCNPJ" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
                           <EmptySpace pref="96" max="32767" attributes="0"/>
                       </Group>
@@ -306,7 +310,10 @@
                               <Component id="chkCAtivo" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkCreditoRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCNPJ" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
                           <EmptySpace pref="184" max="32767" attributes="0"/>
@@ -359,6 +366,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCAtivo">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Ativo"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkCNPJ">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="CPF / CNPJ"/>
                   </Properties>
                 </Component>
               </SubComponents>

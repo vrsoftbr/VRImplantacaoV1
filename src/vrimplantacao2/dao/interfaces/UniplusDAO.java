@@ -3,17 +3,18 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
-import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
-import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -22,20 +23,27 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Importacao
  */
-public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
+public class UniplusDAO extends InterfaceDAO {
 
-    public boolean usaIDInternoBalanca = false;
-    public String idAtacado = "0";
-    public String lojaID;
+    private int prefixoAtacado = 999;
+    private String complemento = "";
+    private boolean forcarIdProdutoQuandoPesavel = false;
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento != null ? complemento.trim() : "";
+    }
+    
+    public void setPrefixoAtacado(int prefixoAtacado) {
+        this.prefixoAtacado = prefixoAtacado;
+    }
+
+    public void setForcarIdProdutoQuandoPesavel(boolean forcarIdProdutoQuandoPesavel) {
+        this.forcarIdProdutoQuandoPesavel = forcarIdProdutoQuandoPesavel;
+    }
     
     @Override
     public String getSistema() {
-       return "Uniplus" + lojaID;
-    }
-
-    @Override
-    public List<MapaTributoIMP> getTributacao() throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       return "Uniplus" + ("".equals(this.complemento) ? "" : " - " + this.complemento);
     }
     
     public List<Estabelecimento> getLojas() throws Exception {
@@ -55,6 +63,40 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         
         return result;
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet(Arrays.asList(new OpcaoProduto[]{
+            OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+            OpcaoProduto.MERCADOLOGICO,
+            OpcaoProduto.MERCADOLOGICO_PRODUTO,
+            OpcaoProduto.PRODUTOS,
+            OpcaoProduto.ATIVO,
+            OpcaoProduto.DESC_COMPLETA,
+            OpcaoProduto.DESC_GONDOLA,
+            OpcaoProduto.DESC_REDUZIDA,
+            OpcaoProduto.DATA_CADASTRO,
+            OpcaoProduto.EAN,
+            OpcaoProduto.EAN_EM_BRANCO,
+            OpcaoProduto.TIPO_EMBALAGEM_EAN,
+            OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.CUSTO,
+            OpcaoProduto.CUSTO_COM_IMPOSTO,
+            OpcaoProduto.CUSTO_SEM_IMPOSTO,
+            OpcaoProduto.MARGEM,
+            OpcaoProduto.PRECO,
+            OpcaoProduto.ESTOQUE_MAXIMO,
+            OpcaoProduto.ESTOQUE_MINIMO,
+            OpcaoProduto.ESTOQUE,
+            OpcaoProduto.PESAVEL,
+            OpcaoProduto.NCM,
+            OpcaoProduto.CEST,
+            OpcaoProduto.ICMS,
+            OpcaoProduto.PIS_COFINS,
+            OpcaoProduto.NATUREZA_RECEITA,
+            OpcaoProduto.ATACADO
+        }));
     }
     
     @Override
@@ -159,7 +201,7 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setEan(rs.getString("ean"));
                         }
                     }
-                    if(usaIDInternoBalanca) {
+                    if(forcarIdProdutoQuandoPesavel) {
                         if(rs.getInt("pesavel") == 1) {
                             imp.setEan(imp.getImportId());
                         }
@@ -168,7 +210,7 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
-                    imp.seteBalanca(rs.getInt("pesavel") == 1 ? true : false);
+                    imp.seteBalanca((rs.getInt("pesavel") == 1));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
@@ -199,38 +241,6 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
     
-    /*Modificado a quantidade do atacado para importação especifica
-    @Override
-    public List<ProdutoIMP> getEANs() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select \n" +
-                    "	codigo,\n" +
-                    "	precopauta1,\n" +
-                    "	10 quantidadepauta1\n" +
-                    "from\n" +
-                    "	produto\n" +
-                    "where\n" +
-                    "	precopauta1 != 0\n"
-            )) {
-                while (rst.next()) {
-
-                    int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("codigo"));
-
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("codigo"));
-                    imp.setEan(idAtacado + String.valueOf(codigoAtual));
-                    imp.setQtdEmbalagem(rst.getInt("quantidadepauta1"));
-                    result.add(imp);
-                }
-            }
-            return result;
-        }
-    }*/
-    
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
 
@@ -257,7 +267,7 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("codigo"));
-                        imp.setEan(idAtacado + String.valueOf(codigoAtual));
+                        imp.setEan(prefixoAtacado + String.valueOf(codigoAtual));
                         imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                         imp.setAtacadoPreco(rst.getDouble("precoatacado"));
                         imp.setPrecovenda(rst.getDouble("preco"));
@@ -419,7 +429,7 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.addContato("Email", null, null, TipoContato.COMERCIAL, rs.getString("email"));
                     }
                     imp.setDatacadastro(rs.getDate("datacadastro"));
-                    imp.setAtivo(rs.getInt("inativo") == 0 ? true : false);
+                    imp.setAtivo((rs.getInt("inativo") == 0));
                     
                     result.add(imp);
                 }
@@ -490,7 +500,7 @@ public class UniplusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataNascimento(rs.getDate("nascimento"));
                     imp.setValorLimite(rs.getDouble("limitecredito"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
-                    imp.setAtivo(rs.getInt("inativo") == 0 ? true : false);
+                    imp.setAtivo((rs.getInt("inativo") == 0));
                     
                     result.add(imp);
                 }

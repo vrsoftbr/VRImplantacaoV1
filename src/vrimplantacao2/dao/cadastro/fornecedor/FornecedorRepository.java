@@ -496,7 +496,7 @@ public class FornecedorRepository {
         vo.setInscricaoMunicipal(imp.getInsc_municipal());
         vo.setInscricaoSuframa(imp.getSuframa());
         vo.setSituacaoCadastro(imp.isAtivo() ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-        vo.setBloqueado(!imp.isAtivo());
+        vo.setBloqueado(imp.isBloqueado());
         vo.setTelefone(imp.getTel_principal());
         vo.setPedidoMinimoQtd(imp.getQtd_minima_pedido());
         vo.setPedidoMinimoValor(imp.getValor_minimo_pedido());

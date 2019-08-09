@@ -422,7 +422,7 @@ public class AcomDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
                     "	p.Pes_cod6 id,\n" +
-                    "	coalesce(p.Pes_cnpj, p.Pes_cpf) cnpjcpf,\n" +
+                    "	case when p.Pes_cnpj = '' then p.Pes_cpf else p.Pes_cnpj end cnpjcpf,\n" +
                     "	p.Pes_nome45 razaosocial,\n" +
                     "	p.Pes_natural nomefantasia,\n" +
                     "	coalesce(p.Pes_ie, p.Pes_rg) ie_rg,\n" +
@@ -483,6 +483,9 @@ public class AcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     imp.setId(rst.getString("id"));
                     imp.setCnpj(rst.getString("cnpjcpf"));
+                    if(imp.getCnpj() == null || "".equals(imp.getCnpj())) {
+                        imp.setCnpj(imp.getId());
+                    }
                     imp.setRazao(rst.getString("razaosocial"));
                     imp.setFantasia(rst.getString("nomefantasia"));
                     imp.setInscricaoestadual(rst.getString("ie_rg"));
