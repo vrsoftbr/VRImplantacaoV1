@@ -443,7 +443,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    f.num_cgc cnpj,\n" +
                     "    f.num_insc_est ie,\n" +
                     "    f.flg_simples,\n" +
-                    "    case bloq.flg_bloqueado when 'S' then 0 else 1 end bloqueado,\n" +
+                    "    case bloq.flg_bloqueado when 'S' then 1 else 0 end bloqueado,\n" +
                     "    f.des_endereco endereco,\n" +
                     "    f.num_endereco numero,\n" +
                     "    f.des_bairro bairro,\n" +
