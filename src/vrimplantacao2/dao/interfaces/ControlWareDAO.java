@@ -4,15 +4,13 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoPostgres;
-import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
-import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -20,11 +18,34 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Importacao
  */
-public class ControlWareDAO extends InterfaceDAO {
+public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider {
+    
+    public String complemento = "";
 
     @Override
     public String getSistema() {
-        return "ControlWare";
+        return "ControlWare" + complemento;
+    }
+    
+    
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	codcf id,\n" +
+                    "	descricao\n" +
+                    "from\n" +
+                    "	classfiscal\n" +
+                    "order by\n" +
+                    "	id")) {
+                while(rs.next()) {
+                    result.add(new MapaTributoIMP(rs.getString("id"), rs.getString("descricao")));
+                }
+            }
+        }
+        return result;
     }
     
     public List<Estabelecimento> getLojaCliente() throws Exception {
@@ -56,7 +77,7 @@ public class ControlWareDAO extends InterfaceDAO {
                     "	sgr.descricao merc3\n" +
                     "from\n" +
                     "	departamento dep\n" +
-                    "	left join grupoprod grp on dep.coddepto = grp.codgrupo\n" +
+                    "	left join grupoprod grp on dep.coddepto = grp.coddepto\n" +
                     "	left join subgrupo sgr on grp.codgrupo = sgr.codgrupo\n" +
                     "order by\n" +
                     "	id_merc1,\n" +
