@@ -74,6 +74,7 @@ public class UniplusDAO extends InterfaceDAO {
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet(Arrays.asList(new OpcaoProduto[]{
             OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+            OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
             OpcaoProduto.MERCADOLOGICO,
             OpcaoProduto.MERCADOLOGICO_PRODUTO,
             OpcaoProduto.PRODUTOS,
