@@ -5,17 +5,22 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
+import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -32,6 +37,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class RPInfoDAO extends InterfaceDAO {
 
     public boolean importarFuncionario = false;
+    public boolean gerarCodigoAtacado = true;
+    public int idLojaVR = 1;
 
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
@@ -57,9 +64,7 @@ public class RPInfoDAO extends InterfaceDAO {
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(new OpcaoProduto[]{
-            OpcaoProduto.MERCADOLOGICO,
-            OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
-            OpcaoProduto.MERCADOLOGICO_PRODUTO,
+            OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
             OpcaoProduto.FAMILIA_PRODUTO,
             OpcaoProduto.FAMILIA,
             OpcaoProduto.IMPORTAR_MANTER_BALANCA,
@@ -89,10 +94,107 @@ public class RPInfoDAO extends InterfaceDAO {
             OpcaoProduto.DESCONTINUADO,
             OpcaoProduto.PESAVEL,
             OpcaoProduto.ICMS,
-            OpcaoProduto.PIS_COFINS
+            OpcaoProduto.PIS_COFINS,
+            OpcaoProduto.ATACADO
         }));
     }
+    
+    @Override
+    public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
+        Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
 
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "grup_classificacao merc1, \n"
+                    + "grup_descricao merc1_desc\n"
+                    + "from grupos\n"
+                    + "where char_length(grup_classificacao) <= 2\n"
+                    + "order by grup_classificacao"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP imp = new MercadologicoNivelIMP();
+                    imp.setId(rst.getString("merc1"));
+                    imp.setDescricao(rst.getString("merc1_desc"));
+                    merc.put(imp.getId(), imp);
+                }
+            }
+
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "substring(grup_classificacao, 1, 1) merc1, \n"
+                    + "substring(grup_classificacao, 2, 2) merc2, \n"
+                    + "grup_descricao merc2_desc\n"
+                    + "from grupos\n"
+                    + "where char_length(grup_classificacao) = 3\n"
+                    + "order by grup_classificacao"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP merc1 = merc.get(rst.getString("merc1"));
+                    if (merc1 != null) {
+                        merc1.addFilho(
+                                rst.getString("merc2"),
+                                rst.getString("merc2_desc")
+                        );
+                    }
+                }
+            }
+
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "substring(grup_classificacao, 1, 1) merc1, \n"
+                    + "substring(grup_classificacao, 2, 2) merc2, \n"
+                    + "substring(grup_classificacao, 4, 2) merc3,\n"
+                    + "grup_descricao merc3_desc\n"
+                    + "from grupos\n"
+                    + "where char_length(grup_classificacao) = 5\n"
+                    + "order by grup_classificacao"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP merc1 = merc.get(rst.getString("merc1"));
+                    if (merc1 != null) {
+                        MercadologicoNivelIMP merc2 = merc1.getNiveis().get(rst.getString("merc2"));
+                        if (merc2 != null) {
+                            merc2.addFilho(
+                                    rst.getString("merc3"),
+                                    rst.getString("merc3_desc")
+                            );
+                        }
+                    }
+                }
+            }
+
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "substring(grup_classificacao, 1, 1) merc1, \n"
+                    + "substring(grup_classificacao, 2, 2) merc2, \n"
+                    + "substring(grup_classificacao, 4, 2) merc3,\n"
+                    + "substring(grup_classificacao, 6, 2) merc4,\n"
+                    + "grup_descricao merc4_desc\n"
+                    + "from grupos\n"
+                    + "where char_length(grup_classificacao) = 7\n"
+                    + "order by grup_classificacao"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP merc1 = merc.get(rst.getString("merc1"));
+                    if (merc1 != null) {
+                        MercadologicoNivelIMP merc2 = merc1.getNiveis().get(rst.getString("merc2"));
+                        if (merc2 != null) {
+                            MercadologicoNivelIMP merc3 = merc2.getNiveis().get(rst.getString("merc3"));
+                            if (merc3 != null) {
+                                merc3.addFilho(
+                                        rst.getString("merc4"),
+                                        rst.getString("merc4_desc")
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return new ArrayList<>(merc.values());
+    }
+    
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -146,29 +248,63 @@ public class RPInfoDAO extends InterfaceDAO {
 
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getEANs() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	cbal_prod_codigo id,\n" +
-                    "	cbal_prod_codbarras ean,\n" +
-                    "	null unidade,\n" +
-                    "	coalesce(nullif(cbalt.cbal_fatoremb,0),1) qtdembalagem\n" +
-                    "from\n" +
-                    "	cbalt")) {
-                while(rs.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rs.getString("id"));
-                    imp.setEan(rs.getString("ean"));
-                    imp.setTipoEmbalagem("UN");
-                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    
-                    result.add(imp);
+
+        if (!gerarCodigoAtacado) {
+            try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select\n"
+                        + "	cbal_prod_codigo id,\n"
+                        + "	cbal_prod_codbarras ean,\n"
+                        + "	null unidade,\n"
+                        + "	coalesce(nullif(cbalt.cbal_fatoremb,0),1) qtdembalagem\n"
+                        + "from\n"
+                        + "	cbalt")) {
+                    while (rs.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rs.getString("id"));
+                        imp.setEan(rs.getString("ean"));
+                        imp.setTipoEmbalagem("UN");
+                        imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+
+                        result.add(imp);
+                    }
+                }
+            }
+        } else {
+            try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "prun_prod_codigo,\n"
+                        + "prun_prvenda,\n"
+                        + "prun_fatorpr3,\n"
+                        + "prun_prvenda3,\n"
+                        + "prun_emb\n"
+                        + "from produn \n"
+                        + "where prun_unid_codigo = '" + getLojaOrigem() + "'\n"
+                        + "and prun_fatorpr3 > 1\n"
+                        + "and prun_prvenda3 > 0"
+                )) {
+                    while (rst.next()) {
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("prun_prod_codigo"));
+
+                        if (codigoAtual > 0) {
+
+                            ProdutoIMP imp = new ProdutoIMP();
+                            imp.setImportLoja(getLojaOrigem());
+                            imp.setImportSistema(getSistema());
+                            imp.setImportId(rst.getString("prun_prod_codigo"));
+                            imp.setEan(String.valueOf(idLojaVR) + "99999" + String.valueOf(codigoAtual));
+                            imp.setTipoEmbalagem(rst.getString("prun_emb"));
+                            imp.setQtdEmbalagem(rst.getInt("prun_fatorpr3"));
+                            result.add(imp);
+                        }
+                    }
                 }
             }
         }
@@ -279,23 +415,9 @@ public class RPInfoDAO extends InterfaceDAO {
                     //imp.seteBalanca(rst.getBoolean("e_balanca"));
                     imp.setTipoEmbalagem(rst.getString("unidade"));
                     imp.setValidade(rst.getInt("validade"));
-                    
-                    if ((rst.getString("descricaocompleta") != null) &&
-                            (!rst.getString("descricaocompleta").trim().isEmpty())) {
-                        imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                        imp.setDescricaoGondola(rst.getString("descricaocompleta"));
-                    } else {
-                        imp.setDescricaoCompleta(rst.getString("descricaoreduzida"));
-                        imp.setDescricaoGondola(rst.getString("descricaoreduzida"));
-                    }
-                    
-                    if ((rst.getString("descricaoreduzida") != null) &&
-                            (!rst.getString("descricaoreduzida").trim().isEmpty())) {
-                        imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
-                    } else {
-                        imp.setDescricaoReduzida(rst.getString("descricaocompleta"));
-                    }
-                    
+                    imp.setDescricaoCompleta(rst.getString("descricaoreduzida"));
+                    imp.setDescricaoGondola(rst.getString("descricaoreduzida"));
+                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
@@ -326,6 +448,49 @@ public class RPInfoDAO extends InterfaceDAO {
         return result;
     }
 
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        if (opt == OpcaoProduto.ATACADO) {
+            try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "prun_prod_codigo,\n"
+                        + "prun_prvenda,\n"
+                        + "prun_fatorpr3,\n"
+                        + "prun_prvenda3,\n"
+                        + "prun_emb\n"
+                        + "from produn \n"
+                        + "where prun_unid_codigo = '" + getLojaOrigem() + "'\n"
+                        + "and prun_fatorpr3 > 1\n"
+                        + "and prun_prvenda3 > 0"
+                )) {
+                    while (rst.next()) {
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("prun_prod_codigo"));
+
+                        if (codigoAtual > 0) {
+
+                            ProdutoIMP imp = new ProdutoIMP();
+                            imp.setImportLoja(getLojaOrigem());
+                            imp.setImportSistema(getSistema());
+                            imp.setImportId(rst.getString("prun_prod_codigo"));
+                            imp.setEan(String.valueOf(idLojaVR) + "99999" + String.valueOf(codigoAtual));
+                            imp.setTipoEmbalagem(rst.getString("prun_emb"));
+                            imp.setQtdEmbalagem(rst.getInt("prun_fatorpr3"));
+                            imp.setPrecovenda(rst.getDouble("prun_prvenda"));
+                            imp.setAtacadoPreco(rst.getDouble("prun_prvenda3"));
+                            result.add(imp);
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+        
+        return null;
+    }
+    
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -478,13 +643,13 @@ public class RPInfoDAO extends InterfaceDAO {
                     + "	c.clie_dtadmissao dataadmissao,\n"
                     + "	c.clie_funcao cargo,\n"
                     + "	c.clie_rendacomprovada renda,\n"
-                    + "	c.clie_limiteconv limite,\n"
+                    + "	c.clie_limiteconv,\n"
+                    + "c.clie_limitecheque,\n"
                     + "	c.clie_obs observacao,\n"
                     + "	c.clie_diavenc diavencimento,\n"
                     + "	c.clie_sitconv permitecreditorotativo,\n"
                     + "	c.clie_sitcheque permitecheque,\n"
-                    + "	c.clie_senhapdv senhapdv,\n"
-                    + "	c.clie_limitetotalcdc limite\n"
+                    + "	c.clie_senhapdv senhapdv\n"
                     + "from\n"
                     + "	clientes c\n"
                     + "	left join municipios mr on\n"
@@ -534,13 +699,13 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setDataAdmissao(rst.getDate("dataadmissao"));
                     imp.setCargo(rst.getString("cargo"));
                     imp.setSalario(rst.getDouble("renda"));
-                    imp.setValorLimite(rst.getDouble("limite"));
+                    imp.setValorLimite(rst.getDouble("clie_limiteconv") == 0 ? rst.getDouble("clie_limitecheque") : rst.getDouble("clie_limiteconv"));
                     imp.setObservacao2(rst.getString("observacao"));
                     imp.setDiaVencimento(rst.getInt("diavencimento"));
                     imp.setPermiteCreditoRotativo("S".equals(rst.getString("permitecreditorotativo")));
                     imp.setPermiteCheque("S".equals(rst.getString("permitecheque")));
                     imp.setSenha(Integer.valueOf(Utils.formataNumero(rst.getString("senhapdv"))));
-                    imp.setLimiteCompra(rst.getDouble("limite"));
+                    imp.setBloqueado("I".equals(rst.getString("clie_situacao")));
 
                     result.add(imp);
                 }
@@ -736,6 +901,54 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setValor(rs.getDouble("valor"));
                     imp.setNumeroCupom(rs.getString("cupom"));
 
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "pfin_operacao id,\n"
+                    + "pfin_dataemissao emissao,\n"
+                    + "pfin_datavcto vencimento,\n"
+                    + "pfin_pdvs_codigo ecf,\n"
+                    + "pfin_codentidade idcliente,\n"
+                    + "c.clie_razaosocial razao,\n"
+                    + "c.clie_cnpjcpf cnpj,\n"
+                    + "c.clie_rgie as rg,\n"
+                    + "c.clie_foneres as telefone,\n"
+                    + "pfin_complemento observacao,\n"
+                    + "pfin_numerodcto cupom,\n"
+                    + "pfin_parcela parcela,\n"
+                    + "pfin_valor valor\n"
+                    + "from pendfin\n"
+                    + "left join clientes c on (pendfin.pfin_codentidade = c.clie_codigo)\n"
+                    + "where\n"
+                    + "pfin_unid_codigo = '"+getLojaOrigem()+"' \n"
+                    + "and pfin_pr = 'R' \n"
+                    + "and pfin_status = 'P' \n"
+                    + "and pfin_pger_conta in (112501)"
+            )) {
+                while (rst.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setDate(rst.getDate("emissao"));
+                    imp.setDataDeposito(rst.getDate("vencimento"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setNome(rst.getString("razao"));
+                    imp.setCpf(rst.getString("cnpj"));
+                    imp.setRg(rst.getString("rg"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setAlinea(0);
                     result.add(imp);
                 }
             }

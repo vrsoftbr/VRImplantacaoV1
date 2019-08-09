@@ -158,6 +158,7 @@ public class RPInfoGUI extends VRInternalFrame {
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
                     dao.importarFuncionario = chkImportarFuncionario.isSelected();
+                    dao.gerarCodigoAtacado = chkGerarCodigoAtacado.isSelected();
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
@@ -190,6 +191,12 @@ public class RPInfoGUI extends VRInternalFrame {
                             if(chkFTipoFornecedor.isSelected()) {
                                 opcoes.add(OpcaoFornecedor.TIPO_FORNECEDOR);
                             }
+                            if (chkRazaoSocial.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.RAZAO_SOCIAL);
+                            }
+                            if (chkNomeFantasia.isSelected()) {
+                                opcoes.add(OpcaoFornecedor.NOME_FANTASIA);
+                            }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
                             }
@@ -211,6 +218,9 @@ public class RPInfoGUI extends VRInternalFrame {
                         }
                         if(chkCDataNascimento.isSelected()) {
                             importador.atualizarClientePreferencial(OpcaoCliente.DATA_NASCIMENTO);
+                        }
+                        if (chkBloqueado.isSelected()) {
+                            importador.atualizarClientePreferencial(OpcaoCliente.BLOQUEADO);
                         }
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
@@ -283,6 +293,8 @@ public class RPInfoGUI extends VRInternalFrame {
         chkFTipoEmpresa = new vrframework.bean.checkBox.VRCheckBox();
         chkFEmail = new vrframework.bean.checkBox.VRCheckBox();
         chkFTipoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkRazaoSocial = new vrframework.bean.checkBox.VRCheckBox();
+        chkNomeFantasia = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabClienteDados = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -292,6 +304,7 @@ public class RPInfoGUI extends VRInternalFrame {
         chkLimiteCredito = new vrframework.bean.checkBox.VRCheckBox();
         chkCDataNascimento = new vrframework.bean.checkBox.VRCheckBox();
         chkImportarFuncionario = new vrframework.bean.checkBox.VRCheckBox();
+        chkBloqueado = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -300,6 +313,8 @@ public class RPInfoGUI extends VRInternalFrame {
         chkUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         chkReiniciarIDClienteUnif = new vrframework.bean.checkBox.VRCheckBox();
         txtReiniciarIDClienteUnif = new vrframework.bean.textField.VRTextField();
+        vRPanel1 = new vrframework.bean.panel.VRPanel();
+        chkGerarCodigoAtacado = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel2 = new javax.swing.JLabel();
@@ -360,6 +375,10 @@ public class RPInfoGUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkFTipoFornecedor, "Tipo Fornecedor");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkRazaoSocial, "Razão Social");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkNomeFantasia, "Nome Fantasia");
+
         javax.swing.GroupLayout tabImpFornecedorLayout = new javax.swing.GroupLayout(tabImpFornecedor);
         tabImpFornecedor.setLayout(tabImpFornecedorLayout);
         tabImpFornecedorLayout.setHorizontalGroup(
@@ -375,7 +394,9 @@ public class RPInfoGUI extends VRInternalFrame {
                     .addComponent(chkFCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFTipoEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkFTipoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkFTipoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkRazaoSocial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkNomeFantasia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(289, Short.MAX_VALUE))
         );
         tabImpFornecedorLayout.setVerticalGroup(
@@ -396,7 +417,11 @@ public class RPInfoGUI extends VRInternalFrame {
                 .addComponent(chkFEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkFTipoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(115, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkRazaoSocial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkNomeFantasia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(69, Short.MAX_VALUE))
         );
 
         tabParametros.addTab("Fornecedores", tabImpFornecedor);
@@ -447,6 +472,8 @@ public class RPInfoGUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkImportarFuncionario, "Importar Funcionário junto com cliente");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkBloqueado, "Bloqueado");
+
         javax.swing.GroupLayout tabClienteDadosLayout = new javax.swing.GroupLayout(tabClienteDados);
         tabClienteDados.setLayout(tabClienteDadosLayout);
         tabClienteDadosLayout.setHorizontalGroup(
@@ -464,7 +491,8 @@ public class RPInfoGUI extends VRInternalFrame {
                         .addComponent(chkImportarFuncionario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkLimiteCredito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkLimiteCredito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(156, Short.MAX_VALUE))
         );
         tabClienteDadosLayout.setVerticalGroup(
@@ -484,7 +512,9 @@ public class RPInfoGUI extends VRInternalFrame {
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkLimiteCredito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(110, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(87, Short.MAX_VALUE))
         );
 
         tabClientes.addTab("Descrição", tabClienteDados);
@@ -552,6 +582,27 @@ public class RPInfoGUI extends VRInternalFrame {
         );
 
         tabs.addTab("Unificação", vRPanel2);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkGerarCodigoAtacado, "Gerar Código de Atacado");
+
+        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
+        vRPanel1.setLayout(vRPanel1Layout);
+        vRPanel1Layout.setHorizontalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkGerarCodigoAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(349, Short.MAX_VALUE))
+        );
+        vRPanel1Layout.setVerticalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkGerarCodigoAtacado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(258, Short.MAX_VALUE))
+        );
+
+        tabs.addTab("Parametros Extras", vRPanel1);
 
         btnMigrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/importar.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(btnMigrar, "Migrar");
@@ -684,6 +735,7 @@ public class RPInfoGUI extends VRInternalFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkBloqueado;
     private vrframework.bean.checkBox.VRCheckBox chkCDataNascimento;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
@@ -695,9 +747,12 @@ public class RPInfoGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFTipoEmpresa;
     private vrframework.bean.checkBox.VRCheckBox chkFTipoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkGerarCodigoAtacado;
     private vrframework.bean.checkBox.VRCheckBox chkImportarFuncionario;
     private vrframework.bean.checkBox.VRCheckBox chkLimiteCredito;
+    private vrframework.bean.checkBox.VRCheckBox chkNomeFantasia;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkRazaoSocial;
     private vrframework.bean.checkBox.VRCheckBox chkReiniciarIDClienteUnif;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
@@ -716,6 +771,7 @@ public class RPInfoGUI extends VRInternalFrame {
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
     private vrframework.bean.textField.VRTextField txtReiniciarIDClienteUnif;
+    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     // End of variables declaration//GEN-END:variables

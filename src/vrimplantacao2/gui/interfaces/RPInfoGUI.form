@@ -131,6 +131,8 @@
                               <Component id="chkFTipoEmpresa" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFEmail" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFTipoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkRazaoSocial" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkNomeFantasia" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="289" max="32767" attributes="0"/>
                       </Group>
@@ -156,7 +158,11 @@
                           <Component id="chkFEmail" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkFTipoFornecedor" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="115" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkRazaoSocial" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkNomeFantasia" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="69" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -227,6 +233,16 @@
                     <Property name="text" type="java.lang.String" value="Tipo Fornecedor"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkRazaoSocial">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Raz&#xe3;o Social"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNomeFantasia">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Nome Fantasia"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="tabClientes">
@@ -275,6 +291,7 @@
                                   <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="chkLimiteCredito" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkBloqueado" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace pref="156" max="32767" attributes="0"/>
                           </Group>
@@ -299,7 +316,9 @@
                               <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkLimiteCredito" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="110" max="32767" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="chkBloqueado" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace pref="87" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -368,6 +387,11 @@
                     <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkImportarFuncionario">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Importar Funcion&#xe1;rio junto com cliente"/>
+                      </Properties>
+                    </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkBloqueado">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Bloqueado"/>
                       </Properties>
                     </Component>
                   </SubComponents>
@@ -469,6 +493,43 @@
             <Component class="vrframework.bean.textField.VRTextField" name="txtReiniciarIDClienteUnif">
               <Properties>
                 <Property name="mascara" type="java.lang.String" value="Numero"/>
+              </Properties>
+            </Component>
+          </SubComponents>
+        </Container>
+        <Container class="vrframework.bean.panel.VRPanel" name="vRPanel1">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Parametros Extras">
+                <Property name="tabTitle" type="java.lang.String" value="Parametros Extras"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="chkGerarCodigoAtacado" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="349" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="chkGerarCodigoAtacado" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="258" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkGerarCodigoAtacado">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Gerar C&#xf3;digo de Atacado"/>
               </Properties>
             </Component>
           </SubComponents>

@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Date;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,13 +20,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import vrimplantacao.classe.file.ArquivoLeitura;
-import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -36,6 +38,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class SIMSDAO extends InterfaceDAO {
 
+    private String ASSOCIACAOFile;
+    private String MERELOFile;
     private String MERFile;
     private String CBMERFile;
     private String NIVE1File;
@@ -44,7 +48,20 @@ public class SIMSDAO extends InterfaceDAO {
     private String NIVE4File;
     private String CLIENTEFile;
     private String FORNECEDORFile;
+    private String CRVOUCH1File;
 
+    public void setCRVOUCH1File(String CRVOUCH1File) {
+        this.CRVOUCH1File = CRVOUCH1File;
+    }
+    
+    public void setASSOCIACAOFile(String ASSOCIACAOFile) {
+        this.ASSOCIACAOFile = ASSOCIACAOFile;
+    }
+
+    public void setMERELEFile(String MERELOFile) {
+        this.MERELOFile = MERELOFile;
+    }
+    
     public void setMERFile(String MERFile) {
         this.MERFile = MERFile;
     }
@@ -80,6 +97,25 @@ public class SIMSDAO extends InterfaceDAO {
     @Override
     public String getSistema() {
         return "SIMS";
+    }
+
+    @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+
+        for (List<String> familia : carregarASSOCIACAO()) {
+
+            String codigo = familia.get(0);
+            String descricao = familia.get(1);
+
+            FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+            imp.setImportLoja(getLojaOrigem());
+            imp.setImportSistema(getSistema());
+            imp.setImportId(codigo);
+            imp.setDescricao(descricao);
+            result.add(imp);
+        }
+        return result;
     }
 
     @Override
@@ -151,7 +187,6 @@ public class SIMSDAO extends InterfaceDAO {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
         for (List<String> prod : carregarMER()) {
 
             String id = prod.get(0);
@@ -173,6 +208,8 @@ public class SIMSDAO extends InterfaceDAO {
             double estoque = prod.get(13) == null || prod.get(13).trim().isEmpty() ? 0 : Double.parseDouble(prod.get(13));
             String piscofins = prod.get(65);
             int aliqPdv = prod.get(7) != null || !prod.get(7).trim().isEmpty() ? Utils.stringToInt(prod.get(7)) : -2;
+            String aliq = prod.get(8);
+            String redu = prod.get(9);
             String merc1 = prod.get(4);
             String merc2 = prod.get(68);
             String merc3 = prod.get(69);
@@ -196,39 +233,17 @@ public class SIMSDAO extends InterfaceDAO {
                     && (!ean.trim().isEmpty())) {
 
                 ProdutoIMP imp = new ProdutoIMP();
-                //ProdutoBalancaVO produtoBalanca;
                 imp.setImportLoja(getLojaOrigem());
                 imp.setImportSistema(getSistema());
-                imp.setImportId(id);
-                imp.setEan(ean);
 
-                /*if ((imp.getEan() != null)
-                 && (!imp.getEan().trim().isEmpty())) {
+                if (eBalanca) {
+                    imp.setImportId(id + "-" + ean);
+                    imp.setEan(ean);
+                } else {
+                    imp.setImportId(id);
+                    imp.setEan(ean);
+                }
 
-                 long codigoProduto;
-                 codigoProduto = Long.parseLong(imp.getEan());
-                 if (codigoProduto <= 999999) {
-                 if (codigoProduto <= Integer.MAX_VALUE) {
-                 produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                 } else {
-                 produtoBalanca = null;
-                 }
-
-                 if (produtoBalanca != null) {
-                 imp.seteBalanca(true);
-                 imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : Utils.stringToInt(prod.get(106)));
-                 } else {
-                 imp.setValidade(0);
-                 imp.seteBalanca(false);
-                 }
-                 } else {
-                 imp.setValidade(Utils.stringToInt(prod.get(106)));
-                 imp.seteBalanca(false);
-                 }
-                 } else {
-                 imp.setValidade(Utils.stringToInt(prod.get(106)));
-                 imp.seteBalanca(false);
-                 }*/
                 imp.seteBalanca(eBalanca);
                 imp.setTipoEmbalagem(tipoEmbalagem);
                 imp.setValidade(validade);
@@ -284,7 +299,7 @@ public class SIMSDAO extends InterfaceDAO {
                     imp.setPiscofinsCstCredito(71);
                 }
 
-                if (aliqPdv == 2) {
+                if (aliqPdv == 3) {
                     imp.setIcmsCst(51);
                     imp.setIcmsAliq(0);
                     imp.setIcmsReducao(0);
@@ -296,32 +311,65 @@ public class SIMSDAO extends InterfaceDAO {
                     imp.setIcmsCst(40);
                     imp.setIcmsAliq(0);
                     imp.setIcmsReducao(0);
-                } else if (aliqPdv == 0) {
-                    imp.setIcmsCst(0);
-                    imp.setIcmsAliq(18);
-                    imp.setIcmsReducao(0);
-                } else if (aliqPdv == 7) {
-                    imp.setIcmsCst(0);
-                    imp.setIcmsAliq(7);
-                    imp.setIcmsReducao(0);
-                } else if (aliqPdv == 8) {
-                    imp.setIcmsCst(0);
-                    imp.setIcmsAliq(25);
-                    imp.setIcmsReducao(0);
-                } else if (aliqPdv == 9) {
-                    imp.setIcmsCst(0);
-                    imp.setIcmsAliq(12);
-                    imp.setIcmsReducao(0);
                 } else {
-                    imp.setIcmsCst(40);
-                    imp.setIcmsAliq(0);
-                    imp.setIcmsReducao(0);
-                }
 
+                    if ((redu != null)
+                            && (!redu.trim().isEmpty())) {
+
+                        if (Double.parseDouble(redu) > 0) {
+                            imp.setIcmsCst(20);
+                            imp.setIcmsReducao(Double.parseDouble(redu));
+                        } else {
+                            imp.setIcmsCst(0);
+                            imp.setIcmsReducao(0);
+                        }
+                    } else {
+                        imp.setIcmsCst(0);
+                        imp.setIcmsReducao(0);
+                    }
+
+                    if ("070".equals(aliq)) {
+                        imp.setIcmsAliq(7);
+                    } else if ("120".equals(aliq)) {
+                        imp.setIcmsAliq(12);
+                    } else if ("180".equals(aliq)) {
+                        imp.setIcmsAliq(18);
+                    } else if ("250".equals(aliq)) {
+                        imp.setIcmsAliq(25);
+                    } else if ("110".equals(aliq)) {
+                        imp.setIcmsAliq(11);
+                    } else if ("040".equals(aliq)) {
+                        imp.setIcmsAliq(4);
+                    } else if ("045".equals(aliq)) {
+                        imp.setIcmsAliq(4.5);
+                    }
+                }
                 result.add(imp);
             }
         }
         return result;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        if (opt == OpcaoProduto.FAMILIA) {
+            for (List<String> prod : carregarMERELO()) {
+                
+                String codProd = prod.get(0);
+                String codFam = prod.get(1);
+                
+                ProdutoIMP imp = new ProdutoIMP();
+                imp.setImportLoja(getLojaOrigem());
+                imp.setImportSistema(getSistema());
+                imp.setImportId(codProd);
+                imp.setIdFamiliaProduto(codFam);
+                result.add(imp);
+            }
+            return result;
+        }        
+        return null;
     }
 
     @Override
@@ -405,8 +453,9 @@ public class SIMSDAO extends InterfaceDAO {
             imp.setRazao(rst.get(1));
             imp.setFantasia(imp.getRazao());
             imp.setCnpj(rst.get(2));
-            imp.setInscricaoestadual(rst.get(3));
+            imp.setInscricaoestadual(rst.get(4));
             imp.setEndereco((rst.get(19) + " " + rst.get(20)).trim());
+            imp.setNumero(rst.get(51));
             imp.setComplemento(rst.get(21));
             imp.setCep(rst.get(25));
             imp.setBairro(rst.get(22));
@@ -419,12 +468,20 @@ public class SIMSDAO extends InterfaceDAO {
                 dataCadastro = new Date(new java.util.Date().getTime());
             }
             imp.setDataCadastro(dataCadastro);
-            imp.setTelefone(rst.get(4));
+            imp.setTelefone(rst.get(8));
             imp.setFax(rst.get(12));
             imp.setEmail(rst.get(48));
             imp.setCelular(rst.get(9));
             imp.setValorLimite(Utils.stringToDouble(rst.get(16)));
             imp.setBloqueado(Utils.acertarTexto(rst.get(13)).startsWith("5"));
+            
+            if (imp.isBloqueado()) {
+                imp.setPermiteCheque(false);
+                imp.setPermiteCreditoRotativo(false);
+            } else {
+                imp.setPermiteCheque(true);
+                imp.setPermiteCreditoRotativo(true);
+            }
 
             Date dataNasc;
             try {
@@ -448,6 +505,43 @@ public class SIMSDAO extends InterfaceDAO {
             }
             result.add(imp);
         }
+        return result;
+    }
+    
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        DateFormat fmt = new SimpleDateFormat("dd/MM/yyyy");
+        java.sql.Date dtEmissao, dtVencimento;
+        
+        for (List<String> rst : carregarCRVOUCH1()) {
+            String id = rst.get(0);
+            String idCliente = Utils.formataNumero(rst.get(1));
+            String numeroCupom = rst.get(2);
+            String emissao = rst.get(3);
+            String venvimento = rst.get(4);
+            Double valor = Double.parseDouble(rst.get(6).replace(".", "").replace(",", "."));
+            String pagto = rst.get(8);
+            
+            System.out.println(idCliente);
+            
+            if ((pagto == null) ||
+                    (pagto.trim().isEmpty())) {
+                
+                dtEmissao = new java.sql.Date(fmt.parse(emissao).getTime());
+                dtVencimento = new java.sql.Date(fmt.parse(venvimento).getTime());
+                
+                CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                imp.setId(id);
+                imp.setIdCliente(idCliente);
+                imp.setNumeroCupom(numeroCupom);
+                imp.setValor(valor);
+                imp.setDataEmissao(dtEmissao);
+                imp.setDataVencimento(dtVencimento);
+                result.add(imp);
+            }
+        }
+        
         return result;
     }
 
@@ -521,7 +615,100 @@ public class SIMSDAO extends InterfaceDAO {
         }
         return result;
     }
+
+    private List<List<String>> carregarASSOCIACAO() throws Exception {
+        List<List<String>> result = new ArrayList<>();
+
+        File f = new File(this.ASSOCIACAOFile);
+        try (FileReader fr = new FileReader(f)) {
+            try (BufferedReader br = new BufferedReader(fr)) {
+                Long recordId = null;
+
+                for (String linha = br.readLine(); linha != null; linha = br.readLine()) {
+                    if (linha.startsWith("^ASSOCIACAO")) {
+                        recordId = Long.parseLong(getId(linha)[0]);
+                    } else {
+                        List<String> familia = new ArrayList<>(Arrays.asList(linha.split("\\^")));
+                        familia.add(0, String.valueOf(recordId));
+
+                        if (familia.size() < 20) {
+                            int cont = 20 - familia.size();
+                            while (cont > 0) {
+                                familia.add("");
+                                cont--;
+                            }
+                        }
+                        result.add(familia);
+                    }
+                }
+            }
+        }
+        return result;
+    }
     
+    private List<List<String>> carregarCRVOUCH1() throws Exception {
+        List<List<String>> result = new ArrayList<>();
+        
+        File f = new File(this.CRVOUCH1File);
+        try (FileReader fr = new FileReader(f)) {
+            try (BufferedReader br = new BufferedReader(fr)) {
+                Long recordId = null;
+                
+                for (String linha = br.readLine(); linha != null; linha = br.readLine()) {
+                    if (linha.startsWith("VOUCH")) {
+                        recordId = Long.parseLong(Utils.formataNumero(getId(linha)[0]));
+                    } else {
+                        List<String> contReceber = new ArrayList<>(Arrays.asList(linha.split("\\^")));
+
+                        if (!linha.startsWith("^")) {
+                            contReceber.add(0, String.valueOf(recordId));
+
+                            if (contReceber.size() < 20) {
+                                int cont = 60 - contReceber.size();
+                                while (cont > 0) {
+                                    contReceber.add("");
+                                    cont--;
+                                }
+                            }
+                            result.add(contReceber);
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    
+    private List<List<String>> carregarMERELO() throws Exception {
+        List<List<String>> result = new ArrayList<>();
+
+        File f = new File(this.MERELOFile);
+        try (FileReader fr = new FileReader(f)) {
+            try (BufferedReader br = new BufferedReader(fr)) {
+                Long recordId = null;
+
+                for (String linha = br.readLine(); linha != null; linha = br.readLine()) {
+                    if (linha.startsWith("^MERELO")) {
+                        recordId = Long.parseLong(getId(linha)[0]);
+                    } else {
+                        List<String> prodFamilia = new ArrayList<>(Arrays.asList(linha.split("\\^")));
+                        prodFamilia.add(0, String.valueOf(recordId));
+
+                        if (prodFamilia.size() < 20) {
+                            int cont = 20 - prodFamilia.size();
+                            while (cont > 0) {
+                                prodFamilia.add("");
+                                cont--;
+                            }
+                        }
+                        result.add(prodFamilia);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
     private List<List<String>> carregarMER() throws Exception {
         List<List<String>> result = new ArrayList<>();
 
