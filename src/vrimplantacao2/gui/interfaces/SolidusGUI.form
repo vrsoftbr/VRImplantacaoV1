@@ -219,6 +219,8 @@
                               <Component id="chkFContatos" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFCnpj" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFTipoEmpresa" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFSituacaoCadastro" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkFBloqueado" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="289" max="32767" attributes="0"/>
                       </Group>
@@ -237,10 +239,14 @@
                                   <Component id="chkFCnpj" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkFTipoEmpresa" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkFSituacaoCadastro" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkFBloqueado" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="82" max="32767" attributes="0"/>
+                          <EmptySpace pref="40" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -299,6 +305,28 @@
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFTipoEmpresaActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFSituacaoCadastro">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Situa&#xe7;&#xe3;o Cadastro"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
+                    </Property>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFSituacaoCadastroActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkFBloqueado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Bloqueado"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
+                    </Property>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFBloqueadoActionPerformed"/>
                   </Events>
                 </Component>
               </SubComponents>
