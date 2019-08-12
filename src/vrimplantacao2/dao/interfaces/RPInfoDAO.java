@@ -65,6 +65,8 @@ public class RPInfoDAO extends InterfaceDAO {
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(new OpcaoProduto[]{
             OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+            OpcaoProduto.MERCADOLOGICO_PRODUTO,
+            OpcaoProduto.MERCADOLOGICO,
             OpcaoProduto.FAMILIA_PRODUTO,
             OpcaoProduto.FAMILIA,
             OpcaoProduto.IMPORTAR_MANTER_BALANCA,
@@ -222,7 +224,8 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setMerc1Descricao(rst.getString("merc1_desc"));
                     imp.setMerc2ID(rst.getString("merc2"));
                     imp.setMerc2Descricao(rst.getString("merc2_desc"));
-
+                    imp.setMerc3ID("1");
+                    imp.setMerc3Descricao(rst.getString("merc2_desc"));
                     result.add(imp);
                 }
             }
@@ -418,8 +421,9 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setDescricaoCompleta(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaoreduzida"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
-                    imp.setCodMercadologico1(rst.getString("merc1"));
-                    imp.setCodMercadologico2(rst.getString("merc2"));
+                    //imp.setCodMercadologico1(rst.getString("merc1"));
+                    //imp.setCodMercadologico2(rst.getString("merc2"));
+                    //imp.setCodMercadologico2("1");
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
@@ -482,6 +486,34 @@ public class RPInfoDAO extends InterfaceDAO {
                             imp.setAtacadoPreco(rst.getDouble("prun_prvenda3"));
                             result.add(imp);
                         }
+                    }
+                }
+            }
+            return result;
+        }
+        
+        if (opt == OpcaoProduto.MERCADOLOGICO) {
+            try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "p.prod_codigo,\n"
+                        + "substring(g.grup_classificacao, 1, 1) merc1,\n"
+                        + "substring(g.grup_classificacao, 2, 2) merc2,\n"
+                        + "substring(g.grup_classificacao, 4, 2) merc3,\n"
+                        + "substring(g.grup_classificacao, 6, 2) merc4\n"
+                        + "from produtos p\n"
+                        + "inner join grupos g on g.grup_codigo = p.prod_grup_codigo"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("prod_codigo"));
+                        imp.setCodMercadologico1(rst.getString("merc1"));
+                        imp.setCodMercadologico2(rst.getString("merc2"));
+                        imp.setCodMercadologico3(rst.getString("merc3"));
+                        imp.setCodMercadologico4(rst.getString("merc4"));
+                        result.add(imp);
                     }
                 }
             }

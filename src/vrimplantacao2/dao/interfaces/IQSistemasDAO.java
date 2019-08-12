@@ -12,12 +12,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoMySQL;
-import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -571,20 +568,15 @@ public class IQSistemasDAO extends InterfaceDAO {
                     + "valoratual\n"
                     + "FROM crmovclientes \n"
                     + "WHERE CodigoFilial = '" + getLojaOrigem() + "'\n"
-                    + "AND quitado = 'N'"
+                    + "AND quitado = 'N'\n"
+                    + "AND vencimento <> '0000-00-00'"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rst.getString("id"));
                     imp.setIdCliente(rst.getString("codcliente"));
                     imp.setDataEmissao(rst.getDate("emissao"));
-                    
-                    if (rst.getString("vencimento").contains("0000-00-00")) {
-                        imp.setDataVencimento(rst.getDate("emissao"));
-                    } else {
-                        imp.setDataVencimento(rst.getDate("vencimento"));
-                    }
-                    
+                    imp.setDataVencimento(rst.getDate("vencimento"));
                     imp.setValor(rst.getDouble("valoratual"));
                     imp.setNumeroCupom(rst.getString("cupom"));
                     imp.setParcela(rst.getInt("parcela"));
