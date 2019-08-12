@@ -8,12 +8,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.SituacaoCheque;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -69,6 +74,7 @@ public class UniplusDAO extends InterfaceDAO {
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet(Arrays.asList(new OpcaoProduto[]{
             OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+            OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
             OpcaoProduto.MERCADOLOGICO,
             OpcaoProduto.MERCADOLOGICO_PRODUTO,
             OpcaoProduto.PRODUTOS,
@@ -201,16 +207,14 @@ public class UniplusDAO extends InterfaceDAO {
                             imp.setEan(rs.getString("ean"));
                         }
                     }
-                    if(forcarIdProdutoQuandoPesavel) {
-                        if(rs.getInt("pesavel") == 1) {
-                            imp.setEan(imp.getImportId());
-                        }
-                    }
                     imp.setSituacaoCadastro(rs.getInt("inativo") == 1 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
                     imp.seteBalanca((rs.getInt("pesavel") == 1));
+                    if (imp.isBalanca() && (forcarIdProdutoQuandoPesavel || "".equals(Utils.acertarTexto(imp.getEan())))) {
+                        imp.setEan(imp.getImportId()); 
+                    }
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
@@ -397,6 +401,7 @@ public class UniplusDAO extends InterfaceDAO {
                     "	estado est on est.id = e.idestado\n" +
                     "where\n" +
                     "	e.fornecedor = 1\n" +
+                    "	or e.id in (select distinct identidade from financeiro where tipo = 'P')\n" +
                     "order by\n" +
                     "	e.codigo::integer")) {
                 while(rs.next()) {
@@ -507,5 +512,223 @@ public class UniplusDAO extends InterfaceDAO {
             }
         }
         return result;
-    } 
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	f.id,\n" +
+                    "	f.emissao,\n" +
+                    "	f.documento cupom,\n" +
+                    "	0 ecf,\n" +
+                    "	f.valor,\n" +
+                    "	f.historico observacao,\n" +
+                    "	e.codigo id_cliente,\n" +
+                    "	f.vencimento,\n" +
+                    "	f.parcela,\n" +
+                    "	f.juros,\n" +
+                    "	f.multa\n" +
+                    "from\n" +
+                    "	financeiro f\n" +
+                    "	join entidade e on\n" +
+                    "           f.identidade = e.id\n" +
+                    "where\n" +
+                    "	f.tipo = 'R'\n" +
+                    "	and f.idfilial = " + getLojaOrigem() + "\n" +
+                    "	and f.idtipodocumentofinanceiro in (1,8)\n" +
+                    "order by\n" +
+                    "	f.id"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(complemento);
+                    imp.setId(rst.getString("id"));
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setNumeroCupom(rst.getString("cupom"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setIdCliente(rst.getString("id_cliente"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setParcela(rst.getInt("parcela"));
+                    imp.setJuros(rst.getDouble("juros"));
+                    imp.setMulta(rst.getDouble("multa"));
+                    
+                    incluirLancamentos(imp);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    private void incluirLancamentos(CreditoRotativoIMP imp) throws Exception {
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	fl.id,\n" +
+                    "	fl.valor,\n" +
+                    "	fl.desconto,\n" +
+                    "	fl.multa,\n" +
+                    "	fl.baixa datapagamento,\n" +
+                    "	fl.historico observacao\n" +
+                    "from\n" +
+                    "	financeirolancamento fl\n" +
+                    "where\n" +
+                    "	fl.idfinanceiro = " + imp.getId() + "\n" +
+                    "order by\n" +
+                    "	fl.id"
+            )) {
+                while (rst.next()) {
+                    imp.addPagamento(
+                            rst.getString("id"),
+                            rst.getDouble("valor"),
+                            rst.getDouble("desconto"),
+                            rst.getDouble("multa"),
+                            rst.getDate("datapagamento"),
+                            rst.getString("observacao")
+                    );
+                }
+            }
+        }
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	f.id,\n" +
+                    "	e.cnpjcpf cpf,\n" +
+                    "	f.numerocheque,\n" +
+                    "	b.codigo banco,\n" +
+                    "	f.agencia,\n" +
+                    "	f.numerocontacorrente,\n" +
+                    "	f.numerocheque,\n" +
+                    "	f.emissao date,\n" +
+                    "	f.baixa datadeposito,\n" +
+                    "	f.documento cupom,\n" +
+                    "	0 ecf,\n" +
+                    "	e.rg,\n" +
+                    "	e.telefone,\n" +
+                    "	e.nome,\n" +
+                    "	f.historico observacao,\n" +
+                    "	f.valor,\n" +
+                    "	f.juros,\n" +
+                    "	f.pagamento\n" +
+                    "from\n" +
+                    "	financeiro f\n" +
+                    "	left join entidade e on\n" +
+                    "		f.identidade = e.id\n" +
+                    "	left join banco b on\n" +
+                    "		f.idbanco = b.id\n" +
+                    "where\n" +
+                    "	f.tipo = 'R'\n" +
+                    "	and f.idfilial = " + getLojaOrigem() + "\n" +
+                    "	and f.idtipodocumentofinanceiro in (5)\n" +
+                    "order by\n" +
+                    "	f.id"
+            )) {
+                while (rst.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setCpf(rst.getString("cpf"));
+                    imp.setNumeroCheque(rst.getString("numerocheque"));
+                    imp.setBanco(rst.getInt("banco"));
+                    imp.setAgencia(rst.getString("agencia"));
+                    imp.setConta(rst.getString("numerocontacorrente"));
+                    imp.setNumeroCheque(rst.getString("numerocheque"));
+                    imp.setDate(rst.getDate("date"));
+                    imp.setDataDeposito(rst.getDate("datadeposito"));
+                    imp.setNumeroCupom(rst.getString("cupom"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setRg(rst.getString("rg"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setNome(rst.getString("nome"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setValorJuros(rst.getDouble("juros"));
+                    if (rst.getString("pagamento") == null || rst.getString("pagamento").trim().equals("")) {
+                        imp.setSituacaoCheque(SituacaoCheque.ABERTO);
+                    } else {
+                        imp.setSituacaoCheque(SituacaoCheque.BAIXADO);
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	f.id,\n" +
+                    "	e.codigo identidade,\n" +
+                    "	f.documento,\n" +
+                    "	f.emissao,\n" +
+                    "	f.entrada,\n" +
+                    "	f.historico observacao,\n" +
+                    "	doc.descricao tipodocumento,\n" +
+                    "	f.vencimento,\n" +
+                    "	f.valor,\n" +
+                    "	f.saldo\n" +
+                    "from\n" +
+                    "	financeiro f\n" +
+                    "	join entidade e on\n" +
+                    "		f.identidade = e.id\n" +
+                    "	left join tipodocumentofinanceiro doc on\n" +
+                    "		f.idtipodocumentofinanceiro = doc.id\n" +
+                    "where\n" +
+                    "	f.tipo = 'P'\n" +
+                    "	and f.idfilial = 1\n" +
+                    "	and (select sum(valor) from financeirolancamento where idfinanceiro = f.id) < f.valor\n" +
+                    "order by\n" +
+                    "	f.id"
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(rst.getString("identidade"));
+                    imp.setNumeroDocumento(rst.getString("documento"));
+                    imp.setIdTipoEntradaVR(210);
+                    imp.setDataEmissao(rst.getDate("emissao"));
+                    imp.setDataEntrada(rst.getDate("entrada"));
+                    imp.setObservacao(
+                            new StringBuilder(rst.getString("tipodocumento"))
+                                    .append(rst.getDouble("saldo") > 0 ? " - Valor original RS" + rst.getDouble("valor"): "")
+                                    .append(" - ")
+                                    .append(rst.getString("observacao"))
+                                    .toString()
+                    );
+                    imp.addVencimento(
+                            rst.getDate("vencimento"), 
+                            (rst.getDouble("saldo") > 0 ? rst.getDouble("saldo") : rst.getDouble("valor"))
+                    );
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
 }
