@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.interfaces;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
@@ -7,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import vrframework.classe.ProgressBar;
-import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.NutricionalToledoDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.NutricionalToledoItemVO;
@@ -26,6 +26,8 @@ import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -42,18 +44,22 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean eFicha = false;
     
+    private Connection sco;
+    private Connection sfi;
+    private Connection cli;
+    
     @Override
     public String getSistema() {
         return "SHI";
     }
 
-    public List<Estabelecimento> getLojasCliente(boolean sco) throws Exception {
+    public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {            
+        try (Statement stm = sco.createStatement()) {            
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    codigo,\n"
-                    + "    codigo || ' - ' || " + (sco ? "razsoc" : "nomexx") + " descricao\n"
+                    + "    codigo || ' - ' || razsoc descricao\n"
                     + "from filial\n"
                     + "order by codigo"
             )) {
@@ -69,7 +75,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
         List<MercadologicoNivelIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = sco.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT CODIGO, DESCRI FROM GRUPO ORDER BY char_length(codigo), codigo"
             )) {
@@ -109,7 +115,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = sco.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT ID, DESCRI descricao FROM ALTERN order by id"
             )) {
@@ -131,7 +137,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = sco.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    p.codigo id,\n"
@@ -236,7 +242,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoIMP> getProdutos(OpcaoProduto opcao) throws Exception {
         if (opcao == OpcaoProduto.CUSTO) {
             List<ProdutoIMP> result = new ArrayList<>();
-            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (Statement stm = sco.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select\n" +
                         "    pc.codpro,\n" +
@@ -268,7 +274,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
             return result;
         } else if (opcao == OpcaoProduto.ESTOQUE) {
             List<ProdutoIMP> result = new ArrayList<>();
-            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (Statement stm = sco.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select\n" +
                         "    e.codpro,\n" +
@@ -301,7 +307,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
             return result;
         } else if (opcao == OpcaoProduto.SUGESTAO_COTACAO || opcao == OpcaoProduto.SUGESTAO_PEDIDO) {
             List<ProdutoIMP> result = new ArrayList<>();
-            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (Statement stm = sco.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select p.codigo codProduto, p.descri, p.catego,\n"
                         + "       c.codigo codCategoria, c.descri descCategoria\n"
@@ -331,7 +337,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
             return result;
         } else if (opcao == OpcaoProduto.CUSTO_COM_IMPOSTO) {
             List<ProdutoIMP> result = new ArrayList<>();
-            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (Statement stm = sco.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select\n"
                         + "    ri.codpro,\n"
@@ -361,7 +367,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
             return result;
         } else if (opcao == OpcaoProduto.CUSTO_SEM_IMPOSTO) {
             List<ProdutoIMP> result = new ArrayList<>();
-            try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (Statement stm = sco.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select\n" +
                         "    pc.codpro,\n" +
@@ -399,7 +405,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
         
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = sco.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
                     "    codigo,\n" +
@@ -422,7 +428,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
         
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = sco.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
                     "    f.codigo id,\n" +
@@ -473,7 +479,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
                     }
                     
-                    try (Statement stm2 = ConexaoFirebird.getConexao().createStatement()) {
+                    try (Statement stm2 = sco.createStatement()) {
                         try (ResultSet rst2 = stm2.executeQuery(
                                 "select\n" +
                                 "    codigo,\n" +
@@ -518,7 +524,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         }
                     }
                     
-                    try (Statement stm3 = ConexaoFirebird.getConexao().createStatement()) {
+                    try (Statement stm3 = sco.createStatement()) {
                         try (ResultSet rst3 = stm3.executeQuery(
                                 "select f.codigo, f.ciccgc, f.nomexx,\n"
                                 + "       f.pagame, p.descri, p.numpar,\n"
@@ -680,20 +686,8 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = sco.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    /*"select\n" +
-                    "    fornec,\n" +
-                    "    codpro,\n" +
-                    "    codfor,\n" +
-                    "    data,\n" +
-                    "    embala\n" +
-                    "from\n" +
-                    "    codfornec\n" +
-                    "order by\n" +
-                    "    fornec,\n" +
-                    "    codpro, \n" +
-                    "    codfor"*/
                     "select p.codigo codPro,  p.reffab codExt, p.fornec codFor, "
                     + "p.embala emb, current_date data\n"
                     + "from produtos p\n"
@@ -725,7 +719,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = cli.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
                     "    c.codigo id,\n" +
@@ -840,7 +834,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = cli.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
                     "    d.FILIAL||'-'||d.TIPDOC||'-'||d.SEQUEN||'-'||d.DESDOB id,\n" +
@@ -896,7 +890,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> result = new ArrayList<>();
         
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = cli.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
                     "    c.filial||'-'||c.sequen id,\n" +
@@ -951,7 +945,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
     private List<NutricionalToledoVO> carregarNutricionalToledo() throws Exception {
         List<NutricionalToledoVO> vNutricionalToledo = new ArrayList<>();
 
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = sco.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select n.codpro,\n"
                     + "'TOLEDO' descricao,\n"
@@ -1021,7 +1015,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         List<OfertaIMP> result = new ArrayList<>();
         
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = sco.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
                     "    pv.filial,\n" +
@@ -1055,6 +1049,79 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
-    
-    
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        
+        try (Statement stm = sfi.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    p.sequen id,\n" +
+                    "    nullif(trim(e.idfornec),'') id_fornecedor,\n" +
+                    "    p.docume numerodocumento,\n" +
+                    "    p.dataxx dataemissao,\n" +
+                    "    p.dataentra dataentrada,\n" +
+                    "    p.valorpago,\n" +
+                    "                         \n" +
+                    "    p.vencim vencimento,\n" +
+                    "    p.valorx valor,\n" +
+                    "    p.parcela,\n" +
+                    "    p.histbaixa observacao\n" +
+                    "from\n" +
+                    "    docpagar p\n" +
+                    "    join entidade e on\n" +
+                    "        p.entidade = e.codigo\n" +
+                    "where\n" +
+                    "    p.filial = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n" +
+                    "    and p.status = 'P'\n" +
+                    "    and not nullif(trim(e.idfornec),'') is null\n" +
+                    "order by\n" +
+                    "    p.sequen"
+            )) {
+                while (rst.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setIdFornecedor(Utils.stringLong(rst.getString("id_fornecedor")));
+                    imp.setNumeroDocumento(rst.getString("numerodocumento"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataEntrada(rst.getDate("dataentrada"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    ContaPagarVencimentoIMP parc = imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"));
+                    parc.setNumeroParcela(Utils.stringToInt(rst.getString("parcela"), 1));
+                    parc.setObservacao(rst.getString("observacao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    public Connection getSco() {
+        return sco;
+    }
+
+    public void setSco(Connection sco) {
+        this.sco = sco;
+    }
+
+    public Connection getSfi() {
+        return sfi;
+    }
+
+    public void setSfi(Connection sfi) {
+        this.sfi = sfi;
+    }
+
+    public Connection getCli() {
+        return cli;
+    }
+
+    public void setCli(Connection cli) {
+        this.cli = cli;
+    }
+       
 }
