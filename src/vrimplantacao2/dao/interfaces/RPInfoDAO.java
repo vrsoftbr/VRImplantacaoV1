@@ -933,11 +933,39 @@ public class RPInfoDAO extends InterfaceDAO {
                     imp.setValor(rs.getDouble("valor"));
                     imp.setNumeroCupom(rs.getString("cupom"));
 
+                    incluirLancamentos(imp);
+                    
                     result.add(imp);
                 }
             }
         }
         return result;
+    }
+    
+    private void incluirLancamentos(CreditoRotativoIMP imp) throws Exception {
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select "
+                    + "pfin_operacao id,\n"
+                    + "pfin_dataemissao datapagamento,\n"
+                    + "pfin_multa multa,\n"
+                    + "pfin_descontos desconto,\n"
+                    + "pfin_baixaparcial valor\n"
+                    + "from pendfin\n"
+                    + "where pfin_operacao = '" + imp.getId() + "'"
+            )) {
+                while (rst.next()) {
+                    imp.addPagamento(
+                            rst.getString("id"),
+                            rst.getDouble("valor"),
+                            rst.getDouble("desconto"),
+                            rst.getDouble("multa"),
+                            rst.getDate("datapagamento"),
+                            "IMPORTADO VR"
+                    );
+                }
+            }
+        }
     }
     
     @Override
