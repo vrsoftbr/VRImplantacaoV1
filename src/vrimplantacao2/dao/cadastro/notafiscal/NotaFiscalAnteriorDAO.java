@@ -5,8 +5,8 @@ import java.sql.Statement;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.notafiscal.TipoNota;
-import vrimplantacao2.vo.importacao.Destinatario;
 import vrimplantacao2.vo.importacao.NotaOperacao;
+import vrimplantacao2.vo.enums.TipoDestinatario;
 
 /**
  *
@@ -44,7 +44,6 @@ public class NotaFiscalAnteriorDAO {
                         "	valortotal numeric,\n" +
                         "	tipodestinatario integer,\n" +
                         "	iddestinatario varchar,\n" +
-                        "	cnpjcpf varchar,\n" +
                         "	primary key (sistema, loja, operacao, id)\n" +
                         ")"
                 );
@@ -72,8 +71,7 @@ public class NotaFiscalAnteriorDAO {
                     "	valorproduto,\n" +
                     "	valortotal,\n" +
                     "	tipodestinatario,\n" +
-                    "	iddestinatario,\n" +
-                    "	cnpjcpf\n" +
+                    "	iddestinatario\n" +
                     "FROM\n" +
                     "	implantacao.codant_notafiscal\n" +
                     "where\n" +
@@ -98,9 +96,8 @@ public class NotaFiscalAnteriorDAO {
                     vo.setDataEmissao(rst.getDate("dataemissao"));
                     vo.setValorProduto(rst.getDouble("valorproduto"));
                     vo.setValorTotal(rst.getDouble("valortotal"));
-                    vo.setTipoDestinatario(Destinatario.TipoDestinatario.get(rst.getInt("tipodestinatario")));
+                    vo.setTipoDestinatario(TipoDestinatario.get(rst.getInt("tipodestinatario")));
                     vo.setIdDestinatario(rst.getString("iddestinatario"));
-                    vo.setCnpjCpf(rst.getString("cnpjcpf"));
                     
                     result.put(vo, String.valueOf(vo.getOperacao().getId()), vo.getId());
                 }
@@ -110,11 +107,11 @@ public class NotaFiscalAnteriorDAO {
         return result;
     }
 
-    void atualizar(NotaFiscalAnteriorVO anterior) {
+    public void atualizar(NotaFiscalAnteriorVO anterior) {
         throw new UnsupportedOperationException("Funcao ainda nao suportada.");
     }
 
-    void incluir(NotaFiscalAnteriorVO anterior) {
+    public void incluir(NotaFiscalAnteriorVO anterior) {
         throw new UnsupportedOperationException("Funcao ainda nao suportada.");
     }
     

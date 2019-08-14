@@ -9,7 +9,6 @@ import vrimplantacao2.vo.cadastro.notafiscal.NotaEntrada;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaSaida;
 import vrimplantacao2.vo.cadastro.notafiscal.SituacaoNfe;
 import vrimplantacao2.vo.cadastro.notafiscal.SituacaoNotaEntrada;
-import vrimplantacao2.vo.importacao.Destinatario;
 import vrimplantacao2.vo.importacao.NotaFiscalIMP;
 import vrimplantacao2.vo.importacao.NotaOperacao;
 
@@ -55,6 +54,11 @@ public class NotaFiscalRepository {
                         //Se a ordem for para excluir a nota se ela existir.
                         if (apagarNotasExistentes) {
                             //Elimina ela do banco
+                            
+                            /**
+                             * TODO: Incluir código que ao ocorrer um erro, ele vincula a nota 
+                             * ao anterior e vai para o próximo
+                             */                            
                             provider.eliminarNotaEntrada(idNotaEntrada);
                         } else {
                             //Grava o anterior no banco e segue para a próxima nota
@@ -129,7 +133,12 @@ public class NotaFiscalRepository {
                 addAnterior(anterior);
             }            
             provider.notificar();
-        }        
+        }
+        
+        //Limpando variaveis
+        this.anteriores.clear();
+        this.anteriores = null;
+        System.gc();
     }
 
     /**
@@ -180,12 +189,12 @@ public class NotaFiscalRepository {
         }
     }
 
-    public int getFornecedor(Destinatario destinatario) throws Exception {
-        return provider.getFornecedorById(destinatario.getId());
+    public int getFornecedor(String idDestinatario) throws Exception {
+        return provider.getFornecedorById(idDestinatario);
     }
     
-    public int getClienteEventual(Destinatario destinatario) throws Exception {
-        return provider.getClienteEventual(destinatario.getId());
+    public int getClienteEventual(String idDestinatario) throws Exception {
+        return provider.getClienteEventual(idDestinatario);
     }
     
     public NotaEntrada converterNotaEntrada(NotaFiscalIMP imp) throws Exception {
@@ -193,7 +202,7 @@ public class NotaFiscalRepository {
         
         n.setIdLoja(this.provider.getLojaVR());
         n.setNumeroNota(imp.getNumeroNota());
-        n.setIdFornecedor(getFornecedor(imp.getDestinatario()));
+        n.setIdFornecedor(getFornecedor(imp.getIdDestinatario()));
         n.setDataEntrada(imp.getDataEmissao());
         n.setIdTipoEntrada(this.tipoNotaEntrada);
         n.setDataEmissao(imp.getDataEmissao());
@@ -259,12 +268,12 @@ public class NotaFiscalRepository {
         n.setIdLoja(provider.getLojaVR());
         n.setNumeroNota(imp.getNumeroNota());
         n.setTipoNota(imp.getTipoNota());
-        switch (imp.getDestinatario().getTipo()) {
+        switch (imp.getTipoDestinatario()) {
             case FORNECEDOR:
-                n.setIdFornecedor(getFornecedor(imp.getDestinatario()));
+                n.setIdFornecedor(getFornecedor(imp.getIdDestinatario()));
                 break;
             case CLIENTE_EVENTUAL:
-                n.setIdClienteEventual(getClienteEventual(imp.getDestinatario()));
+                n.setIdClienteEventual(getClienteEventual(imp.getIdDestinatario()));
                 break;
         }                
         n.setIdTipoSaida(this.tipoNotaSaida);
@@ -345,10 +354,6 @@ public class NotaFiscalRepository {
         vo.setLoja(provider.getLojaOrigem());
         vo.setOperacao(imp.getOperacao());
         vo.setId(imp.getId());
-
-        //private Integer idNotaSaida;
-        //private Integer idNotaEntrada;
-
         vo.setTipoNota(imp.getTipoNota());
         vo.setModelo(imp.getModelo());
         vo.setSerie(imp.getSerie());
@@ -357,10 +362,8 @@ public class NotaFiscalRepository {
         vo.setValorProduto(imp.getValorProduto());
         vo.setValorTotal(imp.getValorTotal());
 
-        vo.setTipoDestinatario(imp.getDestinatario().getTipo());
-        vo.setIdDestinatario(imp.getDestinatario().getId());
-        vo.setRazaoSocial(imp.getDestinatario().getRazaoSocial());
-        vo.setCnpjCpf(imp.getDestinatario().getCnpjCpf());
+        vo.setTipoDestinatario(imp.getTipoDestinatario());
+        vo.setIdDestinatario(imp.getIdDestinatario());
         
         return vo;
     }
