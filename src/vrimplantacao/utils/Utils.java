@@ -16,13 +16,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.openide.util.Exceptions;
 import vrframework.classe.Conexao;
 import vrframework.classe.Util;
@@ -1022,12 +1020,22 @@ public class Utils {
      * @param tamanho Tamanho da string do email.
      * @return email formatado.
      */
-    public static String formataEmail(String email, int tamanho) {
-        email = Utils.acertarTexto(email, tamanho);
-        if (email.contains("@")) {
-            return email.toLowerCase();
-        } else {
-            return "";
+    public static String formataEmail(String email, int tamanho) {        
+        if (email == null) { 
+            email = ""; 
+        }
+        try {
+            byte[] bytes = email.toLowerCase().getBytes();
+             email = new String(bytes, "ISO-8859-1");
+            
+            if (email.contains("@")) {
+                return email;
+            } else {
+                return "";
+            }
+        } catch (UnsupportedEncodingException ex) {
+            Exceptions.printStackTrace(ex);
+            throw new RuntimeException(ex.getMessage(), ex);
         }
     }
 
