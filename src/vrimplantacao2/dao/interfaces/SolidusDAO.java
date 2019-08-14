@@ -515,13 +515,23 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (
                             !"".equals(Utils.acertarTexto(rst.getString("des_contato"))) ||
                             !"".equals(Utils.acertarTexto(rst.getString("tel_principal"))) ||
-                            !"".equals(Utils.acertarTexto(rst.getString("des_email")))
+                            !"".equals(Utils.acertarTexto(rst.getString("email_vendedor")))
                     ) {
-                        imp.addContato("1", rst.getString("des_contato"), rst.getString("tel_principal"), rst.getString("celular"), TipoContato.COMERCIAL, rst.getString("email_vendedor"));
+                        imp.addContato("1", rst.getString("des_contato"), rst.getString("tel_principal"), rst.getString("celular"), TipoContato.COMERCIAL, "");
                     }
                     String fax = Utils.formataNumero(rst.getString("num_fax"));
                     if (!"0".equals(fax)) {
                         imp.addContato("2", "FAX", fax, "", TipoContato.COMERCIAL, "");
+                    }
+                    for (String email: Utils.formataEmail(rst.getString("email_vendedor"), 200).split(";")) {
+                        if (email != null && !email.equals("")) {
+                            imp.addEmail("E-MAIL COMERCIAL", email, TipoContato.COMERCIAL);
+                        }
+                    }
+                    for (String email: rst.getString("des_email").split(";")) {
+                        if (email != null && !email.equals("")) {
+                            imp.addEmail("NFE", email, TipoContato.NFE);
+                        }
                     }
                                         
                     if (rst.getBoolean("produtorrural")) {

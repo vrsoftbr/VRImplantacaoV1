@@ -45,7 +45,7 @@ public class FornecedorContatoVO {
     }
 
     public void setEmail(String email) {
-        this.email = Utils.acertarObservacao(email, 50, "");
+        this.email = Utils.formataEmail(email, 50);
     }
 
     public void setCelular(String celular) {
