@@ -153,6 +153,7 @@ import vrimplantacao2.gui.interfaces.MrsGUI;
 import vrimplantacao2.gui.interfaces.MultiPdvGUI;
 import vrimplantacao2.gui.interfaces.OpenGUI;
 import vrimplantacao2.gui.interfaces.OrionGUI;
+import vrimplantacao2.gui.interfaces.OryonGUI;
 import vrimplantacao2.gui.interfaces.PdvVrGUI;
 import vrimplantacao2.gui.interfaces.PlanilhaVrGUI;
 import vrimplantacao2.gui.interfaces.PomaresGUI;
@@ -688,6 +689,7 @@ public final class MenuGUI extends VRMdiFrame {
         jMenu12 = new javax.swing.JMenu();
         jMenuItem25 = new javax.swing.JMenuItem();
         mnuBase = new javax.swing.JMenuItem();
+        mnuOryon = new javax.swing.JMenuItem();
         jMenu13 = new javax.swing.JMenu();
         mnuLogus = new javax.swing.JMenuItem();
         mnuBrainSoft = new javax.swing.JMenuItem();
@@ -2179,6 +2181,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu12.add(mnuBase);
+
+        mnuOryon.setText("Oryon");
+        mnuOryon.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuOryonActionPerformed(evt);
+            }
+        });
+        jMenu12.add(mnuOryon);
 
         mnuDatabase.add(jMenu12);
 
@@ -4032,6 +4042,10 @@ public final class MenuGUI extends VRMdiFrame {
         STI3GUI.exibir(this);
     }//GEN-LAST:event_mnuSTI3ActionPerformed
 
+    private void mnuOryonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuOryonActionPerformed
+        OryonGUI.exibir(this);
+    }//GEN-LAST:event_mnuOryonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4204,6 +4218,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuMrs;
     private javax.swing.JMenuItem mnuOpen;
     private javax.swing.JMenu mnuOrion;
+    private javax.swing.JMenuItem mnuOryon;
     private javax.swing.JMenuItem mnuParametros;
     private javax.swing.JMenuItem mnuParametros1;
     private javax.swing.JMenu mnuPlanilha;
