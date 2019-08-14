@@ -16,11 +16,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.openide.util.Exceptions;
 import vrframework.classe.Conexao;
 import vrframework.classe.Util;
@@ -820,6 +822,89 @@ public class Utils {
             }
         } else {
             return VALOR_VAZIO;
+        }
+    }
+    
+    private static final char[] ACENTUADO = new char[] {'Á','À','Â','Ã','Ç','É','È','Ê','Í','Ì','Î','Ñ','Ó','Ò','Ô','Õ','Ö','\r','Ú','Ù','Û','Ü'};
+    private static final char[] SEM_ACENTO = new char[]{'A','A','A','A','C','E','E','E','I','I','I','N','O','O','O','O','O',' ' ,'U','U','U','U'};
+    
+    /**
+     * Método para padronizar as informações de uma string utilizada para campos
+     * de observação no VR.
+     *
+     * @param texto Texto a ser ajustado.
+     * @param tamanho Tamanho máximo do campo.
+     * @param stringPadrao Caso o texto seja nulo ou vazio, essa string é
+     * utilizada.
+     * @return Texto padronizado
+     */
+    public static String acertarObservacao(String texto, int tamanho, String stringPadrao) {
+        if (tamanho < 0) {
+            tamanho = 0;
+        }
+
+        texto = acertarObservacao(texto);
+
+        if ((texto != null)
+                && (!texto.trim().isEmpty())) {
+
+            if (texto.length() > tamanho) {
+                texto = texto.substring(0, tamanho);
+            }
+        } else {
+            texto = stringPadrao != null ? stringPadrao : VALOR_VAZIO;
+        }
+
+        return texto.trim();
+    }
+    
+    /**
+     * Método para padronizar as informações de uma string utilizada para campos
+     * de observação no VR.
+     *
+     * @param texto Texto a ser ajustado.
+     * @param tamanho Tamanho máximo do campo.
+     * @return Texto padronizado
+     */
+    public static String acertarObservacao(String texto, int tamanho) {
+        return acertarObservacao(texto, tamanho, "");
+    }
+    
+    /**
+     * Método para padronizar as informações de uma string utilizada para campos
+     * de observação no VR.
+     *
+     * @param texto Texto a ser ajustado.
+     * @return Texto padronizado
+     */
+    public static String acertarObservacao(String texto) {
+        if (texto == null) { 
+            texto = ""; 
+        }
+            
+        texto = texto.toUpperCase();
+        
+        StringBuilder b = new StringBuilder();
+        
+        for (int i = 0; i < texto.length(); i++) {
+            char c = texto.charAt(i);
+            for (int j = 0; j < ACENTUADO.length; j++) {
+                if (c == ACENTUADO[j]) {
+                    c = SEM_ACENTO[j];
+                }
+            }
+            b.append(c);
+        }
+
+        try {
+            byte[] bytes = b.toString().getBytes();
+
+            String vRetorno = new String(bytes, "ISO-8859-1");
+
+            return vRetorno;
+        } catch (UnsupportedEncodingException ex) {
+            Exceptions.printStackTrace(ex);
+            throw new RuntimeException(ex.getMessage(), ex);
         }
     }
     

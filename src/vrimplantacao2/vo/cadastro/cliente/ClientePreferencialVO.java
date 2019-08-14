@@ -373,7 +373,7 @@ public class ClientePreferencialVO {
     }
 
     public void setObservacao2(String observacao2) {
-        this.observacao2 = Utils.acertarTexto(observacao2, 2500);
+        this.observacao2 = Utils.acertarObservacao(observacao2, 2500);
     }
 
     public void setPermiteCreditoRotativo(boolean permiteCreditoRotativo) {
