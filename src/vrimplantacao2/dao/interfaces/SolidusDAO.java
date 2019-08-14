@@ -499,18 +499,18 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrazoVisita(rst.getInt("prazovisita"));
                     imp.setPrazoSeguranca(rst.getInt("prazoseguranca"));
                     
-                    StringBuilder obs = new StringBuilder();
-                    
-                    obs
-                            .append("CONTATO ").append(rst.getString("des_contato"))
-                            .append(" FONE.: ").append(rst.getString("tel_principal"))
-                            .append(" CEL.: ").append(rst.getString("celular"))
-                            .append(" FAX.: ").append(rst.getString("num_fax"))
-                            .append(" EMAIL VEND.: ").append(rst.getString("email_vendedor"))
-                            .append(" OUTROS EMAIL: ").append(rst.getString("des_email"))
-                            .append(" BLOQ.: ").append(rst.getString("des_motivo_bloq"))
-                            .append(" OBS.: ").append(rst.getString("observacao"));
-                    imp.setObservacao(obs.toString());
+                    imp.setObservacao(
+                            new StringBuilder()
+                                .append("CONTATO ").append(rst.getString("des_contato"))
+                                .append(" FONE.: ").append(rst.getString("tel_principal"))
+                                .append(" CEL.: ").append(rst.getString("celular"))
+                                .append(" FAX.: ").append(rst.getString("num_fax"))
+                                .append(" EMAIL VEND.: ").append(rst.getString("email_vendedor"))
+                                .append(" OUTROS EMAIL: ").append(rst.getString("des_email"))
+                                .append(" BLOQ.: ").append(rst.getString("des_motivo_bloq"))
+                                .append(" OBS.: ").append(rst.getString("observacao"))
+                                .toString()
+                    );
                     
                     if (
                             !"".equals(Utils.acertarTexto(rst.getString("des_contato"))) ||
@@ -666,8 +666,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    left join tab_cidade cd on\n" +
                     "        c.cod_cidade = cd.cod_cidade\n" +
                     "where\n" +
-                    "   c.des_cliente <> 'CADASTRO AUTOMATICO' and\n" +
-                    "   c.flg_envia_codigo = 'S'\n" +
+                    "   c.des_cliente <> 'CADASTRO AUTOMATICO'\n" +
                     "order by\n" +
                     "    1"
             )) {
@@ -699,13 +698,22 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNomeConjuge(rst.getString("nomeconjuge"));
                     imp.setNomePai(rst.getString("nomepai"));
                     imp.setNomeMae(rst.getString("nomemae"));
-                    imp.setObservacao2(rst.getString("observacao2"));
                     imp.setDiaVencimento(rst.getInt("diavencimento"));
                     imp.setTelefone(rst.getString("num_fone"));
                     imp.setFax(rst.getString("num_fax"));
                     imp.setCelular(rst.getString("num_celular"));
                     imp.setEmail(rst.getString("des_email"));
                     imp.setPermiteCreditoRotativo(rst.getBoolean("permiterotativo"));
+                    
+                    imp.setObservacao2(
+                            new StringBuilder()
+                                .append(" FONE.: ").append(rst.getString("num_fone"))
+                                .append(" CEL.: ").append(rst.getString("num_celular"))
+                                .append(" FAX.: ").append(rst.getString("num_fax"))
+                                .append(" EMAIL.: ").append(rst.getString("des_email"))
+                                .append(" OBS.: ").append(rst.getString("observacao2"))
+                                .toString()
+                    );
                     
                     result.add(imp);
                 }
