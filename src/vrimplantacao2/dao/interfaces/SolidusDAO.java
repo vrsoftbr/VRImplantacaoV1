@@ -22,9 +22,13 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.interfaces.custom.solidus.Entidade;
 import vrimplantacao2.utils.sql.SQLUtils;
+import vrimplantacao2.vo.cadastro.notafiscal.SituacaoNfe;
+import vrimplantacao2.vo.cadastro.notafiscal.TipoFreteNotaFiscal;
+import vrimplantacao2.vo.cadastro.notafiscal.TipoNota;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoDestinatario;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -37,6 +41,7 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NotaFiscalIMP;
+import vrimplantacao2.vo.importacao.NotaOperacao;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -1292,16 +1297,6 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    nf.dta_entrada dataentradasaida,\n" +
                     "    nf.val_total_nf total_nota,\n" +
                     "    nf.cod_parceiro dest_id,\n" +
-                    "    nf.des_razao_social dest_razao,\n" +
-                    "    nf.num_cnpj_cpf dest_cnpj,\n" +
-                    "    nf.num_ie_rg dest_ie,\n" +
-                    "    nf.des_endereco dest_endereco,\n" +
-                    "    nf.num_endereco dest_numero,\n" +
-                    "    nf.des_bairro dest_bairro,\n" +
-                    "    nf.num_municipio dest_municipio_ibge,\n" +
-                    "    nf.des_cidade dest_municipio,\n" +
-                    "    nf.des_uf dest_uf,\n" +
-                    "    nf.num_cep dest_cep,\n" +
                     "    nf.cod_transportadora,\n" +
                     "    nf.cod_motorista,\n" +
                     "    nf.tipo_frete,\n" +
@@ -1315,59 +1310,56 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    nf.flg_inutilizada,\n" +
                     "    nf.num_chave_acesso,\n" +
                     "    nf.dta_alteracao\n" +
-                    "\n" +
                     "from\n" +
                     "    tab_nf nf\n" +
-                    "    left join tab_motorista mt on\n" +
-                    "        nf.cod_motorista = mt.cod_motorista\n" +
-                    "    left join tab_transportadora tr on\n" +
-                    "        nf.cod_transportadora = tr.cod_transportadora\n" +
                     "where\n" +
                     "    nf.cod_loja = " + getLojaOrigem() + " and\n" +
+                    "    nf.tipo_operacao = 0 and\n" + //TODO: Excluir esta linha quando incluir a nota de saida
                     "    nf.dta_emissao >= " + SQLUtils.stringSQL(DATE_FORMAT.format(dataEmissaoNfe)) + "\n" +
                     "order by\n" +
                     "    nf.dta_emissao"
             )) {
                 while (rst.next()) {
                     NotaFiscalIMP imp = new NotaFiscalIMP();
-                    /*
-                    imp.set(rst.getString("cod_parceiro"));
-                    imp.set(rst.getString("tipo_parceiro"));
-                    imp.set(rst.getString("num_nf"));
-                    imp.set(rst.getString("num_serie_nf"));
-                    imp.set(rst.getString("tipo_ident"));
-                    imp.set(rst.getString("tipo_operacao"));
-                    imp.set(rst.getString("tipo_nf"));
-                    imp.set(rst.getString("serie"));
-                    imp.set(rst.getString("numeronota"));
-                    imp.set(rst.getString("dataemissao"));
-                    imp.set(rst.getString("dataentradasaida"));
-                    imp.set(rst.getString("total_nota"));
-                    imp.set(rst.getString("dest_id"));
-                    imp.set(rst.getString("dest_razao"));
-                    imp.set(rst.getString("dest_cnpj"));
-                    imp.set(rst.getString("dest_ie"));
-                    imp.set(rst.getString("dest_endereco"));
-                    imp.set(rst.getString("dest_numero"));
-                    imp.set(rst.getString("dest_bairro"));
-                    imp.set(rst.getString("dest_municipio_ibge"));
-                    imp.set(rst.getString("dest_municipio"));
-                    imp.set(rst.getString("dest_uf"));
-                    imp.set(rst.getString("dest_cep"));
-                    imp.set(rst.getString("cod_transportadora"));
-                    imp.set(rst.getString("cod_motorista"));
-                    imp.set(rst.getString("tipo_frete"));
-                    imp.set(rst.getString("tipo_pagamento"));
-                    imp.set(rst.getString("tipo_emitente"));
-                    imp.set(rst.getString("obs_fiscal"));
-                    imp.set(rst.getString("obs_livre"));
-                    imp.set(rst.getString("val_peso_cte"));
-                    imp.set(rst.getString("flg_cancelado"));
-                    imp.set(rst.getString("flg_denegada"));
-                    imp.set(rst.getString("flg_inutilizada"));
-                    imp.set(rst.getString("num_chave_acesso"));
-                    imp.set(rst.getString("dta_alteracao"));
-                    */
+                    
+                    imp.setId(
+                            rst.getString("cod_parceiro"),
+                            "-",
+                            rst.getString("tipo_parceiro"),
+                            "-",
+                            rst.getString("num_nf"),
+                            "-",
+                            rst.getString("num_serie_nf"),
+                            "-",
+                            rst.getString("tipo_ident")
+                    );
+                    imp.setOperacao(NotaOperacao.get(rst.getInt("tipo_operacao")));
+                    imp.setTipoNota(TipoNota.get(rst.getInt("tipo_nf")));
+                    imp.setSerie(rst.getString("serie"));
+                    imp.setNumeroNota(Utils.stringToInt(rst.getString("numeronota")));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataEntradaSaida(rst.getDate("dataentradasaida"));
+                    imp.setValorTotal(rst.getDouble("total_nota"));
+                    imp.setTipoDestinatario(imp.getOperacao() == NotaOperacao.ENTRADA ? TipoDestinatario.FORNECEDOR : TipoDestinatario.CLIENTE_EVENTUAL);
+                    imp.setIdDestinatario(rst.getString("dest_id"));
+                    //imp.set(rst.getString("cod_transportadora"));
+                    //imp.set(rst.getString("cod_motorista"));
+                    imp.setTipoFreteNotaFiscal(TipoFreteNotaFiscal.get(rst.getInt("tipo_frete")));
+                    imp.setInformacaoComplementar(rst.getString("obs_fiscal") + " " + rst.getString("obs_livre"));                    
+                    imp.setPesoBruto(rst.getDouble("val_peso_cte"));
+                    imp.setPesoLiquido(rst.getDouble("val_peso_cte"));
+                    if ("S".equals(rst.getString("flg_inutilizada"))) {
+                        imp.setSituacaoNfe(SituacaoNfe.INUTILIZADA);
+                    }
+                    if ("S".equals(rst.getString("flg_denegada"))) {
+                        imp.setSituacaoNfe(SituacaoNfe.DENEGADA);
+                    }
+                    if ("S".equals(rst.getString("flg_cancelado"))) {
+                        imp.setSituacaoNfe(SituacaoNfe.CANCELADA);
+                    }
+                    imp.setChaveNfe(rst.getString("num_chave_acesso"));
+                    imp.setDataHoraAlteracao(rst.getDate("dta_alteracao"));
+                    
                     result.add(imp);
                 }
             }
