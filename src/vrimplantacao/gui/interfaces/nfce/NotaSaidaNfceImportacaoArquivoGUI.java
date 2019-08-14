@@ -1,6 +1,8 @@
 package vrimplantacao.gui.interfaces.nfce;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import vrimplantacao.dao.ParametroDAO;
 import vrimplantacao.dao.notafiscal.NotaSaidaNfceDAO;
 import vrimplantacao.vo.interfaces.DivergenciaVO;
@@ -17,6 +19,8 @@ import vrimplantacao.dao.notafiscal.NotaSaidaNfceDAO.LojaV2;
 import vrimplantacao.gui.interfaces.rfd.ItensNaoExistenteGUI;
 
 public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
+    
+    private static final Logger LOG = Logger.getLogger(NotaSaidaNfceImportacaoArquivoGUI.class.getName());
 
     NotaSaidaNfceDAO dao = new NotaSaidaNfceDAO();
 
@@ -71,15 +75,21 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                             vDivergenciaGeral.add(new DivergenciaVO("Não foi possível importar o arquivo " + arq + "! " + ex, TipoDivergencia.ERRO.getId()));
                             continue;
                         }
+                        NotaSaidaNfceDAO notaSaidaNfceDAO = new NotaSaidaNfceDAO();
 
-                        long idVendaNFCe = new NotaSaidaNfceDAO().getIdVendaNFCe(oVenda);
+                        long idVendaNFCe = notaSaidaNfceDAO.getIdVendaNFCe(oVenda);
 
+                        if (oVenda.id > 0 && chkEliminarVendaExistente.isSelected()) {
+                            System.out.println("EliminarVendaExistente");
+                            notaSaidaNfceDAO.eliminarVenda(oVenda.id);
+                            idVendaNFCe = 0;
+                        }
+                        
                         if (idVendaNFCe <= 0) {
                             oVenda.baixarEstoque = chkBaixaEstoque.isSelected();
-                            new NotaSaidaNfceDAO().salvarVenda(oVenda);
-
+                            notaSaidaNfceDAO.salvarVenda(oVenda);
                         } else {
-                            new NotaSaidaNfceDAO().atualizarVendaNFCe(idVendaNFCe, oVenda);
+                            notaSaidaNfceDAO.atualizarVendaNFCe(idVendaNFCe, oVenda);
 
                         }
                     }
@@ -106,6 +116,7 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                 } catch (Exception ex) {
                     ProgressBar.dispose();
                     Util.exibirMensagemErro(ex, getTitle());
+                    ex.printStackTrace();
                 }
             }
         };
@@ -132,6 +143,7 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
         chkVerificarCodigoBarras = new vrframework.bean.checkBox.VRCheckBox();
         btnMapDivergencias = new vrframework.bean.button.VRButton();
         chkExibirDivergencias = new vrframework.bean.checkBox.VRCheckBox();
+        chkEliminarVendaExistente = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         btnSair = new vrframework.bean.button.VRButton();
         btnImportar = new vrframework.bean.button.VRButton();
@@ -187,6 +199,13 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
 
         chkExibirDivergencias.setText("Exibir divergências produtos não cadastrados");
 
+        chkEliminarVendaExistente.setText("Eliminar venda existente");
+        chkEliminarVendaExistente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkEliminarVendaExistenteActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
         vRPanel1Layout.setHorizontalGroup(
@@ -204,7 +223,8 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                             .addComponent(chkVerificarCodigoBarras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkVerificarCodigoAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkExibirDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnMapDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, 344, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(btnMapDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, 344, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkEliminarVendaExistente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 4, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -215,7 +235,7 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                 .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(flcArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(chkExibirDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkBaixaEstoque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -225,7 +245,9 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
                 .addComponent(chkVerificarCodigoBarras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMapDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(35, 35, 35)
+                .addGap(28, 28, 28)
+                .addComponent(chkEliminarVendaExistente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(vRLabel35, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cboLojaV2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -339,12 +361,17 @@ public class NotaSaidaNfceImportacaoArquivoGUI extends VRInternalFrame {
         ItensNaoExistenteGUI.exibir(this.mdiFrame);
     }//GEN-LAST:event_btnMapDivergenciasActionPerformed
 
+    private void chkEliminarVendaExistenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkEliminarVendaExistenteActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkEliminarVendaExistenteActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnImportar;
     private vrframework.bean.button.VRButton btnMapDivergencias;
     private vrframework.bean.button.VRButton btnSair;
     private javax.swing.JComboBox cboLojaV2;
     private vrframework.bean.checkBox.VRCheckBox chkBaixaEstoque;
+    private vrframework.bean.checkBox.VRCheckBox chkEliminarVendaExistente;
     private vrframework.bean.checkBox.VRCheckBox chkExibirDivergencias;
     private vrframework.bean.checkBox.VRCheckBox chkVerificarCodigoAnterior;
     private vrframework.bean.checkBox.VRCheckBox chkVerificarCodigoBarras;

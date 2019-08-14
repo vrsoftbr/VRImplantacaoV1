@@ -461,7 +461,11 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    f.des_email,\n" +
                     "    f.num_fax,\n" +
                     "    case f.micro_empresa when 'S' then 1 else 0 end microempresa,\n" +
-                    "    case f.flg_produtor_rural when 'S' then 1 else 0 end produtorrural\n" +
+                    "    case f.flg_produtor_rural when 'S' then 1 else 0 end produtorrural,\n" +
+                    "    bloq.des_motivo_bloq,\n" +
+                    "    f.des_email_vend email_vendedor,\n" +
+                    "    f.num_celular celular,\n" +
+                    "    f.num_med_cpgto condicaopagamento\n" +
                     "from\n" +
                     "    tab_fornecedor f\n" +
                     "    left join tab_cidade cd on\n" +
@@ -491,20 +495,33 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTel_principal(rst.getString("tel_principal"));
                     imp.setValor_minimo_pedido(rst.getDouble("valor_minimo_pedido"));
                     imp.setDatacadastro(rst.getDate("datacadastro"));
-                    imp.setObservacao(rst.getString("observacao"));
                     imp.setPrazoEntrega(rst.getInt("prazoEntrega"));
                     imp.setPrazoVisita(rst.getInt("prazovisita"));
                     imp.setPrazoSeguranca(rst.getInt("prazoseguranca"));
+                    
+                    StringBuilder obs = new StringBuilder();
+                    
+                    obs
+                            .append("CONTATO ").append(rst.getString("des_contato"))
+                            .append(" FONE.: ").append(rst.getString("tel_principal"))
+                            .append(" CEL.: ").append(rst.getString("celular"))
+                            .append(" FAX.: ").append(rst.getString("num_fax"))
+                            .append(" EMAIL VEND.: ").append(rst.getString("email_vendedor"))
+                            .append(" OUTROS EMAIL: ").append(rst.getString("des_email"))
+                            .append(" BLOQ.: ").append(rst.getString("des_motivo_bloq"))
+                            .append(" OBS.: ").append(rst.getString("observacao"));
+                    imp.setObservacao(obs.toString());
+                    
                     if (
                             !"".equals(Utils.acertarTexto(rst.getString("des_contato"))) ||
                             !"".equals(Utils.acertarTexto(rst.getString("tel_principal"))) ||
                             !"".equals(Utils.acertarTexto(rst.getString("des_email")))
                     ) {
-                        imp.addContato("A", rst.getString("des_contato"), rst.getString("tel_principal"), "", TipoContato.COMERCIAL, rst.getString("des_email"));
+                        imp.addContato("1", rst.getString("des_contato"), rst.getString("tel_principal"), rst.getString("celular"), TipoContato.COMERCIAL, rst.getString("email_vendedor"));
                     }
                     String fax = Utils.formataNumero(rst.getString("num_fax"));
                     if (!"0".equals(fax)) {
-                        imp.addContato("B", "FAX", fax, "", TipoContato.COMERCIAL, "");
+                        imp.addContato("2", "FAX", fax, "", TipoContato.COMERCIAL, "");
                     }
                                         
                     if (rst.getBoolean("produtorrural")) {
@@ -517,6 +534,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else if (rst.getBoolean("microempresa")) {
                         imp.setTipoEmpresa(TipoEmpresa.ME_SIMPLES);
                     }
+                    imp.setCondicaoPagamento(Utils.stringToInt(rst.getString("condicaopagamento")));
                     
                     result.add(imp);
                 }

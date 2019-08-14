@@ -79,6 +79,7 @@
                               <Component id="chkVerificarCodigoAnterior" min="-2" max="-2" attributes="0"/>
                               <Component id="chkExibirDivergencias" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="btnMapDivergencias" alignment="0" min="-2" pref="344" max="-2" attributes="0"/>
+                              <Component id="chkEliminarVendaExistente" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="0" pref="4" max="32767" attributes="0"/>
                       </Group>
@@ -94,7 +95,7 @@
                   <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="flcArquivo" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="17" max="32767" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
                   <Component id="chkExibirDivergencias" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="chkBaixaEstoque" min="-2" max="-2" attributes="0"/>
@@ -104,7 +105,9 @@
                   <Component id="chkVerificarCodigoBarras" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnMapDivergencias" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="35" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
+                  <Component id="chkEliminarVendaExistente" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="vRLabel35" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="cboLojaV2" min="-2" max="-2" attributes="0"/>
@@ -178,6 +181,14 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Exibir diverg&#xea;ncias produtos n&#xe3;o cadastrados"/>
           </Properties>
+        </Component>
+        <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkEliminarVendaExistente">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Eliminar venda existente"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkEliminarVendaExistenteActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

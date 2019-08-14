@@ -18,6 +18,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
@@ -53,6 +54,17 @@ import vrimplantacao2.utils.multimap.MultiMap;
 public class NotaSaidaNfceDAO {
 
     private ArrayList<DivergenciaVO> vDivergencia = null;
+
+    public void eliminarVenda(long idVenda) throws Exception{
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute("delete from pdv.vendanfce where id_venda = " + idVenda);
+            stm.execute("delete from pdv.vendaitem where id_venda = " + idVenda);
+            stm.execute("delete from pdv.vendafinalizadora where id_venda = " + idVenda);
+            stm.execute("delete from pdv.venda where id = " + idVenda);
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
 
     public static class LojaV2 {
 
@@ -237,11 +249,12 @@ public class NotaSaidaNfceDAO {
 
                 Element prod = (Element) det.getElementsByTagName("prod").item(0);
                 Element imposto = (Element) det.getElementsByTagName("imposto").item(0);
+                Element icms = (Element) imposto.getElementsByTagName("ICMS").item(0);
 
-                Element ICMS00 = (Element) imposto.getElementsByTagName("ICMS00").item(0);
-                Element ICMS40 = (Element) imposto.getElementsByTagName("ICMS40").item(0);
-                Element ICMS60 = (Element) imposto.getElementsByTagName("ICMS60").item(0);
-                Element ICMS90 = (Element) imposto.getElementsByTagName("ICMS90").item(0);
+                Element ICMS00 = (Element) icms.getElementsByTagName("ICMS00").item(0);
+                Element ICMS40 = (Element) icms.getElementsByTagName("ICMS40").item(0);
+                Element ICMS60 = (Element) icms.getElementsByTagName("ICMS60").item(0);
+                Element ICMS90 = (Element) icms.getElementsByTagName("ICMS90").item(0);
 
                 Element pICMS = (Element) imposto.getElementsByTagName("pICMS").item(0);
 
@@ -324,6 +337,8 @@ public class NotaSaidaNfceDAO {
 
                 int idAliquotaICMS = 0;
 
+                VendaItemVO oVendaItem = new VendaItemVO();
+                
                 if (ICMS00 != null) {
                     Element CST = (Element) ICMS00.getElementsByTagName("CST").item(0);
                     idAliquotaICMS = getIdAliquotaICMS(Integer.parseInt(CST.getTextContent()), Double.parseDouble(pICMS.getTextContent()));
@@ -335,7 +350,15 @@ public class NotaSaidaNfceDAO {
                 } else if (ICMS60 != null) {
                     Element CST = (Element) ICMS60.getElementsByTagName("CST").item(0);
                     idAliquotaICMS = getIdAliquotaICMS(Integer.parseInt(CST.getTextContent()), 0);
-
+                    
+                    Node vBCEfet = ICMS60.getElementsByTagName("vBCEfet").item(0);
+                    Node vICMSEfet = ICMS60.getElementsByTagName("vICMSEfet").item(0);
+                    if (vBCEfet != null) {
+                        oVendaItem.valorBaseSubstituicaoEfetivo = Utils.stringToDouble(vBCEfet.getTextContent(), 0);
+                    }
+                    if (vICMSEfet != null) {
+                        oVendaItem.valorIcmsSubstituicaoEfetivo = Utils.stringToDouble(vICMSEfet.getTextContent(), 0);
+                    }
                 } else if (ICMS90 != null) {
                     Element CST = (Element) ICMS90.getElementsByTagName("CST").item(0);
                     idAliquotaICMS = getIdAliquotaICMS(Integer.parseInt(CST.getTextContent()), Double.parseDouble(pICMS.getTextContent()));
@@ -345,7 +368,7 @@ public class NotaSaidaNfceDAO {
                 
                 codigoBarras = ("0".equals(Utils.formataNumero(cEAN.getTextContent())) ? String.valueOf(codigoProduto) : cEAN.getTextContent());
 
-                VendaItemVO oVendaItem = new VendaItemVO();
+                
                 oVendaItem.idProduto = codigoProduto;
                 oVendaItem.quantidade = Double.parseDouble(qCom.getTextContent());
                 oVendaItem.valorTotal = Double.parseDouble(vProd.getTextContent());
@@ -413,7 +436,7 @@ public class NotaSaidaNfceDAO {
 
         return writer.toString();
     }
-
+    
     public void salvarVenda(VendaVO i_oVenda) throws Exception {
         Statement stm = null;
         StringBuilder sql = null;
@@ -481,7 +504,7 @@ public class NotaSaidaNfceDAO {
                 sql.append("INSERT INTO pdv.vendaitem (id_venda, id_produto, quantidade, precovenda, valortotal, id_aliquota,");
                 sql.append(" cancelado, valorcancelado, id_tipocancelamento, matriculacancelamento, contadordoc, valordesconto,");
                 sql.append(" valoracrescimo, valordescontocupom, valoracrescimocupom, regracalculo, codigobarras, unidademedida,");
-                sql.append(" totalizadorparcial, sequencia, valoracrescimofixo, valordescontopromocao) VALUES (");
+                sql.append(" totalizadorparcial, sequencia, valoracrescimofixo, valordescontopromocao, valorbasesubstituicaoefetivo, valoricmssubstituicaoefetivo) VALUES (");
                 sql.append(idVenda + ", ");
                 sql.append(oItem.idProduto + ", ");
                 sql.append(oItem.quantidade + ", ");
@@ -503,7 +526,9 @@ public class NotaSaidaNfceDAO {
                 sql.append("'" + oItem.totalizadorParcial + "', ");
                 sql.append(oItem.sequencia + ",");
                 sql.append(oItem.valorAcrescimoFixo + ",");
-                sql.append(oItem.valorDescontoPromocao + ")");
+                sql.append(oItem.valorDescontoPromocao + ",");
+                sql.append(oItem.valorBaseSubstituicaoEfetivo + ",");
+                sql.append(oItem.valorIcmsSubstituicaoEfetivo + ")");
 
                 stm.execute(sql.toString());
 
@@ -652,7 +677,7 @@ public class NotaSaidaNfceDAO {
         //sql.append(" AND data='" + Format.dataBanco(i_oVenda.data) + "'");
         sql.append(" AND data='" + Util.formatDataBanco(i_oVenda.data) + "'");
         sql.append(" AND numerocupom=" + i_oVenda.numeroCupom);
-
+        System.out.println(sql.toString());
         rst = stm.executeQuery(sql.toString());
 
         if (rst.next()) {
