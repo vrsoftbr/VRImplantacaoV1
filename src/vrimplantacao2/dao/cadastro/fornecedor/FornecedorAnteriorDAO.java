@@ -199,7 +199,7 @@ public class FornecedorAnteriorDAO {
                     "	importid = '" + id + "'"
             )) {
                 if (rst.next()) {
-                    return rst.getObject("codigoatual", Integer.class);
+                    return rst.getInt("codigoatual");
                 }
             }
         }

@@ -83,7 +83,7 @@ public class NotaFiscalAnteriorVO {
     }
 
     public void setTipoNota(TipoNota tipoNota) {
-        this.tipoNota = tipoNota;
+        this.tipoNota = tipoNota == null ? TipoNota.NORMAL : tipoNota;
     }
 
     public String getModelo() {

@@ -196,7 +196,7 @@ public class ClienteEventualAnteriorDAO {
                     "	id = '" + id + "'"
             )) {
                 if (rst.next()) {
-                    return rst.getObject("codigoatual", Integer.class);
+                    return rst.getInt("codigoatual");
                 }
             }
         }

@@ -157,7 +157,7 @@ public class NotaEntradaDAO {
         sql.put("informacaocomplementar", ne.getInformacaoComplementar());
         sql.put("valoricmssn", ne.getValorIcmsSN());
         sql.put("datahoraalteracao", ne.getDataHoraAlteracao());
-        sql.put("liberadovencimento", ne.getLiberadoVencimento(), -1);
+        sql.put("liberadovencimento", ne.getLiberadoVencimento(), -2);
         sql.put("justificativadivergencia", ne.getJustificativaDivergencia());
         sql.put("consistido", ne.isConsistido());
         sql.put("quantidadepaletes", ne.getQuantidadePaletes());

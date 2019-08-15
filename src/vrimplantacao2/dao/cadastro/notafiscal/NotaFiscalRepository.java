@@ -4,6 +4,9 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import vrframework.classe.Conexao;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaEntrada;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaSaida;
@@ -18,6 +21,8 @@ import vrimplantacao2.vo.importacao.NotaOperacao;
  */
 public class NotaFiscalRepository {
     
+    private static final Logger LOG = Logger.getLogger(NotaFiscalRepository.class.getName());
+    
     private final NotaFiscalRepositoryProvider provider;
     
     private final int tipoNotaEntrada;
@@ -31,114 +36,126 @@ public class NotaFiscalRepository {
     }
 
     public void importar(List<NotaFiscalIMP> notas, HashSet<OpcaoNotaFiscal> opt) throws Exception {
-        this.provider.notificar("Notas Fiscais...Carregando anteriores...");
-        this.anteriores = provider.getAnteriores();
-        this.provider.notificar("Notas Fiscais...Gravando notas fiscais...", notas.size());
+        try {
+            Conexao.begin();
         
-        boolean apagarNotasExistentes = opt.contains(OpcaoNotaFiscal.IMP_EXCLUIR_NOTAS_EXISTENTES);
-        
-        for (NotaFiscalIMP imp: notas) {
-            //Verifica a existência de anterior
-            NotaFiscalAnteriorVO anterior = anteriores.get(
-                    String.valueOf(imp.getOperacao().getId()),
-                    imp.getId()
-            );
-            //Se não existir
-            if (anterior == null) {
-                anterior = converterAnterior(imp);
-                //Verifica a existencia da nota no banco e cria o anterior.
-                if (imp.getOperacao() == NotaOperacao.ENTRADA) {
-                    Integer idNotaEntrada = provider.getIdNotaEntrada(imp);
-                    //Se a nota existir
-                    if (idNotaEntrada != null) {
-                        //Se a ordem for para excluir a nota se ela existir.
+            this.provider.notificar("Notas Fiscais...Carregando anteriores...");
+            this.anteriores = provider.getAnteriores();
+            this.provider.notificar("Notas Fiscais...Gravando notas fiscais...", notas.size());
+
+            boolean apagarNotasExistentes = opt.contains(OpcaoNotaFiscal.IMP_EXCLUIR_NOTAS_EXISTENTES);
+
+            for (NotaFiscalIMP imp: notas) {
+                //Verifica a existência de anterior
+                NotaFiscalAnteriorVO anterior = anteriores.get(
+                        String.valueOf(imp.getOperacao().getId()),
+                        imp.getId()
+                );
+                //Se não existir
+                if (anterior == null) {
+                    anterior = converterAnterior(imp);
+                    //Verifica a existencia da nota no banco e cria o anterior.
+                    if (imp.getOperacao() == NotaOperacao.ENTRADA) {
+                        Integer idNotaEntrada = provider.getIdNotaEntrada(imp);
+                        //Se a nota existir
+                        if (idNotaEntrada != null) {
+                            //Se a ordem for para excluir a nota se ela existir.
+                            if (apagarNotasExistentes) {
+                                //Elimina ela do banco
+
+                                /**
+                                 * TODO: Incluir código que ao ocorrer um erro, ele vincula a nota 
+                                 * ao anterior e vai para o próximo
+                                 */                            
+                                provider.eliminarNotaEntrada(idNotaEntrada);
+                            } else {
+                                //Grava o anterior no banco e segue para a próxima nota
+                                anterior.setIdNotaEntrada(idNotaEntrada);
+                                provider.incluirAnterior(anterior);
+                                addAnterior(anterior);
+                                provider.notificar();
+                                continue;                            
+                            }
+                        }
+
+                        NotaEntrada ne = gravarNotaEntrada(imp);
+                        //Vincula o anterior
+                        anterior.setIdNotaEntrada(ne.getId());  
+
+                    } else {
+                        Integer idNotaSaida = provider.getIdNotaSaida(imp);
+                        //Se a nota existir
+                        if (idNotaSaida != null) {
+                            //Se a ordem for para excluir a nota se ela existir.
+                            if (apagarNotasExistentes) {
+                                //Elimina ela do banco
+                                provider.eliminarNotaSaida(idNotaSaida);
+                            } else {
+                                //Grava o anterior no banco e segue para a próxima nota
+                                anterior.setIdNotaSaida(idNotaSaida);
+                                provider.incluirAnterior(anterior);
+                                addAnterior(anterior);
+                                provider.notificar();
+                                continue;                            
+                            }
+                        }
+
+                        NotaSaida ns = gravarNotaSaida(imp);
+                        //Vincula o anterior
+                        anterior.setIdNotaSaida(ns.getId()); 
+
+                    }
+                    //Incluindo o código anterior no banco.
+                    this.provider.incluirAnterior(anterior);
+                    addAnterior(anterior);                
+                } else {
+                    //Se a ordem for apagar as notas, elimina as notas se existirem
+                    //senão vai para a próxima nota.
+                    if (anterior.getOperacao() == NotaOperacao.ENTRADA && anterior.getIdNotaEntrada() != null) {
                         if (apagarNotasExistentes) {
-                            //Elimina ela do banco
-                            
-                            /**
-                             * TODO: Incluir código que ao ocorrer um erro, ele vincula a nota 
-                             * ao anterior e vai para o próximo
-                             */                            
-                            provider.eliminarNotaEntrada(idNotaEntrada);
+                            provider.eliminarNotaEntrada(anterior.getIdNotaEntrada());
                         } else {
-                            //Grava o anterior no banco e segue para a próxima nota
-                            anterior.setIdNotaEntrada(idNotaEntrada);
-                            provider.incluirAnterior(anterior);
-                            addAnterior(anterior);
-                            provider.notificar();
-                            continue;                            
+                            continue;
+                        }
+                    } else if (anterior.getOperacao() == NotaOperacao.SAIDA && anterior.getIdNotaSaida() != null) {
+                        if (apagarNotasExistentes) {
+                            provider.eliminarNotaSaida(anterior.getIdNotaSaida());
+                        } else {
+                            continue;
                         }
                     }
-                        
-                    NotaEntrada ne = gravarNotaEntrada(imp);
-                    //Vincula o anterior
-                    anterior.setIdNotaEntrada(ne.getId());  
-                    
-                } else {
-                    Integer idNotaSaida = provider.getIdNotaSaida(imp);
-                    //Se a nota existir
-                    if (idNotaSaida != null) {
-                        //Se a ordem for para excluir a nota se ela existir.
-                        if (apagarNotasExistentes) {
-                            //Elimina ela do banco
-                            provider.eliminarNotaSaida(idNotaSaida);
-                        } else {
-                            //Grava o anterior no banco e segue para a próxima nota
-                            anterior.setIdNotaSaida(idNotaSaida);
-                            provider.incluirAnterior(anterior);
-                            addAnterior(anterior);
-                            provider.notificar();
-                            continue;                            
-                        }
-                    }
-                    
-                    NotaSaida ns = gravarNotaSaida(imp);
-                    //Vincula o anterior
-                    anterior.setIdNotaSaida(ns.getId()); 
-                    
-                }
-                //Incluindo o código anterior no banco.
-                this.provider.atualizarAnterior(anterior);
-                addAnterior(anterior);
-                
-            } else {
-                //Se a ordem for apagar as notas, elimina as notas se existirem
-                //senão vai para a próxima nota.
-                if (anterior.getOperacao() == NotaOperacao.ENTRADA && anterior.getIdNotaEntrada() != null) {
-                    if (apagarNotasExistentes) {
-                        provider.eliminarNotaEntrada(anterior.getIdNotaEntrada());
+                    anterior.setIdNotaEntrada(null);
+                    anterior.setIdNotaSaida(null);
+
+                    //Conversão e inclusão da nota
+                    if (imp.getOperacao() == NotaOperacao.ENTRADA) {
+                        NotaEntrada ne = gravarNotaEntrada(imp);
+                        anterior.setIdNotaEntrada(ne.getId());  
                     } else {
-                        continue;
+                        NotaSaida ns = gravarNotaSaida(imp);
+                        anterior.setIdNotaSaida(ns.getId());  
                     }
-                } else if (anterior.getOperacao() == NotaOperacao.SAIDA && anterior.getIdNotaSaida() != null) {
-                    if (apagarNotasExistentes) {
-                        provider.eliminarNotaSaida(anterior.getIdNotaSaida());
-                    } else {
-                        continue;
-                    }
-                }
-                anterior.setIdNotaEntrada(null);
-                anterior.setIdNotaSaida(null);
-                
-                //Conversão e inclusão da nota
-                if (imp.getOperacao() == NotaOperacao.ENTRADA) {
-                    NotaEntrada ne = gravarNotaEntrada(imp);
-                    anterior.setIdNotaEntrada(ne.getId());  
-                } else {
-                    NotaSaida ns = gravarNotaSaida(imp);
-                    anterior.setIdNotaSaida(ns.getId());  
-                }
-                //Incluindo o código anterior no banco.
-                this.provider.atualizarAnterior(anterior);
-                addAnterior(anterior);
-            }            
-            provider.notificar();
+                    //Incluindo o código anterior no banco.
+                    this.provider.atualizarAnterior(anterior);
+                    addAnterior(anterior);
+                }            
+                provider.notificar();
+            }
+            
+            Conexao.commit();
+        } catch (Exception ex) {
+            Conexao.rollback();
+            LOG.log(Level.SEVERE, ex.getMessage(), ex);
+            ex.printStackTrace();
+            throw ex;
+        } finally {
+            //Limpando variaveis
+            if (this.anteriores != null) {
+                this.anteriores.clear();
+                this.anteriores = null;
+            }
+            System.gc();
         }
-        
-        //Limpando variaveis
-        this.anteriores.clear();
-        this.anteriores = null;
-        System.gc();
     }
 
     /**
@@ -188,21 +205,17 @@ public class NotaFiscalRepository {
             return null;
         }
     }
-
-    public int getFornecedor(String idDestinatario) throws Exception {
-        return provider.getFornecedorById(idDestinatario);
-    }
-    
-    public int getClienteEventual(String idDestinatario) throws Exception {
-        return provider.getClienteEventual(idDestinatario);
-    }
     
     public NotaEntrada converterNotaEntrada(NotaFiscalIMP imp) throws Exception {
         NotaEntrada n = new NotaEntrada();
         
         n.setIdLoja(this.provider.getLojaVR());
         n.setNumeroNota(imp.getNumeroNota());
-        n.setIdFornecedor(getFornecedor(imp.getIdDestinatario()));
+        Integer fornecedor = provider.getFornecedorById(imp.getIdDestinatario());
+        if (fornecedor == null) {
+            throw new Exception("Fornecedor não encontrado " + imp.getIdDestinatario());
+        }
+        n.setIdFornecedor(fornecedor);
         n.setDataEntrada(imp.getDataEmissao());
         n.setIdTipoEntrada(this.tipoNotaEntrada);
         n.setDataEmissao(imp.getDataEmissao());
@@ -270,10 +283,18 @@ public class NotaFiscalRepository {
         n.setTipoNota(imp.getTipoNota());
         switch (imp.getTipoDestinatario()) {
             case FORNECEDOR:
-                n.setIdFornecedor(getFornecedor(imp.getIdDestinatario()));
+                Integer fornecedor = provider.getFornecedorById(imp.getIdDestinatario());
+                if (fornecedor == null) {
+                    throw new Exception("Fornecedor não encontrado " + imp.getIdDestinatario());
+                }
+                n.setIdFornecedor(fornecedor);
                 break;
             case CLIENTE_EVENTUAL:
-                n.setIdClienteEventual(getClienteEventual(imp.getIdDestinatario()));
+                Integer clienteeventual = provider.getClienteEventual(imp.getIdDestinatario());
+                if (clienteeventual == null) {
+                    throw new Exception("Cliente eventual não encontrado " + imp.getIdDestinatario());
+                }
+                n.setIdClienteEventual(clienteeventual);
                 break;
         }                
         n.setIdTipoSaida(this.tipoNotaSaida);
@@ -367,6 +388,5 @@ public class NotaFiscalRepository {
         
         return vo;
     }
-    
-    
+       
 }
