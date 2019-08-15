@@ -159,6 +159,7 @@ public class RPInfoGUI extends VRInternalFrame {
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
                     dao.importarFuncionario = chkImportarFuncionario.isSelected();
                     dao.gerarCodigoAtacado = chkGerarCodigoAtacado.isSelected();
+                    dao.idLojaVR = idLojaVR;
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
