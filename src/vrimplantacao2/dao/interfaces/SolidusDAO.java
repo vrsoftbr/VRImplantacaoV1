@@ -71,7 +71,6 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     private List<Entidade> entidadesCheques;
     private List<Entidade> entidadesCreditoRotativo;
     private List<Entidade> entidadesContas;
-    private Date dataEmissaoNfe = new Date();
     
     private boolean removerDigitoProdutoBalanca = false;
 
@@ -105,10 +104,6 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setEntidadesContas(List<Entidade> entidadesContas) {
         this.entidadesContas = entidadesContas;
-    }
-
-    public void setDataEmissaoNfe(Date dataEmissaoNfe) {
-        this.dataEmissaoNfe = dataEmissaoNfe != null ? dataEmissaoNfe : new Date();
     }
     
     @Override
@@ -1296,7 +1291,6 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    nf.dta_emissao dataemissao,\n" +
                     "    nf.dta_entrada dataentradasaida,\n" +
                     "    nf.val_total_nf total_nota,\n" +
-                    "    nf.cod_parceiro dest_id,\n" +
                     "    nf.cod_transportadora,\n" +
                     "    nf.cod_motorista,\n" +
                     "    nf.tipo_frete,\n" +
@@ -1314,8 +1308,10 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    tab_nf nf\n" +
                     "where\n" +
                     "    nf.cod_loja = " + getLojaOrigem() + " and\n" +
-                    "    nf.tipo_operacao = 0 and\n" + //TODO: Excluir esta linha quando incluir a nota de saida
-                    "    nf.dta_emissao >= " + SQLUtils.stringSQL(DATE_FORMAT.format(dataEmissaoNfe)) + "\n" +
+                    "    nf.tipo_operacao in (0,1) and\n" +
+                    "    nf.tipo_nf in (0,1) and\n" +
+                    //"    nf.tipo_operacao = 0 and\n" + //TODO: Excluir esta linha quando incluir a nota de saida
+                    "    nf.dta_emissao >= " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + "\n" +
                     "order by\n" +
                     "    nf.dta_emissao"
             )) {
@@ -1341,7 +1337,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataEntradaSaida(rst.getDate("dataentradasaida"));
                     imp.setValorTotal(rst.getDouble("total_nota"));
                     imp.setTipoDestinatario(imp.getOperacao() == NotaOperacao.ENTRADA ? TipoDestinatario.FORNECEDOR : TipoDestinatario.CLIENTE_EVENTUAL);
-                    imp.setIdDestinatario(rst.getString("dest_id"));
+                    imp.setIdDestinatario(rst.getString("cod_parceiro"));
                     //imp.set(rst.getString("cod_transportadora"));
                     //imp.set(rst.getString("cod_motorista"));
                     imp.setTipoFreteNotaFiscal(TipoFreteNotaFiscal.get(rst.getInt("tipo_frete")));
