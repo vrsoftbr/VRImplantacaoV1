@@ -75,8 +75,8 @@ public class NotaSaidaDAO {
 
     public void eliminarNota(int id) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            stm.executeQuery("delete from notasaidaitem where id_notasaida = " + id);
-            stm.executeQuery("delete from notasaida where id = " + id);
+            stm.execute("delete from notasaidaitem where id_notasaida = " + id);
+            stm.execute("delete from notasaida where id = " + id);
         }
     }
 

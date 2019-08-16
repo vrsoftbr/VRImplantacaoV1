@@ -28,6 +28,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.notafiscal.OpcaoNotaFiscal;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.SolidusDAO;
@@ -378,7 +379,7 @@ public class SolidusGUI extends VRInternalFrame {
                         }
                         if (chkNotasFiscais.isSelected()) {
                             dao.setNotasDataInicio(edtDtNotaIni.getDate());
-                            importador.importarNotas();
+                            importador.importarNotas(OpcaoNotaFiscal.IMP_EXCLUIR_NOTAS_EXISTENTES);
                         }
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {

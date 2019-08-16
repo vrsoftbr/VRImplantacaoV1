@@ -115,12 +115,14 @@ public class NotaFiscalRepository {
                         if (apagarNotasExistentes) {
                             provider.eliminarNotaEntrada(anterior.getIdNotaEntrada());
                         } else {
-                            continue;
+                            provider.notificar();
+                            continue;      
                         }
                     } else if (anterior.getOperacao() == NotaOperacao.SAIDA && anterior.getIdNotaSaida() != null) {
                         if (apagarNotasExistentes) {
                             provider.eliminarNotaSaida(anterior.getIdNotaSaida());
                         } else {
+                            provider.notificar();
                             continue;
                         }
                     }

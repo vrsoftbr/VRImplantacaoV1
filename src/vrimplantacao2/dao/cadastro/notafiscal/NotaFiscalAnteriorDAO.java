@@ -3,6 +3,7 @@ package vrimplantacao2.dao.cadastro.notafiscal;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import vrframework.classe.Conexao;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.notafiscal.TipoNota;
@@ -88,8 +89,8 @@ public class NotaFiscalAnteriorDAO {
                     vo.setLoja(rst.getString("loja"));
                     vo.setOperacao(NotaOperacao.get(rst.getInt("operacao")));
                     vo.setId(rst.getString("id"));
-                    vo.setIdNotaSaida(asfasdas rst.getObject("id_notasaida", Integer.class));
-                    vo.setIdNotaEntrada(rst.getObject("id_notaentrada", Integer.class));
+                    vo.setIdNotaSaida(Utils.toInteger(rst.getString("id_notasaida")));
+                    vo.setIdNotaEntrada(Utils.toInteger(rst.getString("id_notaentrada")));
                     vo.setTipoNota(TipoNota.get(rst.getInt("tiponota")));
                     vo.setModelo(rst.getString("modelo"));
                     vo.setSerie(rst.getString("serie"));
