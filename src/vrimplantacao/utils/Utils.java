@@ -79,7 +79,35 @@ public class Utils {
         return telefone;
     }
 
-    public double calcularSemImposto(double i_custoComImposto, double i_icmsCredito, double i_pisCofins, double i_valorIva, double i_valorIpi) throws Exception {
+    /**
+     * Converte um texto em {@link Long} removendo os caracteres não numéricos.
+     * @param texto Texto a ser convertido.
+     * @return {@link Long} convertido ou null caso a string seja null ou ""
+     */
+    public static Long toLong(String texto) {
+        texto = Utils.formataNumero(texto, "");
+        int size = String.valueOf(Long.MAX_VALUE).length();
+        if (texto.length() > size) {
+            texto = texto.substring(0, size);
+        }
+        return !texto.equals(VALOR_VAZIO) ? Long.parseLong(texto) : null;
+    }
+    
+    /**
+     * Converte um texto em {@link Long} removendo os caracteres não numéricos.
+     * @param texto Texto a ser convertido.
+     * @return {@link Long} convertido ou null caso a string seja null ou ""
+     */
+    public static Integer toInteger(String texto) {
+        Long result = Utils.toLong(texto);
+        if (result != null && result >= Integer.MIN_VALUE && result <= Integer.MAX_VALUE) {
+            return result.intValue();
+        } else {
+            return null;
+        }
+    }
+
+    public static double calcularSemImposto(double i_custoComImposto, double i_icmsCredito, double i_pisCofins, double i_valorIva, double i_valorIpi) throws Exception {
         double custoSemImposto = ((i_custoComImposto - i_valorIva - i_valorIpi) * ((100 - i_icmsCredito - i_pisCofins) / 100)) + i_valorIva + i_valorIpi;
         return Util.round(custoSemImposto, 4);
     }
