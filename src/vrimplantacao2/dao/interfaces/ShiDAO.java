@@ -22,6 +22,7 @@ import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
+import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
@@ -38,6 +39,7 @@ import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 
 /**
  *
@@ -1011,6 +1013,34 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    @Override
+    public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
+        List<ReceitaBalancaIMP> result = new ArrayList<>();
+
+        try (Statement stm = sco.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "p.codigo id_produto,\n"
+                    + "p.descri desc_produto,\n"
+                    + "p.receita,\n"
+                    + "r.descri desc_receita\n"
+                    + "from produtos p\n"
+                    + "join receita r on r.codigo = p.receita and r.codigo > 0"
+            )) {
+                while (rst.next()) {
+                    ReceitaBalancaIMP imp = new ReceitaBalancaIMP();
+
+                    imp.setId(rst.getString("receita") + "-" + rst.getString("id_produto"));
+                    imp.setDescricao(rst.getString("desc_produto"));
+                    imp.setReceita(rst.getString("desc_receita"));
+                    imp.getProdutos().add(rst.getString("id_produto"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
     private List<NutricionalToledoVO> carregarNutricionalToledo() throws Exception {
         List<NutricionalToledoVO> vNutricionalToledo = new ArrayList<>();
 

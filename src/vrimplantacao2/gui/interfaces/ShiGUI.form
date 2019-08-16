@@ -239,7 +239,7 @@
                               <Component id="vRLabel21" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="txtSenha" min="-2" pref="96" max="-2" attributes="0"/>
-                              <EmptySpace pref="26" max="32767" attributes="0"/>
+                              <EmptySpace pref="109" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -399,49 +399,52 @@
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="chkT1EAN" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkT1EANemBranco" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkT1PisCofins" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkT1NatReceita" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkT1ICMS" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkT1AtivoInativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkT1EAN" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkT1EANemBranco" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkT1PisCofins" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkT1NatReceita" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkT1ICMS" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkT1AtivoInativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCustoComImposto" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCustoSemImposto" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="29" max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="103" alignment="0" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="1" attributes="0">
+                                      <Component id="chkT1DescCompleta" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" pref="32" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" attributes="0">
-                                          <Component id="chkT1DescCompleta" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                          <Component id="chkValidade" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" attributes="0">
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="chkT1DescReduzida" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkT1DescGondola" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkT1ProdMercadologico" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkNutricional" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkReceitaFilizola" min="-2" max="-2" attributes="0"/>
                                       </Group>
-                                      <Component id="chkT1DescReduzida" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <Group type="103" groupAlignment="0" attributes="0">
-                                              <Component id="chkT1DescGondola" alignment="0" min="-2" max="-2" attributes="0"/>
-                                              <Component id="chkT1ProdMercadologico" alignment="0" min="-2" max="-2" attributes="0"/>
-                                              <Component id="chkNutricional" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                          <Group type="103" groupAlignment="0" attributes="0">
-                                              <Component id="chkQtdEmbalagemEAN" min="-2" max="-2" attributes="0"/>
-                                              <Component id="chkTipoEmbalagemEAN" min="-2" max="-2" attributes="0"/>
-                                              <Component id="chkFamilia" min="-2" max="-2" attributes="0"/>
-                                              <Component id="chkAtacado" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
                                   </Group>
                               </Group>
-                              <Component id="chkCustoComImposto" min="-2" max="-2" attributes="0"/>
-                              <Group type="102" attributes="0">
-                                  <Component id="chkCustoSemImposto" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                  <Component id="chkOfertas" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="txtDtOferta" min="-2" pref="69" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkReceitaToledo" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="54" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace pref="25" max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="txtDtOferta" min="-2" pref="69" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="chkQtdEmbalagemEAN" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkTipoEmbalagemEAN" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkFamilia" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkAtacado" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="1" attributes="0">
+                                      <Component id="chkOfertas" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="-2" pref="71" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Component id="chkValidade" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -451,88 +454,101 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
-                                  <Group type="103" groupAlignment="3" attributes="0">
-                                      <Component id="chkT1DescCompleta" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkValidade" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkT1DescReduzida" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="3" attributes="0">
-                                      <Component id="chkT1DescGondola" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkFamilia" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
-                              <Group type="103" groupAlignment="1" attributes="0">
-                                  <Group type="102" alignment="1" attributes="0">
-                                      <Component id="chkFamiliaProduto" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="chkMercadologico" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="1" attributes="0">
+                                      <Group type="102" alignment="1" attributes="0">
+                                          <Component id="chkFamiliaProduto" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkMercadologico" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Group type="103" groupAlignment="0" attributes="0">
+                                              <Component id="chkProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkManterBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                      </Group>
                                       <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="chkProdutos" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkManterBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Group type="102" alignment="0" attributes="0">
+                                              <EmptySpace min="-2" pref="46" max="-2" attributes="0"/>
+                                              <Component id="chkT1PisCofins" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                          <Group type="102" alignment="0" attributes="0">
+                                              <Component id="chkT1EAN" min="-2" max="-2" attributes="0"/>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="chkT1EANemBranco" min="-2" max="-2" attributes="0"/>
+                                          </Group>
                                       </Group>
                                   </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" alignment="0" attributes="0">
                                           <EmptySpace min="-2" pref="46" max="-2" attributes="0"/>
-                                          <Component id="chkT1PisCofins" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkT1Estoque" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
-                                          <Component id="chkT1EAN" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace min="23" pref="23" max="-2" attributes="0"/>
+                                          <Component id="chkT1Preco" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Component id="chkT1Custo" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Component id="chkT1NatReceita" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="chkT1EANemBranco" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkT1ICMS" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkT1AtivoInativo" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                               </Group>
                               <Group type="102" attributes="0">
-                                  <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
-                                  <Component id="chkAtacado" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <EmptySpace min="-2" pref="46" max="-2" attributes="0"/>
-                                  <Component id="chkT1Estoque" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <EmptySpace min="23" pref="23" max="-2" attributes="0"/>
-                                  <Component id="chkT1Preco" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Component id="chkT1Custo" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="3" attributes="0">
-                                      <Component id="chkT1NatReceita" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkT1ProdMercadologico" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkTipoEmbalagemEAN" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <EmptySpace min="-2" pref="46" max="-2" attributes="0"/>
+                                          <Component id="chkFamilia" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
+                                          <Group type="103" groupAlignment="3" attributes="0">
+                                              <Component id="chkAtacado" alignment="3" min="-2" max="-2" attributes="0"/>
+                                              <Component id="chkT1DescReduzida" alignment="3" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkT1DescGondola" min="-2" max="-2" attributes="0"/>
+                                      </Group>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
-                                      <Component id="chkT1ICMS" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkTipoEmbalagemEAN" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkT1ProdMercadologico" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
                                       <Component id="chkQtdEmbalagemEAN" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkNutricional" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkT1AtivoInativo" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="chkOfertas" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkReceitaFilizola" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="chkT1DescCompleta" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkValidade" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
-                                  <EmptySpace type="unrelated" pref="23" max="32767" attributes="0"/>
+                                  <EmptySpace type="unrelated" pref="25" max="32767" attributes="0"/>
                                   <Component id="btnMapaTribut" min="-2" pref="35" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkCustoComImposto" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
-                                      <Component id="chkCustoSemImposto" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="chkOfertas" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkCustoComImposto" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkReceitaToledo" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Component id="txtDtOferta" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCustoSemImposto" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace pref="24" max="32767" attributes="0"/>
                               </Group>
                           </Group>
@@ -699,6 +715,16 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNutricional">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Nutricional"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkReceitaFilizola">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Receita Filizola"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkReceitaToledo">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Receita Toledo"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -954,7 +980,7 @@
                               <Component id="chkConvConveniado" min="-2" max="-2" attributes="0"/>
                               <Component id="chkConvRecebimento" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="377" max="32767" attributes="0"/>
+                          <EmptySpace pref="460" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
