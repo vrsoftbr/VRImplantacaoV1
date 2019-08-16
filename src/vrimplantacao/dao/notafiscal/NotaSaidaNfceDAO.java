@@ -270,8 +270,9 @@ public class NotaSaidaNfceDAO {
                 Element qCom = (Element) prod.getElementsByTagName("qCom").item(0);
 
                 if (verificarCodigoAnterior) {
-                    String codigo = cProd.getTextContent().replace("'", "").replace("\n", "").trim();
-                    ProdutoMapa mp = mapa.get(tipo.toString(), codigo);
+                    String codigo = cProd.getTextContent().replace("'", "").replace("\n", "").trim(), codigoAcom;
+                    codigoAcom = codigo.substring(0, codigo.length() - 2);
+                    ProdutoMapa mp = mapa.get(tipo.toString(), codigoAcom);
                     if (importacaoV2) {
                         daoV2.setImportSistema(impLoja.impSistema);
                         daoV2.setImportLoja(impLoja.impLoja);
@@ -279,7 +280,7 @@ public class NotaSaidaNfceDAO {
                         if (mp != null && mp.getCodigoAtual() > 0) {
                             codigoProduto = mp.getCodigoAtual();
                         } else {
-                            codigoProduto = daoV2.getCodigoAnterior2(daoV2.getImportSistema(), daoV2.getImportLoja(), codigo);
+                            codigoProduto = daoV2.getCodigoAnterior2(daoV2.getImportSistema(), daoV2.getImportLoja(), codigoAcom);
                         }
                     } else {
                         if (mp != null && mp.getCodigoAtual() > 0) {
@@ -309,7 +310,7 @@ public class NotaSaidaNfceDAO {
                         if (mp != null && mp.getCodigoAtual() > 0) {
                             codigoProduto = mp.getCodigoAtual();
                         } else {
-                            codigoProduto = daoV2.getCodigoAtualEANant(daoV2.getImportSistema(), daoV2.getImportLoja(), cProd.getTextContent().replace("'", "").replace("\n", "").trim());
+                            codigoProduto = daoV2.getCodigoAtualEANant(daoV2.getImportSistema(), daoV2.getImportLoja(), cEAN.getTextContent().replace("'", "").replace("\n", "").trim());
                         }
                     } else {
 
