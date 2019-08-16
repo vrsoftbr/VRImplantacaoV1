@@ -31,7 +31,7 @@ import vrimplantacao.gui.interfaces.AriusGUI;
 import vrimplantacao.gui.interfaces.ArquivoPadraoGUI;
 import vrimplantacao.gui.interfaces.BoechatSoftGUI;
 import vrimplantacao.gui.interfaces.ConcretizeGUI;
-import vrimplantacao.gui.interfaces.ControlWareGUI;
+import vrimplantacao2.gui.interfaces.ControlWareGUI;
 import vrimplantacao.gui.interfaces.ControllGUI;
 import vrimplantacao.gui.interfaces.DGComGUI;
 import vrimplantacao2.gui.interfaces.DelphiGUI;
@@ -3012,18 +3012,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemCISSActionPerformed
 
     private void jMenuItemControlWareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemControlWareActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarControlWare == null || formImportarControlWare.isClosed()) {
-                formImportarControlWare = new ControlWareGUI(this);
-            }
-
-            formImportarControlWare.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
+        ControlWareGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemControlWareActionPerformed
 
     private void jMenuItemDestroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemDestroActionPerformed
