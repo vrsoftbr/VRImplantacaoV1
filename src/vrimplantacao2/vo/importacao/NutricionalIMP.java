@@ -72,7 +72,11 @@ public class NutricionalIMP {
     }
 
     public void setDescricao(String descricao) {
-        this.descricao = descricao;
+        if (descricao.length() > 20) {
+            this.descricao = descricao.substring(0, 20);
+        } else {
+            this.descricao = descricao;
+        }
     }
 
     public SituacaoCadastro getSituacaoCadastro() {
