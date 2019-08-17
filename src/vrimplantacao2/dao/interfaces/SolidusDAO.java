@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.interfaces.custom.solidus.Entidade;
@@ -46,6 +47,7 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NotaFiscalIMP;
 import vrimplantacao2.vo.importacao.NotaOperacao;
+import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -213,7 +215,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.PAUTA_FISCAL,
             OpcaoProduto.PAUTA_FISCAL_PRODUTO,
             OpcaoProduto.PESO_BRUTO,
-            OpcaoProduto.PESO_LIQUIDO
+            OpcaoProduto.PESO_LIQUIDO,
+            OpcaoProduto.NUTRICIONAL
         }));
     }
 
@@ -1548,5 +1551,96 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }    
+
+    @Override
+    public List<NutricionalIMP> getNutricional(Set<OpcaoNutricional> opcoes) throws Exception {
+        List<NutricionalIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    n.cod_info_nutricional id,\n" +
+                    "    n.des_info_nutricional descricao,\n" +
+                    "    n.valor_calorico caloria,\n" +
+                    "    n.carboidrato,\n" +
+                    "    n.proteina,\n" +
+                    "    n.gordura_total gordura,\n" +
+                    "    n.gordura_saturada,\n" +
+                    "    n.gordura_trans,\n" +
+                    "    n.colesterol,\n" +
+                    "    n.fibra_alimentar,\n" +
+                    "    n.calcio,\n" +
+                    "    n.ferro,\n" +
+                    "    n.sodio,\n" +
+                    "    n.vd_valor_calorico,\n" +
+                    "    n.vd_carboidrato,\n" +
+                    "    n.vd_proteina,\n" +
+                    "    n.vd_gordura_total,\n" +
+                    "    n.vd_gordura_saturada,\n" +
+                    "    n.vd_gordura_trans,\n" +
+                    "    n.vd_fibra_alimentar,\n" +
+                    "    n.vd_calcio,\n" +
+                    "    n.vd_ferro,\n" +
+                    "    n.vd_sodio,\n" +
+                    "    n.des_porcao,\n" +
+                    "    n.unidade_porcao,\n" +
+                    "    n.porcao\n" +
+                    "from\n" +
+                    "    tab_info_nutricional n\n" +
+                    "order by\n" +
+                    "    1"
+            )) {
+                while (rst.next()) {
+                    NutricionalIMP imp = new NutricionalIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    imp.setCaloria(rst.getInt("caloria"));
+                    imp.setCarboidrato(rst.getDouble("carboidrato"));
+                    imp.setProteina(rst.getDouble("proteina"));
+                    imp.setGordura(rst.getDouble("gordura"));
+                    imp.setGorduraSaturada(rst.getDouble("gordura_saturada"));
+                    imp.setGorduraTrans(rst.getDouble("gordura_trans"));
+                    imp.setFibra(rst.getDouble("fibra_alimentar"));
+                    imp.setCalcio(rst.getDouble("calcio"));
+                    imp.setFerro(rst.getDouble("ferro"));
+                    imp.setSodio(rst.getDouble("sodio"));
+                    imp.setPercentualCaloria(rst.getInt("vd_valor_calorico"));
+                    imp.setPercentualCarboidrato(rst.getInt("vd_carboidrato"));
+                    imp.setPercentualProteina(rst.getInt("vd_proteina"));
+                    imp.setPercentualGordura(rst.getInt("vd_gordura_total"));
+                    imp.setPercentualGorduraSaturada(rst.getInt("vd_gordura_saturada"));
+                    imp.setPercentualFibra(rst.getInt("vd_fibra_alimentar"));
+                    imp.setPercentualCalcio(rst.getInt("vd_calcio"));
+                    imp.setPercentualFerro(rst.getInt("vd_ferro"));
+                    imp.setPercentualSodio(rst.getInt("vd_sodio"));
+                    imp.setPorcao(rst.getString("porcao") + " " + rst.getString("unidade_porcao") + " " + rst.getString("des_porcao"));
+                    
+                    incluirProdutoNutricional(imp);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    private void incluirProdutoNutricional(NutricionalIMP imp) throws Exception {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    cod_produto\n" +
+                    "from\n" +
+                    "    tab_produto\n" +
+                    "where\n" +
+                    "    cod_info_nutricional = " + imp.getId()
+            )) {
+                while (rst.next()) {
+                    imp.addProduto(rst.getString("cod_produto"));
+                }
+            }
+        }
+    }
     
 }
