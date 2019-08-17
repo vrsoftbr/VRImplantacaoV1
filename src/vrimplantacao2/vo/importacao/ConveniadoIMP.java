@@ -8,6 +8,7 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
  * @author Leandro
  */
 public class ConveniadoIMP {
+    
     private String id;
     private String nome;
     private String idEmpresa;
