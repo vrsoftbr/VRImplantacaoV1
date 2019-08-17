@@ -27,6 +27,7 @@ import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.notafiscal.SituacaoNfe;
 import vrimplantacao2.vo.cadastro.notafiscal.TipoFreteNotaFiscal;
 import vrimplantacao2.vo.cadastro.notafiscal.TipoNota;
+import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -52,6 +53,7 @@ import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -216,7 +218,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.PAUTA_FISCAL_PRODUTO,
             OpcaoProduto.PESO_BRUTO,
             OpcaoProduto.PESO_LIQUIDO,
-            OpcaoProduto.NUTRICIONAL
+            OpcaoProduto.NUTRICIONAL,
+            OpcaoProduto.RECEITA_BALANCA
         }));
     }
 
@@ -1642,5 +1645,54 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
     }
+    
+    private void incluirProdutoReceitaBalanca(ReceitaBalancaIMP imp) throws Exception {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    cod_produto\n" +
+                    "from\n" +
+                    "    tab_produto\n" +
+                    "where\n" +
+                    "    cod_info_receita = " + imp.getId()
+            )) {
+                while (rst.next()) {
+                    imp.addProduto(rst.getString("cod_produto"));
+                }
+            }
+        }
+    }
+
+    @Override
+    public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
+        List<ReceitaBalancaIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    r.cod_info_receita id,\n" +
+                    "    r.des_info_receita descricao,\n" +
+                    "    r.detalhamento receita\n" +
+                    "from\n" +
+                    "    tab_info_receita r"
+            )) {
+                while (rst.next()) {
+                    ReceitaBalancaIMP imp = new ReceitaBalancaIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    imp.setReceita(rst.getString("receita"));
+                    
+                    incluirProdutoReceitaBalanca(imp);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    
     
 }
