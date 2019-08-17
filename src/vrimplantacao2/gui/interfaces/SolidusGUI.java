@@ -381,6 +381,15 @@ public class SolidusGUI extends VRInternalFrame {
                             dao.setNotasDataInicio(edtDtNotaIni.getDate());
                             importador.importarNotas(OpcaoNotaFiscal.IMP_EXCLUIR_NOTAS_EXISTENTES);
                         }
+                        if (chkCvEmpresa.isSelected()) {
+                            importador.importarConvenioEmpresa();
+                        }
+                        if (chkCvConveniado.isSelected()) {
+                            importador.importarConvenioConveniado();
+                        }
+                        if (chkCvTransacao.isSelected()) {
+                            importador.importarConvenioTransacao();
+                        }
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -464,6 +473,10 @@ public class SolidusGUI extends VRInternalFrame {
         chkReiniciarIDCliente = new vrframework.bean.checkBox.VRCheckBox();
         txtReiniciarID = new vrframework.bean.textField.VRTextField();
         chkCObservacao2 = new vrframework.bean.checkBox.VRCheckBox();
+        chkCvEmpresa = new vrframework.bean.checkBox.VRCheckBox();
+        chkCvConveniado = new vrframework.bean.checkBox.VRCheckBox();
+        chkCvTransacao = new vrframework.bean.checkBox.VRCheckBox();
+        vRLabel26 = new vrframework.bean.label.VRLabel();
         tabClienteRotativo = new vrframework.bean.panel.VRPanel();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -736,11 +749,37 @@ public class SolidusGUI extends VRInternalFrame {
             }
         });
 
+        chkCvEmpresa.setText("Empresas");
+        chkCvEmpresa.setEnabled(true);
+        chkCvEmpresa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkCvEmpresaActionPerformed(evt);
+            }
+        });
+
+        chkCvConveniado.setText("Conveniados");
+        chkCvConveniado.setEnabled(true);
+        chkCvConveniado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkCvConveniadoActionPerformed(evt);
+            }
+        });
+
+        chkCvTransacao.setText("Transações");
+        chkCvTransacao.setEnabled(true);
+        chkCvTransacao.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkCvTransacaoActionPerformed(evt);
+            }
+        });
+
+        vRLabel26.setText("Convênio");
+
         javax.swing.GroupLayout tabClienteDadosLayout = new javax.swing.GroupLayout(tabClienteDados);
         tabClienteDados.setLayout(tabClienteDadosLayout);
         tabClienteDadosLayout.setHorizontalGroup(
             tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tabClienteDadosLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tabClienteDadosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(tabClienteDadosLayout.createSequentialGroup()
@@ -754,7 +793,13 @@ public class SolidusGUI extends VRInternalFrame {
                         .addComponent(chkReiniciarIDCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtReiniciarID, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(264, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 171, Short.MAX_VALUE)
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkCvTransacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCvEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCvConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
         tabClienteDadosLayout.setVerticalGroup(
             tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -762,10 +807,18 @@ public class SolidusGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkCObservacao2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkCObservacao2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(tabClienteDadosLayout.createSequentialGroup()
+                        .addComponent(chkCvEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCvConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCvTransacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
                 .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkReiniciarIDCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtReiniciarID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -1140,6 +1193,11 @@ public class SolidusGUI extends VRInternalFrame {
         jLabel2.setText("Loja Origem");
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
+        cmbLojaOrigem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbLojaOrigemActionPerformed(evt);
+            }
+        });
 
         btnConectar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/chat/desconectado.png"))); // NOI18N
         btnConectar.setText("Conectar");
@@ -1418,6 +1476,22 @@ public class SolidusGUI extends VRInternalFrame {
     private void chkCObservacao2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCObservacao2ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkCObservacao2ActionPerformed
+
+    private void cmbLojaOrigemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbLojaOrigemActionPerformed
+        dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+    }//GEN-LAST:event_cmbLojaOrigemActionPerformed
+
+    private void chkCvEmpresaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCvEmpresaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkCvEmpresaActionPerformed
+
+    private void chkCvConveniadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCvConveniadoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkCvConveniadoActionPerformed
+
+    private void chkCvTransacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCvTransacaoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkCvTransacaoActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
@@ -1428,6 +1502,9 @@ public class SolidusGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkContasAPagar;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
+    private vrframework.bean.checkBox.VRCheckBox chkCvConveniado;
+    private vrframework.bean.checkBox.VRCheckBox chkCvEmpresa;
+    private vrframework.bean.checkBox.VRCheckBox chkCvTransacao;
     private vrframework.bean.checkBox.VRCheckBox chkEliminarDigito;
     private vrframework.bean.checkBox.VRCheckBox chkFBloqueado;
     private vrframework.bean.checkBox.VRCheckBox chkFCnpj;
@@ -1491,6 +1568,7 @@ public class SolidusGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel23;
     private vrframework.bean.label.VRLabel vRLabel24;
     private vrframework.bean.label.VRLabel vRLabel25;
+    private vrframework.bean.label.VRLabel vRLabel26;
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.panel.VRPanel vRPanel4;

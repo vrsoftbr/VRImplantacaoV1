@@ -3,6 +3,7 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +36,9 @@ import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ConveniadoIMP;
+import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
+import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -56,6 +60,8 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  * <br>
  * Aparentemente eles criptografam a senha transformando no código númerico do 
  * charset utilizado, incrementando 1 e gravando a letra de volta.
+ * 
+ * C:\GSGroup\ETL\PDI\simple-jndi\jdbc.propertie   Local com a senha do banco
  * @author Leandro
  */
 public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
@@ -209,6 +215,181 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.PESO_BRUTO,
             OpcaoProduto.PESO_LIQUIDO
         }));
+    }
+
+    @Override
+    public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
+        List<ConvenioEmpresaIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    c.cod_cliente id,\n" +
+                    "    c.des_cliente razao,\n" +
+                    "    c.num_cgc cnpj,\n" +
+                    "    c.num_insc_est ie,\n" +
+                    "    c.des_endereco endereco,\n" +
+                    "    c.num_endereco numero,\n" +
+                    "    c.des_complemento complemento,\n" +
+                    "    c.des_bairro bairro,\n" +
+                    "    cd.des_cidade municipio,\n" +
+                    "    cd.des_sigla uf,\n" +
+                    "    c.num_cep cep,\n" +
+                    "    c.num_fone telefone,\n" +
+                    "    c.dta_cadastro datainicio,\n" +
+                    "    coalesce(cast(c.dta_vencimento_cad as date), cast('01.01.2200' as date)) datatermino,\n" +
+                    "    c.cod_status_pdv,\n" +
+                    "    c.val_desconto desconto,\n" +
+                    "    c.num_dia_fecha diapagamento,\n" +
+                    "    case when c.dta_inicio_bloqueio < '01.01.2000' then null else c.dta_inicio_bloqueio end databloqueio,\n" +
+                    "    c.des_observacao observacao\n" +
+                    "from\n" +
+                    "    tab_cliente c\n" +
+                    "    left join tab_cidade cd on\n" +
+                    "        c.cod_cidade = cd.cod_cidade\n" +
+                    "where\n" +
+                    "    c.cod_cliente in (select distinct cod_convenio from tab_cliente)\n" +
+                    "order by\n" +
+                    "    1"
+            )) {
+                while (rst.next()) {
+                    ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoEstadual(rst.getString("ie"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setDataInicio(rst.getDate("datainicio"));
+                    imp.setDataTermino(rst.getDate("datatermino"));
+                    imp.setDesconto(rst.getDouble("desconto"));
+                    imp.setDiaPagamento(Utils.stringToInt(rst.getString("diapagamento"), 1));
+                    imp.setDataBloqueio(rst.getDate("databloqueio"));
+                    imp.setObservacoes(rst.getString("observacao"));
+                    
+                    result.add(imp);                    
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ConveniadoIMP> getConveniado() throws Exception {
+        List<ConveniadoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    c.cod_cliente id,\n" +
+                    "    c.des_cliente nome,\n" +
+                    "    c.cod_convenio idempresa,\n" +
+                    "    c.cod_status_pdv,\n" +
+                    "    c.num_cgc cnpj,\n" +
+                    "    c.des_senha senha,\n" +
+                    "    c.num_insc_est ie,\n" +
+                    "    c.des_observacao observacao,\n" +
+                    "    cast('01.01.2200' as date) validadecartao,\n" +
+                    "    case c.flg_exibe_lim when 'S' then 1 else 0 end visualizasaldo,\n" +
+                    "    coalesce(c.val_limite_conv, 0) limiteconvenio,\n" +
+                    "    c.val_desconto desconto\n" +
+                    "from\n" +
+                    "    tab_cliente c\n" +
+                    "    left join tab_cidade cd on\n" +
+                    "        c.cod_cidade = cd.cod_cidade\n" +
+                    "where\n" +
+                    "    not nullif(c.cod_convenio, 0) is null\n" +
+                    "    and coalesce(c.val_limite_conv, 0) > 0\n" +
+                    "order by\n" +
+                    "    1"
+            )) {
+                while (rst.next()) {
+                    ConveniadoIMP imp = new ConveniadoIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setNome(rst.getString("nome"));
+                    imp.setIdEmpresa(rst.getString("idempresa"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setValidadeCartao(rst.getDate("validadecartao"));
+                    imp.setVisualizaSaldo(rst.getBoolean("visualizasaldo"));
+                    imp.setConvenioLimite(rst.getDouble("limiteconvenio"));
+                    imp.setConvenioDesconto(rst.getDouble("desconto"));
+                    
+                    if (imp.getConvenioLimite() > 9999999F) {
+                        imp.setConvenioLimite(9999999);
+                    }
+                    
+                    result.add(imp);                    
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
+        List<ConvenioTransacaoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n" +
+                    "    t.cod_loja,\n" +
+                    "    t.tipo_conta, \n" +
+                    "    t.tipo_parceiro,\n" +
+                    "    t.cod_parceiro,\n" +
+                    "    t.num_registro,\n" +
+                    "    t.cod_parceiro idconveniado,\n" +
+                    "    t.num_pdv ecf,\n" +
+                    "    t.num_cupom_fiscal numerocupom,\n" +
+                    "    t.dta_cadastro datacadastro,\n" +
+                    "    t.val_parcela valor,\n" +
+                    "    t.dta_emissao datamovimento,\n" +
+                    "    t.des_observacao observacao\n" +
+                    "from\n" +
+                    "    tab_fluxo t\n" +
+                    "where\n" +
+                    "    t.cod_loja = " + getLojaOrigem() + "\n" +
+                    "    and t.tipo_parceiro = 0\n" +
+                    "    and coalesce(t.flg_quitado,'N') = 'N'\n" +
+                    "    and coalesce(t.cod_convenio,0) > 0\n" +
+                    "order by\n" +
+                    "    1, 2, 3, 4, 5"
+            )) {
+                while (rst.next()) {
+                    ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
+                    
+                    imp.setId(String.format(
+                            "%d-%d-%d-%d-%d",
+                            rst.getInt("cod_loja"),
+                            rst.getInt("tipo_conta"),
+                            rst.getInt("tipo_parceiro"),
+                            rst.getInt("cod_parceiro"),
+                            rst.getInt("num_registro")
+                    ));
+                    imp.setIdConveniado(rst.getString("idconveniado"));
+                    imp.setEcf(rst.getString("ecf"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
+                    imp.setDataHora(new Timestamp(rst.getDate("datacadastro").getTime()));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setDataMovimento(rst.getDate("datamovimento"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    
+                    result.add(imp);                    
+                }
+            }
+        }
+        
+        return result;
     }
 
     @Override
@@ -443,7 +624,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    f.num_cgc cnpj,\n" +
                     "    f.num_insc_est ie,\n" +
                     "    f.flg_simples,\n" +
-                    "    case bloq.flg_bloqueado when 'S' then 1 else 0 end bloqueado,\n" +
+                    "    case coalesce(bloq.flg_bloqueado,'N') when 'S' then 1 else 0 end bloqueado,\n" +
                     "    f.des_endereco endereco,\n" +
                     "    f.num_endereco numero,\n" +
                     "    f.des_bairro bairro,\n" +
@@ -1246,8 +1427,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "from\n" +
                     "    tab_ncm_uf nuf\n" +
                     "    join tab_ncm ncm on ncm.cod_ncm = nuf.cod_ncm\n" +
-                    "where\n" +
-                    "    nuf.des_sigla = 'SP'\n" +
+                    //"where nuf.des_sigla = 'SP'\n" +
                     "order by\n" +
                     "    ncm, uf"
             )) {
