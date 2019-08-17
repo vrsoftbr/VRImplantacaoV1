@@ -292,7 +292,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    c.cod_cliente id,\n" +
                     "    c.des_cliente nome,\n" +
                     "    c.cod_convenio idempresa,\n" +
-                    "    c.cod_status_pdv,\n" +
+                    "    case s.negativar when 'S' then 1 else 0 end bloqueado,\n" +
                     "    c.num_cgc cnpj,\n" +
                     "    c.des_senha senha,\n" +
                     "    c.num_insc_est ie,\n" +
@@ -305,6 +305,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    tab_cliente c\n" +
                     "    left join tab_cidade cd on\n" +
                     "        c.cod_cidade = cd.cod_cidade\n" +
+                    "    left join tab_cliente_status_pdv s on\n" +
+                    "        c.cod_status_pdv = s.cod_status_pdv\n" +
                     "where\n" +
                     "    not nullif(c.cod_convenio, 0) is null\n" +
                     "    and coalesce(c.val_limite_conv, 0) > 0\n" +
@@ -323,6 +325,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setVisualizaSaldo(rst.getBoolean("visualizasaldo"));
                     imp.setConvenioLimite(rst.getDouble("limiteconvenio"));
                     imp.setConvenioDesconto(rst.getDouble("desconto"));
+                    imp.setBloqueado(rst.getBoolean("bloqueado"));
                     
                     if (imp.getConvenioLimite() > 9999999F) {
                         imp.setConvenioLimite(9999999);
@@ -352,7 +355,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    t.num_pdv ecf,\n" +
                     "    t.num_cupom_fiscal numerocupom,\n" +
                     "    t.dta_cadastro datacadastro,\n" +
-                    "    t.val_parcela valor,\n" +
+                    "    t.val_total_nf valor,\n" +
                     "    t.dta_emissao datamovimento,\n" +
                     "    t.des_observacao observacao\n" +
                     "from\n" +
@@ -743,6 +746,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
             try (ResultSet rst = stm.executeQuery(
                     "select distinct\n" +
                     "    pl.cod_produto,\n" +
+                    "    (select dta_ult_alt_preco_venda from tab_produto_historico where cod_loja = pl.cod_loja and cod_produto = pl.cod_produto) dtinicio,\n" +
                     "    pl.dta_valida_oferta,\n" +
                     "    pl.val_oferta\n" +
                     "from\n" +
@@ -750,6 +754,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "where\n" +
                     "    pl.cod_loja = " + getLojaOrigem() + "\n" +
                     "    and not pl.dta_valida_oferta is null\n" +
+                    "    and pl.dta_valida_oferta >= current_date\n" +
                     "order by\n" +
                     "    1"
             )) {
@@ -757,7 +762,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     OfertaIMP imp = new OfertaIMP();
                     
                     imp.setIdProduto(rst.getString("cod_produto"));
-                    imp.setDataInicio(rst.getDate("dta_valida_oferta"));
+                    imp.setDataInicio(rst.getDate("dtinicio"));
                     imp.setDataFim(rst.getDate("dta_valida_oferta"));
                     imp.setPrecoOferta(rst.getDouble("val_oferta"));
                     
@@ -972,7 +977,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    f.num_parcela parcela,\n" +
                     "    f.val_juros juros,\n" +
                     "    f.num_cgc_cpf cpf,\n" +
-                    "    f.dta_pgto,\n" +
+                    "    coalesce(f.dta_pgto, f.dta_vencimento) dta_pgto,\n" +
                     "    f.val_desconto,\n" +
                     "    f.val_juros,\n" +
                     "    f.flg_quitado\n" +
