@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,8 +51,11 @@ public class ProdutoRepository {
     private boolean usarConversaoDeAliquotaSimples = true;
     public boolean importarSomenteLoja = false;
     
-    public ProdutoRepository(ProdutoRepositoryProvider provider) {
+    private Map<String, Entry<String, Integer>> divisoes;
+    
+    public ProdutoRepository(ProdutoRepositoryProvider provider) throws Exception {
         this.provider = provider;
+        this.divisoes = provider.getDivisoesAnteriores();
     }
 
     public String getSistema() {
@@ -1172,6 +1176,12 @@ public class ProdutoRepository {
         vo.setExcecao(obterPautaFiscal(imp.getPautaFiscalId()));
         vo.setVendaPdv(imp.isVendaPdv());
         vo.setAceitaMultiplicacaoPDV(imp.isAceitaMultiplicacaoPDV());
+        
+        //Importação da divisão de fornecedores
+        Entry<String, Integer> divisaoFornecedor = this.divisoes.get(imp.getDivisao());
+        if (divisaoFornecedor != null && divisaoFornecedor.getValue() != null) {
+            vo.setIdDivisaoFornecedor(divisaoFornecedor.getValue());
+        }
 
         /**
          * Busca e se existir, relaciona o produto com o comprador.

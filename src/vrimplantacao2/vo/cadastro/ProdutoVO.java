@@ -10,7 +10,6 @@ import vrimplantacao2.vo.enums.NaturezaReceitaVO;
 import vrimplantacao2.vo.enums.NcmVO;
 import vrimplantacao2.vo.enums.NormaReposicao;
 import vrimplantacao2.vo.enums.PisCofinsVO;
-import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoEmbalagem;
 
 public class ProdutoVO {
@@ -46,6 +45,7 @@ public class ProdutoVO {
     private int excecao = 0;
     private int idComprador = 1;
     private boolean aceitaMultiplicacaoPDV = true;
+    private int idDivisaoFornecedor = 0;
     
     private final MultiMap<Long, ProdutoAutomacaoVO> eans = new MultiMap<>(
         new Factory<ProdutoAutomacaoVO>() {
@@ -369,6 +369,14 @@ public class ProdutoVO {
 
     public void setAceitaMultiplicacaoPDV(boolean aceitaMultiplicacaoPDV) {
         this.aceitaMultiplicacaoPDV = aceitaMultiplicacaoPDV;
+    }
+
+    public int getIdDivisaoFornecedor() {
+        return idDivisaoFornecedor;
+    }
+
+    public void setIdDivisaoFornecedor(int idDivisaoFornecedor) {
+        this.idDivisaoFornecedor = idDivisaoFornecedor;
     }
     
 }
