@@ -42,6 +42,7 @@ import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.DivisaoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -221,7 +222,9 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.PESO_LIQUIDO,
             OpcaoProduto.NUTRICIONAL,
             OpcaoProduto.RECEITA_BALANCA,
-            OpcaoProduto.RECEITA
+            OpcaoProduto.RECEITA,
+            OpcaoProduto.DIVISAO,
+            OpcaoProduto.DIVISAO_PRODUTO,
         }));
     }
 
@@ -520,7 +523,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    pl.cod_tributacao,\n" +
                     "    pl.cod_trib_entrada,\n" +
                     "    pl.per_pauta_iva,\n" +
-                    "    pl.val_pauta_iva\n" +
+                    "    pl.val_pauta_iva,\n" +
+                    "    div.cod_divisao divisao\n" +
                     "from\n" +
                     "    tab_produto p\n" +
                     "    join tab_loja loja on loja.cod_loja = " + getLojaOrigem() + "\n" +
@@ -537,6 +541,15 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "        from\n" +
                     "            tab_codigo_barra\n" +
                     "    ) ean on p.cod_produto = ean.cod_produto\n" +
+                    "    left join (select distinct\n" +
+                    "        pf.cod_produto,\n" +
+                    "        max(df.cod_divisao) cod_divisao\n" +
+                    "    from\n" +
+                    "        tab_divisao_fornecedor df\n" +
+                    "        join tab_produto_fornecedor pf on\n" +
+                    "            df.cod_fornecedor = pf.cod_fornecedor\n" +
+                    "    group by\n" +
+                    "        1) div on p.cod_produto = div.cod_produto\n" +
                     "    left join tab_produto_loja pl on\n" +
                     "        p.cod_produto = pl.cod_produto and\n" +
                     "        pl.cod_loja = loja.cod_loja\n" +
@@ -613,6 +626,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsAliqEntrada(rst.getDouble("icms_entrada_aliq"));
                     imp.setIcmsReducaoEntrada(rst.getDouble("icms_entrada_reducao"));
                     imp.setPautaFiscalId(rst.getString("ncm"));
+                    imp.setDivisao(rst.getString("divisao"));
                     
                     result.add(imp);
                 }
@@ -1740,7 +1754,33 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
         
         return result;
     }
-    
-    
+
+    @Override
+    public List<DivisaoIMP> getDivisoes() throws Exception {
+        List<DivisaoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct\n" +
+                    "   df.cod_divisao id,\n" +
+                    "   df.des_divisao descricao\n" +
+                    "from\n" +
+                    "    tab_divisao_fornecedor df\n" +
+                    "order by\n" +
+                    "    1"
+            )) {
+                while (rst.next()) {
+                    DivisaoIMP imp = new DivisaoIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("id") + " - " + rst.getString("descricao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
     
 }
