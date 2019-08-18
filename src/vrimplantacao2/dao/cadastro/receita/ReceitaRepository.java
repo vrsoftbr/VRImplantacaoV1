@@ -97,7 +97,7 @@ public class ReceitaRepository {
                         prodItemVO = prodAntDAO.getCodigoAnterior().get(
                                 imp.getImportsistema(),
                                 imp.getImportloja(),
-                                String.valueOf(idProduto)
+                                produto
                         ).getCodigoAtual();
 
                         Integer prodItem = prodItemVO.getId();
@@ -167,6 +167,7 @@ public class ReceitaRepository {
 
         vo.setQtdembalagemproduto(imp.getQtdembalagemproduto());
         vo.setQtdembalagemreceita(imp.getQtdembalagemreceita());
+        vo.setFatorconversao(imp.getFator());
         return vo;
     }
 

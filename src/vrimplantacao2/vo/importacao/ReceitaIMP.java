@@ -25,6 +25,7 @@ public class ReceitaIMP {
   private double rendimento;
   private int qtdembalagemreceita;
   private int qtdembalagemproduto;
+  private double fator = 1;
   private Set<String> produtos = new HashSet<>();
 
     /**
@@ -173,6 +174,14 @@ public class ReceitaIMP {
 
     public void setProdutos(Set<String> produtos) {
         this.produtos = produtos;
+    }
+
+    public double getFator() {
+        return fator;
+    }
+
+    public void setFator(double fator) {
+        this.fator = fator == 0 ? 1 : fator;
     }
     
 }
