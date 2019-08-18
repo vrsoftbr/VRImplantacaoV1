@@ -54,6 +54,7 @@ import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
+import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -219,7 +220,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.PESO_BRUTO,
             OpcaoProduto.PESO_LIQUIDO,
             OpcaoProduto.NUTRICIONAL,
-            OpcaoProduto.RECEITA_BALANCA
+            OpcaoProduto.RECEITA_BALANCA,
+            OpcaoProduto.RECEITA
         }));
     }
 
@@ -1684,6 +1686,52 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setReceita(rst.getString("receita"));
                     
                     incluirProdutoReceitaBalanca(imp);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ReceitaIMP> getReceitas() throws Exception {
+        List<ReceitaIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    pp.cod_produto id,\n" +
+                    "    pp.cod_produto_producao id_produto,\n" +
+                    "    p.des_produto descricao,\n" +
+                    "    pp.qtd_rendimento rendimento,\n" +
+                    "    case when pp.des_unidade in ('KG', 'LT') then 1000 else 1 end fator,\n" +
+                    "    pp.qtd_receita,\n" +
+                    "    pp.qtd_producao,\n" +
+                    "    pp.qtd_receita + pp.qtd_producao qtd_total\n" +
+                    "from\n" +
+                    "    tab_produto_producao pp\n" +
+                    "    join tab_produto p on\n" +
+                    "        pp.cod_produto = p.cod_produto\n" +
+                    "where\n" +
+                    "    pp.cod_loja = " + getLojaOrigem() + "\n" +
+                    "order by\n" +
+                    "    1, 2"
+            )) {
+                while (rst.next()) {
+                    ReceitaIMP imp = new ReceitaIMP();
+                    
+                    imp.setImportsistema(getSistema());                    
+                    imp.setImportloja(getLojaOrigem());
+                    imp.setImportid(rst.getString("id"));
+                    imp.setIdproduto(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    imp.setRendimento(rst.getDouble("rendimento"));
+                    imp.setQtdembalagemreceita(Math.round(rst.getFloat("qtd_receita") * 1000));
+                    imp.setQtdembalagemproduto(1000);
+                    imp.setFator(1);
+                    imp.getProdutos().add(rst.getString("id_produto"));
                     
                     result.add(imp);
                 }
