@@ -1122,15 +1122,14 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    f.val_juros juros,\n" +
                     "    f.num_cgc_cpf cpf\n" +
                     "from\n" +
-                    "    tab_fluxo_referencia f\n" +
+                    "    tab_fluxo f\n" +
                     "    left join tab_entidade e on f.cod_entidade = e.cod_entidade\n" +
                     "where\n" +
-                    "    f.flg_quitado = 'N' and\n" +
-                    "    f.tipo_parceiro = 1 and\n" +
-                    "    f.cod_entidade in (" + implodeList(entidadesContas) + ") and\n" +
                     "    f.cod_loja = " + getLojaOrigem() + "\n" +
-                    "order by\n" +
-                    "    f.dta_emissao"
+                    "    and f.tipo_conta = 0\n" +
+                    "    and tipo_parceiro = 1\n" +
+                    "    and f.flg_quitado = 'N'\n" +
+                    "    and not f.num_docto is null"
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
