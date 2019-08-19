@@ -121,7 +121,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
         Arquivo mercadologicos = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
-        ProgressBar.setStatus("Carregando família de produtos...");
+        ProgressBar.setStatus("Carregando mercadologico de produtos...");
         int cont = 0;
         
         for (LinhaArquivo linha: mercadologicos) {
@@ -202,6 +202,10 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 produto.setImportLoja(getLojaOrigem());
                 produto.setImportId(id);
                 produto.setEan(linha.getString("codigobarras"));
+                String ean_planilha = linha.getString("codigobarras");
+                if((ean_planilha != null) && (!"".equals(ean_planilha)) && (ean_planilha.length() > 14)) {
+                    produto.setEan(ean_planilha.substring(0, 14));
+                }
                 produto.setQtdEmbalagem(linha.getInt("qtdembalagem"));
                 produto.setQtdEmbalagemCotacao(linha.getInt("qtdembalagemcotacao"));
                 if (produto.getQtdEmbalagemCotacao() == 0) {

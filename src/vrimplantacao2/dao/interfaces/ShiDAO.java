@@ -7,12 +7,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.dao.cadastro.NutricionalToledoDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.NutricionalToledoItemVO;
 import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -20,6 +22,7 @@ import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
+import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
@@ -32,9 +35,11 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 
 /**
  *
@@ -43,11 +48,11 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean eFicha = false;
-    
+
     private Connection sco;
     private Connection sfi;
     private Connection cli;
-    
+
     @Override
     public String getSistema() {
         return "SHI";
@@ -55,7 +60,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
-        try (Statement stm = sco.createStatement()) {            
+        try (Statement stm = sco.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "    codigo,\n"
@@ -177,7 +182,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    left join icmsprod icm on icm.codpro = p.codigo and icm.estado = f.estado\n"
                     + "order by\n"
                     + "    p.codigo"
-            )) { 
+            )) {
                 while (rst.next()) {
                     {
                         ProdutoIMP imp = new ProdutoIMP();
@@ -244,21 +249,21 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
             List<ProdutoIMP> result = new ArrayList<>();
             try (Statement stm = sco.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "select\n" +
-                        "    pc.codpro,\n" +
-                        "    pc.custo\n" +
-                        "from\n" +
-                        "    precocusto pc\n" +
-                        "    join(select\n" +
-                        "             codpro,\n" +
-                        "             filial,\n" +
-                        "             max(data) data\n" +
-                        "         from\n" +
-                        "             precocusto\n" +
-                        "         group by\n" +
-                        "             codpro, filial) a using (codpro, filial, data)\n" +
-                        "where\n" +
-                        "    pc.filial = " + getLojaOrigem()
+                        "select\n"
+                        + "    pc.codpro,\n"
+                        + "    pc.custo\n"
+                        + "from\n"
+                        + "    precocusto pc\n"
+                        + "    join(select\n"
+                        + "             codpro,\n"
+                        + "             filial,\n"
+                        + "             max(data) data\n"
+                        + "         from\n"
+                        + "             precocusto\n"
+                        + "         group by\n"
+                        + "             codpro, filial) a using (codpro, filial, data)\n"
+                        + "where\n"
+                        + "    pc.filial = " + getLojaOrigem()
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
@@ -276,23 +281,23 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
             List<ProdutoIMP> result = new ArrayList<>();
             try (Statement stm = sco.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "select\n" +
-                        "    e.codpro,\n" +
-                        "    e.saldoatu,\n" +
-                        "    e.saldoant,\n" +
-                        "    e.movimento\n" +
-                        "from\n" +
-                        "    estoque e\n" +
-                        "    join(select\n" +
-                        "             codpro,\n" +
-                        "             filial,\n" +
-                        "             max(data) data\n" +
-                        "         from\n" +
-                        "             estoque\n" +
-                        "         group by\n" +
-                        "             codpro, filial) a using (codpro, filial, data)\n" +
-                        "where\n" +
-                        "    e.filial = " + getLojaOrigem()
+                        "select\n"
+                        + "    e.codpro,\n"
+                        + "    e.saldoatu,\n"
+                        + "    e.saldoant,\n"
+                        + "    e.movimento\n"
+                        + "from\n"
+                        + "    estoque e\n"
+                        + "    join(select\n"
+                        + "             codpro,\n"
+                        + "             filial,\n"
+                        + "             max(data) data\n"
+                        + "         from\n"
+                        + "             estoque\n"
+                        + "         group by\n"
+                        + "             codpro, filial) a using (codpro, filial, data)\n"
+                        + "where\n"
+                        + "    e.filial = " + getLojaOrigem()
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
@@ -369,21 +374,21 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
             List<ProdutoIMP> result = new ArrayList<>();
             try (Statement stm = sco.createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "select\n" +
-                        "    pc.codpro,\n" +
-                        "    pc.custo\n" +
-                        "from\n" +
-                        "    precocusto pc\n" +
-                        "    join(select\n" +
-                        "             codpro,\n" +
-                        "             filial,\n" +
-                        "             max(data) data\n" +
-                        "         from\n" +
-                        "             precocusto\n" +
-                        "         group by\n" +
-                        "             codpro, filial) a using (codpro, filial, data)\n" +
-                        "where\n" +
-                        "    pc.filial = " + getLojaOrigem()
+                        "select\n"
+                        + "    pc.codpro,\n"
+                        + "    pc.custo\n"
+                        + "from\n"
+                        + "    precocusto pc\n"
+                        + "    join(select\n"
+                        + "             codpro,\n"
+                        + "             filial,\n"
+                        + "             max(data) data\n"
+                        + "         from\n"
+                        + "             precocusto\n"
+                        + "         group by\n"
+                        + "             codpro, filial) a using (codpro, filial, data)\n"
+                        + "where\n"
+                        + "    pc.filial = " + getLojaOrigem()
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
@@ -397,61 +402,61 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
             }
             return result;
         }
-        
+
         return null;
     }
 
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = sco.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    codigo,\n" +
-                    "    descri\n" +
-                    "from\n" +
-                    "    icms\n" +
-                    "order by\n" +
-                    "    codigo"
+                    "select\n"
+                    + "    codigo,\n"
+                    + "    descri\n"
+                    + "from\n"
+                    + "    icms\n"
+                    + "order by\n"
+                    + "    codigo"
             )) {
                 while (rst.next()) {
                     result.add(new MapaTributoIMP(rst.getString("codigo"), rst.getString("descri")));
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = sco.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    f.codigo id,\n" +
-                    "    f.nomexx razao,\n" +
-                    "    f.fantas fantasia,\n" +
-                    "    f.ciccgc cnpj,\n" +
-                    "    f.inscrg ie_rg,\n" +
-                    "    case f.inativ when 'S' then 0 else 1 end ativo,\n" +
-                    "    f.endere endereco,\n" +
-                    "    f.bairro,\n" +
-                    "    f.cidade,\n" +
-                    "    f.estado,\n" +
-                    "    f.cepxxx cep,\n" +
-                    "    f.pedmin valor_minimo_pedido,\n" +
-                    "    f.dtcada datacadastro,\n" +
-                    "    f.observ observacao,\n" +
-                    "    f.entreg prazoEntrega,\n" +
-                    "    f.frecom prazoVisita,\n" +
-                    "    case when coalesce(trim(upper(f.simplesnac)),'N') = 'S' then 1 else 0 end simplesnac\n" +
-                    "from\n" +
-                    "    fornecedor f  \n" +
-                    "order by\n" +
-                    "    f.codigo"
+                    "select\n"
+                    + "    f.codigo id,\n"
+                    + "    f.nomexx razao,\n"
+                    + "    f.fantas fantasia,\n"
+                    + "    f.ciccgc cnpj,\n"
+                    + "    f.inscrg ie_rg,\n"
+                    + "    case f.inativ when 'S' then 0 else 1 end ativo,\n"
+                    + "    f.endere endereco,\n"
+                    + "    f.bairro,\n"
+                    + "    f.cidade,\n"
+                    + "    f.estado,\n"
+                    + "    f.cepxxx cep,\n"
+                    + "    f.pedmin valor_minimo_pedido,\n"
+                    + "    f.dtcada datacadastro,\n"
+                    + "    f.observ observacao,\n"
+                    + "    f.entreg prazoEntrega,\n"
+                    + "    f.frecom prazoVisita,\n"
+                    + "    case when coalesce(trim(upper(f.simplesnac)),'N') = 'S' then 1 else 0 end simplesnac\n"
+                    + "from\n"
+                    + "    fornecedor f  \n"
+                    + "order by\n"
+                    + "    f.codigo"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -478,22 +483,22 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     } else {
                         imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL);
                     }
-                    
+
                     try (Statement stm2 = sco.createStatement()) {
                         try (ResultSet rst2 = stm2.executeQuery(
-                                "select\n" +
-                                "    codigo,\n" +
-                                "    trim(coalesce(contato,'')) contato,\n" +
-                                "    trim(coalesce(telefone,'')) telefone,\n" +
-                                "    trim(coalesce(fax,'')) fax,\n" +
-                                "    trim(coalesce(celular,'')) celular,\n" +
-                                "    trim(coalesce(email,'')) email\n" +
-                                "from\n" +
-                                "    contato\n" +
-                                "where\n" +
-                                "    fornecedor = " + imp.getImportId() + "\n" +
-                                "order by\n" +
-                                "    codigo"
+                                "select\n"
+                                + "    codigo,\n"
+                                + "    trim(coalesce(contato,'')) contato,\n"
+                                + "    trim(coalesce(telefone,'')) telefone,\n"
+                                + "    trim(coalesce(fax,'')) fax,\n"
+                                + "    trim(coalesce(celular,'')) celular,\n"
+                                + "    trim(coalesce(email,'')) email\n"
+                                + "from\n"
+                                + "    contato\n"
+                                + "where\n"
+                                + "    fornecedor = " + imp.getImportId() + "\n"
+                                + "order by\n"
+                                + "    codigo"
                         )) {
                             boolean primeiro = true;
                             while (rst2.next()) {
@@ -503,27 +508,27 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                                     imp.setTel_principal(fone);
                                 }
                                 imp.addContato(
-                                        rst2.getString("codigo"), 
-                                        rst2.getString("contato"), 
-                                        rst2.getString("telefone"), 
-                                        rst2.getString("celular"), 
+                                        rst2.getString("codigo"),
+                                        rst2.getString("contato"),
+                                        rst2.getString("telefone"),
+                                        rst2.getString("celular"),
                                         TipoContato.COMERCIAL,
                                         rst2.getString("email")
                                 );
                                 if (!"".equals(rst2.getString("fax"))) {
                                     imp.addContato(
-                                        rst2.getString("codigo"), 
-                                        "FAX", 
-                                        rst2.getString("telefone"), 
-                                        rst2.getString("celular"), 
-                                        TipoContato.COMERCIAL,
-                                        rst2.getString("email")
+                                            rst2.getString("codigo"),
+                                            "FAX",
+                                            rst2.getString("telefone"),
+                                            rst2.getString("celular"),
+                                            TipoContato.COMERCIAL,
+                                            rst2.getString("email")
                                     );
                                 }
                             }
                         }
                     }
-                    
+
                     try (Statement stm3 = sco.createStatement()) {
                         try (ResultSet rst3 = stm3.executeQuery(
                                 "select f.codigo, f.ciccgc, f.nomexx,\n"
@@ -557,7 +562,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                                         imp.addPagamento(
                                                 String.valueOf(i),
                                                 rst3.getInt("dias02"));
-                                        
+
                                     }
                                     if (i == 3) {
                                         imp.addPagamento(
@@ -572,7 +577,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                                     if (i == 5) {
                                         imp.addPagamento(
                                                 String.valueOf(i),
-                                                rst3.getInt("dias05"));                                        
+                                                rst3.getInt("dias05"));
                                     }
                                     if (i == 6) {
                                         imp.addPagamento(
@@ -673,19 +678,19 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                                 }
                             }
                         }
-                    }                    
+                    }
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = sco.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select p.codigo codPro,  p.reffab codExt, p.fornec codFor, "
@@ -698,7 +703,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setIdFornecedor(rst.getString("codFor"));
@@ -706,67 +711,67 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCodigoExterno(rst.getString("codExt"));
                     imp.setDataAlteracao(rst.getDate("data"));
                     imp.setQtdEmbalagem(rst.getDouble("emb"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = cli.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    c.codigo id,\n" +
-                    "    c.fichax,\n" +
-                    "    c.ciccgc cnpj,\n" +
-                    "    case when char_length(trim(c.ciccgc)) > 11 then c.inscri_jur else c.rgnume_fis end inscricaoestadual,\n" +
-                    "    c.rgorga_fis orgaoemissor,\n" +
-                    "    c.razsoc razao,\n" +
-                    "    c.nomexx fantasia,\n" +
-                    "    case when c.situac <> 1 then 0 else 1 end ativo,\n" +
-                    "    c.endere_res endereco,\n" +
-                    "    c.numero_res numero,\n" +
-                    "    c.comple_res complemento,\n" +
-                    "    c.bairro_res bairro,\n" +
-                    "    c.cidade_res municipio,\n" +
-                    "    c.estado_res estado,\n" +
-                    "    c.cepxxx_res cep,     \n" +
-                    "    trim(coalesce(c.telddd_res,'')||coalesce(c.telfon_res, '')) telefone,\n" +
-                    "    c.nascim_fis datanascimento,\n" +
-                    "    c.datcad datacadastro,\n" +
-                    "    case c.sexoxx_fis when 2 then 0 else 1 end sexo,\n" +
-                    "    emp.descri tipo_emprego,\n" +
-                    "    c.nomexx_com empresa,\n" +
-                    "    c.endere_com empresa_endereco,\n" +
-                    "    c.numero_com empresa_numero,\n" +
-                    "    c.comple_com empresa_complemento,\n" +
-                    "    c.bairro_com empresa_bairro,\n" +
-                    "    c.cidade_com empresa_cidade,\n" +
-                    "    c.estado_com empresa_estado,\n" +
-                    "    c.cepxxx_com empresa_cep, \n" +
-                    "    trim(coalesce(c.telddd_com,'')||coalesce(c.telfon_com, '')) telefone_empresa,\n" +
-                    "    c.rendax_fis salario,\n" +
-                    "    c.limcre,\n" +
-                    "    c.nomcon_fis conjuge,\n" +
-                    "    c.nompai_fis pai,\n" +
-                    "    c.nommae_fis mae,\n" +
-                    "    c.mensagemsemst observacao,\n" +
-                    "    c.diaven diaVencimento,\n" +
-                    "    c.emailx email,\n" +
-                    "    l.valorx valorCredito,\n " +
-                    "    l2.valorx valorCheque,\n"+
-                    "    trim(coalesce(c.telddd_cel,'')||coalesce(c.telfon_cel, '')) celular\n" +
-                    "from\n" +
-                    "    clientes c\n" +
-                    "    left join emprego emp on c.empreg_fis = emp.codigo\n" +
-                    "    left join limite l on c.limcon = l.codigo\n"+
-                    "    left join limite l2 on c.limche = l2.codigo\n"
+                    "select\n"
+                    + "    c.codigo id,\n"
+                    + "    c.fichax,\n"
+                    + "    c.ciccgc cnpj,\n"
+                    + "    case when char_length(trim(c.ciccgc)) > 11 then c.inscri_jur else c.rgnume_fis end inscricaoestadual,\n"
+                    + "    c.rgorga_fis orgaoemissor,\n"
+                    + "    c.razsoc razao,\n"
+                    + "    c.nomexx fantasia,\n"
+                    + "    case when c.situac <> 1 then 0 else 1 end ativo,\n"
+                    + "    c.endere_res endereco,\n"
+                    + "    c.numero_res numero,\n"
+                    + "    c.comple_res complemento,\n"
+                    + "    c.bairro_res bairro,\n"
+                    + "    c.cidade_res municipio,\n"
+                    + "    c.estado_res estado,\n"
+                    + "    c.cepxxx_res cep,     \n"
+                    + "    trim(coalesce(c.telddd_res,'')||coalesce(c.telfon_res, '')) telefone,\n"
+                    + "    c.nascim_fis datanascimento,\n"
+                    + "    c.datcad datacadastro,\n"
+                    + "    case c.sexoxx_fis when 2 then 0 else 1 end sexo,\n"
+                    + "    emp.descri tipo_emprego,\n"
+                    + "    c.nomexx_com empresa,\n"
+                    + "    c.endere_com empresa_endereco,\n"
+                    + "    c.numero_com empresa_numero,\n"
+                    + "    c.comple_com empresa_complemento,\n"
+                    + "    c.bairro_com empresa_bairro,\n"
+                    + "    c.cidade_com empresa_cidade,\n"
+                    + "    c.estado_com empresa_estado,\n"
+                    + "    c.cepxxx_com empresa_cep, \n"
+                    + "    trim(coalesce(c.telddd_com,'')||coalesce(c.telfon_com, '')) telefone_empresa,\n"
+                    + "    c.rendax_fis salario,\n"
+                    + "    c.limcre,\n"
+                    + "    c.nomcon_fis conjuge,\n"
+                    + "    c.nompai_fis pai,\n"
+                    + "    c.nommae_fis mae,\n"
+                    + "    c.mensagemsemst observacao,\n"
+                    + "    c.diaven diaVencimento,\n"
+                    + "    c.emailx email,\n"
+                    + "    l.valorx valorCredito,\n "
+                    + "    l2.valorx valorCheque,\n"
+                    + "    trim(coalesce(c.telddd_cel,'')||coalesce(c.telfon_cel, '')) celular\n"
+                    + "from\n"
+                    + "    clientes c\n"
+                    + "    left join emprego emp on c.empreg_fis = emp.codigo\n"
+                    + "    left join limite l on c.limcon = l.codigo\n"
+                    + "    left join limite l2 on c.limche = l2.codigo\n"
                     + "where c.filial = " + getLojaOrigem()
                     + " order by\n"
                     + "    c.codigo"
@@ -822,53 +827,62 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDiaVencimento(rst.getInt("diaVencimento"));
                     imp.setEmail(rst.getString("email"));
                     imp.setCelular(rst.getString("celular"));
-                    result.add(imp);   
+                    result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = cli.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    d.FILIAL||'-'||d.TIPDOC||'-'||d.SEQUEN||'-'||d.DESDOB id,\n" +
-                    "    cl.fichax,\n" +        
-                    "    d.datcad,\n" +
-                    "    c.cupomx,\n" +
-                    "    c.caixax,\n" +
-                    "    d.valorx,\n" +
-                    "    d.observ,\n" +
-                    "    d.client,\n" +
-                    "    d.vencim,\n" +
-                    "    cl.ciccgc\n" +
-                    "from\n" +
-                    "    documentos d\n" +
-                    "    left join cupom c on d.idcupom = c.idcupom\n" +
-                    "    join clientes cl on cl.codigo = d.client\n" +
-                    "where\n" +
-                    "    status = 1\n"
+                    "select\n"
+                    + "    d.FILIAL||'-'||d.TIPDOC||'-'||d.SEQUEN||'-'||d.DESDOB id,\n "
+                    + "    d.SEQUEN,\n"
+                    + "    cl.fichax,\n"
+                    + "    d.dataxx,\n"
+                    + "    c.cupomx as cupom,\n"
+                    + "    d.cupomx as cupom_doc,\n"
+                    + "    c.caixax,\n"
+                    + "    d.valorx,\n"
+                    + "    d.observ,\n"
+                    + "    d.client,\n"
+                    + "    d.vencim,\n"
+                    + "    cl.ciccgc\n"
+                    + "from\n"
+                    + "    documentos d\n"
+                    + "    left join cupom c on d.idcupom = c.idcupom\n"
+                    + "    join clientes cl on cl.codigo = d.client\n"
+                    + "where\n"
+                    + "    status = 1\n"
                     + " and d.filial = " + getLojaOrigem()
                     + " order by\n"
                     + "    d.datcad"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    
+
                     imp.setId(rst.getString("id"));
-                    imp.setDataEmissao(rst.getDate("datcad"));
-                    imp.setNumeroCupom(rst.getString("cupomx"));
+                    imp.setDataEmissao(rst.getDate("dataxx"));
+                    
+                    if ((rst.getString("cupom") != null)
+                            && (!rst.getString("cupom").trim().isEmpty())) {
+                        imp.setNumeroCupom(rst.getString("cupom"));
+                    } else {
+                        imp.setNumeroCupom(rst.getString("SEQUEN"));
+                    }
+                    
                     imp.setEcf(rst.getString("caixax"));
                     imp.setValor(rst.getDouble("valorx"));
                     imp.setObservacao(rst.getString("observ"));
                     if (eFicha) {
-                        if ((rst.getString("fichax") != null) &&
-                                (!rst.getString("fichax").trim().isEmpty())) {
+                        if ((rst.getString("fichax") != null)
+                                && (!rst.getString("fichax").trim().isEmpty())) {
                             imp.setIdCliente(rst.getString("fichax"));
                         } else {
                             imp.setIdCliente("A" + rst.getString("client"));
@@ -877,45 +891,45 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setIdCliente(rst.getString("client"));
                     }
                     imp.setDataVencimento(rst.getDate("vencim"));
-                    imp.setCnpjCliente(rst.getString("ciccgc"));                    
+                    imp.setCnpjCliente(rst.getString("ciccgc"));
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = cli.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    c.filial||'-'||c.sequen id,\n" +
-                    "    c.ciccgc cpf,\n" +
-                    "    c.cheque,\n" +
-                    "    c.bancox,\n" +
-                    "    c.agenci,\n" +
-                    "    c.contax,\n" +
-                    "    c.dataxx,\n" +
-                    "    c.vencim,\n"+
-                    "    c.valorx,\n" +
-                    "    case when char_length(trim(cl.ciccgc)) > 11 then cl.inscri_jur else cl.rgnume_fis end rg,\n" +
-                    "    trim(coalesce(cl.telddd_res,'')||coalesce(cl.telfon_res, '')) telefone,\n" +
-                    "    cl.razsoc,\n" +
-                    "    c.observ,\n" +
-                    "    case c.status when 1 then 0 else coalesce(c.motdv2, c.motdv1) end alinea,\n" +
-                    "    c.datalt\n" +
-                    "from\n" +
-                    "    cheques c\n" +
-                    "    join clientes cl on c.client = cl.codigo\n" +
-                    "where\n" +
-                    "    c.quitad is null\n"
+                    "select\n"
+                    + "    c.filial||'-'||c.sequen id,\n"
+                    + "    c.ciccgc cpf,\n"
+                    + "    c.cheque,\n"
+                    + "    c.bancox,\n"
+                    + "    c.agenci,\n"
+                    + "    c.contax,\n"
+                    + "    c.dataxx,\n"
+                    + "    c.vencim,\n"
+                    + "    c.valorx,\n"
+                    + "    case when char_length(trim(cl.ciccgc)) > 11 then cl.inscri_jur else cl.rgnume_fis end rg,\n"
+                    + "    trim(coalesce(cl.telddd_res,'')||coalesce(cl.telfon_res, '')) telefone,\n"
+                    + "    cl.razsoc,\n"
+                    + "    c.observ,\n"
+                    + "    case c.status when 1 then 0 else coalesce(c.motdv2, c.motdv1) end alinea,\n"
+                    + "    c.datalt\n"
+                    + "from\n"
+                    + "    cheques c\n"
+                    + "    join clientes cl on c.client = cl.codigo\n"
+                    + "where\n"
+                    + "    c.quitad is null\n"
                     + " and c.filial = " + getLojaOrigem()
                     + " order by\n"
-                    +                    "    id"
+                    + "    id"
             )) {
                 while (rst.next()) {
                     ChequeIMP imp = new ChequeIMP();
@@ -938,7 +952,92 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
             }
         }
-        
+
+        return result;
+    }
+
+    @Override
+    public List<NutricionalIMP> getNutricional(Set<OpcaoNutricional> opcoes) throws Exception {
+        List<NutricionalIMP> result = new ArrayList<>();
+
+        try (Statement stm = sco.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "n.codpro as id,\n"
+                    + "substring(p.descri from 1 for 20) as descricao,\n"
+                    + "n.porcao as porcao,\n"
+                    + "n.valcal as caloria,\n"
+                    + "n.carboi as carboidratos,\n"
+                    + "n.protei as proteina,\n"
+                    + "n.gortot as gorduras,\n"
+                    + "n.gorsat as gorduras_saturada,\n"
+                    + "n.colest,\n"
+                    + "n.fibra as fibra_alimentar,\n"
+                    + "n.calcio as calcio,\n"
+                    + "n.ferro as ferro,\n"
+                    + "n.sodio as sodio,\n"
+                    + "n.vdvalcal,\n"
+                    + "n.vdcarboi,\n"
+                    + "n.vdprotei,\n"
+                    + "n.vdgortot,\n"
+                    + "n.vdgorsat,\n"
+                    + "n.vdcolest,\n"
+                    + "n.vdfibra,\n"
+                    + "n.vdcalcio,\n"
+                    + "n.vdferro,\n"
+                    + "n.vdsodio\n"
+                    + "from tabnutric n\n"
+                    + "inner join produtos p on p.codigo = n.codpro"
+            )) {
+                while (rst.next()) {
+                    NutricionalIMP imp = new NutricionalIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+                    imp.setCaloria(rst.getInt("caloria"));
+                    imp.setCarboidrato(rst.getDouble("carboidratos"));
+                    imp.setProteina(rst.getDouble("proteina"));
+                    imp.setGordura(rst.getDouble("gorduras"));
+                    imp.setFibra(rst.getDouble("fibra_alimentar"));
+                    imp.setCalcio(rst.getDouble("calcio"));
+                    imp.setFerro(rst.getDouble("ferro"));
+                    imp.setSodio(rst.getDouble("sodio"));
+                    imp.setPorcao(rst.getString("porcao"));
+                    //imp.getMensagemAlergico().add(rst.getString("mensagemalergico"));                    
+                    imp.addProduto(rst.getString("id"));
+                    result.add(imp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
+        List<ReceitaBalancaIMP> result = new ArrayList<>();
+
+        try (Statement stm = sco.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "p.codigo id_produto,\n"
+                    + "p.descri desc_produto,\n"
+                    + "p.receita,\n"
+                    + "r.descri desc_receita\n"
+                    + "from produtos p\n"
+                    + "join receita r on r.codigo = p.receita and r.codigo > 0"
+            )) {
+                while (rst.next()) {
+                    ReceitaBalancaIMP imp = new ReceitaBalancaIMP();
+
+                    imp.setId(rst.getString("receita") + "-" + rst.getString("id_produto"));
+                    imp.setDescricao(rst.getString("desc_produto"));
+                    imp.setReceita(rst.getString("desc_receita"));
+                    imp.getProdutos().add(rst.getString("id_produto"));
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
     
@@ -995,7 +1094,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return vNutricionalToledo;
     }
-    
+
     public void importarNutricionalToledo() throws Exception {
         try {
             ProgressBar.setStatus("Carregando dados...Nutricional Toledo...");
@@ -1014,74 +1113,74 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
             dataTermino = new Date();
         }
         List<OfertaIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = sco.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    pv.filial,\n" +
-                    "    pv.codpro idproduto,\n" +
-                    "    pv.inipro datainicio,\n" +
-                    "    pv.terpro datatermino,\n" +
-                    "    pv.promoc precooferta\n" +
-                    "from\n" +
-                    "    precovenda pv\n" +
-                    "where\n" +
-                    "   pv.filial = " + getLojaOrigem() + " and\n" +
-                    "   pv.promoc > 0 and\n" +
-                    "    pv.terpro >= " + SQLUtils.stringSQL(
+                    "select\n"
+                    + "    pv.filial,\n"
+                    + "    pv.codpro idproduto,\n"
+                    + "    pv.inipro datainicio,\n"
+                    + "    pv.terpro datatermino,\n"
+                    + "    pv.promoc precooferta\n"
+                    + "from\n"
+                    + "    precovenda pv\n"
+                    + "where\n"
+                    + "   pv.filial = " + getLojaOrigem() + " and\n"
+                    + "   pv.promoc > 0 and\n"
+                    + "    pv.terpro >= " + SQLUtils.stringSQL(
                             new SimpleDateFormat("dd.MM.yyyy").format(dataTermino)
                     )
             )) {
                 while (rst.next()) {
                     OfertaIMP imp = new OfertaIMP();
-                    
+
                     imp.setIdProduto(rst.getString("idproduto"));
                     imp.setDataInicio(rst.getDate("datainicio"));
                     imp.setDataFim(rst.getDate("datatermino"));
                     imp.setPrecoOferta(rst.getDouble("precooferta"));
                     imp.setSituacaoOferta(SituacaoOferta.ATIVO);
                     imp.setTipoOferta(TipoOfertaVO.CAPA);
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = sfi.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    p.sequen id,\n" +
-                    "    nullif(trim(e.idfornec),'') id_fornecedor,\n" +
-                    "    p.docume numerodocumento,\n" +
-                    "    p.dataxx dataemissao,\n" +
-                    "    p.dataentra dataentrada,\n" +
-                    "    p.valorpago,\n" +
-                    "                         \n" +
-                    "    p.vencim vencimento,\n" +
-                    "    p.valorx valor,\n" +
-                    "    p.parcela,\n" +
-                    "    p.histbaixa observacao\n" +
-                    "from\n" +
-                    "    docpagar p\n" +
-                    "    join entidade e on\n" +
-                    "        p.entidade = e.codigo\n" +
-                    "where\n" +
-                    "    p.filial = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n" +
-                    "    and p.status = 'P'\n" +
-                    "    and not nullif(trim(e.idfornec),'') is null\n" +
-                    "order by\n" +
-                    "    p.sequen"
+                    "select\n"
+                    + "    p.sequen id,\n"
+                    + "    nullif(trim(e.idfornec),'') id_fornecedor,\n"
+                    + "    p.docume numerodocumento,\n"
+                    + "    p.dataxx dataemissao,\n"
+                    + "    p.dataentra dataentrada,\n"
+                    + "    p.valorpago,\n"
+                    + "                         \n"
+                    + "    p.vencim vencimento,\n"
+                    + "    p.valorx valor,\n"
+                    + "    p.parcela,\n"
+                    + "    p.histbaixa observacao\n"
+                    + "from\n"
+                    + "    docpagar p\n"
+                    + "    join entidade e on\n"
+                    + "        p.entidade = e.codigo\n"
+                    + "where\n"
+                    + "    p.filial = " + getLojaOrigem().substring(0, getLojaOrigem().length() - 1) + "\n"
+                    + "    and p.status = 'P'\n"
+                    + "    and not nullif(trim(e.idfornec),'') is null\n"
+                    + "order by\n"
+                    + "    p.sequen"
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
-                    
+
                     imp.setId(rst.getString("id"));
                     imp.setIdFornecedor(Utils.stringLong(rst.getString("id_fornecedor")));
                     imp.setNumeroDocumento(rst.getString("numerodocumento"));
@@ -1091,12 +1190,12 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     ContaPagarVencimentoIMP parc = imp.addVencimento(rst.getDate("vencimento"), rst.getDouble("valor"));
                     parc.setNumeroParcela(Utils.stringToInt(rst.getString("parcela"), 1));
                     parc.setObservacao(rst.getString("observacao"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -1123,5 +1222,5 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
     public void setCli(Connection cli) {
         this.cli = cli;
     }
-       
+
 }

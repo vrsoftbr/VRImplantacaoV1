@@ -32,7 +32,7 @@ public class OryonGUI extends VRInternalFrame {
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
-        txtDatabase.setArquivo(params.getWithNull("C:\\vr\\database\\oryon.mdb", SISTEMA, "DATABASE"));
+        txtDatabase.setArquivo(params.getWithNull("C://Clientes//SC//Andrea - SC//ms access//Oryon//Oryon.mdb", SISTEMA, "DATABASE"));
         txtUsuario.setText(params.getWithNull("", SISTEMA, "USUARIO"));
         txtSenha.setText(params.getWithNull("", SISTEMA, "SENHA"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");

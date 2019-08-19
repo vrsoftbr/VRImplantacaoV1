@@ -133,7 +133,8 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {   
-            stm.executeUpdate("set client_encoding to 'WIN1252';");
+            stm.executeUpdate("set client_encoding to 'UTF8';");
+            //stm.executeUpdate("set server_encoding to 'UTF8';");
             try (ResultSet rs = stm.executeQuery(
                 "select\n" +
                 "	p.codproduto id,\n" +
@@ -200,7 +201,11 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
+                    imp.seteBalanca(rs.getBoolean("e_balanca"));
                     imp.setEan(rs.getString("codigobarras"));
+                    if(imp.isBalanca()) {
+                        imp.setEan(imp.getImportId());
+                    }
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setCustoComImposto(rs.getDouble("custocomnota"));
                     imp.setCustoSemImposto(rs.getDouble("custosemnota"));
@@ -214,7 +219,7 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setCodMercadologico1(rs.getString("mercadologico1"));
                     imp.setCodMercadologico2(rs.getString("mercadologico2"));
                     imp.setCodMercadologico3(rs.getString("mercadologico3"));
-                    imp.seteBalanca(rs.getBoolean("e_balanca"));
+                    
                     imp.setValidade(rs.getInt("validade"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
