@@ -671,13 +671,17 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    bloq.des_motivo_bloq,\n" +
                     "    f.des_email_vend email_vendedor,\n" +
                     "    f.num_celular celular,\n" +
-                    "    f.num_med_cpgto condicaopagamento\n" +
+                    "    f.num_med_cpgto condicaopagamento,\n" +
+                    "    case lf.inativo when 'S' then 1 else 0 end ativo\n" +
                     "from\n" +
                     "    tab_fornecedor f\n" +
                     "    left join tab_cidade cd on\n" +
                     "        f.cod_cidade = cd.cod_cidade \n" +
                     "    left join tab_fornecedor_bloqueio bloq on\n" +
                     "        f.cod_fornecedor = bloq.cod_fornecedor\n" +
+                    "    left join tab_loja_fornecedor lf on\n" +
+                    "        lf.cod_fornecedor = f.cod_fornecedor and\n" +
+                    "        lf.cod_loja = " + getLojaOrigem() + "\n" +
                     "order by\n" +
                     "    id"
             )) {
@@ -704,6 +708,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrazoEntrega(rst.getInt("prazoEntrega"));
                     imp.setPrazoVisita(rst.getInt("prazovisita"));
                     imp.setPrazoSeguranca(rst.getInt("prazoseguranca"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
                     
                     imp.setObservacao(
                             new StringBuilder()
@@ -850,7 +855,6 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    coalesce(nullif(trim(c.num_insc_est), ''), c.num_rg) inscricaoestadual,\n" +
                     "    c.des_cliente razao,\n" +
                     "    coalesce(nullif(trim(c.des_fantasia), ''), c.des_cliente) fantasia,\n" +
-                    "    c.cod_status_pdv ativobloq,\n" +
                     "    c.des_endereco endereco,\n" +
                     "    c.num_endereco numero,\n" +
                     "    c.des_complemento complemento,\n" +
@@ -878,11 +882,19 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    c.num_fax,\n" +
                     "    c.num_celular,\n" +
                     "    c.des_email,\n" +
-                    "    case c.flg_envia_codigo when 'S' then 1 else 0 end permiterotativo\n" +
+                    "    case sta.negativar when 'S' then 1 else 0 end bloqueado,\n" +
+                    "    case c.flg_envia_codigo when 'S' then 1 else 0 end permiterotativo,\n" +
+                    "    sta.des_status_pdv observacao1,\n" +
+                    "    case lc.inativo when 'S' then 0 else 1 end ativo\n" +
                     "from\n" +
                     "    tab_cliente c\n" +
                     "    left join tab_cidade cd on\n" +
                     "        c.cod_cidade = cd.cod_cidade\n" +
+                    "    left join tab_cliente_status_pdv sta on\n" +
+                    "        c.cod_status_pdv = sta.cod_status_pdv\n" +
+                    "    left join tab_loja_cliente lc on\n" +
+                    "        lc.cod_cliente = c.cod_cliente and\n" +
+                    "        lc.cod_loja = " + getLojaOrigem() + "\n" +
                     "where\n" +
                     "   c.des_cliente <> 'CADASTRO AUTOMATICO'\n" +
                     "order by\n" +
@@ -896,7 +908,9 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
-                    setSituacaoCadastro(imp, rst.getInt("ativobloq"));
+                    //setSituacaoCadastro(imp, rst.getInt("ativobloq"));
+                    imp.setBloqueado(rst.getBoolean("bloqueado"));
+                    imp.setAtivo(rst.getBoolean("ativo"));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
                     imp.setComplemento(rst.getString("complemento"));
@@ -1010,6 +1024,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    and tipo_parceiro = 0\n" +
                     "    and f.flg_quitado = 'N'\n" +
                     "    and not f.num_docto is null\n" +
+                    "    and f.cod_entidade in (" + implodeList(entidadesCreditoRotativo) + ")\n\n" +
                     "order by\n" +
                     "    1, 2, 3, 4, 5"
             )) {
@@ -1067,10 +1082,11 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    left join tab_entidade e on f.cod_entidade = e.cod_entidade\n" +
                     "    left join tab_cliente c on f.cod_parceiro = c.cod_cliente\n" +
                     "where\n" +
-                    "    f.flg_quitado = 'N'\n" +
-                    "    and f.tipo_parceiro = 0\n" +
+                    "    f.cod_loja = " + getLojaOrigem() + "\n" +
+                    "    and f.tipo_conta = 1\n" +
+                    "    and tipo_parceiro = 0\n" +
+                    "    and f.flg_quitado = 'N'\n" +
                     "    and f.cod_entidade in (" + implodeList(entidadesCheques) + ")\n" +
-                    "    and f.cod_loja = " + getLojaOrigem() + "\n" +
                     "order by\n" +
                     "    f.dta_emissao, id"
             )) {
