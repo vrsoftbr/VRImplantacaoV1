@@ -15,10 +15,10 @@ public class ConexaoAccess {
     private String senha = "";
 
     public void abrirConexao(String i_database, String i_usuario, String i_senha) throws Exception {
-        //Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-        Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
-        //String db = "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};DBQ=" + i_database;
-        String db = "jdbc:ucanaccess://C:/Oryon.mdb";
+        Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
+        //Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+        String db = "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};DBQ=" + i_database;
+        //String db = "jdbc:ucanaccess://C:/Oryon.mdb";
         try {
             con = DriverManager.getConnection(db, i_usuario, i_senha);
         } catch (Exception ex) {

@@ -133,8 +133,7 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {   
-            stm.executeUpdate("set client_encoding to 'UTF8';");
-            //stm.executeUpdate("set server_encoding to 'UTF8';");
+            //stm.executeUpdate("set client_encoding to 'WIN1252';");
             try (ResultSet rs = stm.executeQuery(
                 "select\n" +
                 "	p.codproduto id,\n" +

@@ -354,7 +354,7 @@ public class STI3DAO extends InterfaceDAO implements MapaTributoProvider {
                     "    i.item sequencia,\n" +
                     "    i.cancelado,\n" +
                     "    i.valortotalitem valor,\n" +
-                    "    i.descontoinformado desconto,\n" +
+                    "    i.desconto,\n" +
                     "	 a.aliquota icms\n" +
                     "from\n" +
                     "	powerstock.itens_vendas i\n" +
