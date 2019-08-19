@@ -52,6 +52,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
     private Connection sco;
     private Connection sfi;
     private Connection cli;
+    private Connection cupom;
 
     @Override
     public String getSistema() {
@@ -869,14 +870,14 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setId(rst.getString("id"));
                     imp.setDataEmissao(rst.getDate("dataxx"));
-                    
+
                     if ((rst.getString("cupom") != null)
                             && (!rst.getString("cupom").trim().isEmpty())) {
                         imp.setNumeroCupom(rst.getString("cupom"));
                     } else {
                         imp.setNumeroCupom(rst.getString("SEQUEN"));
                     }
-                    
+
                     imp.setEcf(rst.getString("caixax"));
                     imp.setValor(rst.getDouble("valorx"));
                     imp.setObservacao(rst.getString("observ"));
@@ -1040,7 +1041,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     private List<NutricionalToledoVO> carregarNutricionalToledo() throws Exception {
         List<NutricionalToledoVO> vNutricionalToledo = new ArrayList<>();
 
@@ -1223,4 +1224,11 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
         this.cli = cli;
     }
 
+    public Connection getCupom() {
+        return this.cupom;
+    }
+
+    public void setCupom(Connection cupom) {
+        this.cupom = cupom;
+    }
 }
