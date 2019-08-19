@@ -26,6 +26,8 @@ import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
  */
 public class CreditoRotativoRepository {
     
+    private static final Logger LOG = Logger.getLogger(CreditoRotativoRepository.class.getName());
+    
     private CreditoRotativoProvider provider;
 
     public CreditoRotativoRepository(CreditoRotativoProvider provider) {
@@ -138,6 +140,8 @@ public class CreditoRotativoRepository {
                         cred.setId_clientePreferencial(preferencial.getCodigoAtual().getId());
                         provider.gravarRotativo(cred);
                         anterior.setCodigoAtual(cred);
+                    } else {
+                        LOG.warning("Cliente '" + imp.getIdCliente() + "' não encontrado!");
                     }
                     provider.gravarRotativoAnterior(anterior);
                     anteriores.put(

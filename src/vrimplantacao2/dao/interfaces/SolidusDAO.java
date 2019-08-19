@@ -985,61 +985,55 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
-                    "    f.cod_loja || '-' || f.tipo_conta || '-' || f.tipo_parceiro || '-' || f.cod_parceiro || '-' || f.num_registro id,\n" +
-                    "    f.cod_entidade || ' - ' || e.des_entidade pagamento,\n" +
-                    "    f.num_cgc_cpf cpf,\n" +
-                    "    c.num_cgc cpf2,\n" +
-                    "    f.dta_emissao dataemissao,\n" +
-                    "    f.num_cupom_fiscal numerocupom,\n" +
-                    "    f.num_pdv pdv,\n" +
+                    "    f.cod_loja,\n" +
+                    "    f.tipo_conta,\n" +
+                    "    f.tipo_parceiro,\n" +
+                    "    f.cod_parceiro,\n" +
+                    "    f.num_registro,\n" +
+                    "    f.dta_emissao dataemissao, \n" +
+                    "    f.num_docto numerocupom,\n" +
+                    "    f.num_pdv ecf,\n" +
                     "    f.val_parcela valor,\n" +
-                    "    f.des_cc,\n" +
-                    "    f.cod_parceiro idcliente,\n" +
+                    "    f.des_observacao observacao,\n" +
+                    "    f.cod_parceiro idcliente, \n" +
                     "    f.dta_vencimento datavencimento,\n" +
-                    "    f.num_parcela parcela,\n" +
+                    "    f.num_parcela parcela, \n" +
                     "    f.val_juros juros,\n" +
                     "    f.num_cgc_cpf cpf,\n" +
-                    "    coalesce(f.dta_pgto, f.dta_vencimento) dta_pgto,\n" +
-                    "    f.val_desconto,\n" +
-                    "    f.val_juros,\n" +
-                    "    f.flg_quitado\n" +
+                    "    f.cod_entidade || ' - ' || e.des_entidade pagamento\n" +
                     "from\n" +
                     "    tab_fluxo f\n" +
                     "    left join tab_entidade e on f.cod_entidade = e.cod_entidade\n" +
-                    "    left join tab_cliente c on f.cod_parceiro = c.cod_cliente\n" +
                     "where\n" +
-                    "    f.dta_emissao >= '" + DATE_FORMAT.format(rotativoDtaInicio) + "'\n" +
-                    "    and f.dta_emissao <= '" + DATE_FORMAT.format(rotativoDtaFim) + "'\n" +
-                    "    and f.tipo_parceiro = 0\n" +
-                    "    and f.cod_entidade in (" + implodeList(this.entidadesCreditoRotativo) + ")\n" +
-                    "    and f.cod_loja = " + getLojaOrigem() + "\n" +                            
+                    "    f.cod_loja = " + getLojaOrigem() + "\n" +
+                    "    and f.tipo_conta = 1\n" +
+                    "    and tipo_parceiro = 0\n" +
+                    "    and f.flg_quitado = 'N'\n" +
+                    "    and not f.num_docto is null\n" +
                     "order by\n" +
-                    "    f.dta_emissao, id"
+                    "    1, 2, 3, 4, 5"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     
-                    imp.setId(rst.getString("id"));   
+                    imp.setId(String.format(
+                            "%d-%d-%d-%d-%d",
+                            rst.getInt("cod_loja"),
+                            rst.getInt("tipo_conta"),
+                            rst.getInt("tipo_parceiro"),
+                            rst.getInt("cod_parceiro"),
+                            rst.getInt("num_registro")
+                    ));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setNumeroCupom(rst.getString("numerocupom"));
-                    imp.setEcf(rst.getString("pdv"));
+                    imp.setEcf(rst.getString("ecf"));
                     imp.setValor(rst.getDouble("valor"));
-                    imp.setObservacao(rst.getString("des_cc"));
+                    imp.setObservacao(rst.getString("pagamento") + " - " + rst.getString("observacao"));
                     imp.setIdCliente(rst.getString("idcliente"));
                     imp.setDataVencimento(rst.getDate("datavencimento"));
                     imp.setParcela(rst.getInt("parcela"));
                     imp.setJuros(rst.getDouble("juros"));
                     imp.setCnpjCliente(rst.getString("cpf"));
-                    if ("S".equals(rst.getString("flg_quitado"))) {
-                        imp.addPagamento(
-                                rst.getString("id"),
-                                imp.getValor(), 
-                                rst.getDouble("val_desconto"), 
-                                rst.getDouble("val_juros"),
-                                rst.getDate("dta_pgto"),
-                                ""
-                        );
-                    }
                     
                     result.add(imp);
                 }
