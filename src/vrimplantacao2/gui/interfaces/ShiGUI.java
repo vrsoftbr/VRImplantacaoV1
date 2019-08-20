@@ -395,6 +395,16 @@ public class ShiGUI extends VRInternalFrame {
                         if (chkConvRecebimento.isSelected()) {
                             importador.importarConvenioTransacao();
                         }
+                        
+                        if (chkHistoricoVendas.isSelected()) {
+                            if (edtVendaDtIni.getDate() == null || edtVendaDtFim.getDate() == null) {
+                                Util.exibirMensagem("Por favor, informe um intervalo de datas para importar as vendas", "Atenção");
+                            } else {
+                                shiDAO.setDataInicioVenda(edtVendaDtIni.getDate());
+                                shiDAO.setDataTerminoVenda(edtVendaDtFim.getDate());
+                                importador.importarHistoricoVendas(false);
+                            }
+                        }
 
                     } else if (tabs.getSelectedIndex() == 2) {
                         if (chkUnifProdutos.isSelected()) {
@@ -513,6 +523,12 @@ public class ShiGUI extends VRInternalFrame {
         chkConvEmpresa = new vrframework.bean.checkBox.VRCheckBox();
         chkConvConveniado = new vrframework.bean.checkBox.VRCheckBox();
         chkConvRecebimento = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel1 = new vrframework.bean.panel.VRPanel();
+        chkHistoricoVendas = new vrframework.bean.checkBox.VRCheckBox();
+        vRLabel1 = new vrframework.bean.label.VRLabel();
+        vRLabel2 = new vrframework.bean.label.VRLabel();
+        edtVendaDtIni = new org.jdesktop.swingx.JXDatePicker();
+        edtVendaDtFim = new org.jdesktop.swingx.JXDatePicker();
         tabUnificacao = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -1123,6 +1139,48 @@ public class ShiGUI extends VRInternalFrame {
 
         tabImportacao.addTab("Convênio", tabConvenio);
 
+        chkHistoricoVendas.setText("Histórico de Vendas");
+
+        vRLabel1.setText("Data Início");
+
+        vRLabel2.setText("Data Término");
+
+        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
+        vRPanel1.setLayout(vRPanel1Layout);
+        vRPanel1Layout.setHorizontalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkHistoricoVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(vRPanel1Layout.createSequentialGroup()
+                        .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(edtVendaDtIni, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(edtVendaDtFim, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(393, Short.MAX_VALUE))
+        );
+        vRPanel1Layout.setVerticalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkHistoricoVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(edtVendaDtIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(edtVendaDtFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(164, Short.MAX_VALUE))
+        );
+
+        tabImportacao.addTab("Vendas", vRPanel1);
+
         tabs.addTab("Importação", tabImportacao);
 
         chkUnifProdutos.setText("Produtos (Somente com EAN válido)");
@@ -1295,6 +1353,7 @@ public class ShiGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
     private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkHistoricoVendas;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkNutricional;
@@ -1329,6 +1388,8 @@ public class ShiGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkValidade;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
+    private org.jdesktop.swingx.JXDatePicker edtVendaDtFim;
+    private org.jdesktop.swingx.JXDatePicker edtVendaDtIni;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel4;
@@ -1350,6 +1411,8 @@ public class ShiGUI extends VRInternalFrame {
     private vrframework.bean.fileChooser.VRFileChooser txtSFI;
     private vrframework.bean.passwordField.VRPasswordField txtSenha;
     private vrframework.bean.textField.VRTextField txtUsuario;
+    private vrframework.bean.label.VRLabel vRLabel1;
+    private vrframework.bean.label.VRLabel vRLabel2;
     private vrframework.bean.label.VRLabel vRLabel20;
     private vrframework.bean.label.VRLabel vRLabel21;
     private vrframework.bean.label.VRLabel vRLabel23;
@@ -1359,6 +1422,7 @@ public class ShiGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel27;
     private vrframework.bean.label.VRLabel vRLabel28;
     private vrframework.bean.label.VRLabel vRLabel29;
+    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel3;
     // End of variables declaration//GEN-END:variables
 

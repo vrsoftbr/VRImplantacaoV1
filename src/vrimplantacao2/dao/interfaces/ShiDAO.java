@@ -6,8 +6,11 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.dao.cadastro.NutricionalToledoDAO;
 import vrimplantacao.utils.Utils;
@@ -16,7 +19,9 @@ import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.venda.VendaHistoricoIMP;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
@@ -53,6 +58,16 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
     private Connection sfi;
     private Connection cli;
     private Connection cupom;
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
+    
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
 
     @Override
     public String getSistema() {
@@ -1200,6 +1215,196 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    private class ProdutoComplementoParcial {
+        int id;
+        String impId;
+        double pisDeb = 0;
+        double pisCred = 0;
+        double pisRed = 0;
+        double icmsDebCst = 0;
+        double icmsDebAliq = 0;
+        double icmsDebRed = 0;
+        double icmsCredCst = 0;
+        double icmsCredAliq = 0;
+        double icmsCredRed = 0;
+    }
+    
+    @Override
+    public List<VendaHistoricoIMP> getHistoricoVenda() throws Exception {
+        List<VendaHistoricoIMP> result = new ArrayList<>();
+        Map<String, String> eans = new HashMap<>();
+        Map<String, ProdutoComplementoParcial> aliquotas = new HashMap<>();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	ant.impid,\n"
+                    + "	min(ean.codigobarras) codigobarras\n"
+                    + "from\n"
+                    + "	produtoautomacao ean\n"
+                    + "	join implantacao.codant_produto ant on\n"
+                    + "		ant.codigoatual = ean.id_produto and\n"
+                    + "		ant.impsistema = '" + getSistema() + "' and\n"
+                    + "         ant.imploja = '" + getLojaOrigem() + "' \n"
+                    + "group by\n"
+                    + "	ant.impid"
+            )) {
+                while (rst.next()) {
+                    eans.put(rst.getString("impid"), rst.getString("codigobarras"));
+                }
+            }
+            
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	ant.impid,\n" +
+                    "	ant.codigoatual,\n" +
+                    "	pisdeb.valorpis pisdeb,\n" +
+                    "	piscred.valorpis piscred,\n" +
+                    "	piscred.reduzidocredito pisred,\n" +
+                    "	aliqdeb.situacaotributaria icmsdeb_cst,\n" +
+                    "	aliqdeb.porcentagem icmsdeb_aliq,\n" +
+                    "	aliqdeb.reduzido icmsdeb_red,\n" +
+                    "	aliqcred.situacaotributaria icmscred_cst,\n" +
+                    "	aliqcred.porcentagem icmscred_aliq,\n" +
+                    "	aliqcred.reduzido icmscred_red\n" +
+                    "from\n" +
+                    "	produtoaliquota al\n" +
+                    "	join (\n" +
+                    "			select \n" +
+                    "				loja.id, \n" +
+                    "				f.id_estado\n" +
+                    "			from\n" +
+                    "				loja\n" +
+                    "				join fornecedor f on\n" +
+                    "					loja.id_fornecedor = f.id\n" +
+                    "	) loja on\n" +
+                    "		loja.id = 1 and\n" +
+                    "		loja.id_estado = al.id_estado\n" +
+                    "	join produto p on\n" +
+                    "		al.id_produto = p.id\n" +
+                    "	join implantacao.codant_produto ant on\n" +
+                    "		ant.impsistema = '" + getSistema() + "' and\n" +
+                    "		ant.imploja = '" + getLojaOrigem() + "' and\n" +
+                    "		ant.codigoatual = al.id_produto\n" +
+                    "	join tipopiscofins pisdeb on\n" +
+                    "		p.id_tipopiscofins = pisdeb.id\n" +
+                    "	join tipopiscofins piscred on\n" +
+                    "		p.id_tipopiscofinscredito = piscred.id\n" +
+                    "	join aliquota aliqdeb on\n" +
+                    "		al.id_aliquotadebito = aliqdeb.id\n" +
+                    "	join aliquota aliqcred on\n" +
+                    "		al.id_aliquotacredito = aliqcred.id\n" +
+                    "order by\n" +
+                    "	1"
+            )) {
+                while (rst.next()) {
+                    ProdutoComplementoParcial pcp = new ProdutoComplementoParcial();
+                    pcp.id = rst.getInt("codigoatual");
+                    pcp.impId = rst.getString("impid");
+                    pcp.pisDeb = rst.getDouble("pisdeb");
+                    pcp.pisCred = rst.getDouble("piscred");
+                    pcp.pisRed = rst.getDouble("pisred");
+                    pcp.icmsDebCst = rst.getDouble("icmsdeb_cst");
+                    pcp.icmsDebAliq = rst.getDouble("icmsdeb_aliq");
+                    pcp.icmsDebRed = rst.getDouble("icmsdeb_red");
+                    pcp.icmsCredCst = rst.getDouble("icmscred_cst");
+                    pcp.icmsCredAliq = rst.getDouble("icmscred_aliq");
+                    pcp.icmsCredRed = rst.getDouble("icmscred_red");
+                    aliquotas.put(pcp.impId, pcp);
+                }
+            }
+        }
+        
+        try (Statement stm = cupom.createStatement()) {
+            SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
+            
+            System.out.println(
+                "select\n"
+                    + "m.data as data,\n"
+                    + "m.ecf,\n"
+                    + "m.venda as totaldia,\n"
+                    + "m.serie as numeroserie,\n"
+                    + "m.pdv,\n"
+                    + "m.vlcanc,\n"
+                    + "m.gtinicial,\n"
+                    + "m.gtfinal,\n"
+                    + "m.valorz,\n"
+                    + "i.cupom, \n"
+                    + "i.item as sequencia,\n"
+                    + "p.codpro as id_produto,\n"
+                    + "i.produto as ean,\n"
+                    + "i.preuni as precovenda,\n"
+                    + "i.quanti as quantidade,\n"
+                    + "i.valor as valortotalitem,\n"
+                    + "i.sittri as icms,\n"
+                    + "i.vlicms as valor_icms,\n"
+                    + "i.vpis, \n"
+                    + "i.vcofins\n"
+                    + "from movdia m\n"
+                    + "join item i on i.idmovdia = m.id\n"
+                    + "join prod p on p.barras = i.produto\n"
+                    + "where m.filial = '" + getLojaOrigem() + "'\n"
+                    + "and m.data >= '" + fmt.format(dataInicioVenda) + "'\n"
+                    + "and m.data <= '" + fmt.format(dataTerminoVenda) + "'"
+            );
+            
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "m.data as data,\n"
+                    + "m.ecf,\n"
+                    + "m.venda as totaldia,\n"
+                    + "m.serie as numeroserie,\n"
+                    + "m.pdv,\n"
+                    + "m.vlcanc,\n"
+                    + "m.gtinicial,\n"
+                    + "m.gtfinal,\n"
+                    + "m.valorz,\n"
+                    + "i.cupom, \n"
+                    + "i.item as sequencia,\n"
+                    + "p.codpro as id_produto,\n"
+                    + "i.produto as ean,\n"
+                    + "i.preuni as precovenda,\n"
+                    + "i.quanti as quantidade,\n"
+                    + "i.valor as valortotalitem,\n"
+                    + "i.sittri as icms,\n"
+                    + "i.vlicms as valor_icms,\n"
+                    + "i.vpis, \n"
+                    + "i.vcofins\n"
+                    + "from movdia m\n"
+                    + "join item i on i.idmovdia = m.id\n"
+                    + "join prod p on p.barras = i.produto\n"
+                    + "where m.filial = '" + getLojaOrigem() + "'\n"
+                    + "and m.data >= '" + fmt.format(dataInicioVenda) + "'\n"
+                    + "and m.data <= '" + fmt.format(dataTerminoVenda) + "'"
+            )) {
+                while (rst.next()) {
+                    VendaHistoricoIMP imp = new VendaHistoricoIMP();
+                    imp.setIdProduto(rst.getString("id_produto"));
+                    
+                    String ean = eans.get(imp.getIdProduto());
+                    if (ean == null) {ean = imp.getIdProduto();}                    
+                    imp.setEan(ean);
+                    
+                    ProdutoComplementoParcial pcp = aliquotas.get(imp.getIdProduto());                    
+                    
+                    imp.setData(fmt.parse(rst.getString("data")));
+                    imp.setCustoComImposto(0);
+                    imp.setCustoSemImposto(0);
+                    imp.setPrecoVenda(rst.getDouble("precovenda"));
+                    imp.setQuantidade(rst.getDouble("quantidade"));
+                    imp.setValorTotal(rst.getDouble("valortotalitem"));
+                    imp.setIcmsCredito(MathUtils.round((imp.getValorTotal() * ((100 - pcp.icmsCredRed) / 100)) * pcp.icmsCredAliq / 100, 2));
+                    imp.setIcmsDebito(MathUtils.round((imp.getValorTotal() * ((100 - pcp.icmsDebRed) / 100)) * pcp.icmsDebAliq / 100, 2));
+                    imp.setPisCofinsCredito(MathUtils.round((imp.getValorTotal() * ((100 - pcp.pisRed) / 100)) * pcp.pisCred / 100, 2));
+                    imp.setPisCofinsDebito(MathUtils.round(imp.getValorTotal() * pcp.pisDeb / 100, 2));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }    
+    
     public Connection getSco() {
         return sco;
     }
