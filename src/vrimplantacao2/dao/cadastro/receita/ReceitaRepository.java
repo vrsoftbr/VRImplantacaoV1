@@ -120,7 +120,7 @@ public class ReceitaRepository {
                     ).getCodigoAtual();
 
                     Integer prodReceita = prodReceVO.getId();
-                    if (!receitaProduto.containsKey(prodReceita, prodReceita)) {
+                    if (!receitaProduto.containsKey(prodReceita, prodReceita)) { 
                         voProduto.setId_produto(prodReceita);
                         provider.gravarProduto(voProduto);
                         receitaProduto.put(null, prodReceita, prodReceita);

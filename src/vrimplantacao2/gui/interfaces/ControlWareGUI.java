@@ -67,6 +67,8 @@ public class ControlWareGUI extends VRInternalFrame {
         super(i_mdiFrame);
         initComponents();
         
+        //ConexaoPostgres.CHARSET = "WIN1252";
+        
         this.title = "Importação " + NOME_SISTEMA;
                 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
@@ -92,7 +94,6 @@ public class ControlWareGUI extends VRInternalFrame {
         if (txtUsuarioPostgres.getText().isEmpty()) {
             throw new VRException("Favor informar o usuário do banco de dados " + SERVIDOR_SQL);
         }
-        
         connSQL.abrirConexao(txtHostPostgres.getText(), txtPortaPostgres.getInt(), 
                 txtBancoDadosPostgres.getText(), txtUsuarioPostgres.getText(), txtSenhaPostgres.getText());
         
