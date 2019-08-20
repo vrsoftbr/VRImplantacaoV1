@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import vrimplantacao2.vo.enums.TipoPagamento;
 
 /**
  * Classe utilizada para importar os dados das contas à pagar.
@@ -97,12 +98,17 @@ public class ContaPagarIMP {
     }
     
     public ContaPagarVencimentoIMP addVencimento(Date vencimento, double valor) {
+        return addVencimento(vencimento, valor, TipoPagamento.BOLETO_BANCARIO);
+    }
+    
+    public ContaPagarVencimentoIMP addVencimento(Date vencimento, double valor, TipoPagamento tipoPagamento) {
         ContaPagarVencimentoIMP imp = new ContaPagarVencimentoIMP();
         this.getVencimentos().add(imp);
         imp.setContaPagar(this);
         imp.setVencimento(vencimento);
         imp.setValor(valor);
         imp.setNumeroParcela(getVencimentos().size());
+        imp.setTipoPagamento(tipoPagamento);
         return imp;
     }
 

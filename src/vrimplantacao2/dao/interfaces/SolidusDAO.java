@@ -34,10 +34,12 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoDestinatario;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoIva;
+import vrimplantacao2.vo.enums.TipoPagamento;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
@@ -75,14 +77,10 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     private static final Logger LOG = Logger.getLogger(SolidusDAO.class.getName());
     
     private Date vendasDataInicio = null;
-    private Date rotativoDtaInicio = null;
-    private Date rotativoDtaFim = null;
-    private Date contasDtaInicio = null;
-    private Date contasDtaFim = null;
     private Date notasDataInicio = null;
     private List<Entidade> entidadesCheques;
     private List<Entidade> entidadesCreditoRotativo;
-    private List<Entidade> entidadesContas;
+    private List<Entidade> entidadesConvenio;
     
     private boolean removerDigitoProdutoBalanca = false;
 
@@ -96,26 +94,6 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setVendasDataInicio(Date vendasDataInicio) {
         this.vendasDataInicio = vendasDataInicio;
-    }
-
-    public void setRotativoDtaInicio(Date rotativoDtaInicio) {
-        this.rotativoDtaInicio = rotativoDtaInicio;
-    }
-
-    public void setRotativoDtaFim(Date rotativoDtaFim) {
-        this.rotativoDtaFim = rotativoDtaFim;
-    }
-
-    public void setContasDtaInicio(Date contasDtaInicio) {
-        this.contasDtaInicio = contasDtaInicio;
-    }
-
-    public void setContasDtaFim(Date contasDtaFim) {
-        this.contasDtaFim = contasDtaFim;
-    }
-
-    public void setEntidadesContas(List<Entidade> entidadesContas) {
-        this.entidadesContas = entidadesContas;
     }
     
     @Override
@@ -285,8 +263,20 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataBloqueio(rst.getDate("databloqueio"));
                     imp.setObservacoes(rst.getString("observacao"));
                     
-                    result.add(imp);                    
+                    result.add(imp);
                 }
+                
+                /*ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
+                    
+                imp.setId("999");
+                imp.setRazao("CADASTRO AUTOMATICO");
+                imp.setCnpj("0");
+                imp.setDataInicio(new Date());
+                imp.setDataTermino(new Date());
+                imp.setDiaPagamento(1);
+                imp.setDataBloqueio(new Date());
+
+                result.add(imp);*/
             }
         }
         
@@ -297,12 +287,12 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ConveniadoIMP> getConveniado() throws Exception {
         List<ConveniadoIMP> result = new ArrayList<>();
         
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {            
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
                     "    c.cod_cliente id,\n" +
                     "    c.des_cliente nome,\n" +
-                    "    c.cod_convenio idempresa,\n" +
+                    "    coalesce(c.cod_convenio, '999') idempresa,\n" +
                     "    case s.negativar when 'S' then 1 else 0 end bloqueado,\n" +
                     "    c.num_cgc cnpj,\n" +
                     "    c.des_senha senha,\n" +
@@ -311,16 +301,19 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    cast('01.01.2200' as date) validadecartao,\n" +
                     "    case c.flg_exibe_lim when 'S' then 1 else 0 end visualizasaldo,\n" +
                     "    coalesce(c.val_limite_conv, 0) limiteconvenio,\n" +
-                    "    c.val_desconto desconto\n" +
+                    "    c.val_desconto desconto,\n" +
+                    "    case lc.inativo when 'S' then 0 else 1 end ativo\n" +
                     "from\n" +
                     "    tab_cliente c\n" +
                     "    left join tab_cidade cd on\n" +
                     "        c.cod_cidade = cd.cod_cidade\n" +
                     "    left join tab_cliente_status_pdv s on\n" +
                     "        c.cod_status_pdv = s.cod_status_pdv\n" +
+                    "    left join tab_loja_cliente lc on\n" +
+                    "        lc.cod_cliente = c.cod_cliente and\n" +
+                    "        lc.cod_loja = " + getLojaOrigem() + "\n" +
                     "where\n" +
                     "    not nullif(c.cod_convenio, 0) is null\n" +
-                    "    and coalesce(c.val_limite_conv, 0) > 0\n" +
                     "order by\n" +
                     "    1"
             )) {
@@ -337,6 +330,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setConvenioLimite(rst.getDouble("limiteconvenio"));
                     imp.setConvenioDesconto(rst.getDouble("desconto"));
                     imp.setBloqueado(rst.getBoolean("bloqueado"));
+                    imp.setSituacaoCadastro(rst.getBoolean("ativo") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     
                     if (imp.getConvenioLimite() > 9999999F) {
                         imp.setConvenioLimite(9999999);
@@ -371,11 +365,14 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    t.des_observacao observacao\n" +
                     "from\n" +
                     "    tab_fluxo t\n" +
+                    "    left join tab_entidade e on t.cod_entidade = e.cod_entidade\n" +
                     "where\n" +
                     "    t.cod_loja = " + getLojaOrigem() + "\n" +
+                    "    and t.tipo_conta = 1\n" +
                     "    and t.tipo_parceiro = 0\n" +
-                    "    and coalesce(t.flg_quitado,'N') = 'N'\n" +
-                    "    and coalesce(t.cod_convenio,0) > 0\n" +
+                    "    and t.flg_quitado = 'N'\n" +
+                    "    and t.cod_entidade in (" + implodeList(entidadesConvenio) + ")\n" +
+                    "    and t.num_condicao = 30\n" +
                     "order by\n" +
                     "    1, 2, 3, 4, 5"
             )) {
@@ -1130,7 +1127,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    f.des_cc,\n" +
                     "    f.num_parcela parcela,\n" +
                     "    f.val_juros juros,\n" +
-                    "    f.num_cgc_cpf cpf\n" +
+                    "    f.num_cgc_cpf cpf,\n" +
+                    "    f.cod_entidade\n" +
                     "from\n" +
                     "    tab_fluxo f\n" +
                     "    left join tab_entidade e on f.cod_entidade = e.cod_entidade\n" +
@@ -1152,7 +1150,37 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataHoraAlteracao(rst.getTimestamp("dataalteracao"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setObservacao(rst.getString("pagamento") + " - " + rst.getString("des_cc"));
-                    imp.addVencimento(rst.getDate("datavencimento"), rst.getDouble("valor"));
+                    ContaPagarVencimentoIMP venc = imp.addVencimento(rst.getDate("datavencimento"), rst.getDouble("valor"));
+                    
+                    switch (rst.getInt("cod_entidade")) {
+                        case 1  : venc.setTipoPagamento(TipoPagamento.DINHEIRO); break;//DINHEIRO                   
+                        case 2  : venc.setTipoPagamento(TipoPagamento.CARTAO_CREDITO); break;//CARTAO DE CREDITO          
+                        case 3  : venc.setTipoPagamento(TipoPagamento.CHEQUE); break;//CHEQUE A VISTA             
+                        case 4  : venc.setTipoPagamento(TipoPagamento.CHEQUE); break;//CHEQUE A PRAZO             
+                        case 5  : venc.setTipoPagamento(TipoPagamento.S_BOLETO); break;//VALE - CONVENIO            
+                        case 6  : venc.setTipoPagamento(TipoPagamento.S_BOLETO); break;//TICKET                     
+                        case 7  : venc.setTipoPagamento(TipoPagamento.CHEQUE); break;//CHEQUE SEM DADOS           
+                        case 9  : venc.setTipoPagamento(TipoPagamento.BOLETO_BANCARIO); break;//BOLETO                     
+                        case 10 : venc.setTipoPagamento(TipoPagamento.CHEQUE); break;//CHEQUE A PRAZO PG          
+                        case 11 : venc.setTipoPagamento(TipoPagamento.S_BOLETO); break;//BONIFICACAO DE MERCADORIA  
+                        case 13 : venc.setTipoPagamento(TipoPagamento.CARTAO_DEBITO); break;//VISA ELECTRON              
+                        case 14 : venc.setTipoPagamento(TipoPagamento.CARTAO_CREDITO); break;//VISA CREDITO               
+                        case 15 : venc.setTipoPagamento(TipoPagamento.CARTAO_DEBITO); break;//MAESTRO                    
+                        case 16 : venc.setTipoPagamento(TipoPagamento.CARTAO_CREDITO); break;//MASTERCARD                 
+                        case 18 : venc.setTipoPagamento(TipoPagamento.CARTAO_DEBITO); break;//SODEXO                     
+                        case 20 : venc.setTipoPagamento(TipoPagamento.S_BOLETO); break;//CONTRA VALE                
+                        case 21 : venc.setTipoPagamento(TipoPagamento.CARTAO_DEBITO); break;//CARTAO DEBITO              
+                        case 22 : venc.setTipoPagamento(TipoPagamento.CARTAO_DEBITO); break;//CARTAO BALCAO              
+                        case 23 : venc.setTipoPagamento(TipoPagamento.CARTAO_CREDITO); break;//CARTAO PARCELADO           
+                        case 24 : venc.setTipoPagamento(TipoPagamento.S_BOLETO); break;//QUEBRA DE CAIXA            
+                        case 25 : venc.setTipoPagamento(TipoPagamento.S_BOLETO); break;//CONVENIO WEB               
+                        case 26 : venc.setTipoPagamento(TipoPagamento.CARTAO_DEBITO); break;//KAPP CARD                  
+                        case 27 : venc.setTipoPagamento(TipoPagamento.S_BOLETO); break;//DESCONTO BOLETO            
+                        case 28 : venc.setTipoPagamento(TipoPagamento.DEPOSITO); break;//DEPOSITO BANCARIO          
+                        case 29 : venc.setTipoPagamento(TipoPagamento.CARTAO_DEBITO); break;//CARTAO KAPPCARD            
+                        case 30 : venc.setTipoPagamento(TipoPagamento.S_BOLETO); break;//CONVENIO NOVAMERIC  
+                        default: venc.setTipoPagamento(TipoPagamento.BOLETO_BANCARIO); break;//BOLETO   
+                    }
                     
                     result.add(imp);
                 }
@@ -1211,6 +1239,10 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setNotasDataInicio(Date notasDataInicio) {
         this.notasDataInicio = notasDataInicio;
+    }
+
+    public void setEntidadesConvenio(List<Entidade> entidadesConvenio) {
+        this.entidadesConvenio = entidadesConvenio;
     }
     
     private static class VendaIterator implements Iterator<VendaIMP> {

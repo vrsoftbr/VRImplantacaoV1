@@ -268,7 +268,7 @@ public class ContasPagarRepository {
         vo.setDatapagamento(cp.getDataPagamento());
         vo.setDatavencimento(cp.getVencimento());
         vo.setId_banco(cp.getId_banco());
-        vo.setId_tipopagamento(cp.getIdTipoPagamentoVR() == null ? 0 : cp.getIdTipoPagamentoVR());
+        vo.setId_tipopagamento(cp.getTipoPagamento().getId());
         vo.setNumerocheque(cp.getNumerocheque());
         vo.setNumeroparcela(cp.getNumeroParcela());
         vo.setObservacao("IMPORTADO VR" + (cp.getObservacao() == null ? "" : " " + cp.getObservacao()));

@@ -38,6 +38,7 @@ import vrimplantacao2.vo.enums.TipoEmbalagem;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoIndicadorIE;
 import vrimplantacao2.vo.enums.TipoOrgaoPublico;
+import vrimplantacao2.vo.enums.TipoPagamento;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.enums.TipoVistaPrazo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
@@ -688,7 +689,12 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 parc.setConta(linha.getString("conta"));
                 parc.setDataPagamento(linha.getData("pagoem"));
                 parc.setId(linha.getString("parcelaid"));
-                parc.setIdTipoPagamentoVR(linha.getString("tipopagamentovr") != null ? linha.getInt("tipopagamentovr") : null);
+                if (linha.getString("tipopagamentovr") != null) {
+                    TipoPagamento tp = new TipoPagamento(Utils.stringToInt(linha.getString("tipopagamentovr")), "");
+                    parc.setTipoPagamento(tp);
+                } else {
+                    parc.setTipoPagamento(TipoPagamento.BOLETO_BANCARIO);
+                }                
                 parc.setId_banco(linha.getInt("banco"));
                 parc.setNumeroParcela(linha.getInt("numeroparcela"));
                 parc.setNumerocheque(linha.getInt("numerocheque"));
