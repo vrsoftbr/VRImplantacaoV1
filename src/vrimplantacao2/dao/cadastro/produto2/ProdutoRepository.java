@@ -358,6 +358,20 @@ public class ProdutoRepository {
                         
                         provider.atualizar(prod, optSimples);
                         provider.complemento().atualizar(complemento, optSimples);
+                        
+                        if (optSimples.contains(OpcaoProduto.ATACADO)) {
+                            if (id > 0 && ean > 0) { //ID e EAN válidos
+                                if (!provider.automacao().cadastrado(ean)) {
+                                    automacao.setProduto(anterior.getCodigoAtual());
+                                    provider.automacao().salvar(automacao);
+                                }
+                            }
+
+                            if (!provider.eanAnterior().cadastrado(imp.getImportId(), imp.getEan())) {
+                                ProdutoAnteriorEanVO eanAnterior = converterAnteriorEAN(imp);
+                                provider.eanAnterior().salvar(eanAnterior);
+                            }
+                        }
                         provider.automacao().atualizar(automacao, optSimples);
 
                         if (aliquotas.containsKey(prod.getId(), aliquota.getEstado().getId())) {
