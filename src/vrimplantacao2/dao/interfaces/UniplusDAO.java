@@ -145,6 +145,7 @@ public class UniplusDAO extends InterfaceDAO {
         try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
+                    "	p.id,\n" +
                     "	p.codigo, \n" +
                     "	p.ean, \n" +
                     "	p.inativo, \n" +
@@ -154,15 +155,11 @@ public class UniplusDAO extends InterfaceDAO {
                     "	p.datacadastro, \n" +
                     "	p.unidademedida as unidade, \n" +
                     "	1 qtdembalagem, \n" +
-                    "	p.custoindireto custooperacional, \n" +
-                    "	p.precocusto, \n" +
-                    "	p.lucrobruto as margembruta, \n" +
-                    "	p.percentuallucroajustado as margem, \n" +
-                    "   case when p.precocusto = 0.000000 then \n" +
-                    "        0 else \n" +
-                    "   round((((p.preco / case when p.precocusto = 0.000000 then 1 else p.precocusto end) - 1) * 100), 2) end as margemcalculada, \n" +
-                    "	p.percentualmarkup, \n" +
-                    "	p.preco as precovenda, \n" +
+                    "	p.custoindireto custooperacional,\n" +
+                    "	preco.percentualmarkupajustado margem, \n" +
+                    "	preco.precoultimacompra custosemimposto,\n" +
+                    "	preco.precocusto custocomimposto,\n" +
+                    "	preco.preco as precovenda,\n" +
                     "	p.quantidademinima, \n" +
                     "	p.quantidademaxima, \n" +
                     "	e.quantidade, \n" +
@@ -185,16 +182,24 @@ public class UniplusDAO extends InterfaceDAO {
                     "	p.idhierarquia as merc2, \n" +
                     "	p.idhierarquia as merc3,\n" +
                     "	r.codigo naturezareceita\n" +
-                    " from \n" +
-                    "	produto p \n" +
-                    " left join \n" +
-                    "	saldoestoque e on e.idproduto = p.id and e.codigoproduto = p.codigo \n" +
-                    " left join \n" +
-                    "	cest on cest.id = p.idcest\n" +
-                    "left join\n" +
-                    "	receitasemcontribuicao r on p.idreceitasemcontribuicao = r.id\n" +
-                    " order by \n" +
-                    "	p.codigo")) {
+                    "from \n" +
+                    "	produto p\n" +
+                    "	join filial f on\n" +
+                    "		f.id = " + getLojaOrigem() + "\n" +
+                    "	left join formacaoprecoproduto preco on\n" +
+                    "		preco.idproduto = p.id and\n" +
+                    "		preco.idfilial = f.id\n" +
+                    "	left join saldoestoque e on\n" +
+                    "		e.idproduto = p.id and\n" +
+                    "		e.codigoproduto = p.codigo and\n" +
+                    "		e.idfilial = f.id\n" +
+                    "	left join cest on\n" +
+                    "		cest.id = p.idcest\n" +
+                    "	left join\n" +
+                    "		receitasemcontribuicao r on p.idreceitasemcontribuicao = r.id\n" +
+                    "order by \n" +
+                    "	p.codigo"
+            )) {
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportSistema(getSistema());
@@ -218,9 +223,10 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    imp.setCustoComImposto(rs.getDouble("precocusto"));
+                    imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
+                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
-                    imp.setMargem(rs.getDouble("margemcalculada"));
+                    imp.setMargem(rs.getDouble("margem"));
                     imp.setEstoqueMinimo(rs.getDouble("quantidademinima"));
                     imp.setEstoqueMaximo(rs.getDouble("quantidademaxima"));
                     imp.setEstoque(rs.getDouble("quantidade"));
