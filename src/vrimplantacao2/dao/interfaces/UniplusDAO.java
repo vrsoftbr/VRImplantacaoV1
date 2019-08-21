@@ -176,7 +176,7 @@ public class UniplusDAO extends InterfaceDAO {
                     "	p.idcest, \n" +
                     "	cest.codigo as cest, \n" +
                     "	p.cstpisentrada, \n" +
-                    "	p.cstcofinsentrada, \n" +
+                    "	p.cstpis, \n" +
                     "	p.idfamilia, \n" +
                     "	p.idhierarquia as merc1, \n" +
                     "	p.idhierarquia as merc2, \n" +
@@ -236,7 +236,7 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setIcmsAliqSaidaForaEstado(rs.getDouble("aliquotaicmsinterna"));
                     imp.setIcmsAliqSaidaForaEstadoNF(rs.getDouble("aliquotaicmsinterna"));
                     imp.setPiscofinsCstCredito(rs.getString("cstpisentrada"));
-                    imp.setPiscofinsCstDebito(rs.getString("cstpisentrada"));
+                    imp.setPiscofinsCstDebito(rs.getString("cstpis"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setCodMercadologico1(rs.getString("merc1"));
@@ -615,14 +615,13 @@ public class UniplusDAO extends InterfaceDAO {
                     "select\n" +
                     "	f.id,\n" +
                     "	e.cnpjcpf cpf,\n" +
-                    "	f.numerocheque,\n" +
+                    "	f.documento numerocheque,\n" +
                     "	b.codigo banco,\n" +
                     "	f.agencia,\n" +
                     "	f.numerocontacorrente,\n" +
                     "	f.numerocheque,\n" +
                     "	f.emissao date,\n" +
                     "	f.baixa datadeposito,\n" +
-                    "	f.documento cupom,\n" +
                     "	0 ecf,\n" +
                     "	e.rg,\n" +
                     "	e.telefone,\n" +
@@ -656,12 +655,11 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setNumeroCheque(rst.getString("numerocheque"));
                     imp.setDate(rst.getDate("date"));
                     imp.setDataDeposito(rst.getDate("datadeposito"));
-                    imp.setNumeroCupom(rst.getString("cupom"));
                     imp.setEcf(rst.getString("ecf"));
                     imp.setRg(rst.getString("rg"));
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setNome(rst.getString("nome"));
-                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setObservacao("NUM. CHEQUE: " + rst.getString("numerocheque") + "\r\n" + rst.getString("observacao"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setValorJuros(rst.getDouble("juros"));
                     if (rst.getString("pagamento") == null || rst.getString("pagamento").trim().equals("")) {
