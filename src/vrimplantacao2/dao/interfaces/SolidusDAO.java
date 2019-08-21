@@ -265,18 +265,6 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     result.add(imp);
                 }
-                
-                /*ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
-                    
-                imp.setId("999");
-                imp.setRazao("CADASTRO AUTOMATICO");
-                imp.setCnpj("0");
-                imp.setDataInicio(new Date());
-                imp.setDataTermino(new Date());
-                imp.setDiaPagamento(1);
-                imp.setDataBloqueio(new Date());
-
-                result.add(imp);*/
             }
         }
         
@@ -360,7 +348,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    t.num_pdv ecf,\n" +
                     "    t.num_cupom_fiscal numerocupom,\n" +
                     "    t.dta_cadastro datacadastro,\n" +
-                    "    t.val_total_nf valor,\n" +
+                    "    t.val_parcela valor,\n" +
                     "    t.dta_emissao datamovimento,\n" +
                     "    t.des_observacao observacao\n" +
                     "from\n" +
@@ -1674,7 +1662,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPercentualCalcio(rst.getInt("vd_calcio"));
                     imp.setPercentualFerro(rst.getInt("vd_ferro"));
                     imp.setPercentualSodio(rst.getInt("vd_sodio"));
-                    imp.setPorcao(rst.getString("porcao") + " " + rst.getString("unidade_porcao") + " " + rst.getString("des_porcao"));
+                    imp.setPorcao(rst.getString("porcao"));
                     
                     incluirProdutoNutricional(imp);
                     
