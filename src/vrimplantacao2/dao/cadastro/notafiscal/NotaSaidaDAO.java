@@ -75,8 +75,8 @@ public class NotaSaidaDAO {
 
     public void eliminarNota(int id) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            stm.executeQuery("delete from notasaidaitem where id_notasaida = " + id);
-            stm.executeQuery("delete from notasaida where id = " + id);
+            stm.execute("delete from notasaidaitem where id_notasaida = " + id);
+            stm.execute("delete from notasaida where id = " + id);
         }
     }
 
@@ -100,7 +100,8 @@ public class NotaSaidaDAO {
 
     public void salvar(NotaSaida ns) throws Exception {
         SQLBuilder sql = new SQLBuilder();
-        
+        sql.setSchema("public");
+        sql.setTableName("notasaida");
         sql.put("id_loja", ns.getIdLoja());
         sql.put("numeroNota", ns.getNumeroNota());
         sql.put("id_tiponota", ns.getTipoNota().getId());
@@ -151,12 +152,12 @@ public class NotaSaidaDAO {
         sql.put("aplicaicmsencargo", ns.isAplicaIcmsEncargo());
         sql.put("pesobruto", ns.getPesoBruto());
         sql.put("datahoraalteracao", ns.getDataHoraAlteracao());
-        sql.put("idlocalentrega", ns.getIdLocalEntrega());
+        sql.put("id_localentrega", ns.getIdLocalEntrega());
         sql.put("valoricmsusoconsumo", ns.getValorIcmsUsoConsumo());
         sql.put("aplicaicmsipi", ns.isAplicaIcmsIpi());
-        sql.put("id_tipoviatransporteinternacional", ns.getIdTipoViaTransporteInteracional());
+        sql.put("id_tipoviatransporteinternacional", ns.getIdTipoViaTransporteInteracional(), -1);
         sql.put("valorafrmm", ns.getValorafrmm());
-        sql.put("id_tipoformaimportacao", ns.getIdTipoFormaImportacao());
+        sql.put("id_tipoformaimportacao", ns.getIdTipoFormaImportacao(), -1);
         sql.put("aplicaIcmsStIpi", ns.isAplicaIcmsStIpi());
         sql.put("especie", ns.getEspecie());
         sql.put("marca", ns.getMarca());
@@ -164,7 +165,7 @@ public class NotaSaidaDAO {
         sql.put("aplicaPisCofinsDesconto", ns.isAplicaPisCofinsDesconto());
         sql.put("aplicaPisCofinsEncargo", ns.isAplicaPisCofinsEncargo());
         sql.put("serie", ns.getSerie());
-        sql.put("id_EscritaSaldo", ns.getIdEscritaSaldo());
+        sql.put("id_EscritaSaldo", ns.getIdEscritaSaldo(), -1);
         sql.put("valorFcp", ns.getValorFcp());
         sql.put("valorFcpSt", ns.getValorFcpSt());
         sql.put("valorIcmsDesonerado", ns.getValorIcmsDesonerado());

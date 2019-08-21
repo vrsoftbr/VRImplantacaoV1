@@ -82,8 +82,8 @@ public class NotaEntradaDAO {
 
     public void eliminarNota(int id) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            stm.executeQuery("delete from notaentradaitem where id_notaentrada = " + id);
-            stm.executeQuery("delete from notaentrada where id = " + id);
+            stm.execute("delete from notaentradaitem where id_notaentrada = " + id);
+            stm.execute("delete from notaentrada where id = " + id);
         }
     }
 
@@ -157,7 +157,7 @@ public class NotaEntradaDAO {
         sql.put("informacaocomplementar", ne.getInformacaoComplementar());
         sql.put("valoricmssn", ne.getValorIcmsSN());
         sql.put("datahoraalteracao", ne.getDataHoraAlteracao());
-        sql.put("liberadovencimento", ne.getLiberadoVencimento(), -1);
+        sql.put("liberadovencimento", ne.getLiberadoVencimento(), -2);
         sql.put("justificativadivergencia", ne.getJustificativaDivergencia());
         sql.put("consistido", ne.isConsistido());
         sql.put("quantidadepaletes", ne.getQuantidadePaletes());

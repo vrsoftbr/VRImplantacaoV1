@@ -135,7 +135,7 @@ public class ConvenioConveniadoRepository {
         vo.setBloqueado(imp.isBloqueado());
         vo.setSituacaoCadastro(imp.getSituacaoCadastro());
         vo.setId_loja(imp.getLojaCadastro() > 0 ? imp.getLojaCadastro() : provider.getLojaVR());
-        vo.setObservacao("IMPORTADO VR " + Utils.acertarTexto(imp.getObservacao()));
+        vo.setObservacao("IMPORTADO VR " + imp.getObservacao());
         vo.setDataValidadeCartao(imp.getValidadeCartao());
         vo.setDataDesbloqueio(imp.getDataDesbloqueio());
         vo.setVisualizaSaldo(true);

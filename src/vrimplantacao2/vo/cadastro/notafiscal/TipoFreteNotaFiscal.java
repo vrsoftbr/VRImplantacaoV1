@@ -29,7 +29,7 @@ public enum TipoFreteNotaFiscal {
         return idVR;
     }
     
-    public static TipoFreteNotaFiscal getById(int id) {
+    public static TipoFreteNotaFiscal get(int id) {
         for (TipoFreteNotaFiscal tipo : values()) {
             if (tipo.getId() == id) {
                 return tipo;

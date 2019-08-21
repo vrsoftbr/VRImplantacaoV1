@@ -59,22 +59,12 @@ public class ReceitaDAO {
             sql.setTableName("receitaitem");
             sql.put("id_receita", vo.getId_receita());
             sql.put("id_produto", vo.getId_produto());
+            sql.put("qtdembalagemreceita", vo.getQtdembalagemreceita());
+            sql.put("qtdembalagemproduto", vo.getQtdembalagemproduto());            
+            sql.put("baixaestoque", vo.isBaixaestoque());
+            sql.put("fatorconversao", vo.getFatorconversao());
+            sql.put("embalagem", vo.isEmbalagem());
             
-            if (vo.getQtdembalagemreceita() < 10) {
-                sql.put("qtdembalagemreceita", vo.getQtdembalagemreceita() * 1000);
-            } else {
-                sql.put("qtdembalagemreceita", vo.getQtdembalagemreceita() * 100);
-            }
-            
-            if (vo.getQtdembalagemproduto() < 10) {
-                sql.put("qtdembalagemproduto", vo.getQtdembalagemproduto() * 1000);
-            } else {
-                sql.put("qtdembalagemproduto", vo.getQtdembalagemproduto() * 100);
-            }
-            
-            sql.put("baixaestoque", true);
-            sql.put("fatorconversao", 1);
-            sql.put("embalagem", false);
             stm.execute(sql.getInsert());
         }
     }

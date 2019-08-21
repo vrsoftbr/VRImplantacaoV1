@@ -2,8 +2,8 @@ package vrimplantacao2.dao.cadastro.notafiscal;
 
 import java.util.Date;
 import vrimplantacao2.vo.cadastro.notafiscal.TipoNota;
-import vrimplantacao2.vo.importacao.Destinatario;
 import vrimplantacao2.vo.importacao.NotaOperacao;
+import vrimplantacao2.vo.enums.TipoDestinatario;
 
 /**
  *
@@ -27,10 +27,8 @@ public class NotaFiscalAnteriorVO {
     private double valorProduto = 0;
     private double valorTotal = 0;
     
-    private Destinatario.TipoDestinatario tipoDestinatario = Destinatario.TipoDestinatario.FORNECEDOR;
+    private TipoDestinatario tipoDestinatario = TipoDestinatario.FORNECEDOR;
     private String idDestinatario;
-    private String razaoSocial;
-    private String cnpjCpf;
 
     public String getSistema() {
         return sistema;
@@ -85,7 +83,7 @@ public class NotaFiscalAnteriorVO {
     }
 
     public void setTipoNota(TipoNota tipoNota) {
-        this.tipoNota = tipoNota;
+        this.tipoNota = tipoNota == null ? TipoNota.NORMAL : tipoNota;
     }
 
     public String getModelo() {
@@ -136,11 +134,11 @@ public class NotaFiscalAnteriorVO {
         this.valorTotal = valorTotal;
     }
 
-    public Destinatario.TipoDestinatario getTipoDestinatario() {
+    public TipoDestinatario getTipoDestinatario() {
         return tipoDestinatario;
     }
 
-    public void setTipoDestinatario(Destinatario.TipoDestinatario tipoDestinatario) {
+    public void setTipoDestinatario(TipoDestinatario tipoDestinatario) {
         this.tipoDestinatario = tipoDestinatario;
     }
 
@@ -150,23 +148,6 @@ public class NotaFiscalAnteriorVO {
 
     public void setIdDestinatario(String idDestinatario) {
         this.idDestinatario = idDestinatario;
-    }
-
-    public String getRazaoSocial() {
-        return razaoSocial;
-    }
-
-    public void setRazaoSocial(String razaoSocial) {
-        this.razaoSocial = razaoSocial;
-    }
-
-    public String getCnpjCpf() {
-        return cnpjCpf;
-    }
-
-    public void setCnpjCpf(String cnpjCpf) {
-        this.cnpjCpf = cnpjCpf;
-    }
-    
+    }    
     
 }

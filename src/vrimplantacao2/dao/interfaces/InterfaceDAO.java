@@ -33,6 +33,7 @@ import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
+import vrimplantacao2.vo.importacao.DivisaoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.InventarioIMP;
@@ -512,6 +513,15 @@ public abstract class InterfaceDAO {
      * @throws Exception 
      */
     public List<NotaFiscalIMP> getNotasFiscais() throws Exception {
+        return new ArrayList<>();
+    }
+
+    /**
+     * Retorna uma lista com as divisões do fornecedor para importar.
+     * @return Lista com as divisões de fornecedor a serem importadas.
+     * @throws Exception 
+     */
+    public List<DivisaoIMP> getDivisoes() throws Exception {
         return new ArrayList<>();
     }
     

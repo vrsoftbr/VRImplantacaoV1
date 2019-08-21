@@ -52,15 +52,15 @@ public class ConvenioEmpresaRepository {
                         cnpj = id;
                     }
                     
-                    ConvenioEmpresaVO vo = converterEmpresa(imp);
+                    ConvenioEmpresaVO vo = converterEmpresa(imp);                                        
+                    vo.setId(id);
+                    vo.setCnpj(cnpj);                    
+                    gravarEmpresa(vo);
+                    
                     anterior = converterEmpresaAnterior(imp);
                     anterior.setCodigoAtual(vo.getId());
-                    
-                    vo.setId(id);
-                    vo.setCnpj(cnpj);
-                    
-                    gravarEmpresa(vo);
                     gravarEmpresaAnterior(anterior);
+                    
                     cnpjExistentes.add(cnpj);
                     anteriores.put( imp.getId(), anterior );
                 }

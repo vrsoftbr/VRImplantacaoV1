@@ -218,7 +218,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 opt.contains(OpcaoProduto.RECEITA_BALANCA) ||
                 opt.contains(OpcaoProduto.INVENTARIO) ||
                 opt.contains(OpcaoProduto.NUTRICIONAL) ||
-                opt.contains(OpcaoProduto.RECEITA)
+                opt.contains(OpcaoProduto.RECEITA) ||
+                opt.contains(OpcaoProduto.DIVISAO) ||
+                opt.contains(OpcaoProduto.DIVISAO_PRODUTO)
         ) {
             chkAssociado.setVisible(opt.contains(OpcaoProduto.ASSOCIADO));
             if (chkAssociado.isVisible()) {
@@ -234,6 +236,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkNutricionalFilizola.setVisible(opt.contains(OpcaoProduto.NUTRICIONAL));
             chkInventario.setVisible(opt.contains(OpcaoProduto.INVENTARIO));
             chkReceitaProduto.setVisible(opt.contains(OpcaoProduto.RECEITA));
+            chkDivisao.setVisible(opt.contains(OpcaoProduto.DIVISAO));
+            chkDivisaoProduto.setVisible(opt.contains(OpcaoProduto.DIVISAO_PRODUTO));
             tabImportacao.add(pnlImpOutrosDados);
         }
         
@@ -363,6 +367,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         chkNutricionalFilizola = new vrframework.bean.checkBox.VRCheckBox();
         chkInventario = new vrframework.bean.checkBox.VRCheckBox();
         chkReceitaProduto = new vrframework.bean.checkBox.VRCheckBox();
+        chkDivisao = new vrframework.bean.checkBox.VRCheckBox();
+        chkDivisaoProduto = new vrframework.bean.checkBox.VRCheckBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(vRCheckBox3, "vRCheckBox3");
 
@@ -1018,32 +1024,43 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkReceitaProduto, "Receita (Produto)");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkDivisao, "Divisão");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkDivisaoProduto, "Divisao x Produto");
+
         javax.swing.GroupLayout pnlImpOutrosDadosLayout = new javax.swing.GroupLayout(pnlImpOutrosDados);
         pnlImpOutrosDados.setLayout(pnlImpOutrosDadosLayout);
         pnlImpOutrosDadosLayout.setHorizontalGroup(
             pnlImpOutrosDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlImpOutrosDadosLayout.createSequentialGroup()
-                .addGap(6, 6, 6)
                 .addGroup(pnlImpOutrosDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel9)
                     .addGroup(pnlImpOutrosDadosLayout.createSequentialGroup()
-                        .addComponent(chkNutricionalToledo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkNutricionalFilizola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(chkInventario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkReceitaProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(6, 6, 6)
+                        .addGroup(pnlImpOutrosDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel9)
+                            .addGroup(pnlImpOutrosDadosLayout.createSequentialGroup()
+                                .addComponent(chkNutricionalToledo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkNutricionalFilizola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(chkInventario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkReceitaProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkDivisao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(pnlImpOutrosDadosLayout.createSequentialGroup()
+                                .addComponent(chkAssociado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkComprador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkCompradorProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkReceitaToledo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkReceitaFilizola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(pnlImpOutrosDadosLayout.createSequentialGroup()
-                        .addComponent(chkAssociado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkComprador, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkCompradorProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkReceitaToledo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkReceitaFilizola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap()
+                        .addComponent(chkDivisaoProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(70, Short.MAX_VALUE))
         );
         pnlImpOutrosDadosLayout.setVerticalGroup(
@@ -1063,8 +1080,11 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                     .addComponent(chkNutricionalToledo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkNutricionalFilizola, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkInventario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkReceitaProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(6, 6, 6))
+                    .addComponent(chkReceitaProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkDivisao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkDivisaoProduto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         tabImportacao.add(pnlImpOutrosDados);
@@ -1100,6 +1120,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkDescGondola;
     public vrframework.bean.checkBox.VRCheckBox chkDescReduzida;
     public vrframework.bean.checkBox.VRCheckBox chkDescontinuado;
+    public vrframework.bean.checkBox.VRCheckBox chkDivisao;
+    public vrframework.bean.checkBox.VRCheckBox chkDivisaoProduto;
     public vrframework.bean.checkBox.VRCheckBox chkEAN;
     public vrframework.bean.checkBox.VRCheckBox chkEANemBranco;
     public vrframework.bean.checkBox.VRCheckBox chkEstoque;
@@ -1274,7 +1296,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             }
             if (chkComprador.isSelected()) {
                 importador.importarComprador();
-            }             
+            }
+            if (chkDivisao.isSelected()) {
+                importador.importarDivisoes();
+            }
 
             {
                 List<OpcaoProduto> opcoes = new ArrayList<>();
@@ -1397,6 +1422,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
                 if (chkPesoLiquido.isSelected()) {
                     opcoes.add(OpcaoProduto.PESO_LIQUIDO);
+                }
+                if (chkDivisaoProduto.isSelected()) {
+                    opcoes.add(OpcaoProduto.DIVISAO_PRODUTO);
                 }
                 opcoes.addAll(getParametrosExtras());
                 if (!opcoes.isEmpty()) {

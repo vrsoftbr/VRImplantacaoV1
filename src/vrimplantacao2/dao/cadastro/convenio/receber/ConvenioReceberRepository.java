@@ -51,10 +51,9 @@ public class ConvenioReceberRepository {
                     gravarTransacaoAnterior(anterior);
                     
                 } else {
-                    System.out.println(String.format("ID: %s VALOR: %s (anterior == null: %s) (conveniado != null: %s)", 
+                    System.out.println(String.format("ID: %s VALOR: %s (conveniado != null: %s)", 
                             imp.getId(),
                             String.valueOf(imp.getValor()),
-                            String.valueOf(anterior == null),
                             String.valueOf(conveniado != null)
                     ));
                 }

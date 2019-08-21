@@ -105,6 +105,8 @@ public class ProdutoIMP {
     private boolean emiteEtiqueta = true;
     private boolean aceitaMultiplicacaoPDV = true;
     
+    private String divisao;
+    
     public String getImportSistema() {
         return importSistema;
     }
@@ -837,6 +839,14 @@ public class ProdutoIMP {
 
     public void setAceitaMultiplicacaoPDV(boolean aceitaMultiplicacaoPDV) {
         this.aceitaMultiplicacaoPDV = aceitaMultiplicacaoPDV;
+    }
+
+    public String getDivisao() {
+        return divisao;
+    }
+
+    public void setDivisao(String divisao) {
+        this.divisao = divisao;
     }
     
 }
