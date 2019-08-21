@@ -262,12 +262,12 @@ public class UniplusDAO extends InterfaceDAO {
                         "	codigo,\n" +
                         "	codigo ean,\n" +
                         "	precopauta1 precoatacado,\n" +
-                        "	10 qtdembalagem,\n" +
+                        "	quantidadepauta1 qtdembalagem,\n" +
                         "       preco\n" +
                         "from\n" +
                         "	produto\n" +
                         "where\n" +
-                        "	precopauta1 != 0\n"
+                        "	precopauta1 > 0\n"
                 )) {
                     while (rst.next()) {
                         
