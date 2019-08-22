@@ -77,6 +77,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     private static final Logger LOG = Logger.getLogger(SolidusDAO.class.getName());
     
     private Date vendasDataInicio = null;
+    private Date vendasDataTermino = null;
     private Date notasDataInicio = null;
     private List<Entidade> entidadesCheques;
     private List<Entidade> entidadesCreditoRotativo;
@@ -94,6 +95,14 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public void setVendasDataInicio(Date vendasDataInicio) {
         this.vendasDataInicio = vendasDataInicio;
+    }
+
+    public void setVendasDataTermino(Date vendasDataTermino) {
+        this.vendasDataTermino = vendasDataTermino;
+    }
+
+    public Date getVendasDataTermino() {
+        return vendasDataTermino;
     }
     
     @Override
@@ -1180,12 +1189,12 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new VendaIterator(getLojaOrigem(), getVendasDataInicio());
+        return new VendaIterator(getLojaOrigem(), getVendasDataInicio(), getVendasDataTermino());
     }
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new VendaItemIterator(getLojaOrigem(), getVendasDataInicio());
+        return new VendaItemIterator(getLojaOrigem(), getVendasDataInicio(), getVendasDataTermino());
     }
 
     public List<Entidade> getEntidades() throws SQLException {
@@ -1239,7 +1248,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
         private ResultSet rst;
         private VendaIMP next;
 
-        public VendaIterator(String idLojaCliente, Date dataInicio) {
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) {
             try {
                 this.stm = ConexaoFirebird.getConexao().createStatement();
                 this.rst = stm.executeQuery("select\n" +
@@ -1264,7 +1273,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                         "    left join tab_cliente c on v.cod_cliente = c.cod_cliente\n" +
                         "where\n" +
                         "    v.cod_loja = " + idLojaCliente + "\n" +
-                        "    and cast(v.dta_saida as date) >= '" + DATE_FORMAT.format(dataInicio) + "'\n" +
+                        "    and v.dta_saida >= '" + DATE_FORMAT.format(dataInicio) + " 00:00:00'\n" +
+                        "    and v.dta_saida <= '" + DATE_FORMAT.format(dataTermino) + " 23:59:59'\n" +
                         "    and v.num_ident != 0\n" +
                         "group by\n" +
                         "    v.num_ident,\n" +
@@ -1355,7 +1365,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
         private VendaItemIMP next;
         private Map<Integer, Tributacao> tributacao = new HashMap<>();
 
-        public VendaItemIterator(String idLojaCliente, Date dataInicio) {
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) {
             try {                
                 try (Statement st = ConexaoFirebird.getConexao().createStatement()) {
                     try (ResultSet rs = st.executeQuery(
@@ -1402,7 +1412,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                         "    join tab_produto p on v.cod_produto = p.cod_produto\n" +
                         "where\n" +
                         "    v.cod_loja = " + idLojaCliente + "\n" +
-                        "    and cast(v.dta_saida as date) >= '" + DATE_FORMAT.format(dataInicio) + "'\n" +
+                        "    and v.dta_saida >= '" + DATE_FORMAT.format(dataInicio) + " 00:00:00'\n" +
+                        "    and v.dta_saida <= '" + DATE_FORMAT.format(dataTermino) + " 23:59:59'\n" +
                         "    and v.num_ident != 0\n" +
                         "order by\n" +
                         "    id"
