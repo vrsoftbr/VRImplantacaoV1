@@ -85,7 +85,7 @@ public class VendaItemImpDao {
 
         @Override
         public Void call() throws Exception {
-            
+            VendaItemIMP it = null;
             try {
                 
                 dao.executeRawNoArgs("delete from vendaitem");
@@ -109,6 +109,7 @@ public class VendaItemImpDao {
                     ProgressBar.setMaximum(itens.size());
                 
                     for (VendaItemIMP item: itens) {
+                        it = item;
                         dao.create(item);
                         ProgressBar.next();
                     }
@@ -118,8 +119,12 @@ public class VendaItemImpDao {
                 LOG.fine("Itens das vendas gravadas no banco temporário");
 
             } catch (Exception e) {
-                LOG.log(Level.SEVERE, "Erro ao gerar o banco", e);
-                throw e;
+                LOG.log(Level.SEVERE, "Erro ao gerar o banco " + (it != null ? it.toString() + " - " + it.getId() : "") + e.getMessage(), e);
+                if (e.getCause() != null) {                    
+                    throw (Exception) e.getCause();
+                } else {
+                    throw e;
+                }
             }
 
             return null;
