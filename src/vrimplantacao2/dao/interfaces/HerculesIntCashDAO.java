@@ -12,6 +12,7 @@ import java.util.List;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -139,6 +140,39 @@ public class HerculesIntCashDAO extends InterfaceDAO {
     }
 
     @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.ESTOQUE) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "est.Fmp_CodPrd as idproduto, \n"
+                        + "est.Fmp_DatMov,\n"
+                        + "est.Fmp_TipEst,\n"
+                        + "est.Fmp_QtdMov,\n"
+                        + "est.Fmp_QtdEst as estoque\n"
+                        + "from dbo.IntFmp est\n"
+                        + "where est.Fmp_DatMov in (select MAX(Fmp_DatMov) from dbo.IntFmp where Fmp_CodPrd = est.Fmp_CodPrd)\n"
+                        + "and est.Fmp_CodEmp = '" + getLojaOrigem() + "'\n"
+                        + "order by Fmp_CodPrd"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+                        imp.setEstoque(rst.getDouble("estoque"));
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+        return null;
+    }
+
+    @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
 
@@ -252,11 +286,11 @@ public class HerculesIntCashDAO extends InterfaceDAO {
         }
         return result;
     }
-    
+
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
