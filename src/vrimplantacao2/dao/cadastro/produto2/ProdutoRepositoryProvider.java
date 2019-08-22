@@ -1,5 +1,6 @@
 package vrimplantacao2.dao.cadastro.produto2;
 
+import com.hxtt.f.e;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Arrays;
@@ -7,7 +8,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import org.openide.util.Exceptions;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.dao.cadastro.CestDAO;
@@ -64,6 +67,15 @@ public class ProdutoRepositoryProvider {
     private ProdutoDAO produtoDAO = new ProdutoDAO(); 
     private Set<OpcaoProduto> opcoes = new HashSet<>();    
     private PautaFiscalDAO pautaDao = new PautaFiscalDAO();
+    private DivisaoDAO divisaoDAO;
+
+    public ProdutoRepositoryProvider() {
+        try {
+            this.divisaoDAO = new DivisaoDAO();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.getLocalizedMessage(), ex);
+        }
+    }
 
     public String getSistema() {
         return sistema;
@@ -203,6 +215,10 @@ public class ProdutoRepositoryProvider {
 
     public void next() throws Exception {
         ProgressBar.next();
+    }
+
+    public Map<String, Entry<String, Integer>> getDivisoesAnteriores() throws Exception {
+        return divisaoDAO.getAnteriores(getSistema(), getLoja());
     }
     
     public class Anterior {

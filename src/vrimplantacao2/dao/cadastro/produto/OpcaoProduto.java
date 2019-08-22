@@ -300,6 +300,13 @@ public enum OpcaoProduto {
             return "Emite Etiqueta (Prod. Compl.)";
         }
     },
+    DIVISAO_PRODUTO {
+        @Override
+        public String toString() {
+            return "Divisão dos produtos.";
+        }        
+    },
+    DIVISAO,
     /**
         Em alguns sistemas o produto pode ser vendido tanto pelo EAN13 quanto na balança.
         Isso para o VR pode causar problemas, por essa razão o VRImplantação trata esse

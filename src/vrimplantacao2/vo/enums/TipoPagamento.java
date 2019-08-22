@@ -8,6 +8,17 @@ import java.util.Objects;
  */
 public class TipoPagamento {
     
+    public static final TipoPagamento CARTAO_DEBITO = new TipoPagamento(0, "CARTAO DEBITO");
+    public static final TipoPagamento DOC_TED = new TipoPagamento(1, "DOC/TED");
+    public static final TipoPagamento CARTAO_CREDITO = new TipoPagamento(2, "CARTAO CREDITO");
+    public static final TipoPagamento CHEQUE = new TipoPagamento(3, "CHEQUE");
+    public static final TipoPagamento BOLETO_BANCARIO = new TipoPagamento(4, "BOLETO BANCARIO");
+    public static final TipoPagamento DINHEIRO = new TipoPagamento(5, "DINHEIRO");
+    public static final TipoPagamento DEPOSITO = new TipoPagamento(6, "DEPOSITO");
+    public static final TipoPagamento CARTEIRA = new TipoPagamento(7, "CARTEIRA");
+    public static final TipoPagamento S_BOLETO = new TipoPagamento(8, "S/BOLETO");
+    
+    
     private int id;
     private String descricao;
 

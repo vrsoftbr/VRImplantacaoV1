@@ -12,6 +12,7 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -309,6 +310,35 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setIbge_uf(rs.getInt("id_estado"));
                     imp.setObservacao(rs.getString("observacao"));
                     imp.setDatacadastro(rs.getDate("datacadastro"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	codprodfornec id,\n" +
+                    "	codproduto idproduto,\n" +
+                    "	codfornec idfornecedor,\n" +
+                    "	reffornec codigoexterno\n" +
+                    "from\n" +
+                    "	prodfornec\n" +
+                    "order by\n" +
+                    "	2, 1")) {
+                while(rs.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdFornecedor(rs.getString("idfornecedor"));
+                    imp.setIdProduto(rs.getString("idproduto"));
+                    imp.setCodigoExterno(rs.getString("codigoexterno"));
                     
                     result.add(imp);
                 }

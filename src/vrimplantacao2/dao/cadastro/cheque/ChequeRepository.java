@@ -96,7 +96,7 @@ public class ChequeRepository {
         vo.setRg(imp.getRg());
         vo.setTelefone(imp.getTelefone());
         vo.setNome(imp.getNome());
-        vo.setObservacao("IMPORTADO VR " + Utils.acertarTexto(imp.getObservacao()));
+        vo.setObservacao("IMPORTADO VR " + Utils.acertarObservacao(imp.getObservacao()));
         vo.setSituacaoCheque(imp.getSituacaoCheque());
         vo.setTipoLocalCobranca(imp.getIdLocalCobranca());
         vo.setCmc7(imp.getCmc7());

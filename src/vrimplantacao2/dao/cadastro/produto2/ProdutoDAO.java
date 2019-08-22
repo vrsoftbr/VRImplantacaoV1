@@ -195,6 +195,7 @@ public class ProdutoDAO {
             sql.putNull("margemmaxima");
             sql.put("permitedescontopdv", true);
             sql.put("verificapesopdv", false);
+            sql.put("id_divisaofornecedor", vo.getIdDivisaoFornecedor());
             if (Versao.menorQue(3, 17, 10)) {
                 sql.put("id_tipoproduto", 0);
                 sql.put("fabricacaopropria", false);
@@ -319,6 +320,9 @@ public class ProdutoDAO {
         }
         if (opt.contains(OpcaoProduto.ACEITA_MULTIPLICACAO_PDV)) {
             sql.put("aceitamultiplicacaopdv", vo.isAceitaMultiplicacaoPDV());
+        }
+        if (opt.contains(OpcaoProduto.DIVISAO_PRODUTO)) {
+            sql.put("id_divisaofornecedor", vo.getIdDivisaoFornecedor());
         }
 
         sql.setWhere("id = " + vo.getId());

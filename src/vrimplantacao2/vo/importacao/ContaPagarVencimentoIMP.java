@@ -1,6 +1,7 @@
 package vrimplantacao2.vo.importacao;
 
 import java.util.Date;
+import vrimplantacao2.vo.enums.TipoPagamento;
 
 /**
  *
@@ -16,12 +17,12 @@ public class ContaPagarVencimentoIMP {
     private Date dataPagamento;
     private String observacao;
     private boolean pago = false;
-    private Integer idTipoPagamentoVR = null;
     private int id_banco = -1;
     private String agencia = "";
     private String conta = "";
     private int numerocheque = 0;
     private boolean conferido = false;
+    private TipoPagamento tipoPagamento = TipoPagamento.BOLETO_BANCARIO;
 
     public String getId() {
         return id;
@@ -87,14 +88,6 @@ public class ContaPagarVencimentoIMP {
         this.pago = pago;
     }
 
-    public Integer getIdTipoPagamentoVR() {
-        return idTipoPagamentoVR;
-    }
-
-    public void setIdTipoPagamentoVR(Integer idTipoPagamentoVR) {
-        this.idTipoPagamentoVR = idTipoPagamentoVR;
-    }
-
     public int getId_banco() {
         return id_banco;
     }
@@ -133,6 +126,14 @@ public class ContaPagarVencimentoIMP {
 
     public void setConferido(boolean conferido) {
         this.conferido = conferido;
+    }
+
+    public TipoPagamento getTipoPagamento() {
+        return tipoPagamento;
+    }
+
+    public void setTipoPagamento(TipoPagamento tipoPagamento) {
+        this.tipoPagamento = tipoPagamento == null ? TipoPagamento.BOLETO_BANCARIO : tipoPagamento;
     }
     
 }

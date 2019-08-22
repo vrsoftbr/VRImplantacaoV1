@@ -164,7 +164,7 @@ public class ClienteEventualVO {
     }
 
     public void setObservacao(String observacao) {
-        this.observacao = Utils.acertarTexto(observacao, 2500);
+        this.observacao = Utils.acertarObservacao(observacao, 2500);
     }
 
     public void setId_pais(int id_pais) {

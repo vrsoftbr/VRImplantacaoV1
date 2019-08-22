@@ -3,10 +3,12 @@ package vrimplantacao2.dao.cadastro.notafiscal;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import vrframework.classe.Conexao;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.notafiscal.TipoNota;
-import vrimplantacao2.vo.importacao.Destinatario;
 import vrimplantacao2.vo.importacao.NotaOperacao;
+import vrimplantacao2.vo.enums.TipoDestinatario;
 
 /**
  *
@@ -44,7 +46,6 @@ public class NotaFiscalAnteriorDAO {
                         "	valortotal numeric,\n" +
                         "	tipodestinatario integer,\n" +
                         "	iddestinatario varchar,\n" +
-                        "	cnpjcpf varchar,\n" +
                         "	primary key (sistema, loja, operacao, id)\n" +
                         ")"
                 );
@@ -72,8 +73,7 @@ public class NotaFiscalAnteriorDAO {
                     "	valorproduto,\n" +
                     "	valortotal,\n" +
                     "	tipodestinatario,\n" +
-                    "	iddestinatario,\n" +
-                    "	cnpjcpf\n" +
+                    "	iddestinatario\n" +
                     "FROM\n" +
                     "	implantacao.codant_notafiscal\n" +
                     "where\n" +
@@ -89,8 +89,8 @@ public class NotaFiscalAnteriorDAO {
                     vo.setLoja(rst.getString("loja"));
                     vo.setOperacao(NotaOperacao.get(rst.getInt("operacao")));
                     vo.setId(rst.getString("id"));
-                    vo.setIdNotaSaida(rst.getObject("id_notasaida", Integer.class));
-                    vo.setIdNotaEntrada(rst.getObject("id_notaentrada", Integer.class));
+                    vo.setIdNotaSaida(Utils.toInteger(rst.getString("id_notasaida")));
+                    vo.setIdNotaEntrada(Utils.toInteger(rst.getString("id_notaentrada")));
                     vo.setTipoNota(TipoNota.get(rst.getInt("tiponota")));
                     vo.setModelo(rst.getString("modelo"));
                     vo.setSerie(rst.getString("serie"));
@@ -98,9 +98,8 @@ public class NotaFiscalAnteriorDAO {
                     vo.setDataEmissao(rst.getDate("dataemissao"));
                     vo.setValorProduto(rst.getDouble("valorproduto"));
                     vo.setValorTotal(rst.getDouble("valortotal"));
-                    vo.setTipoDestinatario(Destinatario.TipoDestinatario.get(rst.getInt("tipodestinatario")));
+                    vo.setTipoDestinatario(TipoDestinatario.get(rst.getInt("tipodestinatario")));
                     vo.setIdDestinatario(rst.getString("iddestinatario"));
-                    vo.setCnpjCpf(rst.getString("cnpjcpf"));
                     
                     result.put(vo, String.valueOf(vo.getOperacao().getId()), vo.getId());
                 }
@@ -110,12 +109,55 @@ public class NotaFiscalAnteriorDAO {
         return result;
     }
 
-    void atualizar(NotaFiscalAnteriorVO anterior) {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    public void atualizar(NotaFiscalAnteriorVO anterior) throws Exception {
+        SQLBuilder sql = new SQLBuilder();
+        sql.setSchema("implantacao");
+        sql.setTableName("codant_notafiscal");
+        sql.put("id_notasaida", anterior.getIdNotaSaida());
+        sql.put("id_notaentrada", anterior.getIdNotaEntrada());
+        sql.put("tiponota", anterior.getTipoNota().getId());
+        sql.put("modelo", anterior.getModelo());
+        sql.put("serie", anterior.getSerie());
+        sql.put("numeronota", anterior.getNumeroNota());
+        sql.put("dataemissao", anterior.getDataEmissao());
+        sql.put("valorproduto", anterior.getValorProduto());
+        sql.put("valortotal", anterior.getValorTotal());
+        sql.put("tipodestinatario", anterior.getTipoDestinatario().getId());
+        sql.put("iddestinatario", anterior.getIdDestinatario());
+        sql.setWhere(String.format(
+                "sistema = '%s' and loja = '%s' and operacao = %d and id = '%s'",
+                anterior.getSistema(),
+                anterior.getLoja(),
+                anterior.getOperacao().getId(),
+                anterior.getId()
+        ));
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(sql.getUpdate());
+        }
     }
 
-    void incluir(NotaFiscalAnteriorVO anterior) {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    public void incluir(NotaFiscalAnteriorVO anterior) throws Exception {
+        SQLBuilder sql = new SQLBuilder();
+        sql.setSchema("implantacao");
+        sql.setTableName("codant_notafiscal");
+        sql.put("sistema", anterior.getSistema());
+        sql.put("loja", anterior.getLoja());
+        sql.put("operacao", anterior.getOperacao().getId());
+        sql.put("id", anterior.getId());
+        sql.put("id_notasaida", anterior.getIdNotaSaida());
+        sql.put("id_notaentrada", anterior.getIdNotaEntrada());
+        sql.put("tiponota", anterior.getTipoNota().getId());
+        sql.put("modelo", anterior.getModelo());
+        sql.put("serie", anterior.getSerie());
+        sql.put("numeronota", anterior.getNumeroNota());
+        sql.put("dataemissao", anterior.getDataEmissao());
+        sql.put("valorproduto", anterior.getValorProduto());
+        sql.put("valortotal", anterior.getValorTotal());
+        sql.put("tipodestinatario", anterior.getTipoDestinatario().getId());
+        sql.put("iddestinatario", anterior.getIdDestinatario());
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(sql.getInsert());
+        }
     }
     
 }

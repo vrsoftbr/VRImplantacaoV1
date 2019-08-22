@@ -124,7 +124,7 @@ public class ChequeVO {
     }
 
     public void setObservacao(String observacao) {
-        this.observacao = Utils.acertarTexto(observacao, 500);
+        this.observacao = Utils.acertarObservacao(observacao, 500);
     }
 
     public void setSituacaoCheque(SituacaoCheque situacaoCheque) {

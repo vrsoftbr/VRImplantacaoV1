@@ -1,5 +1,6 @@
 package vrimplantacao2.vo.importacao;
 
+import vrimplantacao2.vo.enums.TipoDestinatario;
 import java.util.ArrayList;
 import java.util.Date;
 import vrimplantacao2.vo.cadastro.notafiscal.SituacaoNfe;
@@ -15,7 +16,10 @@ public class NotaFiscalIMP {
     private String id;
     private NotaOperacao operacao = NotaOperacao.ENTRADA;
     private TipoNota tipoNota = TipoNota.NORMAL;
-    private Destinatario destinatario = new Destinatario();
+    
+    private TipoDestinatario tipoDestinatario = TipoDestinatario.FORNECEDOR;
+    private String idDestinatario; //Pode ser Cliente Eventual ou Fornecedor
+    
     private String modelo = "55";
     private String serie;
     private int numeroNota;
@@ -54,8 +58,12 @@ public class NotaFiscalIMP {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setId(String... ids) {
+        StringBuilder builder = new StringBuilder();
+        for (String key: ids) {
+            builder.append(key);
+        }
+        this.id = builder.toString();
     }
 
     public NotaOperacao getOperacao() {
@@ -74,12 +82,20 @@ public class NotaFiscalIMP {
         this.tipoNota = tipoNota;
     }
 
-    public Destinatario getDestinatario() {
-        return destinatario;
+    public TipoDestinatario getTipoDestinatario() {
+        return tipoDestinatario;
     }
 
-    public void setDestinatario(Destinatario destinatario) {
-        this.destinatario = destinatario;
+    public void setTipoDestinatario(TipoDestinatario tipoDestinatario) {
+        this.tipoDestinatario = tipoDestinatario == null ? TipoDestinatario.FORNECEDOR : tipoDestinatario;
+    }
+
+    public String getIdDestinatario() {
+        return idDestinatario;
+    }
+
+    public void setIdDestinatario(String idDestinatario) {
+        this.idDestinatario = idDestinatario;
     }
 
     public String getModelo() {
@@ -304,6 +320,10 @@ public class NotaFiscalIMP {
 
     public void setXml(String xml) {
         this.xml = xml;
+    }
+
+    public ArrayList<NotaFiscalItemIMP> getItens() {
+        return itens;
     }
     
 }

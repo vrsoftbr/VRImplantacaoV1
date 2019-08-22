@@ -58,7 +58,7 @@ public class ConveniadoVO {
     }
 
     public void setObservacao(String observacao) {
-        this.observacao = Utils.acertarTexto(observacao, 60);
+        this.observacao = Utils.acertarObservacao(observacao, 60);
     }
 
     public void setMatricula(int matricula) {

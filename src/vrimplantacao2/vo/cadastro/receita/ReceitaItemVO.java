@@ -16,7 +16,7 @@ public class ReceitaItemVO {
     private int qtdembalagemreceita;
     private int qtdembalagemproduto;
     private boolean baixaestoque = true;
-    private double fatorconversao;
+    private double fatorconversao = 1;
     private boolean embalagem = false;
 
     /**

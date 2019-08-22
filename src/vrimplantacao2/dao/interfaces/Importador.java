@@ -78,6 +78,8 @@ import vrimplantacao2.dao.cadastro.venda.VendaItemImpDao;
 import vrimplantacao2.dao.cadastro.venda.VendaRepository;
 import vrimplantacao2.dao.cadastro.venda.VendaRepositoryProvider;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.cadastro.divisao.DivisaoRepository;
+import vrimplantacao2.vo.cadastro.divisao.DivisaoRepositoryProvider;
 import vrimplantacao2.vo.cadastro.financeiro.contareceber.OpcaoContaReceber;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
@@ -96,6 +98,7 @@ import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.ConvenioTransacaoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
+import vrimplantacao2.vo.importacao.DivisaoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.InventarioIMP;
@@ -1056,5 +1059,22 @@ public class Importador {
         );
         NotaFiscalRepository repository = new NotaFiscalRepository(provider);
         repository.importar(notas, opt);
+    }
+
+    /**
+     * Importa as divisões de fornecedor.
+     * @throws Exception 
+     */
+    public void importarDivisoes() throws Exception {
+        ProgressBar.setStatus("Carregando divisões de fornecedor...");
+        
+        List<DivisaoIMP> divisoes = getInterfaceDAO().getDivisoes();
+        DivisaoRepositoryProvider provider = new DivisaoRepositoryProvider(                
+                getSistema(),
+                getLojaOrigem(),
+                getLojaVR()
+        );
+        DivisaoRepository repository = new DivisaoRepository(provider);
+        repository.importar(divisoes);
     }
 }

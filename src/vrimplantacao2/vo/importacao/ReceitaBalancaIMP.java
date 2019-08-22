@@ -42,8 +42,8 @@ public class ReceitaBalancaIMP {
         return produtos;
     }
 
-    public void setProdutos(Set<String> produtos) {
-        this.produtos = produtos;
+    public boolean addProduto(String id) {
+        return this.produtos.add(id);
     }
     
 }

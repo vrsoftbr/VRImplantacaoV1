@@ -145,6 +145,7 @@ public class UniplusDAO extends InterfaceDAO {
         try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select \n" +
+                    "	p.id,\n" +
                     "	p.codigo, \n" +
                     "	p.ean, \n" +
                     "	p.inativo, \n" +
@@ -154,15 +155,11 @@ public class UniplusDAO extends InterfaceDAO {
                     "	p.datacadastro, \n" +
                     "	p.unidademedida as unidade, \n" +
                     "	1 qtdembalagem, \n" +
-                    "	p.custoindireto custooperacional, \n" +
-                    "	p.precocusto, \n" +
-                    "	p.lucrobruto as margembruta, \n" +
-                    "	p.percentuallucroajustado as margem, \n" +
-                    "   case when p.precocusto = 0.000000 then \n" +
-                    "        0 else \n" +
-                    "   round((((p.preco / case when p.precocusto = 0.000000 then 1 else p.precocusto end) - 1) * 100), 2) end as margemcalculada, \n" +
-                    "	p.percentualmarkup, \n" +
-                    "	p.preco as precovenda, \n" +
+                    "	p.custoindireto custooperacional,\n" +
+                    "	preco.percentualmarkupajustado margem, \n" +
+                    "	preco.precoultimacompra custosemimposto,\n" +
+                    "	preco.precocusto custocomimposto,\n" +
+                    "	preco.preco as precovenda,\n" +
                     "	p.quantidademinima, \n" +
                     "	p.quantidademaxima, \n" +
                     "	e.quantidade, \n" +
@@ -179,22 +176,30 @@ public class UniplusDAO extends InterfaceDAO {
                     "	p.idcest, \n" +
                     "	cest.codigo as cest, \n" +
                     "	p.cstpisentrada, \n" +
-                    "	p.cstcofinsentrada, \n" +
+                    "	p.cstpis, \n" +
                     "	p.idfamilia, \n" +
                     "	p.idhierarquia as merc1, \n" +
                     "	p.idhierarquia as merc2, \n" +
                     "	p.idhierarquia as merc3,\n" +
                     "	r.codigo naturezareceita\n" +
-                    " from \n" +
-                    "	produto p \n" +
-                    " left join \n" +
-                    "	saldoestoque e on e.idproduto = p.id and e.codigoproduto = p.codigo \n" +
-                    " left join \n" +
-                    "	cest on cest.id = p.idcest\n" +
-                    "left join\n" +
-                    "	receitasemcontribuicao r on p.idreceitasemcontribuicao = r.id\n" +
-                    " order by \n" +
-                    "	p.codigo")) {
+                    "from \n" +
+                    "	produto p\n" +
+                    "	join filial f on\n" +
+                    "		f.id = " + getLojaOrigem() + "\n" +
+                    "	left join formacaoprecoproduto preco on\n" +
+                    "		preco.idproduto = p.id and\n" +
+                    "		preco.idfilial = f.id\n" +
+                    "	left join saldoestoque e on\n" +
+                    "		e.idproduto = p.id and\n" +
+                    "		e.codigoproduto = p.codigo and\n" +
+                    "		e.idfilial = f.id\n" +
+                    "	left join cest on\n" +
+                    "		cest.id = p.idcest\n" +
+                    "	left join\n" +
+                    "		receitasemcontribuicao r on p.idreceitasemcontribuicao = r.id\n" +
+                    "order by \n" +
+                    "	p.codigo"
+            )) {
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportSistema(getSistema());
@@ -218,9 +223,10 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    imp.setCustoComImposto(rs.getDouble("precocusto"));
+                    imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
+                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setPrecovenda(rs.getDouble("precovenda"));
-                    imp.setMargem(rs.getDouble("margemcalculada"));
+                    imp.setMargem(rs.getDouble("margem"));
                     imp.setEstoqueMinimo(rs.getDouble("quantidademinima"));
                     imp.setEstoqueMaximo(rs.getDouble("quantidademaxima"));
                     imp.setEstoque(rs.getDouble("quantidade"));
@@ -230,7 +236,7 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setIcmsAliqSaidaForaEstado(rs.getDouble("aliquotaicmsinterna"));
                     imp.setIcmsAliqSaidaForaEstadoNF(rs.getDouble("aliquotaicmsinterna"));
                     imp.setPiscofinsCstCredito(rs.getString("cstpisentrada"));
-                    imp.setPiscofinsCstDebito(rs.getString("cstpisentrada"));
+                    imp.setPiscofinsCstDebito(rs.getString("cstpis"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setCodMercadologico1(rs.getString("merc1"));
@@ -256,12 +262,12 @@ public class UniplusDAO extends InterfaceDAO {
                         "	codigo,\n" +
                         "	codigo ean,\n" +
                         "	precopauta1 precoatacado,\n" +
-                        "	10 qtdembalagem,\n" +
+                        "	quantidadepauta1 qtdembalagem,\n" +
                         "       preco\n" +
                         "from\n" +
                         "	produto\n" +
                         "where\n" +
-                        "	precopauta1 != 0\n"
+                        "	precopauta1 > 0\n"
                 )) {
                     while (rst.next()) {
                         
@@ -609,14 +615,13 @@ public class UniplusDAO extends InterfaceDAO {
                     "select\n" +
                     "	f.id,\n" +
                     "	e.cnpjcpf cpf,\n" +
-                    "	f.numerocheque,\n" +
+                    "	f.documento numerocheque,\n" +
                     "	b.codigo banco,\n" +
                     "	f.agencia,\n" +
                     "	f.numerocontacorrente,\n" +
                     "	f.numerocheque,\n" +
                     "	f.emissao date,\n" +
                     "	f.baixa datadeposito,\n" +
-                    "	f.documento cupom,\n" +
                     "	0 ecf,\n" +
                     "	e.rg,\n" +
                     "	e.telefone,\n" +
@@ -650,12 +655,11 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setNumeroCheque(rst.getString("numerocheque"));
                     imp.setDate(rst.getDate("date"));
                     imp.setDataDeposito(rst.getDate("datadeposito"));
-                    imp.setNumeroCupom(rst.getString("cupom"));
                     imp.setEcf(rst.getString("ecf"));
                     imp.setRg(rst.getString("rg"));
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setNome(rst.getString("nome"));
-                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setObservacao("NUM. CHEQUE: " + rst.getString("numerocheque") + "\r\n" + rst.getString("observacao"));
                     imp.setValor(rst.getDouble("valor"));
                     imp.setValorJuros(rst.getDouble("juros"));
                     if (rst.getString("pagamento") == null || rst.getString("pagamento").trim().equals("")) {
