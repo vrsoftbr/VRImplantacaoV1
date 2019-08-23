@@ -5,99 +5,339 @@
  */
 package vrimplantacao2.dao.interfaces;
 
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
+import vrimplantacao2.vo.importacao.ProdutoIMP;
+
 /**
  *
  * @author lucasrafael
  */
-public class HerculesIntCashDAO {
- 
-/*
-    
-select 
-f.Fil_CodEmp,
-f.Fil_CodFil,
-f.Fil_NomFan
-from dbo.IntFil f
-inner join dbo.IntEmp e on e.Emp_CodEmp = f.Fil_CodEmp
-order by f.Fil_CodEmp, f.Fil_CodFil
+public class HerculesIntCashDAO extends InterfaceDAO {
 
-select 
-g.Grp_CodGrp, g.Grp_DesGrp,
-sg.Sgp_CodSub, sg.Sgp_DesSub
-from dbo.IntGrp g
-left join dbo.IntSgp sg on sg.Sgp_CodGrp = g.Grp_CodGrp
-order by g.Grp_CodGrp, sg.Sgp_CodSub;
+    @Override
+    public String getSistema() {
+        return "HerculesIntCash";
+    }
 
-select
-p.Prd_CodPrd as id,
-p.Prd_CodBar as barras,
-p.Prd_TipVen as balanca,
-p.Prd_DesPrd as descricao,
-p.Prd_CodUnd as unidade,
-p.Prd_PesLiq as pesoliquido,
-p.Prd_PesBru as pesobruto,
-p.Prd_SitPrd as sitiacaocadastro,
-p.Prd_DatAtu as datacadastro,
-p.Prd_PrdNcm as ncm,
-p.Prd_CodCes as cest,
-p.Prd_CodGrp as merc1,
-p.Prd_CodSub as merc2,
-pr.Pvp_PreVen as precovenda
-from dbo.IntPrd p
-left join dbo.IntPvp pr on pr.Pvp_CodPrd = p.Prd_CodPrd
-where p.Prd_CodEmp = 1;
+    public List<Estabelecimento> getLojas() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
 
-select 
-f.For_CicFor as id,
-f.For_CicFor as cnpj,
-f.For_IntEst as inscruicaoestadual,
-f.For_NomFor as razao,
-f.For_NomFan as fantasia,
-f.For_EndFor as endereco,
-f.For_EndNum as numero,
-f.For_BaiFor as bairro,
-f.For_CidFor as municipio,
-f.For_CodMun as municipio_ibge,
-f.For_EstFor as uf,
-f.For_CepFor as cep,
-f.For_FonFor as telefone,
-f.For_FaxFor as fax,
-f.For_CelFor as celular,
-f.For_EmaFor as email
-from dbo.IntFor f
-where f.For_CodEmp = 1
-order by f.For_CicFor
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "f.Fil_CodEmp,\n"
+                    + "f.Fil_CodFil,\n"
+                    + "f.Fil_NomFan\n"
+                    + "from dbo.IntFil f\n"
+                    + "inner join dbo.IntEmp e on e.Emp_CodEmp = f.Fil_CodEmp\n"
+                    + "order by f.Fil_CodEmp, f.Fil_CodFil"
+            )) {
+                while (rst.next()) {
+                    result.add(new Estabelecimento(
+                            rst.getString("Fil_CodEmp"),
+                            rst.getString("Fil_CodFil") + " - " + rst.getString("Fil_NomFan")
+                    ));
+                }
+            }
+        }
+        return result;
+    }
 
-select 
-Fpr_CodPrd as idproduto,
-Fpr_CicFor as idfornecedor,
-Fpr_CodFor as codigoexterno,
-Fpr_UltEnt as dataalteracao,
-Fpr_UltCus as custotabela
-from dbo.IntFpr
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
 
-select
-c.Cli_CicCli as id,
-c.Cli_CicCli as cnpj,
-c.Cli_NomCli as razao,
-c.Cli_NomFan as fantasia,
-c.Cli_EndCli as endereco,
-c.Cli_EndNum as numero,
-c.Cli_BaiCli as bairro,
-c.Cli_CidCli as municipio,
-c.Cli_CodMun as municipio_ibge,
-c.Cli_EstCli as uf,
-c.Cli_CepCli as cep,
-c.Cli_FonCli as telefone,
-c.Cli_FaxCli as fax,
-c.Cli_CelCli as celular,
-c.Cli_EmaCli as email,
-c.Cli_DatCad as datacadastro,
-c.Cli_LimCre as valorlimite,
-c.Cli_StaCli as situacaocadastro
-from dbo.IntCli c
-order by c.Cli_CicCli;
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "g.Grp_CodGrp, g.Grp_DesGrp,\n"
+                    + "sg.Sgp_CodSub, sg.Sgp_DesSub\n"
+                    + "from dbo.IntGrp g\n"
+                    + "left join dbo.IntSgp sg on sg.Sgp_CodGrp = g.Grp_CodGrp\n"
+                    + "order by g.Grp_CodGrp, sg.Sgp_CodSub"
+            )) {
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setMerc1ID(rst.getString("Grp_CodGrp"));
+                    imp.setMerc1Descricao(rst.getString("Grp_DesGrp"));
+                    imp.setMerc2ID(rst.getString("Sgp_CodSub"));
+                    imp.setMerc2Descricao(rst.getString("Sgp_DesSub"));
+                    imp.setMerc3ID("1");
+                    imp.setMerc3Descricao(imp.getMerc2Descricao());
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 
-select * from dbo.IntCmv    
-*/    
+    @Override
+    public List<ProdutoIMP> getProdutos() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "p.Prd_CodPrd as id,\n"
+                    + "p.Prd_CodBar as barras,\n"
+                    + "p.Prd_TipVen as balanca,\n"
+                    + "p.Prd_DesPrd as descricao,\n"
+                    + "p.Prd_CodUnd as unidade,\n"
+                    + "p.Prd_PesLiq as pesoliquido,\n"
+                    + "p.Prd_PesBru as pesobruto,\n"
+                    + "p.Prd_SitPrd as sitiacaocadastro,\n"
+                    + "p.Prd_DatAtu as datacadastro,\n"
+                    + "p.Prd_PrdNcm as ncm,\n"
+                    + "p.Prd_CodCes as cest,\n"
+                    + "p.Prd_CodGrp as merc1,\n"
+                    + "p.Prd_CodSub as merc2,\n"
+                    + "pr.Pvp_PreVen as precovenda\n"
+                    + "from dbo.IntPrd p\n"
+                    + "left join dbo.IntPvp pr on pr.Pvp_CodPrd = p.Prd_CodPrd\n"
+                    + "	and p.Prd_CodEmp = '" + getLojaOrigem() + "'"
+                    + "	and pr.Pvp_CodEmp = '" + getLojaOrigem() + "'"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("barras"));
+                    imp.seteBalanca("B".equals(rst.getString("balanca")));
+                    imp.setDescricaoCompleta(rst.getString("descricao"));
+                    imp.setDescricaoReduzida(imp.getDescricaoCompleta());
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setPesoBruto(rst.getDouble("pesobruto"));
+                    imp.setPesoLiquido(rst.getDouble("pesoliquido"));
+                    imp.setSituacaoCadastro("A".equals(rst.getString("situacaocadastro")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setCodMercadologico1(rst.getString("merc1"));
+                    imp.setCodMercadologico2(rst.getString("merc2"));
+                    imp.setCodMercadologico3("1");
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.ESTOQUE) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "est.Fmp_CodPrd as idproduto, \n"
+                        + "est.Fmp_DatMov,\n"
+                        + "est.Fmp_TipEst,\n"
+                        + "est.Fmp_QtdMov,\n"
+                        + "est.Fmp_QtdEst as estoque\n"
+                        + "from dbo.IntFmp est\n"
+                        + "where est.Fmp_DatMov in (select MAX(Fmp_DatMov) from dbo.IntFmp where Fmp_CodPrd = est.Fmp_CodPrd)\n"
+                        + "and est.Fmp_CodEmp = '" + getLojaOrigem() + "'\n"
+                        + "order by Fmp_CodPrd"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+                        imp.setEstoque(rst.getDouble("estoque"));
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+        return null;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "     f.For_CicFor as id,\n"
+                    + "     f.For_CicFor as cnpj,\n"
+                    + "     f.For_IntEst as inscricaoestadual,\n"
+                    + "     f.For_NomFor as razao,\n"
+                    + "     f.For_NomFan as fantasia,\n"
+                    + "     f.For_EndFor as endereco,\n"
+                    + "     f.For_EndNum as numero,\n"
+                    + "     f.For_BaiFor as bairro,\n"
+                    + "     f.For_CidFor as municipio,\n"
+                    + "     f.For_CodMun as municipio_ibge,\n"
+                    + "     f.For_EstFor as uf,\n"
+                    + "     f.For_CepFor as cep,\n"
+                    + "     f.For_FonFor as telefone,\n"
+                    + "     f.For_FaxFor as fax,\n"
+                    + "     f.For_CelFor as celular,\n"
+                    + "     f.For_EmaFor as email\n"
+                    + "from dbo.IntFor f\n"
+                    + "where f.For_CodEmp = '" + getLojaOrigem() + "' \n"
+                    + "order by f.For_CicFor"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("inscricaoestadual"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setIbge_municipio(rst.getInt("municipio_ibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setTel_principal(rst.getString("telefone"));
+
+                    if ((rst.getString("fax") != null)
+                            && (!rst.getString("fax").trim().isEmpty())) {
+
+                        imp.addContato(
+                                "FAX",
+                                rst.getString("fax"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("celular") != null)
+                            && (!rst.getString("celular").trim().isEmpty())) {
+
+                        imp.addContato(
+                                "CELULAR",
+                                null,
+                                rst.getString("celular"),
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("email") != null)
+                            && (!rst.getString("email").trim().isEmpty())) {
+
+                        imp.addContato(
+                                "EMAIL",
+                                null,
+                                null,
+                                TipoContato.NFE,
+                                rst.getString("email").toLowerCase()
+                        );
+                    }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "     Fpr_CodPrd as idproduto,\n"
+                    + "     Fpr_CicFor as idfornecedor,\n"
+                    + "     Fpr_CodFor as codigoexterno,\n"
+                    + "     Fpr_UltEnt as dataalteracao,\n"
+                    + "     Fpr_UltCus as custotabela\n"
+                    + "from dbo.IntFpr"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setDataAlteracao(rst.getDate("datalteracao"));
+                    imp.setCustoTabela(rst.getDouble("custotabela"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "     c.Cli_CicCli as id,\n"
+                    + "     c.Cli_CicCli as cnpj,\n"
+                    + "     c.Cli_NomCli as razao,\n"
+                    + "     c.Cli_NomFan as fantasia,\n"
+                    + "     c.Cli_EndCli as endereco,\n"
+                    + "     c.Cli_EndNum as numero,\n"
+                    + "     c.Cli_BaiCli as bairro,\n"
+                    + "     c.Cli_CidCli as municipio,\n"
+                    + "     c.Cli_CodMun as municipio_ibge,\n"
+                    + "     c.Cli_EstCli as uf,\n"
+                    + "     c.Cli_CepCli as cep,\n"
+                    + "     c.Cli_FonCli as telefone,\n"
+                    + "     c.Cli_FaxCli as fax,\n"
+                    + "     c.Cli_CelCli as celular,\n"
+                    + "     c.Cli_EmaCli as email,\n"
+                    + "     c.Cli_DatCad as datacadastro,\n"
+                    + "     c.Cli_LimCre as valorlimite,\n"
+                    + "     c.Cli_StaCli as situacaocadastro\n"
+                    + "from dbo.IntCli c\n"
+                    + "order by c.Cli_CicCli"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("cnpj"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setMunicipioIBGE(rst.getInt("municipio_ibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setAtivo("A".equals(rst.getString("situacaocadastro")));
+                    imp.setValorLimite(rst.getDouble("valorlimite"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setFax(rst.getString("fax"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setEmail(rst.getString("email") != null ? rst.getString("email").toLowerCase() : "");
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 }

@@ -101,7 +101,8 @@ public class UniplusDAO extends InterfaceDAO {
             OpcaoProduto.ICMS,
             OpcaoProduto.PIS_COFINS,
             OpcaoProduto.NATUREZA_RECEITA,
-            OpcaoProduto.ATACADO
+            OpcaoProduto.ATACADO,
+            OpcaoProduto.VALIDADE
         }));
     }
     
@@ -149,6 +150,7 @@ public class UniplusDAO extends InterfaceDAO {
                     "	p.codigo, \n" +
                     "	p.ean, \n" +
                     "	p.inativo, \n" +
+                    "   p.diasvencimento as validade,\n" +
                     "	p.nome as descricaocompleta, \n" +
                     "	p.nomeecf as descricaoreduzida, \n" +
                     "	p.nome as descricaogondola, \n" +
@@ -217,6 +219,7 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
                     imp.seteBalanca((rs.getInt("pesavel") == 1));
+                    imp.setValidade(rs.getInt("validade"));
                     if (imp.isBalanca() && (forcarIdProdutoQuandoPesavel || "".equals(Utils.acertarTexto(imp.getEan())))) {
                         imp.setEan(imp.getImportId()); 
                     }
@@ -258,7 +261,7 @@ public class UniplusDAO extends InterfaceDAO {
             List<ProdutoIMP> result = new ArrayList<>();
             try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "select \n" +
+                        /*"select \n" +
                         "	codigo,\n" +
                         "	codigo ean,\n" +
                         "	precopauta1 precoatacado,\n" +
@@ -267,7 +270,19 @@ public class UniplusDAO extends InterfaceDAO {
                         "from\n" +
                         "	produto\n" +
                         "where\n" +
-                        "	precopauta1 > 0\n"
+                        "	precopauta1 > 0\n"*/
+                        
+                        "select	\n"
+                        + "	p.codigo,\n"
+                        + "	p.codigo ean,\n"
+                        + "	p.precopauta1 precoatacado,\n"
+                        + "	p.quantidadepauta1 qtdembalagem,\n"
+                        + "        preco.preco\n"
+                        + "from produto p\n"
+                        + "join filial f on f.id = " + getLojaOrigem() + "\n"
+                        + "left join formacaoprecoproduto preco on preco.idproduto = p.id\n"
+                        + "	and preco.idfilial = f.id\n"
+                        + "where precopauta1 > 0"
                 )) {
                     while (rst.next()) {
                         
