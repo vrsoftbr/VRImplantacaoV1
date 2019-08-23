@@ -83,7 +83,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="txtSistema" min="-2" pref="102" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="vRPanel6" alignment="0" pref="511" max="32767" attributes="0"/>
+                  <Component id="vRPanel6" alignment="0" pref="525" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -225,7 +225,7 @@
                               <Component id="chkFBloqueado" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFObservacao" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="190" max="32767" attributes="0"/>
+                          <EmptySpace pref="204" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -410,7 +410,7 @@
                                       </Group>
                                   </Group>
                               </Group>
-                              <EmptySpace pref="264" max="32767" attributes="0"/>
+                              <EmptySpace pref="278" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -526,7 +526,7 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jScrollPane1" pref="358" max="32767" attributes="0"/>
+                              <Component id="jScrollPane1" pref="372" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="17" max="-2" attributes="0"/>
@@ -596,7 +596,7 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jScrollPane2" pref="407" max="32767" attributes="0"/>
+                              <Component id="jScrollPane2" pref="421" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -672,7 +672,7 @@
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" attributes="0">
                                       <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace min="0" pref="271" max="32767" attributes="0"/>
+                                      <EmptySpace min="0" pref="285" max="32767" attributes="0"/>
                                   </Group>
                                   <Component id="jScrollPane4" max="32767" attributes="0"/>
                               </Group>
@@ -803,8 +803,8 @@
                                   <Component id="vRPanel5" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="vRPanel4" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="169" max="32767" attributes="0"/>
+                              <Component id="vRPanel4" max="32767" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -818,7 +818,7 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="vRPanel7" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="55" max="32767" attributes="0"/>
+                              <EmptySpace pref="59" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -838,9 +838,11 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="chkPdvVendas" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="edtDtVendaIni" pref="104" max="32767" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" max="-2" attributes="0"/>
+                                  <Component id="edtDtVendaIni" pref="127" max="32767" attributes="0"/>
+                                  <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
+                                  <Component id="edtDtVendaFim" pref="140" max="32767" attributes="0"/>
+                                  <EmptySpace min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -849,6 +851,7 @@
                               <Group type="103" groupAlignment="2" attributes="0">
                                   <Component id="chkPdvVendas" alignment="2" min="-2" max="-2" attributes="0"/>
                                   <Component id="edtDtVendaIni" alignment="2" min="-2" max="-2" attributes="0"/>
+                                  <Component id="edtDtVendaFim" alignment="2" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -865,6 +868,8 @@
                           </Events>
                         </Component>
                         <Component class="org.jdesktop.swingx.JXDatePicker" name="edtDtVendaIni">
+                        </Component>
+                        <Component class="org.jdesktop.swingx.JXDatePicker" name="edtDtVendaFim">
                         </Component>
                       </SubComponents>
                     </Container>
@@ -987,7 +992,7 @@
                               <Component id="txtReiniciarIDClienteUnif" min="-2" pref="47" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace pref="249" max="32767" attributes="0"/>
+                      <EmptySpace pref="263" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -1077,7 +1082,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="tabsConn" pref="479" max="32767" attributes="0"/>
+                  <Component id="tabsConn" pref="493" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>

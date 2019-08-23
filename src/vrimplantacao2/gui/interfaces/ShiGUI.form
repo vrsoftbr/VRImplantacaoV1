@@ -1067,11 +1067,15 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkHistoricoVendas" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Group type="102" alignment="0" attributes="0">
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <Component id="chkHistoricoVendas" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
+                                  <Component id="chkVendas" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="edtVendaDtIni" alignment="0" min="-2" pref="99" max="-2" attributes="0"/>
                                       <Component id="vRLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -1091,7 +1095,10 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkHistoricoVendas" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkHistoricoVendas" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkVendas" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="vRLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -1126,6 +1133,11 @@
                 <Component class="org.jdesktop.swingx.JXDatePicker" name="edtVendaDtIni">
                 </Component>
                 <Component class="org.jdesktop.swingx.JXDatePicker" name="edtVendaDtFim">
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkVendas">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Vendas"/>
+                  </Properties>
                 </Component>
               </SubComponents>
             </Container>
