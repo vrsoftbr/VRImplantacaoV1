@@ -80,25 +80,53 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n"
-                    + "p.ProdutoBalanca, codB.NumeroCodigoBarraProduto, p.CodigoProduto, p.CodigoNCM, \n"
-                    + "p.CodigoGrupoProduto, p.CodigoSubGrupoProduto, p.Descricao, p.DescricaoTecnica, \n"
-                    + "p.Observacoes, p.SiglaUnidade, p.PesoBruto, p.PesoLiquido, p.PrazoValidade, \n"
-                    + "p.DataCadastro, p.MargemLucroTeorica, p.Situacao, p.ClassificacaoFiscal, \n"
-                    + "p.SituacaoTributariaPISEnt, p.SituacaoTributariaPIS, p.SituacaoTributariaCOFINSEnt, \n"
-                    + "p.SituacaoTributariaCOFINS, p.NaturezaReceitaPisCofins, codB.SiglaUnidade TipoEmbalagem, \n"
-                    + "codB.QuantidadeProduto, gfp.CodigoGrupoFiscal, gf.Descricao, p.CodigoEspecificadorST as cest\n"
-                    + "from Produto p\n"
-                    + "left join CodigoBarraProduto codB on codB.CodigoProduto = p.CodigoProduto\n"
-                    + "left join GrupoFiscalProduto gfp on gfp.CodigoProduto = p.CodigoProduto\n"
-                    + "left join GrupoFiscal gf on gf.CodigoGrupoFiscal = gfp.CodigoGrupoFiscal\n"
-                    + "and gfp.SiglaPais = '" + pais + "'\n"
-                    + "and gfp.SiglaUF = '" + uf + "'\n"
-                    + "and gf.SiglaUF =  '" + uf + "'\n"
-                    + "and gf.SiglaPais = '" + pais + "'\n"
-                    + "and gfp.CodigoFilial = " + getLojaOrigem() + "\n"
-                    + "and gf.CodigoFilial = " + getLojaOrigem() + "\n"
-                    + "order by p.CodigoProduto"
+                    "select\n" +
+                    "    codb.numerocodigobarraproduto,\n" +
+                    "    p.codigoproduto,\n" +
+                    "    p.codigoncm,\n" +
+                    "    p.codigogrupoproduto,\n" +
+                    "    p.codigosubgrupoproduto,\n" +
+                    "    p.descricao,\n" +
+                    "    p.descricaotecnica,\n" +
+                    "    p.observacoes,\n" +
+                    "    p.siglaunidade,\n" +
+                    "    p.pesobruto,\n" +
+                    "    p.pesoliquido,\n" +
+                    "    p.prazovalidade,\n" +
+                    "    p.datacadastro,\n" +
+                    "    p.margemlucroteorica,\n" +
+                    "    p.situacao,\n" +
+                    "    p.classificacaofiscal,\n" +
+                    "    p.situacaotributariapisent,\n" +
+                    "    p.situacaotributariapis,\n" +
+                    "    p.situacaotributariacofinsent,\n" +
+                    "    p.situacaotributariacofins,\n" +
+                    "    p.naturezareceitapiscofins,\n" +
+                    "    codb.siglaunidade tipoembalagem,\n" +
+                    "    codb.quantidadeproduto,\n" +
+                    "    gfp.codigogrupofiscal,\n" +
+                    "    gf.descricao,\n" +
+                    "    p.codigoespecificadorst as cest\n" +
+                    "from\n" +
+                    "    produto p\n" +
+                    "	join Filial fl on\n" +
+                    "		fl.codigofilial = '" + getLojaOrigem() + "'\n" +
+                    "	join Municipio mun on\n" +
+                    "		fl.codigomunicipio = mun.codigomunicipio\n" +
+                    "    left join codigobarraproduto codb on\n" +
+                    "        codb.codigoproduto = p.codigoproduto\n" +
+                    "    left join grupofiscalproduto gfp on\n" +
+                    "        gfp.codigoproduto = p.codigoproduto\n" +
+                    "        and gfp.siglapais = mun.SiglaPais\n" +
+                    "        and gfp.siglauf = mun.SiglaUF \n" +
+                    "        and gfp.codigofilial = fl.codigofilial\n" +
+                    "    left join grupofiscal gf on\n" +
+                    "        gf.codigogrupofiscal = gfp.codigogrupofiscal\n" +
+                    "        and gf.siglauf = mun.SiglaUF\n" +
+                    "        and gf.siglapais = mun.SiglaPais\n" +
+                    "        and gf.codigofilial = fl.codigofilial\n" +
+                    "order by\n" +
+                    "    p.codigoproduto, codb.numerocodigobarraproduto desc"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
@@ -107,7 +135,20 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("CodigoProduto"));
                     imp.setEan(rst.getString("NumeroCodigoBarraProduto"));
-                    imp.setTipoEmbalagem(rst.getString("TipoEmbalagem"));
+                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("NumeroCodigoBarraProduto")));
+                    if (bal != null) {
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem(
+                                "U".equals(bal.getPesavel()) ?
+                                "KG" :
+                                "UN"
+                        );
+                        imp.setValidade(bal.getValidade());
+                    } else {
+                        imp.setTipoEmbalagem(rst.getString("TipoEmbalagem"));
+                        imp.setValidade(rst.getInt("PrazoValidade"));
+                        
+                    }
                     imp.setQtdEmbalagem(rst.getInt("QuantidadeProduto"));
                     imp.setDescricaoCompleta(rst.getString("Descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
@@ -120,7 +161,6 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCest(rst.getString("cest"));
                     imp.setSituacaoCadastro("A".equals(rst.getString("Situacao")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setDataCadastro(rst.getDate("DataCadastro"));
-                    imp.setValidade(rst.getInt("PrazoValidade"));
                     imp.setPesoBruto(rst.getDouble("PesoBruto"));
                     imp.setPesoLiquido(rst.getDouble("PesoLiquido"));
                     imp.setPiscofinsCstDebito(rst.getString("SituacaoTributariaPIS"));
@@ -128,28 +168,6 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsNaturezaReceita(rst.getString("NaturezaReceitaPisCofins"));
                     imp.setIcmsDebitoId(rst.getString("CodigoGrupoFiscal"));
                     imp.setIcmsCreditoId(rst.getString("CodigoGrupoFiscal"));
-
-                    if ((rst.getString("NumeroCodigoBarraProduto") != null)
-                            && (!rst.getString("NumeroCodigoBarraProduto").trim().isEmpty())
-                            && (rst.getString("NumeroCodigoBarraProduto").trim().length() >= 4)
-                            && (rst.getString("NumeroCodigoBarraProduto").trim().length() <= 6)) {
-
-                        ProdutoBalancaVO produtoBalanca;
-                        long codigoProduto;
-                        codigoProduto = Long.parseLong(imp.getEan().trim());
-                        if (codigoProduto <= Integer.MAX_VALUE) {
-                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                        } else {
-                            produtoBalanca = null;
-                        }
-                        if (produtoBalanca != null) {
-                            imp.seteBalanca(true);
-                            imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rst.getInt("PrazoValidade"));
-                        } else {
-                            imp.setValidade(0);
-                            imp.seteBalanca(false);
-                        }
-                    }
 
                     result.add(imp);
                 }
