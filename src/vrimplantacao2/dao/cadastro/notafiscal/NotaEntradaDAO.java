@@ -3,10 +3,14 @@ package vrimplantacao2.dao.cadastro.notafiscal;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.LinkedHashMap;
+import java.util.List;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaEntrada;
+import vrimplantacao2.vo.cadastro.notafiscal.NotaEntradaItem;
 import vrimplantacao2.vo.importacao.NotaFiscalIMP;
+import vrimplantacao2.vo.importacao.NotaFiscalItemIMP;
 
 /**
  * Classe responsável por gerenciar a manipulação dos dados das notas de entradas.
@@ -74,10 +78,6 @@ public class NotaEntradaDAO {
                 return rst.getInt("id");
             }
         }
-    }
-
-    public void salvarItens(NotaEntrada ne) throws Exception {
-        //TODO: Incluir rotina de importação dos itens da nota.
     }
 
     public void eliminarNota(int id) throws Exception {

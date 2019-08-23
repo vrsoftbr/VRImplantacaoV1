@@ -1,11 +1,15 @@
 package vrimplantacao2.dao.cadastro.notafiscal;
 
+import java.util.Map;
 import vrframework.classe.ProgressBar;
 import vrimplantacao2.dao.cadastro.cliente.ClienteEventualAnteriorDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaEntrada;
+import vrimplantacao2.vo.cadastro.notafiscal.NotaEntradaItem;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaSaida;
+import vrimplantacao2.vo.cadastro.notafiscal.NotaSaidaItem;
 import vrimplantacao2.vo.importacao.NotaFiscalIMP;
 
 /**
@@ -23,6 +27,7 @@ public class NotaFiscalRepositoryProvider {
     private FornecedorAnteriorDAO fornecedorAnteriorDAO;
     private ClienteEventualAnteriorDAO clienteEventualAnteriorDAO;
     private NotaFiscalAnteriorDAO notaFiscalAnteriorDAO;
+    private ProdutoAnteriorDAO produtoAnteriorDAO;
 
     public NotaFiscalRepositoryProvider(String sistema, String lojaOrigem, int lojaVR) throws Exception {
         this.sistema = sistema;
@@ -34,6 +39,7 @@ public class NotaFiscalRepositoryProvider {
         this.fornecedorAnteriorDAO = new FornecedorAnteriorDAO();
         this.clienteEventualAnteriorDAO = new ClienteEventualAnteriorDAO();
         this.notaFiscalAnteriorDAO = new NotaFiscalAnteriorDAO();
+        this.produtoAnteriorDAO = new ProdutoAnteriorDAO();
     }
 
     public String getSistema() {
@@ -95,10 +101,6 @@ public class NotaFiscalRepositoryProvider {
         notaFiscalAnteriorDAO.atualizar(anterior);
     }
 
-    public void salvarEntradaItens(NotaEntrada ne) throws Exception {
-        notaEntradaDAO.salvarItens(ne);
-    }
-
     public void eliminarNotaEntrada(int id) throws Exception {
         notaEntradaDAO.eliminarNota(id);
     }
@@ -121,6 +123,18 @@ public class NotaFiscalRepositoryProvider {
 
     public void salvarSaidaItens(NotaSaida ns) throws Exception {
         notaSaidaDAO.salvarItens(ns);
+    }
+
+    void salvarEntradaItem(NotaEntradaItem item) {
+        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    }
+
+    void salvarSaidaItem(NotaSaidaItem item) {
+        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    }
+
+    public Map<String, Integer> getProdutosAnteriores() throws Exception {
+        return produtoAnteriorDAO.getAnteriores(sistema, lojaOrigem);
     }
     
 }
