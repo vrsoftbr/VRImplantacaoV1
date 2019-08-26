@@ -18,7 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
-import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.NutricionalToledoDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.NutricionalToledoItemVO;
@@ -67,7 +67,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
     private Connection sco;
     private Connection sfi;
     private Connection cli;
-    public Connection cupom;
+    private Connection cupom;
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
 
@@ -1452,19 +1452,19 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+        return new VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda, cupom);
     }
 
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+        return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda, cupom);
     }
 
-    private static class VendaIterator extends ShiDAO implements Iterator<VendaIMP> {
+    private static class VendaIterator implements Iterator<VendaIMP> {
 
         private final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-        private Statement stm = cupom.createStatement();
+        private Statement stm;
         private ResultSet rst;
         private String sql;
         private VendaIMP next;
@@ -1516,7 +1516,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
-        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino, Connection con) throws Exception {
             this.sql
                     = "select\n"
                     + "m.data,\n"
@@ -1540,6 +1540,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "and m.data <= '" + FORMAT.format(dataTermino) + "'";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
+            stm = con.createStatement();
             rst = stm.executeQuery(sql);
         }
 
@@ -1568,7 +1569,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
 
         private final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-        private Statement stm = ConexaoSqlServer.getConexao().createStatement();
+        private Statement stm;
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
@@ -1667,7 +1668,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
             item.setIcmsAliq(aliq);
         }
 
-        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino, Connection con) throws Exception {
             this.sql
                     = "select\n"
                     + "m.data,\n"
@@ -1695,6 +1696,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "and m.data <= '" + FORMAT.format(dataTermino) + "'";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
+            stm = con.createStatement();
             rst = stm.executeQuery(sql);
         }
 
