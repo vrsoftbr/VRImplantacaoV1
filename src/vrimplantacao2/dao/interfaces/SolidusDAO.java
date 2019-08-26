@@ -50,6 +50,7 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.NotaFiscalIMP;
+import vrimplantacao2.vo.importacao.NotaFiscalItemIMP;
 import vrimplantacao2.vo.importacao.NotaOperacao;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
@@ -1588,8 +1589,6 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValorTotal(rst.getDouble("total_nota"));
                     imp.setTipoDestinatario(imp.getOperacao() == NotaOperacao.ENTRADA ? TipoDestinatario.FORNECEDOR : TipoDestinatario.CLIENTE_EVENTUAL);
                     imp.setIdDestinatario(rst.getString("cod_parceiro"));
-                    //imp.set(rst.getString("cod_transportadora"));
-                    //imp.set(rst.getString("cod_motorista"));
                     imp.setTipoFreteNotaFiscal(TipoFreteNotaFiscal.get(rst.getInt("tipo_frete")));
                     imp.setInformacaoComplementar(rst.getString("obs_fiscal") + " " + rst.getString("obs_livre"));                    
                     imp.setPesoBruto(rst.getDouble("val_peso_cte"));
@@ -1606,13 +1605,123 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setChaveNfe(rst.getString("num_chave_acesso"));
                     imp.setDataHoraAlteracao(rst.getDate("dta_alteracao"));
                     
+                    getNotasItem(
+                            rst.getString("cod_parceiro"),
+                            rst.getString("tipo_parceiro"),
+                            rst.getString("num_nf"),
+                            rst.getString("num_serie_nf"),
+                            rst.getString("tipo_ident"), 
+                            imp
+                    );
+                    
                     result.add(imp);
                 }
             }
         }
         
         return result;
-    }    
+    }
+
+    private void getNotasItem(String codParceiro, String tipoParceiro, String numNf, String numSerieNf, String tipoIdent, NotaFiscalIMP imp) throws Exception {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    nfi.cod_parceiro,\n" +
+                    "    nfi.tipo_parceiro,\n" +
+                    "    nfi.num_nf,\n" +
+                    "    nfi.num_serie_nf,\n" +
+                    "    nfi.tipo_ident,\n" +
+                    "    nfi.cfop,\n" +
+                    "    nfi.cod_tributacao,\n" +
+                    "    nfi.num_item,\n" +
+                    "    nfi.cod_item id_produto,\n" +
+                    "    nfi.num_ncm ncm,\n" +
+                    "    nfi.num_cest cest,\n" +
+                    "    nfi.cfop,\n" +
+                    "    nfi.des_item descricao,\n" +
+                    "    nfi.des_unidade unidade,\n" +
+                    "    --incluir codigo de barras,\n" +
+                    "    nfi.qtd_embalagem qtdembalagem,\n" +
+                    "    nfi.qtd_total quantidade,\n" +
+                    "    nfi.val_total valor,\n" +
+                    "    nfi.val_desconto valor_desconto,\n" +
+                    "    nfi.val_frete valor_frete,\n" +
+                    "    nfi.val_isento valor_isento,\n" +
+                    "    nfi.val_outras valor_outras,\n" +
+                    "    nfi.cod_sit_tributaria icms_cst,\n" +
+                    "    nfi.per_aliq_icms icms_aliq,\n" +
+                    "    nfi.per_red_bc_icms icms_red,\n" +
+                    "    nfi.val_icms icms_valor,\n" +
+                    "    nfi.val_bc_st icms_bc_st,\n" +
+                    "    nfi.val_icms_st icms_st,\n" +
+                    "    nfi.val_base_ipi ipi_base,\n" +
+                    "    nfi.val_ipi ipi_valor,\n" +
+                    "    nfi.cst_pis pis_cst,\n" +
+                    "    nfi.per_iva iva_porcentagem,\n" +
+                    "    nfi.val_pauta_iva iva_pauta\n" +
+                    "from\n" +
+                    "    tab_nf_item nfi\n" +
+                    "where\n" +
+                    "    nfi.cod_parceiro = " + codParceiro + " and\n" +
+                    "    nfi.tipo_parceiro = " + tipoParceiro + " and\n" +
+                    "    nfi.num_nf = " + numNf + " and\n" +
+                    "    nfi.num_serie_nf = " + numSerieNf + " and\n" +
+                    "    nfi.tipo_ident = " + tipoIdent + "\n" +
+                    "order by\n" +
+                    "    nfi.cod_parceiro,\n" +
+                    "    nfi.tipo_parceiro,\n" +
+                    "    nfi.num_nf,\n" +
+                    "    nfi.num_serie_nf,\n" +
+                    "    nfi.tipo_ident,\n" +
+                    "    nfi.cfop,\n" +
+                    "    nfi.cod_tributacao,\n" +
+                    "    nfi.num_item,\n" +
+                    "    nfi.cod_item"
+            )) {
+                while (rst.next()) {
+                    NotaFiscalItemIMP item = imp.addItem();
+
+                    item.setId(
+                            rst.getString("cod_parceiro"), "-",
+                            rst.getString("tipo_parceiro"), "-",
+                            rst.getString("num_nf"), "-",
+                            rst.getString("num_serie_nf"), "-",
+                            rst.getString("tipo_ident"), "-",
+                            rst.getString("cfop"), "-",
+                            rst.getString("cod_tributacao"), "-",
+                            rst.getString("num_item"), "-",
+                            rst.getString("id_produto")
+                    );
+                    item.setNumeroItem(rst.getInt("num_item"));
+                    item.setIdProduto(rst.getString("id_produto"));
+                    item.setNcm(rst.getString("ncm"));
+                    item.setCest(rst.getString("cest"));
+                    item.setCfop(rst.getString("cfop"));
+                    item.setDescricao(rst.getString("descricao"));
+                    item.setUnidade(rst.getString("unidade"));
+                    item.setQuantidadeEmbalagem(rst.getDouble("qtdembalagem"));
+                    item.setQuantidade(rst.getDouble("quantidade"));
+                    item.setValorTotalProduto(rst.getDouble("valor"));
+                    item.setValorDesconto(rst.getDouble("valor_desconto"));
+                    item.setValorFrete(rst.getDouble("valor_frete"));
+                    item.setValorIsento(rst.getDouble("valor_isento"));
+                    item.setValorOutras(rst.getDouble("valor_outras"));
+                    item.setIcmsCst(rst.getInt("icms_cst"));
+                    item.setIcmsAliquota(rst.getDouble("icms_aliq"));
+                    item.setIcmsReduzido(rst.getDouble("icms_red"));
+                    item.setIcmsValor(rst.getDouble("icms_valor"));
+                    item.setIcmsBaseCalculoST(rst.getDouble("icms_bc_st"));
+                    item.setIcmsValorST(rst.getDouble("icms_st"));
+                    item.setIpiValorBase(rst.getDouble("ipi_base"));
+                    item.setIpiValor(rst.getDouble("ipi_valor"));
+                    item.setPisCofinsCst(rst.getInt("pis_cst"));
+                    item.setIvaPorcentagem(rst.getDouble("iva_porcentagem"));
+                    item.setIvaPauta(rst.getDouble("iva_pauta"));
+                    
+                }
+            }
+        }
+    }
 
     @Override
     public List<NutricionalIMP> getNutricional(Set<OpcaoNutricional> opcoes) throws Exception {
