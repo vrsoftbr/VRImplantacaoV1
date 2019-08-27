@@ -145,62 +145,62 @@ public class UniplusDAO extends InterfaceDAO {
         List<ProdutoIMP> result = new ArrayList<>();
         try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	p.id,\n" +
-                    "	p.codigo, \n" +
-                    "	p.ean, \n" +
-                    "	p.inativo, \n" +
-                    "   p.diasvencimento as validade,\n" +
-                    "	p.nome as descricaocompleta, \n" +
-                    "	p.nomeecf as descricaoreduzida, \n" +
-                    "	p.nome as descricaogondola, \n" +
-                    "	p.datacadastro, \n" +
-                    "	p.unidademedida as unidade, \n" +
-                    "	1 qtdembalagem, \n" +
-                    "	p.custoindireto custooperacional,\n" +
-                    "	preco.percentualmarkupajustado margem, \n" +
-                    "	preco.precoultimacompra custosemimposto,\n" +
-                    "	preco.precocusto custocomimposto,\n" +
-                    "	preco.preco as precovenda,\n" +
-                    "	p.quantidademinima, \n" +
-                    "	p.quantidademaxima, \n" +
-                    "	e.quantidade, \n" +
-                    "	p.tributacao, \n" +
-                    "	p.situacaotributaria as cst, \n" +
-                    "	p.cstpis, \n" +
-                    "	p.cstcofins, \n" +
-                    "	p.cstpisentrada, \n" +
-                    "	p.icmsentrada as icmscredito, \n" +
-                    "	p.icmssaida as icmsdebito, \n" +
-                    "	p.aliquotaicmsinterna, \n" +
-                    "	p.pesavel, \n" +
-                    "	p.ncm, \n" +
-                    "	p.idcest, \n" +
-                    "	cest.codigo as cest, \n" +
-                    "	p.cstpisentrada, \n" +
-                    "	p.cstpis, \n" +
-                    "	p.idfamilia, \n" +
-                    "	p.idhierarquia as merc1, \n" +
-                    "	p.idhierarquia as merc2, \n" +
-                    "	p.idhierarquia as merc3,\n" +
-                    "	r.codigo naturezareceita\n" +
-                    "from \n" +
-                    "	produto p\n" +
-                    "	join filial f on\n" +
-                    "		f.id = " + getLojaOrigem() + "\n" +
-                    "	left join formacaoprecoproduto preco on\n" +
-                    "		preco.idproduto = p.id and\n" +
-                    "		preco.idfilial = f.id\n" +
-                    "	left join saldoestoque e on\n" +
-                    "		e.idproduto = p.id and\n" +
-                    "		e.codigoproduto = p.codigo and\n" +
-                    "		e.idfilial = f.id\n" +
-                    "	left join cest on\n" +
-                    "		cest.id = p.idcest\n" +
-                    "	left join\n" +
-                    "		receitasemcontribuicao r on p.idreceitasemcontribuicao = r.id\n" +
-                    "order by \n" +
-                    "	p.codigo"
+                    "select \n"
+                    + "	p.id,\n"
+                    + "	p.codigo, \n"
+                    + "	p.ean, \n"
+                    + "	p.inativo, \n"
+                    + " p.diasvencimento as validade,\n"
+                    + "	p.nome as descricaocompleta, \n"
+                    + "	p.nomeecf as descricaoreduzida, \n"
+                    + "	p.nome as descricaogondola, \n"
+                    + "	p.datacadastro, \n"
+                    + "	p.unidademedida as unidade, \n"
+                    + "	1 qtdembalagem, \n"
+                    + "	p.custoindireto custooperacional,\n"
+                    + "	preco.percentualmarkupajustado margem, \n"
+                    + "	preco.precoultimacompra custosemimposto,\n"
+                    + "	preco.precocusto custocomimposto,\n"
+                    + "	preco.preco as precovenda,\n"
+                    + "	p.quantidademinima, \n"
+                    + "	p.quantidademaxima, \n"
+                    + "	e.quantidade, \n"
+                    + "	p.tributacao, \n"
+                    + "	p.situacaotributaria as cst, \n"
+                    + "	p.cstpis, \n"
+                    + "	p.cstcofins, \n"
+                    + "	p.cstpisentrada, \n"
+                    + "	p.icmsentrada as icmscredito, \n"
+                    + "	p.icmssaida as icmsdebito, \n"
+                    + "	p.aliquotaicmsinterna, \n"
+                    + "	p.pesavel, \n"
+                    + "	p.ncm, \n"
+                    + "	p.idcest, \n"
+                    + "	cest.codigo as cest, \n"
+                    + "	p.cstpisentrada, \n"
+                    + "	p.cstpis, \n"
+                    + "	p.idfamilia, \n"
+                    + "	p.idhierarquia as merc1, \n"
+                    + "	p.idhierarquia as merc2, \n"
+                    + "	p.idhierarquia as merc3,\n"
+                    + "	r.codigo naturezareceita\n"
+                    + "from \n"
+                    + "	produto p\n"
+                    + "	join filial f on\n"
+                    + "		f.id = " + getLojaOrigem() + "\n"
+                    + "	left join formacaoprecoproduto preco on\n"
+                    + "		preco.idproduto = p.id and\n"
+                    + "		preco.idfilial = f.id\n"
+                    + "	left join saldoestoque e on\n"
+                    + "		e.idproduto = p.id and\n"
+                    + "		e.codigoproduto = p.codigo and\n"
+                    + "		e.idfilial = f.id\n"
+                    + "	left join cest on\n"
+                    + "		cest.id = p.idcest\n"
+                    + "	left join\n"
+                    + "		receitasemcontribuicao r on p.idreceitasemcontribuicao = r.id\n"
+                    + " order by \n"
+                    + "	p.codigo"
             )) {
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -218,11 +218,24 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
-                    imp.seteBalanca((rs.getInt("pesavel") == 1));
-                    imp.setValidade(rs.getInt("validade"));
-                    if (imp.isBalanca() && (forcarIdProdutoQuandoPesavel || "".equals(Utils.acertarTexto(imp.getEan())))) {
-                        imp.setEan(imp.getImportId()); 
+                    
+                    if ((rs.getString("ean") != null)
+                            && (!rs.getString("ean").trim().isEmpty())) {
+
+                        if (rs.getString("ean").length() <= 6) {
+                            imp.seteBalanca(true);
+                        } else {
+                            imp.seteBalanca(false);
+                        }
+                    } else {
+                        imp.seteBalanca(false);
                     }
+                    
+                    //imp.seteBalanca((rs.getInt("pesavel") == 1));
+                    imp.setValidade(rs.getInt("validade"));
+                    //if (imp.isBalanca() && (forcarIdProdutoQuandoPesavel || "".equals(Utils.acertarTexto(imp.getEan())))) {
+                    //    imp.setEan(imp.getImportId()); 
+                    //}
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
@@ -261,18 +274,18 @@ public class UniplusDAO extends InterfaceDAO {
             List<ProdutoIMP> result = new ArrayList<>();
             try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        /*"select \n" +
-                        "	codigo,\n" +
-                        "	codigo ean,\n" +
-                        "	precopauta1 precoatacado,\n" +
-                        "	quantidadepauta1 qtdembalagem,\n" +
-                        "       preco\n" +
-                        "from\n" +
-                        "	produto\n" +
-                        "where\n" +
-                        "	precopauta1 > 0\n"*/
-                        
-                        "select	\n"
+                        "select \n"
+                        + "	codigo,\n"
+                        + "	codigo ean,\n"
+                        + "	precopauta1 precoatacado,\n"
+                        + "	quantidadepauta1 qtdembalagem,\n"
+                        + "       preco\n"
+                        + "from\n"
+                        + "	produto\n"
+                        + "where\n"
+                        + "	precopauta1 > 0\n"
+                        + "union all \n"
+                        + "select	\n"
                         + "	p.codigo,\n"
                         + "	p.codigo ean,\n"
                         + "	p.precopauta1 precoatacado,\n"

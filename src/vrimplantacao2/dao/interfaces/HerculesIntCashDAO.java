@@ -32,7 +32,7 @@ public class HerculesIntCashDAO extends InterfaceDAO {
         return "HerculesIntCash";
     }
 
-    public List<Estabelecimento> getLojas() throws Exception {
+    public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
