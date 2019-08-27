@@ -366,31 +366,33 @@ public class Importador {
     /**
      * Importa os códigos de barras dos produtos.
      *
+     * @param opcoes Opções de importação de produto
      * @throws Exception
      */
-    public void importarEAN() throws Exception {
+    public void importarEAN(OpcaoProduto... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando produtos...");
         List<ProdutoIMP> produtos = getInterfaceDAO().getEANs();
         ProdutoDAO dao = new ProdutoDAO();
         dao.setImportSistema(getInterfaceDAO().getSistema());
         dao.setImportLoja(getInterfaceDAO().getLojaOrigem());
         dao.setIdLojaVR(getLojaVR());
-        dao.salvarEAN(produtos);
+        dao.salvarEAN(produtos, new HashSet<>(Arrays.asList(opcoes)));
     }
 
     /**
      * Importa os códigos de barras atacado dos produtos.
      *
+     * @param opcoes
      * @throws Exception
      */
-    public void importarEANAtacado() throws Exception {
+    public void importarEANAtacado(OpcaoProduto... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando produtos...");
         List<ProdutoIMP> produtos = getInterfaceDAO().getEANsAtacado();
         ProdutoDAO dao = new ProdutoDAO();
         dao.setImportSistema(getInterfaceDAO().getSistema());
         dao.setImportLoja(getInterfaceDAO().getLojaOrigem());
         dao.setIdLojaVR(getLojaVR());
-        dao.salvarEAN(produtos);
+        dao.salvarEAN(produtos, new HashSet<>(Arrays.asList(opcoes)));
     }
     
     /**
