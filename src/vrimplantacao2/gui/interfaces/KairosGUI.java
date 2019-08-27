@@ -42,6 +42,7 @@ public class KairosGUI extends VRInternalFrame {
         txtPorta.setText(params.get(SISTEMA, "PORTA"));
         txtUsuario.setText(params.get(SISTEMA, "USUARIO"));
         txtSenha.setText(params.get(SISTEMA, "SENHA"));
+        chkManterEANMenores.setSelected(params.getBool(SISTEMA, "MANTER_EANS_MENORES"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
@@ -53,6 +54,7 @@ public class KairosGUI extends VRInternalFrame {
         params.put(txtPorta.getText(), SISTEMA, "PORTA");
         params.put(txtUsuario.getText(), SISTEMA, "USUARIO");
         params.put(txtSenha.getText(), SISTEMA, "SENHA");
+        params.put(chkManterEANMenores.isSelected(), SISTEMA, "MANTER_EANS_MENORES");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
             params.put(cliente.cnpj, SISTEMA, "LOJA_CLIENTE");
@@ -202,7 +204,14 @@ public class KairosGUI extends VRInternalFrame {
                             importador.importarMercadologico();
                         }
                         if (chkProdutos.isSelected()) {
-                            importador.importarProduto(chkManterBalanca.isSelected());
+                            List<OpcaoProduto> opcoes = new ArrayList<>();
+                            if (chkManterBalanca.isSelected()) {
+                                opcoes.add(OpcaoProduto.IMPORTAR_MANTER_BALANCA);
+                            }
+                            if (chkManterEANMenores.isSelected()) {
+                                opcoes.add(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
+                            }
+                            importador.importarProduto(opcoes.toArray(new OpcaoProduto[]{}));
                         }
 
                         {
@@ -346,6 +355,7 @@ public class KairosGUI extends VRInternalFrame {
         jPanel1 = new javax.swing.JPanel();
         chkProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
+        chkManterEANMenores = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Custo = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Preco = new vrframework.bean.checkBox.VRCheckBox();
         chkMargem = new vrframework.bean.checkBox.VRCheckBox();
@@ -467,6 +477,11 @@ public class KairosGUI extends VRInternalFrame {
         chkManterBalanca.setText("Manter Balança");
         chkManterBalanca.setEnabled(true);
         jPanel1.add(chkManterBalanca);
+
+        chkManterEANMenores.setText("Manter EANs menores que 7 dígitos");
+        chkManterEANMenores.setToolTipText("Força a migração a manter os EANs dos produtos unitários que são menores que 7 dígitos");
+        chkManterEANMenores.setEnabled(true);
+        jPanel1.add(chkManterEANMenores);
 
         vRPanel7.add(jPanel1);
 
@@ -954,6 +969,7 @@ public class KairosGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCustoSemImposto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
+    private vrframework.bean.checkBox.VRCheckBox chkManterEANMenores;
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;

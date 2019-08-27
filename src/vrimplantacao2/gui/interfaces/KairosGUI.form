@@ -208,6 +208,15 @@
                         </Property>
                       </Properties>
                     </Component>
+                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkManterEANMenores">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Manter EANs menores que 7 d&#xed;gitos"/>
+                        <Property name="toolTipText" type="java.lang.String" value="For&#xe7;a a migra&#xe7;&#xe3;o a manter os EANs dos produtos unit&#xe1;rios que s&#xe3;o menores que 7 d&#xed;gitos"/>
+                        <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                          <Connection code="true" type="code"/>
+                        </Property>
+                      </Properties>
+                    </Component>
                   </SubComponents>
                 </Container>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1Custo">

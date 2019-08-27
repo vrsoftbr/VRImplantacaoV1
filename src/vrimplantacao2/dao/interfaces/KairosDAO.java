@@ -94,6 +94,9 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    p.pesoliquido,\n" +
                     "    p.prazovalidade,\n" +
                     "    p.datacadastro,\n" +
+                    "	 preco.preconormal precovenda,\n" +
+                    "	 preco.precopromocao atacpreco,\n" +
+                    "	 preco.quantidadeiniciopromocao atacqtd,\n" +
                     "    p.margemlucroteorica,\n" +
                     "    p.situacao,\n" +
                     "    p.classificacaofiscal,\n" +
@@ -125,6 +128,11 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     "        and gf.siglauf = mun.SiglaUF\n" +
                     "        and gf.siglapais = mun.SiglaPais\n" +
                     "        and gf.codigofilial = fl.codigofilial\n" +
+                    "	left join precovendaproduto preco on\n" +
+                    "		preco.CodigoFilial = fl.CodigoFilial\n" +
+                    "		and preco.codigoproduto = p.codigoproduto\n" +
+                    "		and preco.CodigoCondicaoPagamento = 1\n" +
+                    "		and preco.SiglaUnidade = p.siglaunidade\n" +
                     "order by\n" +
                     "    p.codigoproduto, codb.numerocodigobarraproduto desc"
             )) {
@@ -168,6 +176,7 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsNaturezaReceita(rst.getString("NaturezaReceitaPisCofins"));
                     imp.setIcmsDebitoId(rst.getString("CodigoGrupoFiscal"));
                     imp.setIcmsCreditoId(rst.getString("CodigoGrupoFiscal"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
 
                     result.add(imp);
                 }
@@ -180,29 +189,19 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
-        if (opt == OpcaoProduto.PRECO) {
+        if (opt == OpcaoProduto.ATACADO) {
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "select CodigoProduto, PrecoNormal "
-                        + "from vwPrecoVendaProduto \n"
-                        + "where CodigoFilial = " + getLojaOrigem() + " \n"
-                        + "and CodigoCondicaoPagamento = 1\n"
-                        + "and CodigoPrazoPagamento = 1\n"
-                        + "and SiglaUnidade = 'UN'\n"
-                        + "union all\n"
-                        + "select CodigoProduto, PrecoNormal "
-                        + "from vwPrecoVendaProduto \n"
-                        + "where CodigoFilial = " + getLojaOrigem() + " \n"
-                        + "and CodigoCondicaoPagamento = 1\n"
-                        + "and CodigoPrazoPagamento = 1\n"
-                        + "and SiglaUnidade = 'KG'"
+                        ""
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("CodigoProduto"));
-                        imp.setPrecovenda(rst.getDouble("PrecoNormal"));
+                        imp.setEan(String.format("999%06d", Utils.stringToInt(imp.getImportId())));
+                        imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                        imp.setAtacadoPreco(rst.getDouble("atacado"));
                         result.add(imp);
                     }
                 }
