@@ -129,6 +129,7 @@ import vrimplantacao2.gui.interfaces.GTechGUI;
 import vrimplantacao2.gui.interfaces.GetWayGUI;
 import vrimplantacao2.gui.interfaces.GuiaSistemasGUI;
 import vrimplantacao2.gui.interfaces.HRTechGUI;
+import vrimplantacao2.gui.interfaces.HerculesIntCashGUI;
 import vrimplantacao2.gui.interfaces.HipcomGUI;
 import vrimplantacao2.gui.interfaces.HiperGUI;
 import vrimplantacao2.gui.interfaces.ICommerceGUI;
@@ -612,6 +613,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuWinNexus = new javax.swing.JMenuItem();
         mnuHRTech = new javax.swing.JMenuItem();
         mnuAcom = new javax.swing.JMenuItem();
+        mnuHercules = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1596,6 +1598,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuAcom);
+
+        mnuHercules.setText("Hercules");
+        mnuHercules.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuHerculesActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuHercules);
 
         mnuDatabase.add(mnuSqlServer2);
 
@@ -4035,6 +4045,11 @@ public final class MenuGUI extends VRMdiFrame {
         OryonGUI.exibir(this);
     }//GEN-LAST:event_mnuOryonActionPerformed
 
+    private void mnuHerculesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuHerculesActionPerformed
+        // TODO add your handling code here:
+        HerculesIntCashGUI.exibir(this);
+    }//GEN-LAST:event_mnuHerculesActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4175,6 +4190,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuGDoor;
     private javax.swing.JMenuItem mnuGTech;
     private javax.swing.JMenuItem mnuHRTech;
+    private javax.swing.JMenuItem mnuHercules;
     private javax.swing.JMenuItem mnuHipcom;
     private javax.swing.JMenuItem mnuHiper;
     private javax.swing.JMenuItem mnuHipicom;
