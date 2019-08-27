@@ -335,6 +335,11 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMapaTribActionPerformed"/>
                   </Events>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAtacado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Atacado"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="vRPanel9">

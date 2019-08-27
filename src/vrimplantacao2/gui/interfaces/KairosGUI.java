@@ -273,6 +273,9 @@ public class KairosGUI extends VRInternalFrame {
                             if (chkQtdEmbalagemEAN.isSelected()) {
                                 opcoes.add(OpcaoProduto.QTD_EMBALAGEM_EAN);
                             }
+                            if (chkAtacado.isSelected()) {
+                                opcoes.add(OpcaoProduto.ATACADO);
+                            }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
                             }
@@ -378,6 +381,7 @@ public class KairosGUI extends VRInternalFrame {
         chkT1NCM = new vrframework.bean.checkBox.VRCheckBox();
         chkT1CEST = new vrframework.bean.checkBox.VRCheckBox();
         btnMapaTrib = new vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton();
+        chkAtacado = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel9 = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -560,6 +564,9 @@ public class KairosGUI extends VRInternalFrame {
             }
         });
         vRPanel7.add(btnMapaTrib);
+
+        chkAtacado.setText("Atacado");
+        vRPanel7.add(chkAtacado);
 
         vRTabbedPane2.addTab("Produtos", vRPanel7);
 
@@ -963,6 +970,7 @@ public class KairosGUI extends VRInternalFrame {
     private javax.swing.JToggleButton btnConectar;
     private vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTrib;
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkAtacado;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkCustoComImposto;
