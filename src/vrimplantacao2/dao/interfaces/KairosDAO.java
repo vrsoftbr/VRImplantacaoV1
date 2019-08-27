@@ -192,16 +192,28 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
         if (opt == OpcaoProduto.ATACADO) {
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        ""
+                        "select\n" +
+                        "	preco.codigoproduto id_produto,\n" +
+                        "        preco.preconormal precovenda,\n" +
+                        "        preco.quantidadeiniciopromocao qtdembalagem,\n" +
+                        "        preco.precopromocao precoatacado\n" +
+                        "from\n" +
+                        "	precovendaproduto preco\n" +
+                        "where\n" +
+                        "	preco.CodigoFilial = '" + getLojaOrigem() + "'\n" +
+                        "	and preco.CodigoCondicaoPagamento = 1\n" +
+                        "	and preco.SiglaUnidade in ('UN', 'KG')\n" +
+                        "	and preco.datainiciopromocao <= getdate() and preco.datafimpromocao >= getdate() + 360"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("CodigoProduto"));
+                        imp.setImportId(rst.getString("id_produto"));
                         imp.setEan(String.format("999%06d", Utils.stringToInt(imp.getImportId())));
+                        imp.setPrecovenda(rst.getDouble("precovenda"));
                         imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                        imp.setAtacadoPreco(rst.getDouble("atacado"));
+                        imp.setAtacadoPreco(rst.getDouble("precoatacado"));
                         result.add(imp);
                     }
                 }
