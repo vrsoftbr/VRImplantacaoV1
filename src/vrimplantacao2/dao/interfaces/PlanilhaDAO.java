@@ -35,6 +35,7 @@ import vrimplantacao2.vo.enums.TipoCancelamento;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoDesconto;
 import vrimplantacao2.vo.enums.TipoEmbalagem;
+import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoIndicadorIE;
 import vrimplantacao2.vo.enums.TipoOrgaoPublico;
@@ -401,7 +402,10 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 forn.setQtd_minima_pedido(linha.getInt("qtd_minima_pedido"));
                 forn.setValor_minimo_pedido(linha.getDouble("valor_minimo_pedido"));
                 forn.setDatacadastro(getData(linha.getString("datacadastro")));
-                forn.setObservacao(linha.getString("observacao"));    
+                forn.setObservacao(linha.getString("observacao"));
+                if(linha.existsColumn("tipoempresa")) {
+                    forn.setTipoEmpresa(linha.getInt("tipoempresa") == 1 ? TipoEmpresa.EPP_SIMPLES : TipoEmpresa.LUCRO_REAL);
+                }
                 
                 int i = 1;
                 while (true) {
@@ -490,7 +494,13 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             ClienteIMP imp = new ClienteIMP();
             try {
             imp.setId(linha.getString("id"));
-            imp.setCnpj(linha.getString("cnpj"));
+            if(linha.existsColumn("cpf")) {
+                imp.setCnpj(linha.getString("cnpj") == null || "".equals(linha.getString("cnpj")) 
+                        ? linha.getString("cpf") : linha.getString("cnpj"));
+            } else {
+                imp.setCnpj(linha.getString("cnpj"));
+            }
+            
             long cnpj = Utils.stringToLong(linha.getString("cnpj"));
             if (cnpj > 99999999999L) {                
                 imp.setInscricaoestadual(linha.getString("inscricaoestadual"));

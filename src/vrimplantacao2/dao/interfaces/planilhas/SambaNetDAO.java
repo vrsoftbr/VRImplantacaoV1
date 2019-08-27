@@ -356,7 +356,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
 
                 String centroReceita = "", grupo = "", categoria = "";
                 
-                Map<String, String> familia = getFamilia();
+                //Map<String, String> familia = getFamilia();
 
                 ProgressBar.setStatus("Analisando Planilha de Produtos");
                 ProgressBar.setMaximum(sheet.getRows());
@@ -387,7 +387,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setCodMercadologico1(centroReceita);
                         imp.setCodMercadologico2(grupo);
                         imp.setCodMercadologico3(categoria);
-                        imp.setIdFamiliaProduto(familia.get(imp.getImportId()));
+                        //imp.setIdFamiliaProduto(familia.get(imp.getImportId()));
                         
                         Integer plu = mapaBalanca.get(imp.getImportId());
                         if (plu != null) {
@@ -602,7 +602,7 @@ public class SambaNetDAO extends InterfaceDAO implements MapaTributoProvider {
                         val(sh, 8, i).equals("Endereço:")
                 ) {
                     imp.setFantasia(val(sh, 2, i));
-                    if (imp.getFantasia().equals("")) {
+                    if (imp.getFantasia() == null || imp.getFantasia().equals("")) {
                         imp.setFantasia(imp.getRazao());
                     }
                     imp.setEndereco(val(sh, 9, i));
