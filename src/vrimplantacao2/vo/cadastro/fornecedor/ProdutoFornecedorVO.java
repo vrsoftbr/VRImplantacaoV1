@@ -23,6 +23,7 @@ public class ProdutoFornecedorVO {
     private double pesoEmbalagem = 0;
     private double ipi = 0;
     private int tipoIpi = 0;
+    private int idDivisaoFornecedor = 0;
 
     public int getId() {
         return id;
@@ -111,4 +112,13 @@ public class ProdutoFornecedorVO {
     public void setTipoIpi(int tipoIpi) {
         this.tipoIpi = tipoIpi;
     }
+
+    public int getIdDivisaoFornecedor() {
+        return idDivisaoFornecedor;
+    }
+
+    public void setIdDivisaoFornecedor(int idDivisaoFornecedor) {
+        this.idDivisaoFornecedor = idDivisaoFornecedor;
+    }
+    
 }

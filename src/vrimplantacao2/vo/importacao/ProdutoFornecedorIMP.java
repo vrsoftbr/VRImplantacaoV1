@@ -19,6 +19,7 @@ public class ProdutoFornecedorIMP {
     private double custoTabela = 0;
     private double ipi = 0;
     private int tipoIpi = 0;
+    private String idDivisaoFornecedor = "";
     
     public String getImportSistema() {
         return importSistema;
@@ -107,4 +108,13 @@ public class ProdutoFornecedorIMP {
     public void setTipoIpi(int tipoIpi) {
         this.tipoIpi = tipoIpi;
     }
+
+    public String getIdDivisaoFornecedor() {
+        return idDivisaoFornecedor;
+    }
+
+    public void setIdDivisaoFornecedor(String idDivisaoFornecedor) {
+        this.idDivisaoFornecedor = idDivisaoFornecedor;
+    }
+    
 }

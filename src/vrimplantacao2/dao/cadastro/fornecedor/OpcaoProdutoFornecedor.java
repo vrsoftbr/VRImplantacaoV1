@@ -15,7 +15,12 @@ public enum OpcaoProdutoFornecedor {
             return "IPI Fornecedor";
         }
     },
-    
+    DIVISAO_FORNECEDOR {
+        @Override
+        public String toString(){
+            return "Divisão do Fornecedor";
+        }
+    },
     QTDEMBALAGEM {
         @Override
         public String toString(){
