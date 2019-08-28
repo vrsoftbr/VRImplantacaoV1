@@ -351,16 +351,17 @@ public class Importador {
     /**
      * Executa a importação do produto fornecedor.
      *
+     * @param opcoes
      * @throws Exception
      */
-    public void importarProdutoFornecedor() throws Exception {
+    public void importarProdutoFornecedor(OpcaoProdutoFornecedor... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando produtos dos fornecedores...");
         List<ProdutoFornecedorIMP> produtos = getInterfaceDAO().getProdutosFornecedores();
         ProdutoFornecedorDAO dao = new ProdutoFornecedorDAO();
         dao.setImportSistema(getInterfaceDAO().getSistema());
         dao.setImportLoja(getInterfaceDAO().getLojaOrigem());
         dao.setIdLojaVR(getLojaVR());
-        dao.salvar(produtos);
+        dao.salvar(produtos, new HashSet<>(Arrays.asList(opcoes)));
     }
 
     /**
@@ -586,16 +587,17 @@ public class Importador {
      * Unifica o cadastro de Produto Fornecedor. Se o fornecedor existir e se o
      * código externo não estiver sendo utilizado grava o registro.
      *
+     * @param opcoes
      * @throws Exception
      */
-    public void unificarProdutoFornecedor() throws Exception {
+    public void unificarProdutoFornecedor(OpcaoProdutoFornecedor... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando produtos dos fornecedores (Unificação)...");
         List<ProdutoFornecedorIMP> produtos = getInterfaceDAO().getProdutosFornecedores();
         ProdutoFornecedorDAO dao = new ProdutoFornecedorDAO();
         dao.setImportSistema(getInterfaceDAO().getSistema());
         dao.setImportLoja(getInterfaceDAO().getLojaOrigem());
         dao.setIdLojaVR(getLojaVR());
-        dao.salvar(produtos);
+        dao.salvar(produtos, new HashSet<>(Arrays.asList(opcoes)));
     }
 
     /**

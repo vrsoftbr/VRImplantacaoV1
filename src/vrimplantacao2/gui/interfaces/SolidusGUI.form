@@ -211,19 +211,29 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkContasAPagar" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Component id="chkFContatos" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFCnpj" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFTipoEmpresa" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFSituacaoCadastro" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFBloqueado" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFObservacao" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkFContatos" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Group type="102" attributes="0">
+                                          <EmptySpace min="21" pref="21" max="-2" attributes="0"/>
+                                          <Component id="chkProdutoFornecedorDivisao" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Group type="102" attributes="0">
+                                          <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkContasAPagar" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                  </Group>
+                              </Group>
                           </Group>
                           <EmptySpace pref="204" max="32767" attributes="0"/>
                       </Group>
@@ -237,7 +247,10 @@
                               <Group type="102" attributes="0">
                                   <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkFContatos" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="chkFContatos" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkProdutoFornecedorDivisao" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkFCnpj" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -254,7 +267,7 @@
                                   <Component id="chkContasAPagar" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <EmptySpace pref="22" max="32767" attributes="0"/>
+                          <EmptySpace pref="26" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -355,6 +368,17 @@
                       <Connection code="true" type="code"/>
                     </Property>
                   </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoFornecedorDivisao">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Divis&#xe3;o"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
+                    </Property>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkProdutoFornecedorDivisaoActionPerformed"/>
+                  </Events>
                 </Component>
               </SubComponents>
             </Container>
