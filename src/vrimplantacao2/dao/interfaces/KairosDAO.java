@@ -8,6 +8,8 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import vrimplantacao.classe.ConexaoSqlServer;
@@ -21,7 +23,9 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -94,6 +98,9 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    p.pesoliquido,\n" +
                     "    p.prazovalidade,\n" +
                     "    p.datacadastro,\n" +
+                    "	 preco.preconormal precovenda,\n" +
+                    "	 preco.precopromocao atacpreco,\n" +
+                    "	 preco.quantidadeiniciopromocao atacqtd,\n" +
                     "    p.margemlucroteorica,\n" +
                     "    p.situacao,\n" +
                     "    p.classificacaofiscal,\n" +
@@ -125,6 +132,11 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     "        and gf.siglauf = mun.SiglaUF\n" +
                     "        and gf.siglapais = mun.SiglaPais\n" +
                     "        and gf.codigofilial = fl.codigofilial\n" +
+                    "	left join precovendaproduto preco on\n" +
+                    "		preco.CodigoFilial = fl.CodigoFilial\n" +
+                    "		and preco.codigoproduto = p.codigoproduto\n" +
+                    "		and preco.CodigoCondicaoPagamento = 1\n" +
+                    "		and preco.SiglaUnidade = p.siglaunidade\n" +
                     "order by\n" +
                     "    p.codigoproduto, codb.numerocodigobarraproduto desc"
             )) {
@@ -168,6 +180,7 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsNaturezaReceita(rst.getString("NaturezaReceitaPisCofins"));
                     imp.setIcmsDebitoId(rst.getString("CodigoGrupoFiscal"));
                     imp.setIcmsCreditoId(rst.getString("CodigoGrupoFiscal"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
 
                     result.add(imp);
                 }
@@ -180,29 +193,31 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
-        if (opt == OpcaoProduto.PRECO) {
+        if (opt == OpcaoProduto.ATACADO) {
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "select CodigoProduto, PrecoNormal "
-                        + "from vwPrecoVendaProduto \n"
-                        + "where CodigoFilial = " + getLojaOrigem() + " \n"
-                        + "and CodigoCondicaoPagamento = 1\n"
-                        + "and CodigoPrazoPagamento = 1\n"
-                        + "and SiglaUnidade = 'UN'\n"
-                        + "union all\n"
-                        + "select CodigoProduto, PrecoNormal "
-                        + "from vwPrecoVendaProduto \n"
-                        + "where CodigoFilial = " + getLojaOrigem() + " \n"
-                        + "and CodigoCondicaoPagamento = 1\n"
-                        + "and CodigoPrazoPagamento = 1\n"
-                        + "and SiglaUnidade = 'KG'"
+                        "select\n" +
+                        "	preco.codigoproduto id_produto,\n" +
+                        "        preco.preconormal precovenda,\n" +
+                        "        preco.quantidadeiniciopromocao qtdembalagem,\n" +
+                        "        preco.precopromocao precoatacado\n" +
+                        "from\n" +
+                        "	precovendaproduto preco\n" +
+                        "where\n" +
+                        "	preco.CodigoFilial = '" + getLojaOrigem() + "'\n" +
+                        "	and preco.CodigoCondicaoPagamento = 1\n" +
+                        "	and preco.SiglaUnidade in ('UN', 'KG')\n" +
+                        "	and preco.datainiciopromocao <= getdate() and preco.datafimpromocao >= getdate() + 360"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("CodigoProduto"));
-                        imp.setPrecovenda(rst.getDouble("PrecoNormal"));
+                        imp.setImportId(rst.getString("id_produto"));
+                        imp.setEan(String.format("999%06d", Utils.stringToInt(imp.getImportId())));
+                        imp.setPrecovenda(rst.getDouble("precovenda"));
+                        imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                        imp.setAtacadoPreco(rst.getDouble("precoatacado"));
                         result.add(imp);
                     }
                 }
@@ -416,47 +431,106 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            
+            HashSet<String> movimento = new HashSet<>();            
             try (ResultSet rst = stm.executeQuery(
-                    "select tp.CodigoTipoPessoa, p.CodigoPessoa, p.RazaoSocial, p.NomeFantasia, \n"
-                    + "       p.DataNascimento, p.Sexo, p.EstadoCivil, p.Contato, p.Observacoes, \n"
-                    + "       p.DataCadastro, endP.Endereco, endP.Numero, endP.Bairro, endP.Complemento, \n"
-                    + "       m.CodigoIBGEMunicipio, m.Nome municipio, m.SiglaUF, endP.CEP, endP.PontoReferencia, \n"
-                    + "       endP.ContatoEndereco, \n"
-                    + "(select top(1) telP.NumeroTelefone \n"
-                    + "   from TelefonePessoa telP \n"
-                    + "  where telP.CodigoPessoa = p.CodigoPessoa) as Telefone, \n"
-                    + "(select docCnpj.NumeroDocumento \n"
-                    + "   from DocumentoPessoa docCnpj \n"
-                    + "   left join Documento doc on doc.CodigoDocumento = docCnpj.CodigoDocumento \n"
-                    + "  where docCnpj.CodigoPessoa = p.CodigoPessoa \n"
-                    + "    and doc.CodigoDocumento = 1) as Cnpj, \n"
-                    + "(select docInscEst.NumeroDocumento \n"
-                    + "   from DocumentoPessoa docInscEst \n"
-                    + "   left join Documento doc on doc.CodigoDocumento = docInscEst.CodigoDocumento \n"
-                    + "  where docInscEst.CodigoPessoa = p.CodigoPessoa \n"
-                    + "    and doc.CodigoDocumento = 3) as InscricaoEstadual, \n"
-                    + "(select docRG.NumeroDocumento \n"
-                    + "   from DocumentoPessoa docRG \n"
-                    + "   left join Documento doc on doc.CodigoDocumento = docRG.CodigoDocumento \n"
-                    + "  where docRG.CodigoPessoa = p.CodigoPessoa \n"
-                    + "    and doc.CodigoDocumento = 2) as RG, \n"
-                    + "(select docRG.OrgaoExpedidor \n"
-                    + "   from DocumentoPessoa docRG \n"
-                    + "   left join Documento doc on doc.CodigoDocumento = docRG.CodigoDocumento \n"
-                    + "  where docRG.CodigoPessoa = p.CodigoPessoa \n"
-                    + "    and doc.CodigoDocumento = 2) as OrgaoExp, \n"
-                    + " (select top(1) c.LimiteCredito \n"
-                    + "   from Cliente c \n"
-                    + "  inner join DocumentoPessoa dp on dp.NumeroDocumento = c.CnpjCpfCliente \n"
-                    + "    and dp.CodigoPessoa = p.CodigoPessoa) LimiteCredito \n"
-                    + "from Pessoa p \n"
-                    + "left join EnderecoPessoa endP on endP.CodigoPessoa = p.CodigoPessoa \n"
-                    + "left join Municipio m on endP.CodigoMunicipio = m.CodigoMunicipio \n"
-                    + "inner join TipoPessoa tp on tp.CodigoPessoa = p.CodigoPessoa and tp.CodigoTipoPessoa = 'C' \n"
-                    + "order by p.CodigoPessoa"
+                    "select distinct\n" +
+                    "            mv.codigopessoalancamento\n" +
+                    "        from\n" +
+                    "            movimentofinanceiro mv\n" +
+                    "        where\n" +
+                    "            mv.statuslancamento = 'G' \n" +
+                    "            and mv.tipolancamento = 'C'"
             )) {
                 while (rst.next()) {
+                    movimento.add(rst.getString("codigopessoalancamento"));
+                }
+            }
+            
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    coalesce(nullif(ltrim(tp.codigotipopessoa),'') ,'Z') codigotipopessoa,\n" +
+                    "    p.codigopessoa,\n" +
+                    "    p.razaosocial,\n" +
+                    "    p.nomefantasia,\n" +
+                    "    p.datanascimento,\n" +
+                    "    p.sexo,\n" +
+                    "    p.estadocivil,\n" +
+                    "    p.contato,\n" +
+                    "    p.observacoes,\n" +
+                    "    p.datacadastro,\n" +
+                    "    endp.endereco,\n" +
+                    "    endp.numero,\n" +
+                    "    endp.bairro,\n" +
+                    "    endp.complemento,\n" +
+                    "    m.codigoibgemunicipio,\n" +
+                    "    m.nome municipio,\n" +
+                    "    m.siglauf,\n" +
+                    "    endp.cep,\n" +
+                    "    endp.pontoreferencia,\n" +
+                    "    endp.contatoendereco,\n" +
+                    "    (select\n" +
+                    "         top(1) telp.numerotelefone\n" +
+                    "     from\n" +
+                    "         telefonepessoa telp\n" +
+                    "     where\n" +
+                    "         telp.codigopessoa = p.codigopessoa) as telefone,\n" +
+                    "    (select\n" +
+                    "         doccnpj.numerodocumento\n" +
+                    "     from\n" +
+                    "         documentopessoa doccnpj\n" +
+                    "         left join documento doc on doc.codigodocumento = doccnpj.codigodocumento\n" +
+                    "     where\n" +
+                    "         doccnpj.codigopessoa = p.codigopessoa and\n" +
+                    "         doc.codigodocumento = 1) as cnpj,\n" +
+                    "    (select\n" +
+                    "         docinscest.numerodocumento\n" +
+                    "     from\n" +
+                    "         documentopessoa docinscest\n" +
+                    "         left join documento doc on doc.codigodocumento = docinscest.codigodocumento\n" +
+                    "     where\n" +
+                    "         docinscest.codigopessoa = p.codigopessoa and\n" +
+                    "         doc.codigodocumento = 3) as inscricaoestadual,\n" +
+                    "    (select\n" +
+                    "         docrg.numerodocumento\n" +
+                    "     from\n" +
+                    "         documentopessoa docrg\n" +
+                    "         left join documento doc on doc.codigodocumento = docrg.codigodocumento\n" +
+                    "     where\n" +
+                    "         docrg.codigopessoa = p.codigopessoa and\n" +
+                    "         doc.codigodocumento = 2) as rg,\n" +
+                    "    (select\n" +
+                    "         docrg.orgaoexpedidor\n" +
+                    "     from\n" +
+                    "         documentopessoa docrg\n" +
+                    "         left join documento doc on doc.codigodocumento = docrg.codigodocumento\n" +
+                    "     where\n" +
+                    "         docrg.codigopessoa = p.codigopessoa and\n" +
+                    "         doc.codigodocumento = 2) as orgaoexp,\n" +
+                    "    (select\n" +
+                    "         top(1) c.limitecredito\n" +
+                    "     from\n" +
+                    "         cliente c\n" +
+                    "         inner join documentopessoa dp on dp.numerodocumento = c.cnpjcpfcliente and dp.codigopessoa = p.codigopessoa) limitecredito\n" +
+                    "from\n" +
+                    "    pessoa p\n" +
+                    "    left join enderecopessoa endp on endp.codigopessoa = p.codigopessoa\n" +
+                    "    left join municipio m on endp.codigomunicipio = m.codigomunicipio\n" +
+                    "    left join tipopessoa tp on tp.codigopessoa = p.codigopessoa\n" +
+                    "order by\n" +
+                    "    codigotipopessoa, p.codigopessoa"
+            )) {
+                while (rst.next()) {
+                    
+                    if (
+                            !"C".equals(rst.getString("codigotipopessoa")) &&
+                            !movimento.contains(rst.getString("CodigoPessoa"))
+                    ) {
+                        continue;
+                    }                    
+                    
                     ClienteIMP imp = new ClienteIMP();
+                    
                     imp.setId(rst.getString("CodigoPessoa"));
                     imp.setRazao(rst.getString("RazaoSocial"));
                     imp.setFantasia(rst.getString("NomeFantasia"));
@@ -597,4 +671,70 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result =  new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	mv.codigofilial,\n" +
+                    "	mv.nsufinanceiro id,\n" +
+                    "	mv.dataemissao,\n" +
+                    "	mv.valorvencimento valor,\n" +
+                    "	mv.historicolivre observacao,\n" +
+                    "	mv.codigopessoalancamento idcliente,\n" +
+                    "	mv.datavencimento,\n" +
+                    "	mv.parcela\n" +
+                    "from\n" +
+                    "	movimentofinanceiro mv\n" +
+                    "where\n" +
+                    "	mv.codigofilial = '" + getLojaOrigem() + "'\n" +
+                    "	and mv.statuslancamento = 'G' \n" +
+                    "	and mv.tipolancamento = 'C' \n" +
+                    "order by\n" +
+                    "	mv.codigofilial,\n" +
+                    "	mv.nsufinanceiro"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rst.getString("codigofilial") + "-" + rst.getString("id"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setIdCliente(rst.getString("idcliente"));
+                    imp.setDataVencimento(rst.getDate("datavencimento"));
+                    imp.setParcela(rst.getInt("parcela"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result =  new ArrayList<>();
+        
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    ""
+            )) {
+                while (rst.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    
+        
 }

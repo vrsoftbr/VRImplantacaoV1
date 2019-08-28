@@ -178,8 +178,8 @@ public class SambaNetGUI extends VRInternalFrame {
                             if (
                                     txtPlanilhaProdutos.getArquivo().equals("")||
                                     txtPlanilhaProdutosContador.getArquivo().equals("")||
-                                    txtPlanilhaBalanca.getArquivo().equals("")||
-                                    txtPlanilhaFamilia.getArquivo().equals("")) {
+                                    txtPlanilhaBalanca.getArquivo().equals("")/*||
+                                    txtPlanilhaFamilia.getArquivo().equals("")*/) {
                                 erros.append("Produtos - Informe o arquivo RelProdutosXtra.xls, RelFamiliaPrecoXtra.xls e o RelProdutosListagemContadorXtra.xls").append("\n");
                             }
                         }

@@ -254,8 +254,11 @@ public class ProdutoDAO {
     final ProdutoAutomacaoDAO automacaoDAO = new ProdutoAutomacaoDAO();
     private final ProdutoAliquotaDAO aliquotaDAO = new ProdutoAliquotaDAO();
 
-    public void salvarEAN(List<ProdutoIMP> produtos) throws Exception {
+    public void salvarEAN(List<ProdutoIMP> produtos, Set<OpcaoProduto> opcoes) throws Exception {
         try {
+            
+            boolean importarMenoresQue7Digitos = opcoes.contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
+            
             Conexao.begin();
             ProgressBar.setStatus("Produtos - Gravando EAN...");
             ProgressBar.setMaximum(produtos.size());
@@ -269,7 +272,7 @@ public class ProdutoDAO {
                 //Se o produto foi localizado executa
                 if (anterior != null) {
                     long ean13 = Utils.stringToLong(imp.getEan());
-                    if ((ean13 > 999999) && (!Produtoprovider.automacao().cadastrado(ean13))) {
+                    if ((!importarMenoresQue7Digitos && ean13 > 999999) && (!Produtoprovider.automacao().cadastrado(ean13))) {
                         //ProdutoAutomacaoVO automacao = prodRepository.converterEAN(imp, ean13, unidade);
                         //automacao.setProduto(anterior.getCodigoAtual());
                         //Produtoprovider.automacao().salvar(automacao);

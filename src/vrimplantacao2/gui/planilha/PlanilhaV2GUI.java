@@ -100,6 +100,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         chkFornContatos = new vrframework.bean.checkBox.VRCheckBox();
         chkFornProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkContaPagar = new vrframework.bean.checkBox.VRCheckBox();
+        chkTipoForn = new javax.swing.JCheckBox();
         tabFornUnificacao = new vrframework.bean.panel.VRPanel();
         chkFornUnificar = new vrframework.bean.checkBox.VRCheckBox();
         chkFornUnificarProd = new vrframework.bean.checkBox.VRCheckBox();
@@ -139,6 +140,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         chkCliPrefRotativoBaixas = new vrframework.bean.checkBox.VRCheckBox();
         chkCliPrefInscricaoEstadual = new vrframework.bean.checkBox.VRCheckBox();
         chkCliCheques = new vrframework.bean.checkBox.VRCheckBox();
+        chkCNPJCli = new javax.swing.JCheckBox();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         chkCliEvenDados = new vrframework.bean.checkBox.VRCheckBox();
         chkCliEvenContatos = new vrframework.bean.checkBox.VRCheckBox();
@@ -391,6 +393,8 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkContaPagar, "Conta Pagar");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkTipoForn, "Tipo de Empresa");
+
         javax.swing.GroupLayout tabFornImportacaoLayout = new javax.swing.GroupLayout(tabFornImportacao);
         tabFornImportacao.setLayout(tabFornImportacaoLayout);
         tabFornImportacaoLayout.setHorizontalGroup(
@@ -398,13 +402,15 @@ public class PlanilhaV2GUI extends VRInternalFrame {
             .addGroup(tabFornImportacaoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabFornImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkFornProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(tabFornImportacaoLayout.createSequentialGroup()
-                        .addComponent(chkFornDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
+                        .addGroup(tabFornImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkFornDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkFornContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(66, 66, 66)
                         .addComponent(chkContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkFornContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkFornProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(380, Short.MAX_VALUE))
+                    .addComponent(chkTipoForn))
+                .addContainerGap(332, Short.MAX_VALUE))
         );
         tabFornImportacaoLayout.setVerticalGroup(
             tabFornImportacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -414,10 +420,12 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                     .addComponent(chkFornDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkFornContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(chkTipoForn)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkFornContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkFornProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(149, Short.MAX_VALUE))
+                .addContainerGap(135, Short.MAX_VALUE))
         );
 
         tabsForn.addTab("Importação", tabFornImportacao);
@@ -641,6 +649,8 @@ public class PlanilhaV2GUI extends VRInternalFrame {
 
         org.openide.awt.Mnemonics.setLocalizedText(chkCliCheques, "Cheques");
 
+        org.openide.awt.Mnemonics.setLocalizedText(chkCNPJCli, "CNPJ");
+
         javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
         vRPanel2.setLayout(vRPanel2Layout);
         vRPanel2Layout.setHorizontalGroup(
@@ -658,7 +668,10 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                         .addComponent(chkCliPrefRotativoBaixas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkCliCheques, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkCliPrefInscricaoEstadual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(vRPanel2Layout.createSequentialGroup()
+                        .addComponent(chkCliPrefInscricaoEstadual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCNPJCli)))
                 .addContainerGap(135, Short.MAX_VALUE))
         );
         vRPanel2Layout.setVerticalGroup(
@@ -671,7 +684,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                     .addComponent(chkCliPrefRotativoBaixas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCliCheques, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkCliPrefInscricaoEstadual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkCliPrefInscricaoEstadual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCNPJCli)))
         );
 
         vRPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Cliente Eventual"));
@@ -1251,6 +1266,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.button.VRButton btnMapaTribut;
     private vrframework.bean.button.VRButton btnMigrar;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI checksProdutoPanelGUI1;
+    private javax.swing.JCheckBox chkCNPJCli;
     private vrframework.bean.checkBox.VRCheckBox chkCliCheques;
     private vrframework.bean.checkBox.VRCheckBox chkCliEvenContatos;
     private vrframework.bean.checkBox.VRCheckBox chkCliEvenDados;
@@ -1275,6 +1291,7 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private vrframework.bean.checkBox.VRCheckBox chkPorEanHistorico;
     private vrframework.bean.checkBox.VRCheckBox chkProdUnifProdutos;
+    private javax.swing.JCheckBox chkTipoForn;
     private javax.swing.JComboBox cmbLojaDestino;
     private javax.swing.JLabel jLabel2;
     private vrframework.bean.label.VRLabel lblContaPagar;
@@ -1395,6 +1412,9 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                     if (!opcoes.isEmpty()) {
                                         importador.importarFornecedor();
                                     }
+                                    if(chkTipoForn.isSelected()) {
+                                        importador.atualizarFornecedor(OpcaoFornecedor.TIPO_EMPRESA);
+                                    }
                                     if (chkFornProdutoFornecedor.isSelected()) {
                                         importador.importarProdutoFornecedor();
                                     }
@@ -1461,6 +1481,10 @@ public class PlanilhaV2GUI extends VRInternalFrame {
                                     }
                                     if(chkCliCheques.isSelected()) {
                                         importador.importarCheque();
+                                    }
+                                    
+                                    if(chkCNPJCli.isSelected()) {
+                                        importador.atualizarClientePreferencial(OpcaoCliente.CNPJ);
                                     }
                                     if (chkCliEvenDados.isSelected()) {
                                         List<OpcaoCliente> opcoes = new ArrayList<>();

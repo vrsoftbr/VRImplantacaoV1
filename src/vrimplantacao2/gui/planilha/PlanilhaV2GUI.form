@@ -498,15 +498,18 @@
                           <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="chkFornProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="chkFornDados" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="chkFornDados" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkFornContatos" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace min="-2" pref="66" max="-2" attributes="0"/>
                                       <Component id="chkContaPagar" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <Component id="chkFornContatos" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chkFornProdutoFornecedor" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkTipoForn" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="380" max="32767" attributes="0"/>
+                              <EmptySpace pref="332" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -519,10 +522,12 @@
                                   <Component id="chkContaPagar" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkFornContatos" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkTipoForn" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
+                              <Component id="chkFornContatos" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="chkFornProdutoFornecedor" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="149" max="32767" attributes="0"/>
+                              <EmptySpace pref="135" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -546,6 +551,11 @@
                     <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkContaPagar">
                       <Properties>
                         <Property name="text" type="java.lang.String" value="Conta Pagar"/>
+                      </Properties>
+                    </Component>
+                    <Component class="javax.swing.JCheckBox" name="chkTipoForn">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Tipo de Empresa"/>
                       </Properties>
                     </Component>
                   </SubComponents>
@@ -961,7 +971,11 @@
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkCliCheques" min="-2" max="-2" attributes="0"/>
                                       </Group>
-                                      <Component id="chkCliPrefInscricaoEstadual" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Component id="chkCliPrefInscricaoEstadual" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkCNPJCli" min="-2" max="-2" attributes="0"/>
+                                      </Group>
                                   </Group>
                                   <EmptySpace pref="135" max="32767" attributes="0"/>
                               </Group>
@@ -978,7 +992,10 @@
                                       <Component id="chkCliCheques" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkCliPrefInscricaoEstadual" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="chkCliPrefInscricaoEstadual" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkCNPJCli" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -1012,6 +1029,11 @@
                         <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCliCheques">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="Cheques"/>
+                          </Properties>
+                        </Component>
+                        <Component class="javax.swing.JCheckBox" name="chkCNPJCli">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="CNPJ"/>
                           </Properties>
                         </Component>
                       </SubComponents>

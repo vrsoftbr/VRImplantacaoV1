@@ -320,7 +320,12 @@ public enum OpcaoProduto {
      * diferentemente do modo tradicional onde apenas as alíquotas de entrada e saída são usadas.
      */
     USAR_CONVERSAO_ALIQUOTA_COMPLETA,
-    IMPORTAR_INDIVIDUAL_LOJA;
+    IMPORTAR_INDIVIDUAL_LOJA, 
+    /**
+     * Faz com que o sistema grave os EANs que são menores que 7 dígitos nos
+     * produtos unitários.
+     */
+    IMPORTAR_EAN_MENORES_QUE_7_DIGITOS;
 
     public static Set<OpcaoProduto> getAll() {
         return new HashSet<>(Arrays.asList(OpcaoProduto.values()));
