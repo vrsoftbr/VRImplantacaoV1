@@ -8,10 +8,11 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
@@ -47,6 +48,42 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
         return "Kairos";
     }
 
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.CUSTO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.ATACADO
+        ));
+    }
+    
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
@@ -151,7 +188,7 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (bal != null) {
                         imp.seteBalanca(true);
                         imp.setTipoEmbalagem(
-                                "U".equals(bal.getPesavel()) ?
+                                "P".equals(bal.getPesavel()) ?
                                 "KG" :
                                 "UN"
                         );
