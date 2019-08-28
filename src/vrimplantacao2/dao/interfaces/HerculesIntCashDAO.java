@@ -8,8 +8,10 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import vrimplantacao.classe.ConexaoPostgres;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -32,10 +34,44 @@ public class HerculesIntCashDAO extends InterfaceDAO {
         return "HerculesIntCash";
     }
 
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet(Arrays.asList(new OpcaoProduto[]{
+            OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+            OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+            OpcaoProduto.MERCADOLOGICO,
+            OpcaoProduto.MERCADOLOGICO_PRODUTO,
+            OpcaoProduto.PRODUTOS,
+            OpcaoProduto.ATIVO,
+            OpcaoProduto.DESC_COMPLETA,
+            OpcaoProduto.DESC_GONDOLA,
+            OpcaoProduto.DESC_REDUZIDA,
+            OpcaoProduto.DATA_CADASTRO,
+            OpcaoProduto.EAN,
+            OpcaoProduto.EAN_EM_BRANCO,
+            OpcaoProduto.TIPO_EMBALAGEM_EAN,
+            OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.CUSTO,
+            OpcaoProduto.MARGEM,
+            OpcaoProduto.PRECO,
+            OpcaoProduto.ESTOQUE_MAXIMO,
+            OpcaoProduto.ESTOQUE_MINIMO,
+            OpcaoProduto.ESTOQUE,
+            OpcaoProduto.PESAVEL,
+            OpcaoProduto.NCM,
+            OpcaoProduto.CEST,
+            OpcaoProduto.ICMS,
+            OpcaoProduto.PIS_COFINS,
+            OpcaoProduto.NATUREZA_RECEITA,
+            OpcaoProduto.ATACADO,
+            OpcaoProduto.VALIDADE
+        }));
+    }
+
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
                     + "f.Fil_CodEmp,\n"
@@ -64,7 +100,8 @@ public class HerculesIntCashDAO extends InterfaceDAO {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
                     + "g.Grp_CodGrp, g.Grp_DesGrp,\n"
-                    + "sg.Sgp_CodSub, sg.Sgp_DesSub\n"
+                    + "coalesce(sg.Sgp_CodSub, 1) as Sgp_CodSub,\n"
+                    + "sg.Sgp_DesSub\n"
                     + "from dbo.IntGrp g\n"
                     + "left join dbo.IntSgp sg on sg.Sgp_CodGrp = g.Grp_CodGrp\n"
                     + "order by g.Grp_CodGrp, sg.Sgp_CodSub"
@@ -76,7 +113,14 @@ public class HerculesIntCashDAO extends InterfaceDAO {
                     imp.setMerc1ID(rst.getString("Grp_CodGrp"));
                     imp.setMerc1Descricao(rst.getString("Grp_DesGrp"));
                     imp.setMerc2ID(rst.getString("Sgp_CodSub"));
-                    imp.setMerc2Descricao(rst.getString("Sgp_DesSub"));
+
+                    if ((rst.getString("Sgp_DesSub") != null)
+                            && (!rst.getString("Sgp_DesSub").trim().isEmpty())) {
+                        imp.setMerc2Descricao(rst.getString("Sgp_DesSub"));
+                    } else {
+                        imp.setMerc2Descricao(rst.getString("Grp_DesGrp"));
+                    }
+
                     imp.setMerc3ID("1");
                     imp.setMerc3Descricao(imp.getMerc2Descricao());
                     result.add(imp);
@@ -100,17 +144,28 @@ public class HerculesIntCashDAO extends InterfaceDAO {
                     + "p.Prd_CodUnd as unidade,\n"
                     + "p.Prd_PesLiq as pesoliquido,\n"
                     + "p.Prd_PesBru as pesobruto,\n"
-                    + "p.Prd_SitPrd as sitiacaocadastro,\n"
+                    + "p.Prd_SitPrd as situacaocadastro,\n"
                     + "p.Prd_DatAtu as datacadastro,\n"
                     + "p.Prd_PrdNcm as ncm,\n"
                     + "p.Prd_CodCes as cest,\n"
+                    + "trib.Afs_SitPis as pis,\n"
+                    + "trib.Afs_SitCof as cofins,\n"
+                    + "trib.Afs_NatPis as naturezareceita,\n"
+                    + "trib.Afs_SitTri as cstIcms,\n"
+                    + "trib.Afs_AlqIcm as aliqIcms,\n"
+                    + "trib.Afs_FatRed as reduIcms,\n"
                     + "p.Prd_CodGrp as merc1,\n"
                     + "p.Prd_CodSub as merc2,\n"
                     + "pr.Pvp_PreVen as precovenda\n"
                     + "from dbo.IntPrd p\n"
                     + "left join dbo.IntPvp pr on pr.Pvp_CodPrd = p.Prd_CodPrd\n"
                     + "	and p.Prd_CodEmp = '" + getLojaOrigem() + "'"
-                    + "	and pr.Pvp_CodEmp = '" + getLojaOrigem() + "'"
+                    + "	and pr.Pvp_CodEmp = '" + getLojaOrigem() + "'\n"
+                    + "left join dbo.IntAfs trib on trib.Afs_PrdNcm = p.Prd_PrdNcm \n"
+                    + "and trib.Afs_CodTcl = 1\n"
+                    + "and trib.Afs_CodTme in ('PDV')\n"
+                    + "and trib.Afs_CodCfo = 5102 \n"
+                    + "and trib.Afs_CodEmp = '" + getLojaOrigem() + "'"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -119,6 +174,7 @@ public class HerculesIntCashDAO extends InterfaceDAO {
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("barras"));
                     imp.seteBalanca("B".equals(rst.getString("balanca")));
+                    imp.setTipoEmbalagem(rst.getString("unidade").trim());
                     imp.setDescricaoCompleta(rst.getString("descricao"));
                     imp.setDescricaoReduzida(imp.getDescricaoCompleta());
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -127,11 +183,17 @@ public class HerculesIntCashDAO extends InterfaceDAO {
                     imp.setSituacaoCadastro("A".equals(rst.getString("situacaocadastro")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
-                    imp.setCodMercadologico2(rst.getString("merc2"));
+                    imp.setCodMercadologico2(String.valueOf(rst.getInt("merc2")));
                     imp.setCodMercadologico3("1");
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
+                    imp.setPiscofinsCstDebito(rst.getString("pis"));
+                    imp.setPiscofinsCstCredito(rst.getString("cofins"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
+                    imp.setIcmsCst(rst.getInt("cstIcms"));
+                    imp.setIcmsAliq(rst.getDouble("aliqIcms"));
+                    imp.setIcmsReducao(rst.getDouble("reduIcms"));
                     result.add(imp);
                 }
             }
@@ -163,6 +225,29 @@ public class HerculesIntCashDAO extends InterfaceDAO {
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("idproduto"));
                         imp.setEstoque(rst.getDouble("estoque"));
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+        if (opt == OpcaoProduto.CUSTO) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "cus.Fpr_CodPrd, \n"
+                        + "cus.Fpr_UltCus\n"
+                        + "from IntFpr cus \n"
+                        + "where cus.Fpr_UltEnt in (select MAX(Fpr_UltEnt) from IntFpr where Fpr_CodPrd = cus.Fpr_CodPrd)\n"
+                        + "and cus.Fpr_CodEmp = '" + getLojaOrigem() + "'"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("Fpr_CodPrd"));
+                        imp.setCustoComImposto(rst.getDouble("Fpr_UltCus"));
+                        imp.setCustoSemImposto(imp.getCustoComImposto());
                         result.add(imp);
                     }
                 }
@@ -278,7 +363,7 @@ public class HerculesIntCashDAO extends InterfaceDAO {
                     imp.setIdProduto(rst.getString("idproduto"));
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
-                    imp.setDataAlteracao(rst.getDate("datalteracao"));
+                    imp.setDataAlteracao(rst.getDate("dataalteracao"));
                     imp.setCustoTabela(rst.getDouble("custotabela"));
                     result.add(imp);
                 }
@@ -294,7 +379,7 @@ public class HerculesIntCashDAO extends InterfaceDAO {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "     c.Cli_CicCli as id,\n"
+                    + "     c.Cli_CodCli as id,\n"
                     + "     c.Cli_CicCli as cnpj,\n"
                     + "     c.Cli_NomCli as razao,\n"
                     + "     c.Cli_NomFan as fantasia,\n"
@@ -318,8 +403,9 @@ public class HerculesIntCashDAO extends InterfaceDAO {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rst.getString("id"));
-                    imp.setRazao(rst.getString("cnpj"));
+                    imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj(rst.getString("cnpj"));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
                     imp.setCep(rst.getString("cep"));
@@ -334,6 +420,8 @@ public class HerculesIntCashDAO extends InterfaceDAO {
                     imp.setFax(rst.getString("fax"));
                     imp.setCelular(rst.getString("celular"));
                     imp.setEmail(rst.getString("email") != null ? rst.getString("email").toLowerCase() : "");
+                    imp.setPermiteCheque(true);
+                    imp.setPermiteCreditoRotativo(true);
                     result.add(imp);
                 }
             }
