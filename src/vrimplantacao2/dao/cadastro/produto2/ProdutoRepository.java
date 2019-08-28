@@ -49,6 +49,7 @@ public class ProdutoRepository {
 
     private boolean naoTransformarEANemUN = false;
     private boolean usarConversaoDeAliquotaSimples = true;
+    private boolean importarMenoresQue7Digitos = false;
     public boolean importarSomenteLoja = false;
     
     private Map<String, Entry<String, Integer>> divisoes;
@@ -76,6 +77,7 @@ public class ProdutoRepository {
 
     public void salvar(List<ProdutoIMP> produtos) throws Exception {
         usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
+        importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);        
         
         LOG.finest("Abrindo a transação");
         provider.begin();        
@@ -240,6 +242,7 @@ public class ProdutoRepository {
     public void atualizar(List<ProdutoIMP> produtos, OpcaoProduto... opcoes) throws Exception {
         usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
         importarSomenteLoja = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_INDIVIDUAL_LOJA);
+        importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         
         
         LOG.finer("Entrando no método atualizar; produtos(" + produtos.size() + ") opcoes(" + opcoes.length + ")");
@@ -421,6 +424,7 @@ public class ProdutoRepository {
      */
     public void unificar(List<ProdutoIMP> produtos) throws Exception {
         usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
+        importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         
         provider.begin();
         try {
@@ -567,6 +571,7 @@ public class ProdutoRepository {
      */
     public void unificar2(List<ProdutoIMP> produtos) throws Exception {
         usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
+        importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         
         provider.begin();
         try {
@@ -1533,7 +1538,8 @@ public class ProdutoRepository {
                 to.ean = -2;
             }
         } else {
-            if (to.ean <= 999999) {
+            //Se a ordem for para manter os somente os EANs válidos
+            if (!importarMenoresQue7Digitos && to.ean <= 999999) {
                 to.ean = -2;
             }
         }
