@@ -22,6 +22,7 @@ public class OryonDAO extends InterfaceDAO {
 }
 
 /*
+--- Script de Produto
 select
   p.codigo as id,
   p.codigo as codigobarras,
@@ -74,7 +75,7 @@ order by
 */
 
 /*
--- Scrip de Mercadologico
+-- Script de Mercadologico
 select 
    codigo as merc1,
    grupo as descmerc1,
@@ -89,7 +90,7 @@ order by
 */
 
 /*
--- Scrip Produto Fornecedor
+-- Script Produto Fornecedor
 select
   codpro as idproduto,
   codfor as idfornecedor,
@@ -116,7 +117,7 @@ order by
 */
 
 /*
--- Scrip de Cliente
+-- Script de Cliente
 select 
    codigo as id,
    nome as razao,
@@ -152,7 +153,7 @@ order by
 */
 
 /*
--- Scrip de Fornecedor
+-- Script de Fornecedor
 select 
    codigo as id,
    nome as razao,
@@ -181,7 +182,7 @@ order by
 */
 
 /*
--- Scrip Rotativo
+-- Script Rotativo
 select
    codigo_fluxo as id,
    duplicata,
@@ -203,7 +204,7 @@ order by
 */
 
 /*
--- Scrip Conta Pagar
+-- Script Conta Pagar
 select
    codigo_fluxo as id,
    duplicata,
@@ -225,7 +226,7 @@ order by
 */
 
 /*
--- Scrip Venda
+-- Script Venda
 select
     n.link as id,
     n.dia as data,
@@ -250,7 +251,7 @@ order by
 */
 
 /*
--- Scrip Venda Item
+-- Script Venda Item
 select 
    vi.link as cod_venda,
    vi.dia as data,
