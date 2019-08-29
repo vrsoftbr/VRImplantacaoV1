@@ -35,12 +35,8 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="conexao" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
-                      <Component id="txtDescAdic" min="-2" pref="84" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="cmbLojaOrigem" max="32767" attributes="0"/>
                   </Group>
                   <Component id="pnlLoja" alignment="0" max="32767" attributes="0"/>
@@ -59,11 +55,9 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="vRLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="cmbLojaOrigem" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtDescAdic" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="vRLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabOperacoes" pref="340" max="32767" attributes="0"/>
+              <Component id="tabOperacoes" pref="344" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pnlLoja" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -76,16 +70,6 @@
       <Properties>
         <Property name="sistema" type="java.lang.String" value="JM2Online"/>
       </Properties>
-    </Component>
-    <Component class="vrframework.bean.label.VRLabel" name="vRLabel2">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Desc. Adicional"/>
-      </Properties>
-    </Component>
-    <Component class="vrframework.bean.textField.VRTextField" name="txtDescAdic">
-      <Events>
-        <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txtDescAdicKeyReleased"/>
-      </Events>
     </Component>
     <Component class="vrframework.bean.label.VRLabel" name="vRLabel1">
       <Properties>

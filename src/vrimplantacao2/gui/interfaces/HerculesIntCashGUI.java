@@ -1,9 +1,5 @@
 package vrimplantacao2.gui.interfaces;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import org.openide.util.Exceptions;
 import vrframework.bean.internalFrame.VRInternalFrame;
@@ -16,12 +12,9 @@ import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
-import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.interfaces.AcomDAO;
 import vrimplantacao2.dao.interfaces.HerculesIntCashDAO;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.conexao.ConexaoEvent;
-import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoView;
 import vrimplantacao2.parametro.Parametros;
 
 public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent {
@@ -42,13 +35,11 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
         conexao.carregarParametros();
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
-        txtDescAdic.setText(params.get(SISTEMA, "DESC_ADIC"));
     }
 
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.gravarParametros(params, SISTEMA);
-        params.put(txtDescAdic.getText(), SISTEMA, "DESC_ADIC");
         conexao.atualizarParametros();
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
@@ -219,8 +210,6 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
 
         jXDatePicker1 = new org.jdesktop.swingx.JXDatePicker();
         conexao = new vrimplantacao2.gui.component.conexao.sqlserver.ConexaoSqlServerPanel();
-        vRLabel2 = new vrframework.bean.label.VRLabel();
-        txtDescAdic = new vrframework.bean.textField.VRTextField();
         vRLabel1 = new vrframework.bean.label.VRLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
         tabOperacoes = new javax.swing.JTabbedPane();
@@ -249,14 +238,6 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
         setToolTipText("");
 
         conexao.setSistema("JM2Online");
-
-        vRLabel2.setText("Desc. Adicional");
-
-        txtDescAdic.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                txtDescAdicKeyReleased(evt);
-            }
-        });
 
         vRLabel1.setText("Loja (Cliente):");
 
@@ -397,10 +378,6 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(conexao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtDescAdic, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cmbLojaOrigem, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -416,11 +393,9 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtDescAdic, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(vRLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cmbLojaOrigem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabOperacoes, javax.swing.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
+                .addComponent(tabOperacoes, javax.swing.GroupLayout.DEFAULT_SIZE, 344, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlLoja, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -443,10 +418,6 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
             this.setDefaultCursor();
         }
     }//GEN-LAST:event_btnMigrarActionPerformed
-
-    private void txtDescAdicKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDescAdicKeyReleased
-//        dao.setComplemento(txtDescAdic.getText());
-    }//GEN-LAST:event_txtDescAdicKeyReleased
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
@@ -471,10 +442,8 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
     private javax.swing.JTabbedPane tabImportacao;
     private javax.swing.JTabbedPane tabOperacoes;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
-    private vrframework.bean.textField.VRTextField txtDescAdic;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel1;
-    private vrframework.bean.label.VRLabel vRLabel2;
     private vrframework.bean.panel.VRPanel vRPanel2;
     // End of variables declaration//GEN-END:variables
 

@@ -18,6 +18,7 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -422,6 +423,40 @@ public class HerculesIntCashDAO extends InterfaceDAO {
                     imp.setEmail(rst.getString("email") != null ? rst.getString("email").toLowerCase() : "");
                     imp.setPermiteCheque(true);
                     imp.setPermiteCreditoRotativo(true);
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select  \n"
+                    + "(rec.Cat_CodEmp + '-' + rec.Cat_CicCli + '-' + rec.Cat_NumTit) as id,\n"
+                    + "cli.Cli_CodCli as id_cliente,\n"
+                    + "rec.Cat_CicCli as cnpj_cliente,\n"
+                    + "rec.Cat_NumTit as numero_cupom,\n"
+                    + "rec.Cat_DatEmi as data_emissao,\n"
+                    + "rec.Cat_DatVen as data_vencimento,\n"
+                    + "rec.Cat_SldTit as valor\n"
+                    + "from dbo.IntCat rec \n"
+                    + "inner join dbo.IntCli cli on cli.Cli_CicCli = rec.Cat_CicCli\n"
+                    + "where rec.Cat_SldTit > 0\n"
+                    + "and rec.Cat_CodEmp = '" + getLojaOrigem() + "'"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdCliente(rst.getString("id_cliente"));
+                    imp.setDataEmissao(rst.getDate("data_emissao"));
+                    imp.setDataVencimento(rst.getDate("data_vencimento"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setNumeroCupom(rst.getString("numero_cupom"));
                     result.add(imp);
                 }
             }
