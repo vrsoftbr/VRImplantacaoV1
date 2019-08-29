@@ -2,9 +2,13 @@ package vrimplantacao2.dao.cadastro.notafiscal;
 
 import java.util.Map;
 import vrframework.classe.ProgressBar;
+import vrimplantacao.dao.cadastro.AliquotaDAO;
 import vrimplantacao2.dao.cadastro.cliente.ClienteEventualAnteriorDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
+import vrimplantacao2.dao.cadastro.produto.PisCofinsDAO;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
+import vrimplantacao2.dao.cadastro.produto.ProdutoComplementoDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoDAO;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaEntrada;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaEntradaItem;
@@ -28,8 +32,13 @@ public class NotaFiscalRepositoryProvider {
     private ClienteEventualAnteriorDAO clienteEventualAnteriorDAO;
     private NotaFiscalAnteriorDAO notaFiscalAnteriorDAO;
     private ProdutoAnteriorDAO produtoAnteriorDAO;
+    private AliquotaDAO aliquotaDAO;
+    private ProdutoComplementoDAO produtoComplementoDAO;
+    private PisCofinsDAO pisCofinsDAO;
+    private MapaTributacaoDAO mapaTributacaoDAO;
 
     public NotaFiscalRepositoryProvider(String sistema, String lojaOrigem, int lojaVR) throws Exception {
+        
         this.sistema = sistema;
         this.lojaOrigem = lojaOrigem;
         this.lojaVR = lojaVR;
@@ -40,6 +49,11 @@ public class NotaFiscalRepositoryProvider {
         this.clienteEventualAnteriorDAO = new ClienteEventualAnteriorDAO();
         this.notaFiscalAnteriorDAO = new NotaFiscalAnteriorDAO();
         this.produtoAnteriorDAO = new ProdutoAnteriorDAO();
+        this.produtoComplementoDAO = new ProdutoComplementoDAO();
+        this.pisCofinsDAO = new PisCofinsDAO();
+        this.mapaTributacaoDAO = new MapaTributacaoDAO();
+        this.mapaTributacaoDAO.createTable();
+        
     }
 
     public String getSistema() {
@@ -131,6 +145,22 @@ public class NotaFiscalRepositoryProvider {
 
     public Map<String, Integer> getProdutosAnteriores() throws Exception {
         return produtoAnteriorDAO.getAnteriores(sistema, lojaOrigem);
+    }
+
+    public Map<String, Integer> getAliquotaPorId() throws Exception {
+        return mapaTributacaoDAO.getAliquotaPorId(sistema, lojaOrigem);
+    }
+
+    public Map<String, Integer> getAliquotaPorValor() throws Exception {
+        return aliquotaDAO.getAliquotaPorValor();
+    }
+
+    public Map<Integer, Double> getCustoProduto() throws Exception {
+        return produtoComplementoDAO.getCustoProduto(lojaVR);
+    }
+
+    public Map<Integer, Integer> getPisCofins() throws Exception {
+        return pisCofinsDAO.getPisCofinsByCst();
     }
     
 }

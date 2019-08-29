@@ -18,7 +18,6 @@ import vrimplantacao2.vo.cadastro.notafiscal.NotaSaida;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaSaidaItem;
 import vrimplantacao2.vo.cadastro.notafiscal.SituacaoNfe;
 import vrimplantacao2.vo.cadastro.notafiscal.SituacaoNotaEntrada;
-import vrimplantacao2.vo.enums.PisCofinsVO;
 import vrimplantacao2.vo.importacao.NotaFiscalIMP;
 import vrimplantacao2.vo.importacao.NotaFiscalItemIMP;
 import vrimplantacao2.vo.importacao.NotaOperacao;
@@ -37,6 +36,10 @@ public class NotaFiscalRepository {
     private final int tipoNotaSaida;
     private MultiMap<String, NotaFiscalAnteriorVO> anteriores;
     private Map<String, Integer> produtosAnteiores;
+    private Map<String, Integer> aliquotasPorId;
+    private Map<String, Integer> aliquotasPorValor;
+    private Map<Integer, Double> custoProduto;
+    private Map<Integer, Integer> pisCofins;
 
     public NotaFiscalRepository(NotaFiscalRepositoryProvider provider) throws Exception {
         this.provider = provider;
@@ -51,6 +54,10 @@ public class NotaFiscalRepository {
             this.provider.notificar("Notas Fiscais...Carregando anteriores...");
             this.anteriores = provider.getAnteriores();
             this.produtosAnteiores = provider.getProdutosAnteriores();
+            this.aliquotasPorId = provider.getAliquotaPorId();
+            this.aliquotasPorValor = provider.getAliquotaPorValor();
+            this.custoProduto = provider.getCustoProduto();
+            this.pisCofins = provider.getPisCofins();
             this.provider.notificar("Notas Fiscais...Gravando notas fiscais...", notas.size());
 
             boolean apagarNotasExistentes = opt.contains(OpcaoNotaFiscal.IMP_EXCLUIR_NOTAS_EXISTENTES);
@@ -571,17 +578,17 @@ public class NotaFiscalRepository {
         
         return result;
     }
-
+    
     private int obterAliquotaICMS(NotaFiscalItemIMP imp) {
         
         if (imp.getIdIcms() != null) {
-            Integer id = aliquotasPorId(imp.getIdIcms());
+            Integer id = aliquotasPorId.get(imp.getIdIcms());
             if (id != null) {
                 return id;
             }
         }
         
-        Integer id = aliquotasPorValor(imp.getIcmsCst(), imp.getIcmsAliquota(), imp.getIcmsReduzido());
+        Integer id = aliquotasPorValor.get(String.format("%d-%02f-%02f", imp.getIcmsCst(), imp.getIcmsAliquota(), imp.getIcmsReduzido()));
         if (id != null) {
             return id;
         }            
@@ -594,7 +601,7 @@ public class NotaFiscalRepository {
     }
 
     private Integer obterTipoPisCofins(NotaFiscalItemIMP imp) {
-        Integer idPisCofins = pisCofins(imp.getPisCofinsCst());
+        Integer idPisCofins = pisCofins.get(imp.getPisCofinsCst());
         if (idPisCofins != null) {
             return idPisCofins;
         }
