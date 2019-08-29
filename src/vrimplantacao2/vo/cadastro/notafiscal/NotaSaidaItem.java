@@ -15,8 +15,7 @@ public class NotaSaidaItem {
     private int idProduto;//id_produto;// integer NOT NULL,
     private double quantidade = 0;// numeric(12,3) NOT NULL,
     private int qtdEmbalagem = 1;// integer NOT NULL,
-    private double valor = 0;// numeric(13,4) NOT NULL,
-    //private double valorTotal = 0;// numeric(11,2) NOT NULL,
+    private double valorTotal = 0;// numeric(11,2) NOT NULL,
     private double valorIpi = 0;// numeric(13,4) NOT NULL,
     private int idAliquota;//id_aliquota;// integer NOT NULL,
     private double valorBaseCalculo = 0;// numeric(11,2) NOT NULL,
@@ -95,15 +94,15 @@ public class NotaSaidaItem {
     }
 
     public double getValor() {
-        return valor;
-    }
-
-    public void setValor(double valor) {
-        this.valor = MathUtils.round(valor, 4, 99999999.99D);
+        return MathUtils.round(getValorTotal() / getQuantidade(), 4);
     }
 
     public double getValorTotal() {
-        return MathUtils.round((this.quantidade * this.qtdEmbalagem) * this.valor, 2, 99999999.99D);
+        return valorTotal;
+    }
+
+    public void setValorTotal(double valorTotal) {
+        this.valorTotal = MathUtils.round(valorTotal, 4, 99999999.99D);
     }
 
     public double getValorIpi() {

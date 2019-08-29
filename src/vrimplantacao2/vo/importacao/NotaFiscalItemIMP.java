@@ -19,7 +19,7 @@ public class NotaFiscalItemIMP {
     private String unidade;
     private String ean;
 
-    private double quantidadeEmbalagem = 1;
+    private int quantidadeEmbalagem = 1;
     private double quantidade = 0;
     private double valorTotalProduto = 0;
     private double valorDesconto = 0;
@@ -64,7 +64,7 @@ public class NotaFiscalItemIMP {
     }
     
     public double getValorUnidade() {
-        return MathUtils.round(this.valorTotalProduto / (this.quantidade * this.quantidadeEmbalagem), 2);
+        return MathUtils.round(this.valorTotalProduto / this.quantidade, 4);
     }
     
     public double getValorTotal() {
@@ -143,11 +143,11 @@ public class NotaFiscalItemIMP {
         this.ean = ean;
     }
 
-    public double getQuantidadeEmbalagem() {
+    public int getQuantidadeEmbalagem() {
         return quantidadeEmbalagem;
     }
 
-    public void setQuantidadeEmbalagem(double quantidadeEmbalagem) {
+    public void setQuantidadeEmbalagem(int quantidadeEmbalagem) {
         this.quantidadeEmbalagem = quantidadeEmbalagem;
     }
 

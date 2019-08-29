@@ -1704,7 +1704,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     item.setCfop(rst.getString("cfop"));
                     item.setDescricao(rst.getString("descricao"));
                     item.setUnidade(rst.getString("unidade"));
-                    item.setQuantidadeEmbalagem(rst.getDouble("qtdembalagem"));
+                    item.setQuantidadeEmbalagem(rst.getInt("qtdembalagem"));
                     item.setQuantidade(rst.getDouble("quantidade"));
                     item.setValorTotalProduto(rst.getDouble("valor"));
                     item.setValorDesconto(rst.getDouble("valor_desconto"));

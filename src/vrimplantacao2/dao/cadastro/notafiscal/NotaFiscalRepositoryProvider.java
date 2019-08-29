@@ -116,12 +116,12 @@ public class NotaFiscalRepositoryProvider {
         notaFiscalAnteriorDAO.atualizar(anterior);
     }
 
-    public void eliminarNotaEntrada(int id) throws Exception {
-        notaEntradaDAO.eliminarNota(id);
+    public void eliminarNotaEntrada(int codigoAtual) throws Exception {
+        notaEntradaDAO.eliminarNota(codigoAtual);
     }
 
-    public void eliminarNotaSaida(int id) throws Exception {
-        notaSaidaDAO.eliminarNota(id);
+    public void eliminarNotaSaida(int codigoAtual) throws Exception {
+        notaSaidaDAO.eliminarNota(codigoAtual);
     }
 
     public Integer getIdNotaEntrada(NotaFiscalIMP imp) throws Exception {
