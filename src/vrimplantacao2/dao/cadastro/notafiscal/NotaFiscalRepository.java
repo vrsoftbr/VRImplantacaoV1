@@ -251,7 +251,7 @@ public class NotaFiscalRepository {
         n.setIdTipoEntrada(this.tipoNotaEntrada);
         n.setDataEmissao(imp.getDataEmissao());
         n.setDataHoraLancamento(getTimestamp(imp.getDataHoraAlteracao()));
-        /*
+        
         n.setValorIpi(imp.getValorIpi());
         n.setValorFrete(imp.getValorFrete());
         n.setValorDesconto(imp.getValorDesconto());
@@ -259,7 +259,7 @@ public class NotaFiscalRepository {
         n.setValorDespesaAdicional(0);
         n.setValorIcms(imp.getValorIcms());
         n.setValorIcmsSubstituicao(imp.getValorIcmsSubstituicao());
-        */
+        
         n.setValorMercadoria(imp.getValorProduto());
         n.setValorTotal(imp.getValorTotal());
         n.setIdUsuario(0);
@@ -333,7 +333,7 @@ public class NotaFiscalRepository {
         n.setIdTipoSaida(this.tipoNotaSaida);
         n.setDataHoraEmissao(getTimestamp(imp.getDataEmissao()));
         n.setDataSaida(imp.getDataEntradaSaida());
-        /*
+        
         n.setValorIpi(imp.getValorIpi());
         n.setValorFrete(imp.getValorFrete());
         n.setValorOutrasDespesas(imp.getValorOutrasDespesas());
@@ -341,11 +341,11 @@ public class NotaFiscalRepository {
         n.setValorIcms(imp.getValorIcms());
         n.setValorSeguro(imp.getValorSeguro());
         n.setValorDesconto(imp.getValorDesconto());
-        */
+        
         n.setValorTotal(imp.getValorTotal());
         //private double valorBaseCalculo = 0;// numeric(11,2) NOT NULL,
         //private double valorBaseSubstituicao = 0;// numeric(11,2) NOT NULL,
-        n.setValorIcmsSubstituicao(imp.getValorIcmsSubstituicao());
+        //n.setValorIcmsSubstituicao(imp.getValorIcmsSubstituicao());
         //private boolean impressao = true;//boolean NOT NULL,
         //private SituacaoNotaSaida situacaoNotaSaida = SituacaoNotaSaida.FINALIZADO;// id_situacaonotasaida integer NOT NULL,
         
@@ -466,18 +466,18 @@ public class NotaFiscalRepository {
             }
             ni.setCfopNota(ni.getCfop());
             ni.setValorIpi(ni.getValorIpi() + imp.getIpiValor());
-            /*
+            
             ni.setValorIsento(ni.getValorIsento() + imp.getValorIsento());
             ni.setValorOutras(ni.getValorOutras() + imp.getValorOutras());
             ni.setSituacaoTributaria(imp.getIcmsCst()); 
             ni.setValorFrete(ni.getValorFrete() + imp.getValorFrete());
             //private double valorOutrasDespesas = 0;// numeric(11,2) NOT NULL DEFAULT 0,
             ni.setValorDesconto(ni.getValorDesconto() + imp.getValorDesconto());
-            */
+            
             ni.setIdAliquotaCreditoForaEstado(idAliquota);            
             ni.setIdTipoEntrada(210);//TODO: Incluir um campo para especificar o ID VR.
             
-/*
+
             ni.setValorBaseCalculo(ni.getValorBaseCalculo() + imp.getIcmsBaseCalculo());
             ni.setValorIcms(ni.getValorIcms() + imp.getIcmsValor());
             ni.setValorIcmsSubstituicao(ni.getValorIcmsSubstituicao() + imp.getIcmsValorST());
@@ -488,7 +488,7 @@ public class NotaFiscalRepository {
             ni.setValorPisCofins(ni.getValorPisCofins() + imp.getPisCofinsValor());//private double valorPisCofins = 0;// numeric(11,2) NOT NULL,
             //private boolean contabilizaValor = true;// boolean NOT NULL,
             ni.setValorBaseSubstituicao(ni.getValorBaseSubstituicao() + imp.getIcmsBaseCalculoST());
-            ni.setValorEmbalagem(ni.getValorEmbalagem() + imp.getValorUnidade());
+            ni.setValorEmbalagem(ni.getValorEmbalagem() + (imp.getValorUnidade() * imp.getQuantidadeEmbalagem()));
             //private double valorIcmsSubstituicaoXml = 0;// numeric(11,2) NOT NULL,
             //private int idAliquotaPautaFiscal = -1;//id_aliquotapautafiscal = -1;// integer,
             
@@ -505,7 +505,7 @@ public class NotaFiscalRepository {
             //private int idMotivoDesoneracao = -1;// integer,
             //private double valorBaseCalculoIcmsDesonerado = 0;// numeric(11,2),
             //private double valorIcmsDiferido = 0;// numeric(11,2)
-*/
+
             result.put(String.format("%d-%d-%s", idNotaEntrada, idProduto, cfop),ni);
         }
         
@@ -549,18 +549,18 @@ public class NotaFiscalRepository {
             ni.setSituacaoTributaria(imp.getIcmsCst()); //private int situacaoTributaria = 0;// integer NOT NULL DEFAULT 0,
             ni.setNumeroAdicao(imp.getNumeroItem());//private int numeroAdicao = 0;// integer NOT NULL DEFAULT 0,
             ni.setValorIpi(ni.getValorIpi() + imp.getIpiValor());
-            
-/*          
+                      
             ni.setValorDesconto(ni.getValorDesconto() + imp.getValorDesconto());//private double valorDesconto = 0;// numeric(11,2) NOT NULL DEFAULT 0,
             ni.setValorIsento(ni.getValorIsento() + imp.getValorIsento());//private double valorIsento = 0;// numeric(11,2) NOT NULL DEFAULT 0,
             ni.setValorOutras(ni.getValorOutras() + imp.getValorOutras());//private double valorOutras = 0;// numeric(11,2) NOT NULL DEFAULT 0,              
+
             ni.setValorBaseCalculo(ni.getValorBaseCalculo() + imp.getIcmsBaseCalculo());
             ni.setValorIcms(ni.getValorIcms() + imp.getIcmsValor());
             ni.setValorBaseSubstituicao(ni.getValorBaseSubstituicao() + imp.getIcmsBaseCalculoST());
             ni.setValorIcmsSubstituicao(ni.getValorIcmsSubstituicao() + imp.getIcmsValorST());
             ni.setValorPisCofins(ni.getValorPisCofins() + imp.getPisCofinsValor());
             
-            
+/*            
             //TODO: Incluir a vinculação da pauta fiscal //private int tipoIva = 0;// integer NOT NULL DEFAULT 0,
             
             //TODO: Incluir a vinculação da pauta fiscal //private int idAliquotaPautaFiscal = -1;//id_aliquotapautafiscal;// integer,
@@ -603,7 +603,22 @@ public class NotaFiscalRepository {
             }
         }
         
-        Integer id = aliquotasPorValor.get(String.format("%d-%02f-%02f", imp.getIcmsCst(), imp.getIcmsAliquota(), imp.getIcmsReduzido()));
+        int cst = imp.getIcmsCst();
+        double aliq = imp.getIcmsAliquota();
+        double red = imp.getIcmsReduzido();
+        
+        if (
+                cst == 40 || 
+                cst == 41 ||
+                cst == 50 ||
+                cst == 51 ||
+                cst == 60
+        ) {
+            aliq = 0;
+            red = 0;
+        }
+        
+        Integer id = aliquotasPorValor.get(String.format("%d-%.2f-%.2f", cst, aliq, red));
         if (id != null) {
             return id;
         }            

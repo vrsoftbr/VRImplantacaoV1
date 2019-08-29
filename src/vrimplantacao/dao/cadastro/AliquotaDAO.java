@@ -277,7 +277,7 @@ public class AliquotaDAO {
             )) {
                 while (rst.next()) {
                     result.put(
-                            String.format("%d-%02f-%02f", rst.getInt("cst"), rst.getDouble("aliquota"), rst.getDouble("reduzido")),
+                            String.format("%d-%.2f-%.2f", rst.getInt("cst"), rst.getDouble("aliquota"), rst.getDouble("reduzido")),
                             rst.getInt("id")
                     );
                 }
