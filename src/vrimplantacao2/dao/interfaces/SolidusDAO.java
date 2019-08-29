@@ -1719,7 +1719,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     item.setIcmsValorST(rst.getDouble("icms_st"));
                     item.setIpiValorBase(rst.getDouble("ipi_base"));
                     item.setIpiValor(rst.getDouble("ipi_valor"));
-                    item.setPisCofinsCst(rst.getInt("pis_cst"));
+                    item.setPisCofinsCst(Utils.stringToInt(rst.getString("pis_cst")));
                     item.setIvaPorcentagem(rst.getDouble("iva_porcentagem"));
                     item.setIvaPauta(rst.getDouble("iva_pauta"));
                     
