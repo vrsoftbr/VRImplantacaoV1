@@ -3,14 +3,11 @@ package vrimplantacao2.dao.cadastro.notafiscal;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.LinkedHashMap;
-import java.util.List;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaEntrada;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaEntradaItem;
 import vrimplantacao2.vo.importacao.NotaFiscalIMP;
-import vrimplantacao2.vo.importacao.NotaFiscalItemIMP;
 
 /**
  * Classe responsável por gerenciar a manipulação dos dados das notas de entradas.
@@ -180,6 +177,74 @@ public class NotaEntradaDAO {
                     ne.setId(rst.getInt("id"));
                 }
             }
+        }
+    }
+
+    public void salvarItem(NotaEntradaItem item) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            
+            SQLBuilder sql = new SQLBuilder();  
+            
+            sql.setSchema("public");
+            sql.setTableName("notaentradaitem");
+            sql.put("id_notaentrada", item.getIdNotaEntrada());
+            sql.put("id_produto", item.getIdProduto());
+            sql.put("quantidade", item.getQuantidade());
+            sql.put("qtdembalagem", item.getQtdEmbalagem());
+            sql.put("valor", item.getValor());
+            sql.put("valortotal", item.getValorTotal());
+            sql.put("valoripi", item.getValorIpi());
+            sql.put("id_aliquota", item.getIdAliquota());
+            sql.put("custocomimposto", item.getCustoComImposto());
+            sql.put("valortotalfinal", item.getValorTotalFinal());
+            sql.put("valorbasecalculo", item.getValorBaseCalculo());
+            sql.put("valoricms", item.getValorIcms());
+            sql.put("valoricmssubstituicao", item.getValorIcmsSubstituicao());
+            sql.put("custocomimpostoanterior", item.getCustoComImpostoAnterior());
+            sql.put("valorbonificacao", item.getValorBonificacao());
+            sql.put("valorverba", item.getValorVerba());
+            sql.put("quantidadedevolvida", item.getQuantidadeDevolvida());
+            sql.put("valorpiscofins", item.getValorPisCofins());
+            sql.put("contabilizavalor", item.isContabilizaValor());
+            sql.put("valorbasesubstituicao", item.getValorBaseSubstituicao());
+            sql.put("valorembalagem", item.getValorEmbalagem());
+            sql.put("cfop", item.getCfop());
+            sql.put("valoricmssubstituicaoxml", item.getValorIcmsSubstituicaoXml());
+            sql.put("valorisento", item.getValorIsento());
+            sql.put("valoroutras", item.getValorOutras());
+            sql.put("situacaotributaria", item.getSituacaoTributaria());
+            sql.put("valorfrete", item.getValorFrete());
+            sql.put("valoroutrasdespesas", item.getValorOutrasDespesas());
+            sql.put("valordesconto", item.getValorDesconto());
+            sql.put("id_tipopiscofins", item.getIdTipoPisCofins());
+            sql.put("id_aliquotacreditoforaestado", item.getIdAliquotaCreditoForaEstado());
+            sql.put("id_aliquotapautafiscal", item.getIdAliquotaPautaFiscal(), -1);
+            sql.put("id_tipoentrada", item.getIdTipoEntrada(), -1);
+            sql.put("valoroutrassubstituicao", item.getValorOutras());
+            sql.put("quantidadebonificacao", item.getQuantidadeBonificacao());
+            sql.put("valorsubstituicaoestadual", item.getValorSubstituicaoEstadual());
+            sql.put("descricaoxml", item.getDescricaoXml());
+            sql.put("valordespesafrete", item.getValorDespesaFrete());
+            sql.put("cfopnota", item.getCfopNota());
+            sql.put("valorbasefcp", item.getValorBaseFcp());
+            sql.put("valorfcp", item.getValorFcp());
+            sql.put("valorbasefcpst", item.getValorBaseFcpSt());
+            sql.put("valorfcpst", item.getValorFcpSt());
+            sql.put("valoricmsdesonerado", item.getValorIcmsDesonerado());
+            sql.put("idmotivodesoneracao", item.getIdMotivoDesoneracao(), -1);
+            sql.put("valorbasecalculoicmsdesonerado", item.getValorBaseCalculoIcmsDesonerado());
+            sql.put("valoricmsdiferido", item.getValorIcmsDiferido());
+            //sql.put("basecalculoicmsstretido");
+            //sql.put("porcentagemicmsstretido");
+            //sql.put("valoricmsstretido");
+            //sql.put("basecalculofcpstretido");
+            //sql.put("porcentagemfcpstretido");
+            //sql.put("valorfcpstretido");
+            //sql.put("porcentagemfcp");
+            //sql.put("porcentagemfcpst");
+            
+            stm.execute(sql.getInsert());
+            
         }
     }
     

@@ -18,6 +18,7 @@ import vrimplantacao2.vo.cadastro.notafiscal.NotaSaida;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaSaidaItem;
 import vrimplantacao2.vo.cadastro.notafiscal.SituacaoNfe;
 import vrimplantacao2.vo.cadastro.notafiscal.SituacaoNotaEntrada;
+import vrimplantacao2.vo.enums.PisCofinsVO;
 import vrimplantacao2.vo.importacao.NotaFiscalIMP;
 import vrimplantacao2.vo.importacao.NotaFiscalItemIMP;
 import vrimplantacao2.vo.importacao.NotaOperacao;
@@ -438,10 +439,13 @@ public class NotaFiscalRepository {
 
             ni.setValorIpi(imp.getIpiValor());
             
-            //TODO: Incluir função para buscar o tributo do icms private int idAliquota; //id_aliquota;// integer NOT NULL,
+            Integer idAliquota = obterAliquotaICMS(imp);
+            ni.setIdAliquota(idAliquota);
             
-            //TODO: Incluir uma forma de buscar o custo atual do produto e preencher o campo. private double custoComImposto = 0;// numeric(13,4) NOT NULL,
-
+            //ni.setIdAliquotaPautaFiscal(idAliquota);                        
+            
+            ni.setCustoComImposto(obterCustoComImposto(idProduto));            
+            
             ni.setValorBaseCalculo(imp.getIcmsBaseCalculo());
             ni.setValorIcms(imp.getIcmsValor());
             ni.setValorIcmsSubstituicao(imp.getIcmsValorST());
@@ -462,11 +466,15 @@ public class NotaFiscalRepository {
             //private double valorOutrasDespesas = 0;// numeric(11,2) NOT NULL DEFAULT 0,
             ni.setValorDesconto(imp.getValorDesconto());
             
-            //TODO: Incluir rotina de busca de PIS/COFINS //private int idTipoPisCofins = 0;//id_tipopiscofins;// integer NOT NULL DEFAULT 0,
+            Integer pisCofins = obterTipoPisCofins(imp);
+            if (pisCofins != null) {
+                ni.setIdTipoPisCofins(pisCofins);
+            } else {
+                ni.setIdTipoPisCofins(13);//ISENTO
+            }
             
-            //TODO: Incluir rotina para buscar a aliquota fora do estado. //private int idAliquotaCreditoForaEstado = 0;//id_aliquotacreditoforaestado;// integer NOT NULL,
-            
-            //TODO: Incluir rotina para buscar a aliquota da pauta fiscal //private int idAliquotaPautaFiscal = -1;//id_aliquotapautafiscal = -1;// integer,
+            ni.setIdAliquotaCreditoForaEstado(idAliquota);            
+            //private int idAliquotaPautaFiscal = -1;//id_aliquotapautafiscal = -1;// integer,
             
             ni.setIdTipoEntrada(210);//TODO: Incluir um campo para especificar o ID VR.
             //private double valorOutrasSubstituicao = 0;// numeric(11,2) NOT NULL DEFAULT 0,
@@ -516,7 +524,7 @@ public class NotaFiscalRepository {
             ni.setValor(imp.getValorTotal());
             ni.setValorIpi(imp.getIpiValor());
             
-            //TODO: Incluir uma busca//private int idAliquota;//id_aliquota;// integer NOT NULL,  
+            ni.setIdAliquota(obterAliquotaICMS(imp));
             
             ni.setValorBaseCalculo(imp.getIcmsBaseCalculo());
             ni.setValorIcms(imp.getIcmsValor());
@@ -563,5 +571,33 @@ public class NotaFiscalRepository {
         
         return result;
     }
-       
+
+    private int obterAliquotaICMS(NotaFiscalItemIMP imp) {
+        
+        if (imp.getIdIcms() != null) {
+            Integer id = aliquotasPorId(imp.getIdIcms());
+            if (id != null) {
+                return id;
+            }
+        }
+        
+        Integer id = aliquotasPorValor(imp.getIcmsCst(), imp.getIcmsAliquota(), imp.getIcmsReduzido());
+        if (id != null) {
+            return id;
+        }            
+        
+        return 6;//Isento;
+    }
+
+    private double obterCustoComImposto(int idProduto) {        
+        return custoProduto.get(idProduto);        
+    }
+
+    private Integer obterTipoPisCofins(NotaFiscalItemIMP imp) {
+        Integer idPisCofins = pisCofins(imp.getPisCofinsCst());
+        if (idPisCofins != null) {
+            return idPisCofins;
+        }
+        return null;
+    }
 }

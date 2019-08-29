@@ -120,17 +120,13 @@ public class NotaFiscalRepositoryProvider {
     public void salvarSaida(NotaSaida ns) throws Exception {
         notaSaidaDAO.salvar(ns);
     }
-
-    public void salvarSaidaItens(NotaSaida ns) throws Exception {
-        notaSaidaDAO.salvarItens(ns);
+    
+    public void salvarEntradaItem(NotaEntradaItem item) throws Exception {
+        notaEntradaDAO.salvarItem(item);
     }
 
-    void salvarEntradaItem(NotaEntradaItem item) {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
-    }
-
-    void salvarSaidaItem(NotaSaidaItem item) {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    public void salvarSaidaItem(NotaSaidaItem item) throws Exception  {
+        notaSaidaDAO.salvarItem(item);
     }
 
     public Map<String, Integer> getProdutosAnteriores() throws Exception {
