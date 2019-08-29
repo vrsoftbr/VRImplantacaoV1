@@ -1,5 +1,6 @@
 package vrimplantacao2.vo.cadastro.notafiscal;
 
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.MathUtils;
 
 /**
@@ -86,7 +87,7 @@ public class NotaEntradaItem {
     }
 
     public void setQuantidade(double quantidade) {
-        this.quantidade = quantidade;
+        this.quantidade = MathUtils.round(quantidade, 3, 99999999.99D);
     }
 
     public int getQtdEmbalagem() {
@@ -102,11 +103,11 @@ public class NotaEntradaItem {
     }
 
     public void setValor(double valor) {
-        this.valor = valor;
+        this.valor = MathUtils.round(valor, 4, 99999999.99D);
     }
 
     public double getValorTotal() {
-        return MathUtils.round((this.quantidade * this.qtdEmbalagem) * this.valor, 2);
+        return MathUtils.round((this.quantidade * this.qtdEmbalagem) * this.valor, 2, 99999999.99D);
     }
 
     public double getValorIpi() {
@@ -114,7 +115,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorIpi(double valorIpi) {
-        this.valorIpi = valorIpi;
+        this.valorIpi = MathUtils.round(valorIpi, 2, 99999999.99D);
     }
 
     public int getIdAliquota() {
@@ -130,7 +131,7 @@ public class NotaEntradaItem {
     }
 
     public void setCustoComImposto(double custoComImposto) {
-        this.custoComImposto = custoComImposto;
+        this.custoComImposto = MathUtils.round(custoComImposto, 4, 99999999.99D);
     }
 
     public double getValorTotalFinal() {
@@ -142,7 +143,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorBaseCalculo(double valorBaseCalculo) {
-        this.valorBaseCalculo = valorBaseCalculo;
+        this.valorBaseCalculo = MathUtils.round(valorBaseCalculo, 2, 99999999.99D);
     }
 
     public double getValorIcms() {
@@ -150,7 +151,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorIcms(double valorIcms) {
-        this.valorIcms = valorIcms;
+        this.valorIcms = MathUtils.round(valorIcms, 4, 99999999.99D);
     }
 
     public double getValorIcmsSubstituicao() {
@@ -158,7 +159,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorIcmsSubstituicao(double valorIcmsSubstituicao) {
-        this.valorIcmsSubstituicao = valorIcmsSubstituicao;
+        this.valorIcmsSubstituicao = MathUtils.round(valorIcmsSubstituicao, 4, 99999999.99D);
     }
 
     public double getCustoComImpostoAnterior() {
@@ -166,7 +167,7 @@ public class NotaEntradaItem {
     }
 
     public void setCustoComImpostoAnterior(double custoComImpostoAnterior) {
-        this.custoComImpostoAnterior = custoComImpostoAnterior;
+        this.custoComImpostoAnterior = MathUtils.round(custoComImpostoAnterior, 4, 99999999.99D);
     }
 
     public double getValorBonificacao() {
@@ -174,7 +175,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorBonificacao(double valorBonificacao) {
-        this.valorBonificacao = valorBonificacao;
+        this.valorBonificacao = MathUtils.round(valorBonificacao, 2, 99999999.99D);
     }
 
     public double getValorVerba() {
@@ -182,7 +183,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorVerba(double valorVerba) {
-        this.valorVerba = valorVerba;
+        this.valorVerba = MathUtils.round(valorVerba, 2, 99999999.99D);
     }
 
     public double getQuantidadeDevolvida() {
@@ -190,7 +191,7 @@ public class NotaEntradaItem {
     }
 
     public void setQuantidadeDevolvida(double quantidadeDevolvida) {
-        this.quantidadeDevolvida = quantidadeDevolvida;
+        this.quantidadeDevolvida = MathUtils.round(quantidadeDevolvida, 3, 99999999.99D);
     }
 
     public double getValorPisCofins() {
@@ -198,7 +199,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorPisCofins(double valorPisCofins) {
-        this.valorPisCofins = valorPisCofins;
+        this.valorPisCofins = MathUtils.round(valorPisCofins, 2, 99999999.99D);
     }
 
     public boolean isContabilizaValor() {
@@ -214,7 +215,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorBaseSubstituicao(double valorBaseSubstituicao) {
-        this.valorBaseSubstituicao = valorBaseSubstituicao;
+        this.valorBaseSubstituicao = MathUtils.round(valorBaseSubstituicao, 2, 99999999.99D);
     }
 
     public double getValorEmbalagem() {
@@ -222,7 +223,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorEmbalagem(double valorEmbalagem) {
-        this.valorEmbalagem = valorEmbalagem;
+        this.valorEmbalagem = MathUtils.round(valorEmbalagem, 4, 99999999.99D);
     }
 
     public String getCfop() {
@@ -230,7 +231,7 @@ public class NotaEntradaItem {
     }
 
     public void setCfop(String cfop) {
-        this.cfop = cfop;
+        this.cfop = String.format("%,d", Utils.stringToInt(cfop));
     }
 
     public double getValorIcmsSubstituicaoXml() {
@@ -238,7 +239,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorIcmsSubstituicaoXml(double valorIcmsSubstituicaoXml) {
-        this.valorIcmsSubstituicaoXml = valorIcmsSubstituicaoXml;
+        this.valorIcmsSubstituicaoXml = MathUtils.round(valorIcmsSubstituicaoXml, 2, 99999999.99D);
     }
 
     public double getValorIsento() {
@@ -246,7 +247,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorIsento(double valorIsento) {
-        this.valorIsento = valorIsento;
+        this.valorIsento = MathUtils.round(valorIsento, 2, 99999999.99D);
     }
 
     public double getValorOutras() {
@@ -254,7 +255,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorOutras(double valorOutras) {
-        this.valorOutras = valorOutras;
+        this.valorOutras = MathUtils.round(valorOutras, 2, 99999999.99D);
     }
 
     public int getSituacaoTributaria() {
@@ -270,7 +271,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorFrete(double valorFrete) {
-        this.valorFrete = valorFrete;
+        this.valorFrete = MathUtils.round(valorFrete, 2, 99999999.99D);
     }
 
     public double getValorOutrasDespesas() {
@@ -278,7 +279,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorOutrasDespesas(double valorOutrasDespesas) {
-        this.valorOutrasDespesas = valorOutrasDespesas;
+        this.valorOutrasDespesas = MathUtils.round(valorOutrasDespesas, 2, 99999999.99D);
     }
 
     public double getValorDesconto() {
@@ -286,7 +287,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorDesconto(double valorDesconto) {
-        this.valorDesconto = valorDesconto;
+        this.valorDesconto = MathUtils.round(valorDesconto, 2, 99999999.99D);
     }
 
     public int getIdTipoPisCofins() {
@@ -326,7 +327,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorOutrasSubstituicao(double valorOutrasSubstituicao) {
-        this.valorOutrasSubstituicao = valorOutrasSubstituicao;
+        this.valorOutrasSubstituicao = MathUtils.round(valorOutrasSubstituicao, 2, 99999999.99D);
     }
 
     public double getQuantidadeBonificacao() {
@@ -334,7 +335,7 @@ public class NotaEntradaItem {
     }
 
     public void setQuantidadeBonificacao(double quantidadeBonificacao) {
-        this.quantidadeBonificacao = quantidadeBonificacao;
+        this.quantidadeBonificacao = MathUtils.round(quantidadeBonificacao, 2, 99999999.99D);
     }
 
     public double getValorSubstituicaoEstadual() {
@@ -342,7 +343,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorSubstituicaoEstadual(double valorSubstituicaoEstadual) {
-        this.valorSubstituicaoEstadual = valorSubstituicaoEstadual;
+        this.valorSubstituicaoEstadual = MathUtils.round(valorSubstituicaoEstadual, 2, 99999999.99D);
     }
 
     public String getDescricaoXml() {
@@ -358,7 +359,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorDespesaFrete(double valorDespesaFrete) {
-        this.valorDespesaFrete = valorDespesaFrete;
+        this.valorDespesaFrete = MathUtils.round(valorDespesaFrete, 4, 99999999.99D);
     }
 
     public String getCfopNota() {
@@ -366,7 +367,7 @@ public class NotaEntradaItem {
     }
 
     public void setCfopNota(String cfopNota) {
-        this.cfopNota = cfopNota;
+        this.cfopNota = String.format("%,d", Utils.stringToInt(cfopNota));
     }
 
     public double getValorBaseFcp() {
@@ -374,7 +375,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorBaseFcp(double valorBaseFcp) {
-        this.valorBaseFcp = valorBaseFcp;
+        this.valorBaseFcp = MathUtils.round(valorBaseFcp, 2, 99999999.99D);
     }
 
     public double getValorFcp() {
@@ -382,7 +383,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorFcp(double valorFcp) {
-        this.valorFcp = valorFcp;
+        this.valorFcp = MathUtils.round(valorFcp, 2, 99999999.99D);
     }
 
     public double getValorBaseFcpSt() {
@@ -390,7 +391,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorBaseFcpSt(double valorBaseFcpSt) {
-        this.valorBaseFcpSt = valorBaseFcpSt;
+        this.valorBaseFcpSt = MathUtils.round(valorBaseFcpSt, 2, 99999999.99D);
     }
 
     public double getValorFcpSt() {
@@ -398,7 +399,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorFcpSt(double valorFcpSt) {
-        this.valorFcpSt = valorFcpSt;
+        this.valorFcpSt = MathUtils.round(valorFcpSt, 2, 99999999.99D);
     }
 
     public double getValorIcmsDesonerado() {
@@ -406,7 +407,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorIcmsDesonerado(double valorIcmsDesonerado) {
-        this.valorIcmsDesonerado = valorIcmsDesonerado;
+        this.valorIcmsDesonerado = MathUtils.round(valorIcmsDesonerado, 2, 99999999.99D);
     }
 
     public int getIdMotivoDesoneracao() {
@@ -422,7 +423,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorBaseCalculoIcmsDesonerado(double valorBaseCalculoIcmsDesonerado) {
-        this.valorBaseCalculoIcmsDesonerado = valorBaseCalculoIcmsDesonerado;
+        this.valorBaseCalculoIcmsDesonerado = MathUtils.round(valorBaseCalculoIcmsDesonerado, 2, 99999999.99D);
     }
 
     public double getValorIcmsDiferido() {
@@ -430,7 +431,7 @@ public class NotaEntradaItem {
     }
 
     public void setValorIcmsDiferido(double valorIcmsDiferido) {
-        this.valorIcmsDiferido = valorIcmsDiferido;
+        this.valorIcmsDiferido = MathUtils.round(valorIcmsDiferido, 2, 99999999.99D);
     }
 
 }

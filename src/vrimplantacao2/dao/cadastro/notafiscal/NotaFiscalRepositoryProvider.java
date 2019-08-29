@@ -49,6 +49,7 @@ public class NotaFiscalRepositoryProvider {
         this.clienteEventualAnteriorDAO = new ClienteEventualAnteriorDAO();
         this.notaFiscalAnteriorDAO = new NotaFiscalAnteriorDAO();
         this.produtoAnteriorDAO = new ProdutoAnteriorDAO();
+        this.aliquotaDAO = new AliquotaDAO();
         this.produtoComplementoDAO = new ProdutoComplementoDAO();
         this.pisCofinsDAO = new PisCofinsDAO();
         this.mapaTributacaoDAO = new MapaTributacaoDAO();

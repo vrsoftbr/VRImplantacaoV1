@@ -428,23 +428,28 @@ public class NotaFiscalRepository {
         }
         itens.clear();
         
-        List<NotaEntradaItem> result = new ArrayList<>();
+        Map<String, NotaEntradaItem> result = new LinkedHashMap<>();
         for (NotaFiscalItemIMP imp: unico.values()) {
-            NotaEntradaItem ni = new NotaEntradaItem();
-            
             Integer idProduto = this.produtosAnteiores.get(imp.getIdProduto());
             if (idProduto == null) {
                 throw new Exception("Produto '" + imp.getIdProduto() + "' - '" + imp.getDescricao() + "' não encontrado ");
-            }     
+            }
+            String cfop = String.format("%,d", Utils.stringToInt(imp.getCfop()));
+            
+            NotaEntradaItem ni = result.get(String.format("%d-%d-%s", idNotaEntrada, idProduto, cfop));
+            
+            if (ni == null) {
+                ni = new NotaEntradaItem();
+            }
             
             //private int id;// integer NOT NULL DEFAULT nextval('notaentradaitem_id_seq'::regclass),
             ni.setIdNotaEntrada(idNotaEntrada);
             ni.setIdProduto(idProduto);
-            ni.setQuantidade(imp.getQuantidade());
-            ni.setQtdEmbalagem((int) Math.round(imp.getQuantidadeEmbalagem()));
-            ni.setValor(imp.getValorTotal());
+            ni.setQuantidade(ni.getQuantidade() + imp.getQuantidade());
+            ni.setQtdEmbalagem(ni.getQtdEmbalagem() + (int) Math.round(imp.getQuantidadeEmbalagem()));
+            ni.setValor(ni.getValor() + imp.getValorUnidade());
 
-            ni.setValorIpi(imp.getIpiValor());
+            ni.setValorIpi(ni.getValorIpi() + imp.getIpiValor());
             
             Integer idAliquota = obterAliquotaICMS(imp);
             ni.setIdAliquota(idAliquota);
@@ -453,29 +458,29 @@ public class NotaFiscalRepository {
             
             ni.setCustoComImposto(obterCustoComImposto(idProduto));            
             
-            ni.setValorBaseCalculo(imp.getIcmsBaseCalculo());
-            ni.setValorIcms(imp.getIcmsValor());
-            ni.setValorIcmsSubstituicao(imp.getIcmsValorST());
+            ni.setValorBaseCalculo(ni.getValorBaseCalculo() + imp.getIcmsBaseCalculo());
+            ni.setValorIcms(ni.getValorIcms() + imp.getIcmsValor());
+            ni.setValorIcmsSubstituicao(ni.getValorIcmsSubstituicao() + imp.getIcmsValorST());
             //private double custoComImpostoAnterior = 0;// numeric(13,4) NOT NULL,
             //private double valorBonificacao = 0;// numeric(11,2) NOT NULL,
             //private double valorVerba = 0;// numeric(11,2) NOT NULL,
             //private double quantidadeDevolvida = 0;// numeric(12,3) NOT NULL,
-            ni.setValorPisCofins(imp.getPisCofinsValor());//private double valorPisCofins = 0;// numeric(11,2) NOT NULL,
+            ni.setValorPisCofins(ni.getValorPisCofins() + imp.getPisCofinsValor());//private double valorPisCofins = 0;// numeric(11,2) NOT NULL,
             //private boolean contabilizaValor = true;// boolean NOT NULL,
-            ni.setValorBaseSubstituicao(imp.getIcmsBaseCalculoST());
-            ni.setValorEmbalagem(imp.getValorUnidade());
-            ni.setCfop(String.format("%04d", Utils.stringToInt(imp.getCfop())));
+            ni.setValorBaseSubstituicao(ni.getValorBaseSubstituicao() + imp.getIcmsBaseCalculoST());
+            ni.setValorEmbalagem(ni.getValorEmbalagem() + imp.getValorUnidade());
+            ni.setCfop(imp.getCfop());
             //private double valorIcmsSubstituicaoXml = 0;// numeric(11,2) NOT NULL,
-            ni.setValorIsento(imp.getValorIsento());
-            ni.setValorOutras(imp.getValorOutras());
+            ni.setValorIsento(ni.getValorIsento() + imp.getValorIsento());
+            ni.setValorOutras(ni.getValorOutras() + imp.getValorOutras());
             ni.setSituacaoTributaria(imp.getIcmsCst()); 
-            ni.setValorFrete(imp.getValorFrete());
+            ni.setValorFrete(ni.getValorFrete() + imp.getValorFrete());
             //private double valorOutrasDespesas = 0;// numeric(11,2) NOT NULL DEFAULT 0,
-            ni.setValorDesconto(imp.getValorDesconto());
+            ni.setValorDesconto(ni.getValorDesconto() + imp.getValorDesconto());
             
-            Integer pisCofins = obterTipoPisCofins(imp);
-            if (pisCofins != null) {
-                ni.setIdTipoPisCofins(pisCofins);
+            Integer pisCof = obterTipoPisCofins(imp);
+            if (pisCof != null) {
+                ni.setIdTipoPisCofins(pisCof);
             } else {
                 ni.setIdTipoPisCofins(13);//ISENTO
             }
@@ -499,10 +504,10 @@ public class NotaFiscalRepository {
             //private double valorBaseCalculoIcmsDesonerado = 0;// numeric(11,2),
             //private double valorIcmsDiferido = 0;// numeric(11,2)
 
-            result.add(ni);
+            result.put(String.format("%d-%d-%s", idNotaEntrada, idProduto, cfop),ni);
         }
         
-        return result;
+        return new ArrayList<>(result.values());
     }
 
     private List<NotaSaidaItem> converterNotaSaidaItem(long idNotaSaida, ArrayList<NotaFiscalItemIMP> itens) throws Exception {
@@ -514,40 +519,46 @@ public class NotaFiscalRepository {
         }
         itens.clear();
         
-        List<NotaSaidaItem> result = new ArrayList<>();
+        Map<String, NotaSaidaItem> result = new LinkedHashMap<>();
         for (NotaFiscalItemIMP imp: unico.values()) {
-            NotaSaidaItem ni = new NotaSaidaItem();
             
             Integer idProduto = this.produtosAnteiores.get(imp.getIdProduto());
             if (idProduto == null) {
                 throw new Exception("Produto '" + imp.getIdProduto() + "' - '" + imp.getDescricao() + "' não encontrado ");
-            }     
+            }
+            String cfop = String.format("%,d", Utils.stringToInt(imp.getCfop()));
+            
+            NotaSaidaItem ni = result.get(String.format("%d-%d-%s", idNotaSaida, idProduto, cfop));
+            
+            if (ni == null) {
+                ni = new NotaSaidaItem();
+            }
             
             //private int id;// integer NOT NULL DEFAULT nextval('notasaidaitem_id_seq'::regclass),
             ni.setIdNotaSaida(idNotaSaida);
             ni.setIdProduto(idProduto);
-            ni.setQuantidade(imp.getQuantidade());
-            ni.setQtdEmbalagem((int) Math.round(imp.getQuantidadeEmbalagem()));
-            ni.setValor(imp.getValorTotal());
-            ni.setValorIpi(imp.getIpiValor());
+            ni.setQuantidade(ni.getQuantidade() + imp.getQuantidade());
+            ni.setQtdEmbalagem(ni.getQtdEmbalagem() + (int) Math.round(imp.getQuantidadeEmbalagem()));
+            ni.setValor(ni.getValor() + imp.getValorUnidade());
+            ni.setValorIpi(ni.getValorIpi() + imp.getIpiValor());
             
             ni.setIdAliquota(obterAliquotaICMS(imp));
             
-            ni.setValorBaseCalculo(imp.getIcmsBaseCalculo());
-            ni.setValorIcms(imp.getIcmsValor());
-            ni.setValorBaseSubstituicao(imp.getIcmsBaseCalculoST());
-            ni.setValorIcmsSubstituicao(imp.getIcmsValorST());
-            ni.setValorPisCofins(imp.getPisCofinsValor());
-            ni.setValorIpi(imp.getIpiValor());//private double valorBaseIpi = 0;// numeric(11,2) NOT NULL,
-            ni.setCfop(String.format("%04d", Utils.stringToInt(imp.getCfop())));//private String cfop;// character varying(5),
+            ni.setValorBaseCalculo(ni.getValorBaseCalculo() + imp.getIcmsBaseCalculo());
+            ni.setValorIcms(ni.getValorIcms() + imp.getIcmsValor());
+            ni.setValorBaseSubstituicao(ni.getValorBaseSubstituicao() + imp.getIcmsBaseCalculoST());
+            ni.setValorIcmsSubstituicao(ni.getValorIcmsSubstituicao() + imp.getIcmsValorST());
+            ni.setValorPisCofins(ni.getValorPisCofins() + imp.getPisCofinsValor());
+            ni.setValorIpi(ni.getValorIpi() + imp.getIpiValor());//private double valorBaseIpi = 0;// numeric(11,2) NOT NULL,
+            ni.setCfop(String.format("%,d", Utils.stringToInt(imp.getCfop())));//private String cfop;// character varying(5),
             
             //TODO: Incluir a vinculação da pauta fiscal //private int tipoIva = 0;// integer NOT NULL DEFAULT 0,
             
             //TODO: Incluir a vinculação da pauta fiscal //private int idAliquotaPautaFiscal = -1;//id_aliquotapautafiscal;// integer,
             
-            ni.setValorDesconto(imp.getValorDesconto());//private double valorDesconto = 0;// numeric(11,2) NOT NULL DEFAULT 0,
-            ni.setValorIsento(imp.getValorIsento());//private double valorIsento = 0;// numeric(11,2) NOT NULL DEFAULT 0,
-            ni.setValorOutras(imp.getValorOutras());//private double valorOutras = 0;// numeric(11,2) NOT NULL DEFAULT 0,
+            ni.setValorDesconto(ni.getValorDesconto() + imp.getValorDesconto());//private double valorDesconto = 0;// numeric(11,2) NOT NULL DEFAULT 0,
+            ni.setValorIsento(ni.getValorIsento() + imp.getValorIsento());//private double valorIsento = 0;// numeric(11,2) NOT NULL DEFAULT 0,
+            ni.setValorOutras(ni.getValorOutras() + imp.getValorOutras());//private double valorOutras = 0;// numeric(11,2) NOT NULL DEFAULT 0,
             ni.setSituacaoTributaria(imp.getIcmsCst()); //private int situacaoTributaria = 0;// integer NOT NULL DEFAULT 0,
             //private double valorIcmsDispensado = 0;// numeric(12,3) NOT NULL DEFAULT 0,
             //private int idAliquotaDispensado = -1;//id_aliquotadispensado;// integer,
@@ -573,10 +584,10 @@ public class NotaFiscalRepository {
             //private int idEscritaCodigoAjuste = -1;//id_escritacodigoajuste;// integer,
             //private double valorIcmsDiferido = 0;// numeric(11,2)
 
-            result.add(ni);
+            result.put(String.format("%d-%d-%s", idNotaSaida, idProduto, cfop),ni);
         }
         
-        return result;
+        return new ArrayList<>(result.values());
     }
     
     private int obterAliquotaICMS(NotaFiscalItemIMP imp) {

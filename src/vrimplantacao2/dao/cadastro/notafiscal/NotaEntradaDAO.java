@@ -3,6 +3,8 @@ package vrimplantacao2.dao.cadastro.notafiscal;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaEntrada;
@@ -14,6 +16,8 @@ import vrimplantacao2.vo.importacao.NotaFiscalIMP;
  * @author Leandro
  */
 public class NotaEntradaDAO {
+    
+    private static final Logger LOG = Logger.getLogger(NotaEntradaDAO.class.getName());
 
     public int getTipoNotaEntrada() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
@@ -243,7 +247,13 @@ public class NotaEntradaDAO {
             //sql.put("porcentagemfcp");
             //sql.put("porcentagemfcpst");
             
-            stm.execute(sql.getInsert());
+            String sq = sql.getInsert();
+            try {
+                stm.execute(sq);
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, ex.getMessage() + " - '" + sq + "'", ex);
+                throw ex;
+            }
             
         }
     }

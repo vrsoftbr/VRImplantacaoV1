@@ -192,7 +192,7 @@ public class NotaSaidaDAO {
             SQLBuilder sql = new SQLBuilder();  
             
             sql.setSchema("public");
-            sql.setTableName("notaentradasaida");
+            sql.setTableName("notasaidaitem");
             sql.put("id_notasaida", item.getIdNotaSaida());//private long idNotaSaida;//id_notasaida;// bigint NOT NULL,
             sql.put("id_produto", item.getIdProduto());//id_produto;// integer NOT NULL,
             sql.put("quantidade", item.getQuantidade());// = 0;// numeric(12,3) NOT NULL,
@@ -230,12 +230,12 @@ public class NotaSaidaDAO {
             sql.put("valorbasefcpst", item.getValorBaseFcpSt());// = 0;// numeric(11,2),
             sql.put("valorfcpst", item.getValorFcpSt());// = 0;// numeric(11,2),
             sql.put("valoricmsdesonerado", item.getValorIcmsDesonerado());// = 0;// numeric(11,2),
-            sql.put("id_motivodesoneracao", item.getIdMotivoDesoneracao(), -1);// = -1;// integer,
-            sql.put("valorbasecalculoicmsdesonerado", item.getValorBaseCalculoIcmsDesonerado());// = 0;// numeric(11,2),
-            sql.put("id_escritafundamento", item.getIdEscritaFundamento(), -1);// = -1;//id_escritafundamento;// integer,
-            sql.put("id_escritacodigoajuste", item.getIdEscritaCodigoAjuste(), -1);// = -1;//id_escritacodigoajuste;// integer,
-            sql.put("valoricmsdiferido", item.getValorIcmsDiferido());// = 0;// numeric(11,2)
-            
+//            sql.put("id_motivodesoneracao", item.getIdMotivoDesoneracao(), -1);// = -1;// integer,
+//            sql.put("valorbasecalculoicmsdesonerado", item.getValorBaseCalculoIcmsDesonerado());// = 0;// numeric(11,2),
+//            sql.put("id_escritafundamento", item.getIdEscritaFundamento(), -1);// = -1;//id_escritafundamento;// integer,
+//            sql.put("id_escritacodigoajuste", item.getIdEscritaCodigoAjuste(), -1);// = -1;//id_escritacodigoajuste;// integer,
+//            sql.put("valoricmsdiferido", item.getValorIcmsDiferido());// = 0;// numeric(11,2)
+
             stm.execute(sql.getInsert());
             
         }
