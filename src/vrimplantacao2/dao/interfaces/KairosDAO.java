@@ -21,6 +21,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.SituacaoCheque;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoSexo;
@@ -71,6 +72,7 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.NCM,
                 OpcaoProduto.CEST,
                 OpcaoProduto.ATIVO,
+                OpcaoProduto.DESCONTINUADO,
                 OpcaoProduto.DATA_CADASTRO,
                 OpcaoProduto.PESO_BRUTO,
                 OpcaoProduto.PESO_LIQUIDO,
@@ -150,7 +152,9 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    codb.quantidadeproduto,\n" +
                     "    gfp.codigogrupofiscal,\n" +
                     "    gf.descricao,\n" +
-                    "    p.codigoespecificadorst as cest\n" +
+                    "    p.codigoespecificadorst as cest,\n" +
+                    "    case p.situacao when 'A' then 1 else 0 end situacaocadastro,\n" +
+                    "    case p.situacaocompra when 'I' then 1 else 0 end descontinuado\n" +
                     "from\n" +
                     "    produto p\n" +
                     "	join Filial fl on\n" +
@@ -218,6 +222,8 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoId(rst.getString("CodigoGrupoFiscal"));
                     imp.setIcmsCreditoId(rst.getString("CodigoGrupoFiscal"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setSituacaoCadastro(SituacaoCadastro.getById(rst.getInt("situacaocadastro")));
+                    imp.setDescontinuado(rst.getBoolean("descontinuado"));
 
                     result.add(imp);
                 }
@@ -759,10 +765,43 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select\n" +
+                    "	c.codigofilial,\n" +
+                    "	c.codigoinstituicaofinanceira,\n" +
+                    "	c.numeroagencia,\n" +
+                    "	c.numerocontacorrente,\n" +
+                    "	c.numerocheque,\n" +
+                    "	c.cnpjcpfemitente,\n" +
+                    "	c.dataemissao,\n" +
+                    "	c.datacheque datacheque,\n" +
+                    "	c.datalancamento,\n" +
+                    "	c.valornominal\n" +
+                    "from\n" +
+                    "	chequerecebido c\n" +
+                    "where\n" +
+                    "	c.codigofilial = '" + getLojaOrigem() + "'\n" +
+                    "order by\n" +
+                    "	1,2,3,4,5"
             )) {
                 while (rst.next()) {
                     ChequeIMP imp = new ChequeIMP();
+                    
+                    imp.setId(String.format(
+                            "%s-%s-%s-%s-%s",
+                            rst.getString("codigofilial"),
+                            rst.getString("codigoinstituicaofinanceira"),
+                            rst.getString("numeroagencia"),
+                            rst.getString("numerocontacorrente"),
+                            rst.getString("numerocheque")
+                    ));
+                    imp.setBanco(Utils.stringToInt(rst.getString("codigoinstituicaofinanceira")));
+                    imp.setAgencia(rst.getString("numeroagencia"));
+                    imp.setConta(rst.getString("numerocontacorrente"));
+                    imp.setNumeroCheque(rst.getString("numerocheque"));
+                    imp.setCpf(rst.getString("cnpjcpfemitente"));
+                    imp.setDataDeposito(rst.getDate("datalancamento"));
+                    imp.setValor(rst.getDouble("valornominal"));
+                    imp.setSituacaoCheque(SituacaoCheque.BAIXADO);
                     
                     result.add(imp);
                 }
