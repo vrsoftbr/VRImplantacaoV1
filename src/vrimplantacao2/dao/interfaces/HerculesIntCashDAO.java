@@ -235,19 +235,28 @@ public class HerculesIntCashDAO extends InterfaceDAO {
         if (opt == OpcaoProduto.CUSTO) {
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
-                        "select \n"
-                        + "cus.Fpr_CodPrd, \n"
-                        + "cus.Fpr_UltCus\n"
-                        + "from IntFpr cus \n"
-                        + "where cus.Fpr_UltEnt in (select MAX(Fpr_UltEnt) from IntFpr where Fpr_CodPrd = cus.Fpr_CodPrd)\n"
-                        + "and cus.Fpr_CodEmp = '" + getLojaOrigem() + "'"
+                        "select "
+                        + "  b.Pnf_CodPrd as id_produto,\n"
+                        + "  b.Pnf_ValUni as custo\n"
+                        + "from dbo.IntNfe a\n"
+                        + "inner join dbo.IntPnf b on b.Pnf_NumNot = a.Nfe_NumNot\n"
+                        + "where b.Pnf_CodTme = 'ENT'\n"
+                        + "  and b.Pnf_CodEmp = '" + getLojaOrigem() + "'\n"
+                        + "  and a.Nfe_DatEnt in (select \n"
+                        + "	max(nf.Nfe_DatEnt) as ult_data\n"
+                        + "  from dbo.IntPnf nfp\n"
+                        + "  inner join dbo.IntNfe nf on nf.Nfe_NumNot = nfp.Pnf_NumNot\n"
+                        + "  where nfp.Pnf_CodTme = 'ENT'\n"
+                        + "  and nfp.Pnf_CodPrd = b.Pnf_CodPrd\n"
+                        + "  and nfp.Pnf_CodEmp = '" + getLojaOrigem() + "')\n"
+                        + "order by b.Pnf_CodPrd"
                 )) {
                     while (rst.next()) {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("Fpr_CodPrd"));
-                        imp.setCustoComImposto(rst.getDouble("Fpr_UltCus"));
+                        imp.setImportId(rst.getString("id_produto"));
+                        imp.setCustoComImposto(rst.getDouble("custo"));
                         imp.setCustoSemImposto(imp.getCustoComImposto());
                         result.add(imp);
                     }
@@ -256,6 +265,34 @@ public class HerculesIntCashDAO extends InterfaceDAO {
             return result;
         }
         return null;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "p.Prd_CodPrd as id,\n"
+                    + "p.Prd_CodPrd as barras,\n"
+                    + "p.Prd_CodUnd as unidade\n"
+                    + "from dbo.IntPrd p\n"
+                    + "where p.Prd_CodEmp = '" + getLojaOrigem() + "'"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("barras"));
+                    imp.setTipoEmbalagem(rst.getString("unidade"));
+                    imp.setQtdEmbalagem(1);
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 
     @Override

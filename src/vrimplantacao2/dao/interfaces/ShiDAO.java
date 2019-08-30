@@ -1533,8 +1533,8 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "'' as modelo,\n"
                     + "cb.status\n"
                     + "from movdia m\n"
-                    + "join cabec cb on cb.idmovdia = m.id\n"
-                    + "join convenio c on c.idmovdia = m.id\n"
+                    + "left join cabec cb on cb.idmovdia = m.id\n"
+                    + "left join convenio c on c.idmovdia = m.id and cb.cupom = c.cupom\n"
                     + "where m.filial = " + idLojaCliente + "\n"
                     + "and m.data >= '" + FORMAT.format(dataInicio) + "'\n"
                     + "and m.data <= '" + FORMAT.format(dataTermino) + "'";
@@ -1579,13 +1579,27 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String idVenda = rst.getString("id_venda");
-                        String id = rst.getString("id") + "-" + rst.getString("id_venda");
+                        String idVenda = rst.getString("data")
+                                + "-"
+                                + rst.getString("ecf")
+                                + "-"
+                                + rst.getString("numerocupom")
+                                + "-"
+                                + rst.getString("vc_clientepreferencial");
+
+                        String id = rst.getString("data")
+                                + "-"
+                                + rst.getString("ecf")
+                                + "-"
+                                + rst.getString("numerocupom")
+                                + "-"
+                                + rst.getString("vc_clientepreferencial")
+                                + "-"
+                                + rst.getString("produto");
 
                         next.setId(id);
                         next.setVenda(idVenda);
                         next.setProduto(rst.getString("produto"));
-                        next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setTotalBruto(rst.getDouble("total"));
                         next.setValorDesconto(rst.getDouble("desconto"));
@@ -1678,6 +1692,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "m.serie as numeroserie,\n"
                     + "cb.cupom as numerocupom,\n"
                     + "cb.chave as ChaveCfe,\n"
+                    + "c.codcli as vc_clientepreferencial,\n"
                     + "cb.valor as subtotalimpressora,\n"
                     + "i.produto as codigobarras,\n"
                     + "i.codpro as produto,\n"
@@ -1688,9 +1703,9 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "0 as desconto,\n"
                     + "0 as acrescimo\n"
                     + "from movdia m\n"
-                    + "join cabec cb on cb.idmovdia = m.id\n"
-                    + "join convenio c on c.idmovdia = m.id\n"
-                    + "join item i on i.idmovdia = m.id\n"
+                    + "left join cabec cb on cb.idmovdia = m.id\n"
+                    + "left join convenio c on c.idmovdia = m.id and cb.cupom = c.cupom\n"
+                    + "left join item i on i.idmovdia = m.id and cb.cupom = i.cupom\n"
                     + "where m.filial = " + idLojaCliente + "\n"
                     + "and m.data >= '" + FORMAT.format(dataInicio) + "'\n"
                     + "and m.data <= '" + FORMAT.format(dataTermino) + "'";
