@@ -328,6 +328,7 @@ public class NotaFiscalIMP {
     
     public NotaFiscalItemIMP addItem() {
         NotaFiscalItemIMP item = new NotaFiscalItemIMP(this);
+        itens.add(item);
         return item;
     }
     

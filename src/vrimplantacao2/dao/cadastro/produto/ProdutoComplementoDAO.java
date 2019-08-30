@@ -5,8 +5,10 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
@@ -554,5 +556,21 @@ public class ProdutoComplementoDAO {
                     "	id_produto"
             );
         }
+    }
+
+    public Map<Integer, Double> getCustoProduto(int idLojaVR) throws Exception {
+        Map<Integer, Double> result = new HashMap<>();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select id_produto, custocomimposto from produtocomplemento where id_loja = " + idLojaVR
+            )) {
+                while (rst.next()) {
+                    result.put(rst.getInt("id_produto"), rst.getDouble("custocomimposto"));
+                }
+            }
+        }
+        
+        return result;
     }
 }

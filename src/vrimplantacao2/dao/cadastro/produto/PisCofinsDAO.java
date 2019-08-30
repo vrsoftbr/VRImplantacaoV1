@@ -2,6 +2,8 @@ package vrimplantacao2.dao.cadastro.produto;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.enums.NaturezaReceitaVO;
@@ -121,5 +123,24 @@ public class PisCofinsDAO {
                 }
             }
         }
+    }
+
+    public Map<Integer, Integer> getPisCofinsByCst() throws Exception {
+        Map<Integer, Integer> result = new HashMap<>();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                "select\n" +
+                "	id,\n" +
+                "	cst\n" +
+                "from tipopiscofins"   
+            )) {
+                while (rst.next()) {
+                    result.put(rst.getInt("cst"), rst.getInt("id"));
+                }
+            }
+        }
+        
+        return result;
     }
 }

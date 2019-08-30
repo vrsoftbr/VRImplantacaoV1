@@ -2,10 +2,12 @@ package vrimplantacao2.dao.cadastro.notafiscal;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import vrframework.classe.Conexao;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaSaida;
+import vrimplantacao2.vo.cadastro.notafiscal.NotaSaidaItem;
 import vrimplantacao2.vo.importacao.NotaFiscalIMP;
 
 /**
@@ -75,6 +77,7 @@ public class NotaSaidaDAO {
 
     public void eliminarNota(int id) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
+            stm.execute("delete from notasaidaitemimportacaoxml where id_notasaidaitem in (select id from notasaidaitem where id_notasaida = " + id + ")");
             stm.execute("delete from notasaidaitem where id_notasaida = " + id);
             stm.execute("delete from notasaida where id = " + id);
         }
@@ -91,7 +94,7 @@ public class NotaSaidaDAO {
                     "	n.datasaida = '" + new SimpleDateFormat("yyyy-MM-dd").format(imp.getDataEntradaSaida()) + "'"
             )) {
                 if (rst.next()) {
-                    return rst.getObject("id", Integer.class);
+                    return rst.getInt("id") > 0 ? rst.getInt("id") : null;
                 }
             }
         }
@@ -100,6 +103,7 @@ public class NotaSaidaDAO {
 
     public void salvar(NotaSaida ns) throws Exception {
         SQLBuilder sql = new SQLBuilder();
+        
         sql.setSchema("public");
         sql.setTableName("notasaida");
         sql.put("id_loja", ns.getIdLoja());
@@ -183,8 +187,59 @@ public class NotaSaidaDAO {
         }
     }
 
-    public void salvarItens(NotaSaida ns) throws Exception {
-        //TODO: Incluir rotina de importação dos itens da nota.
+    public void salvarItem(NotaSaidaItem item) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            
+            SQLBuilder sql = new SQLBuilder();  
+            
+            sql.setSchema("public");
+            sql.setTableName("notasaidaitem");
+            sql.put("id_notasaida", item.getIdNotaSaida());//private long idNotaSaida;//id_notasaida;// bigint NOT NULL,
+            sql.put("id_produto", item.getIdProduto());//id_produto;// integer NOT NULL,
+            sql.put("quantidade", item.getQuantidade());// = 0;// numeric(12,3) NOT NULL,
+            sql.put("qtdembalagem", item.getQtdEmbalagem());// = 1;// integer NOT NULL,
+            sql.put("valor", item.getValor());// = 0;// numeric(13,4) NOT NULL,
+            sql.put("valortotal", item.getValorTotal());// = 0;// numeric(11,2) NOT NULL,
+            sql.put("valoripi", item.getValorIpi());// = 0;// numeric(13,4) NOT NULL,
+            sql.put("id_aliquota", item.getIdAliquota());//;//id_aliquota;// integer NOT NULL,
+            sql.put("valorbasecalculo", item.getValorBaseCalculo());// = 0;// numeric(11,2) NOT NULL,
+            sql.put("valoricms", item.getValorIcms());// = 0;// numeric(13,4) NOT NULL,
+            sql.put("valorbasesubstituicao", item.getValorBaseSubstituicao());// = 0;// numeric(11,2) NOT NULL,
+            sql.put("valoricmssubstituicao", item.getValorIcmsSubstituicao());// = 0;// numeric(13,4) NOT NULL,
+            sql.put("valorpiscofins", item.getValorPisCofins());// = 0;// numeric(11,2) NOT NULL,
+            sql.put("valorbaseipi", item.getValorBaseIpi());// = 0;// numeric(11,2) NOT NULL,
+            sql.put("cfop", item.getCfop());//;// character varying(5),
+            sql.put("tipoiva", item.getTipoIva());// = 0;// integer NOT NULL DEFAULT 0,
+            sql.put("id_aliquotapautafiscal", item.getIdAliquotaPautaFiscal(), -1);// = -1;//id_aliquotapautafiscal;// integer,
+            sql.put("valordesconto", item.getValorDesconto());// = 0;// numeric(11,2) NOT NULL DEFAULT 0,
+            sql.put("valorisento", item.getValorIsento());// = 0;// numeric(11,2) NOT NULL DEFAULT 0,
+            sql.put("valoroutras", item.getValorOutras());// = 0;// numeric(11,2) NOT NULL DEFAULT 0,
+            sql.put("situacaotributaria", item.getSituacaoTributaria());// = 0;// integer NOT NULL DEFAULT 0,
+            sql.put("valoricmsdispensado", item.getValorIcmsDispensado());// = 0;// numeric(12,3) NOT NULL DEFAULT 0,
+            sql.put("id_aliquotadispensado", item.getIdAliquotaDispensado(), -1);// = -1;//id_aliquotadispensado;// integer,
+            sql.put("tiponaturezareceita", item.getTipoNaturezaReceita(), -1);// = -1;// integer,
+            sql.put("datadesembaraco", item.getDataDesembaraco());//;// timestamp without time zone,
+            sql.put("id_estadodesembaraco", item.getIdEstadoDesembaraco(), -1);// = -1;//id_estadodesembaraco;// integer,
+            sql.put("numeroadicao", item.getNumeroAdicao());// = 0;// integer NOT NULL DEFAULT 0,
+            sql.put("localdesembaraco", item.getLocalDesembaraco());// = "";// character varying(50) NOT NULL DEFAULT ''::character varying,
+            sql.put("id_tiposaida", item.getIdTipoSaida(), -1);// = -1;//id_tiposaida;// integer,
+            sql.put("id_aliquotainterestadual", item.getIdAliquotaInterestadual(), -1);// = -1;//id_aliquotainterestadual;// integer,
+            sql.put("id_aliquotadestino", item.getIdAliquotaDestino(), -1);// = -1;//id_aliquotadestino;// integer,
+            sql.put("id_tipoorigemapuracao", item.getIdTipoOrigemApuracao(), -1);// = -1;//id_tipoorigemapuracao;// integer,
+            sql.put("valorbasefcp", item.getValorBaseFcp());// = 0;// numeric(11,2),
+            sql.put("valorfcp", item.getValorFcp());// = 0;// numeric(11,2),
+            sql.put("valorbasefcpst", item.getValorBaseFcpSt());// = 0;// numeric(11,2),
+            sql.put("valorfcpst", item.getValorFcpSt());// = 0;// numeric(11,2),
+            sql.put("valoricmsdesonerado", item.getValorIcmsDesonerado());// = 0;// numeric(11,2),
+//            sql.put("id_motivodesoneracao", item.getIdMotivoDesoneracao(), -1);// = -1;// integer,
+//            sql.put("valorbasecalculoicmsdesonerado", item.getValorBaseCalculoIcmsDesonerado());// = 0;// numeric(11,2),
+//            sql.put("id_escritafundamento", item.getIdEscritaFundamento(), -1);// = -1;//id_escritafundamento;// integer,
+//            sql.put("id_escritacodigoajuste", item.getIdEscritaCodigoAjuste(), -1);// = -1;//id_escritacodigoajuste;// integer,
+//            sql.put("valoricmsdiferido", item.getValorIcmsDiferido());// = 0;// numeric(11,2)
+
+            stm.execute(sql.getInsert());
+            
+        }
     }
     
 }
