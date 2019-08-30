@@ -83,6 +83,7 @@ public class NotaEntradaDAO {
 
     public void eliminarNota(int id) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
+            stm.execute("delete from notaentradaitemimportacaoxml where id_notaentradaitem in (select id from notaentradaitem where id_notaentrada = " + id + ")");
             stm.execute("delete from notaentradaitem where id_notaentrada = " + id);
             stm.execute("delete from notaentrada where id = " + id);
         }
@@ -100,7 +101,7 @@ public class NotaEntradaDAO {
                     "	n.dataentrada = '" + new SimpleDateFormat("yyyy-MM-dd").format(imp.getDataEntradaSaida()) + "'"
             )) {
                 if (rst.next()) {
-                    return rst.getObject("id", Integer.class);
+                    return rst.getInt("id") > 0 ? rst.getInt("id") : null;
                 }
             }
         }

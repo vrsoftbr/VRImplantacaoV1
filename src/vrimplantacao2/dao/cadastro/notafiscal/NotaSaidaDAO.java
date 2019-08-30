@@ -77,6 +77,7 @@ public class NotaSaidaDAO {
 
     public void eliminarNota(int id) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
+            stm.execute("delete from notasaidaitemimportacaoxml where id_notasaidaitem in (select id from notasaidaitem where id_notasaida = " + id + ")");
             stm.execute("delete from notasaidaitem where id_notasaida = " + id);
             stm.execute("delete from notasaida where id = " + id);
         }
@@ -93,7 +94,7 @@ public class NotaSaidaDAO {
                     "	n.datasaida = '" + new SimpleDateFormat("yyyy-MM-dd").format(imp.getDataEntradaSaida()) + "'"
             )) {
                 if (rst.next()) {
-                    return rst.getObject("id", Integer.class);
+                    return rst.getInt("id") > 0 ? rst.getInt("id") : null;
                 }
             }
         }

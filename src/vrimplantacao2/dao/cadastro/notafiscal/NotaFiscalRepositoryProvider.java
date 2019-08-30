@@ -3,6 +3,7 @@ package vrimplantacao2.dao.cadastro.notafiscal;
 import java.util.Map;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.dao.cadastro.AliquotaDAO;
+import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao2.dao.cadastro.cliente.ClienteEventualAnteriorDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
 import vrimplantacao2.dao.cadastro.produto.PisCofinsDAO;
@@ -162,6 +163,10 @@ public class NotaFiscalRepositoryProvider {
 
     public Map<Integer, Integer> getPisCofins() throws Exception {
         return pisCofinsDAO.getPisCofinsByCst();
+    }
+
+    public int getIdFornecedorLoja() throws Exception {
+        return new LojaDAO().getIdFornecedor(lojaVR);
     }
     
 }

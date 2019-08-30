@@ -40,6 +40,7 @@ public class NotaFiscalRepository {
     private Map<String, Integer> aliquotasPorValor;
     private Map<Integer, Double> custoProduto;
     private Map<Integer, Integer> pisCofins;
+    private int idFornecedorLoja = -1;
 
     public NotaFiscalRepository(NotaFiscalRepositoryProvider provider) throws Exception {
         this.provider = provider;
@@ -58,9 +59,11 @@ public class NotaFiscalRepository {
             this.aliquotasPorValor = provider.getAliquotaPorValor();
             this.custoProduto = provider.getCustoProduto();
             this.pisCofins = provider.getPisCofins();
+            this.idFornecedorLoja = provider.getIdFornecedorLoja();
             this.provider.notificar("Notas Fiscais...Gravando notas fiscais...", notas.size());
 
             boolean apagarNotasExistentes = opt.contains(OpcaoNotaFiscal.IMP_EXCLUIR_NOTAS_EXISTENTES);
+            boolean apagarNotasImportadas = opt.contains(OpcaoNotaFiscal.IMP_EXCLUIR_NOTAS_EXISTENTES_IMPORTADAS);
 
             for (NotaFiscalIMP imp: notas) {
                 //Verifica a existência de anterior
@@ -129,14 +132,14 @@ public class NotaFiscalRepository {
                     //Se a ordem for apagar as notas, elimina as notas se existirem
                     //senão vai para a próxima nota.
                     if (anterior.getOperacao() == NotaOperacao.ENTRADA && anterior.getIdNotaEntrada() != null) {
-                        if (apagarNotasExistentes) {
+                        if (apagarNotasExistentes || apagarNotasImportadas) {
                             provider.eliminarNotaEntrada(anterior.getIdNotaEntrada());
                         } else {
                             provider.notificar();
                             continue;      
                         }
                     } else if (anterior.getOperacao() == NotaOperacao.SAIDA && anterior.getIdNotaSaida() != null) {
-                        if (apagarNotasExistentes) {
+                        if (apagarNotasExistentes || apagarNotasImportadas) {
                             provider.eliminarNotaSaida(anterior.getIdNotaSaida());
                         } else {
                             provider.notificar();
@@ -351,7 +354,7 @@ public class NotaFiscalRepository {
         
         //TODO: INCLUIR IMPORTAÇÃO DE TRANSPORTADORES DEPOIS        
         //private int idMotoristaTransportador = -1;// id_motoristatransportador integer,
-        //private int idFornecedorTransportador = -1;//id_fornecedortransportador integer,
+        n.setIdFornecedorTransportador(idFornecedorLoja);
         //private int idClienteEventualTransportador = -1;//id_clienteeventualtransportador integer,
         //private String placa = "";// character varying(7) NOT NULL,
         
