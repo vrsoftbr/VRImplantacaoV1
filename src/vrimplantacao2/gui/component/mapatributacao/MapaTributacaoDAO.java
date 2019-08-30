@@ -243,5 +243,28 @@ public class MapaTributacaoDAO {
             stm.execute(sql.getUpdate());
         }
     }
+    
+    public Map<String, Integer> getAliquotaPorId(String sistema, String loja) throws Exception {
+        Map<String, Integer> result = new HashMap<>();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	orig_id id,\n" +
+                    "	id_aliquota\n" +
+                    "from\n" +
+                    "	implantacao.mapatributacao\n" +
+                    "where\n" +
+                    "	sistema = '" + sistema + "' and\n" +
+                    "	agrupador = '" + loja + "'"
+            )) {
+                while (rst.next()) {
+                    result.put(rst.getString("id"), rst.getInt("id_aliquota"));
+                }
+            }
+        }
+        
+        return result;
+    }
 
 }

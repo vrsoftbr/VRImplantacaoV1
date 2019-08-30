@@ -173,7 +173,7 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	p.coddepto mercadologico1,\n"
                     + "	p.codgrupo mercadologico2,\n"
                     + "	p.codsubgrupo mercadologico3,\n"
-                    + "       case when p.pesado = 'S' then true else false end as e_balanca,\n"
+                    + " case when p.pesado = 'S' then true else false end as e_balanca,\n"
                     + "	replace(ncm.codigoncm,'.','') ncm,\n"
                     + "	replace(cest.cest,'.','') cest,\n"
                     + "	codfamilia id_familiaproduto,\n"
@@ -199,6 +199,8 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	cast(icms_e.codcst as integer) AS icms_e_cst,\n"
                     + "	icms_e.aliqicms icms_e_aliq,\n"
                     + "	icms_e.aliqredicms icms_e_reducao,\n"
+                    + " p.codcfpdv idaliquotadebito,\n"
+                    + " p.codcfnfe idaliquotacredito,\n"        
                     + "	p.pesoliq pesoliquido,\n"
                     + "	p.pesobruto\n"
                     + "from \n"
@@ -250,7 +252,7 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     if(importarFamiliaDeSimilar) {
-                        imp.setIdFamiliaProduto("id_familiasimilar");
+                        imp.setIdFamiliaProduto(rs.getString("id_familiasimilar"));
                     } else {
                         imp.setIdFamiliaProduto(rs.getString("id_familiaproduto"));
                     }
@@ -260,12 +262,14 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setPiscofinsCstCredito(rs.getString("idtipopiscofinscredito"));
                     imp.setPiscofinsCstDebito(rs.getString("idtipopiscofinsdebito"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
-                    imp.setIcmsCstSaida(rs.getInt("icms_s_cst"));
+                    /*imp.setIcmsCstSaida(rs.getInt("icms_s_cst"));
                     imp.setIcmsAliqSaida(rs.getDouble("icms_s_aliq"));
                     imp.setIcmsReducaoSaida(rs.getDouble("icms_s_reducao"));
                     imp.setIcmsCstEntrada(rs.getInt("icms_e_cst"));
                     imp.setIcmsAliqEntrada(rs.getDouble("icms_e_aliq"));
-                    imp.setIcmsReducaoEntrada(rs.getDouble("icms_e_reducao"));
+                    imp.setIcmsReducaoEntrada(rs.getDouble("icms_e_reducao"));*/
+                    imp.setIcmsCreditoId(rs.getString("idaliquotacredito"));
+                    imp.setIcmsDebitoId(rs.getString("idaliquotadebito"));
 
                     result.add(imp);
                 }

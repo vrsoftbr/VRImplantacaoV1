@@ -305,7 +305,7 @@ public class NotaSaida implements Nota {
     }
 
     public void setInformacaoComplementar(String informacaoComplementar) {
-        this.informacaoComplementar = Utils.acertarTexto(informacaoComplementar, 1000, "");
+        this.informacaoComplementar = Utils.acertarObservacao(informacaoComplementar, 1000, "");
     }
 
     public String getSenha() {

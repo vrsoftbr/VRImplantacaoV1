@@ -1,6 +1,7 @@
 package vrimplantacao2.vo.cadastro.notafiscal;
 
 import java.sql.Timestamp;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.MathUtils;
 
 /**
@@ -14,8 +15,7 @@ public class NotaSaidaItem {
     private int idProduto;//id_produto;// integer NOT NULL,
     private double quantidade = 0;// numeric(12,3) NOT NULL,
     private int qtdEmbalagem = 1;// integer NOT NULL,
-    private double valor = 0;// numeric(13,4) NOT NULL,
-    //private double valorTotal = 0;// numeric(11,2) NOT NULL,
+    private double valorTotal = 0;// numeric(11,2) NOT NULL,
     private double valorIpi = 0;// numeric(13,4) NOT NULL,
     private int idAliquota;//id_aliquota;// integer NOT NULL,
     private double valorBaseCalculo = 0;// numeric(11,2) NOT NULL,
@@ -82,7 +82,7 @@ public class NotaSaidaItem {
     }
 
     public void setQuantidade(double quantidade) {
-        this.quantidade = quantidade;
+        this.quantidade = MathUtils.round(quantidade, 3, 99999999.99D);
     }
 
     public int getQtdEmbalagem() {
@@ -94,15 +94,15 @@ public class NotaSaidaItem {
     }
 
     public double getValor() {
-        return valor;
-    }
-
-    public void setValor(double valor) {
-        this.valor = valor;
+        return MathUtils.round(getValorTotal() / getQuantidade(), 4);
     }
 
     public double getValorTotal() {
-        return MathUtils.round((this.quantidade * this.qtdEmbalagem) * this.valor, 2);
+        return valorTotal;
+    }
+
+    public void setValorTotal(double valorTotal) {
+        this.valorTotal = MathUtils.round(valorTotal, 4, 99999999.99D);
     }
 
     public double getValorIpi() {
@@ -110,7 +110,7 @@ public class NotaSaidaItem {
     }
 
     public void setValorIpi(double valorIpi) {
-        this.valorIpi = valorIpi;
+        this.valorIpi = MathUtils.round(valorIpi, 4, 99999999.99D);
     }
 
     public int getIdAliquota() {
@@ -126,7 +126,7 @@ public class NotaSaidaItem {
     }
 
     public void setValorBaseCalculo(double valorBaseCalculo) {
-        this.valorBaseCalculo = valorBaseCalculo;
+        this.valorBaseCalculo = MathUtils.round(valorBaseCalculo, 2, 99999999.99D);
     }
 
     public double getValorIcms() {
@@ -134,7 +134,7 @@ public class NotaSaidaItem {
     }
 
     public void setValorIcms(double valorIcms) {
-        this.valorIcms = valorIcms;
+        this.valorIcms = MathUtils.round(valorIcms, 4, 99999999.99D);
     }
 
     public double getValorBaseSubstituicao() {
@@ -142,7 +142,7 @@ public class NotaSaidaItem {
     }
 
     public void setValorBaseSubstituicao(double valorBaseSubstituicao) {
-        this.valorBaseSubstituicao = valorBaseSubstituicao;
+        this.valorBaseSubstituicao = MathUtils.round(valorBaseSubstituicao, 2, 99999999.99D);
     }
 
     public double getValorIcmsSubstituicao() {
@@ -150,7 +150,7 @@ public class NotaSaidaItem {
     }
 
     public void setValorIcmsSubstituicao(double valorIcmsSubstituicao) {
-        this.valorIcmsSubstituicao = valorIcmsSubstituicao;
+        this.valorIcmsSubstituicao = MathUtils.round(valorIcmsSubstituicao, 4, 99999999.99D);;
     }
 
     public double getValorPisCofins() {
@@ -158,7 +158,7 @@ public class NotaSaidaItem {
     }
 
     public void setValorPisCofins(double valorPisCofins) {
-        this.valorPisCofins = valorPisCofins;
+        this.valorPisCofins = MathUtils.round(valorPisCofins, 2, 99999999.99D);
     }
 
     public double getValorBaseIpi() {
@@ -166,7 +166,7 @@ public class NotaSaidaItem {
     }
 
     public void setValorBaseIpi(double valorBaseIpi) {
-        this.valorBaseIpi = valorBaseIpi;
+        this.valorBaseIpi = MathUtils.round(valorBaseIpi, 2, 99999999.99D);
     }
 
     public String getCfop() {
@@ -174,7 +174,7 @@ public class NotaSaidaItem {
     }
 
     public void setCfop(String cfop) {
-        this.cfop = cfop;
+        this.cfop = String.format("%,d", Utils.stringToInt(cfop));
     }
 
     public int getTipoIva() {
@@ -198,7 +198,7 @@ public class NotaSaidaItem {
     }
 
     public void setValorDesconto(double valorDesconto) {
-        this.valorDesconto = valorDesconto;
+        this.valorDesconto = MathUtils.round(valorDesconto, 2, 99999999.99D);
     }
 
     public double getValorIsento() {
@@ -206,7 +206,7 @@ public class NotaSaidaItem {
     }
 
     public void setValorIsento(double valorIsento) {
-        this.valorIsento = valorIsento;
+        this.valorIsento = MathUtils.round(valorIsento, 2, 99999999.99D);
     }
 
     public double getValorOutras() {
@@ -214,7 +214,7 @@ public class NotaSaidaItem {
     }
 
     public void setValorOutras(double valorOutras) {
-        this.valorOutras = valorOutras;
+        this.valorOutras = MathUtils.round(valorOutras, 2, 99999999.99D);
     }
 
     public int getSituacaoTributaria() {
@@ -230,7 +230,7 @@ public class NotaSaidaItem {
     }
 
     public void setValorIcmsDispensado(double valorIcmsDispensado) {
-        this.valorIcmsDispensado = valorIcmsDispensado;
+        this.valorIcmsDispensado = MathUtils.round(valorIcmsDispensado, 3, 99999999.99D);
     }
 
     public int getIdAliquotaDispensado() {
@@ -318,7 +318,7 @@ public class NotaSaidaItem {
     }
 
     public void setValorBaseFcp(double valorBaseFcp) {
-        this.valorBaseFcp = valorBaseFcp;
+        this.valorBaseFcp = MathUtils.round(valorBaseFcp, 2, 99999999.99D);
     }
 
     public double getValorFcp() {
@@ -326,7 +326,7 @@ public class NotaSaidaItem {
     }
 
     public void setValorFcp(double valorFcp) {
-        this.valorFcp = valorFcp;
+        this.valorFcp = MathUtils.round(valorFcp, 2, 99999999.99D);
     }
 
     public double getValorBaseFcpSt() {
@@ -334,7 +334,7 @@ public class NotaSaidaItem {
     }
 
     public void setValorBaseFcpSt(double valorBaseFcpSt) {
-        this.valorBaseFcpSt = valorBaseFcpSt;
+        this.valorBaseFcpSt = MathUtils.round(valorBaseFcpSt, 2, 99999999.99D);
     }
 
     public double getValorFcpSt() {
@@ -342,7 +342,7 @@ public class NotaSaidaItem {
     }
 
     public void setValorFcpSt(double valorFcpSt) {
-        this.valorFcpSt = valorFcpSt;
+        this.valorFcpSt = MathUtils.round(valorFcpSt, 2, 99999999.99D);
     }
 
     public double getValorIcmsDesonerado() {
@@ -350,7 +350,7 @@ public class NotaSaidaItem {
     }
 
     public void setValorIcmsDesonerado(double valorIcmsDesonerado) {
-        this.valorIcmsDesonerado = valorIcmsDesonerado;
+        this.valorIcmsDesonerado = MathUtils.round(valorIcmsDesonerado, 2, 99999999.99D);;
     }
 
     public int getIdMotivoDesoneracao() {
@@ -366,7 +366,7 @@ public class NotaSaidaItem {
     }
 
     public void setValorBaseCalculoIcmsDesonerado(double valorBaseCalculoIcmsDesonerado) {
-        this.valorBaseCalculoIcmsDesonerado = valorBaseCalculoIcmsDesonerado;
+        this.valorBaseCalculoIcmsDesonerado = MathUtils.round(valorBaseCalculoIcmsDesonerado, 2, 99999999.99D);
     }
 
     public int getIdEscritaFundamento() {
@@ -390,7 +390,7 @@ public class NotaSaidaItem {
     }
 
     public void setValorIcmsDiferido(double valorIcmsDiferido) {
-        this.valorIcmsDiferido = valorIcmsDiferido;
+        this.valorIcmsDiferido = MathUtils.round(valorIcmsDiferido, 2, 99999999.99D);
     }
     
 }
