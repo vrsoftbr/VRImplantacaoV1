@@ -35,8 +35,8 @@ public class NotaFiscalAnteriorDAO {
                         "	loja varchar not null,\n" +
                         "	operacao integer not null,\n" +
                         "	id varchar not null,\n" +
-                        "	id_notasaida integer references notasaida(id) on update cascade on delete cascade,\n" +
-                        "	id_notaentrada integer references notaentrada(id) on update cascade on delete cascade,\n" +
+                        "	id_notasaida integer references notasaida(id) on update cascade on delete set null,\n" +
+                        "	id_notaentrada integer references notaentrada(id) on update cascade on delete set null,\n" +
                         "	tiponota integer,\n" +
                         "	modelo varchar(4),\n" +
                         "	serie varchar(5),\n" +

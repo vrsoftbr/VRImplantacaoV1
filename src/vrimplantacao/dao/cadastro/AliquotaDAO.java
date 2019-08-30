@@ -2,6 +2,8 @@ package vrimplantacao.dao.cadastro;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import vrimplantacao.vo.cadastro.SituacaoCadastro;
 import vrimplantacao.vo.cadastro.SituacaoTributaria;
 import vrimplantacao.vo.interfaces.AliquotaVO;
@@ -250,6 +252,33 @@ public class AliquotaDAO {
                         rst.getInt("situacaotributaria"),
                         MathUtils.trunc(rst.getDouble("porcentagem"), 1),
                         MathUtils.trunc(rst.getInt("reduzido"), 1)
+                    );
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    public Map<String, Integer> getAliquotaPorValor() throws Exception {
+        Map<String, Integer> result = new HashMap<>();
+        
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	id,\n" +
+                    "	situacaotributaria cst,\n" +
+                    "	case when situacaotributaria in (40,41,50,51,60) then 0 else porcentagem end aliquota,\n" +
+                    "	case when situacaotributaria in (40,41,50,51,60) then 0 else reduzido end reduzido\n" +
+                    "from\n" +
+                    "	aliquota\n" +
+                    "where\n" +
+                    "	id_situacaocadastro = 1"
+            )) {
+                while (rst.next()) {
+                    result.put(
+                            String.format("%d-%.2f-%.2f", rst.getInt("cst"), rst.getDouble("aliquota"), rst.getDouble("reduzido")),
+                            rst.getInt("id")
                     );
                 }
             }

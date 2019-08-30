@@ -22,6 +22,15 @@ public class OryonDAO extends InterfaceDAO {
 }
 
 /*
+--- Script Loja
+select
+   codigo,
+   descricao
+from
+   tabela_unidade_negocio
+*/
+
+/*
 --- Script de Produto
 select
   p.codigo as id,

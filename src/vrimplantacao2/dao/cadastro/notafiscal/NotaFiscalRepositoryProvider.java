@@ -2,9 +2,14 @@ package vrimplantacao2.dao.cadastro.notafiscal;
 
 import java.util.Map;
 import vrframework.classe.ProgressBar;
+import vrimplantacao.dao.cadastro.AliquotaDAO;
+import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao2.dao.cadastro.cliente.ClienteEventualAnteriorDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
+import vrimplantacao2.dao.cadastro.produto.PisCofinsDAO;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
+import vrimplantacao2.dao.cadastro.produto.ProdutoComplementoDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributacaoDAO;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaEntrada;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaEntradaItem;
@@ -28,8 +33,13 @@ public class NotaFiscalRepositoryProvider {
     private ClienteEventualAnteriorDAO clienteEventualAnteriorDAO;
     private NotaFiscalAnteriorDAO notaFiscalAnteriorDAO;
     private ProdutoAnteriorDAO produtoAnteriorDAO;
+    private AliquotaDAO aliquotaDAO;
+    private ProdutoComplementoDAO produtoComplementoDAO;
+    private PisCofinsDAO pisCofinsDAO;
+    private MapaTributacaoDAO mapaTributacaoDAO;
 
     public NotaFiscalRepositoryProvider(String sistema, String lojaOrigem, int lojaVR) throws Exception {
+        
         this.sistema = sistema;
         this.lojaOrigem = lojaOrigem;
         this.lojaVR = lojaVR;
@@ -40,6 +50,12 @@ public class NotaFiscalRepositoryProvider {
         this.clienteEventualAnteriorDAO = new ClienteEventualAnteriorDAO();
         this.notaFiscalAnteriorDAO = new NotaFiscalAnteriorDAO();
         this.produtoAnteriorDAO = new ProdutoAnteriorDAO();
+        this.aliquotaDAO = new AliquotaDAO();
+        this.produtoComplementoDAO = new ProdutoComplementoDAO();
+        this.pisCofinsDAO = new PisCofinsDAO();
+        this.mapaTributacaoDAO = new MapaTributacaoDAO();
+        this.mapaTributacaoDAO.createTable();
+        
     }
 
     public String getSistema() {
@@ -101,12 +117,12 @@ public class NotaFiscalRepositoryProvider {
         notaFiscalAnteriorDAO.atualizar(anterior);
     }
 
-    public void eliminarNotaEntrada(int id) throws Exception {
-        notaEntradaDAO.eliminarNota(id);
+    public void eliminarNotaEntrada(int codigoAtual) throws Exception {
+        notaEntradaDAO.eliminarNota(codigoAtual);
     }
 
-    public void eliminarNotaSaida(int id) throws Exception {
-        notaSaidaDAO.eliminarNota(id);
+    public void eliminarNotaSaida(int codigoAtual) throws Exception {
+        notaSaidaDAO.eliminarNota(codigoAtual);
     }
 
     public Integer getIdNotaEntrada(NotaFiscalIMP imp) throws Exception {
@@ -120,21 +136,37 @@ public class NotaFiscalRepositoryProvider {
     public void salvarSaida(NotaSaida ns) throws Exception {
         notaSaidaDAO.salvar(ns);
     }
-
-    public void salvarSaidaItens(NotaSaida ns) throws Exception {
-        notaSaidaDAO.salvarItens(ns);
+    
+    public void salvarEntradaItem(NotaEntradaItem item) throws Exception {
+        notaEntradaDAO.salvarItem(item);
     }
 
-    void salvarEntradaItem(NotaEntradaItem item) {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
-    }
-
-    void salvarSaidaItem(NotaSaidaItem item) {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+    public void salvarSaidaItem(NotaSaidaItem item) throws Exception  {
+        notaSaidaDAO.salvarItem(item);
     }
 
     public Map<String, Integer> getProdutosAnteriores() throws Exception {
         return produtoAnteriorDAO.getAnteriores(sistema, lojaOrigem);
+    }
+
+    public Map<String, Integer> getAliquotaPorId() throws Exception {
+        return mapaTributacaoDAO.getAliquotaPorId(sistema, lojaOrigem);
+    }
+
+    public Map<String, Integer> getAliquotaPorValor() throws Exception {
+        return aliquotaDAO.getAliquotaPorValor();
+    }
+
+    public Map<Integer, Double> getCustoProduto() throws Exception {
+        return produtoComplementoDAO.getCustoProduto(lojaVR);
+    }
+
+    public Map<Integer, Integer> getPisCofins() throws Exception {
+        return pisCofinsDAO.getPisCofinsByCst();
+    }
+
+    public int getIdFornecedorLoja() throws Exception {
+        return new LojaDAO().getIdFornecedor(lojaVR);
     }
     
 }
