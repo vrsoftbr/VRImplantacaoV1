@@ -1480,11 +1480,11 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
 
                         String id = rst.getString("data")
                                 + "-"
+                                + rst.getString("horainicio")
+                                + "-"
                                 + rst.getString("ecf")
                                 + "-"
-                                + rst.getString("numerocupom")
-                                + "-"
-                                + rst.getString("vc_clientepreferencial");
+                                + rst.getString("numerocupom");
 
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
@@ -1581,11 +1581,11 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         next = new VendaItemIMP();
                         String idVenda = rst.getString("data")
                                 + "-"
+                                + rst.getString("horainicio")
+                                + "-"
                                 + rst.getString("ecf")
                                 + "-"
-                                + rst.getString("numerocupom")
-                                + "-"
-                                + rst.getString("vc_clientepreferencial");
+                                + rst.getString("numerocupom");
 
                         String id = rst.getString("data")
                                 + "-"
@@ -1593,9 +1593,9 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                                 + "-"
                                 + rst.getString("numerocupom")
                                 + "-"
-                                + rst.getString("vc_clientepreferencial")
+                                + rst.getString("produto")
                                 + "-"
-                                + rst.getString("produto");
+                                + rst.getString("sequencia");
 
                         next.setId(id);
                         next.setVenda(idVenda);
@@ -1606,6 +1606,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setValorAcrescimo(rst.getDouble("acrescimo"));
                         next.setCancelado("C".equals(rst.getString("status")));
                         next.setCodigoBarras(rst.getString("codigobarras"));
+                        next.setSequencia(rst.getInt("sequencia"));
 
                         String trib = Utils.acertarTexto(rst.getString("codaliq_venda"));
                         if (trib == null || "".equals(trib)) {
@@ -1685,26 +1686,24 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino, Connection con) throws Exception {
             this.sql
                     = "select\n"
+                    + "m.id,\n"
                     + "m.data,\n"
                     + "cb.hora as horainicio,\n"
                     + "cb.hora as horatermino,\n"
                     + "m.ecf,\n"
                     + "m.serie as numeroserie,\n"
-                    + "cb.cupom as numerocupom,\n"
-                    + "cb.chave as ChaveCfe,\n"
-                    + "c.codcli as vc_clientepreferencial,\n"
-                    + "cb.valor as subtotalimpressora,\n"
+                    + "i.item as sequencia,\n"
                     + "i.produto as codigobarras,\n"
                     + "i.codpro as produto,\n"
                     + "i.quanti as quantidade,\n"
                     + "i.valor as total,\n"
                     + "i.sittri as codaliq_venda,\n"
+                    + "i.cupom as numerocupom,\n"
                     + "i.status,\n"
                     + "0 as desconto,\n"
                     + "0 as acrescimo\n"
                     + "from movdia m\n"
                     + "left join cabec cb on cb.idmovdia = m.id\n"
-                    + "left join convenio c on c.idmovdia = m.id and cb.cupom = c.cupom\n"
                     + "left join item i on i.idmovdia = m.id and cb.cupom = i.cupom\n"
                     + "where m.filial = " + idLojaCliente + "\n"
                     + "and m.data >= '" + FORMAT.format(dataInicio) + "'\n"
