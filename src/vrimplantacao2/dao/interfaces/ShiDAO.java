@@ -1593,6 +1593,8 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
 
                         String id = rst.getString("data")
                                 + "-"
+                                + rst.getString("horainicio")
+                                + "-"
                                 + rst.getString("ecf")
                                 + "-"
                                 + rst.getString("numerocupom")
@@ -1689,7 +1691,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino, Connection con) throws Exception {
             this.sql
-                    = "select \n"
+                    = "select distinct\n"
                     + "m.data,\n"
                     + "cb.hora as horainicio,\n"
                     + "cb.hora as horatermino,\n"
