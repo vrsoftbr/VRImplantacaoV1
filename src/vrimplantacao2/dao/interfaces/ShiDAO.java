@@ -1484,7 +1484,9 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                                 + "-"
                                 + rst.getString("ecf")
                                 + "-"
-                                + rst.getString("numerocupom");
+                                + rst.getString("numerocupom")
+                                + "-"
+                                + rst.getString("ChaveCfe");
 
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
@@ -1494,7 +1496,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
                         next.setData(rst.getDate("data"));
-                        next.setIdClientePreferencial(rst.getString("vc_clientepreferencial"));
+                        //next.setIdClientePreferencial(rst.getString("vc_clientepreferencial"));
 
                         String horaInicio = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horainicio");
                         String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("horatermino");
@@ -1518,7 +1520,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino, Connection con) throws Exception {
             this.sql
-                    = "select\n"
+                    = "select distinct\n"
                     + "m.data,\n"
                     + "cb.hora as horainicio,\n"
                     + "cb.hora as horatermino,\n"
@@ -1526,7 +1528,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "m.serie as numeroserie,\n"
                     + "cb.cupom as numerocupom,\n"
                     + "cb.chave as ChaveCfe,\n"
-                    + "c.codcli as vc_clientepreferencial,\n"
+                    + "--c.codcli as vc_clientepreferencial,\n"
                     + "cb.valor as subtotalimpressora,\n"
                     + "0 as desconto,\n"
                     + "0 as acrescimo,\n"
@@ -1585,7 +1587,9 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                                 + "-"
                                 + rst.getString("ecf")
                                 + "-"
-                                + rst.getString("numerocupom");
+                                + rst.getString("numerocupom")
+                                + "-"
+                                + rst.getString("ChaveCfe");
 
                         String id = rst.getString("data")
                                 + "-"
@@ -1608,9 +1612,9 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setSequencia(rst.getInt("sequencia"));
 
-                        String trib = Utils.acertarTexto(rst.getString("codaliq_venda"));
+                        String trib = Utils.acertarTexto(rst.getString("codaliq_produto"));
                         if (trib == null || "".equals(trib)) {
-                            trib = Utils.acertarTexto(rst.getString("codaliq_produto"));
+                            trib = "I";
                         }
 
                         obterAliquota(next, trib);
@@ -1685,8 +1689,7 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
 
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino, Connection con) throws Exception {
             this.sql
-                    = "select\n"
-                    + "m.id,\n"
+                    = "select \n"
                     + "m.data,\n"
                     + "cb.hora as horainicio,\n"
                     + "cb.hora as horatermino,\n"
@@ -1697,11 +1700,12 @@ public class ShiDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "i.codpro as produto,\n"
                     + "i.quanti as quantidade,\n"
                     + "i.valor as total,\n"
-                    + "i.sittri as codaliq_venda,\n"
+                    + "i.sittri as codaliq_produto,\n"
                     + "i.cupom as numerocupom,\n"
                     + "i.status,\n"
                     + "0 as desconto,\n"
-                    + "0 as acrescimo\n"
+                    + "0 as acrescimo,\n"
+                    + "cb.chave as ChaveCfe\n"
                     + "from movdia m\n"
                     + "left join cabec cb on cb.idmovdia = m.id\n"
                     + "left join item i on i.idmovdia = m.id and cb.cupom = i.cupom\n"
