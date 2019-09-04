@@ -164,7 +164,7 @@ public class HerculesIntCashGUI extends VRInternalFrame implements ConexaoEvent 
                         if (chkCheque.isSelected()) {
                             importador.importarCheque();
                         }
-                    } else if (tabOperacoes.getSelectedIndex() == 2) {
+                    } else if (tabOperacoes.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
                         }

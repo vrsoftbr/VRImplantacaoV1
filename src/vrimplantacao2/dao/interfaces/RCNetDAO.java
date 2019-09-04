@@ -170,41 +170,42 @@ public class RCNetDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT\n" +
-                    "  p.ninterno id,\n" +
-                    "  p.datahoraalteracao,\n" +
-                    "  p.codigobarra ean,\n" +
-                    "  case when coalesce(p.qtdemb,1) >= 1 then coalesce(p.qtdemb,1) else 1 end qtdembalagem,\n" +
-                    "  case when p.peso = 1 and p.tipobalanca = 'P' then 'KG' else 'UN' end tipoembalagem,\n" +
-                    "  p.peso ebalanca,\n" +
-                    "  p.validade,\n" +
-                    "  p.descricao descricaocompleta,\n" +
-                    "  p.abreviacao descricaoreduzida,\n" +
-                    "  p.codgrupo merc1,\n" +
-                    "  p.codgruposub merc2,\n" +
-                    "  p.codgrupomarca merc3,\n" +
-                    "  (select codgrupo from familiaprecoproduto where codigobarra = p.codigobarra and p.coddesativado = 0 limit 1) idfamiliaproduto,\n" +
-                    "  coalesce(est.qtd,0) estoque,\n" +
-                    "  p.estmin" + getLojaOrigem() + " estoqueminimo,\n" +
-                    "  p.estmax" + getLojaOrigem() + " estoquemaximo,\n" +
-                    "  p.m1 margem,\n" +
-                    "  p.p" + getLojaOrigem() + " preco,\n" +
-                    "  coalesce(cus.custo, 0) custosemimposto,\n" +
-                    "  coalesce(cus.custo, 0) custocomimposto,\n" +
-                    //"  coalesce(cus.custoformacao, 0) custocomimposto,\n" +
-                    "  case p.coddesativado when 1 then 0 else 1 end id_situacaocadastro,\n" +
-                    "  p.codigoncm ncm,\n" +
-                    "  p.cest,\n" +
-                    "  p.codpiscofinssaida piscofins_saida,\n" +
-                    "  p.tabelacstpiscofins piscofins_natreceita,\n" +
-                    "  p.cst icms_cst,\n" +
-                    "  p.icmssaida icms_aliq_saida,\n" +
-                    "  p.icmsentrada icms_saliq_entrada,\n" +
-                    "  p.st\n" +
-                    "FROM\n" +
-                    "  itens p\n" +
-                    "  left join estoquen" + getLojaOrigem() + " est on p.codigobarra = est.codigobarra\n" +
-                    "  left join custoloja" + getLojaOrigem() + " cus on p.codigobarra = cus.codigobarra"
+                    "SELECT\n"
+                    + "  p.ninterno id,\n"
+                    + "  p.datahoraalteracao,\n"
+                    + "  p.codigobarra ean,\n"
+                    + "  case when coalesce(p.qtdemb,1) >= 1 then coalesce(p.qtdemb,1) else 1 end qtdembalagem,\n"
+                    + "  case when p.peso = 1 and p.tipobalanca = 'P' then 'KG' else 'UN' end tipoembalagem,\n"
+                    + "  p.peso ebalanca,\n"
+                    + "  p.validade,\n"
+                    + "  p.descricao descricaocompleta,\n"
+                    + "  p.abreviacao descricaoreduzida,\n"
+                    + "  p.codgrupo merc1,\n"
+                    + "  p.codgruposub merc2,\n"
+                    + "  p.codgrupomarca merc3,\n"
+                    + "  (select codgrupo from familiaprecoproduto where codigobarra = p.codigobarra and p.coddesativado = 0 limit 1) idfamiliaproduto,\n"
+                    + "  coalesce(est.qtd,0) estoque,\n"
+                    + "  p.estmin" + getLojaOrigem() + " estoqueminimo,\n"
+                    + "  p.estmax" + getLojaOrigem() + " estoquemaximo,\n"
+                    + "  p.m1 margem,\n"
+                    + "  p.p" + getLojaOrigem() + " preco,\n"
+                    + "  coalesce(cus.custo, 0) custosemimposto,\n"
+                    + "  coalesce(cus.custo, 0) custocomimposto,\n"
+                    + //"  coalesce(cus.custoformacao, 0) custocomimposto,\n" +
+                    "  case p.coddesativado when 1 then 0 else 1 end id_situacaocadastro,\n"
+                    + "  p.codigoncm ncm,\n"
+                    + "  p.cest,\n"
+                    + "  p.codpiscofinssaida piscofins_saida,\n"
+                    + "  p.tabelacstpiscofins piscofins_natreceita,\n"
+                    + "  p.cst icms_cst,\n"
+                    + "  p.icmssaida icms_aliq_saida,\n"
+                    + "  p.icmsentrada icms_saliq_entrada,\n"
+                    + "  p.st\n"
+                    + "FROM\n"
+                    + "  itens p\n"
+                    + "  left join estoquen" + getLojaOrigem() + " est on p.codigobarra = est.codigobarra\n"
+                    + "  left join custoloja" + getLojaOrigem() + " cus on p.codigobarra = cus.codigobarra"
+                    //+ "where p.peso = 1"
             )) {
                 int c1 = 0,c2 = 0;
                 SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
@@ -219,6 +220,8 @@ public class RCNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     } catch (ParseException e) {
                         imp.setDataCadastro(new Date());
                     }
+                    
+                    //imp.setEan(rst.getString("ean").trim().length() > 5 ? rst.getString("ean").substring(0, 5) : rst.getString("ean"));
                     imp.setEan(rst.getString("ean"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
@@ -244,6 +247,7 @@ public class RCNetDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstDebito(rst.getInt("piscofins_saida"));
                     imp.setPiscofinsNaturezaReceita(rst.getInt("piscofins_natreceita"));
                     imp.setIcmsDebitoId(rst.getString("st"));                    
+                    imp.setIcmsCreditoId(rst.getString("st"));                    
                     
                     result.add(imp);
                     

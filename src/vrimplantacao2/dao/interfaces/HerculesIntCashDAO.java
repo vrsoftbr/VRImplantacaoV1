@@ -417,7 +417,7 @@ public class HerculesIntCashDAO extends InterfaceDAO {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "     c.Cli_CodCli as id,\n"
+                    + "     c.Cli_CicCli as id,\n"
                     + "     c.Cli_CicCli as cnpj,\n"
                     + "     c.Cli_NomCli as razao,\n"
                     + "     c.Cli_NomFan as fantasia,\n"
@@ -475,7 +475,7 @@ public class HerculesIntCashDAO extends InterfaceDAO {
             try (ResultSet rst = stm.executeQuery(
                     "select  \n"
                     + "(rec.Cat_CodEmp + '-' + rec.Cat_CicCli + '-' + rec.Cat_NumTit) as id,\n"
-                    + "cli.Cli_CodCli as id_cliente,\n"
+                    + "cli.Cli_CicCli as id_cliente,\n"
                     + "rec.Cat_CicCli as cnpj_cliente,\n"
                     + "rec.Cat_NumTit as numero_cupom,\n"
                     + "rec.Cat_DatEmi as data_emissao,\n"
