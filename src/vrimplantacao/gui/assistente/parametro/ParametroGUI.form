@@ -6,6 +6,8 @@
     </Component>
     <Component class="javax.swing.ButtonGroup" name="rdgLogType">
     </Component>
+    <Component class="javax.swing.ButtonGroup" name="rdgTipoConexaoODBC">
+    </Component>
   </NonVisualComponents>
   <Properties>
     <Property name="title" type="java.lang.String" value="Configurar parametros do sistema"/>
@@ -94,6 +96,7 @@
                           <Component id="vRPanel1" alignment="1" max="32767" attributes="0"/>
                           <Component id="pnlLocalizacao" alignment="1" max="32767" attributes="0"/>
                           <Component id="pnlDiversos" alignment="0" max="32767" attributes="0"/>
+                          <Component id="pnlDriverODBC" alignment="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -108,7 +111,9 @@
                       <Component id="vRPanel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="pnlDiversos" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="186" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="pnlDriverODBC" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="109" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -309,7 +314,6 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="chkIgnorarClienteImpVenda" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="32767" attributes="0"/>
                       </Group>
@@ -343,6 +347,96 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Ignorar cliente n&#xe3;o importado na importa&#xe7;&#xe3;o de venda"/>
                   </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Container class="vrframework.bean.panel.VRPanel" name="pnlDriverODBC">
+              <Properties>
+                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                  <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+                    <TitledBorder title="Op&#xe7;&#xf5;es do driver ODBC"/>
+                  </Border>
+                </Property>
+              </Properties>
+
+              <Layout>
+                <DimensionLayout dim="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="optFonteDados" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="optDriver" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Component id="vRLabel6" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="vRLabel7" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtNomeDriverODBC" min="-2" pref="198" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="130" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+                <DimensionLayout dim="1">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="vRLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="vRLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="txtNomeDriverODBC" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="optFonteDados" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="optDriver" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                </DimensionLayout>
+              </Layout>
+              <SubComponents>
+                <Component class="vrframework.bean.label.VRLabel" name="vRLabel6">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Tipo de Conex&#xe3;o"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.textField.VRTextField" name="txtNomeDriverODBC">
+                  <Properties>
+                    <Property name="caixaAlta" type="boolean" value="false"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.label.VRLabel" name="vRLabel7">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Nome do Driver"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JRadioButton" name="optFonteDados">
+                  <Properties>
+                    <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                      <ComponentRef name="rdgTipoConexaoODBC"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Fonte de Dados"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="optFonteDadosActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JRadioButton" name="optDriver">
+                  <Properties>
+                    <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                      <ComponentRef name="rdgTipoConexaoODBC"/>
+                    </Property>
+                    <Property name="selected" type="boolean" value="true"/>
+                    <Property name="text" type="java.lang.String" value="Driver"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="optFonteDadosActionPerformed"/>
+                  </Events>
                 </Component>
               </SubComponents>
             </Container>

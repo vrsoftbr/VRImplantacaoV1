@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import vrimplantacao2.parametro.Parametros;
 
 public class ConexaoAccess {
 
@@ -14,13 +15,29 @@ public class ConexaoAccess {
     private String usuario = "";
     private String senha = "";
 
-    public void abrirConexao(String i_database, String i_usuario, String i_senha) throws Exception {
+    public static void abrirConexao(String i_database, String i_usuario, String i_senha) throws Exception {
+        
         Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-        //Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
-        String db = "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};DBQ=" + i_database;
-        //String db = "jdbc:ucanaccess://C:/Oryon.mdb";
+        
+        switch (TipoConexaoAccess.get(Parametros.get().getInt(0, "ODBC", "TIPO_CONEXAO"))) {
+            case DRIVER: 
+                con = DriverManager.getConnection(
+                        "jdbc:odbc:Driver={" + 
+                        Parametros.get().getWithNull("Microsoft Access Driver (*.mdb)", "ODBC", "DRIVER_ODBC") + 
+                        "};DBQ=" + i_database
+                );
+                break;
+            default: FONTE_DE_DADOS:
+                con = DriverManager.getConnection(
+                        "jdbc:odbc:" + i_database,
+                        i_usuario,
+                        i_senha
+                );
+                break;                
+        }
+
         try {
-            con = DriverManager.getConnection(db, i_usuario, i_senha);
+            
         } catch (Exception ex) {
             throw ex;
         }
