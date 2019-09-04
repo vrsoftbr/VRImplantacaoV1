@@ -11,6 +11,7 @@ import vrimplantacao.classe.ConexaoAccess;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -114,12 +115,9 @@ public class OryonDAO extends InterfaceDAO {
                     "	p.descricao as descricaocompleta,\n" +
                     "	p.descricao as descricaoreduzida,\n" +
                     "	p.descricao as descricaogondola,\n" +
-                    "	p.categoria as cod_mercadologico1,\n" +
                     "	g.grupo as mercadologico1,\n" +
-                    "	1 as cod_mercadologico2,\n" +
                     "	g.sub_grupo as mercadologico2,\n" +
-                    "	1 as cod_mercadologico3,\n" +
-                    "	g.sub_grupo as mercadologico3,\n" +
+                    "	g.nome as mercadologico3,\n" +
                     "	p.familia,\n" +
                     "	p.unidade,\n" +
                     "	p.qt_embalagem as qtdembalagem,\n" +
@@ -158,7 +156,55 @@ public class OryonDAO extends InterfaceDAO {
                     "	1"
             )) {
                 while (rst.next()) {
-                
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("codigobarras"));
+                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    imp.setDescricaoGondola(rst.getString("descricaogondola"));
+                    
+                    String g1 = Utils.acertarTexto(rst.getString("mercadologico1"));
+                    String g2 = Utils.acertarTexto(rst.getString("mercadologico2"));
+                    String g3 = Utils.acertarTexto(rst.getString("mercadologico3"));
+                    
+                    if ("".equals(g2)) {
+                        g2 = g3;
+                    }
+                    if ("".equals(g1)) {
+                        g1 = g2;
+                    }                   
+                    imp.setCodMercadologico1(g1);
+                    imp.setCodMercadologico2(g2);
+                    imp.setCodMercadologico3(g3);
+                    imp.setIdFamiliaProduto(rst.getString("familia"));
+                    imp.setTipoEmbalagem(rst.getString("unidade"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setSituacaoCadastro(rst.getBoolean("ativo") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
+                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    imp.setMargem(rst.getDouble("margem"));
+                    imp.seteBalanca(rst.getBoolean("balanca"));
+                    imp.setValidade(rst.getInt("validade"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setPesoBruto(rst.getDouble("pesobruto"));
+                    imp.setPesoLiquido(rst.getDouble("pesoliquido"));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+                    imp.setIcmsCstEntrada(rst.getInt("cst_e"));
+                    imp.setIcmsCstSaida(rst.getInt("icms_s"));
+                    imp.setPiscofinsCstCredito(rst.getString("pis_s"));
+                    imp.setPiscofinsCstDebito(rst.getString("pis_e"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("natreceita"));
+                    imp.setPautaFiscalId(rst.getString("mva"));
+                    
+                    result.add(imp);
                 }
             }
         }
