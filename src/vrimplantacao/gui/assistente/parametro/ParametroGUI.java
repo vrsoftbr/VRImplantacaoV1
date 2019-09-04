@@ -1,6 +1,7 @@
 package vrimplantacao.gui.assistente.parametro;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
@@ -47,6 +48,7 @@ import vrframework.bean.table.VRTable;
 import vrframework.bean.textField.VRTextField;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
+import vrimplantacao.classe.TipoConexaoAccess;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.EstadoVO;
 import vrimplantacao.vo.vrimplantacao.MunicipioVO;
@@ -71,7 +73,9 @@ public class ParametroGUI extends VRInternalFrame {
     private ParametroGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         
-        initComponents();  
+        initComponents();
+        
+        setPreferredSize(new Dimension(577, 570));
         
         carregarParametros();
 
@@ -105,6 +109,7 @@ public class ParametroGUI extends VRInternalFrame {
 
         rdgLogLevel = new ButtonGroup();
         rdgLogType = new ButtonGroup();
+        rdgTipoConexaoODBC = new ButtonGroup();
         tabs = new VRTabbedPane();
         tabValorPadrão = new VRPanel();
         pnlLocalizacao = new VRPanel();
@@ -124,6 +129,12 @@ public class ParametroGUI extends VRInternalFrame {
         txtVendaProdutoPadrao = new VRTextField();
         vRLabel5 = new VRLabel();
         chkIgnorarClienteImpVenda = new VRCheckBox();
+        pnlDriverODBC = new VRPanel();
+        vRLabel6 = new VRLabel();
+        txtNomeDriverODBC = new VRTextField();
+        vRLabel7 = new VRLabel();
+        optFonteDados = new JRadioButton();
+        optDriver = new JRadioButton();
         tabLogging = new VRPanel();
         btnLogGravar = new VRButton();
         btnLogCancelar = new VRButton();
@@ -303,8 +314,62 @@ public class ParametroGUI extends VRInternalFrame {
                         .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                             .addComponent(cmbTipoPagamento, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtVendaProdutoPadrao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
-                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkIgnorarClienteImpVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        pnlDriverODBC.setBorder(BorderFactory.createTitledBorder("Opções do driver ODBC"));
+
+        vRLabel6.setText("Tipo de Conexão");
+
+        txtNomeDriverODBC.setCaixaAlta(false);
+
+        vRLabel7.setText("Nome do Driver");
+
+        rdgTipoConexaoODBC.add(optFonteDados);
+        optFonteDados.setText("Fonte de Dados");
+        optFonteDados.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                optFonteDadosActionPerformed(evt);
+            }
+        });
+
+        rdgTipoConexaoODBC.add(optDriver);
+        optDriver.setSelected(true);
+        optDriver.setText("Driver");
+        optDriver.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                optFonteDadosActionPerformed(evt);
+            }
+        });
+
+        GroupLayout pnlDriverODBCLayout = new GroupLayout(pnlDriverODBC);
+        pnlDriverODBC.setLayout(pnlDriverODBCLayout);
+        pnlDriverODBCLayout.setHorizontalGroup(pnlDriverODBCLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDriverODBCLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlDriverODBCLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlDriverODBCLayout.createSequentialGroup()
+                        .addComponent(optFonteDados)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(optDriver))
+                    .addComponent(vRLabel6, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(pnlDriverODBCLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(vRLabel7, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtNomeDriverODBC, GroupLayout.PREFERRED_SIZE, 198, GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(130, Short.MAX_VALUE))
+        );
+        pnlDriverODBCLayout.setVerticalGroup(pnlDriverODBCLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDriverODBCLayout.createSequentialGroup()
+                .addGroup(pnlDriverODBCLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(vRLabel6, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(vRLabel7, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlDriverODBCLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtNomeDriverODBC, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(optFonteDados)
+                    .addComponent(optDriver))
                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -316,7 +381,8 @@ public class ParametroGUI extends VRInternalFrame {
                 .addGroup(tabValorPadrãoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addComponent(vRPanel1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(pnlLocalizacao, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(pnlDiversos, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(pnlDiversos, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnlDriverODBC, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         tabValorPadrãoLayout.setVerticalGroup(tabValorPadrãoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -327,7 +393,9 @@ public class ParametroGUI extends VRInternalFrame {
                 .addComponent(vRPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlDiversos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(186, Short.MAX_VALUE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlDriverODBC, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(109, Short.MAX_VALUE))
         );
 
         tabs.addTab("Valores padrão", tabValorPadrão);
@@ -576,6 +644,14 @@ public class ParametroGUI extends VRInternalFrame {
         excluirLogging();
     }//GEN-LAST:event_btnLogExcluirActionPerformed
 
+    private void optFonteDadosActionPerformed(ActionEvent evt) {//GEN-FIRST:event_optFonteDadosActionPerformed
+        if (optDriver.isSelected()) {
+            txtNomeDriverODBC.setEnabled(true);
+        } else {
+            txtNomeDriverODBC.setEnabled(false);
+        }
+    }//GEN-LAST:event_optFonteDadosActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private VRButton btnCancelar;
     private VRButton btnGravar;
@@ -590,7 +666,10 @@ public class ParametroGUI extends VRInternalFrame {
     private VRComboBox cmbUfPadrao;
     private JLabel jLabel1;
     private JScrollPane jScrollPane1;
+    private JRadioButton optDriver;
+    private JRadioButton optFonteDados;
     private VRPanel pnlDiversos;
+    private VRPanel pnlDriverODBC;
     private VRPanel pnlLocalizacao;
     private VRPanel pnlLogDados;
     private VRPanel pnlNivelLog;
@@ -608,6 +687,7 @@ public class ParametroGUI extends VRInternalFrame {
     private JRadioButton rdWarning;
     private ButtonGroup rdgLogLevel;
     private ButtonGroup rdgLogType;
+    private ButtonGroup rdgTipoConexaoODBC;
     private VRPanel tabLogging;
     private VRPanel tabValorPadrão;
     private VRTable tableLogging;
@@ -615,12 +695,15 @@ public class ParametroGUI extends VRInternalFrame {
     private VRFileChooser txtBancoImplantacao;
     private VRTextField txtCepPadrao;
     private JTextField txtLogNome;
+    private VRTextField txtNomeDriverODBC;
     private VRTextField txtVendaProdutoPadrao;
     private VRLabel vRLabel1;
     private VRLabel vRLabel2;
     private VRLabel vRLabel3;
     private VRLabel vRLabel4;
     private VRLabel vRLabel5;
+    private VRLabel vRLabel6;
+    private VRLabel vRLabel7;
     private VRPanel vRPanel1;
     // End of variables declaration//GEN-END:variables
 
@@ -670,6 +753,16 @@ public class ParametroGUI extends VRInternalFrame {
         chkImportarBancoImplantacao.setSelected(parametros.isImportarBancoImplantacao());
         chkIgnorarClienteImpVenda.setSelected(parametros.isIgnorarClienteImpVenda());
         txtVendaProdutoPadrao.setInt(parametros.getItemVendaPadrao());
+        switch (TipoConexaoAccess.get(Parametros.get().getInt(0, "ODBC", "TIPO_CONEXAO"))) {
+            case DRIVER:
+                optDriver.setSelected(true);
+                txtNomeDriverODBC.setEnabled(true);
+                break;
+            case FONTE_DE_DADOS:
+                optFonteDados.setSelected(true);
+                txtNomeDriverODBC.setEnabled(false);
+        }
+        txtNomeDriverODBC.setText(parametros.getWithNull("Microsoft Access Driver (*.mdb)", "ODBC", "DRIVER_ODBC"));
         
         LOG.fine("Parametros carregados na tela");
     }
@@ -686,6 +779,12 @@ public class ParametroGUI extends VRInternalFrame {
             parametros.setTipoPagamento((TipoPagamento) cmbTipoPagamento.getSelectedItem());
             parametros.setItemVendaPadrao(txtVendaProdutoPadrao.getInt());
             parametros.setIgnorarClienteImpVenda(chkIgnorarClienteImpVenda.isSelected());
+            parametros.put(txtNomeDriverODBC.getText(), "ODBC", "DRIVER_ODBC");
+            if (optDriver.isSelected()) {
+                parametros.put(0, "ODBC", "TIPO_CONEXAO");
+            } else if (optFonteDados.isSelected()) {
+                parametros.put(1, "ODBC", "TIPO_CONEXAO");
+            }
             parametros.salvar();
             Util.exibirMensagem("Parâmetros gravados com sucesso!", title);
         } else {
