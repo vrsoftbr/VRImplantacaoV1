@@ -1,9 +1,18 @@
 package vrimplantacao2.dao.interfaces;
 
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import vrimplantacao.classe.ConexaoAccess;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  *
@@ -16,9 +25,148 @@ public class OryonDAO extends InterfaceDAO {
         return "Oryon";
     }
     
-    public List<Estabelecimento> getLojaCliente() {
-        return new ArrayList<>(Arrays.asList(new Estabelecimento("1", "SUPERMERCADO ANDREA")));
+    public List<Estabelecimento> getLojaCliente() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select Codigo, Descricao from Tabela_Unidade_Negocio order by Codigo"
+            )) {
+                while (rst.next()) {
+                    result.add(new Estabelecimento(rst.getString("Codigo"), rst.getString("Descricao")));
+                }
+            }
+        }
+        
+        return result;
     }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO
+        ));
+    }
+
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "  g.grupo as mercadologico1,\n" +
+                    "  g.sub_grupo as mercadologico2,\n" +
+                    "  g.Nome as mercadologico3\n" +
+                    "from\n" +
+                    "  tabela_categ g \n" +
+                    "order by\n" +
+                    "  1, 2, 3 "
+            )) {
+                while (rst.next()) {
+                    
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    
+                    String g1 = Utils.acertarTexto(rst.getString("mercadologico1"));
+                    String g2 = Utils.acertarTexto(rst.getString("mercadologico2"));
+                    String g3 = Utils.acertarTexto(rst.getString("mercadologico3"));
+                    
+                    if ("".equals(g2)) {
+                        g2 = g3;
+                    }
+                    if ("".equals(g1)) {
+                        g1 = g2;
+                    }                    
+                    
+                    imp.setMerc1ID(g1);
+                    imp.setMerc1Descricao(g1);
+                    imp.setMerc2ID(g2);
+                    imp.setMerc2Descricao(g2);
+                    imp.setMerc3ID(g3);
+                    imp.setMerc3Descricao(g3);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	p.codigo as id,\n" +
+                    "	p.codigo as codigobarras,\n" +
+                    "	p.descricao as descricaocompleta,\n" +
+                    "	p.descricao as descricaoreduzida,\n" +
+                    "	p.descricao as descricaogondola,\n" +
+                    "	p.categoria as cod_mercadologico1,\n" +
+                    "	g.grupo as mercadologico1,\n" +
+                    "	1 as cod_mercadologico2,\n" +
+                    "	g.sub_grupo as mercadologico2,\n" +
+                    "	1 as cod_mercadologico3,\n" +
+                    "	g.sub_grupo as mercadologico3,\n" +
+                    "	p.familia,\n" +
+                    "	p.unidade,\n" +
+                    "	p.qt_embalagem as qtdembalagem,\n" +
+                    "	p.situacao as ativo,\n" +
+                    "	p.qt_estoque as estoque,\n" +
+                    "	p.qt_minimo as estoqueminimo,\n" +
+                    "	p.qt_maximo as estoquemaximo,\n" +
+                    "	p.preco_venda as precovenda,\n" +
+                    "	p.preco_compra as custocomimposto,\n" +
+                    "	p.preco_compra as custosemimposto,\n" +
+                    "	p.margem_lucro as margem,\n" +
+                    "	p.usa_balanca as balanca,\n" +
+                    "	p.dias_validade as validade,\n" +
+                    "	p.data_cadastro as datacadastro,\n" +
+                    "	p.peso as pesobruto,\n" +
+                    "	p.pesoliquido,\n" +
+                    "	p.ncm,\n" +
+                    "	p.cest,\n" +
+                    "	p.situacao_tributaria_icm_entrada as cst_e,\n" +
+                    "	p.situacao_tributaria_icm_saida_ne as cst_ne_s,\n" +
+                    "	p.aliquota_icm_saida_ne as icms_s,\n" +
+                    "	p.aliquota_st_ret as icmsretencao,\n" +
+                    "	p.situacao_tributaria_icm_saida_fe as cst_fe_s,\n" +
+                    "	p.situacao_tributaria_pis as pis_s,\n" +
+                    "	p.situacao_tributaria_pis_entrada as pis_e,\n" +
+                    "	p.situacao_tributaria_cofins as cofins_s,\n" +
+                    "	p.situacao_tributaria_cofins_entrada as cofins_e,\n" +
+                    "	p.codigo_natureza_receita_pis_cofins as natreceita,\n" +
+                    "	p.margem_valor_agregado_fe as mva_fe,\n" +
+                    "	p.margem_valor_agregado as mva\n" +
+                    "from\n" +
+                    "	tabela_pro p\n" +
+                    "	left join tabela_categ g on\n" +
+                    "		p.categoria = g.codigo\n" +
+                    "order by\n" +
+                    "	1"
+            )) {
+                while (rst.next()) {
+                
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    
 }
 
 /*
