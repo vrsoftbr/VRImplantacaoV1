@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import org.openide.util.Exceptions;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -65,48 +66,47 @@ import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
-    
+
     private static final Logger LOG = Logger.getLogger(PlanilhaDAO.class.getName());
-    
+
     private String arquivo;
     private String sistema = "PLANILHA";
     private Map<String, String> opcoes = new LinkedHashMap<>();
     private SimpleDateFormat formatData = new SimpleDateFormat(Parametros.get().getWithNull("yyyy-MM-dd", "IMPORTACAO", "PLANILHA", "FORMATO_DATA"));
     private SimpleDateFormat formatDataCompleta = new SimpleDateFormat(Parametros.get().getWithNull("yyyy-MM-dd hh:mm:ss.SSS", "IMPORTACAO", "PLANILHA", "FORMATO_DATA_COMPLETA"));
-    
+
     public void setFormatoData(String format) {
         this.formatData = new SimpleDateFormat(format);
     }
+
     public void setFormatoDataCompleta(String format) {
         this.formatDataCompleta = new SimpleDateFormat(format);
     }
 
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
-        
+
         Set<OpcaoProduto> result = super.getOpcoesDisponiveisProdutos();
         result.add(OpcaoProduto.PAUTA_FISCAL);
         result.add(OpcaoProduto.PAUTA_FISCAL_PRODUTO);
         result.add(INVENTARIO);
         result.add(OpcaoProduto.OFERTA);
-        
+
         return result;
     }
-    
-    
-    
+
     public void setSistema(String sistema) {
         if (sistema == null) {
             sistema = "PLANILHA";
         }
         this.sistema = sistema;
     }
-    
+
     @Override
     public String getSistema() {
         return this.sistema;
     }
-    
+
     public String getArquivo() {
         return arquivo;
     }
@@ -125,45 +125,45 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         Arquivo mercadologicos = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
         ProgressBar.setStatus("Carregando mercadologico de produtos...");
         int cont = 0;
-        
-        for (LinhaArquivo linha: mercadologicos) {
+
+        for (LinhaArquivo linha : mercadologicos) {
             MercadologicoIMP helper = new MercadologicoIMP();
-            
+
             helper.setImportSistema(getSistema());
             helper.setImportLoja(getLojaOrigem());
-            
+
             helper.setMerc1ID(linha.getString("cod_mercadologico1"));
             helper.setMerc1Descricao(linha.getString("mercadologico1"));
-            
+
             helper.setMerc2ID(linha.getString("cod_mercadologico2"));
             helper.setMerc2Descricao(linha.getString("mercadologico2"));
-            
+
             helper.setMerc3ID(linha.getString("cod_mercadologico3"));
             helper.setMerc3Descricao(linha.getString("mercadologico3"));
-            
+
             helper.setMerc4ID(linha.getString("cod_mercadologico4"));
             helper.setMerc4Descricao(linha.getString("mercadologico4"));
-            
+
             helper.setMerc5ID(linha.getString("cod_mercadologico5"));
             helper.setMerc5Descricao(linha.getString("mercadologico5"));
-            
+
             result.add(helper);
             cont++;
             ProgressBar.setStatus("Carregando mercadológico..." + cont);
         }
-        
-        return result;        
+
+        return result;
     }
-    
+
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
-        
-        Arquivo familias = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());        
+
+        Arquivo familias = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
         ProgressBar.setStatus("Carregando família de produtos...");
         int cont = 0;
-        
-        for (LinhaArquivo linha: familias) {
+
+        for (LinhaArquivo linha : familias) {
             String id = linha.getString("id_familiaproduto");
             if (id != null && !"".equals(id.trim())) {
                 FamiliaProdutoIMP familia = new FamiliaProdutoIMP();
@@ -179,23 +179,23 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             cont++;
             ProgressBar.setStatus("Carregando família de produtos..." + cont);
         }
-        
+
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        
-        Arquivo produtos = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());  
+
+        Arquivo produtos = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
         ProgressBar.setStatus("Carregando produtos...");
-        
+
         int cont1 = 0;
         int cont2 = 0;
-        
+
         Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
-        
-        for (LinhaArquivo linha: produtos) {
+
+        for (LinhaArquivo linha : produtos) {
             String id = linha.getString("id");
             if (id != null && !"".equals(id.trim())) {
                 ProdutoIMP produto = new ProdutoIMP();
@@ -205,7 +205,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 produto.setImportId(id);
                 produto.setEan(linha.getString("codigobarras"));
                 String ean_planilha = linha.getString("codigobarras");
-                if((ean_planilha != null) && (!"".equals(ean_planilha)) && (ean_planilha.length() > 14)) {
+                if ((ean_planilha != null) && (!"".equals(ean_planilha)) && (ean_planilha.length() > 14)) {
                     produto.setEan(ean_planilha.substring(0, 14));
                 }
                 produto.setQtdEmbalagem(linha.getInt("qtdembalagem"));
@@ -217,18 +217,26 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 switch (Utils.acertarTexto(linha.getString("balanca"))) {
                     case "S": {
                         produto.seteBalanca(true);
-                    }; break;
+                    }
+                    ;
+                    break;
                     case "P": {
                         produto.seteBalanca(true);
                         produto.setTipoEmbalagem(TipoEmbalagem.KG.getSigla());
-                    }; break;
+                    }
+                    ;
+                    break;
                     case "U": {
                         produto.seteBalanca(true);
                         produto.setTipoEmbalagem(TipoEmbalagem.UN.getSigla());
-                    }; break;
+                    }
+                    ;
+                    break;
                     default: {
                         produto.seteBalanca(false);
-                    }; break;
+                    }
+                    ;
+                    break;
                 }
                 int eanBal;
                 if ("0".equals(Utils.stringLong(produto.getEan()))) {
@@ -242,10 +250,14 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                     switch (bal.getPesavel()) {
                         case "U": {
                             produto.setTipoEmbalagem(TipoEmbalagem.UN.getSigla());
-                        }; break;
+                        }
+                        ;
+                        break;
                         default: {
                             produto.setTipoEmbalagem(TipoEmbalagem.KG.getSigla());
-                        }; break;
+                        }
+                        ;
+                        break;
                     }
                     if (bal.getValidade() != 0) {
                         produto.setValidade(bal.getValidade());
@@ -272,59 +284,61 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 produto.setCustoSemImposto(linha.getDouble("custosemimposto"));
                 produto.setPrecovenda(linha.getDouble("precovenda"));
                 switch (Utils.acertarTexto(linha.getString("ativo"))) {
-                    case "N": produto.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO); break;
-                    default: produto.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+                    case "N":
+                        produto.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
+                        break;
+                    default:
+                        produto.setSituacaoCadastro(SituacaoCadastro.ATIVO);
                 }
                 produto.setNcm(linha.getString("ncm"));
                 produto.setCest(linha.getString("cest"));
                 produto.setPiscofinsCstCredito(linha.getString("piscofins_cst_credito"));
                 produto.setPiscofinsCstDebito(linha.getString("piscofins_cst_debito"));
                 produto.setPiscofinsNaturezaReceita(linha.getString("piscofins_natureza_receita"));
-                
+
                 produto.setIcmsCst(linha.getInt("icms_cst"));
                 produto.setIcmsAliq(linha.getDouble("icms_aliquota"));
                 produto.setIcmsReducao(linha.getDouble("icms_reduzido"));
-                
+
                 //ICMS ENTRADA
-                
                 if (linha.existsColumn("icms_cst_entrada")) {
                     produto.setIcmsCstEntrada(linha.getInt("icms_cst_entrada"));
                     produto.setIcmsAliqEntrada(linha.getDouble("icms_aliquota_entrada"));
                     produto.setIcmsReducaoEntrada(linha.getDouble("icms_reduzido_entrada"));
                 }
-                
+
                 if (linha.existsColumn("icms_cst_entrada_foraestado")) {
                     produto.setIcmsCstEntradaForaEstado(linha.getInt("icms_cst_entrada_foraestado"));
                     produto.setIcmsAliqEntradaForaEstado(linha.getDouble("icms_aliquota_entrada_foraestado"));
                     produto.setIcmsReducaoEntradaForaEstado(linha.getDouble("icms_reduzido_entrada_foraestado"));
                 }
-                
+
                 if (linha.existsColumn("icms_credito_id")) {
                     produto.setIcmsCreditoId(linha.getString("icms_credito_id"));
                 }
                 if (linha.existsColumn("icms_credito_foraestado_id")) {
                     produto.setIcmsCreditoForaEstadoId(linha.getString("icms_credito_foraestado_id"));
                 }
-                
+
                 //ICMS SAIDA
                 if (linha.existsColumn("icms_cst_saida")) {
                     produto.setIcmsCstSaida(linha.getInt("icms_cst_saida"));
                     produto.setIcmsAliqSaida(linha.getDouble("icms_aliquota_saida"));
                     produto.setIcmsReducaoSaida(linha.getDouble("icms_reduzido_saida"));
                 }
-                
+
                 if (linha.existsColumn("icms_cst_saida_foraestado")) {
                     produto.setIcmsCstSaidaForaEstado(linha.getInt("icms_cst_saida_foraestado"));
                     produto.setIcmsAliqSaidaForaEstado(linha.getDouble("icms_aliquota_saida_foraestado"));
                     produto.setIcmsReducaoSaidaForaEstado(linha.getDouble("icms_reduzido_saida_foraestado"));
                 }
-                
+
                 if (linha.existsColumn("icms_cst_saida_foraestadonf")) {
                     produto.setIcmsCstSaidaForaEstadoNF(linha.getInt("icms_cst_saida_foraestadonf"));
                     produto.setIcmsAliqSaidaForaEstadoNF(linha.getDouble("icms_aliquota_saida_foraestadonf"));
                     produto.setIcmsReducaoSaidaForaEstadoNF(linha.getDouble("icms_reduzido_saida_foraestadonf"));
                 }
-                
+
                 if (linha.existsColumn("icms_debito_id")) {
                     produto.setIcmsDebitoId(linha.getString("icms_debito_id"));
                 }
@@ -333,8 +347,8 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 }
                 if (linha.existsColumn("icms_debito_foraestadonf_id")) {
                     produto.setIcmsDebitoForaEstadoNfId(linha.getString("icms_debito_foraestadonf_id"));
-                }                
-                
+                }
+
                 //ID PAUTA FISCAL                
                 produto.setPautaFiscalId(linha.getString("id_pautafiscal"));
 
@@ -347,21 +361,21 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 ProgressBar.setStatus("Carregando produtos..." + cont1);
             }
         }
-        
-        return result;        
+
+        return result;
     }
 
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-        
-        Arquivo produtos = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());  
+
+        Arquivo produtos = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
         ProgressBar.setStatus("Carregando fornecedores...");
-        
+
         int cont1 = 0;
         int cont2 = 0;
 
-        for (LinhaArquivo linha: produtos) {
+        for (LinhaArquivo linha : produtos) {
             String id = linha.getString("id");
             if (id != null && !"".equals(id.trim())) {
                 FornecedorIMP forn = new FornecedorIMP();
@@ -369,7 +383,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 forn.setImportSistema(getSistema());
                 forn.setImportLoja(getLojaOrigem());
                 forn.setImportId(id);
-                
+
                 forn.setRazao(linha.getString("razao"));
                 forn.setFantasia(linha.getString("fantasia"));
                 forn.setCnpj_cpf(linha.getString("cnpj_cpf"));
@@ -377,7 +391,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 forn.setInsc_municipal(linha.getString("insc_municipal"));
                 forn.setSuframa(linha.getString("suframa"));
                 forn.setAtivo(!"N".equals(linha.getString("ativo")));
-                
+
                 forn.setEndereco(linha.getString("endereco"));
                 forn.setNumero(linha.getString("numero"));
                 forn.setComplemento(linha.getString("complemento"));
@@ -387,7 +401,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 forn.setIbge_uf(linha.getInt("ibge_uf"));
                 forn.setUf(linha.getString("uf"));
                 forn.setCep(linha.getString("cep"));
-                
+
                 forn.setCob_endereco(linha.getString("cob_endereco"));
                 forn.setCob_numero(linha.getString("cob_numero"));
                 forn.setCob_complemento(linha.getString("cob_complemento"));
@@ -397,21 +411,22 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 forn.setCob_ibge_uf(linha.getInt("cob_ibge_uf"));
                 forn.setCob_uf(linha.getString("cob_uf"));
                 forn.setCob_cep(linha.getString("cob_cep"));
-                
+
                 forn.setTel_principal(linha.getString("tel_principal"));
                 forn.setQtd_minima_pedido(linha.getInt("qtd_minima_pedido"));
                 forn.setValor_minimo_pedido(linha.getDouble("valor_minimo_pedido"));
                 forn.setDatacadastro(getData(linha.getString("datacadastro")));
                 forn.setObservacao(linha.getString("observacao"));
-                if(linha.existsColumn("tipoempresa")) {
+                if (linha.existsColumn("tipoempresa")) {
                     forn.setTipoEmpresa(linha.getInt("tipoempresa") == 1 ? TipoEmpresa.EPP_SIMPLES : TipoEmpresa.LUCRO_REAL);
                 }
-                
+
                 int i = 1;
                 while (true) {
                     String prefixo = "cont" + i + "_";
                     if (linha.existsColumn(prefixo + "nome")) {
-                        if (!"".equals(linha.getString(prefixo + "nome").trim())); {
+                        if (!"".equals(linha.getString(prefixo + "nome").trim()));
+                        {
                             FornecedorContatoIMP contato = forn.getContatos().make(
                                     forn.getImportSistema(),
                                     forn.getImportLoja(),
@@ -432,7 +447,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                         break;
                     }
                 }
-                
+
                 result.add(forn);
             }
             cont2++;
@@ -442,21 +457,21 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 ProgressBar.setStatus("Carregando fornecedores..." + cont1);
             }
         }
-        
-        return result; 
+
+        return result;
     }
 
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
-        
-        Arquivo produtos = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());  
-        
+
+        Arquivo produtos = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+
         ProgressBar.setStatus("Carregando Produtos Fornecedores");
-        
+
         int cont1 = 0;
         int cont2 = 0;
-        for (LinhaArquivo linha: produtos) {
+        for (LinhaArquivo linha : produtos) {
             ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
             imp.setImportSistema(getSistema());
             imp.setImportLoja(getLojaOrigem());
@@ -475,157 +490,168 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 ProgressBar.setStatus("Carregando Produtos Fornecedores..." + cont1);
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        
+
         Map<String, TipoEstadoCivil> estCivil = new HashMap<>();
-        for (TipoEstadoCivil est: TipoEstadoCivil.values()) {
+        for (TipoEstadoCivil est : TipoEstadoCivil.values()) {
             estCivil.put(est.toString().substring(0, 3), est);
         }
-        
+
         Arquivo arq = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
-        
-        for (LinhaArquivo linha: arq) {
+
+        for (LinhaArquivo linha : arq) {
             ClienteIMP imp = new ClienteIMP();
             try {
-            imp.setId(linha.getString("id"));
-            if(linha.existsColumn("cpf")) {
-                imp.setCnpj(linha.getString("cnpj") == null || "".equals(linha.getString("cnpj")) 
-                        ? linha.getString("cpf") : linha.getString("cnpj"));
-            } else {
-                imp.setCnpj(linha.getString("cnpj"));
-            }
-            
-            long cnpj = Utils.stringToLong(linha.getString("cnpj"));
-            if (cnpj > 99999999999L) {                
-                imp.setInscricaoestadual(linha.getString("inscricaoestadual"));
-            } else {
-                imp.setInscricaoestadual(linha.getString("rg"));
-            }
-            imp.setOrgaoemissor(linha.getString("orgaoemissor"));
-            imp.setRazao(linha.getString("razao"));
-            imp.setFantasia(linha.getString("fantasia"));
-            imp.setAtivo(!"N".equalsIgnoreCase(linha.getString("ativo")));
-            imp.setBloqueado("N".equalsIgnoreCase(linha.getString("bloqueado")));
-            imp.setDataBloqueio(getData(linha.getString("dataBloqueio")));
-            imp.setEndereco(linha.getString("endereco"));
-            imp.setNumero(linha.getString("numero"));
-            imp.setComplemento(linha.getString("complemento"));
-            imp.setBairro(linha.getString("bairro"));
-            imp.setMunicipioIBGE(linha.getInt("municipioIBGE"));
-            imp.setMunicipio(linha.getString("municipio"));
-            imp.setUfIBGE(linha.getInt("ufIBGE"));
-            imp.setUf(linha.getString("uf"));
-            imp.setCep(linha.getString("cep"));
-            String civil = linha.getString("estadoCivil") + "   ";
-            civil = (civil != null ? civil.substring(1, 3) : "NAO");
-            imp.setEstadoCivil(estCivil.get(civil));
-            imp.setDataNascimento(getData(linha.getString("dataNascimento")));
-            imp.setDataCadastro(getData(linha.getString("dataCadastro")));
-            String sexo = linha.getString("sexo") != null ? linha.getString("sexo") : "";
-            imp.setSexo("F".startsWith(sexo.toUpperCase()) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
-            imp.setEmpresa(linha.getString("empresa"));
-            imp.setEmpresaEndereco(linha.getString("empresaEndereco"));
-            imp.setEmpresaNumero(linha.getString("empresaNumero"));
-            imp.setEmpresaComplemento(linha.getString("empresaComplemento"));
-            imp.setEmpresaBairro(linha.getString("empresaBairro"));
-            imp.setEmpresaMunicipioIBGE(linha.getInt("empresaMunicipioIBGE"));
-            imp.setEmpresaMunicipio(linha.getString("empresaMunicipio"));
-            imp.setEmpresaUfIBGE(linha.getInt("empresaUfIBGE"));
-            imp.setEmpresaUf(linha.getString("empresaUf"));
-            imp.setEmpresaCep(linha.getString("empresaCep"));
-            imp.setEmpresaTelefone(linha.getString("empresaTelefone"));
-            imp.setDataAdmissao(getData(linha.getString("dataAdmissao")));
-            imp.setCargo(linha.getString("cargo"));
-            imp.setSalario(linha.getDouble("salario"));
-            imp.setValorLimite(linha.getDouble("valorLimite"));
-            imp.setNomeConjuge(linha.getString("nomeConjuge"));
-            imp.setNomePai(linha.getString("nomePai"));
-            imp.setNomeMae(linha.getString("nomeMae"));
-            imp.setObservacao(linha.getString("observacao"));
-            imp.setDiaVencimento(linha.getInt("diaVencimento"));
-            imp.setPermiteCreditoRotativo(!"N".equalsIgnoreCase(linha.getString("permiteCreditoRotativo")));
-            imp.setPermiteCheque(!"N".equalsIgnoreCase(linha.getString("permiteCheque")));
-            imp.setTelefone(linha.getString("telefone"));
-            imp.setCelular(linha.getString("celular"));
-            imp.setEmail(linha.getString("email"));
-            //EVENTUAL
-            imp.setFax(linha.getString("fax"));
-            imp.setCobrancaTelefone(linha.getString("cobrancaTelefone"));
-            imp.setPrazoPagamento(linha.getInt("prazopagamento"));
-            imp.setCobrancaEndereco(linha.getString("cobrancaendereco"));
-            imp.setCobrancaNumero(linha.getString("cobrancanumero"));
-            imp.setCobrancaComplemento(linha.getString("cobrancacomplemento"));
-            imp.setCobrancaBairro(linha.getString("cobrancabairro"));
-            imp.setCobrancaMunicipioIBGE(linha.getInt("cobrancamunicipioibge"));
-            imp.setCobrancaMunicipio(linha.getString("cobrancamunicipio"));
-            imp.setCobrancaUfIBGE(linha.getInt("cobrancaufibge"));
-            imp.setCobrancaUf(linha.getString("cobrancauf"));
-            imp.setCobrancaCep(linha.getString("cobrancacep"));
-            String tipoOrgaoPublicoStr = linha.getString("tipoorgaopublico");
-            tipoOrgaoPublicoStr = Utils.acertarTexto(tipoOrgaoPublicoStr, "NENHUM");
-            switch (tipoOrgaoPublicoStr) {
-                case "ESTADUAL": imp.setTipoOrgaoPublico(TipoOrgaoPublico.ESTADUAL); break;
-                case "FEDERAL": imp.setTipoOrgaoPublico(TipoOrgaoPublico.FEDERAL); break;
-                default: imp.setTipoOrgaoPublico(TipoOrgaoPublico.NENHUM); break;
-            }
-            imp.setLimiteCompra(linha.getDouble("limitecompra"));
-            imp.setInscricaoMunicipal(linha.getString("inscricaomunicipal"));
-            String tipoIndicadorIeStr = Utils.acertarTexto(linha.getString("tipoindicadorie"), "NAO CONTRIBUINTE");
-            switch (tipoIndicadorIeStr) {
-                case "ICMS": imp.setTipoIndicadorIe(TipoIndicadorIE.CONTRIBUINTE_ICMS); break;
-                case "ISENTO": imp.setTipoIndicadorIe(TipoIndicadorIE.CONTRIBUINTE_ISENTO); break;
-                default: imp.setTipoIndicadorIe(TipoIndicadorIE.NAO_CONTRIBUINTE); break;
-            }
-            
-            int i = 1;
-            while (true) {
-                String prefixo = "cont" + i + "_";
-                if (linha.existsColumn(prefixo + "nome")) {
-                    if (!"".equals(linha.getString(prefixo + "nome").trim())); {
-                        String email = linha.getString(prefixo + "email");
-                        String cel = linha.getString(prefixo + "celular");
-                        String fone = linha.getString(prefixo + "telefone");
-                        String nome = linha.getString(prefixo + "nome");
-                        if (
-                                !"".equals(nome) ||
-                                !"".equals(cel) ||
-                                !"".equals(fone) ||
-                                !"".equals(email)
-                        ) {
-                            imp.addContato(String.valueOf(i), nome, fone, cel, email);
-                        }
-                    }
-
-                    i++;
+                imp.setId(linha.getString("id"));
+                if (linha.existsColumn("cpf")) {
+                    imp.setCnpj(linha.getString("cnpj") == null || "".equals(linha.getString("cnpj"))
+                            ? linha.getString("cpf") : linha.getString("cnpj"));
                 } else {
-                    break;
+                    imp.setCnpj(linha.getString("cnpj"));
                 }
-            }
+
+                long cnpj = Utils.stringToLong(linha.getString("cnpj"));
+                if (cnpj > 99999999999L) {
+                    imp.setInscricaoestadual(linha.getString("inscricaoestadual"));
+                } else {
+                    imp.setInscricaoestadual(linha.getString("rg"));
+                }
+                imp.setOrgaoemissor(linha.getString("orgaoemissor"));
+                imp.setRazao(linha.getString("razao"));
+                imp.setFantasia(linha.getString("fantasia"));
+                imp.setAtivo(!"N".equalsIgnoreCase(linha.getString("ativo")));
+                imp.setBloqueado("N".equalsIgnoreCase(linha.getString("bloqueado")));
+                imp.setDataBloqueio(getData(linha.getString("dataBloqueio")));
+                imp.setEndereco(linha.getString("endereco"));
+                imp.setNumero(linha.getString("numero"));
+                imp.setComplemento(linha.getString("complemento"));
+                imp.setBairro(linha.getString("bairro"));
+                imp.setMunicipioIBGE(linha.getInt("municipioIBGE"));
+                imp.setMunicipio(linha.getString("municipio"));
+                imp.setUfIBGE(linha.getInt("ufIBGE"));
+                imp.setUf(linha.getString("uf"));
+                imp.setCep(linha.getString("cep"));
+                String civil = linha.getString("estadoCivil") + "   ";
+                civil = (civil != null ? civil.substring(1, 3) : "NAO");
+                imp.setEstadoCivil(estCivil.get(civil));
+                imp.setDataNascimento(getData(linha.getString("dataNascimento")));
+                imp.setDataCadastro(getData(linha.getString("dataCadastro")));
+                String sexo = linha.getString("sexo") != null ? linha.getString("sexo") : "";
+                imp.setSexo("F".startsWith(sexo.toUpperCase()) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                imp.setEmpresa(linha.getString("empresa"));
+                imp.setEmpresaEndereco(linha.getString("empresaEndereco"));
+                imp.setEmpresaNumero(linha.getString("empresaNumero"));
+                imp.setEmpresaComplemento(linha.getString("empresaComplemento"));
+                imp.setEmpresaBairro(linha.getString("empresaBairro"));
+                imp.setEmpresaMunicipioIBGE(linha.getInt("empresaMunicipioIBGE"));
+                imp.setEmpresaMunicipio(linha.getString("empresaMunicipio"));
+                imp.setEmpresaUfIBGE(linha.getInt("empresaUfIBGE"));
+                imp.setEmpresaUf(linha.getString("empresaUf"));
+                imp.setEmpresaCep(linha.getString("empresaCep"));
+                imp.setEmpresaTelefone(linha.getString("empresaTelefone"));
+                imp.setDataAdmissao(getData(linha.getString("dataAdmissao")));
+                imp.setCargo(linha.getString("cargo"));
+                imp.setSalario(linha.getDouble("salario"));
+                imp.setValorLimite(linha.getDouble("valorLimite"));
+                imp.setNomeConjuge(linha.getString("nomeConjuge"));
+                imp.setNomePai(linha.getString("nomePai"));
+                imp.setNomeMae(linha.getString("nomeMae"));
+                imp.setObservacao(linha.getString("observacao"));
+                imp.setDiaVencimento(linha.getInt("diaVencimento"));
+                imp.setPermiteCreditoRotativo(!"N".equalsIgnoreCase(linha.getString("permiteCreditoRotativo")));
+                imp.setPermiteCheque(!"N".equalsIgnoreCase(linha.getString("permiteCheque")));
+                imp.setTelefone(linha.getString("telefone"));
+                imp.setCelular(linha.getString("celular"));
+                imp.setEmail(linha.getString("email"));
+                //EVENTUAL
+                imp.setFax(linha.getString("fax"));
+                imp.setCobrancaTelefone(linha.getString("cobrancaTelefone"));
+                imp.setPrazoPagamento(linha.getInt("prazopagamento"));
+                imp.setCobrancaEndereco(linha.getString("cobrancaendereco"));
+                imp.setCobrancaNumero(linha.getString("cobrancanumero"));
+                imp.setCobrancaComplemento(linha.getString("cobrancacomplemento"));
+                imp.setCobrancaBairro(linha.getString("cobrancabairro"));
+                imp.setCobrancaMunicipioIBGE(linha.getInt("cobrancamunicipioibge"));
+                imp.setCobrancaMunicipio(linha.getString("cobrancamunicipio"));
+                imp.setCobrancaUfIBGE(linha.getInt("cobrancaufibge"));
+                imp.setCobrancaUf(linha.getString("cobrancauf"));
+                imp.setCobrancaCep(linha.getString("cobrancacep"));
+                String tipoOrgaoPublicoStr = linha.getString("tipoorgaopublico");
+                tipoOrgaoPublicoStr = Utils.acertarTexto(tipoOrgaoPublicoStr, "NENHUM");
+                switch (tipoOrgaoPublicoStr) {
+                    case "ESTADUAL":
+                        imp.setTipoOrgaoPublico(TipoOrgaoPublico.ESTADUAL);
+                        break;
+                    case "FEDERAL":
+                        imp.setTipoOrgaoPublico(TipoOrgaoPublico.FEDERAL);
+                        break;
+                    default:
+                        imp.setTipoOrgaoPublico(TipoOrgaoPublico.NENHUM);
+                        break;
+                }
+                imp.setLimiteCompra(linha.getDouble("limitecompra"));
+                imp.setInscricaoMunicipal(linha.getString("inscricaomunicipal"));
+                String tipoIndicadorIeStr = Utils.acertarTexto(linha.getString("tipoindicadorie"), "NAO CONTRIBUINTE");
+                switch (tipoIndicadorIeStr) {
+                    case "ICMS":
+                        imp.setTipoIndicadorIe(TipoIndicadorIE.CONTRIBUINTE_ICMS);
+                        break;
+                    case "ISENTO":
+                        imp.setTipoIndicadorIe(TipoIndicadorIE.CONTRIBUINTE_ISENTO);
+                        break;
+                    default:
+                        imp.setTipoIndicadorIe(TipoIndicadorIE.NAO_CONTRIBUINTE);
+                        break;
+                }
+
+                int i = 1;
+                while (true) {
+                    String prefixo = "cont" + i + "_";
+                    if (linha.existsColumn(prefixo + "nome")) {
+                        if (!"".equals(linha.getString(prefixo + "nome").trim()));
+                        {
+                            String email = linha.getString(prefixo + "email");
+                            String cel = linha.getString(prefixo + "celular");
+                            String fone = linha.getString(prefixo + "telefone");
+                            String nome = linha.getString(prefixo + "nome");
+                            if (!"".equals(nome)
+                                    || !"".equals(cel)
+                                    || !"".equals(fone)
+                                    || !"".equals(email)) {
+                                imp.addContato(String.valueOf(i), nome, fone, cel, email);
+                            }
+                        }
+
+                        i++;
+                    } else {
+                        break;
+                    }
+                }
             } catch (Exception e) {
                 throw e;
             }
-            
+
             result.add(imp);
         }
-        
+
         return result;
     }
 
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-        
+
         Arquivo arq = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
-        
-        for (LinhaArquivo linha: arq) {
+
+        for (LinhaArquivo linha : arq) {
             CreditoRotativoIMP imp = new CreditoRotativoIMP();
-            
+
             try {
                 imp.setId(linha.getString("id"));
                 imp.setCnpjCliente(linha.getString("cnpj"));
@@ -642,44 +668,45 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             } catch (Exception e) {
                 throw e;
             }
-            
+
             result.add(imp);
         }
-        
+
         return result;
     }
 
     @Override
     public List<CreditoRotativoPagamentoAgrupadoIMP> getCreditoRotativoPagamentoAgrupado() throws Exception {
         List<CreditoRotativoPagamentoAgrupadoIMP> result = new ArrayList<>();
-        
+
         Arquivo arq = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
-        
-        for (LinhaArquivo linha: arq) {
+
+        for (LinhaArquivo linha : arq) {
             CreditoRotativoPagamentoAgrupadoIMP imp = new CreditoRotativoPagamentoAgrupadoIMP();
-            
+
             imp.setIdCliente(linha.getString("idcliente"));
             imp.setValor(linha.getDouble("valor"));
-                        
+
             result.add(imp);
         }
-        
+
         return result;
     }
-    
+
     private String arquivoContaPagar;
+
     public void setArquivoContaPagar(String arquivoContaPagar) {
         this.arquivoContaPagar = arquivoContaPagar;
     }
-    
+
     @Override
-    public List<ContaPagarIMP> getContasPagar()throws Exception {
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
         Arquivo arq = ArquivoFactory.getArquivo(this.arquivoContaPagar, getOpcoes());
-        
+
         Map<String, ContaPagarIMP> contas = new LinkedHashMap<>();
-        
-        for(LinhaArquivo linha : arq) {
-            if(linha.getString("faturaid") != null && !"".equals(linha.getString("faturaid").trim())) {
+
+        for (LinhaArquivo linha : arq) {
+            if (linha.getString("faturaid") != null && !"".equals(linha.getString("faturaid").trim())) {
                 ContaPagarIMP imp = contas.get(linha.getString("faturaid"));
                 if (imp == null) {
                     imp = new ContaPagarIMP();
@@ -692,7 +719,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacao(linha.getString("observacaofatura"));
                     contas.put(imp.getId(), imp);
                 }
-                
+
                 ContaPagarVencimentoIMP parc = imp.addVencimento(linha.getData("vencimento"), linha.getDouble("valor"));
                 parc.setAgencia(linha.getString("agencia"));
                 parc.setConferido(false);
@@ -704,13 +731,13 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                     parc.setTipoPagamento(tp);
                 } else {
                     parc.setTipoPagamento(TipoPagamento.BOLETO_BANCARIO);
-                }                
+                }
                 parc.setId_banco(linha.getInt("banco"));
                 parc.setNumeroParcela(linha.getInt("numeroparcela"));
                 parc.setNumerocheque(linha.getInt("numerocheque"));
                 parc.setObservacao(linha.getString("observacao"));
                 parc.setPago(linha.getBoolean("pago"));
-                
+
                 System.out.println("ID: " + imp.getId() + " - Valor: " + imp.getValor() + " Emissão: " + imp.getDataEmissao());
             }
         }
@@ -720,10 +747,10 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
-        
+
         Arquivo arq = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
-        
-        for (LinhaArquivo linha: arq) {                        
+
+        for (LinhaArquivo linha : arq) {
             result.add(new MapaTributoIMP(
                     linha.getString("codtrib"),
                     linha.getString("descricao"),
@@ -732,17 +759,17 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                     linha.getDouble("reduzido")
             ));
         }
-        
+
         return result;
     }
-    
-    
+
     private String arquivoVendas;
     private String arquivoVendasItens;
 
     public void setArquivoVendas(String arquivoVendas) {
         this.arquivoVendas = arquivoVendas;
-    }    
+    }
+
     public void setArquivoVendasItens(String arquivoVendasItens) {
         this.arquivoVendasItens = arquivoVendasItens;
     }
@@ -750,12 +777,12 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<VendaHistoricoIMP> getHistoricoVenda() throws Exception {
         List<VendaHistoricoIMP> result = new ArrayList<>();
-        
+
         Arquivo arq = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
-        
-        for (LinhaArquivo linha: arq) {
+
+        for (LinhaArquivo linha : arq) {
             VendaHistoricoIMP imp = new VendaHistoricoIMP();
-            
+
             imp.setIdProduto(linha.getString("id_produto"));
             imp.setEan(linha.getString("ean"));
             imp.setData(getData(linha.getString("data")));
@@ -771,25 +798,25 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setValorTotal(linha.getDouble("valor_total"));
             imp.setOferta(linha.getBoolean("oferta"));
             imp.setCupomFiscal(linha.getBoolean("cupom"));
-                        
+
             result.add(imp);
         }
-        
+
         return result;
     }
 
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        
+
         String delimiter = ";";
         char stringQuote = '\"';
         if (opcoes != null) {
-            delimiter = getOpcoes().get("delimiter") != null ? getOpcoes().get("delimiter") : ";"; 
+            delimiter = getOpcoes().get("delimiter") != null ? getOpcoes().get("delimiter") : ";";
             stringQuote = (getOpcoes().get("quote") != null ? getOpcoes().get("quote") : "\"").charAt(0);
         }
-        
+
         return new VendaIterator(new ArquivoCSV2(arquivoVendas, delimiter.charAt(0), stringQuote));
-        
+
     }
 
     @Override
@@ -797,21 +824,21 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         String delimiter = ";";
         char stringQuote = '\"';
         if (opcoes != null) {
-            delimiter = getOpcoes().get("delimiter") != null ? getOpcoes().get("delimiter") : ";"; 
+            delimiter = getOpcoes().get("delimiter") != null ? getOpcoes().get("delimiter") : ";";
             stringQuote = (getOpcoes().get("quote") != null ? getOpcoes().get("quote") : "\"").charAt(0);
         }
-        
+
         return new VendaItemIterator(new ArquivoCSV2(arquivoVendasItens, delimiter.charAt(0), stringQuote));
     }
-    
+
     private class VendaIterator implements Iterator<VendaIMP> {
-        
+
         private ArquivoCSV2 csv;
 
         public VendaIterator(ArquivoCSV2 csv) {
             this.csv = csv;
         }
-        
+
         @Override
         public boolean hasNext() {
             return this.csv.hasNext();
@@ -819,7 +846,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
 
         @Override
         public VendaIMP next() {
-            
+
             LinhaArquivo ln = csv.next();
 
             VendaIMP imp = new VendaIMP();
@@ -827,7 +854,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setId(ln.getString("id"));
             imp.setNumeroCupom(ln.getInt("numerocupom"));
             imp.setEcf(ln.getInt("ecf"));
-            imp.setData(ln.getData("data"));
+            imp.setData(getData(ln.getString("data")));
             imp.setIdClientePreferencial(ln.getString("clientepreferencial"));
             imp.setHoraInicio(ln.getTime("horainicio"));
             imp.setHoraTermino(ln.getTime("horatermino"));
@@ -848,16 +875,15 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setXml(ln.getString("xml"));
             imp.setTipoDesconto(TipoDesconto.getById(ln.getInt("tipodesconto")));
             imp.setChaveNfCeContingencia(ln.getString("chavenfcecontingencia"));
-            
-            /*if (!hasNext()) {
-                try {
-                    csv.close();
-                } catch (IOException ex) {
-                    LOG.log(Level.SEVERE, "Erro ao gerar a venda", ex);
-                    throw new RuntimeException(ex);
-                }
-            }*/
 
+            /*if (!hasNext()) {
+             try {
+             csv.close();
+             } catch (IOException ex) {
+             LOG.log(Level.SEVERE, "Erro ao gerar a venda", ex);
+             throw new RuntimeException(ex);
+             }
+             }*/
             return imp;
         }
 
@@ -865,17 +891,17 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         public void remove() {
             throw new UnsupportedOperationException("Not supported."); //To change body of generated methods, choose Tools | Templates.
         }
-        
+
     }
-    
+
     private class VendaItemIterator implements Iterator<VendaItemIMP> {
-        
+
         private ArquivoCSV2 csv;
 
         public VendaItemIterator(ArquivoCSV2 csv) {
             this.csv = csv;
         }
-        
+
         @Override
         public boolean hasNext() {
             return this.csv.hasNext();
@@ -883,7 +909,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
 
         @Override
         public VendaItemIMP next() {
-            
+
             LinhaArquivo ln = csv.next();
 
             VendaItemIMP imp = new VendaItemIMP();
@@ -910,20 +936,18 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             }
             imp.setIdAliquota(ln.getInt("id_aliquota"));
             /*imp.setIcmsCst(ln.getInt("icms_cst"));
-            imp.setIcmsAliq(ln.getDouble("icms_aliq"));
-            imp.setIcmsReduzido(ln.getDouble("icms_red"));*/
+             imp.setIcmsAliq(ln.getDouble("icms_aliq"));
+             imp.setIcmsReduzido(ln.getDouble("icms_red"));*/
             imp.setContadorDoc(ln.getInt("contadordoc"));
-            
-            
-            /*if (!hasNext()) {
-                try {
-                    csv.close();
-                } catch (IOException ex) {
-                    LOG.log(Level.SEVERE, "Erro ao gerar a venda", ex);
-                    throw new RuntimeException(ex);
-                }
-            }*/
 
+            /*if (!hasNext()) {
+             try {
+             csv.close();
+             } catch (IOException ex) {
+             LOG.log(Level.SEVERE, "Erro ao gerar a venda", ex);
+             throw new RuntimeException(ex);
+             }
+             }*/
             return imp;
         }
 
@@ -936,89 +960,93 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
         List<PautaFiscalIMP> result = new ArrayList<>();
-        
-        Arquivo produtos = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());  
-        
+
+        Arquivo produtos = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+
         ProgressBar.setStatus("Carregando Pautas Fiscais");
-        
-        for (LinhaArquivo linha: produtos) {
+
+        for (LinhaArquivo linha : produtos) {
             PautaFiscalIMP imp = new PautaFiscalIMP();
 
             imp.setId(linha.getString("id"));
-            imp.setNcm(linha.getString("ncm"));            
+            imp.setNcm(linha.getString("ncm"));
             imp.setIva(linha.getDouble("iva"));
             imp.setIvaAjustado(linha.getDouble("ivaajustado"));
-            
+
             imp.setIcmsRecolhidoAntecipadamente(linha.getBoolean("recolhidoantecipado"));
             if (linha.existsColumn("id_aliquotadebito")) {
                 imp.setAliquotaDebitoId(linha.getString("id_aliquotadebito"));
             } else {
                 imp.setAliquotaDebito(
                         linha.getInt("aliquotadebito_cst"),
-                        linha.getDouble("aliquotadebito_aliquota"), 
+                        linha.getDouble("aliquotadebito_aliquota"),
                         linha.getDouble("aliquotadebito_reduzido")
                 );
             }
-            
+
             if (linha.existsColumn("id_aliquotacredito")) {
                 imp.setAliquotaCreditoId(linha.getString("id_aliquotacredito"));
             } else {
                 imp.setAliquotaCredito(
                         linha.getInt("aliquotacredito_cst"),
-                        linha.getDouble("aliquotacredito_aliquota"), 
+                        linha.getDouble("aliquotacredito_aliquota"),
                         linha.getDouble("aliquotacredito_reduzido")
                 );
             }
-            
+
             if (linha.existsColumn("id_aliquotacreditoforaestado")) {
                 imp.setAliquotaCreditoForaEstadoId(linha.getString("id_aliquotacreditoforaestado"));
             } else {
                 imp.setAliquotaCreditoForaEstado(
                         linha.getInt("aliquotacreditoforaestado_cst"),
-                        linha.getDouble("aliquotacreditoforaestado_aliquota"), 
+                        linha.getDouble("aliquotacreditoforaestado_aliquota"),
                         linha.getDouble("aliquotacreditoforaestado_reduzido")
                 );
             }
-            
+
             if (linha.existsColumn("id_aliquotadebitoforaestado")) {
                 imp.setAliquotaDebitoForaEstadoId(linha.getString("id_aliquotadebitoforaestado"));
             } else {
                 imp.setAliquotaDebitoForaEstado(
                         linha.getInt("aliquotadebitoforaestado_cst"),
-                        linha.getDouble("aliquotadebitoforaestado_aliquota"), 
+                        linha.getDouble("aliquotadebitoforaestado_aliquota"),
                         linha.getDouble("aliquotadebitoforaestado_reduzido")
                 );
             }
-            
+
             result.add(imp);
-            
+
         }
-        
+
         return result;
     }
 
-    private Date getData(String format) throws ParseException {
+    private Date getData(String format) {
         if (format != null && !"".equals(format.trim())) {
-            return format == null ? null : formatData.parse(format);
+            try {
+                return format == null ? null : formatData.parse(format);
+            } catch (ParseException ex) {
+                Exceptions.printStackTrace(ex);
+            }
         }
         return null;
     }
-    
+
     private Date getDataCompleta(String format) throws ParseException {
         return format == null ? null : formatData.parse(format);
     }
-    
+
     @Override
     public List<InventarioIMP> getInventario() throws Exception {
         List<InventarioIMP> result = new ArrayList<>();
-        
-        Arquivo inventario = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());  
-        
+
+        Arquivo inventario = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+
         ProgressBar.setStatus("Carregando Inventário...");
-        
-        for (LinhaArquivo linha: inventario) {            
+
+        for (LinhaArquivo linha : inventario) {
             InventarioIMP imp = new InventarioIMP();
-            
+
             imp.setId(linha.getString("id"));
             imp.setIdProduto(linha.getString("id_produto"));
             imp.setData(getData(linha.getString("data")));
@@ -1039,23 +1067,23 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setCofins(linha.getDouble("cofins"));
             imp.setCustoMedioComImposto(linha.getDouble("customediocomimposto"));
             imp.setCustoMedioSemImposto(linha.getDouble("customediosemimposto"));
-            
-            result.add(imp);            
+
+            result.add(imp);
         }
-        
+
         return result;
     }
 
     @Override
     public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
         List<OfertaIMP> result = new ArrayList<>();
-        
-        Arquivo inventario = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());  
-        
+
+        Arquivo inventario = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+
         ProgressBar.setStatus("Carregando ofertas...");
-        for (LinhaArquivo linha: inventario) {            
+        for (LinhaArquivo linha : inventario) {
             OfertaIMP imp = new OfertaIMP();
-            
+
             imp.setIdProduto(linha.getString("id"));
             imp.setDataInicio(getData(linha.getString("datainicio")));
             imp.setDataFim(getData(linha.getString("datatermino")));
@@ -1063,23 +1091,23 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setPrecoNormal(linha.getDouble("preconormal"));
             imp.setSituacaoOferta(SituacaoOferta.ATIVO);
             imp.setTipoOferta(TipoOfertaVO.CAPA);
-            
+
             result.add(imp);
         }
-        
+
         return result;
     }
 
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> result = new ArrayList<>();
-        
-        Arquivo inventario = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());  
-        
+
+        Arquivo inventario = ArquivoFactory.getArquivo(this.arquivo, getOpcoes());
+
         ProgressBar.setStatus("Carregando cheques...");
-        for (LinhaArquivo linha: inventario) {            
+        for (LinhaArquivo linha : inventario) {
             ChequeIMP imp = new ChequeIMP();
-            
+
             imp.setId(linha.getString("id"));
             imp.setCpf(linha.getString("cnpjcpf"));
             imp.setNumeroCheque(linha.getString("numerocheque"));
@@ -1101,13 +1129,13 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setValorJuros(linha.getDouble("valorjuros"));
             imp.setValorAcrescimo(linha.getDouble("valoracrescimo"));
             imp.setVistaPrazo(linha.getBoolean("aprazo") ? TipoVistaPrazo.PRAZO : TipoVistaPrazo.A_VISTA);
-            
+
             result.add(imp);
         }
-        
+
         return result;
     }
-    
+
     private String arquivoConvenioEmpresas = "";
     private String arquivoConvenioConveniados = "";
     private String arquivoConvenioTransacoes = "";
@@ -1127,13 +1155,13 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ConvenioEmpresaIMP> getConvenioEmpresa() throws Exception {
         List<ConvenioEmpresaIMP> result = new ArrayList<>();
-        
-        Arquivo empresas = ArquivoFactory.getArquivo(this.arquivoConvenioEmpresas, getOpcoes());  
-        
+
+        Arquivo empresas = ArquivoFactory.getArquivo(this.arquivoConvenioEmpresas, getOpcoes());
+
         ProgressBar.setStatus("Carregando empresas do convênio...");
-        for (LinhaArquivo linha: empresas) {            
+        for (LinhaArquivo linha : empresas) {
             ConvenioEmpresaIMP imp = new ConvenioEmpresaIMP();
-            
+
             imp.setId(linha.getString("id_empresaconvenio"));
             imp.setRazao(linha.getString("razao"));
             imp.setCnpj(linha.getString("cnpj"));
@@ -1158,23 +1186,23 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setDiaInicioRenovacao(Utils.stringToInt(linha.getString("diainiciorenovacao")));
             imp.setDiaFimRenovacao(Utils.stringToInt(linha.getString("diafimrenovacao")));
             imp.setObservacoes(linha.getString("observacoes"));
-            
+
             result.add(imp);
         }
-        
+
         return result;
     }
 
     @Override
     public List<ConveniadoIMP> getConveniado() throws Exception {
         List<ConveniadoIMP> result = new ArrayList<>();
-        
-        Arquivo conveniados = ArquivoFactory.getArquivo(this.arquivoConvenioConveniados, getOpcoes());  
-        
+
+        Arquivo conveniados = ArquivoFactory.getArquivo(this.arquivoConvenioConveniados, getOpcoes());
+
         ProgressBar.setStatus("Carregando conveniados...");
-        for (LinhaArquivo linha: conveniados) {            
+        for (LinhaArquivo linha : conveniados) {
             ConveniadoIMP imp = new ConveniadoIMP();
-            
+
             imp.setId(linha.getString("id"));
             imp.setNome(linha.getString("nome"));
             imp.setIdEmpresa(linha.getString("id_empresaconvenio"));
@@ -1190,29 +1218,29 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setConvenioLimite(linha.getDouble("conveniolimite"));
             imp.setConvenioDesconto(linha.getDouble("conveniodesconto"));
             imp.setLojaCadastro(Utils.stringToInt(linha.getString("lojacadastro")));
-            
+
             result.add(imp);
         }
-        
+
         return result;
     }
 
     @Override
     public List<ConvenioTransacaoIMP> getConvenioTransacao() throws Exception {
         List<ConvenioTransacaoIMP> result = new ArrayList<>();
-        
-        Arquivo conveniados = ArquivoFactory.getArquivo(this.arquivoConvenioTransacoes, getOpcoes());  
-        
+
+        Arquivo conveniados = ArquivoFactory.getArquivo(this.arquivoConvenioTransacoes, getOpcoes());
+
         ProgressBar.setStatus("Carregando transação convenio...");
-        for (LinhaArquivo linha: conveniados) {            
+        for (LinhaArquivo linha : conveniados) {
             ConvenioTransacaoIMP imp = new ConvenioTransacaoIMP();
-            
+
             imp.setId(linha.getString("id"));
             imp.setIdConveniado(linha.getString("id_conveniado"));
             imp.setEcf(linha.getString("ecf"));
             imp.setNumeroCupom(linha.getString("numerocupom"));
             imp.setDataHora(new Timestamp(
-                    (linha.getString("datahora") != null ? getData(linha.getString("datahora")): new Date()).getTime()
+                    (linha.getString("datahora") != null ? getData(linha.getString("datahora")) : new Date()).getTime()
             ));
             imp.setValor(linha.getDouble("valor"));
             SituacaoTransacaoConveniado byNome = SituacaoTransacaoConveniado.getByNome(linha.getString("situacaotransacao"));
@@ -1220,11 +1248,11 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setDataMovimento(getData(linha.getString("datamovimento")));
             imp.setFinalizado(linha.getBoolean("finalizado"));
             imp.setObservacao(linha.getString("observacao"));
-            
+
             result.add(imp);
         }
-        
+
         return result;
     }
-    
+
 }

@@ -18,8 +18,12 @@ public class ConexaoAccess {
     public static void abrirConexao(String i_database, String i_usuario, String i_senha) throws Exception {
         
         Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-        
-        switch (TipoConexaoAccess.get(Parametros.get().getInt(0, "ODBC", "TIPO_CONEXAO"))) {
+        con = DriverManager.getConnection(
+                        "jdbc:odbc:ORYON",
+                        i_usuario,
+                        i_senha
+                );
+        /*switch (TipoConexaoAccess.get(Parametros.get().getInt(0, "ODBC", "TIPO_CONEXAO"))) {
             case DRIVER: 
                 con = DriverManager.getConnection(
                         "jdbc:odbc:Driver={" + 
@@ -40,7 +44,7 @@ public class ConexaoAccess {
             
         } catch (Exception ex) {
             throw ex;
-        }
+        }*/
     }
 
     public static Connection getConexao() {
