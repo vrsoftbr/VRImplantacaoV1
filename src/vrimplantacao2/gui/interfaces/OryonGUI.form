@@ -196,13 +196,10 @@
                               </Group>
                               <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-<<<<<<< HEAD
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="vRPanel1" min="-2" max="-2" attributes="0"/>
                           <EmptySpace pref="59" max="32767" attributes="0"/>
-=======
                           <EmptySpace pref="143" max="32767" attributes="0"/>
->>>>>>> 1bb6b0123d431ac9b4cb35b11084ec23309d8bb6
                       </Group>
                   </Group>
                 </DimensionLayout>
