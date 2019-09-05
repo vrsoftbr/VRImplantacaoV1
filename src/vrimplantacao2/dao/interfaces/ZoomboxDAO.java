@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 
@@ -74,15 +75,24 @@ public class ZoomboxDAO extends InterfaceDAO {
                     "	ec.descricao estadocivil,\n" +
                     "	c.datacadastro,\n" +
                     "	c.nascimento,\n" +
-                    "	g.descricao sexo,\n" +
-                    "	c.observacao\n" +
+                    "	coalesce(g.descricao, '') sexo,\n" +
+                    "	c.observacao,\n" +
+                    "	(\n" +
+                    "		select \n" +
+                    "			coalesce(sum(totaldisponivel), 0.00)::numeric(10,2) \n" +
+                    "		 from\n" +
+                    "			clientecredito\n" +
+                    "		 where\n" +
+                    "			idcliente = c.id\n" +
+                    "		 and ativo\n" +
+                    "	) limite\n" +
                     "from\n" +
                     "	cliente c\n" +
                     "	left join estadocivil ec on\n" +
                     "		ec.id = c.idestadocivil\n" +
                     "	left join genero g on\n" +
                     "		c.idgenero = g.id\n" +
-                    (importarClienteSemNome ? "where not nome is null\n" : "") +
+                    (!importarClienteSemNome ? "where not nome is null\n" : "") +
                     "order by\n" +
                     "	1"
             )) {
@@ -107,6 +117,7 @@ public class ZoomboxDAO extends InterfaceDAO {
                     imp.setDataNascimento(rst.getDate("nascimento"));
                     imp.setSexo(rst.getString("sexo").startsWith("F") ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
                     imp.setObservacao2(rst.getString("observacao"));
+                    imp.setValorLimite(rst.getDouble("limite"));
                     
                     getContatos(imp);
                     
@@ -119,7 +130,40 @@ public class ZoomboxDAO extends InterfaceDAO {
     }
 
     private void getContatos(ClienteIMP imp) throws Exception {
-        throw new UnsupportedOperationException("Funcao ainda nao suportada.");
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	con.id,\n" +
+                    "	con.idmeiocomunicacao,\n" +
+                    "	mc.descricao meiocomunicacao,\n" +
+                    "	con.descricao info\n" +
+                    "from\n" +
+                    "	clientemeiocomunicacao con\n" +
+                    "	join meiocomunicacao mc on\n" +
+                    "		con.idmeiocomunicacao = mc.id\n" +
+                    "where\n" +
+                    "	con.idcliente = " + imp.getId() + "\n" +
+                    "order by\n" +
+                    "	con.id"
+            )) {
+                while (rst.next()) {
+                    switch (rst.getInt("idmeiocomunicacao")) {
+                        case 1: 
+                            imp.addTelefone("RESIDENCIAL", rst.getString("info")); 
+                            imp.setTelefone(rst.getString("info"));
+                            break;
+                        case 2: 
+                            imp.addCelular("CELULAR", rst.getString("info"));
+                            imp.setCelular(rst.getString("info"));
+                            break;
+                        case 3: 
+                            imp.addEmail(rst.getString("info"), TipoContato.COMERCIAL); 
+                            imp.setEmail(rst.getString("info"));
+                            break;
+                    }
+                }
+            }
+        }
     }
     
     
