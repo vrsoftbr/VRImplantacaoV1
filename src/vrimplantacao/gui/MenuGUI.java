@@ -205,6 +205,7 @@ import vrimplantacao2.gui.interfaces.WinNexusGUI;
 import vrimplantacao2.gui.interfaces.WinthorGUI;
 import vrimplantacao2.gui.interfaces.Wm_byFileGUI;
 import vrimplantacao2.gui.interfaces.WmsiGUI;
+import vrimplantacao2.gui.interfaces.ZoomboxGUI;
 import vrimplantacao2.gui.interfaces.ZpfGUI;
 import vrimplantacao2.gui.planilha.PlanilhaV2GUI;
 import vrimplantacao2.gui.tools.scripts.ScriptsGUI;
@@ -646,6 +647,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuLyncis = new javax.swing.JMenuItem();
         mnuRPInfo = new javax.swing.JMenuItem();
         mnuMrs = new javax.swing.JMenuItem();
+        mnuMrs1 = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -1855,6 +1857,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu8.add(mnuMrs);
+
+        mnuMrs1.setText("Zoombox");
+        mnuMrs1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMrs1ActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuMrs1);
 
         mnuDatabase.add(jMenu8);
 
@@ -4046,9 +4056,12 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuOryonActionPerformed
 
     private void mnuHerculesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuHerculesActionPerformed
-        // TODO add your handling code here:
         HerculesIntCashGUI.exibir(this);
     }//GEN-LAST:event_mnuHerculesActionPerformed
+
+    private void mnuMrs1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMrs1ActionPerformed
+        ZoomboxGUI.exibir(this);
+    }//GEN-LAST:event_mnuMrs1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4221,6 +4234,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuMarket;
     private javax.swing.JMenuBar mnuMenu;
     private javax.swing.JMenuItem mnuMrs;
+    private javax.swing.JMenuItem mnuMrs1;
     private javax.swing.JMenuItem mnuOpen;
     private javax.swing.JMenu mnuOrion;
     private javax.swing.JMenuItem mnuOryon;

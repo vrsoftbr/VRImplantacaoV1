@@ -158,6 +158,9 @@ public class UniplusDAO extends InterfaceDAO {
                     + "	p.unidademedida as unidade, \n"
                     + "	1 qtdembalagem, \n"
                     + "	p.custoindireto custooperacional,\n"
+                    + " p.percentuallucroajustado margemlucro,\n"
+                    + " p.precocusto,\n" 
+                    + "	p.preco,"        
                     + "	preco.percentualmarkupajustado margem, \n"
                     + "	preco.precoultimacompra custosemimposto,\n"
                     + "	preco.precocusto custocomimposto,\n"
@@ -239,10 +242,18 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
-                    imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
-                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
-                    imp.setPrecovenda(rs.getDouble("precovenda"));
-                    imp.setMargem(rs.getDouble("margem"));
+                    if((rs.getDouble("precovenda") == 0) && (rs.getDouble("custocomimposto") == 0)) {
+                        imp.setCustoSemImposto(rs.getDouble("precocusto"));
+                        imp.setCustoComImposto(rs.getDouble("precocusto"));
+                        imp.setPrecovenda(rs.getDouble("preco"));
+                        imp.setMargem(rs.getDouble("margemlucro"));
+                    } else {
+                        imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
+                        imp.setCustoComImposto(rs.getDouble("custocomimposto"));
+                        imp.setPrecovenda(rs.getDouble("precovenda"));
+                        imp.setMargem(rs.getDouble("margem"));
+                    }
+                    
                     imp.setEstoqueMinimo(rs.getDouble("quantidademinima"));
                     imp.setEstoqueMaximo(rs.getDouble("quantidademaxima"));
                     imp.setEstoque(rs.getDouble("quantidade"));
