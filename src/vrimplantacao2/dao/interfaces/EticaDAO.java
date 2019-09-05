@@ -178,4 +178,93 @@ public class EticaDAO extends InterfaceDAO {
         }
         return result;
     }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "    f.id,\n"
+                    + "    f.razao_social as razao,\n"
+                    + "    f.nome as fantasia,\n"
+                    + "    f.cnpj_cpf,\n"
+                    + "    f.insc_rg,\n"
+                    + "    f.endereco,\n"
+                    + "    f.num_end,\n"
+                    + "    f.complemento,\n"
+                    + "    f.cep_end,\n"
+                    + "    f.bairro_end,\n"
+                    + "    f.cidade_end,\n"
+                    + "    f.codcidade,\n"
+                    + "    f.uf_end,\n"
+                    + "    f.cod_pais,\n"
+                    + "    f.end_entrega,\n"
+                    + "    f.num_end_entrega,\n"
+                    + "    f.cep_end_entrega,\n"
+                    + "    f.compl_ent,\n"
+                    + "    f.cid_end_entrega,\n"
+                    + "    f.uf_end_ent,\n"
+                    + "    f.telefone,\n"
+                    + "    f.telefax,\n"
+                    + "    f.email,\n"
+                    + "    f.site,\n"
+                    + "    f.data_cad,\n"
+                    + "    f.observacoes,\n"
+                    + "    f.ativo\n"
+                    + "from contato f\n"
+                    + "where f.tipo_contato = 'F'\n"
+                    + "order by f.id"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj_cpf"));
+                    imp.setIe_rg(rst.getString("insc_rg"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("num_end"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setCep(rst.getString("cep_end"));
+                    imp.setBairro(rst.getString("bairro_end"));
+                    imp.setMunicipio(rst.getString("cidade_end"));
+                    imp.setIbge_municipio(rst.getInt("codcidade"));
+                    imp.setUf(rst.getString("uf_end"));
+                    imp.setAtivo("T".equals(rst.getString("ativo")));
+                    imp.setDatacadastro(rst.getDate("data_cad"));
+                    imp.setObservacao(rst.getString("observacoes"));
+                    imp.setTel_principal(rst.getString("telefone"));
+
+                    if ((rst.getString("telefax") != null)
+                            && (!rst.getString("telefax").trim().isEmpty())) {
+
+                        imp.addContato(
+                                "FAX",
+                                rst.getString("telefax"),
+                                null,
+                                TipoContato.COMERCIAL,
+                                null
+                        );
+                    }
+                    if ((rst.getString("email") != null)
+                            && (!rst.getString("email").trim().isEmpty())) {
+
+                        imp.addContato(
+                                "EMAIL",
+                                null,
+                                null,
+                                TipoContato.NFE,
+                                rst.getString("email").toLowerCase()
+                        );
+                    }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 }
