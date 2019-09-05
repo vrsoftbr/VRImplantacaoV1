@@ -267,4 +267,126 @@ public class EticaDAO extends InterfaceDAO {
         }
         return result;
     }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "    c.id,\n"
+                    + "    c.razao_social as razao,\n"
+                    + "    c.nome as fantasia,\n"
+                    + "    c.cnpj_cpf,\n"
+                    + "    c.insc_rg,\n"
+                    + "    c.endereco,\n"
+                    + "    c.num_end,\n"
+                    + "    c.complemento,\n"
+                    + "    c.cep_end,\n"
+                    + "    c.bairro_end,\n"
+                    + "    c.cidade_end,\n"
+                    + "    c.codcidade,\n"
+                    + "    c.uf_end,\n"
+                    + "    c.cod_pais,\n"
+                    + "    c.end_entrega,\n"
+                    + "    c.num_end_entrega,\n"
+                    + "    c.cep_end_entrega,\n"
+                    + "    c.compl_ent,\n"
+                    + "    c.cid_end_entrega,\n"
+                    + "    c.uf_end_ent,\n"
+                    + "    c.telefone,\n"
+                    + "    c.telefax,\n"
+                    + "    c.email,\n"
+                    + "    c.site,\n"
+                    + "    c.data_cad,\n"
+                    + "    c.ativo,\n"
+                    + "    c.limite_cred,\n"
+                    + "    c.filiacao_pai,\n"
+                    + "    c.filiacao_mae,\n"
+                    + "    c.local_trab,\n"
+                    + "    c.observacoes,\n"
+                    + "    c.end_local_trab,\n"
+                    + "    c.telefone_trab,\n"
+                    + "    c.data_nasc,\n"
+                    + "    c.credito,\n"
+                    + "    c.dia_venc_finan\n"
+                    + "from contato c\n"
+                    + "where c.tipo_contato = 'C'\n"
+                    + "order bu c.id"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj(rst.getString("cnpj_cpf"));
+                    imp.setInscricaoestadual(rst.getString("insc_rg"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("num_end"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setCep(rst.getString("cep_end"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("cidade_end"));
+                    imp.setMunicipioIBGE(rst.getInt("codcidade"));
+                    imp.setUf(rst.getString("uf_end"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setFax(rst.getString("telefax"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setDataCadastro(rst.getDate("data_cad"));
+                    imp.setAtivo("T".equals(rst.getString("ativo")));
+                    imp.setValorLimite(rst.getDouble("limite_cred"));
+                    imp.setNomeMae(rst.getString("filiacao_mae"));
+                    imp.setNomePai(rst.getString("filiacao_pai"));
+                    imp.setEmpresa(rst.getString("end_local_trab"));
+                    imp.setEmpresaTelefone(rst.getString("telefone_trab"));
+                    imp.setDataNascimento(rst.getDate("data_nasc"));
+                    imp.setDiaVencimento(rst.getInt("dia_venc_finan"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "    r.id,\n"
+                    + "    r.idcontato as idcliente,\n"
+                    + "    pe.coo as numerocupom,\n"
+                    + "    r.data_emissao,\n"
+                    + "    r.data_venc,\n"
+                    + "    (r.valor_conta - r.valor_quitato) as valor,\n"
+                    + "    r.status,\n"
+                    + "    r.juros,\n"
+                    + "    r.multa,\n"
+                    + "    r.obs\n"
+                    + "from contas r\n"
+                    + "left join pedido pe on pe.id = r.idpedido and pe.idempresa = " + getLojaOrigem()
+                    + " and r.idempresa = " + getLojaOrigem() + "\n"
+                    + "where idcontato in (select id from contato where tipo_contato = 'C')\n"
+                    + "and valor_quitato < valor_conta"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdCliente(rst.getString("idcliente"));
+                    imp.setDataEmissao(rst.getDate("data_emissao"));
+                    imp.setDataVencimento(rst.getDate("data_venc"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setJuros(rst.getDouble("juros"));
+                    imp.setMulta(rst.getDouble("multa"));
+                    imp.setObservacao(rst.getString("obs"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 }
