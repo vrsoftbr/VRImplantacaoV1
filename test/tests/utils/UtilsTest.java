@@ -147,6 +147,11 @@ public class UtilsTest {
     }
     
     @Test
+    public void testStringToLong() {
+        assertEquals(999999999999999999L, Utils.stringToLong("9999999999999999999"));
+    }
+    
+    @Test
     public void testIsCnpjCpfValido() {
         
         /*assertFalse(Utils.isCnpjCpfValido(1l));

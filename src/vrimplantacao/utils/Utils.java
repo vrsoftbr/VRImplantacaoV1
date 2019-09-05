@@ -547,7 +547,7 @@ public class Utils {
 
     public static long stringToLong(String texto, long valorPadrao) {
         texto = Utils.formataNumero(texto);
-        int size = String.valueOf(Long.MAX_VALUE).length();
+        int size = 18;
         if (texto.length() > size) {
             texto = texto.substring(0, size);
         }

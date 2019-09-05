@@ -330,6 +330,7 @@
                                   <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="chkFContatos" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCnpjFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="226" max="32767" attributes="0"/>
                       </Group>
@@ -345,7 +346,9 @@
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkFContatos" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="154" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkCnpjFornecedor" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="139" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -364,6 +367,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoFornecedor">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Produto Fornecedor"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCnpjFornecedor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cnpj"/>
                   </Properties>
                 </Component>
               </SubComponents>

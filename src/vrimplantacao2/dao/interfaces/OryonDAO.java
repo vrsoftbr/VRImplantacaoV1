@@ -2,24 +2,28 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import vrimplantacao.classe.ConexaoAccess;
-import vrimplantacao.utils.Utils;
-import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import vrimplantacao.classe.ConexaoAccess;
+import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
  *
@@ -32,10 +36,6 @@ public class OryonDAO extends InterfaceDAO {
     @Override
     public String getSistema() {
         return "Oryon";
-    }
-    
-    public List<Estabelecimento> getLojaCliente() {
-        return new ArrayList<>(Arrays.asList(new Estabelecimento("2", "SUPERMERCADO ANDREA")));
     }
 
     @Override
@@ -311,6 +311,192 @@ public class OryonDAO extends InterfaceDAO {
             throw new UnsupportedOperationException("Not supported.");
         }
     }
+
+    public List<Estabelecimento> getLojaCliente() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select Codigo, Descricao from Tabela_Unidade_Negocio order by Codigo"
+            )) {
+                while (rst.next()) {
+                    result.add(new Estabelecimento(rst.getString("Codigo"), rst.getString("Descricao")));
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO
+        ));
+    }
+
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "  g.grupo as mercadologico1,\n" +
+                    "  g.sub_grupo as mercadologico2,\n" +
+                    "  g.Nome as mercadologico3\n" +
+                    "from\n" +
+                    "  tabela_categ g \n" +
+                    "order by\n" +
+                    "  1, 2, 3 "
+            )) {
+                while (rst.next()) {
+                    
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    
+                    String g1 = Utils.acertarTexto(rst.getString("mercadologico1"));
+                    String g2 = Utils.acertarTexto(rst.getString("mercadologico2"));
+                    String g3 = Utils.acertarTexto(rst.getString("mercadologico3"));
+                    
+                    if ("".equals(g2)) {
+                        g2 = g3;
+                    }
+                    if ("".equals(g1)) {
+                        g1 = g2;
+                    }                    
+                    
+                    imp.setMerc1ID(g1);
+                    imp.setMerc1Descricao(g1);
+                    imp.setMerc2ID(g2);
+                    imp.setMerc2Descricao(g2);
+                    imp.setMerc3ID(g3);
+                    imp.setMerc3Descricao(g3);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	p.codigo as id,\n" +
+                    "	p.codigo as codigobarras,\n" +
+                    "	p.descricao as descricaocompleta,\n" +
+                    "	p.descricao as descricaoreduzida,\n" +
+                    "	p.descricao as descricaogondola,\n" +
+                    "	g.grupo as mercadologico1,\n" +
+                    "	g.sub_grupo as mercadologico2,\n" +
+                    "	g.nome as mercadologico3,\n" +
+                    "	p.familia,\n" +
+                    "	p.unidade,\n" +
+                    "	p.qt_embalagem as qtdembalagem,\n" +
+                    "	p.situacao as ativo,\n" +
+                    "	p.qt_estoque as estoque,\n" +
+                    "	p.qt_minimo as estoqueminimo,\n" +
+                    "	p.qt_maximo as estoquemaximo,\n" +
+                    "	p.preco_venda as precovenda,\n" +
+                    "	p.preco_compra as custocomimposto,\n" +
+                    "	p.preco_compra as custosemimposto,\n" +
+                    "	p.margem_lucro as margem,\n" +
+                    "	p.usa_balanca as balanca,\n" +
+                    "	p.dias_validade as validade,\n" +
+                    "	p.data_cadastro as datacadastro,\n" +
+                    "	p.peso as pesobruto,\n" +
+                    "	p.pesoliquido,\n" +
+                    "	p.ncm,\n" +
+                    "	p.cest,\n" +
+                    "	p.situacao_tributaria_icm_entrada as cst_e,\n" +
+                    "	p.situacao_tributaria_icm_saida_ne as cst_ne_s,\n" +
+                    "	p.aliquota_icm_saida_ne as icms_s,\n" +
+                    "	p.aliquota_st_ret as icmsretencao,\n" +
+                    "	p.situacao_tributaria_icm_saida_fe as cst_fe_s,\n" +
+                    "	p.situacao_tributaria_pis as pis_s,\n" +
+                    "	p.situacao_tributaria_pis_entrada as pis_e,\n" +
+                    "	p.situacao_tributaria_cofins as cofins_s,\n" +
+                    "	p.situacao_tributaria_cofins_entrada as cofins_e,\n" +
+                    "	p.codigo_natureza_receita_pis_cofins as natreceita,\n" +
+                    "	p.margem_valor_agregado_fe as mva_fe,\n" +
+                    "	p.margem_valor_agregado as mva\n" +
+                    "from\n" +
+                    "	tabela_pro p\n" +
+                    "	left join tabela_categ g on\n" +
+                    "		p.categoria = g.codigo\n" +
+                    "order by\n" +
+                    "	1"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("codigobarras"));
+                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    imp.setDescricaoGondola(rst.getString("descricaogondola"));
+                    
+                    String g1 = Utils.acertarTexto(rst.getString("mercadologico1"));
+                    String g2 = Utils.acertarTexto(rst.getString("mercadologico2"));
+                    String g3 = Utils.acertarTexto(rst.getString("mercadologico3"));
+                    
+                    if ("".equals(g2)) {
+                        g2 = g3;
+                    }
+                    if ("".equals(g1)) {
+                        g1 = g2;
+                    }                   
+                    imp.setCodMercadologico1(g1);
+                    imp.setCodMercadologico2(g2);
+                    imp.setCodMercadologico3(g3);
+                    imp.setIdFamiliaProduto(rst.getString("familia"));
+                    imp.setTipoEmbalagem(rst.getString("unidade"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setSituacaoCadastro(rst.getBoolean("ativo") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
+                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    imp.setMargem(rst.getDouble("margem"));
+                    imp.seteBalanca(rst.getBoolean("balanca"));
+                    imp.setValidade(rst.getInt("validade"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setPesoBruto(rst.getDouble("pesobruto"));
+                    imp.setPesoLiquido(rst.getDouble("pesoliquido"));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+                    imp.setIcmsCstEntrada(rst.getInt("cst_e"));
+                    imp.setIcmsCstSaida(rst.getInt("icms_s"));
+                    imp.setPiscofinsCstCredito(rst.getString("pis_s"));
+                    imp.setPiscofinsCstDebito(rst.getString("pis_e"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("natreceita"));
+                    imp.setPautaFiscalId(rst.getString("mva"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }     
 }
 
 /*

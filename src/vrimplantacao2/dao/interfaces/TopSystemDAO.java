@@ -364,11 +364,11 @@ public class TopSystemDAO extends InterfaceDAO {
                     imp.setValidade(rst.getInt("Validade"));
                     imp.setSituacaoCadastro((rst.getInt("inativo") == 0 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO));
 
-                    /*if (mercadologico) {
+                    if (mercadologico) {
                         imp.setCodMercadologico1(rst.getString("merc1"));
                         imp.setCodMercadologico2(rst.getString("merc2"));
                         imp.setCodMercadologico3(rst.getString("merc3"));
-                    }*/
+                    }
 
                     if (mercadologicoNivel) {
                         imp.setCodMercadologico1(rst.getString("nivel1"));
