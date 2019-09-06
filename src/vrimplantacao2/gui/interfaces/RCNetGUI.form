@@ -481,6 +481,8 @@
                               <Component id="chkFContatos" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFPrazoFornecedor" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFCondicaoPagamento" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkRazaoSocial" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkNomeFantasia" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="332" max="32767" attributes="0"/>
                       </Group>
@@ -502,7 +504,11 @@
                               </Group>
                               <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="104" max="32767" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="chkRazaoSocial" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkNomeFantasia" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="59" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -562,6 +568,19 @@
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFCondicaoPagamentoActionPerformed"/>
                   </Events>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkRazaoSocial">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Razao Social"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkRazaoSocialActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNomeFantasia">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Nome Fantasia"/>
+                  </Properties>
                 </Component>
               </SubComponents>
             </Container>

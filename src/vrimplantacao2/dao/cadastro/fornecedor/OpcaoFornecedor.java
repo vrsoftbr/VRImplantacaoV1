@@ -29,6 +29,7 @@ public enum OpcaoFornecedor {
     TIPO_EMPRESA,
     CNPJ_CPF,
     INSCRICAO_ESTADUAL,
+    INSCRICAO_MUNICIPAL,
     MUNICIPIO,
     TIPO_PAGAMENTO, 
     NUMERO, 
