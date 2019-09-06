@@ -16,8 +16,8 @@ import vrimplantacao.classe.ConexaoAccess;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.OryonDAO;
@@ -34,7 +34,7 @@ public class OryonGUI extends VRInternalFrame {
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
-        txtDatabase.setArquivo(params.getWithNull("C://Clientes//SC//Andrea - SC//ms access//Oryon//Oryon.mdb", SISTEMA, "DATABASE"));
+        txtDatabase.setArquivo(params.getWithNull("C://Oryon.mdb", SISTEMA, "DATABASE"));
         txtUsuario.setText(params.getWithNull("", SISTEMA, "USUARIO"));
         txtSenha.setText(params.getWithNull("", SISTEMA, "SENHA"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
@@ -167,6 +167,10 @@ public class OryonGUI extends VRInternalFrame {
                             importador.importarProdutoFornecedor();
                         }
                         
+                        if (chkContaPagar.isSelected()) {
+                            importador.importarContasPagar(OpcaoContaPagar.NOVOS);
+                        }
+                        
                         List<OpcaoFornecedor> opcoes = new ArrayList<>();
                         if (chkFContatos.isSelected()) {
                             opcoes.add(OpcaoFornecedor.CONTATOS);                        
@@ -204,14 +208,6 @@ public class OryonGUI extends VRInternalFrame {
                             baseDAO.setDataInicioVenda(edtDtVendaIni.getDate());
                             baseDAO.setDataTerminoVenda(edtDtVendaFim.getDate());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
-                        }
-
-                        if (chkNutricionalFilizola.isSelected()) {
-                            importador.importarNutricionalFilizola();
-                        }
-
-                        if (chkNutricionalToledo.isSelected()) {
-                            importador.importarNutricionalToledo();
                         }
                         
                         if (chkConvEmpresa.isSelected()) {
@@ -289,6 +285,7 @@ public class OryonGUI extends VRInternalFrame {
         chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
         chkFPrazoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkFCondicaoPagamento = new vrframework.bean.checkBox.VRCheckBox();
+        chkContaPagar = new javax.swing.JCheckBox();
         tabConvenio = new javax.swing.JPanel();
         chkConvEmpresa = new vrframework.bean.checkBox.VRCheckBox();
         chkConvConveniado = new vrframework.bean.checkBox.VRCheckBox();
@@ -460,8 +457,7 @@ public class OryonGUI extends VRInternalFrame {
                     .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(vRPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(59, Short.MAX_VALUE)
-                .addContainerGap(143, Short.MAX_VALUE))
+                .addContainerGap(202, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Clientes", vRPanel9);
@@ -483,6 +479,8 @@ public class OryonGUI extends VRInternalFrame {
         chkFCondicaoPagamento.setText("Condição Pagamento");
         chkFCondicaoPagamento.setEnabled(true);
 
+        chkContaPagar.setText("Conta a Pagar");
+
         javax.swing.GroupLayout vRPanel8Layout = new javax.swing.GroupLayout(vRPanel8);
         vRPanel8.setLayout(vRPanel8Layout);
         vRPanel8Layout.setHorizontalGroup(
@@ -496,7 +494,8 @@ public class OryonGUI extends VRInternalFrame {
                         .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkFPrazoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkFCondicaoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkFCondicaoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkContaPagar))
                 .addContainerGap(332, Short.MAX_VALUE))
         );
         vRPanel8Layout.setVerticalGroup(
@@ -513,7 +512,9 @@ public class OryonGUI extends VRInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(chkFCondicaoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(120, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(chkContaPagar)
+                .addContainerGap(98, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Fornecedores", vRPanel8);
@@ -776,6 +777,7 @@ public class OryonGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
+    private javax.swing.JCheckBox chkContaPagar;
     private vrframework.bean.checkBox.VRCheckBox chkConvConveniado;
     private vrframework.bean.checkBox.VRCheckBox chkConvEmpresa;
     private vrframework.bean.checkBox.VRCheckBox chkConvRecebimento;
@@ -783,10 +785,6 @@ public class OryonGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
     private vrframework.bean.checkBox.VRCheckBox chkFPrazoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
-    private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
-    private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
-    private vrframework.bean.checkBox.VRCheckBox chkNutricionalFilizola;
-    private vrframework.bean.checkBox.VRCheckBox chkNutricionalToledo;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
