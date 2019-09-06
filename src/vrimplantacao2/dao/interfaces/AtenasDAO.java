@@ -4,12 +4,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -111,7 +113,7 @@ public class AtenasDAO extends InterfaceDAO {
                     imp.setDescricaoReduzida(Utils.acertarTexto(rs.getString("produto")));
                     imp.setDescricaoGondola(Utils.acertarTexto(rs.getString("produto")));
                     imp.seteBalanca(rs.getInt("usa_balanca") == 1);
-                    imp.setValidade(rs.getInt("validade"));
+                    //imp.setValidade(rs.getInt("validade"));
                     imp.setSituacaoCadastro(1);
                     imp.setTipoEmbalagem(rs.getString("unidade"));
                     imp.setDataCadastro(rs.getDate("data_cadastro"));
@@ -150,6 +152,8 @@ public class AtenasDAO extends InterfaceDAO {
                     "    codfornecedor is not null and codfornecedor != ''")) {
                 while(rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
                     imp.setIdProduto(rs.getString("codigo"));
                     imp.setIdFornecedor(rs.getString("codfornecedor"));
                     imp.setCodigoExterno(rs.getString("externo"));
@@ -201,7 +205,7 @@ public class AtenasDAO extends InterfaceDAO {
                     imp.setNumero(rs.getString("numero"));
                     imp.setBairro(rs.getString("bairro"));
                     imp.setMunicipio(rs.getString("cidade"));
-                    imp.setUf(rs.getString("ud"));
+                    imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
                     imp.setComplemento(rs.getString("complemento"));
                     imp.setTel_principal(rs.getString("telefone1"));
@@ -270,7 +274,10 @@ public class AtenasDAO extends InterfaceDAO {
                     imp.setCnpj(rs.getString("cpf"));
                     imp.setValorLimite(rs.getDouble("limite"));
                     imp.setDataCadastro(rs.getDate("data_cadastro"));
-                    imp.setDataNascimento(rs.getDate("nascimento"));
+                    /*String data = rs.getString("nascimento").trim();
+                    if(data.matches("[0-9]{2}/[0-9]{2}/[0-9]{4}")) {
+                        imp.setDataNascimento(rs.getDate("nascimento"));
+                    }*/
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setBairro(rs.getString("bairro"));
                     imp.setMunicipio(rs.getString("cidade"));
@@ -283,6 +290,45 @@ public class AtenasDAO extends InterfaceDAO {
                     imp.setCelular(rs.getString("celular"));
                     imp.setEmail(rs.getString("email") == null ? "" : rs.getString("email"));
                     imp.setObservacao(rs.getString("condpgto") == null ? "" : "Cond. Pagto: " + rs.getString("condpgto"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    codigo,\n" +
+                    "    codvenda,\n" +
+                    "    codcaixa,\n" +
+                    "    codcliente,\n" +
+                    "    data_emissao,\n" +
+                    "    data_vencimento,\n" +
+                    "    valor_original,\n" +
+                    "    documento\n" +
+                    "from\n" +
+                    "    c000049\n" +
+                    "where\n" +
+                    "    situacao = 1 and\n" +
+                    "    data_pagamento is null\n" +
+                    "order by\n" +
+                    "    data_emissao")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rs.getString("codigo"));
+                    imp.setNumeroCupom(rs.getString("codvenda"));
+                    imp.setEcf(rs.getString("codcaixa"));
+                    imp.setIdCliente(rs.getString("codcliente"));
+                    imp.setDataEmissao(rs.getDate("data_emissao"));
+                    imp.setDataVencimento(rs.getDate("data_vencimento"));
+                    imp.setValor(rs.getDouble("valor_original"));
+                    imp.setObservacao("Doc.: " + rs.getString("documento"));
                     
                     result.add(imp);
                 }
