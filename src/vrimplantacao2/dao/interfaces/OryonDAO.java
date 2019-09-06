@@ -22,7 +22,13 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -37,7 +43,406 @@ public class OryonDAO extends InterfaceDAO {
     public String getSistema() {
         return "Oryon";
     }
+    
+    public List<Estabelecimento> getLojaCliente() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select Codigo, Descricao from Tabela_Unidade_Negocio order by Codigo"
+            )) {
+                while (rst.next()) {
+                    result.add(new Estabelecimento(rst.getString("Codigo"), rst.getString("Descricao")));
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO
+        ));
+    }
+    
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "  g.grupo as mercadologico1,\n" +
+                    "  g.sub_grupo as mercadologico2,\n" +
+                    "  g.Nome as mercadologico3\n" +
+                    "from\n" +
+                    "  tabela_categ g \n" +
+                    "order by\n" +
+                    "  1, 2, 3 "
+            )) {
+                while (rst.next()) {
+                    
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    
+                    String g1 = Utils.acertarTexto(rst.getString("mercadologico1"));
+                    String g2 = Utils.acertarTexto(rst.getString("mercadologico2"));
+                    String g3 = Utils.acertarTexto(rst.getString("mercadologico3"));
+                    
+                    if ("".equals(g2)) {
+                        g2 = g3;
+                    }
+                    if ("".equals(g1)) {
+                        g1 = g2;
+                    }                    
+                    
+                    imp.setMerc1ID(g1);
+                    imp.setMerc1Descricao(g1);
+                    imp.setMerc2ID(g2);
+                    imp.setMerc2Descricao(g2);
+                    imp.setMerc3ID(g3);
+                    imp.setMerc3Descricao(g3);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	p.codigo as id,\n" +
+                    "	p.codigo as codigobarras,\n" +
+                    "	p.descricao as descricaocompleta,\n" +
+                    "	p.descricao as descricaoreduzida,\n" +
+                    "	p.descricao as descricaogondola,\n" +
+                    "	g.grupo as mercadologico1,\n" +
+                    "	g.sub_grupo as mercadologico2,\n" +
+                    "	g.nome as mercadologico3,\n" +
+                    "	p.familia,\n" +
+                    "	p.unidade,\n" +
+                    "	p.qt_embalagem as qtdembalagem,\n" +
+                    "	p.situacao as ativo,\n" +
+                    "	p.qt_estoque as estoque,\n" +
+                    "	p.qt_minimo as estoqueminimo,\n" +
+                    "	p.qt_maximo as estoquemaximo,\n" +
+                    "	p.preco_venda as precovenda,\n" +
+                    "	p.preco_compra as custocomimposto,\n" +
+                    "	p.preco_compra as custosemimposto,\n" +
+                    "	p.margem_lucro as margem,\n" +
+                    "	p.usa_balanca as balanca,\n" +
+                    "	p.dias_validade as validade,\n" +
+                    "	p.data_cadastro as datacadastro,\n" +
+                    "	p.peso as pesobruto,\n" +
+                    "	p.pesoliquido,\n" +
+                    "	p.ncm,\n" +
+                    "	p.cest,\n" +
+                    "	p.situacao_tributaria_icm_entrada as cst_e,\n" +
+                    "	p.situacao_tributaria_icm_saida_ne as cst_ne_s,\n" +
+                    "	p.aliquota_icm_saida_ne as icms_s,\n" +
+                    "	p.aliquota_st_ret as icmsretencao,\n" +
+                    "	p.situacao_tributaria_icm_saida_fe as cst_fe_s,\n" +
+                    "	p.situacao_tributaria_pis as pis_s,\n" +
+                    "	p.situacao_tributaria_pis_entrada as pis_e,\n" +
+                    "	p.situacao_tributaria_cofins as cofins_s,\n" +
+                    "	p.situacao_tributaria_cofins_entrada as cofins_e,\n" +
+                    "	p.codigo_natureza_receita_pis_cofins as natreceita,\n" +
+                    "	p.margem_valor_agregado_fe as mva_fe,\n" +
+                    "	p.margem_valor_agregado as mva\n" +
+                    "from\n" +
+                    "	tabela_pro p\n" +
+                    "	left join tabela_categ g on\n" +
+                    "		p.categoria = g.codigo\n" +
+                    "order by\n" +
+                    "	1"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("codigobarras"));
+                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    imp.setDescricaoGondola(rst.getString("descricaogondola"));
+                    
+                    String g1 = Utils.acertarTexto(rst.getString("mercadologico1"));
+                    String g2 = Utils.acertarTexto(rst.getString("mercadologico2"));
+                    String g3 = Utils.acertarTexto(rst.getString("mercadologico3"));
+                    
+                    if ("".equals(g2)) {
+                        g2 = g3;
+                    }
+                    if ("".equals(g1)) {
+                        g1 = g2;
+                    }                   
+                    imp.setCodMercadologico1(g1);
+                    imp.setCodMercadologico2(g2);
+                    imp.setCodMercadologico3(g3);
+                    imp.setIdFamiliaProduto(rst.getString("familia"));
+                    imp.setTipoEmbalagem(rst.getString("unidade"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    imp.setSituacaoCadastro(rst.getBoolean("ativo") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
+                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    imp.setMargem(rst.getDouble("margem"));
+                    imp.seteBalanca(rst.getBoolean("balanca"));
+                    imp.setValidade(rst.getInt("validade"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setPesoBruto(rst.getDouble("pesobruto"));
+                    imp.setPesoLiquido(rst.getDouble("pesoliquido"));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+                    imp.setIcmsCstEntrada(rst.getInt("cst_e"));
+                    imp.setIcmsCstSaida(rst.getInt("icms_s"));
+                    imp.setPiscofinsCstCredito(rst.getString("pis_s"));
+                    imp.setPiscofinsCstDebito(rst.getString("pis_e"));
+                    imp.setPiscofinsNaturezaReceita(rst.getString("natreceita"));
+                    imp.setPautaFiscalId(rst.getString("mva"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
 
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "   codigo,\n" +
+                    "   fornecedor,\n" +
+                    "   codigo_forn \n" +
+                    "from\n" +
+                    "   tabela_pro\n" +
+                    "where\n" +
+                    "   fornecedor is not null and \n" +
+                    "   fornecedor <> -1 and\n" +
+                    "   codigo_forn is not null\n" +
+                    "order by\n" +
+                    "   1")) {
+                while(rs.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rs.getString("codigo"));
+                    imp.setIdFornecedor(rs.getString("fornecedor"));
+                    imp.setCodigoExterno(rs.getString("codigo_forn"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "   codigo as id,\n" +
+                    "   nome as razao,\n" +
+                    "   fantasia,\n" +
+                    "   endereco_logradouro as rua,\n" +
+                    "   endereco_numero as numero,\n" +
+                    "   endereco_complemento as complemento,\n" +
+                    "   bairro,\n" +
+                    "   cidade,\n" +
+                    "   codigo_cidade as ibgemunicipio,\n" +
+                    "   cep,\n" +
+                    "   uf,\n" +
+                    "   telefone,\n" +
+                    "   fax,\n" +
+                    "   cnpj,\n" +
+                    "   ie,\n" +
+                    "   contato,\n" +
+                    "   data_cadastro,\n" +
+                    "   email,\n" +
+                    "   inativo,\n" +
+                    "   regime_tributario as tipoempresa \n" +
+                    "from\n" +
+                    "   tabela_for\n" +
+                    "order by\n" +
+                    "   1")) {
+                while(rs.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setEndereco(rs.getString("rua"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setIbge_municipio(rs.getInt("ibgemunicipio"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setTel_principal(rs.getString("telefone"));
+                    imp.setCnpj_cpf(rs.getString("cnpj"));
+                    imp.setIe_rg(rs.getString("ie"));
+                    imp.setDatacadastro(rs.getDate("datacadastro"));
+                    if((rs.getString("email")) != null && (!"".equals(rs.getString("email")))) {
+                        imp.addContato("1", "EMAIL", null, null, TipoContato.NFE, rs.getString("email"));
+                    }
+                    imp.setAtivo("0".equals(rs.getString("inativo")));
+                    imp.setTipoEmpresa(rs.getInt("tipoempresa") == 0 ? TipoEmpresa.LUCRO_REAL : TipoEmpresa.EPP_SIMPLES);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "   codigo as id,\n" +
+                    "   nome as razao,\n" +
+                    "   fantasia,\n" +
+                    "   endereco_logradouro as endereco,\n" +
+                    "   endereco_numero as numero,\n" +
+                    "   endereco_complemento as complemento,\n" +
+                    "   bairro,\n" +
+                    "   cidade,\n" +
+                    "   codigo_cidade as ibgemunicipio,\n" +
+                    "   cep,\n" +
+                    "   uf,\n" +
+                    "   telefone,\n" +
+                    "   fax,\n" +
+                    "   rg,\n" +
+                    "   cic as cpf,\n" +
+                    "   cnpj,\n" +
+                    "   ie,\n" +
+                    "   contato,\n" +
+                    "   limite_credito,\n" +
+                    "   data_cadastro,\n" +
+                    "   pai,\n" +
+                    "   mae,\n" +
+                    "   email,\n" +
+                    "   cancelado,\n" +
+                    "   inativo,\n" +
+                    "   sexomasc as sexo,\n" +
+                    "   profissao \n" +
+                    "from\n" +
+                    "   tabela_cli\n" +
+                    "order by\n" +
+                    "   1")) {
+                while(rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setRazao(rs.getString("razao"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setMunicipioIBGE(rs.getInt("ibgemunicipio"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setTelefone(rs.getString("telefone"));
+                    imp.setFax(rs.getString("fax"));
+                    String rg = rs.getString("rg");
+                    String cpf = rs.getString("cpf");
+                    if(rg == null && !"".equals(rg)) {
+                        imp.setInscricaoestadual(rs.getString("ie"));
+                    } else {
+                        imp.setInscricaoestadual(rg);
+                    }
+                    if(cpf == null && !"".equals(cpf)) {
+                        imp.setCnpj(rs.getString("cnpj"));
+                    } else {
+                        imp.setCnpj(cpf);
+                    }
+                    imp.setValorLimite(rs.getDouble("limite_credito"));
+                    imp.setDataCadastro(rs.getDate("data_cadastro"));
+                    imp.setNomeMae(rs.getString("mae"));
+                    imp.setNomePai(rs.getString("pai"));
+                    imp.setEmail(rs.getString("email"));
+                    imp.setAtivo("0".equals(rs.getString("inativo")));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoAccess.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "   codigo_fluxo as id,\n" +
+                    "   duplicata,\n" +
+                    "   num_maquina as ecf,\n" +
+                    "   dia as datalanc,\n" +
+                    "   vencimento,\n" +
+                    "   numero as coo,\n" +
+                    "   prazo as valor,\n" +
+                    "   cliente,\n" +
+                    "   descricao as observacao\n" +
+                    "from\n" +
+                    "   tabela_fluxo\n" +
+                    "where\n" +
+                    "   cliente is not null and\n" +
+                    "   data_baixa is null and\n" +
+                    "   duplicata is not null\n" +
+                    "order by\n" +
+                    "   vencimento")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setDataEmissao(rs.getDate("datalanc"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setIdCliente(rs.getString("cliente"));
+                    imp.setNumeroCupom(rs.getString("coo"));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<ContaPagarIMP> getContasPagar() throws Exception {
         List<ContaPagarIMP> result = new ArrayList<>();
@@ -65,11 +470,10 @@ public class OryonDAO extends InterfaceDAO {
                     ContaPagarIMP imp = new ContaPagarIMP();
                     imp.setId(rs.getString("id"));
                     imp.setIdFornecedor(rs.getString("fornecedor"));
-                    imp.setVencimento(rs.getDate("vencimento"));
-                    imp.setValor(rs.getDouble("valor"));
                     imp.setNumeroDocumento(rs.getString("coo"));
                     imp.setDataEmissao(rs.getDate("datalanc"));
                     imp.setObservacao(rs.getString("observacao"));
+                    imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valor"));
                     
                     result.add(imp);
                 }
@@ -310,457 +714,5 @@ public class OryonDAO extends InterfaceDAO {
         public void remove() {
             throw new UnsupportedOperationException("Not supported.");
         }
-    }
-
-    public List<Estabelecimento> getLojaCliente() throws Exception {
-        List<Estabelecimento> result = new ArrayList<>();
-        
-        try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select Codigo, Descricao from Tabela_Unidade_Negocio order by Codigo"
-            )) {
-                while (rst.next()) {
-                    result.add(new Estabelecimento(rst.getString("Codigo"), rst.getString("Descricao")));
-                }
-            }
-        }
-        
-        return result;
-    }
-
-    @Override
-    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
-        return new HashSet<>(Arrays.asList(
-                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
-                OpcaoProduto.PRODUTOS,
-                OpcaoProduto.EAN,
-                OpcaoProduto.EAN_EM_BRANCO,
-                OpcaoProduto.MERCADOLOGICO,
-                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
-                OpcaoProduto.MERCADOLOGICO_PRODUTO
-        ));
-    }
-
-    @Override
-    public List<MercadologicoIMP> getMercadologicos() throws Exception {
-        List<MercadologicoIMP> result = new ArrayList<>();
-        
-        try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "  g.grupo as mercadologico1,\n" +
-                    "  g.sub_grupo as mercadologico2,\n" +
-                    "  g.Nome as mercadologico3\n" +
-                    "from\n" +
-                    "  tabela_categ g \n" +
-                    "order by\n" +
-                    "  1, 2, 3 "
-            )) {
-                while (rst.next()) {
-                    
-                    MercadologicoIMP imp = new MercadologicoIMP();
-                    
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    
-                    String g1 = Utils.acertarTexto(rst.getString("mercadologico1"));
-                    String g2 = Utils.acertarTexto(rst.getString("mercadologico2"));
-                    String g3 = Utils.acertarTexto(rst.getString("mercadologico3"));
-                    
-                    if ("".equals(g2)) {
-                        g2 = g3;
-                    }
-                    if ("".equals(g1)) {
-                        g1 = g2;
-                    }                    
-                    
-                    imp.setMerc1ID(g1);
-                    imp.setMerc1Descricao(g1);
-                    imp.setMerc2ID(g2);
-                    imp.setMerc2Descricao(g2);
-                    imp.setMerc3ID(g3);
-                    imp.setMerc3Descricao(g3);
-                    
-                    result.add(imp);
-                }
-            }
-        }
-        
-        return result;
-    }
-
-    @Override
-    public List<ProdutoIMP> getProdutos() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-        
-        try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	p.codigo as id,\n" +
-                    "	p.codigo as codigobarras,\n" +
-                    "	p.descricao as descricaocompleta,\n" +
-                    "	p.descricao as descricaoreduzida,\n" +
-                    "	p.descricao as descricaogondola,\n" +
-                    "	g.grupo as mercadologico1,\n" +
-                    "	g.sub_grupo as mercadologico2,\n" +
-                    "	g.nome as mercadologico3,\n" +
-                    "	p.familia,\n" +
-                    "	p.unidade,\n" +
-                    "	p.qt_embalagem as qtdembalagem,\n" +
-                    "	p.situacao as ativo,\n" +
-                    "	p.qt_estoque as estoque,\n" +
-                    "	p.qt_minimo as estoqueminimo,\n" +
-                    "	p.qt_maximo as estoquemaximo,\n" +
-                    "	p.preco_venda as precovenda,\n" +
-                    "	p.preco_compra as custocomimposto,\n" +
-                    "	p.preco_compra as custosemimposto,\n" +
-                    "	p.margem_lucro as margem,\n" +
-                    "	p.usa_balanca as balanca,\n" +
-                    "	p.dias_validade as validade,\n" +
-                    "	p.data_cadastro as datacadastro,\n" +
-                    "	p.peso as pesobruto,\n" +
-                    "	p.pesoliquido,\n" +
-                    "	p.ncm,\n" +
-                    "	p.cest,\n" +
-                    "	p.situacao_tributaria_icm_entrada as cst_e,\n" +
-                    "	p.situacao_tributaria_icm_saida_ne as cst_ne_s,\n" +
-                    "	p.aliquota_icm_saida_ne as icms_s,\n" +
-                    "	p.aliquota_st_ret as icmsretencao,\n" +
-                    "	p.situacao_tributaria_icm_saida_fe as cst_fe_s,\n" +
-                    "	p.situacao_tributaria_pis as pis_s,\n" +
-                    "	p.situacao_tributaria_pis_entrada as pis_e,\n" +
-                    "	p.situacao_tributaria_cofins as cofins_s,\n" +
-                    "	p.situacao_tributaria_cofins_entrada as cofins_e,\n" +
-                    "	p.codigo_natureza_receita_pis_cofins as natreceita,\n" +
-                    "	p.margem_valor_agregado_fe as mva_fe,\n" +
-                    "	p.margem_valor_agregado as mva\n" +
-                    "from\n" +
-                    "	tabela_pro p\n" +
-                    "	left join tabela_categ g on\n" +
-                    "		p.categoria = g.codigo\n" +
-                    "order by\n" +
-                    "	1"
-            )) {
-                while (rst.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rst.getString("id"));
-                    imp.setEan(rst.getString("codigobarras"));
-                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
-                    imp.setDescricaoGondola(rst.getString("descricaogondola"));
-                    
-                    String g1 = Utils.acertarTexto(rst.getString("mercadologico1"));
-                    String g2 = Utils.acertarTexto(rst.getString("mercadologico2"));
-                    String g3 = Utils.acertarTexto(rst.getString("mercadologico3"));
-                    
-                    if ("".equals(g2)) {
-                        g2 = g3;
-                    }
-                    if ("".equals(g1)) {
-                        g1 = g2;
-                    }                   
-                    imp.setCodMercadologico1(g1);
-                    imp.setCodMercadologico2(g2);
-                    imp.setCodMercadologico3(g3);
-                    imp.setIdFamiliaProduto(rst.getString("familia"));
-                    imp.setTipoEmbalagem(rst.getString("unidade"));
-                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                    imp.setSituacaoCadastro(rst.getBoolean("ativo") ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-                    imp.setEstoque(rst.getDouble("estoque"));
-                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
-                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
-                    imp.setPrecovenda(rst.getDouble("precovenda"));
-                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
-                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
-                    imp.setMargem(rst.getDouble("margem"));
-                    imp.seteBalanca(rst.getBoolean("balanca"));
-                    imp.setValidade(rst.getInt("validade"));
-                    imp.setDataCadastro(rst.getDate("datacadastro"));
-                    imp.setPesoBruto(rst.getDouble("pesobruto"));
-                    imp.setPesoLiquido(rst.getDouble("pesoliquido"));
-                    imp.setNcm(rst.getString("ncm"));
-                    imp.setCest(rst.getString("cest"));
-                    imp.setIcmsCstEntrada(rst.getInt("cst_e"));
-                    imp.setIcmsCstSaida(rst.getInt("icms_s"));
-                    imp.setPiscofinsCstCredito(rst.getString("pis_s"));
-                    imp.setPiscofinsCstDebito(rst.getString("pis_e"));
-                    imp.setPiscofinsNaturezaReceita(rst.getString("natreceita"));
-                    imp.setPautaFiscalId(rst.getString("mva"));
-                    
-                    result.add(imp);
-                }
-            }
-        }
-        
-        return result;
-    }     
+    }  
 }
-
-/*
---- Script Loja
-select
-   codigo,
-   descricao
-from
-   tabela_unidade_negocio
-*/
-
-/*
---- Script de Produto
-select
-  p.codigo as id,
-  p.codigo as codigobarras,
-  descricao as descricaocompleta,
-  descricao as descricaoreduzida,
-  descricao as descricaogondola,
-  categoria as cod_mercadologico1,
-  g.grupo as mercadologico1,
-  1 as cod_mercadologico2,
-  g.sub_grupo as mercadologico2,
-  1 as cod_mercadologico3,
-  g.sub_grupo as mercadologico3,
-  familia,
-  unidade,
-  qt_embalagem as qtdembalagem,
-  situacao as ativo,
-  qt_estoque as estoque,
-  qt_minimo as estoqueminimo,
-  qt_maximo as estoquemaximo,
-  preco_venda as precovenda,
-  preco_compra as custocomimposto,
-  preco_compra as custosemimposto,
-  margem_lucro as margem,
-  usa_balanca as balanca,
-  dias_validade as validade,
-  data_cadastro as datacadastro,
-  peso as pesobruto,
-  pesoliquido,
-  ncm,
-  cest,
-  situacao_tributaria_icm_entrada as cst_e,
-  situacao_tributaria_icm_saida_ne as cst_ne_s,
-  aliquota_icm_saida_ne as icms_s,
-  aliquota_st_ret as icmsretencao,
-  situacao_tributaria_icm_saida_fe as cst_fe_s,
-  situacao_tributaria_pis as pis_s,
-  situacao_tributaria_pis_entrada as pis_e,
-  situacao_tributaria_cofins as cofins_s,
-  situacao_tributaria_cofins_entrada as cofins_e,
-  codigo_natureza_receita_pis_cofins as natreceita,
-  margem_valor_agregado_fe as mva_fe,
-  margem_valor_agregado as mva
-from
-  tabela_pro p,
-  tabela_categ g
-where
-  p.categoria = g.codigo
-order by
-  1
-*/
-
-/*
--- Script de Mercadologico
-select 
-   codigo as merc1,
-   grupo as descmerc1,
-   1 as merc2,
-   sub_grupo as descmerc2,
-   1 as merc3,
-   nome as descmerc3 
-from
-   tabela_categ
-order by
-   1, 2
-*/
-
-/*
--- Script Produto Fornecedor
-select
-  codpro as idproduto,
-  codfor as idfornecedor,
-  codigo_forn as codigoexterno
-from
-  tabela_profor
-order by
-  codpro, codfor
-  
- -----------------------------
- 
- select 
-   codigo as idproduto,
-   fornecedor as idfornecedor,
-   codigo_forn as codigoexterno 
-from
-   tabela_pro
-where
-   fornecedor is not null and 
-   fornecedor <> -1 and
-   codigo_forn is not null
-order by
-   1
-*/
-
-/*
--- Script de Cliente
-select 
-   codigo as id,
-   nome as razao,
-   fantasia,
-   endereco_logradouro as endereco,
-   endereco_numero as numero,
-   endereco_complemento as complemento,
-   bairro,
-   cidade,
-   codigo_cidade as ibgemunicipio,
-   cep,
-   uf,
-   telefone,
-   fax,
-   rg,
-   cic as cpf,
-   cnpj,
-   ie,
-   contato,
-   limite_credito,
-   data_cadastro,
-   pai,
-   mae,
-   email,
-   cancelado,
-   inativo,
-   sexomasc as sexo,
-   profissao 
-from
-   tabela_cli
-order by
-   1
-*/
-
-/*
--- Script de Fornecedor
-select 
-   codigo as id,
-   nome as razao,
-   fantasia,
-   endereco_logradouro as rua,
-   endereco_numero as numero,
-   endereco_complemento as complemento,
-   bairro,
-   cidade,
-   codigo_cidade as ibgemunicipio,
-   cep,
-   uf,
-   telefone,
-   fax,
-   cnpj,
-   ie,
-   contato,
-   data_cadastro,
-   email,
-   inativo,
-   regime_tributario as tipoempresa 
-from
-   tabela_for
-order by
-   1
-*/
-
-/*
--- Script Rotativo
-select
-   codigo_fluxo as id,
-   duplicata,
-   num_maquina as ecf,
-   dia as datalanc,
-   vencimento,
-   numero as coo,
-   prazo as valor,
-   cliente,
-   descricao as observacao
-from
-   tabela_fluxo
-where
-   cliente is not null and
-   data_baixa is null and
-   duplicata is not null
-order by
-   vencimento
-*/
-
-/*
--- Script Conta Pagar
-select
-   codigo_fluxo as id,
-   duplicata,
-   num_maquina as ecf,
-   dia as datalanc,
-   vencimento,
-   numero as coo,
-   prazo as valor,
-   fornecedor,
-   descricao as observacao
-from
-   tabela_fluxo
-where
-   fornecedor is not null and
-   data_baixa is null and
-   duplicata is not null
-order by
-   vencimento
-*/
-
-/*
--- Script Venda
-select
-    n.link as id,
-    n.dia as data,
-    n.cliente as clientepreferencial,
-    c.nome as razao,
-    c.cnpj,
-    c.cic,
-    n.numero as numerocupom,
-    n.desconto as valordesconto,
-    n.valor as subtotalimpressora,
-    n.num_maquina as ecf,
-    n.situacao as cancelado
-from
-    tabela_nota1 n,
-    tabela_cli c
-where
-    n.cliente = c.codigo and
-    n.data_inclusao between #01/01/2018# and #21/08/2019# and
-    n.cupom = True
-order by
-    dia
-*/
-
-/*
--- Script Venda Item
-select 
-   vi.link as cod_venda,
-   vi.dia as data,
-   vi.numero as numerocupom,
-   vi.item as sequencia,
-   vi.codigo as cod_produto,
-   p.descricao as descricaocompleta,
-   p.unidade as unidademedida,
-   vi.quantidade,
-   vi.valor,
-   vi.desconto,
-   vi.situacao,
-   vi.situacao_tributaria_icm as icms_cst,
-   vi.aliquota_icm as icms_aliq
-from 
-   tabela_nota2 vi,
-   tabela_nota1 v,
-   tabela_pro p
-where
-   vi.link = v.link and
-   vi.codigo = p.codigo and
-   v.data_inclusao between #01/01/2018# and #21/08/2019#
-order by
-   1, 2, 4
-*/

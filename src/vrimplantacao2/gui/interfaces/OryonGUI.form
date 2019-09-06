@@ -196,13 +196,9 @@
                               </Group>
                               <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-<<<<<<< HEAD
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="vRPanel1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="59" max="32767" attributes="0"/>
-=======
-                          <EmptySpace pref="143" max="32767" attributes="0"/>
->>>>>>> 1bb6b0123d431ac9b4cb35b11084ec23309d8bb6
+                          <EmptySpace pref="202" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -352,6 +348,7 @@
                               <Component id="chkFContatos" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFPrazoFornecedor" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFCondicaoPagamento" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkContaPagar" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="332" max="32767" attributes="0"/>
                       </Group>
@@ -373,7 +370,9 @@
                               </Group>
                               <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="120" max="32767" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="chkContaPagar" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="98" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -417,6 +416,11 @@
                     <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                       <Connection code="true" type="code"/>
                     </Property>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkContaPagar">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Conta a Pagar"/>
                   </Properties>
                 </Component>
               </SubComponents>

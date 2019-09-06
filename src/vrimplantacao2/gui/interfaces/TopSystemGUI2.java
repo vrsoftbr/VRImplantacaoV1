@@ -262,6 +262,14 @@ public class TopSystemGUI2 extends VRInternalFrame {
                         if (chkCnpjFornecedor.isSelected()) {
                             opcoes.add(OpcaoFornecedor.CNPJ_CPF);
                         }
+                        
+                        if (chkIncMunicipalFornecedor.isSelected()) {
+                            opcoes.add(OpcaoFornecedor.INSCRICAO_MUNICIPAL);
+                        }
+                        
+                        if (chkTelefoneFornecedor.isSelected()) {
+                            opcoes.add(OpcaoFornecedor.TELEFONE);
+                        }
 
                         if (!opcoes.isEmpty()) {
                             importador.atualizarFornecedor(opcoes.toArray(new OpcaoFornecedor[]{}));
@@ -276,6 +284,18 @@ public class TopSystemGUI2 extends VRInternalFrame {
                                     OpcaoCliente.PERMITE_CHEQUE,
                                     OpcaoCliente.VALOR_LIMITE,
                                     OpcaoCliente.OBSERVACOES);
+                        }
+                        
+                        List<OpcaoCliente> optC = new ArrayList<>();
+                        if (chkCelularCliente.isSelected()) {
+                            optC.add(OpcaoCliente.CELULAR);
+                        }
+                        if (chkDataNascimentoCliente.isSelected()) {
+                            optC.add(OpcaoCliente.DATA_NASCIMENTO);
+                        }
+                        
+                        if (!optC.isEmpty()) {
+                            importador.atualizarClientePreferencial(optC.toArray(new OpcaoCliente[]{}));
                         }
                         
                         if (chkClienteEventual.isSelected()) {
@@ -366,11 +386,15 @@ public class TopSystemGUI2 extends VRInternalFrame {
         chkFContatos = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkCnpjFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkIncMunicipalFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkTelefoneFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
+        chkCelularCliente = new vrframework.bean.checkBox.VRCheckBox();
+        chkDataNascimentoCliente = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel4 = new vrframework.bean.panel.VRPanel();
         cbxUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         cbxUnifFornecedores = new vrframework.bean.checkBox.VRCheckBox();
@@ -523,6 +547,15 @@ public class TopSystemGUI2 extends VRInternalFrame {
 
         chkCnpjFornecedor.setText("Cnpj");
 
+        chkIncMunicipalFornecedor.setText("Inscrição Municipal");
+        chkIncMunicipalFornecedor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkIncMunicipalFornecedorActionPerformed(evt);
+            }
+        });
+
+        chkTelefoneFornecedor.setText("Telefone");
+
         javax.swing.GroupLayout vRPanel2Layout = new javax.swing.GroupLayout(vRPanel2);
         vRPanel2.setLayout(vRPanel2Layout);
         vRPanel2Layout.setHorizontalGroup(
@@ -535,7 +568,9 @@ public class TopSystemGUI2 extends VRInternalFrame {
                         .addGap(26, 26, 26)
                         .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCnpjFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkCnpjFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkIncMunicipalFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkTelefoneFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(226, Short.MAX_VALUE))
         );
         vRPanel2Layout.setVerticalGroup(
@@ -549,7 +584,11 @@ public class TopSystemGUI2 extends VRInternalFrame {
                 .addComponent(chkFContatos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCnpjFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(139, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkIncMunicipalFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkTelefoneFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(93, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Forncedores", vRPanel2);
@@ -568,6 +607,10 @@ public class TopSystemGUI2 extends VRInternalFrame {
             }
         });
 
+        chkCelularCliente.setText("Celular");
+
+        chkDataNascimentoCliente.setText("Data Nascimento");
+
         javax.swing.GroupLayout vRPanel3Layout = new javax.swing.GroupLayout(vRPanel3);
         vRPanel3.setLayout(vRPanel3Layout);
         vRPanel3Layout.setHorizontalGroup(
@@ -575,17 +618,25 @@ public class TopSystemGUI2 extends VRInternalFrame {
             .addGroup(vRPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(vRPanel3Layout.createSequentialGroup()
+                        .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(chkCelularCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkDataNascimentoCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(335, Short.MAX_VALUE))
+                .addContainerGap(167, Short.MAX_VALUE))
         );
         vRPanel3Layout.setVerticalGroup(
             vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(vRPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCelularCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkDataNascimentoCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(4, 4, 4)
@@ -762,6 +813,10 @@ public class TopSystemGUI2 extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkClienteEventualActionPerformed
 
+    private void chkIncMunicipalFornecedorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkIncMunicipalFornecedorActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkIncMunicipalFornecedorActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifCliEventual;
@@ -770,6 +825,7 @@ public class TopSystemGUI2 extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutoForn;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkAtivoInativo;
+    private vrframework.bean.checkBox.VRCheckBox chkCelularCliente;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
@@ -778,6 +834,7 @@ public class TopSystemGUI2 extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCusto;
     private vrframework.bean.checkBox.VRCheckBox chkCustoComImposto;
     private vrframework.bean.checkBox.VRCheckBox chkCustoSemImposto;
+    private vrframework.bean.checkBox.VRCheckBox chkDataNascimentoCliente;
     private vrframework.bean.checkBox.VRCheckBox chkDescCompleta;
     private vrframework.bean.checkBox.VRCheckBox chkDescGondola;
     private vrframework.bean.checkBox.VRCheckBox chkDescReduzida;
@@ -789,6 +846,7 @@ public class TopSystemGUI2 extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFamiliaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkICMS;
+    private vrframework.bean.checkBox.VRCheckBox chkIncMunicipalFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
@@ -801,6 +859,7 @@ public class TopSystemGUI2 extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
+    private vrframework.bean.checkBox.VRCheckBox chkTelefoneFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
     private vrframework.bean.checkBox.VRCheckBox chkValidade;
     private javax.swing.JComboBox cmbLojaOrigem;
