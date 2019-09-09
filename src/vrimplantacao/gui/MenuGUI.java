@@ -193,6 +193,7 @@ import vrimplantacao2.gui.interfaces.TGAGUI;
 import vrimplantacao2.gui.interfaces.TiTecnologiaGUI;
 import vrimplantacao2.gui.interfaces.TopSystemGUI;
 import vrimplantacao2.gui.interfaces.TopSystemGUI2;
+import vrimplantacao2.gui.interfaces.TopSystemGUI3;
 import vrimplantacao2.gui.interfaces.TstiGUI;
 import vrimplantacao2.gui.interfaces.UmPontoDoisGUI;
 import vrimplantacao2.gui.interfaces.UniplusGUI;
@@ -3074,7 +3075,7 @@ public final class MenuGUI extends VRMdiFrame {
 
     private void jMenuItemTopSystemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemTopSystemActionPerformed
      
-        TopSystemGUI2.exibir(this);
+        TopSystemGUI3.exibir(this);
     }//GEN-LAST:event_jMenuItemTopSystemActionPerformed
 
     private void jMenuItemSciActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSciActionPerformed

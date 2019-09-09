@@ -10,12 +10,16 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
@@ -50,6 +54,50 @@ public class TopSystemDAO extends InterfaceDAO {
         }
     }
 
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(new OpcaoProduto[]{
+            OpcaoProduto.MERCADOLOGICO,
+            OpcaoProduto.MAPA_TRIBUTACAO,
+            OpcaoProduto.FAMILIA_PRODUTO,
+            OpcaoProduto.FAMILIA,
+            OpcaoProduto.PRODUTOS,
+            OpcaoProduto.IMPORTAR_RESETAR_BALANCA,
+            OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+            OpcaoProduto.DATA_CADASTRO,
+            OpcaoProduto.DATA_ALTERACAO,
+            OpcaoProduto.EAN,
+            OpcaoProduto.EAN_EM_BRANCO,
+            OpcaoProduto.TIPO_EMBALAGEM_EAN,
+            OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.PESAVEL,
+            OpcaoProduto.VALIDADE,
+            OpcaoProduto.DESC_COMPLETA,
+            OpcaoProduto.DESC_GONDOLA,
+            OpcaoProduto.ATIVO,
+            OpcaoProduto.DESC_REDUZIDA,
+            OpcaoProduto.MERCADOLOGICO_PRODUTO,
+            OpcaoProduto.PESO_BRUTO,
+            OpcaoProduto.PESO_LIQUIDO,
+            OpcaoProduto.ESTOQUE_MINIMO,
+            OpcaoProduto.ESTOQUE_MAXIMO,
+            OpcaoProduto.ESTOQUE,
+            OpcaoProduto.CUSTO,
+            OpcaoProduto.PRECO,
+            OpcaoProduto.NCM,
+            OpcaoProduto.CEST,
+            OpcaoProduto.PIS_COFINS,
+            OpcaoProduto.NATUREZA_RECEITA,
+            OpcaoProduto.ICMS,
+            OpcaoProduto.ICMS_SAIDA,
+            OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+            OpcaoProduto.ICMS_ENTRADA,
+            OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+            OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA,
+            OpcaoProduto.MARGEM
+        }));
+    }
+    
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> vResult = new ArrayList<>();
@@ -230,7 +278,8 @@ public class TopSystemDAO extends InterfaceDAO {
                     + "	left join cad_estoque est on est.empresa = emp.codigo and est.codigo = p.codigo and est.tipo_estoque = 1\n"
                     + " left join cad_produto_pcusto cus on cus.cod_produto = p.codigo and cus.empresa = " + getLojaOrigem()
                     + " left join cad_produto_pvenda ven on ven.cod_produto = p.codigo and ven.empresa = " + getLojaOrigem() + "\n"
-                    + "and ven.tabela_preco = 1"                    
+                    + "and ven.tabela_preco = 1\n"
+                    + "where p.inativo = 0"
             )) {
                 while (rst.next()) {
 
