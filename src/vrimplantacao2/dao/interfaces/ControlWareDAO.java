@@ -53,11 +53,11 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select codestabelec id, razaosocial descricao "
+                    "select codestabelec id, razaosocial descricao, nome "
                     + "from estabelecimento order by id"
             )) {
                 while (rst.next()) {
-                    result.add(new Estabelecimento(rst.getString("id"), rst.getInt("id") + " - " + rst.getString("descricao")));
+                    result.add(new Estabelecimento(rst.getString("id"), rst.getInt("id") + " - " + rst.getString("nome")));
                 }
             }
         }
