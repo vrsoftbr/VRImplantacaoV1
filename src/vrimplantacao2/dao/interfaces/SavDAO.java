@@ -29,7 +29,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class SavDAO extends InterfaceDAO {
 
-    private int prefixoAtacado = 999;
+    private int prefixoAtacado = 999999;
 
     public void setPrefixoAtacado(int prefixoAtacado) {
         this.prefixoAtacado = prefixoAtacado;
@@ -177,11 +177,11 @@ public class SavDAO extends InterfaceDAO {
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
-                        imp.setImportId(rst.getString("codigo"));
+                        imp.setImportId(rst.getString("id_produto"));
                         imp.setEan(prefixoAtacado + String.valueOf(codigoAtual));
                         imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                         imp.setAtacadoPreco(rst.getDouble("precoatacado"));
-                        imp.setPrecovenda(rst.getDouble("preco"));
+                        imp.setPrecovenda(rst.getDouble("precovenda"));
                         result.add(imp);
                     }
                 }
