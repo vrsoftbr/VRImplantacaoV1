@@ -17,6 +17,8 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -234,6 +236,129 @@ public class SavDAO extends InterfaceDAO {
                                 null
                         );
                     }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "c.cliCodigo as id,\n"
+                    + "c.cliNome as nome,\n"
+                    + "c.cliCNPJCPF as cnpj_cpf,\n"
+                    + "c.cliRG as rg,\n"
+                    + "c.cliInscEstadual as i_e,\n"
+                    + "c.cliInscMunicipal as i_m,\n"
+                    + "c.cliEndereco as endereco,\n"
+                    + "c.cliEndeNumero as numero,\n"
+                    + "c.cliEndeComplemento as complemento,\n"
+                    + "bai.baiDescricao as bairro,\n"
+                    + "c.cidCodigo as municipio_ibge,\n"
+                    + "cid.cidDescricao as municipio,\n"
+                    + "c.cliUF as uf,\n"
+                    + "c.cliCEP as cep,\n"
+                    + "(coalesce(c.cliDDD, '') + coalesce(c.cliFone, '')) as telefone,\n"
+                    + "c.cliFax as fax,\n"
+                    + "c.cliCelular as celular,\n"
+                    + "c.cliEmail as email,\n"
+                    + "c.cliContato as contato,\n"
+                    + "c.cliDataCadastro as datacadastro,\n"
+                    + "c.cliDataNascimento as nascimento,\n"
+                    + "c.cliCredito as valorlimite,\n"
+                    + "c.cliStatus as situacaocadastro\n"
+                    + "from dbo.tbCliente c\n"
+                    + "left join dbo.tbBairro bai on bai.baiCodigo = c.baiCodigo\n"
+                    + "left join dbo.tbCidade cid on cid.cidCodigo = c.cidCodigo\n"
+                    + "order by c.cliCodigo"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("nome"));
+                    imp.setFantasia(rst.getString("nome"));
+                    imp.setCnpj(rst.getString("cnpj_cpf"));
+                    imp.setInscricaoestadual(rst.getString("i_e"));
+                    imp.setInscricaoMunicipal(rst.getString("i_m"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setMunicipioIBGE(rst.getInt("municipio_ibge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setFax(rst.getString("fax"));
+                    imp.setCelular(rst.getString("celular"));
+                    imp.setEmail(rst.getString("email"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setDataNascimento(rst.getDate("nascimento"));
+                    imp.setValorLimite(rst.getDouble("valorlimite"));
+                    imp.setAtivo("A".equals(rst.getString("situacaocadastro")));
+
+                    if (imp.getValorLimite() > 0) {
+                        imp.setPermiteCheque(true);
+                        imp.setPermiteCreditoRotativo(true);
+                    } else {
+                        imp.setPermiteCheque(false);
+                        imp.setPermiteCreditoRotativo(false);
+                    }
+
+                    if ((rst.getString("contato") != null)
+                            && (!rst.getString("contato").trim().isEmpty())) {
+                        imp.addTelefone(
+                                "CONTATO",
+                                rst.getString("contato")
+                        );
+                    }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select  \n"
+                    + "crbNumero as id,\n"
+                    + "cliCodigo as id_cliente,\n"
+                    + "crbDocumento as numerocupom,\n"
+                    + "crbHistorico as observacao,\n"
+                    + "coalesce(crbParcela, 1) as numeroparcela,\n"
+                    + "coalesce(crbDataCompra, crbDataVencimento) as dataemissao,\n"
+                    + "crbDataVencimento as datavencimento,\n"
+                    + "crbValor as valor,\n"
+                    + "coalesce(crbValorDesconto, 0) as desconto,\n"
+                    + "coalesce(crbValorJuros, 0) as juros,\n"
+                    + "coalesce(crbValorMulta, 0) as multa\n"
+                    + "from dbo.tbContaReceber\n"
+                    + "where crbDataCancelamento is null\n"
+                    + "and crbDataPagamento is null"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdCliente(rst.getString("id_cliente"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
+                    imp.setParcela(rst.getInt("numeroparcela"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataVencimento(rst.getDate("datavencimento"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setJuros(rst.getDouble("juros"));
+                    imp.setMulta(rst.getDouble("multa"));
+                    imp.setObservacao(rst.getString("observacao"));
                     result.add(imp);
                 }
             }
