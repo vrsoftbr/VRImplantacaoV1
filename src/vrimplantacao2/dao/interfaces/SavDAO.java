@@ -15,6 +15,7 @@ import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -27,6 +28,12 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  * @author lucasrafael
  */
 public class SavDAO extends InterfaceDAO {
+
+    private int prefixoAtacado = 999;
+
+    public void setPrefixoAtacado(int prefixoAtacado) {
+        this.prefixoAtacado = prefixoAtacado;
+    }
 
     @Override
     public String getSistema() {
@@ -147,6 +154,41 @@ public class SavDAO extends InterfaceDAO {
             }
         }
         return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.ATACADO) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + "ata.proCodigo as id_produto, \n"
+                        + "ata.pprQtdProduto as qtdembalagem, \n"
+                        + "ata.pprValorVenda as precoatacado,\n"
+                        + "pro.proValorVenda as precovenda\n"
+                        + "from dbo.tbProdutoPreco ata\n"
+                        + "inner join dbo.tbProduto pro on pro.proCodigo = ata.proCodigo"
+                )) {
+                    while (rst.next()) {
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("codigo"));
+
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("codigo"));
+                        imp.setEan(prefixoAtacado + String.valueOf(codigoAtual));
+                        imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                        imp.setAtacadoPreco(rst.getDouble("precoatacado"));
+                        imp.setPrecovenda(rst.getDouble("preco"));
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }
+        }
+        return null;
     }
 
     @Override
