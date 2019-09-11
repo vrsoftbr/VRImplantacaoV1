@@ -29,7 +29,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class SavDAO extends InterfaceDAO {
 
-    private int prefixoAtacado = 999999;
+    private int prefixoAtacado = 99999;
 
     public void setPrefixoAtacado(int prefixoAtacado) {
         this.prefixoAtacado = prefixoAtacado;
@@ -130,7 +130,7 @@ public class SavDAO extends InterfaceDAO {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
-                    imp.seteBalanca("S".equals(rst.getString("baianca")));
+                    imp.seteBalanca("S".equals(rst.getString("balanca")));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setDescricaoCompleta(rst.getString("descricao"));
@@ -146,7 +146,13 @@ public class SavDAO extends InterfaceDAO {
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("cst_pis"));
                     imp.setPiscofinsCstCredito(rst.getString("cst_cofins"));
-                    imp.setIcmsCst(rst.getInt("cst_icms"));
+                    
+                    if ("500".equals(rst.getString("cst_icms"))) {
+                        imp.setIcmsCst(60);
+                    } else {
+                        imp.setIcmsCst(rst.getInt("cst_icms"));
+                    }
+                    
                     imp.setIcmsAliq(rst.getDouble("aliq_icms"));
                     imp.setIcmsReducao(rst.getDouble("redu_icms"));
                     result.add(imp);
@@ -172,13 +178,13 @@ public class SavDAO extends InterfaceDAO {
                         + "inner join dbo.tbProduto pro on pro.proCodigo = ata.proCodigo"
                 )) {
                     while (rst.next()) {
-                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("codigo"));
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("id_produto"));
 
                         ProdutoIMP imp = new ProdutoIMP();
                         imp.setImportLoja(getLojaOrigem());
                         imp.setImportSistema(getSistema());
                         imp.setImportId(rst.getString("id_produto"));
-                        imp.setEan(prefixoAtacado + String.valueOf(codigoAtual));
+                        imp.setEan(String.valueOf(rst.getInt("qtdembalagem")) + prefixoAtacado + String.valueOf(codigoAtual));
                         imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                         imp.setAtacadoPreco(rst.getDouble("precoatacado"));
                         imp.setPrecovenda(rst.getDouble("precovenda"));
