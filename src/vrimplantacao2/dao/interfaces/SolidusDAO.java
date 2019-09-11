@@ -808,8 +808,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    pf.des_referencia,\n" +
                     "    max(div.cod_divisao) id_divisao,\n" +
                     "    max(pf.dta_alteracao) dta_alteracao,\n" +
-                    "    max(pf.qtd_embalagem_compra) qtd_embalagem_compra,\n" +
-                    "    max(pf.val_custo_embalagem) val_custo_embalagem\n" +
+                    "    coalesce(nullif(max(pf.qtd_embalagem_compra),0), 1) qtd_embalagem_compra,\n" +
+                    "    max(pf.val_custo_embalagem) / coalesce(nullif(max(pf.qtd_embalagem_compra),0), 1) val_custo_embalagem\n" +
                     "from\n" +
                     "    tab_produto_fornecedor pf\n" +
                     "    left join tab_divisao_fornecedor div on\n" +
@@ -820,7 +820,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    pf.cod_produto,\n" +
                     "    pf.des_referencia,\n" +
                     "    pf.val_custo_embalagem\n" +
-                    "order by 1,2,3"
+                    "order by 1,2,3"                    
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();

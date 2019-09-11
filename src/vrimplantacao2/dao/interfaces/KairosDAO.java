@@ -625,6 +625,9 @@ public class KairosDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTelefone(rst.getString("Telefone"));
                     imp.setCnpj(rst.getString("Cnpj"));
                     imp.setInscricaoestadual(rst.getString("InscricaoEstadual"));
+                    if (imp.getInscricaoestadual() == null || imp.getInscricaoestadual().trim().equals("")) {
+                        imp.setInscricaoestadual(rst.getString("rg"));
+                    }
                     imp.setOrgaoemissor(rst.getString("OrgaoExp"));
                     imp.setValorLimite(rst.getDouble("LimiteCredito"));
                     imp.setPermiteCheque(true);
