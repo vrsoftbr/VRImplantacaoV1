@@ -483,6 +483,20 @@
                               <Component id="chkFCondicaoPagamento" min="-2" max="-2" attributes="0"/>
                               <Component id="chkRazaoSocial" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkNomeFantasia" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkEndFornecedor" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkNumFornecedor" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCepFornecedor" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="chkBaiFornecedor" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkMunFornecedor" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkUFFornecedor" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
                           <EmptySpace pref="332" max="32767" attributes="0"/>
                       </Group>
@@ -504,11 +518,23 @@
                               </Group>
                               <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkRazaoSocial" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkNomeFantasia" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="59" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkEndFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkNumFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCepFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkBaiFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkMunFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkUFFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="20" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -580,6 +606,36 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNomeFantasia">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Nome Fantasia"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkEndFornecedor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Endere&#xe7;o"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkNumFornecedor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Numero"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkBaiFornecedor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Bairro"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCepFornecedor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cep"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMunFornecedor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Munic&#xed;pio"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUFFornecedor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="UF"/>
                   </Properties>
                 </Component>
               </SubComponents>

@@ -31,6 +31,7 @@ public enum OpcaoFornecedor {
     INSCRICAO_ESTADUAL,
     INSCRICAO_MUNICIPAL,
     MUNICIPIO,
+    UF,
     TIPO_PAGAMENTO, 
     NUMERO, 
     TIPO_FORNECEDOR,

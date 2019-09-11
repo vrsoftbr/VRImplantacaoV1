@@ -5,61 +5,19 @@
  */
 package vrimplantacao2.dao.interfaces;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import vrframework.classe.Conexao;
-import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoFirebird;
-import vrimplantacao.dao.cadastro.NutricionalToledoDAO;
-import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.vrimplantacao.NutricionalToledoItemVO;
-import vrimplantacao.vo.vrimplantacao.NutricionalToledoVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
-import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.venda.VendaHistoricoIMP;
-import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.utils.MathUtils;
-import vrimplantacao2.utils.multimap.MultiMap;
-import vrimplantacao2.utils.sql.SQLUtils;
-import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
-import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
-import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
-import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
-import vrimplantacao2.vo.enums.TipoEmpresa;
-import vrimplantacao2.vo.enums.TipoSexo;
-import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
-import vrimplantacao2.vo.importacao.ContaPagarIMP;
-import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
-import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
-import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
-import vrimplantacao2.vo.importacao.NutricionalIMP;
-import vrimplantacao2.vo.importacao.OfertaIMP;
-import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
-import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
-import vrimplantacao2.vo.importacao.VendaIMP;
-import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
@@ -72,6 +30,23 @@ public class EticaDAO extends InterfaceDAO {
         return "Etica";
     }
 
+    public List<Estabelecimento> getLojasCliente() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "id, razao_social\n"
+                    + "from empresa\n"
+                    + "order by id"
+            )) {
+                while (rst.next()) {
+                    result.add(new Estabelecimento(rst.getString("id"), rst.getString("razao_social")));
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();

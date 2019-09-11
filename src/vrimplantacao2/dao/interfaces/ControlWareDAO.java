@@ -8,6 +8,11 @@ import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoInscricao;
+import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -23,6 +28,8 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
 
     public String complemento = "";
     public boolean importarFamiliaDeSimilar = false;
+    public int tipoPlanoContaReceber;
+    public int tipoPlanoContaPagar;
 
     @Override
     public String getSistema() {
@@ -53,11 +60,11 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
         List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select codestabelec id, razaosocial descricao "
+                    "select codestabelec id, razaosocial descricao, nome "
                     + "from estabelecimento order by id"
             )) {
                 while (rst.next()) {
-                    result.add(new Estabelecimento(rst.getString("id"), rst.getInt("id") + " - " + rst.getString("descricao")));
+                    result.add(new Estabelecimento(rst.getString("id"), rst.getInt("id") + " - " + rst.getString("nome")));
                 }
             }
         }
@@ -177,7 +184,7 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	replace(ncm.codigoncm,'.','') ncm,\n"
                     + "	replace(cest.cest,'.','') cest,\n"
                     + "	codfamilia id_familiaproduto,\n"
-                    + " codsimilar id_familiasimilar,\n"        
+                    + " codsimilar id_familiasimilar,\n"
                     + "	pe.margemvrj margem,\n"
                     + "	emb.quantidade qtdEmbalagem,\n"
                     + "	coalesce(ean.codean,'') codigobarras,\n"
@@ -190,6 +197,7 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	pe.custorep custocomnota,\n"
                     + "	pe.custorep custosemnota,\n"
                     + "	pe.sldsaida estoque,\n"
+                    + " pe.sldatual estoqueatual,\n"
                     + "	pe.estminimo estoque_minimo,\n"
                     + "	pe.estmaximo estoque_maximo,\n"
                     + "	estab.uf idEstado,\n"
@@ -200,7 +208,7 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     + "	icms_e.aliqicms icms_e_aliq,\n"
                     + "	icms_e.aliqredicms icms_e_reducao,\n"
                     + " p.codcfpdv idaliquotadebito,\n"
-                    + " p.codcfnfe idaliquotacredito,\n"        
+                    + " p.codcfnfe idaliquotacredito,\n"
                     + "	p.pesoliq pesoliquido,\n"
                     + "	p.pesobruto\n"
                     + "from \n"
@@ -237,7 +245,7 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setCustoComImposto(rs.getDouble("custocomnota"));
                     imp.setCustoSemImposto(rs.getDouble("custosemnota"));
-                    imp.setEstoque(rs.getDouble("estoque"));
+                    imp.setEstoque(rs.getDouble("estoqueatual"));
                     imp.setEstoqueMaximo(rs.getDouble("estoque_maximo"));
                     imp.setEstoqueMinimo(rs.getDouble("estoque_minimo"));
                     imp.setPesoBruto(rs.getDouble("pesobruto"));
@@ -251,7 +259,7 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setValidade(rs.getInt("validade"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
-                    if(importarFamiliaDeSimilar) {
+                    if (importarFamiliaDeSimilar) {
                         imp.setIdFamiliaProduto(rs.getString("id_familiasimilar"));
                     } else {
                         imp.setIdFamiliaProduto(rs.getString("id_familiaproduto"));
@@ -263,11 +271,11 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setPiscofinsCstDebito(rs.getString("idtipopiscofinsdebito"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
                     /*imp.setIcmsCstSaida(rs.getInt("icms_s_cst"));
-                    imp.setIcmsAliqSaida(rs.getDouble("icms_s_aliq"));
-                    imp.setIcmsReducaoSaida(rs.getDouble("icms_s_reducao"));
-                    imp.setIcmsCstEntrada(rs.getInt("icms_e_cst"));
-                    imp.setIcmsAliqEntrada(rs.getDouble("icms_e_aliq"));
-                    imp.setIcmsReducaoEntrada(rs.getDouble("icms_e_reducao"));*/
+                     imp.setIcmsAliqSaida(rs.getDouble("icms_s_aliq"));
+                     imp.setIcmsReducaoSaida(rs.getDouble("icms_s_reducao"));
+                     imp.setIcmsCstEntrada(rs.getInt("icms_e_cst"));
+                     imp.setIcmsAliqEntrada(rs.getDouble("icms_e_aliq"));
+                     imp.setIcmsReducaoEntrada(rs.getDouble("icms_e_reducao"));*/
                     imp.setIcmsCreditoId(rs.getString("idaliquotacredito"));
                     imp.setIcmsDebitoId(rs.getString("idaliquotadebito"));
 
@@ -380,4 +388,239 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
         }
         return result;
     }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	c.codcliente id,\n"
+                    + "	case c.codstatus when 1 then 1 when 2 then 1 else 0 end id_situacaocadastro,\n"
+                    + "	case c.tppessoa when 'F' then 1 else 0 end id_tipoinscricao,\n"
+                    + "	coalesce(c.razaosocial, c.nome) nome,\n"
+                    + "	c.enderres res_end,\n"
+                    + "	c.numerores res_num,\n"
+                    + "	c.complementores res_compl,\n"
+                    + "	c.bairrores res_bairro,\n"
+                    + "	c.cepres res_cep,\n"
+                    + "	res_cid.codoficial res_id_municipio,\n"
+                    + "	res_uf.codoficial res_id_estado,\n"
+                    + "	c.enderfat cob_end,\n"
+                    + "	c.numerofat cob_num,\n"
+                    + "	c.complementofat cob_compl,\n"
+                    + "	c.bairrofat cob_bairro,\n"
+                    + "	c.cepfat cob_cep,\n"
+                    + "	cob_cid.codoficial cob_id_municipio,\n"
+                    + "	cob_uf.codoficial cob_id_estado,\n"
+                    + "	c.enderent ent_end,\n"
+                    + "	c.numeroent ent_num,\n"
+                    + "	c.complementoent ent_compl,\n"
+                    + "	c.bairroent ent_bairro,\n"
+                    + "	c.cepent ent_cep,\n"
+                    + "	ent_cid.codoficial ent_id_municipio,\n"
+                    + "	ent_uf.codoficial ent_id_estado,\n"
+                    + "	c.cpfcnpj cnpj,\n"
+                    + "	c.foneres fone1,\n"
+                    + "	c.codempresa id_conveniado_com_cliente,\n"
+                    + "	case c.limite1 when 0 then c.limite2 else c.limite1 end as limite,\n"
+                    + "	c.rgie,\n"
+                    + "	c.dtinclusao datacadastro,\n"
+                    + "	c.dtnascto dataNascimento,\n"
+                    + "	case c.codstatus when 1 then false when 2 then true else true end bloqueado,\n"
+                    + "	c.fonefat fone2,\n"
+                    + "	c.faxfat fax,\n"
+                    + "	c.celular,\n"
+                    + "	c.observacao,\n"
+                    + "	c.email,\n"
+                    + "	case c.sexo when 'F' then 0 else 1 end sexo,\n"
+                    + "	(select razaosocial  from cliente where c.codempresa = codcliente) empresa,\n"
+                    + "	c.respcargo1 cargo,\n"
+                    + "	c.salario,\n"
+                    + "	0 as estadoCivil,\n"
+                    + "	nomeconj conjuge	\n"
+                    + "from\n"
+                    + "	cliente c\n"
+                    + "	left join cidade cob_cid on cob_cid.codcidade = c.codcidadefat\n"
+                    + "	left join estado cob_uf on cob_uf.uf = c.uffat\n"
+                    + "	left join cidade ent_cid on ent_cid.codcidade = c.codcidadeent\n"
+                    + "	left join estado ent_uf on ent_uf.uf = c.ufent\n"
+                    + "	left join cidade res_cid on res_cid.codcidade = c.codcidaderes\n"
+                    + "	left join estado res_uf on res_uf.uf = c.ufres\n"
+                    + "order by\n"
+                    + "	c.codcliente")) {
+                while (rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setInscricaoestadual(rs.getString("rgie"));
+                    imp.setAtivo(rs.getInt("id_situacaocadastro") == 1);
+                    imp.setTipoInscricao(rs.getInt("id_tipoinscricao") == 0 ? TipoInscricao.JURIDICA : TipoInscricao.FISICA);
+                    imp.setRazao(rs.getString("nome"));
+                    imp.setEndereco(rs.getString("res_end"));
+                    imp.setNumero(rs.getString("res_num"));
+                    imp.setComplemento(rs.getString("res_compl"));
+                    imp.setBairro(rs.getString("res_bairro"));
+                    imp.setCep(rs.getString("res_cep"));
+                    imp.setMunicipioIBGE(rs.getInt("res_id_municipio"));
+                    imp.setUfIBGE(rs.getInt("res_id_estado"));
+                    imp.setTelefone(rs.getString("fone1"));
+                    imp.setValorLimite(rs.getDouble("limite"));
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+                    imp.setDataNascimento(rs.getDate("datanascimento"));
+                    imp.setBloqueado(rs.getBoolean("bloqueado"));
+                    imp.setCelular(rs.getString("celular"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    imp.setEmail(rs.getString("email"));
+                    imp.setSexo(rs.getInt("sexo") == 1 ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    public class PlanoConta {
+        private int id;
+        private String descricao;
+        
+        public PlanoConta(int id, String descricao) {
+            this.id = id;
+            this.descricao = descricao;
+        }
+        
+        public void setId(int id) {
+            this.id = id;
+        }
+        
+        public int getId() {
+            return id;
+        }
+        
+        public void setDescricao(String descricao) {
+            this.descricao = descricao;
+        }
+        
+        public String getDescricao() {
+            return descricao;
+        }
+        
+        @Override
+        public String toString() {
+            return descricao;
+        }
+    }
+    
+    public List<PlanoConta> getEspecie() throws Exception {
+        List<PlanoConta> result = new ArrayList<>();
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	codespecie,\n" +
+                    "	descricao \n" +
+                    "from \n" +
+                    "	public.especie\n" +
+                    "order by\n" +
+                    "	descricao")) {
+                while(rs.next()) {
+                    result.add(new PlanoConta(rs.getInt("codespecie"), rs.getString("descricao")));
+                }
+            }
+        }
+        return result;
+    } 
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery("select \n" +
+                    "	codlancto id,\n" +
+                    "	codestabelec id_loja,\n" +
+                    "	(SELECT cupom.seqecf\n" +
+                    "           FROM cupomlancto, cupom\n" +
+                    "          WHERE cupomlancto.codlancto = l.codlancto AND\n" +
+                    "		cupomlancto.idcupom = cupom.idcupom\n" +
+                    "         LIMIT 1) AS cupom,\n" +
+                    "   (SELECT cupom.numeroecf\n" +
+                    "           FROM cupomlancto, cupom\n" +
+                    "          WHERE cupomlancto.codlancto = l.codlancto AND\n" +
+                    "		cupomlancto.idcupom = cupom.idcupom\n" +
+                    "         LIMIT 1) AS ecf,\n" +
+                    "	dtemissao emissao,\n" +
+                    "	dtvencto vencimento,\n" +
+                    "	parcela,\n" +
+                    "	codparceiro idcliente,\n" +
+                    "	valorliquido,\n" +
+                    "	valordescto desconto,\n" +
+                    "	valorjuros\n" +
+                    "from \n" +
+                    "	lancamento l \n" +
+                    "where \n" +
+                    "	pagrec = 'R' and\n" +
+                    "	status = 'A' and\n" +
+                    "	codestabelec = " + getLojaOrigem() + " and\n" +
+                    "	codespecie = " + tipoPlanoContaReceber + "\n" +
+                    "order by\n" +
+                    "	dtlancto")) {
+                while(rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setIdCliente(rs.getString("idcliente"));
+                    imp.setNumeroCupom(rs.getString("cupom"));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setParcela(rs.getInt("parcela"));
+                    imp.setValor(rs.getDouble("valorliquido"));
+                    imp.setJuros(rs.getDouble("valorjuros"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ContaPagarIMP> getContasPagar() throws Exception {
+        List<ContaPagarIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
+                    "	codlancto id,\n" +
+                    "	codestabelec id_loja,\n" +
+                    "	idnotafiscal,\n" +
+                    "	dtemissao emissao,\n" +
+                    "	dtvencto vencimento,\n" +
+                    "	parcela,\n" +
+                    "	codparceiro idfornecedor,\n" +
+                    "	valorliquido,\n" +
+                    "	valordescto desconto,\n" +
+                    "	valorjuros\n" +
+                    "from \n" +
+                    "	lancamento l \n" +
+                    "where \n" +
+                    "	pagrec = 'P' and\n" +
+                    "	status = 'A' and\n" +
+                    "	codestabelec = " + getLojaOrigem() + " and\n" +
+                    "	codespecie = " + tipoPlanoContaPagar + "\n" +
+                    "order by\n" +
+                    "	dtlancto")) {
+                while(rs.next()) {
+                    ContaPagarIMP imp = new ContaPagarIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setNumeroDocumento(rs.getString("idnotafiscal"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valorliquido"));
+                    imp.setIdFornecedor(rs.getString("idfornecedor"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
 }

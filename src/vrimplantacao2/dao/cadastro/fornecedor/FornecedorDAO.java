@@ -682,6 +682,9 @@ public class FornecedorDAO {
                 if (opt.contains(OpcaoFornecedor.MUNICIPIO)) {
                     sql.put("id_municipio", vo.getMunicipio().getId());
                 }
+                if (opt.contains(OpcaoFornecedor.UF)) {
+                    sql.put("id_estado", vo.getEstado() == null ? Parametros.get().getUfPadrao().getId() : vo.getEstado().getId());
+                }
                 if (opt.contains(OpcaoFornecedor.TIPO_PAGAMENTO)) {
                     sql.put("id_tipopagamento", vo.getTipoPagamento().getId());
                 }
