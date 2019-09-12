@@ -290,7 +290,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                         }
                         
                         if (chkOferta.isSelected()) {
-                            importador.importarOfertas(new Date());
+                            importador.importarOfertas(txtDataFimOferta.getDate());
                         }
                         
                         if (chkFornecedor.isSelected()) {
@@ -427,7 +427,6 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkMargem = new vrframework.bean.checkBox.VRCheckBox();
         chkNutricionalFilizola = new vrframework.bean.checkBox.VRCheckBox();
         chkNutricionalToledo = new vrframework.bean.checkBox.VRCheckBox();
-        btnMapaTribut = new vrframework.bean.button.VRButton();
         chkPautaFiscal = new vrframework.bean.checkBox.VRCheckBox();
         chkPautaFiscalProduto = new vrframework.bean.checkBox.VRCheckBox();
         chkPSitCadastro = new vrframework.bean.checkBox.VRCheckBox();
@@ -439,6 +438,8 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkPReceitaFilizola = new vrframework.bean.checkBox.VRCheckBox();
         chkPReceitaToledo = new vrframework.bean.checkBox.VRCheckBox();
         chkOferta = new vrframework.bean.checkBox.VRCheckBox();
+        txtDataFimOferta = new org.jdesktop.swingx.JXDatePicker();
+        btnMapaTribut = new vrframework.bean.button.VRButton();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         jPanel3 = new javax.swing.JPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -597,15 +598,6 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkNutricionalToledo.setText("Nutricional (Toledo)");
         tabProdutos.add(chkNutricionalToledo);
 
-        btnMapaTribut.setText("Mapa de Tribut.");
-        btnMapaTribut.setEnabled(false);
-        btnMapaTribut.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnMapaTributActionPerformed(evt);
-            }
-        });
-        tabProdutos.add(btnMapaTribut);
-
         chkPautaFiscal.setText("Pauta Fiscal");
         tabProdutos.add(chkPautaFiscal);
 
@@ -638,6 +630,16 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkOferta.setText("Oferta");
         tabProdutos.add(chkOferta);
+        tabProdutos.add(txtDataFimOferta);
+
+        btnMapaTribut.setText("Mapa de Tribut.");
+        btnMapaTribut.setEnabled(false);
+        btnMapaTribut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMapaTributActionPerformed(evt);
+            }
+        });
+        tabProdutos.add(btnMapaTribut);
 
         tabImportacao.addTab("Produtos", tabProdutos);
 
@@ -685,13 +687,13 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlOutrasReceitasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlOutrasReceitasLayout.createSequentialGroup()
-                        .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
+                        .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
                         .addGap(67, 67, 67))
                     .addComponent(txtOtRecDtIni, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlOutrasReceitasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnlOutrasReceitasLayout.createSequentialGroup()
-                        .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
+                        .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
                         .addGap(56, 56, 56))
                     .addComponent(txtOtRecDtFim, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(5, 5, 5))
@@ -756,13 +758,13 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
                         .addGap(67, 67, 67))
                     .addComponent(txtRotDtIni, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
+                        .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
                         .addGap(56, 56, 56))
                     .addComponent(txtRotDtFim, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(5, 5, 5))
@@ -888,7 +890,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(cmbLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, 357, Short.MAX_VALUE)
+                .addComponent(cmbLojaVR, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnMigrar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -1049,6 +1051,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
     private javax.swing.JPanel tabOutras;
     private javax.swing.JPanel tabProdutos;
     private javax.swing.JTabbedPane tabs;
+    private org.jdesktop.swingx.JXDatePicker txtDataFimOferta;
     private org.jdesktop.swingx.JXDatePicker txtDtCPEntrada;
     private org.jdesktop.swingx.JXDatePicker txtDtCPFim;
     private org.jdesktop.swingx.JXDatePicker txtDtVendaFim;
