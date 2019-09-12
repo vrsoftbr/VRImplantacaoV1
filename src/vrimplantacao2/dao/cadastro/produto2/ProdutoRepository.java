@@ -468,19 +468,7 @@ public class ProdutoRepository {
                 ProdutoVO codigoAtual = null;
 
                 if (eanValido) {
-                    if (eanExistente) {
-                        /**
-                         * Se o produto já existir, apenas atualiza o produto
-                         * complemento (preço, custo e estoque)
-                         */
-                        id = idProdutoExistente;
-                        ProdutoComplementoVO complemento = converterComplemento(imp);
-                        codigoAtual = new ProdutoVO();
-                        codigoAtual.setId(id);
-                        complemento.setProduto(codigoAtual);
-
-                        provider.complemento().atualizar(complemento, new HashSet<OpcaoProduto>());
-                    } else {
+                    if (!eanExistente) {
                         /**
                          * Mesmo que um determinado EAN não esteja cadastrado no
                          * sistema (pois o mesmo pode ter sido excluído por um
