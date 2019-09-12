@@ -479,9 +479,7 @@ public class ProdutoRepository {
                         codigoAtual.setId(id);
                         complemento.setProduto(codigoAtual);
 
-                        provider.complemento().atualizar(complemento, new HashSet<>(
-                                Arrays.asList(OpcaoProduto.CUSTO, OpcaoProduto.PRECO, OpcaoProduto.ESTOQUE)
-                        ));
+                        provider.complemento().atualizar(complemento, new HashSet<OpcaoProduto>());
                     } else {
                         /**
                          * Mesmo que um determinado EAN não esteja cadastrado no
