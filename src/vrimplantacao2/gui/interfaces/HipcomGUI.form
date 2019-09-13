@@ -284,15 +284,6 @@
                     <Property name="text" type="java.lang.String" value="Nutricional (Toledo)"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.button.VRButton" name="btnMapaTribut">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Mapa de Tribut."/>
-                    <Property name="enabled" type="boolean" value="false"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMapaTributActionPerformed"/>
-                  </Events>
-                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPautaFiscal">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Pauta Fiscal"/>
@@ -347,6 +338,17 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Oferta"/>
                   </Properties>
+                </Component>
+                <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDataFimOferta">
+                </Component>
+                <Component class="vrframework.bean.button.VRButton" name="btnMapaTribut">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Mapa de Tribut."/>
+                    <Property name="enabled" type="boolean" value="false"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMapaTributActionPerformed"/>
+                  </Events>
                 </Component>
               </SubComponents>
             </Container>
@@ -451,7 +453,7 @@
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="jLabel6" pref="107" max="32767" attributes="0"/>
+                                      <Component id="jLabel6" pref="112" max="32767" attributes="0"/>
                                       <EmptySpace min="67" pref="67" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="txtOtRecDtIni" alignment="0" max="32767" attributes="0"/>
@@ -459,7 +461,7 @@
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="jLabel7" pref="119" max="32767" attributes="0"/>
+                                      <Component id="jLabel7" pref="123" max="32767" attributes="0"/>
                                       <EmptySpace min="56" pref="56" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="txtOtRecDtFim" alignment="0" max="32767" attributes="0"/>
@@ -585,7 +587,7 @@
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="jLabel2" pref="104" max="32767" attributes="0"/>
+                                      <Component id="jLabel2" pref="109" max="32767" attributes="0"/>
                                       <EmptySpace min="67" pref="67" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="txtRotDtIni" alignment="0" max="32767" attributes="0"/>
@@ -593,7 +595,7 @@
                               <EmptySpace min="-2" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="jLabel3" pref="116" max="32767" attributes="0"/>
+                                      <Component id="jLabel3" pref="120" max="32767" attributes="0"/>
                                       <EmptySpace min="56" pref="56" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="txtRotDtFim" alignment="0" max="32767" attributes="0"/>
@@ -747,7 +749,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="cmbLojaVR" pref="357" max="32767" attributes="0"/>
+                  <Component id="cmbLojaVR" pref="366" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnMigrar" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
