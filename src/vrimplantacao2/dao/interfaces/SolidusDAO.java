@@ -83,9 +83,14 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     private List<Entidade> entidadesCheques;
     private List<Entidade> entidadesCreditoRotativo;
     private List<Entidade> entidadesConvenio;
+    private String siglaEstadoPauta = "";
     
     private boolean removerDigitoProdutoBalanca = false;
 
+    public void setSiglaEstadoPauta(String siglaEstadoPauta) {
+        this.siglaEstadoPauta = siglaEstadoPauta == null ? "" : siglaEstadoPauta;
+    }
+    
     public void setRemoverDigitoProdutoBalanca(boolean removerDigitoProdutoBalanca) {
         this.removerDigitoProdutoBalanca = removerDigitoProdutoBalanca;
     }
@@ -147,8 +152,16 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    t.val_reducao_base_calculo reducao\n" +
                     "from\n" +
                     "    TAB_TRIBUTACAO t\n" +
-                    "    join tab_produto_loja pl on\n" +
+                    "    left join (select distinct cod_tributacao from tab_produto_loja) pl on\n" +
                     "        pl.cod_tributacao = t.cod_tributacao\n" +
+                    "    left join (select distinct cod_tributacao from tab_ncm_uf) nuf on\n" +
+                    "        nuf.cod_tributacao = t.cod_tributacao\n" +
+                    "    left join (select distinct cod_trib_entrada from tab_ncm_uf) nuf2 on\n" +
+                    "        nuf2.cod_trib_entrada = t.cod_tributacao\n" +
+                    "where\n" +
+                    "    not pl.cod_tributacao is null or\n" +
+                    "    not nuf.cod_tributacao is null or\n" +
+                    "    not nuf2.cod_trib_entrada is null\n" +
                     "order by\n" +
                     "    t.cod_sit_tributaria,\n" +
                     "    t.val_icms,\n" +
@@ -1493,17 +1506,21 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
+                    "    nuf.cod_ncm,\n" +
                     "    ncm.num_ncm ncm,\n" +
                     "    nuf.des_sigla uf,\n" +
                     "    nuf.per_iva,\n" +
                     "    nuf.cod_trib_entrada,\n" +
                     "    nuf.cod_tributacao,\n" +
-                    "    coalesce((select first 1 cod_trib_entrada from tab_ncm_uf where cod_ncm = nuf.cod_ncm and des_sigla != 'SP'), nuf.cod_trib_entrada) cod_tributacao_entrada_foraestado,\n" +
-                    "    coalesce((select first 1 cod_tributacao from tab_ncm_uf where cod_ncm = nuf.cod_ncm and des_sigla != 'SP'), nuf.cod_tributacao) cod_tributacao_foraestado\n" +
+                    "    coalesce((select first 1 cod_trib_entrada from tab_ncm_uf where cod_ncm = nuf.cod_ncm and des_sigla = uf.uf), nuf.cod_trib_entrada) cod_tributacao_entrada_foraestado,\n" +
+                    "    coalesce((select first 1 cod_tributacao from tab_ncm_uf where cod_ncm = nuf.cod_ncm and des_sigla = uf.uf), nuf.cod_tributacao) cod_tributacao_foraestado\n" +
                     "from\n" +
                     "    tab_ncm_uf nuf\n" +
+                    "    join tab_loja lj on lj.cod_loja = " + getLojaOrigem() + "\n" +
+                    "    join (select '" + siglaEstadoPauta + "' uf from rdb$database) uf on 1 = 1\n" +
                     "    join tab_ncm ncm on ncm.cod_ncm = nuf.cod_ncm\n" +
-                    //"where nuf.des_sigla = 'SP'\n" +
+                    "where\n" +
+                    "    nuf.des_sigla = lj.des_sigla\n" +
                     "order by\n" +
                     "    ncm, uf"
             )) {
@@ -1514,6 +1531,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNcm(rst.getString("ncm"));
                     imp.setUf(rst.getString("uf"));
                     imp.setIva(rst.getDouble("per_iva"));
+                    imp.setIvaAjustado(rst.getDouble("per_iva"));
                     imp.setTipoIva(TipoIva.PERCENTUAL);
                     imp.setAliquotaDebitoId(rst.getString("cod_tributacao"));
                     imp.setAliquotaCreditoId(rst.getString("cod_trib_entrada"));

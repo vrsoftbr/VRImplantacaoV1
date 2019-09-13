@@ -7,14 +7,21 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
+              <Group type="102" attributes="0">
+                  <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
+                  <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="cbxUfPautaFiscal" min="-2" pref="69" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+              </Group>
+              <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
+                      <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="10" pref="10" max="-2" attributes="0"/>
                           <Component id="chkEliminarDigito" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -26,6 +33,11 @@
                   <Component id="jLabel3" min="-2" pref="23" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="chkEliminarDigito" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Component id="cbxUfPautaFiscal" max="32767" attributes="0"/>
+                      <Component id="jLabel5" max="32767" attributes="0"/>
+                  </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -45,6 +57,47 @@
             </Property>
             <Property name="horizontalAlignment" type="int" value="4"/>
             <Property name="text" type="java.lang.String" value="CUSTOM"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="cbxUfPautaFiscal">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+              <StringArray count="26">
+                <StringItem index="0" value="AL"/>
+                <StringItem index="1" value="AP"/>
+                <StringItem index="2" value="AM"/>
+                <StringItem index="3" value="BA"/>
+                <StringItem index="4" value="CE"/>
+                <StringItem index="5" value="DF"/>
+                <StringItem index="6" value="ES"/>
+                <StringItem index="7" value="GO"/>
+                <StringItem index="8" value="MA"/>
+                <StringItem index="9" value="MT"/>
+                <StringItem index="10" value="MS"/>
+                <StringItem index="11" value="MG"/>
+                <StringItem index="12" value="PA"/>
+                <StringItem index="13" value="PB"/>
+                <StringItem index="14" value="PR"/>
+                <StringItem index="15" value="PE"/>
+                <StringItem index="16" value="PI"/>
+                <StringItem index="17" value="RJ"/>
+                <StringItem index="18" value="RN"/>
+                <StringItem index="19" value="RS"/>
+                <StringItem index="20" value="RO"/>
+                <StringItem index="21" value="RR"/>
+                <StringItem index="22" value="SC"/>
+                <StringItem index="23" value="SP"/>
+                <StringItem index="24" value="SE"/>
+                <StringItem index="25" value="TO"/>
+              </StringArray>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Utilizado para encontrar a al&#xed;quota &quot;Fora do Estado&quot; na Pauta Fiscal"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel5">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="UF Pauta Fiscal (Fora do estado)"/>
+            <Property name="toolTipText" type="java.lang.String" value="Utilizado para encontrar a al&#xed;quota &quot;Fora do Estado&quot; na Pauta Fiscal"/>
           </Properties>
         </Component>
       </SubComponents>

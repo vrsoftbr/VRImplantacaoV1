@@ -61,6 +61,7 @@ public class SolidusGUI extends VRInternalFrame {
         txtSenha.setText(params.getWithNull("masterkey", SISTEMA, "SENHA"));
         txtSistema.setText(params.getWithNull("Solidus", SISTEMA, "SISTEMA"));
         txtReiniciarID.setText(params.getWithNull("1", SISTEMA, "N_REINICIO"));
+        cbxUfPautaFiscal.setSelectedIndex(params.getInt(0, SISTEMA, "UF_PAUTA_FISCAL"));
         edtDtNotaIni.setDate(params.getDate(SISTEMA, "DATA_NOTAS"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
@@ -77,6 +78,7 @@ public class SolidusGUI extends VRInternalFrame {
         params.put(txtSenha.getText(), SISTEMA, "SENHA");
         params.put(txtSistema.getText(), SISTEMA, "SISTEMA");
         params.put(edtDtNotaIni.getDate(), SISTEMA, "DATA_NOTAS");
+        params.put(cbxUfPautaFiscal.getSelectedIndex(), SISTEMA, "UF_PAUTA_FISCAL");
         params.put(Utils.stringToInt(txtReiniciarID.getText()), SISTEMA, "N_REINICIO");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         
@@ -289,6 +291,7 @@ public class SolidusGUI extends VRInternalFrame {
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
                     dao.setRemoverDigitoProdutoBalanca(chkEliminarDigito.isSelected());
+                    dao.setSiglaEstadoPauta(cbxUfPautaFiscal.getSelectedItem().toString());
 
                     if (tabs.getSelectedIndex() == 0) {
 
@@ -463,6 +466,8 @@ public class SolidusGUI extends VRInternalFrame {
         pnlProdutoCustom = new vrframework.bean.panel.VRPanel();
         chkEliminarDigito = new vrframework.bean.checkBox.VRCheckBox();
         jLabel3 = new javax.swing.JLabel();
+        cbxUfPautaFiscal = new javax.swing.JComboBox();
+        jLabel5 = new javax.swing.JLabel();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel1 = new javax.swing.JLabel();
@@ -551,17 +556,29 @@ public class SolidusGUI extends VRInternalFrame {
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel3.setText("CUSTOM");
 
+        cbxUfPautaFiscal.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO" }));
+        cbxUfPautaFiscal.setToolTipText("Utilizado para encontrar a alíquota \"Fora do Estado\" na Pauta Fiscal");
+
+        jLabel5.setText("UF Pauta Fiscal (Fora do estado)");
+        jLabel5.setToolTipText("Utilizado para encontrar a alíquota \"Fora do Estado\" na Pauta Fiscal");
+
         javax.swing.GroupLayout pnlProdutoCustomLayout = new javax.swing.GroupLayout(pnlProdutoCustom);
         pnlProdutoCustom.setLayout(pnlProdutoCustomLayout);
         pnlProdutoCustomLayout.setHorizontalGroup(
             pnlProdutoCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlProdutoCustomLayout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(cbxUfPautaFiscal, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+            .addGroup(pnlProdutoCustomLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnlProdutoCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3)
                     .addGroup(pnlProdutoCustomLayout.createSequentialGroup()
                         .addGap(10, 10, 10)
-                        .addComponent(chkEliminarDigito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel3))
+                        .addComponent(chkEliminarDigito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlProdutoCustomLayout.setVerticalGroup(
@@ -570,6 +587,10 @@ public class SolidusGUI extends VRInternalFrame {
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkEliminarDigito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlProdutoCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(cbxUfPautaFiscal)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1515,6 +1536,7 @@ public class SolidusGUI extends VRInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
     private vrframework.bean.button.VRButton btnMigrar;
+    private javax.swing.JComboBox cbxUfPautaFiscal;
     private vrframework.bean.checkBox.VRCheckBox chkCBloqueado;
     private vrframework.bean.checkBox.VRCheckBox chkCObservacao2;
     private vrframework.bean.checkBox.VRCheckBox chkCSituacaoCadastro;
@@ -1556,6 +1578,7 @@ public class SolidusGUI extends VRInternalFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
