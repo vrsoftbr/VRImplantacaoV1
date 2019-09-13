@@ -1517,13 +1517,9 @@ public class NotaSaidaDAO {
             Conexao.begin();
             stm = Conexao.createStatement();
 
-            rst = stm.executeQuery("SELECT id FROM notasaida WHERE chavenfe = '" + i_notaSaida.chaveNfe + "'");
-
-            if (rst.next()) {
-                Util.exibirMensagemConfirmar("Esta nota já existe, deseja exluir e importar novamente ?", "Atenção");
-
-                NotaSaidaVO oNotaSaida = carregar(rst.getLong("id"));
-
+            Integer idNotaSaida = getIdNotaSaida(i_notaSaida.chaveNfe);
+            if (idNotaSaida != null) {
+                NotaSaidaVO oNotaSaida = carregar(idNotaSaida);
                 excluir(oNotaSaida);
             }
 
@@ -1970,5 +1966,22 @@ public class NotaSaidaDAO {
         String senha = Util.formatNumber(Long.toHexString((long) i_numero * data * i_idLoja), 8).substring(0, 8);
 
         return senha.toUpperCase();
+    }
+
+    public Integer getIdNotaSaida(String chaveNfe) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT id FROM notasaida WHERE chavenfe = '" + chaveNfe + "'"
+            )) {
+                if (rst.next()) {
+                    return rst.getInt("id");
+                }
+                return null;
+            }
+        }
+    }
+    
+    public boolean isNotaExistente(String chaveNfe) throws Exception {
+        return getIdNotaSaida(chaveNfe) != null;
     }
 }

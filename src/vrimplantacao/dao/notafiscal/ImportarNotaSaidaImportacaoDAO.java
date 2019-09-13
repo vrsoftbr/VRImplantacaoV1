@@ -41,48 +41,8 @@ import vrimplantacao.dao.cadastro.ClienteEventuallDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.utils.multimap.MultiMap;
-import vrimplantacao2.vo.cadastro.ProdutoAnteriorVO;
 
 public class ImportarNotaSaidaImportacaoDAO {
-
-    public String carregarCFOP(String i_xml) throws Exception {
-        String cfop = "";
-
-        //abre arquivo
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = dbf.newDocumentBuilder();
-        docBuilder.setErrorHandler(null);
-
-        Document doc = docBuilder.parse(new ByteArrayInputStream(getXML(i_xml).getBytes("utf-8")));
-
-        Element infNFe = (Element) doc.getDocumentElement().getElementsByTagName("infNFe").item(0);
-        Element ide = (Element) infNFe.getElementsByTagName("ide").item(0);
-        Element det = (Element) infNFe.getElementsByTagName("det").item(0);
-        Element prod = (Element) det.getElementsByTagName("prod").item(0);
-
-        cfop = prod.getElementsByTagName("CFOP").item(0).getTextContent();
-        cfop = cfop.substring(0, 1).concat(".").concat(cfop.substring(1, 4));
-
-        return cfop;
-    }
-
-    public String carregarNatOperacao(String i_xml) throws Exception {
-        String natOp = "";
-
-        //abre arquivo
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = dbf.newDocumentBuilder();
-        docBuilder.setErrorHandler(null);
-
-        Document doc = docBuilder.parse(new ByteArrayInputStream(getXML(i_xml).getBytes("utf-8")));
-
-        Element infNFe = (Element) doc.getDocumentElement().getElementsByTagName("infNFe").item(0);
-        Element ide = (Element) infNFe.getElementsByTagName("ide").item(0);
-
-        natOp = ide.getElementsByTagName("natOp").item(0).getTextContent();
-
-        return natOp;
-    }
 
     public static class LojaV2 {
         public String impSistema;
@@ -701,8 +661,8 @@ public class ImportarNotaSaidaImportacaoDAO {
 
         return oNotaSaida;
     }
-
-    public String getXML(String i_arquivo) throws Exception {
+    
+    public static String getXML(String i_arquivo) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dbf.newDocumentBuilder();
         Document doc = docBuilder.parse(new File(i_arquivo));

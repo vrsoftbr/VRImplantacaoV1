@@ -40,4 +40,10 @@ public class TipoSaidaVO {
     public String situacaoCadastro = "";
     public List<CfopVO> vCfop = new ArrayList();
     public boolean geraContrato = false;
+
+    @Override
+    public String toString() {
+        return id + " - " + descricao;
+    }
+        
 }

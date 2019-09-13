@@ -1,11 +1,23 @@
 package vrimplantacao.gui.interfaces;
 
-import vrimplantacao.gui.interfaces.rfd.ExportacaoDivergenciaGUI;
+import java.awt.Component;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
-import vrimplantacao.dao.fiscal.CfopDAO;
+import vrimplantacao.gui.interfaces.rfd.ExportacaoDivergenciaGUI;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JComboBox;
+import javax.swing.JTable;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 import vrimplantacao.dao.notafiscal.NotaSaidaDAO;
 import vrimplantacao.dao.notafiscal.ImportarNotaSaidaImportacaoDAO;
-import vrimplantacao.dao.notafiscal.TipoSaidaDAO;
 import vrimplantacao.vo.notafiscal.NotaSaidaVO;
 import vrimplantacao.vo.notafiscal.TipoSaidaVO;
 import vrframework.bean.internalFrame.VRInternalFrame;
@@ -13,15 +25,14 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
-import vrframework.remote.ItemComboVO;
+import vrimplantacao.dao.fiscal.CfopDAO;
 import vrimplantacao.dao.notafiscal.ImportarNotaSaidaImportacaoDAO.LojaV2;
-import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
+import static vrimplantacao.dao.notafiscal.ImportarNotaSaidaImportacaoDAO.getXML;
 
 public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
-
-    private NotaSaidaVO oImportacao = null;
-    private TipoSaidaVO oTipoSaida = null;
+    
     ImportarNotaSaidaImportacaoDAO dao = new ImportarNotaSaidaImportacaoDAO();
+    XmlModel model;
 
     public ImportarNotaSaidaImportacaoArquivoGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
@@ -30,19 +41,75 @@ public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
         carregarLojaV2();
         
         centralizarForm();
+        
+        flcArquivo.setMultiplosSelecionados(true);
+        tblNotas.setModel(new XmlModel());        
+        tblNotas.setRowHeight(25);
     }
+        
+    private void carregarNotas() throws Exception {        
+        ProgressBar.show();
+        try {
+            ProgressBar.setStatus("Carregando os XMLs das Notas Fiscais de Saída...");
 
-    private void carregarNotaSaida() throws Exception {
-        String cfop = dao.carregarCFOP(flcArquivo.getArquivo());
-        txtNatOperacao.setText(dao.carregarNatOperacao(flcArquivo.getArquivo()));
+            model = new XmlModel(flcArquivo.getArquivo().split(";"));
+            tblNotas.setModel(model);
+            tblNotas.getColumnModel().getColumn(2).setCellEditor(new TipoSaidaCellEditor(model));
 
-        cboTipoNotaSaida.removeAllItems();
+            NotaSaidaDAO notaSaidaDAO = new NotaSaidaDAO();
 
-        List<TipoSaidaVO> vTipoSaida = new CfopDAO().carregarTipoSaida(cfop);
+            if (cboLojaV2.getItemCount() > 0) {
+                dao.impLoja = (LojaV2) cboLojaV2.getSelectedItem();
+            }
 
-        for (TipoSaidaVO oTipo : vTipoSaida) {
-            cboTipoNotaSaida.addItem(new ItemComboVO(oTipo.id, oTipo.descricao));
+            NfeFile[] itens = model.getItens();
+
+            ProgressBar.setStatus("Importando Notas Fiscais...");
+            ProgressBar.setMaximum(itens.length);
+
+            for (NfeFile file: itens) {
+                try {
+                    file.notaSaida = dao.carregar(
+                        file.arquivo.getAbsolutePath(),
+                        file.tipoSaida.id, 
+                        chkVerificarCodigoAnterior.isSelected()
+                    );   
+                } catch (IOException | SAXException | IllegalArgumentException ex) {
+                    if (ex instanceof NumberFormatException) {
+                        file.situacao = NfeFileSituacao.EAN_NAO_ENCONTRADO;
+                    } else {
+                        file.situacao = NfeFileSituacao.ARQUIVO_INVALIDO;
+                    }
+                    model.fireTableDataChanged();
+                    continue;
+                } catch (VRException ex) {
+                    if (ex.getMessage().contains("O cnpj")) {
+                        file.situacao = NfeFileSituacao.CNPJ_DESTINATARIO_NAO_ENCONTRADO;
+                        model.fireTableDataChanged();
+                        continue;
+                    }
+                }
+                if (notaSaidaDAO.isNotaExistente(file.notaSaida.chaveNfe)) {
+                    file.situacao = NfeFileSituacao.NOTA_JA_IMPORTADA;
+                } else if ((file.tipoSaida.destinatarioCliente || file.tipoSaida.geraReceber) && file.notaSaida.idClienteEventualDestinatario == -1) {
+                    file.situacao = NfeFileSituacao.DESTINATARIO_DEVE_SER_EVENTUAL;
+                } else if (!file.tipoSaida.destinatarioCliente && file.notaSaida.idFornecedorDestinatario == -1) {
+                    file.situacao = NfeFileSituacao.DESTINATARIO_DEVE_SER_FORNECEDOR;
+                } else if (!file.notaSaida.vDivergencia.isEmpty()) {
+                    ExportacaoDivergenciaGUI form = new ExportacaoDivergenciaGUI(mdiFrame);
+                    form.setDivergencia(file.notaSaida.vDivergencia);
+                    form.exibeDivergencia();
+                    form.setVisible(true);
+
+                    file.situacao = NfeFileSituacao.DEVERGENCIAS_ENCONTRADAS;
+                }
+                model.fireTableDataChanged();
+                ProgressBar.next();
+            }
+        } finally {
+            ProgressBar.dispose();
         }
+        
     }
 
     @Override
@@ -52,41 +119,33 @@ public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
         Thread thread = new Thread() {
             @Override
             public void run() {
-                try {
-                    ProgressBar.show();
-                    ProgressBar.setStatus("Importando Nota Fiscal...");
-                    
+                try {                    
                     if (cboLojaV2.getItemCount() > 0) {
                         dao.impLoja = (LojaV2) cboLojaV2.getSelectedItem();
                     }
-                    oImportacao = dao.carregar(flcArquivo.getArquivo(), cboTipoNotaSaida.getId(), 
-                            chkVerificarCodigoAnterior.isSelected());
-
-                    oTipoSaida = new TipoSaidaDAO().carregar(oImportacao.idTipoSaida);
-
-                    if ((oTipoSaida.destinatarioCliente || oTipoSaida.geraReceber) && oImportacao.idClienteEventualDestinatario == -1) {
-                        throw new VRException("O destinatário da nota fiscal deve ser um cliente eventual!");
-
-                    } else if (!oTipoSaida.destinatarioCliente && oImportacao.idFornecedorDestinatario == -1) {
-                        throw new VRException("O destinatário da nota fiscal deve ser um fornecedor!");
+                    
+                    NfeFile[] itens = model.getItens();                            
+                    
+                    ProgressBar.show();
+                    ProgressBar.setStatus("Importando Notas Fiscais...");
+                    ProgressBar.setMaximum(itens.length);
+                    
+                    for (int i = 0; i < itens.length; i++) {
+                        NfeFile file = itens[i];
+                        tblNotas.setRowSelectionInterval(i, i);
+                            
+                        if (file.situacao == NfeFileSituacao.OK || (file.situacao == NfeFileSituacao.NOTA_JA_IMPORTADA && chkReimportarNotasExistentes.isSelected())) {
+                            new NotaSaidaDAO().salvar(file.notaSaida);
+                            file.situacao = NfeFileSituacao.NOTA_JA_IMPORTADA;
+                            model.fireTableDataChanged();
+                        }
+                        
+                        ProgressBar.next();
                     }
-
+                    
                     ProgressBar.dispose();
-
-                    if (!oImportacao.vDivergencia.isEmpty()) {
-                        ExportacaoDivergenciaGUI form = new ExportacaoDivergenciaGUI(mdiFrame);
-                        form.setDivergencia(oImportacao.vDivergencia);
-                        form.exibeDivergencia();
-                        form.setVisible(true);
-
-                        Util.exibirMensagem("Divergências encontradas. Verifique antes de prosseguir!", getTitle());
-
-                    } else {
-                        new NotaSaidaDAO().salvar(oImportacao);
-
-                        Util.exibirMensagem("Nota Fiscal importada com sucesso!", getTitle());
-                    }
-
+                    Util.exibirMensagem("Notas Fiscais importada com sucesso!", getTitle());
+                    
                 } catch (Exception ex) {
                     ProgressBar.dispose();
                     Util.exibirMensagemErro(ex, getTitle());
@@ -104,14 +163,13 @@ public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         vRLabel1 = new vrframework.bean.label.VRLabel();
         flcArquivo = new vrframework.bean.fileChooser.VRFileChooser();
-        vRLabel34 = new vrframework.bean.label.VRLabel();
-        cboTipoNotaSaida = new vrframework.bean.comboBox.VRComboBox();
         chkVerificarCodigoAnterior = new vrframework.bean.checkBox.VRCheckBox();
-        pnlLojaV2 = new vrframework.bean.panel.VRPanel();
+        chkReimportarNotasExistentes = new vrframework.bean.checkBox.VRCheckBox();
+        scrollNotas = new javax.swing.JScrollPane();
+        tblNotas = new javax.swing.JTable();
         vRLabel35 = new vrframework.bean.label.VRLabel();
         cboLojaV2 = new javax.swing.JComboBox();
-        vRLabel36 = new vrframework.bean.label.VRLabel();
-        txtNatOperacao = new vrframework.bean.textField.VRTextField();
+        btnDivergencias = new vrframework.bean.button.VRButton();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         btnSair = new vrframework.bean.button.VRButton();
         btnImportar = new vrframework.bean.button.VRButton();
@@ -122,7 +180,7 @@ public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
         tlbToolBar.setRollover(true);
         tlbToolBar.setVisibleImportar(true);
 
-        vRLabel1.setText("Arquivo");
+        vRLabel1.setText("Arquivos de Nf-e de Saída");
 
         flcArquivo.setObrigatorio(true);
         flcArquivo.addEventoFileChooserListener(new vrframework.bean.fileChooser.VREventoFileChooserListener() {
@@ -131,15 +189,37 @@ public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
             }
         });
 
-        vRLabel34.setText("Tipo Saída");
-
-        cboTipoNotaSaida.setObrigatorio(true);
-
         chkVerificarCodigoAnterior.setText("Verificar Código Anterior");
 
-        pnlLojaV2.setBorder(null);
-        pnlLojaV2.setEnabled(false);
-        pnlLojaV2.setOpaque(false);
+        chkReimportarNotasExistentes.setText("Reimportar notas existentes");
+
+        tblNotas.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Arquivo da Nf-e", "Natureza Operação na NF-e", "Tipo de Saída", "Situação"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, true, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        scrollNotas.setViewportView(tblNotas);
 
         vRLabel35.setText("Lojas encontradas (Importação V2)");
 
@@ -154,73 +234,61 @@ public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
             }
         });
 
-        javax.swing.GroupLayout pnlLojaV2Layout = new javax.swing.GroupLayout(pnlLojaV2);
-        pnlLojaV2.setLayout(pnlLojaV2Layout);
-        pnlLojaV2Layout.setHorizontalGroup(
-            pnlLojaV2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlLojaV2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlLojaV2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlLojaV2Layout.createSequentialGroup()
-                        .addComponent(vRLabel35, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(cboLojaV2, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        pnlLojaV2Layout.setVerticalGroup(
-            pnlLojaV2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlLojaV2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(vRLabel35, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cboLojaV2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        vRLabel36.setText("Natureza da operação");
-
-        txtNatOperacao.setEnabled(false);
+        btnDivergencias.setText("Divergências");
+        btnDivergencias.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDivergenciasActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
         vRPanel1.setLayout(vRPanel1Layout);
         vRPanel1Layout.setHorizontalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnlLojaV2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(vRPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(flcArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)
-                    .addComponent(cboTipoNotaSaida, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(vRPanel1Layout.createSequentialGroup()
+                        .addComponent(vRLabel35, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(cboLojaV2, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(vRPanel1Layout.createSequentialGroup()
                         .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel34, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkVerificarCodigoAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(vRLabel36, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(txtNatOperacao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                            .addComponent(scrollNotas, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 608, Short.MAX_VALUE)
+                            .addGroup(vRPanel1Layout.createSequentialGroup()
+                                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(vRPanel1Layout.createSequentialGroup()
+                                        .addComponent(chkVerificarCodigoAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(chkReimportarNotasExistentes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(flcArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap())))
         );
         vRPanel1Layout.setVerticalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(8, 8, 8)
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(flcArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(flcArquivo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vRLabel36, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtNatOperacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vRLabel34, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cboTipoNotaSaida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(chkVerificarCodigoAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlLojaV2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(scrollNotas, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(vRLabel35, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cboLojaV2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addGap(54, 54, 54)
+                .addComponent(chkReimportarNotasExistentes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(284, 284, 284))
         );
 
         btnSair.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/sair.png"))); // NOI18N
@@ -308,7 +376,7 @@ public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
     private void flcArquivoAposSelecao(vrframework.bean.fileChooser.VREventoFileChooser evt) {//GEN-FIRST:event_flcArquivoAposSelecao
         try {
             this.setWaitCursor();
-            carregarNotaSaida();
+            carregarNotas();
 
         } catch (Exception ex) {
             Util.exibirMensagemErro(ex, getTitle());
@@ -326,20 +394,33 @@ public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_cboLojaV2ItemStateChanged
 
+    private void btnDivergenciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDivergenciasActionPerformed
+        NfeFile file = model.getItem(tblNotas.convertRowIndexToModel(tblNotas.getSelectedRow()));
+        if (file != null && file.notaSaida.vDivergencia != null && !file.notaSaida.vDivergencia.isEmpty()) {
+            try {
+                ExportacaoDivergenciaGUI form = new ExportacaoDivergenciaGUI(mdiFrame);
+                form.setDivergencia(file.notaSaida.vDivergencia);
+                form.exibeDivergencia();
+                form.setVisible(true);
+            } catch (Exception ex) {
+                Util.exibirMensagemErro(ex, title);
+            }
+        }
+    }//GEN-LAST:event_btnDivergenciasActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private vrframework.bean.button.VRButton btnDivergencias;
     private vrframework.bean.button.VRButton btnImportar;
     private vrframework.bean.button.VRButton btnSair;
     private javax.swing.JComboBox cboLojaV2;
-    private vrframework.bean.comboBox.VRComboBox cboTipoNotaSaida;
+    private vrframework.bean.checkBox.VRCheckBox chkReimportarNotasExistentes;
     private vrframework.bean.checkBox.VRCheckBox chkVerificarCodigoAnterior;
     private vrframework.bean.fileChooser.VRFileChooser flcArquivo;
-    private vrframework.bean.panel.VRPanel pnlLojaV2;
+    private javax.swing.JScrollPane scrollNotas;
+    private javax.swing.JTable tblNotas;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao tlbToolBar;
-    private vrframework.bean.textField.VRTextField txtNatOperacao;
     private vrframework.bean.label.VRLabel vRLabel1;
-    private vrframework.bean.label.VRLabel vRLabel34;
     private vrframework.bean.label.VRLabel vRLabel35;
-    private vrframework.bean.label.VRLabel vRLabel36;
     private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel2;
     // End of variables declaration//GEN-END:variables
@@ -347,7 +428,6 @@ public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
     private void carregarLojaV2() throws Exception {
         ImportarNotaSaidaImportacaoDAO dao = new ImportarNotaSaidaImportacaoDAO();
         if (dao.isImportacaoV2()) {
-            pnlLojaV2.setEnabled(true);
             cboLojaV2.removeAllItems();
             for (LojaV2 oTipo :dao.carregarLojaV2()) {
                 cboLojaV2.addItem(oTipo);
@@ -355,4 +435,211 @@ public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
         }
     }
 
+}
+
+enum NfeFileSituacao {
+    OK {
+        @Override
+        public String toString() {
+            return "OK";
+        }        
+    }, 
+    NOTA_JA_IMPORTADA {
+        @Override
+        public String toString() {
+            return "Nota fiscal já existente no VR";
+        }        
+    },
+    DEVERGENCIAS_ENCONTRADAS {
+        @Override
+        public String toString() {
+            return "Divergências encontradas. Verifique antes de prosseguir!";
+        }
+    }, 
+    DESTINATARIO_DEVE_SER_EVENTUAL {
+        @Override
+        public String toString() {
+            return "O destinatário da nota fiscal deve ser um cliente eventual!";
+        }
+    }, 
+    DESTINATARIO_DEVE_SER_FORNECEDOR {
+        @Override
+        public String toString() {
+            return "O destinatário da nota fiscal deve ser um fornecedor!";
+        }
+    }, 
+    ARQUIVO_INVALIDO {
+        @Override
+        public String toString() {
+            return "Arquivo não é uma Nf-e válida";
+        }
+    }, EAN_NAO_ENCONTRADO {
+        @Override
+        public String toString() {
+            return "EAN não encontrado";
+        }
+    }, CNPJ_DESTINATARIO_NAO_ENCONTRADO {
+        @Override
+        public String toString() {
+            return "CPF/CNPJ do destinatário não encontrado no VR";
+        }
+    }
+}
+
+class NfeFile {
+    
+    File arquivo;
+    String naturezaOperacao;
+    String cfop;
+    TipoSaidaVO tipoSaida;
+    NfeFileSituacao situacao = NfeFileSituacao.OK;
+    NotaSaidaVO notaSaida;
+    
+    public NfeFile(String arquivo) throws Exception {
+        this.arquivo = new File(arquivo);
+        
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+        docBuilder.setErrorHandler(null);
+
+        Document doc = docBuilder.parse(new ByteArrayInputStream(getXML(this.arquivo.getAbsolutePath()).getBytes("utf-8")));
+
+        Element infNFe = (Element) doc.getDocumentElement().getElementsByTagName("infNFe").item(0);
+        Element ide = (Element) infNFe.getElementsByTagName("ide").item(0);
+        
+        this.naturezaOperacao = ide.getElementsByTagName("natOp").item(0).getTextContent();        
+        
+        Element det = (Element) infNFe.getElementsByTagName("det").item(0);
+        Element prod = (Element) det.getElementsByTagName("prod").item(0);
+
+        this.cfop = prod.getElementsByTagName("CFOP").item(0).getTextContent();
+        this.cfop = cfop.substring(0, 1).concat(".").concat(cfop.substring(1, 4));
+        
+        this.situacao = NfeFileSituacao.OK;
+        List<TipoSaidaVO> tiposDeSaida = new CfopDAO().carregarTipoSaida(cfop);
+        if (!tiposDeSaida.isEmpty()) {
+            this.tipoSaida = tiposDeSaida.get(0);
+        }
+
+    }
+    
+}
+
+class XmlModel extends AbstractTableModel {
+
+    private final NfeFile[] arquivos;
+
+    public XmlModel(String... arquivos) throws Exception {
+        this.arquivos = new NfeFile[arquivos.length];
+        for (int i = 0; i < arquivos.length; i++ ) {
+            this.arquivos[i] = new NfeFile(arquivos[i]);
+        }
+    }
+    
+    @Override
+    public int getRowCount() {
+        return arquivos.length;
+    }
+
+    @Override
+    public int getColumnCount() {
+        return 4;
+    }
+
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        switch (columnIndex) {
+            case 0: return arquivos[rowIndex].arquivo.getName();
+            case 1: return arquivos[rowIndex].naturezaOperacao;
+            case 2: return arquivos[rowIndex].tipoSaida != null ? arquivos[rowIndex].tipoSaida.descricao : "--- SEM TIPO SAIDA CORRESPONDENTE ---";
+            case 3: return arquivos[rowIndex].situacao;
+            default: return "";
+        }
+    }
+
+    @Override
+    public String getColumnName(int columnIndex) {
+        switch (columnIndex) {
+            case 0: return "Arquivo Nf-e";
+            case 1: return "Natureza da Operação Nf-e";
+            case 2: return "Tipo de Saída VR";
+            case 3: return "Situação";
+        }
+        return "";
+    }
+
+    @Override
+    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        if (columnIndex == 2) {
+            arquivos[rowIndex].tipoSaida = (TipoSaidaVO) aValue;
+        }
+    }
+
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return columnIndex == 2 && arquivos[rowIndex].tipoSaida != null;
+    }
+
+    public NfeFile getItem(int row) {
+        return this.arquivos[row];
+    }
+
+    public NfeFile[] getItens() {
+        return arquivos;
+    }
+
+}
+
+class XmlFileCellRenderer extends DefaultTableCellRenderer {
+    
+    private final XmlModel model;    
+
+    public XmlFileCellRenderer(XmlModel model) {
+        this.model = model;
+    }
+    
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+        NfeFile item = this.model.getItem(row);
+        
+        if (column == 4) {
+            
+        }
+        
+        return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+    }
+    
+}
+
+class TipoSaidaCellEditor extends DefaultCellEditor {
+    
+    private final XmlModel model;    
+
+    public TipoSaidaCellEditor(XmlModel model) {
+        super(new JComboBox());
+        this.model = model;
+    }
+
+    @Override
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {       
+        if (column == 2) {            
+            String cfop = model.getItem(row).cfop;            
+            
+            List<TipoSaidaVO> vTipoSaida;
+            try {
+                vTipoSaida = new CfopDAO().carregarTipoSaida(cfop);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex.getMessage(), ex);
+            }
+            
+            JComboBox cboTipoNotaSaida = (JComboBox)getComponent();            
+            cboTipoNotaSaida.removeAllItems();
+            for (TipoSaidaVO oTipo : vTipoSaida) {
+                cboTipoNotaSaida.addItem(oTipo);
+            }
+            return cboTipoNotaSaida;
+        }
+        return super.getTableCellEditorComponent(table, value, isSelected, row, column);
+    }
+    
 }

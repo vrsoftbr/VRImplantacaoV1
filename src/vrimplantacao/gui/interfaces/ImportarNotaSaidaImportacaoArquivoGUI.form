@@ -65,24 +65,34 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="pnlLojaV2" alignment="0" max="32767" attributes="0"/>
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="flcArquivo" pref="337" max="32767" attributes="0"/>
-                      <Component id="cboTipoNotaSaida" alignment="0" max="32767" attributes="1"/>
-                      <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
-                              <Component id="vRLabel34" alignment="0" min="-2" max="-2" attributes="1"/>
-                              <Component id="chkVerificarCodigoAnterior" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="vRLabel36" alignment="0" min="-2" max="-2" attributes="1"/>
-                          </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="vRLabel35" min="-2" max="-2" attributes="1"/>
                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
-                      <Component id="txtNatOperacao" alignment="0" max="32767" attributes="0"/>
+                      <Component id="cboLojaV2" alignment="0" max="32767" attributes="0"/>
+                      <Group type="102" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="scrollNotas" alignment="1" pref="608" max="32767" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Group type="102" attributes="0">
+                                          <Component id="chkVerificarCodigoAnterior" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="chkReimportarNotasExistentes" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
+                                      <Component id="flcArquivo" alignment="0" max="32767" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="btnDivergencias" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                      </Group>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -91,21 +101,25 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="vRLabel1" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Component id="btnDivergencias" pref="0" max="32767" attributes="0"/>
+                      <Component id="flcArquivo" max="32767" attributes="0"/>
+                  </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="flcArquivo" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="vRLabel36" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="txtNatOperacao" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="vRLabel34" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="cboTipoNotaSaida" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
                   <Component id="chkVerificarCodigoAnterior" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="pnlLojaV2" min="-2" max="-2" attributes="0"/>
+                  <Component id="scrollNotas" pref="0" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
+                  <Component id="vRLabel35" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="cboLojaV2" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+              </Group>
+              <Group type="102" attributes="0">
+                  <EmptySpace min="54" pref="54" max="-2" attributes="0"/>
+                  <Component id="chkReimportarNotasExistentes" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="284" pref="284" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -113,7 +127,7 @@
       <SubComponents>
         <Component class="vrframework.bean.label.VRLabel" name="vRLabel1">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Arquivo"/>
+            <Property name="text" type="java.lang.String" value="Arquivos de Nf-e de Sa&#xed;da"/>
           </Properties>
         </Component>
         <Component class="vrframework.bean.fileChooser.VRFileChooser" name="flcArquivo">
@@ -124,89 +138,60 @@
             <EventHandler event="aposSelecao" listener="vrframework.bean.fileChooser.VREventoFileChooserListener" parameters="vrframework.bean.fileChooser.VREventoFileChooser" handler="flcArquivoAposSelecao"/>
           </Events>
         </Component>
-        <Component class="vrframework.bean.label.VRLabel" name="vRLabel34">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Tipo Sa&#xed;da"/>
-          </Properties>
-        </Component>
-        <Component class="vrframework.bean.comboBox.VRComboBox" name="cboTipoNotaSaida">
-          <Properties>
-            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="0"/>
-            </Property>
-            <Property name="obrigatorio" type="boolean" value="true"/>
-          </Properties>
-        </Component>
         <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkVerificarCodigoAnterior">
           <Properties>
             <Property name="text" type="java.lang.String" value="Verificar C&#xf3;digo Anterior"/>
           </Properties>
         </Component>
-        <Container class="vrframework.bean.panel.VRPanel" name="pnlLojaV2">
+        <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkReimportarNotasExistentes">
           <Properties>
-            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-              <Border info="null"/>
-            </Property>
-            <Property name="enabled" type="boolean" value="false"/>
-            <Property name="opaque" type="boolean" value="false"/>
+            <Property name="text" type="java.lang.String" value="Reimportar notas existentes"/>
           </Properties>
+        </Component>
+        <Container class="javax.swing.JScrollPane" name="scrollNotas">
+          <AuxValues>
+            <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+          </AuxValues>
 
-          <Layout>
-            <DimensionLayout dim="0">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" attributes="0">
-                              <Component id="vRLabel35" min="-2" max="-2" attributes="1"/>
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                          </Group>
-                          <Component id="cboLojaV2" max="32767" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
-              </Group>
-            </DimensionLayout>
-            <DimensionLayout dim="1">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="vRLabel35" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="cboLojaV2" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
-                  </Group>
-              </Group>
-            </DimensionLayout>
-          </Layout>
+          <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
           <SubComponents>
-            <Component class="vrframework.bean.label.VRLabel" name="vRLabel35">
+            <Component class="javax.swing.JTable" name="tblNotas">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Lojas encontradas (Importa&#xe7;&#xe3;o V2)"/>
-              </Properties>
-            </Component>
-            <Component class="javax.swing.JComboBox" name="cboLojaV2">
-              <Properties>
-                <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                  <StringArray count="0"/>
+                <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
+                  <Table columnCount="4" rowCount="4">
+                    <Column editable="false" title="Arquivo da Nf-e" type="java.lang.String"/>
+                    <Column editable="false" title="Natureza Opera&#xe7;&#xe3;o na NF-e" type="java.lang.String"/>
+                    <Column editable="true" title="Tipo de Sa&#xed;da" type="java.lang.String"/>
+                    <Column editable="false" title="Situa&#xe7;&#xe3;o" type="java.lang.String"/>
+                  </Table>
                 </Property>
               </Properties>
-              <Events>
-                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="cboLojaV2ItemStateChanged"/>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cboLojaV2ActionPerformed"/>
-              </Events>
             </Component>
           </SubComponents>
         </Container>
-        <Component class="vrframework.bean.label.VRLabel" name="vRLabel36">
+        <Component class="vrframework.bean.label.VRLabel" name="vRLabel35">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Natureza da opera&#xe7;&#xe3;o"/>
+            <Property name="text" type="java.lang.String" value="Lojas encontradas (Importa&#xe7;&#xe3;o V2)"/>
           </Properties>
         </Component>
-        <Component class="vrframework.bean.textField.VRTextField" name="txtNatOperacao">
+        <Component class="javax.swing.JComboBox" name="cboLojaV2">
           <Properties>
-            <Property name="enabled" type="boolean" value="false"/>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+              <StringArray count="0"/>
+            </Property>
           </Properties>
+          <Events>
+            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="cboLojaV2ItemStateChanged"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cboLojaV2ActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="vrframework.bean.button.VRButton" name="btnDivergencias">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Diverg&#xea;ncias"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnDivergenciasActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
