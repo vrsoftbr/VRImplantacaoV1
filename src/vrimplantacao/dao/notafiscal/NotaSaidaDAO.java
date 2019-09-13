@@ -72,6 +72,7 @@ import vrframework.classe.Conexao;
 import vrframework.classe.Database;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
+import vrimplantacao2.parametro.Parametros;
 
 public class NotaSaidaDAO {
 
@@ -760,40 +761,44 @@ public class NotaSaidaDAO {
             finalizarCfop(i_notaSaida);
 
             if (oTipoSaida.atualizaEscrita) {
-                new EscritaFechamentoDAO().verificar(i_notaSaida.dataSaida);
+                if (Parametros.get().getBool(true, "IMPORT_NFE", "VERIFICAR_FECHAMENTO_ESCRITA")) {
+                    new EscritaFechamentoDAO().verificar(i_notaSaida.dataSaida);
+                }
 
                 finalizarEscrita(i_notaSaida);
             }
 
-            if (oTipoSaida.baixaEstoque || oTipoSaida.entraEstoque) {
-                finalizarEstoque(i_notaSaida);
-            }
-
-            if (i_notaSaida.valorTotal > 0) {
-                if (oTipoSaida.geraDevolucao) {
-                    finalizarDevolucao(i_notaSaida);
+            if (Parametros.get().getBool(true, "IMPORT_NFE", "PROCESSAR_FINALIZACOES")) {
+                if (oTipoSaida.baixaEstoque || oTipoSaida.entraEstoque) {
+                    finalizarEstoque(i_notaSaida);
                 }
 
-                if (oTipoSaida.geraReceber) {
-                    finalizarVendaPrazo(i_notaSaida);
+                if (i_notaSaida.valorTotal > 0) {
+                    if (oTipoSaida.geraDevolucao) {
+                        finalizarDevolucao(i_notaSaida);
+                    }
+
+                    if (oTipoSaida.geraReceber) {
+                        finalizarVendaPrazo(i_notaSaida);
+                    }
+
+                    if (oTipoSaida.geraContrato) {
+                        finalizarContrato(i_notaSaida);
+                    }
                 }
 
-                if (oTipoSaida.geraContrato) {
-                    finalizarContrato(i_notaSaida);
+                if (oTipoSaida.consultaPedido) {
+                    finalizarPedido(i_notaSaida);
                 }
-            }
 
-            if (oTipoSaida.consultaPedido) {
-                finalizarPedido(i_notaSaida);
-            }
+                finalizarTrocaCupom(i_notaSaida);
 
-            finalizarTrocaCupom(i_notaSaida);
+                finalizarDevolucaoCupom(i_notaSaida);
 
-            finalizarDevolucaoCupom(i_notaSaida);
-
-            if (oTipoSaida.transferencia && new LojaDAO().isFornecedor(i_notaSaida.idFornecedorDestinatario)) {
-                finalizarSenha(i_notaSaida);
-                finalizarTransferencia(i_notaSaida);
+                if (oTipoSaida.transferencia && new LojaDAO().isFornecedor(i_notaSaida.idFornecedorDestinatario)) {
+                    finalizarSenha(i_notaSaida);
+                    finalizarTransferencia(i_notaSaida);
+                }
             }
 
             //atualiza status
