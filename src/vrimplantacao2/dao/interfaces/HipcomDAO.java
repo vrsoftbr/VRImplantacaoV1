@@ -806,7 +806,10 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rst.getString("id"));
                     imp.setTipoInscricao("J".equals(rst.getString("tipoempresa")) ? TipoInscricao.JURIDICA: TipoInscricao.FISICA);
                     imp.setCnpj(rst.getString("cnpj"));
-                    imp.setInscricaoestadual(Utils.formataNumero(rst.getString("inscricaoestadual")));
+                    //imp.setInscricaoestadual(Utils.formataNumero(rst.getString("inscricaoestadual")));
+                    if((rst.getString("inscricaoestadual") != null) && (!"".equals(rst.getString("inscricaoestadual")))) {
+                        imp.setInscricaoestadual(rst.getString("inscricaoestadual").replace("\\", "").replace("-", "").replace(".", ""));
+                    }
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setAtivo(rst.getBoolean("ativo"));
@@ -840,6 +843,10 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEmpresaTelefone(rst.getString("telefone_empresa"));
                     imp.setSalario(rst.getDouble("salario"));
                     imp.setValorLimite(rst.getDouble("valorlimite"));
+                    if(imp.getValorLimite() > 0) {
+                        imp.setPermiteCheque(true);
+                        imp.setPermiteCreditoRotativo(true);
+                    }
                     imp.setNomeConjuge(rst.getString("conjuge"));
                     imp.setNomePai(rst.getString("pai"));
                     imp.setNomeMae(rst.getString("mae"));
@@ -962,6 +969,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdProduto(rst.getString("id_produto"));
                     imp.setDataInicio(rst.getDate("datainicio"));
                     imp.setDataFim(rst.getDate("datafim"));
+                    imp.setPrecoNormal(rst.getDouble("preconormal"));
                     imp.setPrecoOferta(rst.getDouble("precooferta"));
                     imp.setSituacaoOferta(SituacaoOferta.ATIVO);
                     imp.setTipoOferta(TipoOfertaVO.CAPA);

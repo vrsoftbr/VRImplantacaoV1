@@ -343,11 +343,19 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                             importador.importarClientePreferencial();
                         }
                         
+                        if (chkClienteEventual.isSelected()) {
+                            importador.importarClienteEventual();
+                        }
+                        
                         {
                             List<OpcaoCliente> opcoes = new ArrayList<>();
                             
                             if (chkClienteTipoInscricao.isSelected()) {
                                 opcoes.add(OpcaoCliente.TIPO_INSCRICAO);
+                            }
+                            
+                            if (chkCIE.isSelected()) {
+                                opcoes.add(OpcaoCliente.INSCRICAO_ESTADUAL);
                             }
                             
                             if (!opcoes.isEmpty()) {
@@ -466,6 +474,8 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         chkClienteTipoInscricao = new vrframework.bean.checkBox.VRCheckBox();
+        chkCIE = new javax.swing.JCheckBox();
+        chkClienteEventual = new javax.swing.JCheckBox();
         tabOutras = new javax.swing.JPanel();
         chkVendas = new javax.swing.JCheckBox();
         txtDtVendaIni = new org.jdesktop.swingx.JXDatePicker();
@@ -786,6 +796,10 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkClienteTipoInscricao.setText("Tipo Inscrição");
 
+        chkCIE.setText("Inscrição Estadual");
+
+        chkClienteEventual.setText("Cliente Eventual");
+
         javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
         tabClientes.setLayout(tabClientesLayout);
         tabClientesLayout.setHorizontalGroup(
@@ -797,8 +811,14 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                     .addGroup(tabClientesLayout.createSequentialGroup()
                         .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(chkClienteTipoInscricao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(tabClientesLayout.createSequentialGroup()
+                                .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(chkClienteEventual))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(chkClienteTipoInscricao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(chkCIE))))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -806,14 +826,18 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
             tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabClientesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCIE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkClienteTipoInscricao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkClienteTipoInscricao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkClienteEventual))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(127, Short.MAX_VALUE))
+                .addContainerGap(129, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
@@ -979,7 +1003,9 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.button.VRButton btnMapaTribut;
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkAtivoInativo;
+    private javax.swing.JCheckBox chkCIE;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
+    private javax.swing.JCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkClienteTipoInscricao;
     private javax.swing.JCheckBox chkContasPagar;
