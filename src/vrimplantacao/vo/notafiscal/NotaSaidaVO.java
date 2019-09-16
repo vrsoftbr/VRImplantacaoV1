@@ -83,6 +83,8 @@ public class NotaSaidaVO {
     public List<NotaSaidaVencimentoVO> vVencimento = new ArrayList();
     public boolean aplicaPisCofinsDesconto;
     public boolean aplicaPisCofinsEncargo;
+    
+    public DestinatarioNfe destinatarioNfe = new DestinatarioNfe();
 
     public List<NotaSaidaItemDesmembramentoVO> getvDesmembramento() {
         return vDesmembramento;

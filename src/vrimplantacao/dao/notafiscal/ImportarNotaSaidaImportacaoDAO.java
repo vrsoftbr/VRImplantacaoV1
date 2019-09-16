@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -27,8 +28,6 @@ import vrimplantacao.dao.cadastro.ProdutoDAO;
 import vrimplantacao.dao.sistema.EstadoDAO;
 import vrimplantacao.vo.cadastro.TipoFornecedorVO;
 import vrimplantacao.vo.cadastro.TipoPercentualValor;
-import vrimplantacao.vo.interfaces.DivergenciaVO;
-import vrimplantacao.vo.interfaces.TipoDivergencia;
 import vrimplantacao.vo.notafiscal.NotaSaidaItemVO;
 import vrimplantacao.vo.notafiscal.NotaSaidaVO;
 import vrimplantacao.vo.notafiscal.NotaSaidaVencimentoVO;
@@ -39,10 +38,26 @@ import vrimplantacao.vo.notafiscal.TipoSaidaVO;
 import vrframework.classe.Util;
 import vrimplantacao.dao.cadastro.ClienteEventuallDAO;
 import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.interfaces.DivergenciaVO;
+import vrimplantacao.vo.notafiscal.DestinatarioNfe;
+import vrimplantacao2.dao.cadastro.cliente.ClienteEventualDAO;
+import vrimplantacao2.dao.cadastro.cliente.ClienteRepositoryProvider;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.cadastro.cliente.ClienteEventualVO;
+import vrimplantacao2.vo.cadastro.local.MunicipioVO;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoIndicadorIE;
+import vrimplantacao2.vo.enums.TipoInscricao;
+import vrimplantacao2.vo.enums.TipoOrgaoPublico;
 
 public class ImportarNotaSaidaImportacaoDAO {
+    
+    private boolean incluirClienteEventual;
+
+    public void setIncluirClienteEventual(boolean incluirClienteEventual) {
+        this.incluirClienteEventual = incluirClienteEventual;
+    }
 
     public static class LojaV2 {
         public String impSistema;
@@ -74,6 +89,15 @@ public class ImportarNotaSaidaImportacaoDAO {
         return result;
     }
 
+    private ClienteRepositoryProvider provider;
+    public ImportarNotaSaidaImportacaoDAO() throws Exception {
+        this.provider = new ClienteRepositoryProvider();
+        provider.setSistema("NF-e Saida");
+        provider.setLojaOrigem("1");
+        provider.setLojaVR(1);
+        provider.setDesativarNotificacao(true);
+    }
+    
     public void clearAnteriores() {
         daoV2.clearAnteriores();
     }
@@ -118,14 +142,32 @@ public class ImportarNotaSaidaImportacaoDAO {
         oNotaSaida.idLoja = new LojaDAO().getId(new FornecedorDAO().getId(Long.parseLong(eCNPJ.getTextContent())));
 
         //destinatario
+        DestinatarioNfe de = oNotaSaida.destinatarioNfe;
+        
         Element dest = (Element) infNFe.getElementsByTagName("dest").item(0);
         Element dEnderDest = (Element) dest.getElementsByTagName("enderDest").item(0);
         Element dUF = (Element) dEnderDest.getElementsByTagName("UF").item(0);
         Element dCNPJ = (Element) dest.getElementsByTagName("CNPJ").item(0);
-
         if (dCNPJ == null) {
             dCNPJ = (Element) dest.getElementsByTagName("CPF").item(0);
         }
+                
+        de.setNome(dest.getElementsByTagName("xNome").item(0) != null ? dest.getElementsByTagName("xNome").item(0).getTextContent() : "NFC-e");
+        de.setCnpj(Utils.stringToLong(dCNPJ.getTextContent()));
+        de.setIndicadorId(TipoIndicadorIE.getById(Utils.stringToInt(dest.getElementsByTagName("indIEDest").item(0).getTextContent())));
+        de.setInscricaoEstadual(Utils.stringToLong(dest.getElementsByTagName("IE").item(0) != null ? dest.getElementsByTagName("IE").item(0).getTextContent() : ""));
+        de.setSuframa(Utils.stringToLong(dest.getElementsByTagName("ISUF").item(0) != null ? dest.getElementsByTagName("ISUF").item(0).getTextContent() : ""));
+        de.setInscricaoMunicipal(Utils.stringToLong(dest.getElementsByTagName("IM").item(0) != null ? dest.getElementsByTagName("IM").item(0).getTextContent() : ""));
+        de.setLogradouro(dEnderDest.getElementsByTagName("xLgr").item(0).getTextContent());
+        de.setNumero(dEnderDest.getElementsByTagName("nro").item(0).getTextContent());
+        de.setComplemento(dEnderDest.getElementsByTagName("xCpl").item(0) != null ? dEnderDest.getElementsByTagName("xCpl").item(0).getTextContent() : "");
+        de.setBairro(dEnderDest.getElementsByTagName("xBairro").item(0).getTextContent());
+        de.setCodigoIbgeMunicipio(Utils.stringToInt(dEnderDest.getElementsByTagName("cMun").item(0).getTextContent()));
+        de.setMunicipio(dEnderDest.getElementsByTagName("xMun").item(0).getTextContent());
+        de.setUf(dEnderDest.getElementsByTagName("UF").item(0).getTextContent());
+        de.setEmail(dEnderDest.getElementsByTagName("email").item(0) != null ? dEnderDest.getElementsByTagName("email").item(0).getTextContent(): "");
+        de.setTelefone(dEnderDest.getElementsByTagName("fone").item(0) != null ? dEnderDest.getElementsByTagName("fone").item(0).getTextContent() : "");
+        de.setCep(dEnderDest.getElementsByTagName("CEP").item(0) != null ? dEnderDest.getElementsByTagName("CEP").item(0).getTextContent() : "");
 
         //carrega nota
         oNotaSaida.chaveNfe = infNFe.getAttribute("Id").substring(3, 47);
@@ -161,12 +203,29 @@ public class ImportarNotaSaidaImportacaoDAO {
         TipoFornecedorVO oTipoFornecedor = new TipoFornecedorVO();
 
         if (dCNPJ != null && !dCNPJ.getTextContent().equals("")) {
-            oTipoFornecedor = new FornecedorDAO().carregarTipo(Long.parseLong(dCNPJ.getTextContent()));
-
-            if (oTipoSaida.destinatarioCliente || oTipoSaida.geraReceber) {
-                oNotaSaida.idClienteEventualDestinatario = new ClienteEventuallDAO().getId(Long.parseLong(dCNPJ.getTextContent()));
-            } else {
-                oNotaSaida.idFornecedorDestinatario = new FornecedorDAO().getId(Long.parseLong(dCNPJ.getTextContent()));
+            try {
+                oTipoFornecedor = new FornecedorDAO().carregarTipo(Long.parseLong(dCNPJ.getTextContent()));
+                if (oTipoSaida.destinatarioCliente || oTipoSaida.geraReceber) {
+                    oNotaSaida.idClienteEventualDestinatario = new ClienteEventuallDAO().getId(Long.parseLong(dCNPJ.getTextContent()));
+                } else {
+                    oNotaSaida.idFornecedorDestinatario = new FornecedorDAO().getId(Long.parseLong(dCNPJ.getTextContent()));
+                }
+            } catch (Exception ex) {
+                if (ex.getMessage().contains("O cnpj")) {
+                    if (incluirClienteEventual) {
+                        ClienteEventualVO cliente = converterClienteEventual(oNotaSaida.destinatarioNfe);                        
+                        new ClienteEventualDAO()
+                                .setGerarId(true)
+                                .salvar(cliente);
+                        oNotaSaida.idClienteEventualDestinatario = cliente.getId();
+                    } else {
+                        oNotaSaida.vDivergencia.add(new DivergenciaVO(
+                                DivergenciaVO.CNPJ_DESTINATARIO_NAO_ENCONTRADO,
+                                "CPF/CNPJ '" + String.valueOf(oNotaSaida.destinatarioNfe.getCnpj()) + "' do destinatário não foi encontrado no VR",
+                                0
+                        ));
+                    }
+                }
             }
         }
 
@@ -209,24 +268,30 @@ public class ImportarNotaSaidaImportacaoDAO {
                     daoV2.setImportSistema(impLoja.impSistema);
                     daoV2.setImportLoja(impLoja.impLoja);                    
                     idProduto = daoV2.getCodigoAnterior2(daoV2.getImportSistema(), daoV2.getImportLoja(), cProd.getTextContent());
-                    //ProdutoAnteriorVO anterior = daoV2.getCodigoAnterior2(daoV2.getImportSistema(), daoV2.getImportLoja(), cProd.getTextContent());
-                    //ProdutoAnteriorVO anterior = daoV2.getCodigoAnterior().get(impLoja.impSistema, impLoja.impLoja, cProd.getTextContent());
-                    //if (anterior != null && anterior.getCodigoAtual() != null) {
-                    //    idProduto = anterior.getCodigoAtual().getId();
-                    //} else {
-                    //    idProduto = -1
-                    //}
                 } else {
                     idProduto = new ProdutoDAO().getIdAnterior(Long.parseLong(cProd.getTextContent()));
                 }
-            } else {
-                
-                if (cEAN == null || cEAN.getTextContent().isEmpty()) {
-                    oNotaSaida.vDivergencia.add(new DivergenciaVO("O produto " + xProd.getTextContent() + " está sem código de barras ou código externo.", TipoDivergencia.ERRO.getId()));
-                    continue;
+            } else {                
+                try {
+                    idProduto = new ProdutoDAO().getId(Long.parseLong(cEAN.getTextContent()));
+                    if (cEAN == null || cEAN.getTextContent().isEmpty()) {
+                        oNotaSaida.vDivergencia.add(
+                                new DivergenciaVO(
+                                    DivergenciaVO.EAN_NAO_ENCONTRADO,
+                                    "Campo EAN não foi preenchido"
+                                    ,0
+                                )
+                        );
+                    }
+                } catch (NumberFormatException ex) {
+                    oNotaSaida.vDivergencia.add(
+                        new DivergenciaVO(
+                                DivergenciaVO.EAN_NAO_ENCONTRADO,
+                                "EAN '" + cEAN.getTextContent() + "' não encontrado no VR", 
+                                0
+                        )
+                    );
                 }
-                
-                idProduto = new ProdutoDAO().getId(Long.parseLong(cEAN.getTextContent()));
             }
 
             if (idProduto == -1) {
@@ -237,283 +302,298 @@ public class ImportarNotaSaidaImportacaoDAO {
                 }
             }
 
-            NotaSaidaItemVO oItem = new NotaSaidaDAO().carregarProduto(idProduto, cfop, oNotaSaida.idEstadoDestinatario, oTipoFornecedor.id);
+            try {
+                NotaSaidaItemVO oItem = new NotaSaidaItemVO();
+                oItem.idProduto = idProduto;
+                oItem.cfop = cfop;
 
-            oItem = new NotaSaidaItemVO();
-            oItem.idProduto = idProduto;
-            oItem.cfop = cfop;
+                //Dados de Importação
+                Element DI = (Element) prod.getElementsByTagName("DI").item(0);
 
-            //Dados de Importação
-            Element DI = (Element) prod.getElementsByTagName("DI").item(0);
+                if (DI != null) {
+                    Element xLocDesemb = (Element) DI.getElementsByTagName("xLocDesemb").item(0);
+                    Element UFDesemb = (Element) DI.getElementsByTagName("UFDesemb").item(0);
+                    Element dDesemb = (Element) DI.getElementsByTagName("dDesemb").item(0);
+                    Element adi = (Element) DI.getElementsByTagName("adi").item(0);
 
-            if (DI != null) {
-                Element xLocDesemb = (Element) DI.getElementsByTagName("xLocDesemb").item(0);
-                Element UFDesemb = (Element) DI.getElementsByTagName("UFDesemb").item(0);
-                Element dDesemb = (Element) DI.getElementsByTagName("dDesemb").item(0);
-                Element adi = (Element) DI.getElementsByTagName("adi").item(0);
+                    oItem.localDesembaraco = xLocDesemb.getTextContent();
+                    oItem.idEstadoDesembaraco = new EstadoDAO().getId(UFDesemb.getTextContent());
+                    oItem.dataDesembaraco = Util.formatDataGUI(Date.valueOf(dDesemb.getTextContent()));
+                    oItem.numeroAdicao = Integer.parseInt(adi.getTextContent());
+                }
 
-                oItem.localDesembaraco = xLocDesemb.getTextContent();
-                oItem.idEstadoDesembaraco = new EstadoDAO().getId(UFDesemb.getTextContent());
-                oItem.dataDesembaraco = Util.formatDataGUI(Date.valueOf(dDesemb.getTextContent()));
-                oItem.numeroAdicao = Integer.parseInt(adi.getTextContent());
-            }
+                oNotaSaida.idTipoSaida = i_idTipoNotaSaida;
+                oItem.idTipoSaida = i_idTipoNotaSaida;
 
-            oNotaSaida.idTipoSaida = i_idTipoNotaSaida;
-            oItem.idTipoSaida = i_idTipoNotaSaida;
+                //valores do item da nota
+                Element qCom = (Element) prod.getElementsByTagName("qCom").item(0);
+                oItem.quantidade = Double.parseDouble(qCom.getTextContent());
 
-            //valores do item da nota
-            Element qCom = (Element) prod.getElementsByTagName("qCom").item(0);
-            oItem.quantidade = Double.parseDouble(qCom.getTextContent());
+                Element uCom = (Element) prod.getElementsByTagName("uCom").item(0);
 
-            Element uCom = (Element) prod.getElementsByTagName("uCom").item(0);
+                if (uCom.getTextContent().isEmpty() || !Util.isNumero(uCom.getTextContent().substring(2))) {
+                    oItem.qtdEmbalagem = 1;
+                } else {
+                    oItem.qtdEmbalagem = Integer.parseInt(uCom.getTextContent().substring(2));
+                }
 
-            if (uCom.getTextContent().isEmpty() || !Util.isNumero(uCom.getTextContent().substring(2))) {
-                oItem.qtdEmbalagem = 1;
-            } else {
-                oItem.qtdEmbalagem = Integer.parseInt(uCom.getTextContent().substring(2));
-            }
+                if (!Util.isTipoEmbalagemFracionado(uCom.getTextContent().substring(0, 2))) {
+                    oItem.quantidade = Util.round(oItem.quantidade, 0);
+                } else {
+                    oItem.quantidade = Double.parseDouble(Util.formatDecimal3(oItem.quantidade).replace(".", "").replace(",", "."));
+                }
 
-            if (!Util.isTipoEmbalagemFracionado(uCom.getTextContent().substring(0, 2))) {
-                oItem.quantidade = Util.round(oItem.quantidade, 0);
-            } else {
-                oItem.quantidade = Double.parseDouble(Util.formatDecimal3(oItem.quantidade).replace(".", "").replace(",", "."));
-            }
+                Element vProdItem = (Element) prod.getElementsByTagName("vProd").item(0);
+                oItem.valorTotal = Double.parseDouble(vProdItem.getTextContent());
 
-            Element vProdItem = (Element) prod.getElementsByTagName("vProd").item(0);
-            oItem.valorTotal = Double.parseDouble(vProdItem.getTextContent());
+                Element vOutroItem = (Element) prod.getElementsByTagName("vOutro").item(0);
 
-            Element vOutroItem = (Element) prod.getElementsByTagName("vOutro").item(0);
+                if (vOutroItem != null) {
+                    oItem.valorOutras = Double.parseDouble(vOutroItem.getTextContent());
+                }
 
-            if (vOutroItem != null) {
-                oItem.valorOutras = Double.parseDouble(vOutroItem.getTextContent());
-            }
+                Element vUnCom = (Element) prod.getElementsByTagName("vUnCom").item(0);
+                oItem.valor = Double.parseDouble(vUnCom.getTextContent());
 
-            Element vUnCom = (Element) prod.getElementsByTagName("vUnCom").item(0);
-            oItem.valor = Double.parseDouble(vUnCom.getTextContent());
+                Element vDescItem = (Element) prod.getElementsByTagName("vDesc").item(0);
 
-            Element vDescItem = (Element) prod.getElementsByTagName("vDesc").item(0);
+                if (vDescItem != null && !oTipoSaida.notaProdutor) {
+                    //oItem.valorDesconto = Double.parseDouble(vDescItem.getTextContent());
+                    //oItem.valorTotal += Double.parseDouble(vDescItem.getTextContent());
+                }
+                //impostos
+                //IPI
+                Element imposto = (Element) det.getElementsByTagName("imposto").item(0);
+                Element PIS = (Element) imposto.getElementsByTagName("PIS").item(0);
+                Element PISST = (Element) imposto.getElementsByTagName("PISST").item(0);
+                Element ICMS = (Element) imposto.getElementsByTagName("ICMS").item(0);
+                Element COFINS = (Element) imposto.getElementsByTagName("COFINS").item(0);
+                Element IPI = (Element) imposto.getElementsByTagName("IPI").item(0);
 
-            if (vDescItem != null && !oTipoSaida.notaProdutor) {
-                //oItem.valorDesconto = Double.parseDouble(vDescItem.getTextContent());
-                //oItem.valorTotal += Double.parseDouble(vDescItem.getTextContent());
-            }
-            //impostos
-            //IPI
-            Element imposto = (Element) det.getElementsByTagName("imposto").item(0);
-            Element PIS = (Element) imposto.getElementsByTagName("PIS").item(0);
-            Element PISST = (Element) imposto.getElementsByTagName("PISST").item(0);
-            Element ICMS = (Element) imposto.getElementsByTagName("ICMS").item(0);
-            Element COFINS = (Element) imposto.getElementsByTagName("COFINS").item(0);
-            Element IPI = (Element) imposto.getElementsByTagName("IPI").item(0);
+                if (IPI != null) {
+                    Element IPINT = (Element) IPI.getElementsByTagName("IPINT").item(0);
+                    Element IPITrib = (Element) IPI.getElementsByTagName("IPITrib").item(0);
 
-            if (IPI != null) {
-                Element IPINT = (Element) IPI.getElementsByTagName("IPINT").item(0);
-                Element IPITrib = (Element) IPI.getElementsByTagName("IPITrib").item(0);
+                    if (IPINT != null) {
+                        Element CST = (Element) IPINT.getElementsByTagName("CST").item(0);
 
-                if (IPINT != null) {
-                    Element CST = (Element) IPINT.getElementsByTagName("CST").item(0);
+                        if (CST.getTextContent().equals("99")) {
+                            Element vUnid = (Element) IPINT.getElementsByTagName("vUnid").item(0);
+                            Element vIPI = (Element) IPINT.getElementsByTagName("vIPI").item(0);
 
-                    if (CST.getTextContent().equals("99")) {
-                        Element vUnid = (Element) IPINT.getElementsByTagName("vUnid").item(0);
-                        Element vIPI = (Element) IPINT.getElementsByTagName("vIPI").item(0);
+                            oItem.valorIpi = Double.parseDouble(vUnid.getTextContent());
+                            oNotaSaida.valorIpi += oItem.valorIpi;
+                            oItem.valorTotalIpi = Double.parseDouble(vIPI.getTextContent());
 
-                        oItem.valorIpi = Double.parseDouble(vUnid.getTextContent());
-                        oNotaSaida.valorIpi += oItem.valorIpi;
+                            if (oItem.valorTotalIpi > 0) {
+                                oItem.valorBaseIpi = oItem.valorTotal;
+                            }
+                        }
+
+                    } else if (IPITrib != null) {
+                        Element CST = (Element) IPITrib.getElementsByTagName("CST").item(0);
+                        Element vUnid = (Element) IPITrib.getElementsByTagName("vUnid").item(0);
+                        Element vIPI = (Element) IPITrib.getElementsByTagName("vIPI").item(0);
+
+                        if (vUnid != null && !vUnid.getTextContent().isEmpty()) {
+                            oItem.valorIpi = Double.parseDouble(vUnid.getTextContent());
+                            oNotaSaida.valorIpi += oItem.valorIpi;
+                        }
+
                         oItem.valorTotalIpi = Double.parseDouble(vIPI.getTextContent());
 
                         if (oItem.valorTotalIpi > 0) {
                             oItem.valorBaseIpi = oItem.valorTotal;
                         }
                     }
-
-                } else if (IPITrib != null) {
-                    Element CST = (Element) IPITrib.getElementsByTagName("CST").item(0);
-                    Element vUnid = (Element) IPITrib.getElementsByTagName("vUnid").item(0);
-                    Element vIPI = (Element) IPITrib.getElementsByTagName("vIPI").item(0);
-
-                    if (vUnid != null && !vUnid.getTextContent().isEmpty()) {
-                        oItem.valorIpi = Double.parseDouble(vUnid.getTextContent());
-                        oNotaSaida.valorIpi += oItem.valorIpi;
-                    }
-
-                    oItem.valorTotalIpi = Double.parseDouble(vIPI.getTextContent());
-
-                    if (oItem.valorTotalIpi > 0) {
-                        oItem.valorBaseIpi = oItem.valorTotal;
-                    }
-                }
-            }
-
-            //pis/cofins
-            if (PIS != null) {
-                Element PISAliq = (Element) PIS.getElementsByTagName("PISAliq").item(0);
-                Element PISQtde = (Element) PIS.getElementsByTagName("PISQtde").item(0);
-                Element PISNT = (Element) PIS.getElementsByTagName("PISNT").item(0);
-                Element PISOutr = (Element) PIS.getElementsByTagName("PISOutr").item(0);
-
-                Element CST = null;
-
-                if (PISAliq != null) {
-                    CST = (Element) PISAliq.getElementsByTagName("CST").item(0);
-                    oItem.valorPisCofins += Double.parseDouble(PISAliq.getElementsByTagName("vPIS").item(0).getTextContent());
-                    oItem.cstPisCofins = Integer.parseInt(CST.getTextContent());
-
-                } else if (PISQtde != null) {
-                    CST = (Element) PISQtde.getElementsByTagName("CST").item(0);
-                    oItem.valorPisCofins += Double.parseDouble(PISQtde.getElementsByTagName("vPIS").item(0).getTextContent());
-                    oItem.cstPisCofins = Integer.parseInt(CST.getTextContent());
-
-                } else if (PISNT != null) {
-                    CST = (Element) PISNT.getElementsByTagName("CST").item(0);
-                    oItem.cstPisCofins = Integer.parseInt(CST.getTextContent());
-
-                } else if (PISOutr != null) {
-                    CST = (Element) PISOutr.getElementsByTagName("CST").item(0);
-                    oItem.valorPisCofins += Double.parseDouble(PISOutr.getElementsByTagName("vPIS").item(0).getTextContent());
-                    oItem.cstPisCofins = Integer.parseInt(CST.getTextContent());
-                }
-            }
-
-            if (COFINS != null) {
-                Element COFINSAliq = (Element) COFINS.getElementsByTagName("COFINSAliq").item(0);
-                Element COFINSQtde = (Element) COFINS.getElementsByTagName("COFINSQtde").item(0);
-                Element COFINSNT = (Element) COFINS.getElementsByTagName("COFINSNT").item(0);
-                Element COFINSOutr = (Element) COFINS.getElementsByTagName("COFINSOutr").item(0);
-
-                Element CST = null;
-
-                if (COFINSAliq != null) {
-                    CST = (Element) COFINSAliq.getElementsByTagName("CST").item(0);
-                    oItem.valorPisCofins += Double.parseDouble(COFINSAliq.getElementsByTagName("vCOFINS").item(0).getTextContent());
-
-                } else if (COFINSQtde != null) {
-                    CST = (Element) COFINSQtde.getElementsByTagName("CST").item(0);
-                    oItem.valorPisCofins += Double.parseDouble(COFINSQtde.getElementsByTagName("vCOFINS").item(0).getTextContent());
-
-                } else if (COFINSNT != null) {
-                    CST = (Element) COFINSNT.getElementsByTagName("CST").item(0);
-
-                } else if (COFINSOutr != null) {
-                    CST = (Element) COFINSOutr.getElementsByTagName("CST").item(0);
-                    oItem.valorPisCofins += Double.parseDouble(COFINSOutr.getElementsByTagName("vCOFINS").item(0).getTextContent());
-                }
-            }
-
-            //ICMS
-            if (ICMS != null) {
-                Element ICMSItem = (Element) ICMS.getChildNodes().item(0);
-                Element pRedBC = (Element) ICMSItem.getElementsByTagName("pRedBC").item(0);
-                Element pICMS = (Element) ICMSItem.getElementsByTagName("pICMS").item(0);
-                Element vBC = (Element) ICMSItem.getElementsByTagName("vBC").item(0);
-                Element vICMS = (Element) ICMSItem.getElementsByTagName("vICMS").item(0);
-                Element orig = (Element) ICMSItem.getElementsByTagName("orig").item(0);
-                Element modBCST = (Element) ICMSItem.getElementsByTagName("modBCST").item(0);
-                Element vBCST = (Element) ICMSItem.getElementsByTagName("vBCST").item(0);
-                Element vBCSTRet = (Element) ICMSItem.getElementsByTagName("vBCSTRet").item(0);
-                Element vICMSST = (Element) ICMSItem.getElementsByTagName("vICMSST").item(0);
-                Element vICMSSTRet = (Element) ICMSItem.getElementsByTagName("vICMSSTRet").item(0);
-
-                if (vBC != null) {
-                    oItem.valorBaseCalculo = Double.parseDouble(vBC.getTextContent());
                 }
 
-                if (vICMS != null) {
-                    oItem.valorIcms = Double.parseDouble(vICMS.getTextContent());
-                }
+                //pis/cofins
+                if (PIS != null) {
+                    Element PISAliq = (Element) PIS.getElementsByTagName("PISAliq").item(0);
+                    Element PISQtde = (Element) PIS.getElementsByTagName("PISQtde").item(0);
+                    Element PISNT = (Element) PIS.getElementsByTagName("PISNT").item(0);
+                    Element PISOutr = (Element) PIS.getElementsByTagName("PISOutr").item(0);
 
-                if (modBCST != null && !modBCST.getTextContent().equals("0")) {
-                    if (modBCST.getTextContent().equals("5")) {
-                        oItem.tipoIva = TipoPercentualValor.VALOR.getId();
+                    Element CST = null;
 
-                    } else if (modBCST.getTextContent().equals("4")) {
-                        oItem.tipoIva = TipoPercentualValor.PERCENTUAL.getId();
+                    if (PISAliq != null) {
+                        CST = (Element) PISAliq.getElementsByTagName("CST").item(0);
+                        oItem.valorPisCofins += Double.parseDouble(PISAliq.getElementsByTagName("vPIS").item(0).getTextContent());
+                        oItem.cstPisCofins = Integer.parseInt(CST.getTextContent());
+
+                    } else if (PISQtde != null) {
+                        CST = (Element) PISQtde.getElementsByTagName("CST").item(0);
+                        oItem.valorPisCofins += Double.parseDouble(PISQtde.getElementsByTagName("vPIS").item(0).getTextContent());
+                        oItem.cstPisCofins = Integer.parseInt(CST.getTextContent());
+
+                    } else if (PISNT != null) {
+                        CST = (Element) PISNT.getElementsByTagName("CST").item(0);
+                        oItem.cstPisCofins = Integer.parseInt(CST.getTextContent());
+
+                    } else if (PISOutr != null) {
+                        CST = (Element) PISOutr.getElementsByTagName("CST").item(0);
+                        oItem.valorPisCofins += Double.parseDouble(PISOutr.getElementsByTagName("vPIS").item(0).getTextContent());
+                        oItem.cstPisCofins = Integer.parseInt(CST.getTextContent());
                     }
                 }
 
-                if (vBCST != null) {
-                    oItem.valorBaseSubstituicao = Double.parseDouble(vBCST.getTextContent());
-                } else if (vBCSTRet != null) {
-                    oItem.valorBaseSubstituicao = Double.parseDouble(vBCSTRet.getTextContent());
+                if (COFINS != null) {
+                    Element COFINSAliq = (Element) COFINS.getElementsByTagName("COFINSAliq").item(0);
+                    Element COFINSQtde = (Element) COFINS.getElementsByTagName("COFINSQtde").item(0);
+                    Element COFINSNT = (Element) COFINS.getElementsByTagName("COFINSNT").item(0);
+                    Element COFINSOutr = (Element) COFINS.getElementsByTagName("COFINSOutr").item(0);
+
+                    Element CST = null;
+
+                    if (COFINSAliq != null) {
+                        CST = (Element) COFINSAliq.getElementsByTagName("CST").item(0);
+                        oItem.valorPisCofins += Double.parseDouble(COFINSAliq.getElementsByTagName("vCOFINS").item(0).getTextContent());
+
+                    } else if (COFINSQtde != null) {
+                        CST = (Element) COFINSQtde.getElementsByTagName("CST").item(0);
+                        oItem.valorPisCofins += Double.parseDouble(COFINSQtde.getElementsByTagName("vCOFINS").item(0).getTextContent());
+
+                    } else if (COFINSNT != null) {
+                        CST = (Element) COFINSNT.getElementsByTagName("CST").item(0);
+
+                    } else if (COFINSOutr != null) {
+                        CST = (Element) COFINSOutr.getElementsByTagName("CST").item(0);
+                        oItem.valorPisCofins += Double.parseDouble(COFINSOutr.getElementsByTagName("vCOFINS").item(0).getTextContent());
+                    }
                 }
 
-                if (vICMSST != null) {
-                    oItem.valorIcmsSubstituicao = Double.parseDouble(vICMSST.getTextContent());
-                } else if (vICMSSTRet != null) {
-                    oItem.valorIcmsSubstituicao = Double.parseDouble(vICMSSTRet.getTextContent());
+                //ICMS
+                if (ICMS != null) {
+                    Element ICMSItem = (Element) ICMS.getChildNodes().item(0);
+                    Element pRedBC = (Element) ICMSItem.getElementsByTagName("pRedBC").item(0);
+                    Element pICMS = (Element) ICMSItem.getElementsByTagName("pICMS").item(0);
+                    Element vBC = (Element) ICMSItem.getElementsByTagName("vBC").item(0);
+                    Element vICMS = (Element) ICMSItem.getElementsByTagName("vICMS").item(0);
+                    Element orig = (Element) ICMSItem.getElementsByTagName("orig").item(0);
+                    Element modBCST = (Element) ICMSItem.getElementsByTagName("modBCST").item(0);
+                    Element vBCST = (Element) ICMSItem.getElementsByTagName("vBCST").item(0);
+                    Element vBCSTRet = (Element) ICMSItem.getElementsByTagName("vBCSTRet").item(0);
+                    Element vICMSST = (Element) ICMSItem.getElementsByTagName("vICMSST").item(0);
+                    Element vICMSSTRet = (Element) ICMSItem.getElementsByTagName("vICMSSTRet").item(0);
+
+                    if (vBC != null) {
+                        oItem.valorBaseCalculo = Double.parseDouble(vBC.getTextContent());
+                    }
+
+                    if (vICMS != null) {
+                        oItem.valorIcms = Double.parseDouble(vICMS.getTextContent());
+                    }
+
+                    if (modBCST != null && !modBCST.getTextContent().equals("0")) {
+                        if (modBCST.getTextContent().equals("5")) {
+                            oItem.tipoIva = TipoPercentualValor.VALOR.getId();
+
+                        } else if (modBCST.getTextContent().equals("4")) {
+                            oItem.tipoIva = TipoPercentualValor.PERCENTUAL.getId();
+                        }
+                    }
+
+                    if (vBCST != null) {
+                        oItem.valorBaseSubstituicao = Double.parseDouble(vBCST.getTextContent());
+                    } else if (vBCSTRet != null) {
+                        oItem.valorBaseSubstituicao = Double.parseDouble(vBCSTRet.getTextContent());
+                    }
+
+                    if (vICMSST != null) {
+                        oItem.valorIcmsSubstituicao = Double.parseDouble(vICMSST.getTextContent());
+                    } else if (vICMSSTRet != null) {
+                        oItem.valorIcmsSubstituicao = Double.parseDouble(vICMSSTRet.getTextContent());
+                    }
+
+                    ICMSItem.getTagName();
+                    Element CstCsosn = (Element) ICMSItem.getElementsByTagName("CST").item(0);
+
+                    if (CstCsosn == null) {
+                        CstCsosn = (Element) ICMSItem.getElementsByTagName("CSOSN").item(0);
+                    }
+
+                    oItem.situacaoTributaria = Integer.parseInt(CstCsosn.getTextContent());
+                    oItem.idTipoOrigemMercadoria = Integer.parseInt(orig.getTextContent());
+
+                    if (oItem.situacaoTributaria == 20) {
+                        oItem.valorIsento = Util.round(oItem.valorTotal - oItem.valorBaseCalculo, 2);
+                    } else if (oItem.situacaoTributaria == 40 || oItem.situacaoTributaria == 41 || oItem.situacaoTributaria == 50) {
+                        oItem.valorIsento = oItem.valorTotal;
+                    } else {
+                        oItem.valorIsento = 0;
+                    }
+
+                    //Aliquota
+                    if (oItem.situacaoTributaria == 90 || oItem.situacaoTributaria == 51) {
+                        oItem.idAliquota = new AliquotaDAO().getIdOutras();
+
+                    } else if (oItem.situacaoTributaria == 60 || oItem.situacaoTributaria == 70 || oItem.situacaoTributaria == 10 || oItem.situacaoTributaria == 30) {
+                        oItem.idAliquota = new AliquotaDAO().getIdSubstituido();
+
+                    } else if (oItem.situacaoTributaria == 40 || oItem.situacaoTributaria == 41 || oItem.situacaoTributaria == 50) {
+                        oItem.idAliquota = new AliquotaDAO().getIdIsento();
+
+                    } else if (oItem.situacaoTributaria == 0) {
+                        oItem.idAliquota = new AliquotaDAO().getId(Double.parseDouble(pICMS.getTextContent()), 0);
+
+                    } else if (oItem.situacaoTributaria == 20) {
+                        oItem.idAliquota = new AliquotaDAO().getId(Double.parseDouble(pICMS.getTextContent()) , Double.parseDouble(pRedBC.getTextContent()));
+                    }
+
+                    if (oItem.idAliquota == -1) {
+                        oNotaSaida.vDivergencia.add(
+                            new DivergenciaVO(
+                                    DivergenciaVO.ALIQUOTA_INVALIDA,
+                                    String.format(
+                                            "Produto '%s' não possui uma aliquota válida no VR (ST: %s Aliq.: %s Red.: %s)",
+                                            cProd.getTextContent(),
+                                            String.valueOf(oItem.situacaoTributaria),
+                                            pICMS.getTextContent(),
+                                            pRedBC.getTextContent()
+                                    ),
+                                    0
+                            )
+                        );
+                    }
+
+                    //ValorTotal
+                    if (oItem.situacaoTributaria == 90 || oItem.situacaoTributaria == 60 || oItem.situacaoTributaria == 30) {
+                        oItem.valorOutras = oItem.valorTotal;
+                    }
                 }
 
-                ICMSItem.getTagName();
-                Element CstCsosn = (Element) ICMSItem.getElementsByTagName("CST").item(0);
+                NotaSaidaItemVO tp = somados.get(idProduto, Utils.stringToInt(cfop));
 
-                if (CstCsosn == null) {
-                    CstCsosn = (Element) ICMSItem.getElementsByTagName("CSOSN").item(0);
-                }
+                if (tp != null) {
+                    //Converto a quantidade comprada usando a unidade por embalagem.
+                    oItem.quantidade = oItem.quantidade * oItem.qtdEmbalagem;
+                    oItem.qtdEmbalagem = 1;
 
-                oItem.situacaoTributaria = Integer.parseInt(CstCsosn.getTextContent());
-                oItem.idTipoOrigemMercadoria = Integer.parseInt(orig.getTextContent());
+                    oItem.quantidade += tp.quantidade * tp.qtdEmbalagem;
 
-                if (oItem.situacaoTributaria == 20) {
-                    oItem.valorIsento = Util.round(oItem.valorTotal - oItem.valorBaseCalculo, 2);
-                } else if (oItem.situacaoTributaria == 40 || oItem.situacaoTributaria == 41 || oItem.situacaoTributaria == 50) {
-                    oItem.valorIsento = oItem.valorTotal;
-                } else {
-                    oItem.valorIsento = 0;
-                }
+                    oItem.valorTotal += tp.valorTotal;
+                    oItem.valorBaseCalculo += tp.valorBaseCalculo;
+                    oItem.valorBaseIpi += tp.valorBaseIpi;
+                    oItem.valorBaseSubstituicao += tp.valorBaseSubstituicao;
+                    oItem.valorDesconto += tp.valorDesconto;
+                    oItem.valorIcms += tp.valorIcms;
+                    oItem.valorIcmsDispensado += tp.valorIcmsDispensado;
+                    oItem.valorIcmsSubstituicao += tp.valorIcmsSubstituicao;
+                    oItem.valorIpi += tp.valorIpi;
+                    oItem.valorIsento += tp.valorIsento;
+                    oItem.valorOutras += tp.valorOutras;
+                    oItem.valorPisCofins += tp.valorPisCofins;
+                    oItem.valorTotalIpi += tp.valorTotalIpi;
+                }       
 
-                //Aliquota
-                if (oItem.situacaoTributaria == 90 || oItem.situacaoTributaria == 51) {
-                    oItem.idAliquota = new AliquotaDAO().getIdOutras();
+                oItem.valor = Util.round(oItem.valorTotal / (oItem.quantidade * oItem.qtdEmbalagem), 2);
 
-                } else if (oItem.situacaoTributaria == 60 || oItem.situacaoTributaria == 70 || oItem.situacaoTributaria == 10 || oItem.situacaoTributaria == 30) {
-                    oItem.idAliquota = new AliquotaDAO().getIdSubstituido();
-
-                } else if (oItem.situacaoTributaria == 40 || oItem.situacaoTributaria == 41 || oItem.situacaoTributaria == 50) {
-                    oItem.idAliquota = new AliquotaDAO().getIdIsento();
-
-                } else if (oItem.situacaoTributaria == 0) {
-                    oItem.idAliquota = new AliquotaDAO().getId(Double.parseDouble(pICMS.getTextContent()), 0);
-
-                } else if (oItem.situacaoTributaria == 20) {
-                    oItem.idAliquota = new AliquotaDAO().getId(Double.parseDouble(pICMS.getTextContent()) , Double.parseDouble(pRedBC.getTextContent()));
-                }
+                somados.put(oItem, idProduto, Utils.stringToInt(cfop));
                 
-                if (oItem.idAliquota == -1) {
-                    throw new Exception("Produto '" + cProd.getTextContent() + "' não possui uma aliquota válida no VR (ST: " + oItem.situacaoTributaria + " Aliq.: " + Double.parseDouble(pICMS.getTextContent()) + " Red.: " + Double.parseDouble(pRedBC.getTextContent()) + ")");
-                }
-
-                //ValorTotal
-                if (oItem.situacaoTributaria == 90 || oItem.situacaoTributaria == 60 || oItem.situacaoTributaria == 30) {
-                    oItem.valorOutras = oItem.valorTotal;
-                }
+            } catch (Exception ex) {
+            
             }
-            
-            NotaSaidaItemVO tp = somados.get(idProduto, Utils.stringToInt(cfop));
-            
-            if (tp != null) {
-                //Converto a quantidade comprada usando a unidade por embalagem.
-                oItem.quantidade = oItem.quantidade * oItem.qtdEmbalagem;
-                oItem.qtdEmbalagem = 1;
-                
-                oItem.quantidade += tp.quantidade * tp.qtdEmbalagem;
-                
-                oItem.valorTotal += tp.valorTotal;
-                oItem.valorBaseCalculo += tp.valorBaseCalculo;
-                oItem.valorBaseIpi += tp.valorBaseIpi;
-                oItem.valorBaseSubstituicao += tp.valorBaseSubstituicao;
-                oItem.valorDesconto += tp.valorDesconto;
-                oItem.valorIcms += tp.valorIcms;
-                oItem.valorIcmsDispensado += tp.valorIcmsDispensado;
-                oItem.valorIcmsSubstituicao += tp.valorIcmsSubstituicao;
-                oItem.valorIpi += tp.valorIpi;
-                oItem.valorIsento += tp.valorIsento;
-                oItem.valorOutras += tp.valorOutras;
-                oItem.valorPisCofins += tp.valorPisCofins;
-                oItem.valorTotalIpi += tp.valorTotalIpi;
-            }       
-            
-            oItem.valor = Util.round(oItem.valorTotal / (oItem.quantidade * oItem.qtdEmbalagem), 2);
-            
-            somados.put(oItem, idProduto, Utils.stringToInt(cfop));
             
         }
         
@@ -604,16 +684,28 @@ public class ImportarNotaSaidaImportacaoDAO {
             
             TipoFornecedorVO motorista = new TipoFornecedorVO();
             if (cpfMotorista != null && !cpfMotorista.getTextContent().equals("")) {
-                motorista = new FornecedorDAO().carregarTipo(Long.parseLong(cpfMotorista.getTextContent()));
+                try {
+                    motorista = new FornecedorDAO().carregarTipo(Long.parseLong(cpfMotorista.getTextContent()));
 
-                if (motorista.tipo.equals("F")) {
-                    oNotaSaida.idFornecedorTransportador = motorista.id;
+                    if (motorista.tipo.equals("F")) {
+                        oNotaSaida.idFornecedorTransportador = motorista.id;
 
-                } else if (motorista.tipo.equals("C")) {
-                    oNotaSaida.idClienteEventualTransportador = motorista.id;
+                    } else if (motorista.tipo.equals("C")) {
+                        oNotaSaida.idClienteEventualTransportador = motorista.id;
 
-                } else {
-                    oNotaSaida.idMotoristaTransportador = motorista.id;
+                    } else {
+                        oNotaSaida.idMotoristaTransportador = motorista.id;
+                    }
+                } catch (Exception ex) {
+                    if (ex.getMessage().contains("O cnpj")) {
+                        oNotaSaida.vDivergencia.add(
+                                new DivergenciaVO(
+                                        DivergenciaVO.CNPJ_MOTORISTA_NAO_ENCONTRADO,
+                                        "CPF/CNPJ '" + cpfMotorista.getTextContent() + "' do motorista não foi encontrado no VR",
+                                        0
+                                )
+                        );
+                    }
                 }
             }
         }
@@ -678,4 +770,84 @@ public class ImportarNotaSaidaImportacaoDAO {
 
         return writer.toString();
     }
+    
+    
+    
+    
+    
+    
+    public ClienteEventualVO converterClienteEventual(DestinatarioNfe imp) throws Exception {
+        ClienteEventualVO vo = new ClienteEventualVO();
+        
+        vo.setNome(imp.getNome());
+        
+        vo.setEndereco(imp.getLogradouro());
+        vo.setNumero(imp.getNumero());
+        vo.setComplemento(imp.getComplemento());
+        vo.setBairro(imp.getBairro());        
+        {
+            MunicipioVO mun = provider.getMunicipioById(imp.getCodigoIbgeMunicipio());
+            if (mun == null) {
+                mun = provider.getMunicipioByNomeUf(
+                        Utils.acertarTexto(imp.getMunicipio()), 
+                        Utils.acertarTexto(imp.getUf())
+                );
+                if (mun == null) {
+                    mun = provider.getMunicipioPadrao();
+                }
+            }
+            vo.setId_municipio(mun.getId());
+            vo.setId_estado(mun.getEstado().getId());
+        }        
+        vo.setCep(Utils.stringToInt(imp.getCep()));
+       
+        vo.setTelefone(imp.getTelefone());
+        
+        vo.setCnpj(imp.getCnpj());
+        vo.setTipoInscricao(TipoInscricao.analisarCnpjCpf(vo.getCnpj()));
+        
+        vo.setInscricaoEstadual(String.valueOf(imp.getInscricaoEstadual()));
+        vo.setSituacaoCadastro(SituacaoCadastro.ATIVO);
+        
+        vo.setEnderecoCobranca(imp.getLogradouro());
+        vo.setNumeroCobranca(imp.getNumero());
+        vo.setComplementoCobranca(imp.getComplemento());
+        vo.setBairroCobranca(imp.getBairro());
+        {
+            MunicipioVO mun = provider.getMunicipioById(imp.getCodigoIbgeMunicipio());
+            if (mun == null) {
+                mun = provider.getMunicipioByNomeUf(
+                        Utils.acertarTexto(imp.getMunicipio()), 
+                        Utils.acertarTexto(imp.getUf())
+                );
+                if (mun == null) {
+                    mun = provider.getMunicipioPadrao();
+                }
+            }
+            vo.setId_municipioCobranca(mun.getId());
+            vo.setId_estadoCobranca(mun.getEstado().getId());
+        } 
+        vo.setCepCobranca(Utils.stringToInt(imp.getCep()));
+        
+        vo.setTelefoneCobranca(imp.getTelefone());
+        vo.setPrazoPagamento(0);
+        vo.setTipoOrgaoPublico(TipoOrgaoPublico.NENHUM);
+        vo.setDataCadastro(new java.util.Date());
+        vo.setLimiteCompra(0);
+        vo.setCobraTaxaNotaFiscal(false);
+        
+        vo.setId_tiporecebimento(0);
+        vo.setBloqueado(true);
+        vo.setObservacao("IMPORTADO NFE VR ");
+        vo.setId_pais(1058);
+        vo.setInscricaoMunicipal(String.valueOf(imp.getInscricaoMunicipal()));
+        vo.setId_contaContabilFiscalPassivo(0);
+        vo.setId_contaContabilFiscalAtivo(0);
+        vo.setTipoIndicadorIe(imp.getIndicadorId());
+        vo.setId_classeRisco(0);
+        
+        return vo;
+    }
+    
+    
 }

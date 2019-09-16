@@ -2,14 +2,12 @@ package vrimplantacao.gui.interfaces.rfd;
 
 import java.awt.Component;
 import java.util.ArrayList;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 import vrimplantacao.vo.interfaces.DivergenciaVO;
-import vrimplantacao.vo.interfaces.TipoDivergencia;
 import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.bean.table.VRColumnTable;
@@ -27,6 +25,7 @@ public class ExportacaoDivergenciaGUI extends VRInternalFrame {
     }
 
     public void exibeDivergencia() throws Exception {
+        
         VRColumnTable[] colunas = new VRColumnTable[]{
             new VRColumnTable("", 35, true, SwingConstants.CENTER, false, null),
             new VRColumnTable("Descrição", 500, true, SwingConstants.LEFT, false, null)
@@ -144,15 +143,17 @@ public class ExportacaoDivergenciaGUI extends VRInternalFrame {
                 }
                 lblCampo.setForeground(UIManager.getColor("Table.foreground"));
             }
-            DivergenciaVO oDivergencia = vDivergencia.get(row);
-            if (column == 0) {
-                lblCampo.setHorizontalAlignment(SwingConstants.CENTER);
-                if (oDivergencia.tipo == TipoDivergencia.ERRO.getId()) {
-                    lblCampo.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/erro.png")));
-                } else if (oDivergencia.tipo == TipoDivergencia.ALERTA.getId()) {
-                    lblCampo.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/alerta.png")));
+            /*if (vDivergencia.get(row) instanceof DivergenciaVO) {
+                DivergenciaVO oDivergencia = vDivergencia.get(row);
+                if (column == 0) {
+                    lblCampo.setHorizontalAlignment(SwingConstants.CENTER);
+                    if (oDivergencia.tipo == TipoDivergencia.ERRO.getId()) {
+                        lblCampo.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/erro.png")));
+                    } else if (oDivergencia.tipo == TipoDivergencia.ALERTA.getId()) {
+                        lblCampo.setIcon(new ImageIcon(getClass().getResource("/vrframework/img/alerta.png")));
+                    }
                 }
-            }
+            }*/
             return lblCampo;
         }
     }

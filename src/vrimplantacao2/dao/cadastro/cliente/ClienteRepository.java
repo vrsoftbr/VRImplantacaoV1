@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
-import vrframework.classe.ProgressBar;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.collection.IDStack;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -64,7 +63,7 @@ public class ClienteRepository {
             this.provider.begin();
             try {
                 //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
-                setNotificacao("Preparando para gravar cliente preferêncial...", clientes.size());                
+                provider.setNotificacao("Preparando para gravar cliente preferêncial...", clientes.size());                
                 
                 ClientePreferencialIDStack ids = provider.getClientePreferencialIDStack(iniciarEm);
                 Map<Long, Integer> cnpjCadastrados = provider.preferencial().getCnpjCadastrados();
@@ -72,7 +71,7 @@ public class ClienteRepository {
                 MultiMap<String, Void> contatos = provider.preferencial().getContatosExistentes();
                 //</editor-fold>
 
-                setNotificacao("Gravando cliente preferêncial...", clientes.size());
+                provider.setNotificacao("Gravando cliente preferêncial...", clientes.size());
                 
                 boolean reiniciarID = opt.contains(OpcaoCliente.IMP_REINICIAR_NUMERACAO);
                 
@@ -128,7 +127,7 @@ public class ClienteRepository {
                     if (opt.contains(OpcaoCliente.CONTATOS)) {
                         importarContatoPreferencial(cliente, imp, contatos);
                     }
-                    notificar();
+                    provider.notificar();
                 }
                 this.provider.commit();
 
@@ -158,11 +157,11 @@ public class ClienteRepository {
             provider.begin();
             
             //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
-            setNotificacao("Preparando para gravar cliente preferêncial...", clientes.size());
+            provider.setNotificacao("Preparando para gravar cliente preferêncial...", clientes.size());
             MultiMap<String, ClientePreferencialAnteriorVO> anteriores = provider.preferencial().getAnteriores();
             //</editor-fold>
             
-            setNotificacao("Atualizando cliente preferêncial...", clientes.size());
+            provider.setNotificacao("Atualizando cliente preferêncial...", clientes.size());
             for (ClienteIMP imp: clientes) {                
                 ClientePreferencialAnteriorVO anterior = anteriores.get(
                        provider.getSistema(),
@@ -221,7 +220,7 @@ public class ClienteRepository {
                         atualizarClientePreferencial(vo, opt);
                     }
                 }
-                notificar();
+                provider.notificar();
             }
             
             provider.commit();
@@ -286,7 +285,7 @@ public class ClienteRepository {
             this.provider.begin();
             try {
                 //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
-                setNotificacao("Preparando para gravar cliente eventuais...", clientes.size());
+                provider.setNotificacao("Preparando para gravar cliente eventuais...", clientes.size());
                 ClienteEventualIDStack ids = provider.getClienteEventualIDStack(iniciarEm);
                 Map<Long, Integer> cnpjCadastrados = provider.eventual().getCnpjCadastrados();
                 MultiMap<String, ClienteEventualAnteriorVO> anteriores = provider.eventual().getAnteriores();
@@ -295,7 +294,7 @@ public class ClienteRepository {
 
                 boolean reiniciarID = opt.contains(OpcaoCliente.IMP_REINICIAR_NUMERACAO);
                 
-                setNotificacao("Gravando cliente eventual...", clientes.size());
+                provider.setNotificacao("Gravando cliente eventual...", clientes.size());
                 for (ClienteIMP imp: clientes) {
                     ClienteEventualAnteriorVO anterior = anteriores.get(
                             provider.getSistema(),
@@ -351,7 +350,7 @@ public class ClienteRepository {
                         importarContatoEventual(cliente, imp, contatos);
                     }
 
-                    notificar();
+                    provider.notificar();
                 }
                 this.provider.commit();
 
@@ -392,15 +391,6 @@ public class ClienteRepository {
                 }
             }
         }
-    }
-
-    public void setNotificacao(String mensagem, int qtd) throws Exception {
-        ProgressBar.setStatus(mensagem);
-        ProgressBar.setMaximum(qtd);
-    }
-
-    public void notificar() throws Exception {
-        ProgressBar.next();
     }
 
     public List<ClienteIMP> organizarListagem(List<ClienteIMP> clientes) {
@@ -674,7 +664,7 @@ public class ClienteRepository {
             this.provider.begin();
             try {
                 //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
-                setNotificacao("Preparando para gravar cliente preferêncial (Unificação)...", clientes.size());
+                provider.setNotificacao("Preparando para gravar cliente preferêncial (Unificação)...", clientes.size());
                 ClientePreferencialIDStack ids = provider.getClientePreferencialIDStack(iniciarEm);
                 Map<Long, Integer> cnpjCadastrados = provider.preferencial().getCnpjCadastrados();
                 MultiMap<String, ClientePreferencialAnteriorVO> anteriores = provider.preferencial().getAnteriores();
@@ -683,7 +673,7 @@ public class ClienteRepository {
 
                 boolean reiniciarID = opt.contains(OpcaoCliente.IMP_REINICIAR_NUMERACAO); 
                 
-                setNotificacao("Gravando cliente preferêncial (Unificação)...", clientes.size());
+                provider.setNotificacao("Gravando cliente preferêncial (Unificação)...", clientes.size());
                 for (ClienteIMP imp: clientes) {
                     ClientePreferencialAnteriorVO anterior = anteriores.get(
                             provider.getSistema(),
@@ -758,7 +748,7 @@ public class ClienteRepository {
                         }
                     }
 
-                    notificar();
+                    provider.notificar();
                 }
                 this.provider.commit();
 
@@ -798,7 +788,7 @@ public class ClienteRepository {
             this.provider.begin();
             try {
                 //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
-                setNotificacao("Preparando para gravar cliente eventual (Unificação)...", clientes.size());
+                provider.setNotificacao("Preparando para gravar cliente eventual (Unificação)...", clientes.size());
                 ClienteEventualIDStack ids = provider.getClienteEventualIDStack(iniciarEm);
                 Map<Long, Integer> cnpjCadastrados = provider.eventual().getCnpjCadastrados();
                 MultiMap<String, ClienteEventualAnteriorVO> anteriores = provider.eventual().getAnteriores();
@@ -807,7 +797,7 @@ public class ClienteRepository {
                 
                 boolean reiniciarID = opt.contains(OpcaoCliente.IMP_REINICIAR_NUMERACAO);
 
-                setNotificacao("Gravando cliente eventual (Unificação)...", clientes.size());
+                provider.setNotificacao("Gravando cliente eventual (Unificação)...", clientes.size());
                 for (ClienteIMP imp: clientes) {
                     ClienteEventualAnteriorVO anterior = anteriores.get(
                             provider.getSistema(),
@@ -883,7 +873,7 @@ public class ClienteRepository {
                         }
                     }
 
-                    notificar();
+                    provider.notificar();
                 }
                 this.provider.commit();
 
@@ -929,14 +919,14 @@ public class ClienteRepository {
         
         provider.begin();
         try {
-            setNotificacao("Cliente (VRFood)...Carregando dados necessários...", 0);
+            provider.setNotificacao("Cliente (VRFood)...Carregando dados necessários...", 0);
             LOG.info("Carregando informações necessárias para importar os clientes VRFood");
 
             Map<String, ClienteFoodAnteriorVO> anteriores = provider.food().getAnteriores();
             Map<Long, ClienteFoodVO> telefones = provider.food().getTelefones();
             IDStack ids = provider.food().getClienteVrFoodIds();
 
-            setNotificacao("Cliente (VRFood)...Gravando...", clientes.size());
+            provider.setNotificacao("Cliente (VRFood)...Gravando...", clientes.size());
             LOG.info("Iniciando gravação das informações: " + clientes.size() + " registro(s)");
             for (ClienteIMP imp: organizarListagem(clientes)) {
 
@@ -1049,7 +1039,7 @@ public class ClienteRepository {
 
                 }            
 
-                notificar();
+                provider.notificar();
             }
             
             provider.commit();

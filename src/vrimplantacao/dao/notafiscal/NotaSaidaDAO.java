@@ -4,6 +4,8 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import vrimplantacao.classe.Global;
 import vrimplantacao.dao.CodigoInternoDAO;
@@ -72,9 +74,20 @@ import vrframework.classe.Conexao;
 import vrframework.classe.Database;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
+import vrimplantacao.dao.cadastro.ClienteEventuallDAO;
+import vrimplantacao.dao.cadastro.FornecedorDAO;
+import vrimplantacao.vo.cadastro.TipoFornecedorVO;
+import vrimplantacao.vo.notafiscal.DestinatarioNfe;
+import vrimplantacao2.dao.cadastro.cliente.ClienteRepository;
+import vrimplantacao2.dao.cadastro.cliente.ClienteRepositoryProvider;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.enums.TipoIndicadorIE;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 
 public class NotaSaidaDAO {
+    
+    private boolean criarEventualCasoCnpjNaoExista = false;
 
     public NotaSaidaVO carregar(long i_id) throws Exception {
         ResultSet rst = null;
@@ -1508,7 +1521,7 @@ public class NotaSaidaDAO {
         }
     }
 
-    public void salvar(NotaSaidaVO i_notaSaida) throws Exception {
+    public void salvar(NotaSaidaVO i_notaSaida, boolean importarDestinatarioComoEventual) throws Exception {
         Statement stm = null;
         ResultSet rst = null;
         StringBuilder sql = null;
@@ -1516,7 +1529,7 @@ public class NotaSaidaDAO {
         try {
             Conexao.begin();
             stm = Conexao.createStatement();
-
+            
             Integer idNotaSaida = getIdNotaSaida(i_notaSaida.chaveNfe);
             if (idNotaSaida != null) {
                 NotaSaidaVO oNotaSaida = carregar(idNotaSaida);
@@ -1983,5 +1996,45 @@ public class NotaSaidaDAO {
     
     public boolean isNotaExistente(String chaveNfe) throws Exception {
         return getIdNotaSaida(chaveNfe) != null;
+    }
+
+    public void setCriarEventualCasoCnpjNaoExista(boolean criarEventualCasoCnpjNaoExista) {
+        this.criarEventualCasoCnpjNaoExista = criarEventualCasoCnpjNaoExista;
+    }
+
+    private ClienteIMP converterClienteEventual(NotaSaidaVO nfe) {
+        ClienteIMP imp = new ClienteIMP();
+        
+        DestinatarioNfe dest = nfe.destinatarioNfe;
+        
+        imp.setId(String.valueOf(dest.getCnpj()));
+        imp.setCnpj(String.valueOf(dest.getCnpj()));
+        imp.setRazao(dest.getNome());
+        imp.setFantasia(dest.getNome());
+        imp.setEndereco(dest.getLogradouro());
+        imp.setNumero(dest.getNumero());
+        imp.setComplemento(dest.getComplemento());
+        imp.setBairro(dest.getBairro());
+        imp.setMunicipio(dest.getMunicipio());
+        imp.setMunicipioIBGE(dest.getCodigoIbgeMunicipio());
+        imp.setUf(dest.getUf());
+        imp.setCep(dest.getCep());
+        imp.setTipoIndicadorIe(TipoIndicadorIE.getById(dest.getIndicadorId().getId()));
+        imp.setInscricaoestadual(String.valueOf(dest.getInscricaoEstadual()));
+        imp.setInscricaoMunicipal(String.valueOf(dest.getInscricaoMunicipal()));
+        imp.setTelefone(dest.getTelefone());
+        imp.setEmail(dest.getEmail());
+        
+        return imp;
+    }
+
+    private boolean isClienteEventualExistente(long cnpj) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select id from clienteeventual where cnpj = " + cnpj
+            )) {
+                return (rst.next());
+            }
+        }
     }
 }

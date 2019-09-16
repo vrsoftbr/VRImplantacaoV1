@@ -1,21 +1,23 @@
 package vrimplantacao.gui.interfaces;
 
 import java.awt.Component;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import vrimplantacao.gui.interfaces.rfd.ExportacaoDivergenciaGUI;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
+import javax.swing.JViewport;
+import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 import vrimplantacao.dao.notafiscal.NotaSaidaDAO;
 import vrimplantacao.dao.notafiscal.ImportarNotaSaidaImportacaoDAO;
 import vrimplantacao.vo.notafiscal.NotaSaidaVO;
@@ -24,18 +26,19 @@ import vrframework.bean.internalFrame.VRInternalFrame;
 import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
-import vrframework.classe.VRException;
 import vrimplantacao.dao.fiscal.CfopDAO;
 import vrimplantacao.dao.notafiscal.ImportarNotaSaidaImportacaoDAO.LojaV2;
 import static vrimplantacao.dao.notafiscal.ImportarNotaSaidaImportacaoDAO.getXML;
+import vrimplantacao.vo.interfaces.DivergenciaVO;
 
-public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
+public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {   
     
-    ImportarNotaSaidaImportacaoDAO dao = new ImportarNotaSaidaImportacaoDAO();
+    ImportarNotaSaidaImportacaoDAO dao;
     XmlModel model;
 
     public ImportarNotaSaidaImportacaoArquivoGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
+        this.dao = new ImportarNotaSaidaImportacaoDAO();
         initComponents();
 
         carregarLojaV2();
@@ -47,68 +50,62 @@ public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
         tblNotas.setRowHeight(25);
     }
         
-    private void carregarNotas() throws Exception {        
-        ProgressBar.show();
-        try {
-            ProgressBar.setStatus("Carregando os XMLs das Notas Fiscais de Saída...");
-
-            model = new XmlModel(flcArquivo.getArquivo().split(";"));
-            tblNotas.setModel(model);
-            tblNotas.getColumnModel().getColumn(2).setCellEditor(new TipoSaidaCellEditor(model));
-
-            NotaSaidaDAO notaSaidaDAO = new NotaSaidaDAO();
-
-            if (cboLojaV2.getItemCount() > 0) {
-                dao.impLoja = (LojaV2) cboLojaV2.getSelectedItem();
-            }
-
-            NfeFile[] itens = model.getItens();
-
-            ProgressBar.setStatus("Importando Notas Fiscais...");
-            ProgressBar.setMaximum(itens.length);
-
-            for (NfeFile file: itens) {
+    private void carregarNotas() throws Exception {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
                 try {
-                    file.notaSaida = dao.carregar(
-                        file.arquivo.getAbsolutePath(),
-                        file.tipoSaida.id, 
-                        chkVerificarCodigoAnterior.isSelected()
-                    );   
-                } catch (IOException | SAXException | IllegalArgumentException ex) {
-                    if (ex instanceof NumberFormatException) {
-                        file.situacao = NfeFileSituacao.EAN_NAO_ENCONTRADO;
-                    } else {
-                        file.situacao = NfeFileSituacao.ARQUIVO_INVALIDO;
-                    }
-                    model.fireTableDataChanged();
-                    continue;
-                } catch (VRException ex) {
-                    if (ex.getMessage().contains("O cnpj")) {
-                        file.situacao = NfeFileSituacao.CNPJ_DESTINATARIO_NAO_ENCONTRADO;
-                        model.fireTableDataChanged();
-                        continue;
-                    }
-                }
-                if (notaSaidaDAO.isNotaExistente(file.notaSaida.chaveNfe)) {
-                    file.situacao = NfeFileSituacao.NOTA_JA_IMPORTADA;
-                } else if ((file.tipoSaida.destinatarioCliente || file.tipoSaida.geraReceber) && file.notaSaida.idClienteEventualDestinatario == -1) {
-                    file.situacao = NfeFileSituacao.DESTINATARIO_DEVE_SER_EVENTUAL;
-                } else if (!file.tipoSaida.destinatarioCliente && file.notaSaida.idFornecedorDestinatario == -1) {
-                    file.situacao = NfeFileSituacao.DESTINATARIO_DEVE_SER_FORNECEDOR;
-                } else if (!file.notaSaida.vDivergencia.isEmpty()) {
-                    ExportacaoDivergenciaGUI form = new ExportacaoDivergenciaGUI(mdiFrame);
-                    form.setDivergencia(file.notaSaida.vDivergencia);
-                    form.exibeDivergencia();
-                    form.setVisible(true);
+                    ProgressBar.show();
+                    ProgressBar.setStatus("Carregando os XMLs das Notas Fiscais de Saída...");
 
-                    file.situacao = NfeFileSituacao.DEVERGENCIAS_ENCONTRADAS;
+                    model = new XmlModel(flcArquivo.getArquivo().split(";"));
+                    tblNotas.setModel(model);
+                    tblNotas.getColumnModel().getColumn(2).setCellEditor(new TipoSaidaCellEditor(model));
+
+                    NotaSaidaDAO notaSaidaDAO = new NotaSaidaDAO();
+
+                    if (cboLojaV2.getItemCount() > 0) {
+                        dao.impLoja = (LojaV2) cboLojaV2.getSelectedItem();
+                    }
+
+                    NfeFile[] itens = model.getItens();
+
+                    ProgressBar.setStatus("Importando Notas Fiscais...");
+                    ProgressBar.setMaximum(itens.length);
+
+                    dao.setIncluirClienteEventual(chkCriarEventual.isSelected());
+                    for (NfeFile file: itens) {
+                        
+                        file.notaSaida = dao.carregar(
+                            file.arquivo.getAbsolutePath(),
+                            file.tipoSaida.id, 
+                            chkVerificarCodigoAnterior.isSelected()
+                        );                        
+                        if (notaSaidaDAO.isNotaExistente(file.notaSaida.chaveNfe)) {
+                            file.situacao = new DivergenciaVO(
+                                    DivergenciaVO.NOTA_JA_IMPORTADA,
+                                    "Nota fiscal já existente no VR",
+                                    0
+                            );
+                        }
+                        
+                        if (!file.notaSaida.vDivergencia.isEmpty()) {
+                            file.situacao = file.notaSaida.vDivergencia.get(0);
+                        }
+                        
+                        ProgressBar.next();
+                        model.fireTableDataChanged();
+                    }
+                } catch (Exception ex) {
+                    ProgressBar.dispose();
+                    Util.exibirMensagemErro(ex, getTitle());
+                } finally {
+                    ProgressBar.dispose();
                 }
-                model.fireTableDataChanged();
-                ProgressBar.next();
             }
-        } finally {
-            ProgressBar.dispose();
-        }
+        };
+
+        thread.start();
         
     }
 
@@ -134,9 +131,21 @@ public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
                         NfeFile file = itens[i];
                         tblNotas.setRowSelectionInterval(i, i);
                             
-                        if (file.situacao == NfeFileSituacao.OK || (file.situacao == NfeFileSituacao.NOTA_JA_IMPORTADA && chkReimportarNotasExistentes.isSelected())) {
-                            new NotaSaidaDAO().salvar(file.notaSaida);
-                            file.situacao = NfeFileSituacao.NOTA_JA_IMPORTADA;
+                        if (
+                                file.situacao.id == DivergenciaVO.OK || 
+                                (
+                                    file.situacao.id == DivergenciaVO.NOTA_JA_IMPORTADA && 
+                                    chkReimportarNotasExistentes.isSelected()
+                                ) ||
+                                (
+                                    file.situacao.id ==  DivergenciaVO.CNPJ_DESTINATARIO_NAO_ENCONTRADO &&
+                                    chkCriarEventual.isSelected()
+                                )
+                        ) {
+                            NotaSaidaDAO notaSaidaDAO = new NotaSaidaDAO();
+                            notaSaidaDAO.setCriarEventualCasoCnpjNaoExista(chkCriarEventual.isSelected());
+                            notaSaidaDAO.salvar(file.notaSaida, chkCriarEventual.isSelected());
+                            file.situacao = new DivergenciaVO(DivergenciaVO.NOTA_JA_IMPORTADA, "Nota importada com sucesso!", 1);
                             model.fireTableDataChanged();
                         }
                         
@@ -165,6 +174,7 @@ public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
         flcArquivo = new vrframework.bean.fileChooser.VRFileChooser();
         chkVerificarCodigoAnterior = new vrframework.bean.checkBox.VRCheckBox();
         chkReimportarNotasExistentes = new vrframework.bean.checkBox.VRCheckBox();
+        chkCriarEventual = new vrframework.bean.checkBox.VRCheckBox();
         scrollNotas = new javax.swing.JScrollPane();
         tblNotas = new javax.swing.JTable();
         vRLabel35 = new vrframework.bean.label.VRLabel();
@@ -192,6 +202,8 @@ public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
         chkVerificarCodigoAnterior.setText("Verificar Código Anterior");
 
         chkReimportarNotasExistentes.setText("Reimportar notas existentes");
+
+        chkCriarEventual.setText("Criar como eventual CFP/CNPJ não encontrado");
 
         tblNotas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -251,18 +263,23 @@ public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
                     .addGroup(vRPanel1Layout.createSequentialGroup()
                         .addComponent(vRLabel35, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(cboLojaV2, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(vRPanel1Layout.createSequentialGroup()
-                        .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(scrollNotas, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 608, Short.MAX_VALUE)
-                            .addGroup(vRPanel1Layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vRPanel1Layout.createSequentialGroup()
+                        .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(cboLojaV2, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(scrollNotas)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, vRPanel1Layout.createSequentialGroup()
                                 .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(flcArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addGroup(vRPanel1Layout.createSequentialGroup()
-                                        .addComponent(chkVerificarCodigoAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(chkReimportarNotasExistentes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(flcArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGroup(vRPanel1Layout.createSequentialGroup()
+                                                .addComponent(chkVerificarCodigoAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(chkReimportarNotasExistentes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(chkCriarEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addGap(0, 0, Short.MAX_VALUE)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addContainerGap())))
@@ -270,25 +287,28 @@ public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
         vRPanel1Layout.setVerticalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(8, 8, 8)
-                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(flcArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkVerificarCodigoAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrollNotas, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vRLabel35, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cboLojaV2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(vRPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(8, 8, 8)
+                        .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnDivergencias, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                            .addComponent(flcArquivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkVerificarCodigoAnterior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(scrollNotas, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(vRLabel35, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cboLojaV2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(vRPanel1Layout.createSequentialGroup()
+                        .addGap(54, 54, 54)
+                        .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkReimportarNotasExistentes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkCriarEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
-            .addGroup(vRPanel1Layout.createSequentialGroup()
-                .addGap(54, 54, 54)
-                .addComponent(chkReimportarNotasExistentes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(284, 284, 284))
         );
 
         btnSair.setIcon(new javax.swing.ImageIcon(getClass().getResource("/vrframework/img/sair.png"))); // NOI18N
@@ -413,6 +433,7 @@ public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
     private vrframework.bean.button.VRButton btnImportar;
     private vrframework.bean.button.VRButton btnSair;
     private javax.swing.JComboBox cboLojaV2;
+    private vrframework.bean.checkBox.VRCheckBox chkCriarEventual;
     private vrframework.bean.checkBox.VRCheckBox chkReimportarNotasExistentes;
     private vrframework.bean.checkBox.VRCheckBox chkVerificarCodigoAnterior;
     private vrframework.bean.fileChooser.VRFileChooser flcArquivo;
@@ -437,62 +458,13 @@ public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
 
 }
 
-enum NfeFileSituacao {
-    OK {
-        @Override
-        public String toString() {
-            return "OK";
-        }        
-    }, 
-    NOTA_JA_IMPORTADA {
-        @Override
-        public String toString() {
-            return "Nota fiscal já existente no VR";
-        }        
-    },
-    DEVERGENCIAS_ENCONTRADAS {
-        @Override
-        public String toString() {
-            return "Divergências encontradas. Verifique antes de prosseguir!";
-        }
-    }, 
-    DESTINATARIO_DEVE_SER_EVENTUAL {
-        @Override
-        public String toString() {
-            return "O destinatário da nota fiscal deve ser um cliente eventual!";
-        }
-    }, 
-    DESTINATARIO_DEVE_SER_FORNECEDOR {
-        @Override
-        public String toString() {
-            return "O destinatário da nota fiscal deve ser um fornecedor!";
-        }
-    }, 
-    ARQUIVO_INVALIDO {
-        @Override
-        public String toString() {
-            return "Arquivo não é uma Nf-e válida";
-        }
-    }, EAN_NAO_ENCONTRADO {
-        @Override
-        public String toString() {
-            return "EAN não encontrado";
-        }
-    }, CNPJ_DESTINATARIO_NAO_ENCONTRADO {
-        @Override
-        public String toString() {
-            return "CPF/CNPJ do destinatário não encontrado no VR";
-        }
-    }
-}
-
 class NfeFile {
     
     File arquivo;
     String naturezaOperacao;
     String cfop;
     TipoSaidaVO tipoSaida;
-    NfeFileSituacao situacao = NfeFileSituacao.OK;
+    DivergenciaVO situacao;
     NotaSaidaVO notaSaida;
     
     public NfeFile(String arquivo) throws Exception {
@@ -515,7 +487,6 @@ class NfeFile {
         this.cfop = prod.getElementsByTagName("CFOP").item(0).getTextContent();
         this.cfop = cfop.substring(0, 1).concat(".").concat(cfop.substring(1, 4));
         
-        this.situacao = NfeFileSituacao.OK;
         List<TipoSaidaVO> tiposDeSaida = new CfopDAO().carregarTipoSaida(cfop);
         if (!tiposDeSaida.isEmpty()) {
             this.tipoSaida = tiposDeSaida.get(0);
@@ -552,7 +523,7 @@ class XmlModel extends AbstractTableModel {
             case 0: return arquivos[rowIndex].arquivo.getName();
             case 1: return arquivos[rowIndex].naturezaOperacao;
             case 2: return arquivos[rowIndex].tipoSaida != null ? arquivos[rowIndex].tipoSaida.descricao : "--- SEM TIPO SAIDA CORRESPONDENTE ---";
-            case 3: return arquivos[rowIndex].situacao;
+            case 3: return arquivos[rowIndex].situacao != null ? arquivos[rowIndex].situacao.descricao : "";
             default: return "";
         }
     }
