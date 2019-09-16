@@ -665,6 +665,18 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setObservacao(linha.getString("observacao"));
                 imp.setParcela(linha.getInt("parcela"));
                 imp.setValor(linha.getDouble("valor"));
+                if(linha.existsColumn("datapagamento")) {
+                    if (linha.getData("datapagamento") != null) {
+                        imp.addPagamento(
+                                imp.getId(),
+                                linha.getDouble("valorrecebido"),
+                                0,
+                                0,
+                                linha.getData("datapagamento"),
+                                ""
+                        );
+                    }
+                }
             } catch (Exception e) {
                 throw e;
             }

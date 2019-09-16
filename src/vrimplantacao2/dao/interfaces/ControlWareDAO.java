@@ -538,16 +538,15 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
             try(ResultSet rs = stm.executeQuery("select \n" +
                     "	codlancto id,\n" +
                     "	codestabelec id_loja,\n" +
-                    "	(SELECT cupom.seqecf\n" +
-                    "           FROM cupomlancto, cupom\n" +
-                    "          WHERE cupomlancto.codlancto = l.codlancto AND\n" +
-                    "		cupomlancto.idcupom = cupom.idcupom\n" +
-                    "         LIMIT 1) AS cupom,\n" +
-                    "   (SELECT cupom.numeroecf\n" +
-                    "           FROM cupomlancto, cupom\n" +
-                    "          WHERE cupomlancto.codlancto = l.codlancto AND\n" +
-                    "		cupomlancto.idcupom = cupom.idcupom\n" +
-                    "         LIMIT 1) AS ecf,\n" +
+                    "   numnotafis documento,\n" +
+                    "   (SELECT "
+                    +        "cupom.numeroecf\n" +
+                    "    FROM "
+                    +        "cupomlancto, cupom\n" +
+                    "    WHERE "
+                    +        "cupomlancto.codlancto = l.codlancto AND\n" +
+                             "cupomlancto.idcupom = cupom.idcupom\n" +
+                    "   LIMIT 1) AS ecf,\n" +
                     "	dtemissao emissao,\n" +
                     "	dtvencto vencimento,\n" +
                     "	parcela,\n" +
@@ -568,7 +567,7 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rs.getString("id"));
                     imp.setIdCliente(rs.getString("idcliente"));
-                    imp.setNumeroCupom(rs.getString("cupom"));
+                    imp.setNumeroCupom(rs.getString("documento"));
                     imp.setEcf(rs.getString("ecf"));
                     imp.setDataEmissao(rs.getDate("emissao"));
                     imp.setDataVencimento(rs.getDate("vencimento"));
@@ -591,7 +590,7 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     "select \n" +
                     "	codlancto id,\n" +
                     "	codestabelec id_loja,\n" +
-                    "	idnotafiscal,\n" +
+                    "	numnotafis documento,\n" +
                     "	dtemissao emissao,\n" +
                     "	dtvencto vencimento,\n" +
                     "	parcela,\n" +
@@ -605,13 +604,14 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     "	pagrec = 'P' and\n" +
                     "	status = 'A' and\n" +
                     "	codestabelec = " + getLojaOrigem() + " and\n" +
-                    "	codespecie = " + tipoPlanoContaPagar + "\n" +
+                    "	codespecie = " + tipoPlanoContaPagar + " and\n" +
+                    "   tipoparceiro = 'F'\n" +        
                     "order by\n" +
                     "	dtlancto")) {
                 while(rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
                     imp.setId(rs.getString("id"));
-                    imp.setNumeroDocumento(rs.getString("idnotafiscal"));
+                    imp.setNumeroDocumento(rs.getString("documento"));
                     imp.setDataEmissao(rs.getDate("emissao"));
                     imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valorliquido"));
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
