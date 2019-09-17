@@ -32,12 +32,14 @@ import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.SituacaoCheque;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.enums.TipoIva;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -893,7 +895,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	r.ctrdtemiss <= '" + dateFormat.format(rotativoDataFinal) + "' and\n" +
                     "	r.ctrloja = " + getLojaOrigem() + " and\n" +
                     "	r.ctrvalor > 0 and r.ctrsaldo > 0 and\n" +
-                    "	r.ctrtipo = 'C'\n" +
+                    "	r.ctrtipo = 'C' and\n" +
+                    "   r.ctrgrupo not in (2, 3) \n" +        
                     "order by\n" +
                     "	r.ctrdtemiss"
             )) {
@@ -1073,6 +1076,69 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         
+        return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	concat(r.ctrtipo,'-',r.ctrcod,'-',r.ctrclilj,'-',r.ctrdoc,'-',r.ctrserie,'-',r.ctrparc,'-',r.ctrloja) id,\n" +
+                    "	r.ctrdtemiss dataemissao,\n" +
+                    "	r.ctrdoc numerocupom,\n" +
+                    "	r.ctrncheque cheque,\n" +
+                    "   r.ctrbanco banco,\n" +
+                    "	r.ctragenc agencia,\n" +        
+                    "	r.ctrcaixa ecf,\n" +
+                    "	r.ctrvalor valor,\n" +
+                    "	r.ctrjuros juros,\n" +
+                    "	r.ctrdesc desconto,\n" +
+                    "	r.ctrvalabt abatimento,\n" +
+                    "	r.ctrsaldo valorfinal,\n" +
+                    "	r.ctrobs observacao,\n" +
+                    "	concat(r.ctrclilj,'-',r.ctrcod) idcliente,\n" +
+                    "   r.ctrcpfcgc cnpj,\n" +  
+                    "   c.clinome nome,\n" +
+                    "	c.clirgie rg,\n" +
+                    "	c.clifoneres fone,\n" +        
+                    "	r.ctrdtvenc vencimento,\n" +
+                    "	r.ctrparc parcela\n" +
+                    "from\n" +
+                    "	finctr r\n" +
+                    "LEFT JOIN clicli c ON r.ctrcod = c.clicod\n" +        
+                    "where\n" +
+                    "	r.ctrdtemiss >= '" + dateFormat.format(rotativoDataInicial) + "' and\n" +
+                    "	r.ctrdtemiss <= '" + dateFormat.format(rotativoDataFinal) + "' and\n" +
+                    "	r.ctrloja = " + getLojaOrigem() + " and\n" +
+                    "	r.ctrvalor > 0 and r.ctrsaldo > 0 and\n" +
+                    "	r.ctrtipo = 'C' and\n" +
+                    "	r.ctrgrupo IN (2, 3)\n" +
+                    "order by\n" +
+                    "	r.ctrdtemiss")) {
+                while(rs.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setAgencia(rs.getString("agencia"));
+                    imp.setBanco(rs.getInt("banco"));
+                    imp.setDate(rs.getDate("dataemissao"));
+                    imp.setDataDeposito(rs.getDate("vencimento"));
+                    imp.setCpf(rs.getString("cnpj"));
+                    imp.setNumeroCupom(rs.getString("numerocupom"));
+                    imp.setNumeroCheque(rs.getString("cheque"));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setValor(rs.getDouble("valorfinal"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    imp.setNome(rs.getString("nome"));
+                    imp.setRg(rs.getString("rg"));
+                    imp.setTelefone(rs.getString("fone"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 

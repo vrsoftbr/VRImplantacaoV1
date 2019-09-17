@@ -370,6 +370,8 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                         }
                         
                         if (chkCheque.isSelected()) {
+                            dao.setRotativoDataInicial(txtRotDtIni.getDate());
+                            dao.setRotativoDataFinal(txtRotDtFim.getDate());
                             importador.importarCheque();
                         }
                         

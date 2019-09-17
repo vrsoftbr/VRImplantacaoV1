@@ -59,15 +59,12 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
-/**
- *
- * @author Leandro
- */
-
 /*
-* @Guilherme
-* Para localizar tabelas do RMS, utilizar o sistema próprio deles, RMS Log Viewer, 
-* o mesmo gera os scripts e nomes da tabela.
+ *
+ * @author Leandro @Guilherme
+ * Para localizar tabelas do RMS, utilizar o sistema RMS Log Viewer, 
+ * o mesmo gera os scripts e nomes da tabela, caso necessário.
+ * Site com manual do sistema: https://tdn.totvs.com/display/public/LRMS/Manual+de+Extrato+de+Itens
 */
 public class RMSDAO extends InterfaceDAO {
 
