@@ -93,6 +93,14 @@ public class ImportarNotaSaidaImportacaoArquivoGUI extends VRInternalFrame {
                             file.situacao = file.notaSaida.vDivergencia.get(0);
                         }
                         
+                        if (file.situacao == null) {
+                            file.situacao = new DivergenciaVO(
+                                    DivergenciaVO.OK,
+                                    "OK",
+                                    1
+                            );
+                        }
+                        
                         ProgressBar.next();
                         model.fireTableDataChanged();
                     }
