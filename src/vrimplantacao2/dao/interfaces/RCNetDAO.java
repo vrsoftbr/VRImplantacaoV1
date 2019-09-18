@@ -11,6 +11,8 @@ import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -124,6 +126,80 @@ public class RCNetDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         
         return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "  ninterno id,\n" +
+                    "  p" + getLojaOrigem() + " precovenda,\n" +
+                    "  a" + getLojaOrigem() + " atacado,\n" +
+                    "  q" + getLojaOrigem() + " quantidade\n" +
+                    "from\n" +
+                    "  itens\n" +
+                    "where\n" +
+                    "  q" + getLojaOrigem() + " > '0,00' and\n" +
+                    "  a" + getLojaOrigem() + " > '0,00'"
+            )) {
+                while(rs.next()) {
+                    int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rs.getString("id"));
+                    if (codigoAtual > 0) {
+                            ProdutoIMP imp = new ProdutoIMP();
+                            imp.setImportLoja(getLojaOrigem());
+                            imp.setImportSistema(getSistema());
+                            imp.setImportId(rs.getString("id"));
+                            imp.setEan("999999" + String.valueOf(codigoAtual));
+                            imp.setQtdEmbalagem(rs.getInt("quantidade"));
+                            
+                            result.add(imp);
+                        }
+                }
+                
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        if (opt == OpcaoProduto.ATACADO) {
+            try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+                try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "  ninterno id,\n" +
+                    "  p" + getLojaOrigem() + " precovenda,\n" +
+                    "  a" + getLojaOrigem() + " atacado,\n" +
+                    "  q" + getLojaOrigem() + " quantidade\n" +
+                    "from\n" +
+                    "  itens\n" +
+                    "where\n" +
+                    "  q" + getLojaOrigem() + " > '0,00' and\n" +
+                    "  a" + getLojaOrigem() + " > '0,00'"
+                )) {
+                    while(rs.next()) {
+                        int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rs.getString("id"));
+                        if (codigoAtual > 0) {
+                            ProdutoIMP imp = new ProdutoIMP();
+                            imp.setImportLoja(getLojaOrigem());
+                            imp.setImportSistema(getSistema());
+                            imp.setImportId(rs.getString("id"));
+                            imp.setEan("999999" + String.valueOf(codigoAtual));
+                            imp.setPrecovenda(Utils.stringToDouble(rs.getString("precovenda")));
+                            imp.setAtacadoPreco(Utils.stringToDouble(rs.getString("atacado")));
+                            imp.setQtdEmbalagem(rs.getInt("quantidade"));
+                            
+                            result.add(imp);
+                        }
+                    }   
+                }
+            }
+            return result;
+        }
+        return null;
     }
 
     @Override
