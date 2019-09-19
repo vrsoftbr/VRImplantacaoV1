@@ -369,12 +369,16 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		cot.embcodplu = p.procodplu\n" +
                     "	LEFT join\n" +
                     "		(SELECT\n" +
-                    "			trccodplu, \n" +
-                    "			sum(trcqtde) estoquetroca\n" +
-                    "		FROM \n" +
-                    "			hiptrc\n" +
-                    "		GROUP BY\n" +
-                    "			1) trc ON p.procodplu = trc.trccodplu\n" +
+                                "	trccodplu,\n" +
+                                "	sum(trcqtde) estoquetroca\n" +
+                                "FROM \n" +
+                                "	hiptrc\n" +
+                                "WHERE\n" +
+                                "	trcdtbxa IS NULL and\n" +
+                                "	trcloja = " + getLojaOrigem() + " and\n" +
+                                "	trcstatus = 'P'\n" +
+                                "GROUP BY\n" +
+                                "	1) trc ON p.procodplu = trc.trccodplu\n" +
                     "order BY \n" +
                     "	1"
             )) {
