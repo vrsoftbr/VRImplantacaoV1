@@ -314,7 +314,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
+                    "SELECT\n" +
                     "	p.procodplu id,\n" +
                     "	p.prodtcad datacadastro,\n" +
                     "	coalesce(ean.barcodbar, p.procodplu) ean,\n" +
@@ -335,6 +335,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.procodfam id_familia,\n" +
                     "	p.propeso peso,\n" +
                     "	prc.prlestoq estoque,\n" +
+                    "	trc.estoquetroca,\n" +
                     "	prc.prlmargind margemunit,\n" +
                     "	case when prc.prlctentru <= 0 then prc.prlctnfu else prc.prlctentru end custosemimposto,\n" +
                     "	case when prc.prlctnfu <= 0 then prc.prlctentru else prc.prlctnfu end custocomimposto,\n" +
@@ -366,7 +367,16 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		prc.prlloja = l.lojcod\n" +
                     "	left join cotemb cot on\n" +
                     "		cot.embcodplu = p.procodplu\n" +
-                    "order by 1"
+                    "	LEFT join\n" +
+                    "		(SELECT\n" +
+                    "			trccodplu, \n" +
+                    "			sum(trcqtde) estoquetroca\n" +
+                    "		FROM \n" +
+                    "			hiptrc\n" +
+                    "		GROUP BY\n" +
+                    "			1) trc ON p.procodplu = trc.trccodplu\n" +
+                    "order BY \n" +
+                    "	1"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -394,6 +404,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoBruto(rst.getDouble("peso"));
                     imp.setPesoLiquido(rst.getDouble("peso"));
                     imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setTroca(rst.getDouble("estoquetroca"));
                     imp.setMargem(rst.getDouble("margemunit"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));

@@ -193,6 +193,11 @@
                     <Property name="text" type="java.lang.String" value="Pre&#xe7;o"/>
                   </Properties>
                 </Component>
+                <Component class="javax.swing.JCheckBox" name="chkTroca">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Troca"/>
+                  </Properties>
+                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkEstoque">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Estoque"/>

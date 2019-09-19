@@ -5,6 +5,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -291,32 +292,45 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "	f.codfornec id,\n"
-                    + "	f.razaosocial razao,\n"
-                    + "	f.nome fantasia,\n"
-                    + "	f.cpfcnpj cnpj,\n"
-                    + "	f.rgie inscricaoestadual,\n"
-                    + "	f.fone1,\n"
-                    + "	f.fone2,\n"
-                    + "	f.fone3,\n"
-                    + "	f.fax,\n"
-                    + "	f.site,\n"
-                    + "	f.endereco,\n"
-                    + "	f.numero,\n"
-                    + "	f.complemento,\n"
-                    + "	f.bairro,\n"
-                    + "	f.cep,\n"
-                    + "	c.codoficial id_municipio, \n"
-                    + "	e.codoficial id_estado,\n"
-                    + "	f.observacao,\n"
-                    + "	f.datainclusao datacadastro,\n"
-                    + "	f.email,\n"
-                    + "       case f.status when 'A' then 1 else 0 end as id_situacaocadastro\n"
-                    + "from \n"
-                    + "	fornecedor f\n"
-                    + "	left join cidade c on f.codcidade = c.codcidade\n"
-                    + "	left join estado e on c.uf = e.uf")) {
+                    "select\n" +
+                    "	f.codfornec id,\n" +
+                    "	f.razaosocial razao,\n" +
+                    "	f.nome fantasia,\n" +
+                    "	f.cpfcnpj cnpj,\n" +
+                    "	f.rgie inscricaoestadual,\n" +
+                    "	f.fone1,\n" +
+                    "	f.fone telefone,\n" +
+                    "	f.fone2,\n" +
+                    "	f.fone3,\n" +
+                    "	f.fax,\n" +
+                    "	f.site,\n" +
+                    "	f.endereco,\n" +
+                    "	f.numero,\n" +
+                    "	f.complemento,\n" +
+                    "	f.bairro,\n" +
+                    "	f.cep,\n" +
+                    "	c.codoficial id_municipio, \n" +
+                    "	e.codoficial id_estado,\n" +
+                    "	f.observacao,\n" +
+                    "	f.datainclusao datacadastro,\n" +
+                    "	f.email,\n" +
+                    "	case f.status when 'A' then 1 else 0 end as id_situacaocadastro,\n" +
+                    "	pg.descricao condpagto,\n" +
+                    "	pg.dia1,\n" +
+                    "	pg.dia2,\n" +
+                    "	pg.dia3,\n" +
+                    "	pg.dia4,\n" +
+                    "	fe.diasentrega,\n" +
+                    "	fe.freqvisita\n" +
+                    "from \n" +
+                    "	fornecedor f\n" +
+                    "left join cidade c on f.codcidade = c.codcidade\n" +
+                    "left join estado e on c.uf = e.uf\n" +
+                    "left join condpagto pg on f.codcondpagto = pg.codcondpagto\n" +
+                    "left join fornecestab fe on f.codfornec = fe.codfornec\n" +
+                    "where	\n" +
+                    "	fe.codestabelec = " + getLojaOrigem()
+            )) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -327,21 +341,24 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setCnpj_cpf(rs.getString("cnpj"));
                     imp.setIe_rg(rs.getString("inscricaoestadual"));
                     imp.setAtivo(rs.getInt("id_situacaocadastro") == 1 ? true : false);
-                    imp.setTel_principal(rs.getString("fone1"));
+                    imp.setTel_principal(Utils.formataNumero(rs.getString("telefone")));
+                    if (rs.getString("fone1") != null && !rs.getString("fone1").isEmpty()) {
+                        imp.addContato("1", "TELEFONE 1", rs.getString("fone1"), "", TipoContato.COMERCIAL, "");
+                    }
                     if (rs.getString("fone2") != null && !rs.getString("fone2").isEmpty()) {
-                        imp.addContato("1", "TELEFONE 2", rs.getString("fone2"), "", TipoContato.COMERCIAL, "");
+                        imp.addContato("2", "TELEFONE 2", rs.getString("fone2"), "", TipoContato.COMERCIAL, "");
                     }
                     if (rs.getString("fone3") != null && !rs.getString("fone3").isEmpty()) {
-                        imp.addContato("2", "TELEFONE 3", rs.getString("fone3"), "", TipoContato.COMERCIAL, "");
+                        imp.addContato("3", "TELEFONE 3", rs.getString("fone3"), "", TipoContato.COMERCIAL, "");
                     }
                     if (rs.getString("fax") != null && !rs.getString("fax").isEmpty()) {
-                        imp.addContato("3", "FAX", rs.getString("fax"), "", TipoContato.COMERCIAL, "");
+                        imp.addContato("4", "FAX", rs.getString("fax"), "", TipoContato.COMERCIAL, "");
                     }
                     if (rs.getString("email") != null && !rs.getString("email").isEmpty()) {
-                        imp.addContato("4", "EMAIL", "", "", TipoContato.COMERCIAL, rs.getString("email"));
+                        imp.addContato("5", "EMAIL", "", "", TipoContato.COMERCIAL, rs.getString("email"));
                     }
                     if (rs.getString("site") != null && !rs.getString("site").isEmpty()) {
-                        imp.addContato("5", rs.getString("site"), "", "", TipoContato.COMERCIAL, "");
+                        imp.addContato("6", rs.getString("site"), "", "", TipoContato.COMERCIAL, "");
                     }
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
@@ -352,7 +369,21 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     imp.setIbge_uf(rs.getInt("id_estado"));
                     imp.setObservacao(rs.getString("observacao"));
                     imp.setDatacadastro(rs.getDate("datacadastro"));
-
+                    imp.setPrazoEntrega(rs.getInt("diasentrega"));
+                    imp.setPrazoVisita(rs.getInt("freqvisita"));
+                    
+                    if((rs.getString("dia1") != null) && (!"".equals(rs.getString("dia1")))) {
+                        imp.addCondicaoPagamento(rs.getInt("dia1"));
+                    }
+                    
+                    if((rs.getString("dia2") != null) && (!"".equals(rs.getString("dia2")))) {
+                        imp.addCondicaoPagamento(rs.getInt("dia2"));
+                    }
+                    
+                    if((rs.getString("dia3") != null) && (!"".equals(rs.getString("dia3")))) {
+                        imp.addCondicaoPagamento(rs.getInt("dia3"));
+                    }
+                        
                     result.add(imp);
                 }
             }

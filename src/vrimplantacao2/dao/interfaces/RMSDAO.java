@@ -61,7 +61,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /*
  *
- * @author Leandro @Guilherme
+ * @author Leandro, Guilherme
  * Para localizar tabelas do RMS, utilizar o sistema RMS Log Viewer, 
  * o mesmo gera os scripts e nomes da tabela, caso necessário.
  * Site com manual do sistema: https://tdn.totvs.com/display/public/LRMS/Manual+de+Extrato+de+Itens
