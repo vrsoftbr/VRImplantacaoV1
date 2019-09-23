@@ -20,6 +20,7 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
+import vrimplantacao2.dao.cadastro.notafiscal.OpcaoNotaFiscal;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.RMSDAO;
@@ -52,6 +53,7 @@ public class RMSGUI_2 extends VRInternalFrame {
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
         edtVendaDtIni.setDate(params.getDate(SISTEMA, "VENDA_DT_INI"));
         edtVendaDtFim.setDate(params.getDate(SISTEMA, "VENDA_DT_FIM"));
+        edtDtNotaIni.setDate(params.getDate(SISTEMA, "VENDA_DT_INI_NF"));
         if (params.getBool(SISTEMA, "USAR_STRING_CONN")) {
             tabsConn.setSelectedIndex(1);
         } else {
@@ -73,6 +75,7 @@ public class RMSGUI_2 extends VRInternalFrame {
         params.put(chkIncluirNivel4.isSelected(), SISTEMA, "INCLUIR_NIVEL_4");
         params.put(edtVendaDtIni.getDate(), SISTEMA, "VENDA_DT_INI");
         params.put(edtVendaDtFim.getDate(), SISTEMA, "VENDA_DT_FIM");
+        params.put(edtDtNotaIni.getDate(), SISTEMA, "VENDA_DT_INI_NF");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
             params.put(cliente.cnpj, SISTEMA, "LOJA_CLIENTE");
@@ -106,6 +109,7 @@ public class RMSGUI_2 extends VRInternalFrame {
         
         edtVendaDtIni.setFormats(DATE_FORMAT);
         edtVendaDtFim.setFormats(DATE_FORMAT);
+        edtDtNotaIni.setFormats(DATE_FORMAT);
     }
 
     public void validarDadosAcessoOracle() throws Exception {
@@ -291,6 +295,11 @@ public class RMSGUI_2 extends VRInternalFrame {
                             }
                         }
                         
+                        if (chkNotasFiscais.isSelected()) {
+                            dao.setDataInicioNFEntrada(edtVendaDtIni.getDate());
+                            importador.importarNotas(OpcaoNotaFiscal.IMP_EXCLUIR_NOTAS_EXISTENTES_IMPORTADAS);
+                        }
+                        
                     } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
@@ -368,6 +377,10 @@ public class RMSGUI_2 extends VRInternalFrame {
         chkVendas = new vrframework.bean.checkBox.VRCheckBox();
         rdbVendasAntigas = new vrframework.bean.radioButton.VRRadioButton();
         rdbVendasAtualizadas = new vrframework.bean.radioButton.VRRadioButton();
+        tabOutros = new javax.swing.JPanel();
+        vRPanel7 = new vrframework.bean.panel.VRPanel();
+        chkNotasFiscais = new vrframework.bean.checkBox.VRCheckBox();
+        edtDtNotaIni = new org.jdesktop.swingx.JXDatePicker();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -775,7 +788,52 @@ public class RMSGUI_2 extends VRInternalFrame {
 
         vRTabbedPane2.addTab("Vendas", tabVendas);
 
+        vRPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Importar Notas Fiscais"));
+
+        chkNotasFiscais.setEnabled(true);
+        chkNotasFiscais.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkNotasFiscaisActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout vRPanel7Layout = new javax.swing.GroupLayout(vRPanel7);
+        vRPanel7.setLayout(vRPanel7Layout);
+        vRPanel7Layout.setHorizontalGroup(
+            vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel7Layout.createSequentialGroup()
+                .addComponent(chkNotasFiscais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(edtDtNotaIni, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        vRPanel7Layout.setVerticalGroup(
+            vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                .addComponent(chkNotasFiscais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(edtDtNotaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        javax.swing.GroupLayout tabOutrosLayout = new javax.swing.GroupLayout(tabOutros);
+        tabOutros.setLayout(tabOutrosLayout);
+        tabOutrosLayout.setHorizontalGroup(
+            tabOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabOutrosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(361, Short.MAX_VALUE))
+        );
+        tabOutrosLayout.setVerticalGroup(
+            tabOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabOutrosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(120, Short.MAX_VALUE))
+        );
+
+        vRTabbedPane2.addTab("Outros", tabOutros);
+
         tabs.addTab("Importação", vRTabbedPane2);
+        vRTabbedPane2.getAccessibleContext().setAccessibleName("Outro");
 
         chkUnifProdutos.setText("Produtos (Somente com EAN válido)");
 
@@ -1148,6 +1206,12 @@ public class RMSGUI_2 extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkVendasActionPerformed
 
+    private void chkNotasFiscaisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkNotasFiscaisActionPerformed
+        if (edtDtNotaIni.getDate() == null) {
+            edtDtNotaIni.setDate(new Date());
+        }
+    }//GEN-LAST:event_chkNotasFiscaisActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
     private vrframework.bean.button.VRButton btnMigrar;
@@ -1164,6 +1228,7 @@ public class RMSGUI_2 extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkHistoricoVendas;
     private vrframework.bean.checkBox.VRCheckBox chkIncluirNivel4;
+    private vrframework.bean.checkBox.VRCheckBox chkNotasFiscais;
     private vrframework.bean.checkBox.VRCheckBox chkPagamentoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
@@ -1177,6 +1242,7 @@ public class RMSGUI_2 extends VRInternalFrame {
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrframework.bean.textField.VRTextField dtVenda;
+    private org.jdesktop.swingx.JXDatePicker edtDtNotaIni;
     private org.jdesktop.swingx.JXDatePicker edtVendaDtFim;
     private org.jdesktop.swingx.JXDatePicker edtVendaDtIni;
     private javax.swing.ButtonGroup groupVendasPdv;
@@ -1190,6 +1256,7 @@ public class RMSGUI_2 extends VRInternalFrame {
     private vrframework.bean.radioButton.VRRadioButton rdbVendasAntigas;
     private vrframework.bean.radioButton.VRRadioButton rdbVendasAtualizadas;
     private javax.swing.JPanel tabConvenio;
+    private javax.swing.JPanel tabOutros;
     private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI tabProdutos;
     private vrframework.bean.panel.VRPanel tabVendas;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
@@ -1210,6 +1277,7 @@ public class RMSGUI_2 extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.panel.VRPanel vRPanel6;
+    private vrframework.bean.panel.VRPanel vRPanel7;
     private vrframework.bean.panel.VRPanel vRPanel8;
     private vrframework.bean.panel.VRPanel vRPanel9;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane2;

@@ -32,12 +32,14 @@ import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.SituacaoCheque;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.enums.TipoIva;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -312,7 +314,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
+                    "SELECT\n" +
                     "	p.procodplu id,\n" +
                     "	p.prodtcad datacadastro,\n" +
                     "	coalesce(ean.barcodbar, p.procodplu) ean,\n" +
@@ -333,6 +335,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.procodfam id_familia,\n" +
                     "	p.propeso peso,\n" +
                     "	prc.prlestoq estoque,\n" +
+                    "	trc.estoquetroca,\n" +
                     "	prc.prlmargind margemunit,\n" +
                     "	case when prc.prlctentru <= 0 then prc.prlctnfu else prc.prlctentru end custosemimposto,\n" +
                     "	case when prc.prlctnfu <= 0 then prc.prlctentru else prc.prlctnfu end custocomimposto,\n" +
@@ -364,7 +367,20 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		prc.prlloja = l.lojcod\n" +
                     "	left join cotemb cot on\n" +
                     "		cot.embcodplu = p.procodplu\n" +
-                    "order by 1"
+                    "	LEFT join\n" +
+                    "		(SELECT\n" +
+                                "	trccodplu,\n" +
+                                "	sum(trcqtde) estoquetroca\n" +
+                                "FROM \n" +
+                                "	hiptrc\n" +
+                                "WHERE\n" +
+                                "	trcdtbxa IS NULL and\n" +
+                                "	trcloja = " + getLojaOrigem() + " and\n" +
+                                "	trcstatus = 'P'\n" +
+                                "GROUP BY\n" +
+                                "	1) trc ON p.procodplu = trc.trccodplu\n" +
+                    "order BY \n" +
+                    "	1"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -392,6 +408,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPesoBruto(rst.getDouble("peso"));
                     imp.setPesoLiquido(rst.getDouble("peso"));
                     imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setTroca(rst.getDouble("estoquetroca"));
                     imp.setMargem(rst.getDouble("margemunit"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
@@ -806,7 +823,10 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rst.getString("id"));
                     imp.setTipoInscricao("J".equals(rst.getString("tipoempresa")) ? TipoInscricao.JURIDICA: TipoInscricao.FISICA);
                     imp.setCnpj(rst.getString("cnpj"));
-                    imp.setInscricaoestadual(Utils.formataNumero(rst.getString("inscricaoestadual")));
+                    //imp.setInscricaoestadual(Utils.formataNumero(rst.getString("inscricaoestadual")));
+                    if((rst.getString("inscricaoestadual") != null) && (!"".equals(rst.getString("inscricaoestadual")))) {
+                        imp.setInscricaoestadual(rst.getString("inscricaoestadual").replace("\\", "").replace("-", "").replace(".", ""));
+                    }
                     imp.setRazao(rst.getString("razao"));
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setAtivo(rst.getBoolean("ativo"));
@@ -840,6 +860,10 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEmpresaTelefone(rst.getString("telefone_empresa"));
                     imp.setSalario(rst.getDouble("salario"));
                     imp.setValorLimite(rst.getDouble("valorlimite"));
+                    if(imp.getValorLimite() > 0) {
+                        imp.setPermiteCheque(true);
+                        imp.setPermiteCreditoRotativo(true);
+                    }
                     imp.setNomeConjuge(rst.getString("conjuge"));
                     imp.setNomePai(rst.getString("pai"));
                     imp.setNomeMae(rst.getString("mae"));
@@ -886,7 +910,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	r.ctrdtemiss <= '" + dateFormat.format(rotativoDataFinal) + "' and\n" +
                     "	r.ctrloja = " + getLojaOrigem() + " and\n" +
                     "	r.ctrvalor > 0 and r.ctrsaldo > 0 and\n" +
-                    "	r.ctrtipo = 'C'\n" +
+                    "	r.ctrtipo = 'C' and\n" +
+                    "   r.ctrgrupo not in (2, 3) \n" +        
                     "order by\n" +
                     "	r.ctrdtemiss"
             )) {
@@ -962,6 +987,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdProduto(rst.getString("id_produto"));
                     imp.setDataInicio(rst.getDate("datainicio"));
                     imp.setDataFim(rst.getDate("datafim"));
+                    imp.setPrecoNormal(rst.getDouble("preconormal"));
                     imp.setPrecoOferta(rst.getDouble("precooferta"));
                     imp.setSituacaoOferta(SituacaoOferta.ATIVO);
                     imp.setTipoOferta(TipoOfertaVO.CAPA);
@@ -1043,7 +1069,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	r.ctrdtemiss <= '" + dateFormat.format(receberDataFinal) + "' and\n" +
                     "	r.ctrloja = " + getLojaOrigem() + " and\n" +
                     "	r.ctrvalor > 0 and r.ctrsaldo > 0 and\n" +
-                    "	r.ctrtipo = 'F'\n" +
+                    "	r.ctrtipo = 'F' and\n" +
+                    "   r.ctrcod IN (SELECT forcod FROM hipfor)\n" +       
                     "order by\n" +
                     "	r.ctrdtemiss"
             )) {
@@ -1065,6 +1092,69 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         
+        return result;
+    }
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "	concat(r.ctrtipo,'-',r.ctrcod,'-',r.ctrclilj,'-',r.ctrdoc,'-',r.ctrserie,'-',r.ctrparc,'-',r.ctrloja) id,\n" +
+                    "	r.ctrdtemiss dataemissao,\n" +
+                    "	r.ctrdoc numerocupom,\n" +
+                    "	r.ctrncheque cheque,\n" +
+                    "   r.ctrbanco banco,\n" +
+                    "	r.ctragenc agencia,\n" +        
+                    "	r.ctrcaixa ecf,\n" +
+                    "	r.ctrvalor valor,\n" +
+                    "	r.ctrjuros juros,\n" +
+                    "	r.ctrdesc desconto,\n" +
+                    "	r.ctrvalabt abatimento,\n" +
+                    "	r.ctrsaldo valorfinal,\n" +
+                    "	r.ctrobs observacao,\n" +
+                    "	concat(r.ctrclilj,'-',r.ctrcod) idcliente,\n" +
+                    "   r.ctrcpfcgc cnpj,\n" +  
+                    "   c.clinome nome,\n" +
+                    "	c.clirgie rg,\n" +
+                    "	c.clifoneres fone,\n" +        
+                    "	r.ctrdtvenc vencimento,\n" +
+                    "	r.ctrparc parcela\n" +
+                    "from\n" +
+                    "	finctr r\n" +
+                    "LEFT JOIN clicli c ON r.ctrcod = c.clicod\n" +        
+                    "where\n" +
+                    "	r.ctrdtemiss >= '" + dateFormat.format(rotativoDataInicial) + "' and\n" +
+                    "	r.ctrdtemiss <= '" + dateFormat.format(rotativoDataFinal) + "' and\n" +
+                    "	r.ctrloja = " + getLojaOrigem() + " and\n" +
+                    "	r.ctrvalor > 0 and r.ctrsaldo > 0 and\n" +
+                    "	r.ctrtipo = 'C' and\n" +
+                    "	r.ctrgrupo IN (2, 3)\n" +
+                    "order by\n" +
+                    "	r.ctrdtemiss")) {
+                while(rs.next()) {
+                    ChequeIMP imp = new ChequeIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setAgencia(rs.getString("agencia"));
+                    imp.setBanco(rs.getInt("banco"));
+                    imp.setDate(rs.getDate("dataemissao"));
+                    imp.setDataDeposito(rs.getDate("vencimento"));
+                    imp.setCpf(rs.getString("cnpj"));
+                    imp.setNumeroCupom(rs.getString("numerocupom"));
+                    imp.setNumeroCheque(rs.getString("cheque"));
+                    imp.setEcf(rs.getString("ecf"));
+                    imp.setValor(rs.getDouble("valorfinal"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    imp.setNome(rs.getString("nome"));
+                    imp.setRg(rs.getString("rg"));
+                    imp.setTelefone(rs.getString("fone"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 
