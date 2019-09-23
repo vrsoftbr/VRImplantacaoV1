@@ -12,7 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoDBF;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -149,6 +152,109 @@ public class RootacDAO extends InterfaceDAO {
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + " f.CODIFABRIC as id,\n"
+                    + " f.FORC35RAZA as razao\n,"
+                    + " f.FORC10APEL as fantasia,\n"
+                    + " f.FORC15CGC as cnpj,\n"
+                    + " f.FORC19INSC as ie_rg,\n"
+                    + " f.FORC35ENDE as endereco,\n"
+                    + " f.FORC20BAIR as bairro,\n"
+                    + " f.FORC20CIDA as municipio,\n"
+                    + " f.FORC20ESTA as uf,\n"
+                    + " f.FORC25FONE as telefone,\n"
+                    + " f.FORC10FAX as fax,\n"
+                    + " f.FORCMAILTO as email,\n"
+                    + " f.FORC400OBS1 as observacao\n"
+                    + "FROM RC008FOR f\n"
+                    + "ORDER BY f.CODIFABRIC"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("ie_rg"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setTel_principal(rst.getString("telefone"));
+                    imp.setObservacao(rst.getString("observacao"));
+
+                    if ((rst.getString("FORCMAILTO") != null)
+                            && (!rst.getString("FORCMAILTO").trim().isEmpty())) {
+                        imp.addContato(
+                                "EMAIL",
+                                null,
+                                null,
+                                TipoContato.NFE,
+                                rst.getString("FORCMAILTO").toLowerCase()
+                        );
+                    }
+
+                    try (ResultSet rst2 = stm.executeQuery(
+                            "SELECT\n"
+                            + " (C.DDD+C.TELEFONE) as telefone\n"
+                            + "FROM RCTELTIP C\n"
+                            + "WHERE C.CODIGO = " + imp.getImportId()
+                    )) {
+                        while (rst2.next()) {
+
+                            imp.addContato(
+                                    "TELEFONE",
+                                    rst2.getString("telefone"),
+                                    null,
+                                    TipoContato.COMERCIAL,
+                                    null
+                            );
+                        }
+                    }
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + " CODIGOPLU as idproduto,\n"
+                    + " CODIFABRIC as idfornecedor,\n"
+                    + " ESTC08REFE as codigoexterno,\n"
+                    + " ESTN04QEMB as qtdembalagem\n"
+                    + "FROM RC113REF"
+            )) {
+                while (rst.next()) {
+                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setIdProduto(rst.getString("idproduto"));
+                    imp.setIdFornecedor(rst.getString("idfornecedor"));
+                    imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
                     result.add(imp);
                 }
             }
