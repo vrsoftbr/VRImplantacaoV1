@@ -282,10 +282,10 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIva(rst.getDouble("mva"));
                     imp.setIvaAjustado(imp.getIva());
                     imp.setNcm(rst.getString("ncm"));
-                    imp.setAliquotaDebito(0, rst.getDouble("aliquota_debito"), 0);
-                    imp.setAliquotaDebitoForaEstado(imp.getAliquotaDebito());
-                    imp.setAliquotaCredito(0, rst.getDouble("aliquota_credito"), 0);
-                    imp.setAliquotaCreditoForaEstado(imp.getAliquotaCredito());
+                    String aliquotaDebito = formataIdTributacao(0, rst.getDouble("aliquota_debito"), 0);
+                    imp.setAliquotaDebitoId(aliquotaDebito);
+                    imp.setAliquotaDebitoForaEstadoId(aliquotaDebito);
+                    imp.setAliquotaCreditoForaEstadoId(formataIdTributacao(0, rst.getDouble("aliquota_credito"), 0));
                     
                     result.add(imp);
                 }
@@ -398,20 +398,43 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstDebito(rst.getString("pis_s"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("natreceita"));
                     
+                    int cst = rst.getInt("cst_credito");
+                    double aliquota = rst.getDouble("aliquota_credito");
+                    double reducao = rst.getDouble("reducao_credito");                    
+                    imp.setIcmsCreditoId(formataIdTributacao(cst, aliquota, reducao));
+                    imp.setIcmsCreditoForaEstadoId(formataIdTributacao(cst, aliquota, reducao));
+                    
+                    /*
                     imp.setIcmsCstEntrada(rst.getInt("cst_credito"));
                     imp.setIcmsAliqEntrada(rst.getDouble("aliquota_credito"));
                     imp.setIcmsReducaoEntrada(rst.getDouble("reducao_credito"));
                     imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstEntrada());
                     imp.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqEntrada());
                     imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoEntrada());
+                    */
                     
+                    cst = rst.getInt("cst_debito");
+                    aliquota = rst.getDouble("aliquota_debito");
+                    reducao = rst.getDouble("reducao_debito");                    
+                    imp.setIcmsDebitoId(formataIdTributacao(cst, aliquota, reducao));
+                    
+                    cst = rst.getInt("cst_debito_fe");
+                    aliquota = rst.getDouble("aliquota_debito_fe");
+                    reducao = rst.getDouble("reducao_debito_fe");                    
+                    imp.setIcmsDebitoForaEstadoId(formataIdTributacao(cst, aliquota, reducao));
+                    imp.setIcmsDebitoForaEstadoNfId(formataIdTributacao(cst, aliquota, reducao));
+                    
+                    /*                    
                     imp.setIcmsCstSaida(rst.getInt("cst_debito"));
                     imp.setIcmsAliqSaida(rst.getDouble("aliquota_debito"));
                     imp.setIcmsReducaoSaida(rst.getDouble("reducao_debito"));
                     imp.setIcmsCstSaidaForaEstado(rst.getInt("cst_debito_fe"));
                     imp.setIcmsAliqSaidaForaEstado(rst.getDouble("aliquota_debito_fe"));
                     imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("reducao_debito_fe"));
+                    */
 
+                    
+                    
                     imp.setPautaFiscalId(imp.getImportId());
                     
                     result.add(imp);
@@ -694,6 +717,10 @@ public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+    }
+
+    private String formataIdTributacao(int cst, double aliquota, double reducao) {
+        return String.format("%d-%.2f-%.2f", cst, aliquota, reducao);
     }
     
     private static class VendaIterator implements Iterator<VendaIMP> {
