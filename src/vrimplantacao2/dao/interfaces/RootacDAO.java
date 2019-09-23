@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -255,6 +256,74 @@ public class RootacDAO extends InterfaceDAO {
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
                     imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + " CLIC05CLIE as id,\n"
+                    + " CLIC35NOME as razao,\n"
+                    + " CLIC10APEL as fantasia,\n"
+                    + " CLIC15CGC as cnpj,\n"
+                    + " CLIC19RG as ie_rg,\n"
+                    + " CLIC35ENDE as endereco,\n"
+                    + " CLIC20BAIR as bairro,\n"
+                    + " CLIC20CIDA as nunicipio,\n"
+                    + " CLIC02ESTA as uf,\n"
+                    + " CLIC08CEP as cep,\n"
+                    + " CLIC18FONE as telefone,\n"
+                    + " CLIC11FAX as fax,\n"
+                    + " CLIC40OBS1 as observacao,\n"
+                    + " EMPRESNOME as empresa,\n"
+                    + " EMPRESENDE as empresaendereco,\n"
+                    + " EMPRESESTA as empresauf,\n"
+                    + " EMPRESCIDA as empresamunicipio,\n"
+                    + " EMPRESBAIR as empresabairro,\n"
+                    + " EMPRESCEP as empresacep,\n"
+                    + " EMPRESFONE as empresatelefone,\n"
+                    + " EMPRESFAX as empresafax,\n"
+                    + " CLIN14SALA as salario,\n"
+                    + " CLINLIMDES as limite,\n"
+                    + " CLINLIMCON as limiteconvenio,\n"
+                    + " ESTADOCOVI as estadocovil\n"
+                    + "FROM RC042CLI\n"
+                    + "ORDER BY CLIC05CLIE"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("ie_rg"));
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setFax(rst.getString("fax"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setEmpresa(rst.getString("empresa"));
+                    imp.setEmpresaEndereco(rst.getString("empresaendereco"));
+                    imp.setEmpresaBairro(rst.getString("empresabairro"));
+                    imp.setEmpresaCep(rst.getString("empresacep"));
+                    imp.setEmpresaMunicipio(rst.getString("empresamunicipio"));
+                    imp.setEmpresaUf(rst.getString("empresauf"));
+                    imp.setEmpresaTelefone(rst.getString("empresatelefone"));
+                    imp.setSalario(rst.getDouble("salario"));
+                    imp.setValorLimite(rst.getDouble("limite"));
+                    imp.setPermiteCheque(true);
+                    imp.setPermiteCreditoRotativo(true);
                     result.add(imp);
                 }
             }
