@@ -252,6 +252,9 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                             if (chkPProdComprador.isSelected()) {
                                 opcoes.add(OpcaoProduto.COMPRADOR_PRODUTO);
                             }
+                            if (chkTroca.isSelected()) {
+                                opcoes.add(OpcaoProduto.TROCA);
+                            }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarProdutos(opcoes);
                             }
@@ -370,6 +373,8 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
                         }
                         
                         if (chkCheque.isSelected()) {
+                            dao.setRotativoDataInicial(txtRotDtIni.getDate());
+                            dao.setRotativoDataFinal(txtRotDtFim.getDate());
                             importador.importarCheque();
                         }
                         
@@ -417,6 +422,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
         chkCustoSemImposto = new vrframework.bean.checkBox.VRCheckBox();
         chkCustoComImposto = new vrframework.bean.checkBox.VRCheckBox();
         chkPreco = new vrframework.bean.checkBox.VRCheckBox();
+        chkTroca = new javax.swing.JCheckBox();
         chkEstoque = new vrframework.bean.checkBox.VRCheckBox();
         chkEAN = new vrframework.bean.checkBox.VRCheckBox();
         chkEANemBranco = new vrframework.bean.checkBox.VRCheckBox();
@@ -552,6 +558,9 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
 
         chkPreco.setText("Preço");
         tabProdutos.add(chkPreco);
+
+        chkTroca.setText("Troca");
+        tabProdutos.add(chkTroca);
 
         chkEstoque.setText("Estoque");
         tabProdutos.add(chkEstoque);
@@ -1054,6 +1063,7 @@ public class HipcomGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.checkBox.VRCheckBox chkProdutos;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
+    private javax.swing.JCheckBox chkTroca;
     private vrframework.bean.checkBox.VRCheckBox chkValidade;
     private javax.swing.JCheckBox chkVendaUtilizaDigito;
     private javax.swing.JCheckBox chkVendas;

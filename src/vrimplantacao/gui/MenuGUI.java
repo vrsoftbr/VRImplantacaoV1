@@ -117,6 +117,7 @@ import vrimplantacao2.gui.interfaces.DestroGUI;
 import vrimplantacao2.gui.interfaces.DtComGUI;
 import vrimplantacao2.gui.interfaces.EmporioGUI;
 import vrimplantacao2.gui.interfaces.EsSystemGUI;
+import vrimplantacao2.gui.interfaces.EticaGUI;
 import vrimplantacao2.gui.interfaces.FHOnlineGUI;
 import vrimplantacao2.gui.interfaces.FaciliteGUI;
 import vrimplantacao2.gui.interfaces.Farm2000GUI;
@@ -578,6 +579,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAutomaq = new javax.swing.JMenuItem();
         mnuPwGestor = new javax.swing.JMenuItem();
         mnuAtenas = new javax.swing.JMenuItem();
+        mnuEtica = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1301,6 +1303,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird2.add(mnuAtenas);
+
+        mnuEtica.setText("Etica");
+        mnuEtica.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuEticaActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuEtica);
 
         mnuDatabase.add(mnuFirebird2);
 
@@ -4093,6 +4103,11 @@ public final class MenuGUI extends VRMdiFrame {
         SavGUI.exibir(this);
     }//GEN-LAST:event_mnuSavActionPerformed
 
+    private void mnuEticaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuEticaActionPerformed
+        // TODO add your handling code here:
+        EticaGUI.exibir(this);
+    }//GEN-LAST:event_mnuEticaActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4217,6 +4232,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuDtCom;
     private javax.swing.JMenuItem mnuEmporio;
     private javax.swing.JMenuItem mnuEsSystem;
+    private javax.swing.JMenuItem mnuEtica;
     private javax.swing.JMenuItem mnuFG;
     private javax.swing.JMenuItem mnuFHOnline;
     private javax.swing.JMenuItem mnuFabTech;
