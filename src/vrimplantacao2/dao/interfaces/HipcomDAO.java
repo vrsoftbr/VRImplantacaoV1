@@ -1069,7 +1069,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	r.ctrdtemiss <= '" + dateFormat.format(receberDataFinal) + "' and\n" +
                     "	r.ctrloja = " + getLojaOrigem() + " and\n" +
                     "	r.ctrvalor > 0 and r.ctrsaldo > 0 and\n" +
-                    "	r.ctrtipo = 'F'\n" +
+                    "	r.ctrtipo = 'F' and\n" +
+                    "   r.ctrcod IN (SELECT forcod FROM hipfor)\n" +       
                     "order by\n" +
                     "	r.ctrdtemiss"
             )) {
