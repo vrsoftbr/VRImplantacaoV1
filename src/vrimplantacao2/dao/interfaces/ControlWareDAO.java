@@ -579,7 +579,8 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery("select \n" +
+            try(ResultSet rs = stm.executeQuery(
+                    "select \n" +
                     "	codlancto id,\n" +
                     "	codestabelec id_loja,\n" +
                     "   numnotafis documento,\n" +
@@ -606,7 +607,8 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     "	codestabelec = " + getLojaOrigem() + " and\n" +
                     "	codespecie = " + tipoPlanoContaReceber + "\n" +
                     "order by\n" +
-                    "	dtlancto")) {
+                    "	dtlancto"
+            )) {
                 while(rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rs.getString("id"));

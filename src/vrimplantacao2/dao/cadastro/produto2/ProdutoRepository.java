@@ -523,6 +523,10 @@ public class ProdutoRepository {
                             automacao.setProduto(codigoAtual);
                             provider.automacao().salvar(automacao);
                         }
+                    } else {
+                            id = idProdutoExistente;
+                            codigoAtual = new ProdutoVO();
+                            codigoAtual.setId(id);
                     }
                 }
 

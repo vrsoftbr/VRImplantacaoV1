@@ -1585,16 +1585,16 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "        c.conta, \n"
                     + "        cl.inscricao_rg, \n"
                     + "        cl.telefone1 \n"
-                    + "        from  \n"
+                    + "from  \n"
                     + "        vw_contas c \n"
-                    + "        join clientes cl on (c.id_cadastro = cl.id) \n"
-                    + "        and empresa = 1 \n"
+                    + "join clientes cl on (c.id_cadastro = cl.id) \n"
+                    + "        and empresa = " + getLojaOrigem() + " \n"
                     + "        and parcela <> 0  \n"
-                    + "        and tipo_conta = " + getLojaOrigem() + "\n"
+                    + "        and tipo_conta = 1 \n"
                     + "        and pagamento is null  \n"
                     + "        and not tipo_cadastro is null  \n"
                     + "        and plano_conta in (" + getPlanosContaStr() + ") \n"
-                    + "        order by emissao desc";
+                    + "order by emissao desc";
 
             LOG.fine("SQL a ser executado:\n" + sql);
 

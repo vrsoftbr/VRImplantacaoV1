@@ -39,6 +39,7 @@ import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.enums.TipoIva;
+import vrimplantacao2.vo.enums.TipoVistaPrazo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CompradorIMP;
@@ -1121,7 +1122,8 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	c.clirgie rg,\n" +
                     "	c.clifoneres fone,\n" +        
                     "	r.ctrdtvenc vencimento,\n" +
-                    "	r.ctrparc parcela\n" +
+                    "	r.ctrparc parcela,\n" +
+                    "   r.ctrgrupo\n" +        
                     "from\n" +
                     "	finctr r\n" +
                     "LEFT JOIN clicli c ON r.ctrcod = c.clicod\n" +        
@@ -1150,6 +1152,7 @@ public class HipcomDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setNome(rs.getString("nome"));
                     imp.setRg(rs.getString("rg"));
                     imp.setTelefone(rs.getString("fone"));
+                    imp.setVistaPrazo(rs.getInt("ctrgrupo") == 2 ? TipoVistaPrazo.A_VISTA : TipoVistaPrazo.PRAZO);
                     
                     result.add(imp);
                 }
