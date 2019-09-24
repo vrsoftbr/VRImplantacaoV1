@@ -260,7 +260,7 @@ public class VendaRepository {
                 ",cupom:" + venda.getNumeroCupom() + 
                 ",data:" + DATE_FORMAT.format(venda.getData()) +
                 ",hora:" + TIME_FORMAT.format(venda.getHoraInicio()) +
-                ",idclientepreferencial:" + venda.getClienteEventual() +
+                ",idclientepreferencial:" + venda.getIdClientePreferencial() +
                 ",subtotalimpressora:" + String.format("%.2f", venda.getSubTotalImpressora()) + "}";
     }
 
