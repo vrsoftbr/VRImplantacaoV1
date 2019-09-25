@@ -1498,12 +1498,15 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.desc_forma_pagto,\n"
                     + "	c.tipo_cadastro,\n"
                     + "	c.id_cadastro,\n"
+                    + " cl.id id_cliente,\n"
                     + "	to_char(c.vencimento,'dd/MM/yyyy') vencimento,\n"
                     + "	c.parcela,\n"
                     + "	c.juros,\n"
                     + "	c.cpf_cnpj\n"
                     + "from\n"
                     + "	vw_contas c\n"
+                    + " left join\n" 
+                    + "    clientes cl on cast(c.cpf_cnpj as numeric) = cast(cl.cnpj_cpf as numeric)\n"
                     + "where\n"
                     + "	empresa = " + getLojaOrigem() + "\n"
                     + "	and parcela <> 0\n"
@@ -1537,7 +1540,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     if (rst.getString("observacao") != null && !"".equals(rst.getString("observacao").trim())) {
                         obs.append("observacao: ").append(rst.getString("observacao")).append(" ");
                     }
-                    imp.setIdCliente(rst.getString("id_cadastro"));
+                    imp.setIdCliente(rst.getString("id_cliente"));
                     imp.setDataVencimento(formater.parse(rst.getString("vencimento")));
                     imp.setParcela(rst.getInt("parcela"));
                     imp.setJuros(rst.getDouble("juros"));
