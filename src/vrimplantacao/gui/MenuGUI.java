@@ -156,6 +156,7 @@ import vrimplantacao2.gui.interfaces.MrsGUI;
 import vrimplantacao2.gui.interfaces.MultiPdvGUI;
 import vrimplantacao2.gui.interfaces.OpenGUI;
 import vrimplantacao2.gui.interfaces.OrionGUI;
+import vrimplantacao2.gui.interfaces.OrionTechGUI;
 import vrimplantacao2.gui.interfaces.OryonGUI;
 import vrimplantacao2.gui.interfaces.PdvVrGUI;
 import vrimplantacao2.gui.interfaces.PlanilhaVrGUI;
@@ -580,6 +581,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuPwGestor = new javax.swing.JMenuItem();
         mnuAtenas = new javax.swing.JMenuItem();
         mnuEtica = new javax.swing.JMenuItem();
+        mnuThotau = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1311,6 +1313,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird2.add(mnuEtica);
+
+        mnuThotau.setText("OrionTech (Thotau)");
+        mnuThotau.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuThotauActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuThotau);
 
         mnuDatabase.add(mnuFirebird2);
 
@@ -4099,14 +4109,16 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuAtenasActionPerformed
 
     private void mnuSavActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSavActionPerformed
-        // TODO add your handling code here:
         SavGUI.exibir(this);
     }//GEN-LAST:event_mnuSavActionPerformed
 
     private void mnuEticaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuEticaActionPerformed
-        // TODO add your handling code here:
         EticaGUI.exibir(this);
     }//GEN-LAST:event_mnuEticaActionPerformed
+
+    private void mnuThotauActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuThotauActionPerformed
+        OrionTechGUI.exibir(this);
+    }//GEN-LAST:event_mnuThotauActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4324,6 +4336,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSysmoFirebird;
     private javax.swing.JMenuItem mnuSysmoPostgres;
     private javax.swing.JMenuItem mnuTga;
+    private javax.swing.JMenuItem mnuThotau;
     private javax.swing.JMenuItem mnuTsti;
     private javax.swing.JMenuItem mnuUmPontoDois;
     private javax.swing.JMenuItem mnuUniplus;
