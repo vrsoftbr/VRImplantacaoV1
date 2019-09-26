@@ -1,5 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +27,8 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.OrionTechDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.gui.interfaces.custom.solidus.Entidade;
 import vrimplantacao2.parametro.Parametros;
 
@@ -90,7 +93,7 @@ public class OrionTechGUI extends VRInternalFrame {
         tabProdutos.setOpcoesDisponiveis(dao);
         tabProdutos.tabParametros.add(pnlProdutoCustom);
         
-        /*this.tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+        this.tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
             @Override
             public MapaTributoProvider getProvider() {
                 return dao;
@@ -98,6 +101,7 @@ public class OrionTechGUI extends VRInternalFrame {
 
             @Override
             public String getSistema() {
+                dao.setComplemento(txtComplemento.getText());
                 return dao.getSistema();
             }
 
@@ -110,7 +114,7 @@ public class OrionTechGUI extends VRInternalFrame {
             public Frame getFrame() {
                 return mdiFrame;
             }
-        });*/
+        });
         
         this.title = "Importação " + SISTEMA;        
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
