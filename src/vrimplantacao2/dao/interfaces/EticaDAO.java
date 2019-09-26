@@ -294,7 +294,7 @@ public class EticaDAO extends InterfaceDAO {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rst.getString("id"));
-                    imp.setRazao(rst.getString("razao"));
+                    imp.setRazao(rst.getString("fantasia"));
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setCnpj(rst.getString("cnpj_cpf"));
                     imp.setInscricaoestadual(rst.getString("insc_rg"));
