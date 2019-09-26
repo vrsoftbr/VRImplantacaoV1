@@ -21,13 +21,17 @@ import vrimplantacao.classe.ConexaoAccess;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -35,7 +39,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Importacao
  */
-public class OryonDAO extends InterfaceDAO {
+public class OryonDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(OryonDAO.class.getName());
     
@@ -69,8 +73,141 @@ public class OryonDAO extends InterfaceDAO {
                 OpcaoProduto.EAN_EM_BRANCO,
                 OpcaoProduto.MERCADOLOGICO,
                 OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
-                OpcaoProduto.MERCADOLOGICO_PRODUTO
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.ESTOQUE_MAXIMO,
+                OpcaoProduto.ESTOQUE_MINIMO,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.CUSTO,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.PAUTA_FISCAL,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.PAUTA_FISCAL_PRODUTO
         ));
+    }
+
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select aliquota from tabela_aliquotas"
+            )) {
+                while (rst.next()) {
+                    int cst = 0;
+                    double aliquota = rst.getDouble("aliquota");
+                    double reducao = 0;
+                    
+                    result.add(new MapaTributoIMP(
+                            String.format("%d-%.2f-%.2f", cst, aliquota, reducao),
+                            String.format("%d-%.2f-%.2f", cst, aliquota, reducao),
+                            cst,
+                            aliquota,
+                            reducao
+                    ));
+                }                
+            }
+            
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    p.situacao_tributaria_icm_entrada as cst_credito,\n" +
+                    "    p.aliquota_icm_saida_ne as aliquota_credito,\n" +
+                    "    p.base_icm_saida_ne as reducao_credito\n" +
+                    "from\n" +
+                    "	tabela_pro p\n" +
+                    "group by\n" +
+                    "	p.situacao_tributaria_icm_entrada,\n" +
+                    "    p.aliquota_icm_saida_ne,\n" +
+                    "    p.base_icm_saida_ne"
+            )) {
+                while (rst.next()) {
+                    int cst = rst.getInt("cst_credito");
+                    double aliquota = rst.getDouble("aliquota_credito");
+                    double reducao = rst.getDouble("reducao_credito");
+                    
+                    result.add(new MapaTributoIMP(
+                            String.format("%d-%.2f-%.2f", cst, aliquota, reducao),
+                            String.format("%d-%.2f-%.2f", cst, aliquota, reducao),
+                            cst,
+                            aliquota,
+                            reducao
+                    ));
+                }                
+            }
+            
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    p.situacao_tributaria_icm_saida_ne as cst_debito,\n" +
+                    "    p.aliquota_icm_saida_ne as aliquota_debito,\n" +
+                    "    p.base_icm_saida_ne as reducao_debito\n" +
+                    "from\n" +
+                    "	tabela_pro p\n" +
+                    "group by\n" +
+                    "	p.situacao_tributaria_icm_saida_ne,\n" +
+                    "    p.aliquota_icm_saida_ne,\n" +
+                    "    p.base_icm_saida_ne"
+            )) {
+                while (rst.next()) {
+                    int cst = rst.getInt("cst_debito");
+                    double aliquota = rst.getDouble("aliquota_debito");
+                    double reducao = rst.getDouble("reducao_debito");
+                    
+                    result.add(new MapaTributoIMP(
+                            String.format("%d-%.2f-%.2f", cst, aliquota, reducao),
+                            String.format("%d-%.2f-%.2f", cst, aliquota, reducao),
+                            cst,
+                            aliquota,
+                            reducao
+                    ));
+                }                
+            }
+            
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    p.situacao_tributaria_icm_saida_fe as cst_debito_fe,\n" +
+                    "    p.aliquota_icm_saida_ne as aliquota_debito_fe,\n" +
+                    "    p.base_icm_saida_fe as reducao_debito_fe\n" +
+                    "from\n" +
+                    "	tabela_pro p\n" +
+                    "group by\n" +
+                    "    p.situacao_tributaria_icm_saida_fe,\n" +
+                    "    p.aliquota_icm_saida_ne,\n" +
+                    "    p.base_icm_saida_fe"
+            )) {
+                while (rst.next()) {
+                    int cst = rst.getInt("cst_debito_fe");
+                    double aliquota = rst.getDouble("aliquota_debito_fe");
+                    double reducao = rst.getDouble("reducao_debito_fe");
+                    
+                    result.add(new MapaTributoIMP(
+                            String.format("%d-%.2f-%.2f", cst, aliquota, reducao),
+                            String.format("%d-%.2f-%.2f", cst, aliquota, reducao),
+                            cst,
+                            aliquota,
+                            reducao
+                    ));
+                }                
+            }
+        }
+        
+        return result;
     }
     
     @Override
@@ -120,6 +257,43 @@ public class OryonDAO extends InterfaceDAO {
         
         return result;
     }
+
+    @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    p.codigo as id,\n" +
+                    "    p.ncm,\n" +
+                    "    p.margem_valor_agregado as mva,\n" +
+                    "    p.aliquota_icm_saida_ne as aliquota_debito,\n" +
+                    "    p.aliquota_st_ret as aliquota_credito\n" +
+                    "from\n" +
+                    "    tabela_pro p\n" +
+                    "where\n" +
+                    "    p.margem_valor_agregado > 0"
+            )) {
+                while (rst.next()) {
+                    PautaFiscalIMP imp = new PautaFiscalIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setIva(rst.getDouble("mva"));
+                    imp.setIvaAjustado(imp.getIva());
+                    imp.setNcm(rst.getString("ncm"));
+                    String aliquotaDebito = formataIdTributacao(0, rst.getDouble("aliquota_debito"), 0);
+                    imp.setAliquotaDebitoId(aliquotaDebito);
+                    imp.setAliquotaDebitoForaEstadoId(aliquotaDebito);
+                    imp.setAliquotaCreditoForaEstadoId(formataIdTributacao(0, rst.getDouble("aliquota_credito"), 0));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }    
     
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
@@ -128,50 +302,54 @@ public class OryonDAO extends InterfaceDAO {
         try (Statement stm = ConexaoAccess.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
-                    "	p.codigo as id,\n" +
-                    "	p.codigo as codigobarras,\n" +
-                    "	p.descricao as descricaocompleta,\n" +
-                    "	p.descricao as descricaoreduzida,\n" +
-                    "	p.descricao as descricaogondola,\n" +
-                    "	g.grupo as mercadologico1,\n" +
-                    "	g.sub_grupo as mercadologico2,\n" +
-                    "	g.nome as mercadologico3,\n" +
-                    "	p.familia,\n" +
-                    "	p.unidade,\n" +
-                    "	p.qt_embalagem as qtdembalagem,\n" +
-                    "	p.situacao as ativo,\n" +
-                    "	p.qt_estoque as estoque,\n" +
-                    "	p.qt_minimo as estoqueminimo,\n" +
-                    "	p.qt_maximo as estoquemaximo,\n" +
-                    "	p.preco_venda as precovenda,\n" +
-                    "	p.preco_compra as custocomimposto,\n" +
-                    "	p.preco_compra as custosemimposto,\n" +
-                    "	p.margem_lucro as margem,\n" +
-                    "	p.usa_balanca as balanca,\n" +
-                    "	p.dias_validade as validade,\n" +
-                    "	p.data_cadastro as datacadastro,\n" +
-                    "	p.peso as pesobruto,\n" +
-                    "	p.pesoliquido,\n" +
-                    "	p.ncm,\n" +
-                    "	p.cest,\n" +
-                    "	p.situacao_tributaria_icm_entrada as cst_e,\n" +
-                    "	p.situacao_tributaria_icm_saida_ne as cst_ne_s,\n" +
-                    "	p.aliquota_icm_saida_ne as icms_s,\n" +
-                    "	p.aliquota_st_ret as icmsretencao,\n" +
-                    "	p.situacao_tributaria_icm_saida_fe as cst_fe_s,\n" +
-                    "	p.situacao_tributaria_pis as pis_s,\n" +
-                    "	p.situacao_tributaria_pis_entrada as pis_e,\n" +
-                    "	p.situacao_tributaria_cofins as cofins_s,\n" +
-                    "	p.situacao_tributaria_cofins_entrada as cofins_e,\n" +
-                    "	p.codigo_natureza_receita_pis_cofins as natreceita,\n" +
-                    "	p.margem_valor_agregado_fe as mva_fe,\n" +
-                    "	p.margem_valor_agregado as mva\n" +
+                    "    p.codigo as id,\n" +
+                    "    p.codigo as codigobarras,\n" +
+                    "    p.descricao as descricaocompleta,\n" +
+                    "    p.descricao as descricaoreduzida,\n" +
+                    "    p.descricao as descricaogondola,\n" +
+                    "    g.grupo as mercadologico1,\n" +
+                    "    g.sub_grupo as mercadologico2,\n" +
+                    "    g.nome as mercadologico3,\n" +
+                    "    p.familia,\n" +
+                    "    p.unidade,\n" +
+                    "    p.qt_embalagem as qtdembalagem,\n" +
+                    "    p.situacao as ativo,\n" +
+                    "    p.qt_estoque as estoque,\n" +
+                    "    p.qt_minimo as estoqueminimo,\n" +
+                    "    p.qt_maximo as estoquemaximo,\n" +
+                    "    p.preco_venda as precovenda,   \n" +
+                    "    p.preco_compra as custocomimposto,\n" +
+                    "    p.preco_compra as custosemimposto,\n" +
+                    "    p.margem_lucro as margem,\n" +
+                    "    p.usa_balanca as balanca,\n" +
+                    "    p.dias_validade as validade,\n" +
+                    "    p.data_cadastro as datacadastro,\n" +
+                    "    p.peso as pesobruto,\n" +
+                    "    p.pesoliquido,\n" +
+                    "    p.ncm,\n" +
+                    "    p.cest,\n" +
+
+                    "    p.situacao_tributaria_pis as pis_s,\n" +
+                    "    p.situacao_tributaria_pis_entrada as pis_e,\n" +
+                    "    p.situacao_tributaria_cofins as cofins_s,\n" +
+                    "    p.situacao_tributaria_cofins_entrada as cofins_e,\n" +
+                    "    p.codigo_natureza_receita_pis_cofins as natreceita,\n" +
+                            
+                    "    p.situacao_tributaria_icm_entrada as cst_credito,\n" +
+                    "    p.aliquota_icm_saida_ne as aliquota_credito,\n" +
+                    "    p.base_icm_saida_ne as reducao_credito,\n" +
+                    "    p.situacao_tributaria_icm_saida_ne as cst_debito,\n" +
+                    "    p.aliquota_icm_saida_ne as aliquota_debito,\n" +
+                    "    p.base_icm_saida_ne as reducao_debito,\n" +
+                    "    p.situacao_tributaria_icm_saida_fe as cst_debito_fe,\n" +
+                    "    p.aliquota_icm_saida_ne as aliquota_debito_fe,\n" +
+                    "    p.base_icm_saida_fe as reducao_debito_fe\n" +
                     "from\n" +
-                    "	tabela_pro p\n" +
-                    "	left join tabela_categ g on\n" +
-                    "		p.categoria = g.codigo\n" +
+                    "    tabela_pro p\n" +
+                    "    left join tabela_categ g on\n" +
+                    "        p.categoria = g.codigo\n" +
                     "order by\n" +
-                    "	1"
+                    "    p.codigo"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -215,12 +393,49 @@ public class OryonDAO extends InterfaceDAO {
                     imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setIcmsCstEntrada(rst.getInt("cst_e"));
-                    imp.setIcmsCstSaida(rst.getInt("icms_s"));
-                    imp.setPiscofinsCstCredito(rst.getString("pis_s"));
-                    imp.setPiscofinsCstDebito(rst.getString("pis_e"));
+                    
+                    imp.setPiscofinsCstCredito(rst.getString("pis_e"));
+                    imp.setPiscofinsCstDebito(rst.getString("pis_s"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("natreceita"));
-                    imp.setPautaFiscalId(rst.getString("mva"));
+                    
+                    int cst = rst.getInt("cst_credito");
+                    double aliquota = rst.getDouble("aliquota_credito");
+                    double reducao = rst.getDouble("reducao_credito");                    
+                    imp.setIcmsCreditoId(formataIdTributacao(cst, aliquota, reducao));
+                    imp.setIcmsCreditoForaEstadoId(formataIdTributacao(cst, aliquota, reducao));
+                    
+                    /*
+                    imp.setIcmsCstEntrada(rst.getInt("cst_credito"));
+                    imp.setIcmsAliqEntrada(rst.getDouble("aliquota_credito"));
+                    imp.setIcmsReducaoEntrada(rst.getDouble("reducao_credito"));
+                    imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstEntrada());
+                    imp.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqEntrada());
+                    imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoEntrada());
+                    */
+                    
+                    cst = rst.getInt("cst_debito");
+                    aliquota = rst.getDouble("aliquota_debito");
+                    reducao = rst.getDouble("reducao_debito");                    
+                    imp.setIcmsDebitoId(formataIdTributacao(cst, aliquota, reducao));
+                    
+                    cst = rst.getInt("cst_debito_fe");
+                    aliquota = rst.getDouble("aliquota_debito_fe");
+                    reducao = rst.getDouble("reducao_debito_fe");                    
+                    imp.setIcmsDebitoForaEstadoId(formataIdTributacao(cst, aliquota, reducao));
+                    imp.setIcmsDebitoForaEstadoNfId(formataIdTributacao(cst, aliquota, reducao));
+                    
+                    /*                    
+                    imp.setIcmsCstSaida(rst.getInt("cst_debito"));
+                    imp.setIcmsAliqSaida(rst.getDouble("aliquota_debito"));
+                    imp.setIcmsReducaoSaida(rst.getDouble("reducao_debito"));
+                    imp.setIcmsCstSaidaForaEstado(rst.getInt("cst_debito_fe"));
+                    imp.setIcmsAliqSaidaForaEstado(rst.getDouble("aliquota_debito_fe"));
+                    imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("reducao_debito_fe"));
+                    */
+
+                    
+                    
+                    imp.setPautaFiscalId(imp.getImportId());
                     
                     result.add(imp);
                 }
@@ -310,9 +525,10 @@ public class OryonDAO extends InterfaceDAO {
                     imp.setTel_principal(rs.getString("telefone"));
                     imp.setCnpj_cpf(rs.getString("cnpj"));
                     imp.setIe_rg(rs.getString("ie"));
-                    imp.setDatacadastro(rs.getDate("datacadastro"));
-                    if((rs.getString("email")) != null && (!"".equals(rs.getString("email")))) {
-                        imp.addContato("1", "EMAIL", null, null, TipoContato.NFE, rs.getString("email"));
+                    imp.setDatacadastro(rs.getDate("data_cadastro"));
+                    String email = rs.getString("email");
+                    if((email) != null && (!"".equals(email))) {
+                        imp.addContato("1", "EMAIL", null, null, TipoContato.NFE, email);
                     }
                     imp.setAtivo("0".equals(rs.getString("inativo")));
                     imp.setTipoEmpresa(rs.getInt("tipoempresa") == 0 ? TipoEmpresa.LUCRO_REAL : TipoEmpresa.EPP_SIMPLES);
@@ -501,6 +717,10 @@ public class OryonDAO extends InterfaceDAO {
     @Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+    }
+
+    private String formataIdTributacao(int cst, double aliquota, double reducao) {
+        return String.format("%d-%.2f-%.2f", cst, aliquota, reducao);
     }
     
     private static class VendaIterator implements Iterator<VendaIMP> {

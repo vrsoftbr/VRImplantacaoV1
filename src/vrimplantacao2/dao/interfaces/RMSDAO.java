@@ -616,7 +616,7 @@ public class RMSDAO extends InterfaceDAO {
                     "    left join AA2CFORN f2 on f.TIP_CODIGO = f2.FOR_CODIGO and F.TIP_DIGITO = f2.FOR_DIG_FOR \n" +
                     "    left join AA1FORDT f3 on f.TIP_CODIGO = f3.FOR_CODIGO\n" +
                     "WHERE\n" +
-                    "	F.TIP_LOJ_CLI = 'F'\n" +
+                    "	F.TIP_LOJ_CLI in ('F', 'L')\n" +
                     "order by\n" +
                     "    id"
             )) {
@@ -2288,7 +2288,7 @@ public class RMSDAO extends InterfaceDAO {
                     "    NF.VENCIMENTO\n" +
                     "FROM\n" +
                     "    (SELECT\n" +
-                    "		TIP_CODIGO || TIP_DIGITO ID_FORNECEDOR,\n" +
+                    "        TIP_CODIGO || TIP_DIGITO ID_FORNECEDOR,\n" +
                     "        RTRIM(DECODE(TIP_LOJ_CLI,\n" +
                     "                    'L',\n" +
                     "                    TIP_NOME_FANTASIA,\n" +
@@ -2326,7 +2326,7 @@ public class RMSDAO extends InterfaceDAO {
                     "        AA1CTCON\n" +
                     "    WHERE\n" +
                     "        ROWNUM >= 0 AND\n" +
-                    "        I.ESCHC_DATA >= 1190601 AND\n" +
+                    "        I.ESCHC_DATA >= 1190101 AND\n" +
                     "        I.ESITC_DIGITO = 0 AND\n" +
                     "        NVL(I.ENTSAIC_SITUACAO, ' ') <> 'E' AND\n" +
                     "        NVL(I.ENTSAIC_SITUACAO, ' ') <> '9' AND\n" +
@@ -2423,7 +2423,7 @@ public class RMSDAO extends InterfaceDAO {
                     "    * \n" +
                     "FROM \n" +
                     "    (SELECT \n" +
-                    "	     TIP_CODIGO ID_FORNECEDOR,\n" +
+                    "	     TIP_CODIGO || TIP_DIGITO ID_FORNECEDOR,\n" +
                     "        RTRIM(DECODE(TIP_LOJ_CLI, \n" +
                     "                    'L', \n" +
                     "                    TIP_NOME_FANTASIA,\n" +
@@ -2472,9 +2472,9 @@ public class RMSDAO extends InterfaceDAO {
                     "        AA3CITEM P \n" +        
                     "    WHERE \n" +
                     "        ROWNUM >= 0 AND \n" +
-                    "        I.ESCHC_DATA >= 1190601 AND\n" +
+                    "        I.ESCHC_DATA >= 1190101 AND\n" +
                     "        FIS_NRO_NOTA = " + numeroNota + " AND\n" +
-                    "        TIP_CODIGO = " + idFornecedor + "AND\n" +        
+                    "        TIP_CODIGO || TIP_DIGITO = " + idFornecedor + " AND\n" +        
                     "        I.ESITC_DIGITO = 0 AND \n" +
                     "        NVL(I.ENTSAIC_SITUACAO, ' ') <> 'E' AND \n" +
                     "        NVL(I.ENTSAIC_SITUACAO, ' ') <> '9' AND \n" +
@@ -2540,6 +2540,7 @@ public class RMSDAO extends InterfaceDAO {
                     item.setQuantidade(rst.getDouble("QUANTIDADE"));
                     item.setValorTotalProduto(rst.getDouble("CUSTOTOTAL"));
                     item.setIcmsAliquota(rst.getDouble("ICMS"));
+                    item.setCfop("1.102");
                     if(item.getIcmsAliquota() > 0) {
                         item.setIcmsCst(0);
                     }

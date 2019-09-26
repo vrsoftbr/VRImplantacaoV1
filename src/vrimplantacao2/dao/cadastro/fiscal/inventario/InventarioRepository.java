@@ -104,8 +104,12 @@ public class InventarioRepository {
                         
                         anteriores.put(anterior.getId(), anterior);
                         
+                    } else {
+                        LOG.warning("Produto '" + imp.getIdProduto() + "' - '" + imp.getDescricao() + "' não encontrado!");
                     }
                     
+                } else {
+                    LOG.warning("Inventário '" + imp.getId() + "' - '" + imp.getIdProduto() + "' - '" + imp.getDescricao() + "' já importado ");
                 }
                 
                 notificar();
@@ -120,57 +124,6 @@ public class InventarioRepository {
         }
         
     }
-    
-    /*
-    
-    public void importarInventarioOLD(List<InventarioIMP> inventario) throws Exception {
-        ProdutoAnteriorDAO produtoAnteriorDAO = new ProdutoAnteriorDAO();
-        System.gc();
-
-        this.provider.begin();
-        try {
-
-            //<editor-fold defaultstate="collapsed" desc="Gerando as listagens necessárias para trabalhar com a importação">
-            setNotificacao("Preparando para gravar inventario...", inventario.size());
-            Map<String, InventarioAnteriorVO> anteriores = provider.getAnteriores();
-            //</editor-fold>
-
-            setNotificacao("Gravando inventario...", inventario.size());
-
-            for (InventarioIMP imp : inventario) {
-                int idProduto = produtoAnteriorDAO.getCodigoAnterior2(provider.getSistema(), provider.getLojaOrigem(), imp.getIdProduto());
-
-                if (idProduto > 0) {
-
-                    InventarioAnteriorVO anterior = anteriores.get(imp.getId());
-                    if (anterior == null) {
-                        anterior = converterAnterior(imp, String.valueOf(idProduto));
-                        InventarioVO vo = converterInventario(imp, idProduto);
-                        provider.salvar(vo);
-                        anterior.setIdAtual(vo);
-
-                        provider.salvarAnterior(anterior);
-                        //Inclui na listagem de anteriores.
-                        anteriores.put(anterior.getId(), anterior);
-                    } else {
-                        anterior = converterAnterior(imp, String.valueOf(idProduto));
-                        InventarioVO vo = converterInventario(imp, idProduto);
-                        provider.atualizar(vo);
-                        anterior.setIdAtual(vo);
-                        provider.salvarAnterior(anterior);
-                        anteriores.put(anterior.getId(), anterior);
-                    }
-                }
-                notificar();
-            }
-            this.provider.commit();
-        } catch (Exception ex) {
-            this.provider.rollback();
-            throw ex;
-        }
-    }
-    
-    */
 
     public void setNotificacao(String mensagem, int qtd) throws Exception {
         ProgressBar.setStatus(mensagem);
