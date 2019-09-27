@@ -16,6 +16,7 @@ import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -221,6 +222,8 @@ public class OrionTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSituacaoCadastro("N".equals(rst.getString("ATIVO")) ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setCest(rst.getString("CEST"));
                     imp.setNcm(rst.getString("ncm"));
+                    imp.setPiscofinsCstDebito(rst.getString("PIS_CST_S"));
+                    imp.setPiscofinsCstDebito(rst.getString("PIS_CST_E"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("COD_NATUREZA_RECEITA"));
                     imp.setIcmsDebitoId(rst.getString("icms_id"));
                     imp.setIcmsDebitoForaEstadoId(rst.getString("icms_id"));
@@ -271,5 +274,100 @@ public class OrionTechDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
+    @Override
+    public List<FornecedorIMP> getFornecedores() throws Exception {
+        List<FornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    p.CHAVEPES id,\n" +
+                    "    p.NOME razao,\n" +
+                    "    coalesce(jd.NOMEFANTASIA, fs.APELIDO) fantasia,\n" +
+                    "    coalesce(jd.CNPJ, fs.CPF) cnpj,\n" +
+                    "    coalesce(jd.IE, fs.RG) inscricaoestadual,\n" +
+                    "    jd.IM inscricaomunicipal,\n" +
+                    "    endp.LOGRADOURO,\n" +
+                    "    endp.NUMERO,\n" +
+                    "    endp.COMPLEMENTO,\n" +
+                    "    endp.BAIRRO,\n" +
+                    "    endp.ibgemunicipio,\n" +
+                    "    endp.cep,\n" +
+                    "    endc.LOGRADOURO cob_endereco,\n" +
+                    "    endc.NUMERO cob_numero,\n" +
+                    "    endc.COMPLEMENTO cob_complemento,\n" +
+                    "    endc.BAIRRO cob_bairro,\n" +
+                    "    endc.ibgemunicipio cob_ibgemunicipio,\n" +
+                    "    endc.cep cob_cep,\n" +
+                    "    p.PEDIDOMINIMO,\n" +
+                    "    p.CADASTRO datacadastro,\n" +
+                    "    p.OBSERVACAO\n" +
+                    "from\n" +
+                    "    pessoa p\n" +
+                    "    left join fisica fs on\n" +
+                    "        p.CHAVEPES = fs.CHAVEPES\n" +
+                    "    left join JURIDICA jd on\n" +
+                    "        p.CHAVEPES = jd.CHAVEPES\n" +
+                    "    left join (\n" +
+                    "        select\n" +
+                    "            endp.CHAVEPES,\n" +
+                    "            ep.LOGRADOURO,\n" +
+                    "            ep.NUMERO,\n" +
+                    "            ep.COMPLEMENTO,\n" +
+                    "            ep.BAIRRO,\n" +
+                    "            mun.CODIBGE ibgemunicipio,\n" +
+                    "            cep.CODIGO cep\n" +
+                    "        from\n" +
+                    "            ENDPESSOA endp\n" +
+                    "        left join ENDERECO ep on\n" +
+                    "            ep.CHAVEEND = endp.CHAVEEND\n" +
+                    "        left join MUNICIPIO mun on\n" +
+                    "            ep.CHAVEMUN = mun.CHAVEMUN\n" +
+                    "        left join cep on\n" +
+                    "            ep.CHAVECEP = cep.CHAVECEP\n" +
+                    "        where\n" +
+                    "            endp.FUNCAO = 'P'\n" +
+                    "     ) endp on\n" +
+                    "        endp.CHAVEPES = p.CHAVEPES\n" +
+                    "     left join (\n" +
+                    "        select\n" +
+                    "            endp.CHAVEPES,\n" +
+                    "            ep.LOGRADOURO,\n" +
+                    "            ep.NUMERO,\n" +
+                    "            ep.COMPLEMENTO,\n" +
+                    "            ep.BAIRRO,\n" +
+                    "            mun.CODIBGE ibgemunicipio,\n" +
+                    "            cep.CODIGO cep\n" +
+                    "        from\n" +
+                    "            ENDPESSOA endp\n" +
+                    "        left join ENDERECO ep on\n" +
+                    "            ep.CHAVEEND = endp.CHAVEEND\n" +
+                    "        left join MUNICIPIO mun on\n" +
+                    "            ep.CHAVEMUN = mun.CHAVEMUN\n" +
+                    "        left join cep on\n" +
+                    "            ep.CHAVECEP = cep.CHAVECEP\n" +
+                    "        where\n" +
+                    "            endp.FUNCAO = 'C'\n" +
+                    "     ) endc on\n" +
+                    "        endc.CHAVEPES = p.CHAVEPES\n" +
+                    "where\n" +
+                    "    p.fornecedor = 'S'\n" +
+                    "order by\n" +
+                    "    p.CHAVEPES"
+            )) {
+                while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
     
 }
