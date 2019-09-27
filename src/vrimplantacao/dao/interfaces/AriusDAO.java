@@ -1505,8 +1505,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.cpf_cnpj\n"
                     + "from\n"
                     + "	vw_contas c\n"
-                    + " left join\n" 
-                    + "    clientes cl on cast(c.cpf_cnpj as numeric) = cast(cl.cnpj_cpf as numeric)\n"
+                    + "left join\n" 
+                    + " clientes cl on cast(c.cpf_cnpj as numeric) = cast(cl.cnpj_cpf as numeric)\n"
                     + "where\n"
                     + "	empresa = " + getLojaOrigem() + "\n"
                     + "	and parcela <> 0\n"
@@ -1696,7 +1696,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
     
     
 
-    @Override
+    /*@Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         try {
             MultiStatementIterator<VendaIMP> iterator = new MultiStatementIterator<>(
@@ -1768,6 +1768,16 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
             throw ex;
         }
 
+    }*/
+    
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new VendaIterator(getLojaOrigem(), vendaDataInicio, vendaDataTermino);
+    }
+    
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new VendaItemIterator(getLojaOrigem(), vendaDataInicio, vendaDataTermino);
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {
@@ -1799,8 +1809,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    left join clientes c on v.id_cliente = c.id\n"
                     + "where\n"
                     + "    v.empresa = " + origem + "\n"
-                    + "    and v.data_hora >= '" + DATE_FORMAT.format(vendaDataInicio) + "'\n"
-                    + "    and v.data_hora <= '" + DATE_FORMAT.format(vendaDataTermino) + "'\n"
+                    + "    and to_char(v.data_hora, 'dd/MM/yyyy') >= '" + DATE_FORMAT.format(vendaDataInicio) + "'\n"
+                    + "    and to_char(v.data_hora, 'dd/MM/yyyy') <= '" + DATE_FORMAT.format(vendaDataTermino) + "'\n"
                     + "order by v.id";
             this.stm.setFetchSize(10000);
             this.rst = stm.executeQuery(sql);
@@ -1857,7 +1867,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
-    @Override
+    /*@Override
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
 
         try {
@@ -1926,15 +1936,15 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
             throw ex;
         }
 
-        /*
-         try {
-         return new VendaItemIterator(getLojaOrigem(), vendaDataInicio, vendaDataTermino);
-         } catch (Exception ex) {        
-         LOG.log(Level.SEVERE, "Erro\n", ex);
-         throw ex;
-         }
-         */
-    }
+        
+         //try {
+         //return new VendaItemIterator(getLojaOrigem(), vendaDataInicio, vendaDataTermino);
+         //} catch (Exception ex) {        
+        // LOG.log(Level.SEVERE, "Erro\n", ex);
+        // throw ex;
+         //}
+         
+    }*/
 
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
@@ -1965,8 +1975,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    join produtos p on vi.produto = p.id\n"
                     + "where\n"
                     + "    v.empresa = " + origem + "\n"
-                    + "    and v.data_hora >= '" + DATE_FORMAT.format(vendaDataInicio) + "'\n"
-                    + "    and v.data_hora <= '" + DATE_FORMAT.format(vendaDataTermino) + "'\n"
+                    + "    and to_char(v.data_hora, 'dd/MM/yyyy') >= '" + DATE_FORMAT.format(vendaDataInicio) + "'\n"
+                    + "    and to_char(v.data_hora, 'dd/MM/yyyy') <= '" + DATE_FORMAT.format(vendaDataTermino) + "'\n"
                     + "order by vi.id";
             this.stm.setFetchSize(10000);
             this.rst = stm.executeQuery(sql);
