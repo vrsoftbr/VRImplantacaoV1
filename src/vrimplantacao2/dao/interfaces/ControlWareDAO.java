@@ -720,7 +720,9 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                         String horaTermino = timestampDate.format(rst.getDate("data")) + " " + rst.getString("hora");
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
+                        next.setCancelado("C".equals(rst.getString("status")));
                         next.setSubTotalImpressora(rst.getDouble("totalliquido"));
+                        //next.setValorAcrescimo(rst.getDouble("totalacrescimo"));
                         next.setCpf(rst.getString("cpfcnpj"));
                         next.setNomeCliente(rst.getString("nome"));
                         String endereco
@@ -755,6 +757,8 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     "	c.codcliente,\n" +
                     "	c.nome,\n" +
                     "	cupom.cpfcnpj,\n" +
+                    "   totalacrescimo,\n" +
+                    "   status,\n" +
                     "	c.enderres endereco,\n" +
                     "	c.numerores numero,\n" +
                     "	c.complementores complemento,\n" +
@@ -815,9 +819,11 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                         next.setProduto(rst.getString("codproduto"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
+                        next.setPrecoVenda(rst.getDouble("preco"));
                         next.setTotalBruto(rst.getDouble("valortotal"));
-                        next.setValorDesconto(rst.getDouble("desconto"));
-                        next.setCancelado("C".equals(rst.getBoolean("status")));
+                        //next.setValorAcrescimo(rst.getDouble("acrescimo"));
+                        //next.setValorDesconto(rst.getDouble("desconto"));
+                        next.setCancelado("C".equals(rst.getString("status")));
                         if("S".equals(rst.getString("pesado"))) {
                             next.setCodigoBarras(rst.getString("codproduto"));
                         } else {
@@ -914,6 +920,7 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     "	i.quantidade,\n" +
                     "	i.preco,\n" +
                     "	i.desconto,\n" +
+                    "   i.acrescimo,\n" +
                     "	i.valortotal,\n" +
                     "	i.aliqicms,\n" +
                     "	i.tptribicms,\n" +
@@ -926,7 +933,8 @@ public class ControlWareDAO extends InterfaceDAO implements MapaTributoProvider 
                     "join unidade un on emb.codunidade = un.codunidade\n" +
                     "where\n" +
                     "	c.dtmovto between '" + dataInicio + "' and '" + dataTermino + "' and\n" +
-                    "   c.codestabelec = " + idLojaCliente + "\n" +
+                    "   c.codestabelec = " + idLojaCliente + " and\n" +
+                    "   i.composicao in ('P', 'N')\n" +
                     "order by\n" +
                     "	c.dtmovto, idcupom";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
