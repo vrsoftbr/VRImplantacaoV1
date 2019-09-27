@@ -1,75 +1,37 @@
 package vrimplantacao2.dao.interfaces;
 
-import java.io.File;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import jxl.Cell;
-import jxl.Sheet;
-import jxl.Workbook;
-import jxl.WorkbookSettings;
-import vrframework.classe.Conexao;
-import vrframework.classe.ProgressBar;
-import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoSqlServer;
-import vrimplantacao.dao.cadastro.BancoDAO;
-import vrimplantacao.dao.cadastro.FornecedorDAO;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
-import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
-import vrimplantacao2.dao.cadastro.devolucao.receber.ReceberDevolucaoDAO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
-import vrimplantacao2.dao.cadastro.verba.receber.ReceberVerbaDAO;
-import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
-import vrimplantacao2.utils.MathUtils;
-import vrimplantacao2.utils.multimap.MultiMap;
-import vrimplantacao2.vo.cadastro.financeiro.ReceberDevolucaoVO;
-import vrimplantacao2.vo.cadastro.financeiro.ReceberVerbaVO;
-import vrimplantacao2.vo.enums.SituacaoCadastro;
-import vrimplantacao2.vo.enums.TipoContato;
-import vrimplantacao2.vo.enums.TipoEstadoCivil;
-import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.enums.TipoSexo;
-import vrimplantacao2.vo.importacao.AssociadoIMP;
-import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
-import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
-import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
-import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
-import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
-import vrimplantacao2.vo.importacao.VendaIMP;
-import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
  * @author lucasrafael
  */
 public class ArtSystemDAO extends InterfaceDAO {
-    
+
     @Override
     public String getSistema() {
         return "ArtSystem";
     }
-    
+
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet(Arrays.asList(new OpcaoProduto[]{
@@ -97,9 +59,10 @@ public class ArtSystemDAO extends InterfaceDAO {
             OpcaoProduto.ATACADO,
             OpcaoProduto.VALIDADE,
             OpcaoProduto.MERCADOLOGICO,
+            OpcaoProduto.MERCADOLOGICO_PRODUTO,
         }));
     }
-    
+
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
@@ -121,11 +84,11 @@ public class ArtSystemDAO extends InterfaceDAO {
         }
         return result;
     }
-    
+
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
@@ -151,11 +114,11 @@ public class ArtSystemDAO extends InterfaceDAO {
         }
         return result;
     }
-    
+
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select  \n"
@@ -183,8 +146,8 @@ public class ArtSystemDAO extends InterfaceDAO {
                     + "	pre.PRENVDAATU as precovenda\n"
                     + "from dbo.ASPROPRO p\n"
                     + "left join dbo.ASPROEAN ean on ean.EANNID_PRO = p.PRONID_PRO\n"
-                    + "left join dbo.ASPROEST est on est.ESTNID_PRO = p.PRONID_PRO and est.ESTNID_LOJ = "+getLojaOrigem()+"\n"
-                    + "left join dbo.ASPROPRE pre on pre.PRENID_PRO = p.PRONID_PRO and pre.PRENID_LOJ = "+getLojaOrigem()+"\n"
+                    + "left join dbo.ASPROEST est on est.ESTNID_PRO = p.PRONID_PRO and est.ESTNID_LOJ = " + getLojaOrigem() + "\n"
+                    + "left join dbo.ASPROPRE pre on pre.PRENID_PRO = p.PRONID_PRO and pre.PRENID_LOJ = " + getLojaOrigem() + "\n"
                     + "left join dbo.ASPROINC inc on inc.INCNID_ING = pre.PRENID_INC and INCNID_INT = 121\n"
                     + "left join dbo.ASPROFIG icm on icm.FIGNIDFIGU = pre.PRENIDFIGU"
             )) {
@@ -209,7 +172,7 @@ public class ArtSystemDAO extends InterfaceDAO {
                         if (produtoBalanca != null) {
                             imp.seteBalanca(true);
                             imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
-                        } else {                            
+                        } else {
                             imp.seteBalanca(false);
                         }
 
@@ -222,7 +185,7 @@ public class ArtSystemDAO extends InterfaceDAO {
                         } else {
                             imp.setEan(rst.getString("ean"));
                         }
-                        
+
                         imp.setQtdEmbalagem(rst.getInt("qtdemb_ean"));
                         imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                         imp.setDescricaoReduzida(rst.getString("descricaoresumida"));
@@ -245,17 +208,47 @@ public class ArtSystemDAO extends InterfaceDAO {
                         imp.setEstoqueMinimo(rst.getDouble("estoque_minimo"));
                         imp.setEstoqueMaximo(rst.getDouble("estoque_maximo"));
                         result.add(imp);
-                    }                    
+                    }
                 }
             }
             return result;
         }
     }
+
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        
+        if (opt == OpcaoProduto.MERCADOLOGICO) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + " p.PROCCODPRO as idproduto,\n"
+                        + " (p.PRONID_DEP - 4) as merc\n"
+                        + "from dbo.ASPROPRO p \n"
+                        + "inner join dbo.ASPRODEP d on d.DEPNID_DEP = (p.PRONID_DEP - 4)"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("idproduto"));
+                        imp.setCodMercadologico1(rst.getString("merc"));
+                        imp.setCodMercadologico2("1");
+                        imp.setCodMercadologico3("1");
+                        result.add(imp);
+                    }
+                }
+                return result;
+            }            
+        }
+        return null;
+    }
     
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -310,11 +303,11 @@ public class ArtSystemDAO extends InterfaceDAO {
         }
         return result;
     }
-    
+
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
@@ -341,11 +334,11 @@ public class ArtSystemDAO extends InterfaceDAO {
         }
         return result;
     }
-    
+
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
@@ -436,6 +429,44 @@ public class ArtSystemDAO extends InterfaceDAO {
                     imp.setSalario(rst.getDouble("salario"));
                     imp.setPermiteCreditoRotativo(true);
                     imp.setPermiteCheque(true);
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	f.FINNID_FIN as id,\n"
+                    + "	f.FINNID_ENT as idcliente,\n"
+                    + "	f.FINC_NFNUM as numerocupom,\n"
+                    + "	f.FINDDATEMI as dataemissao,\n"
+                    + "	i.FVLDVENVIG as datavencimento,\n"
+                    + "	i.FVLNVAlBRU as valor,\n"
+                    + "	i.FVLCDESCRI as observacao\n"
+                    + "from [As_FIN].dbo.ASFINFIN f\n"
+                    + "inner join [As_FIN].dbo.ASFINFVL i on i.FVLNID_FIN = f.FINNID_FIN\n"
+                    + "where f.FINCTIPENT = 'CLI'\n"
+                    + "and i.FVLDDATPAG is null\n"
+                    + "and i.FVLNID_PFI = 2\n"
+                    + "and f.FINNID_LOJ = " + getLojaOrigem() + "\n"
+                    + "order by f.FINDDATEMI desc"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setIdCliente(rst.getString("idcliente"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataVencimento(rst.getDate("datavencimento"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("observacao"));
                     result.add(imp);
                 }
             }
