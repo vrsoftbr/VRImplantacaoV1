@@ -1013,6 +1013,7 @@ public class ProdutoRepository {
         complemento.setTipoProduto(imp.getTipoProduto());
         complemento.setFabricacaoPropria(imp.isFabricacaoPropria());
         complemento.setEmiteEtiqueta(imp.isEmiteEtiqueta());
+        complemento.setDataPrimeiraAlteracao(imp.getDataCadastro());
 
         return complemento;
     }

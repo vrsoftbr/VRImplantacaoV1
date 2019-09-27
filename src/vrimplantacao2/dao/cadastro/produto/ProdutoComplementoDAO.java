@@ -65,6 +65,7 @@ public class ProdutoComplementoDAO {
                     sql.put("valoripi", 0);
                     sql.putNull("dataultimopreco");
                     sql.putNull("dataultimaentrada");
+                    sql.put("dataprimeiraalteracao", vo.getDataPrimeiraAlteracao());
                     sql.put("custosemimposto", vo.getCustoSemImposto());
                     sql.put("custocomimposto", vo.getCustoComImposto());
                     sql.put("custosemimpostoanterior", 0);
@@ -137,6 +138,7 @@ public class ProdutoComplementoDAO {
                 sql.put("custocomimpostoanterior", 0);
                 sql.put("precovenda", vo.getPrecoVenda());
                 sql.put("precovendaanterior", 0);
+                sql.put("dataprimeiraalteracao", vo.getDataPrimeiraAlteracao());
                 sql.put("precodiaseguinte", vo.getPrecoDiaSeguinte());
                 if (unificacao) {
                     sql.put("estoque", 0);
