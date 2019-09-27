@@ -65,7 +65,7 @@ import vrimplantacao.gui.interfaces.MobilityGUI;
 import vrimplantacao.gui.interfaces.PCSistemasGUI;
 import vrimplantacao.gui.interfaces.RMSGUI;
 import vrimplantacao.gui.interfaces.RMSGUI_2;
-import vrimplantacao.gui.interfaces.RootacGUI;
+import vrimplantacao2.gui.interfaces.RootacGUI;
 import vrimplantacao.gui.interfaces.SBOMarketGUI;
 import vrimplantacao2.gui.interfaces.SIMSGUI;
 import vrimplantacao.gui.interfaces.SaacGUI;
@@ -94,6 +94,7 @@ import vrimplantacao2.gui.interfaces.ASoftGUI;
 import vrimplantacao2.gui.interfaces.AcomGUI;
 import vrimplantacao2.gui.interfaces.AlphaSysGUI;
 import vrimplantacao2.gui.interfaces.ApolloGUI;
+import vrimplantacao2.gui.interfaces.ArtSystemGUI;
 import vrimplantacao2.gui.interfaces.AsefeGUI;
 import vrimplantacao2.gui.interfaces.AtenasGUI;
 import vrimplantacao2.gui.interfaces.AutoSystemGUI;
@@ -624,6 +625,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAcom = new javax.swing.JMenuItem();
         mnuHercules = new javax.swing.JMenuItem();
         mnuSav = new javax.swing.JMenuItem();
+        mnuArtSystem = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1649,6 +1651,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuSav);
+
+        mnuArtSystem.setText("ArtSystem");
+        mnuArtSystem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuArtSystemActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuArtSystem);
 
         mnuDatabase.add(mnuSqlServer2);
 
@@ -3009,18 +3019,7 @@ public final class MenuGUI extends VRMdiFrame {
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
 
-        try {
-            this.setWaitCursor();
-            if (formImportarRootac == null || formImportarRootac.isClosed()) {
-                formImportarRootac = new RootacGUI(this);
-            }
-            formImportarRootac.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
+        RootacGUI.exibir(this);
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void jMenuItemDirectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemDirectorActionPerformed
@@ -4116,9 +4115,15 @@ public final class MenuGUI extends VRMdiFrame {
         EticaGUI.exibir(this);
     }//GEN-LAST:event_mnuEticaActionPerformed
 
+    private void mnuArtSystemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuArtSystemActionPerformed
+        // TODO add your handling code here:
+        ArtSystemGUI.exibir(this);
+    }//GEN-LAST:event_mnuArtSystemActionPerformed
+
     private void mnuThotauActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuThotauActionPerformed
         OrionTechGUI.exibir(this);
     }//GEN-LAST:event_mnuThotauActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4214,6 +4219,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuAlphaSys;
     private javax.swing.JMenuItem mnuAlterDataWShop;
     private javax.swing.JMenuItem mnuApollo;
+    private javax.swing.JMenuItem mnuArtSystem;
     private javax.swing.JMenuItem mnuAsefe;
     private javax.swing.JMenuItem mnuAtenas;
     private javax.swing.JMenuItem mnuAutoSystem;

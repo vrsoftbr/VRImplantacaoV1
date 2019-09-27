@@ -9,10 +9,19 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
+import vrimplantacao.classe.ConexaoAccess;
 import vrimplantacao.classe.ConexaoDBF;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
+import vrimplantacao.vo.vrimplantacao.SqlVO;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -34,44 +43,172 @@ public class RootacDAO extends InterfaceDAO {
         return "Rootac";
     }
 
-    @Override
-    public List<MercadologicoIMP> getMercadologicos() throws Exception {
-        List<MercadologicoIMP> result = new ArrayList<>();
-
+    public List<Estabelecimento> getLojas() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "LOJC05CODI as codigo,\n"
+                    + "LOJC10APEL as nome\n"
+                    + "from\n"
+                    + "RC002LOJ")) {
+                while (rs.next()) {
+                    result.add(new Estabelecimento(rs.getString("codigo"), rs.getString("nome")));
+                }
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
+        Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(                    
                     "SELECT \n"
-                    + " COALESCE(GRUC03SETO,0) cod_m1,\n"
-                    + " COALESCE(GRUC03GRUP,0) cod_m2,\n"
-                    + " COALESCE(GRUC03SUBG,0) cod_m3,\n"
-                    + " COALESCE(GRUC03FAMI,0) cod_m4,\n"
-                    + " COALESCE(GRUC03SUBF,0) cod_m5,\n"
-                    + " GRUC35DESC desc_m\n"
+                    + " COALESCE(GRUC03SETO,0) COD_M1,\n"
+                    + " GRUC35DESC DESC_M\n"
+                    + " FROM RC001GRU\n"
+                    + "WHERE COALESCE(GRUC03GRUP,0) = 0\n"
+                    + "  AND COALESCE(GRUC03SUBG,0) = 0\n"
+                    + "  AND COALESCE(GRUC03FAMI,0) = 0\n"
+                    + "  AND COALESCE(GRUC03SUBF,0) = 0\n"
+                    + "ORDER BY\n"
+                    + " GRUC03SETO"                    
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP imp = new MercadologicoNivelIMP();
+                    imp.setId(rst.getString("COD_M1"));
+                    imp.setDescricao(rst.getString("DESC_M"));
+                    merc.put(imp.getId(), imp);
+                }
+            }
+
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + " COALESCE(GRUC03SETO,0) COD_M1,\n"
+                    + " COALESCE(GRUC03GRUP,0) COD_M2,\n"
+                    + " GRUC35DESC DESC_M\n"
+                    + " FROM RC001GRU\n"
+                    + "WHERE COALESCE(GRUC03GRUP,0) > 0\n"
+                    + "  AND COALESCE(GRUC03SUBG,0) = 0\n"
+                    + "  AND COALESCE(GRUC03FAMI,0) = 0\n"
+                    + "  AND COALESCE(GRUC03SUBF,0) = 0\n"
+                    + "ORDER BY\n"
+                    + " GRUC03SETO, GRUC03GRUP"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP merc1 = merc.get(rst.getString("COD_M1"));
+                    if (merc1 != null) {
+                        merc1.addFilho(
+                                rst.getString("COD_M2"),
+                                rst.getString("DESC_M")
+                        );
+                    }
+                }
+            }
+
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + " COALESCE(GRUC03SETO,0) COD_M1,\n"
+                    + " COALESCE(GRUC03GRUP,0) COD_M2,\n"
+                    + " COALESCE(GRUC03SUBG,0) COD_M3,\n"
+                    + " GRUC35DESC DESC_M\n"
                     + "FROM RC001GRU\n"
+                    + "WHERE COALESCE(GRUC03GRUP,0) > 0\n"
+                    + "  AND COALESCE(GRUC03SUBG,0) > 0\n"
+                    + "  AND COALESCE(GRUC03FAMI,0) = 0\n"
+                    + "  AND COALESCE(GRUC03SUBF,0) = 0\n"
+                    + "ORDER BY\n"
+                    + " GRUC03SETO, GRUC03GRUP,\n"
+                    + " GRUC03SUBG"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP merc1 = merc.get(rst.getString("COD_M1"));
+                    if (merc1 != null) {
+                        MercadologicoNivelIMP merc2 = merc1.getNiveis().get(rst.getString("COD_M2"));
+                        if (merc2 != null) {
+                            merc2.addFilho(
+                                    rst.getString("COD_M3"),
+                                    rst.getString("DESC_M")
+                            );
+                        }
+                    }
+                }
+            }
+            
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + " COALESCE(GRUC03SETO,0) COD_M1,\n"
+                    + " COALESCE(GRUC03GRUP,0) COD_M2,\n"
+                    + " COALESCE(GRUC03SUBG,0) COD_M3,\n"
+                    + " COALESCE(GRUC03FAMI,0) COD_M4,\n"
+                    + " GRUC35DESC DESC_M\n"
+                    + "FROM RC001GRU\n"
+                    + "WHERE COALESCE(GRUC03GRUP,0) > 0\n"
+                    + "  AND COALESCE(GRUC03SUBG,0) > 0\n"
+                    + "  AND COALESCE(GRUC03FAMI,0) > 0\n"
+                    + "  AND COALESCE(GRUC03SUBF,0) = 0\n"
+                    + "ORDER BY\n"
+                    + " GRUC03SETO, GRUC03GRUP,\n"
+                    + " GRUC03SUBG, GRUC03FAMI"
+            )) {
+                while (rst.next()) {
+                    MercadologicoNivelIMP merc1 = merc.get(rst.getString("COD_M1"));
+                    if (merc1 != null) {
+                        MercadologicoNivelIMP merc2 = merc1.getNiveis().get(rst.getString("COD_M2"));
+                        if (merc2 != null) {
+                            MercadologicoNivelIMP merc3 = merc2.getNiveis().get(rst.getString("COD_M3"));
+                            if (merc3 != null) {
+                                merc3.addFilho(
+                                        rst.getString("COD_M4"),
+                                        rst.getString("DESC_M")
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT\n"
+                    + " COALESCE(GRUC03SETO,0) COD_M1,\n"
+                    + " COALESCE(GRUC03GRUP,0) COD_M2,\n"
+                    + " COALESCE(GRUC03SUBG,0) COD_M3,\n"
+                    + " COALESCE(GRUC03FAMI,0) COD_M4,\n"
+                    + " COALESCE(GRUC03SUBF,0) COD_M5,\n"
+                    + " GRUC35DESC DESC_M\n"
+                    + "FROM RC001GRU\n"
+                    + "WHERE COALESCE(GRUC03GRUP,0) > 0\n"
+                    + "  AND COALESCE(GRUC03SUBG,0) > 0\n"
+                    + "  AND COALESCE(GRUC03FAMI,0) > 0\n"
+                    + "  AND COALESCE(GRUC03SUBF,0) > 0\n"
                     + "ORDER BY\n"
                     + " GRUC03SETO, GRUC03GRUP,\n"
                     + " GRUC03SUBG, GRUC03FAMI,\n"
                     + " GRUC03SUBF"
             )) {
                 while (rst.next()) {
-                    MercadologicoIMP imp = new MercadologicoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setMerc1ID(rst.getString("cod_m1"));
-                    imp.setMerc1Descricao(rst.getString("desc_m"));
-                    imp.setMerc2ID(rst.getString("cod_m2"));
-                    imp.setMerc2Descricao(imp.getMerc1Descricao());
-                    imp.setMerc3ID(rst.getString("cod_m3"));
-                    imp.setMerc3Descricao(imp.getMerc1Descricao());
-                    imp.setMerc4ID(rst.getString("cod_m4"));
-                    imp.setMerc4Descricao(imp.getMerc1Descricao());
-                    imp.setMerc5ID(rst.getString("cod_m5"));
-                    imp.setMerc5Descricao(imp.getMerc5Descricao());
-                    result.add(imp);
+                    MercadologicoNivelIMP merc1 = merc.get(rst.getString("COD_M1"));
+                    if (merc1 != null) {
+                        MercadologicoNivelIMP merc2 = merc1.getNiveis().get(rst.getString("COD_M2"));
+                        if (merc2 != null) {
+                            MercadologicoNivelIMP merc3 = merc2.getNiveis().get(rst.getString("COD_M3"));
+                            if (merc3 != null) {
+                                MercadologicoNivelIMP merc4 = merc3.getNiveis().get(rst.getString("COD_M4"));
+                                if (merc4 != null) {
+                                    merc4.addFilho(
+                                            rst.getString("COD_M5"),
+                                            rst.getString("DESC_M")
+                                    );
+                                }
+                            }
+                        }
+                    }
                 }
-            }
+            }            
         }
-        return result;
+        return new ArrayList<>(merc.values());
     }
 
     @Override
@@ -82,7 +219,9 @@ public class RootacDAO extends InterfaceDAO {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
                     + " CODIGOPLU as id,\n"
+                    + " ESTC01PESO as balanca,\n"
                     + " ESTC03TIPO as unidade,\n"
+                    + " ESTN03QTDE as qtdembalagem,\n"
                     + " ESTC35DESC as descricaocompleta,\n"
                     + " ESTC13CODI as ean,\n"
                     + " ESTC17RESU as descricaoresumida,\n"
@@ -92,36 +231,69 @@ public class RootacDAO extends InterfaceDAO {
                     + " ESTC03SUBG as merc3,\n"
                     + " ESTC03FAMI as merc4,\n"
                     + " ESTC03SUBF as merc5,\n"
-                    + " ESTNO5MRGE as margem,\n"
+                    + " ESTN05MRGE as margem,\n"
                     + " VENDAATUA as precovenda,\n"
                     + " PRODVALIDA as validade,"
                     + " ESTN10MINI as estoqueminimo,\n"
-                    + " ESTN10MAXI as estoquemaximo,\n"
-                    + "FROM RC003EST\n"
-                    + "WHERE ESTC200LOJ = " + getLojaOrigem()
+                    + " ESTN10MAXI as estoquemaximo\n"
+                    + "FROM RC003EST "
+                    + "ORDER BY CODIGOPLU"
             )) {
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("id"));
-                    imp.setEan(rst.getString("ean"));
-                    imp.setValidade(rst.getInt("validade"));
-                    imp.setTipoEmbalagem(rst.getString("unidade"));
-                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rst.getString("descricaoresumida"));
-                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                    imp.setCodMercadologico1(rst.getString("merc1"));
-                    imp.setCodMercadologico2(rst.getString("merc2"));
-                    imp.setCodMercadologico3(rst.getString("merc3"));
-                    imp.setCodMercadologico4(rst.getString("merc4"));
-                    imp.setCodMercadologico5(rst.getString("merc5"));
-                    imp.setNcm(rst.getString("ncm"));
-                    imp.setMargem(rst.getDouble("margem"));
-                    imp.setPrecovenda(rst.getDouble("precovenda"));
-                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
-                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
-                    result.add(imp);
+
+                    if ((rst.getString("id") != null)
+                            && (!rst.getString("id").trim().isEmpty())) {
+
+                        ProdutoIMP imp = new ProdutoIMP();
+                        ProdutoBalancaVO produtoBalanca;
+
+                        String codigoBalanca = rst.getString("id").substring(0, rst.getString("id").trim().length() - 1);
+
+                        long codigoProduto;
+                        codigoProduto = Long.parseLong(codigoBalanca);
+                        if (codigoProduto <= Integer.MAX_VALUE) {
+                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
+                        } else {
+                            produtoBalanca = null;
+                        }
+
+                        if (produtoBalanca != null) {
+                            imp.seteBalanca(true);
+                            imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rst.getInt("validade"));
+                        } else {
+                            rst.getInt("validade");
+                            imp.seteBalanca(false);
+                        }
+
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id"));
+                        //imp.seteBalanca("S".equals(rst.getString("balanca")));
+
+                        if (imp.isBalanca()) {
+                            imp.setEan(codigoBalanca);
+                        } else {
+                            imp.setEan(rst.getString("ean"));
+                        }
+                        //imp.setValidade(rst.getInt("validade"));
+                        imp.setTipoEmbalagem(rst.getString("unidade"));
+                        imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                        imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                        imp.setDescricaoReduzida(rst.getString("descricaoresumida"));
+                        imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                        imp.setCodMercadologico1(rst.getString("merc1"));
+                        imp.setCodMercadologico2(rst.getString("merc2"));
+                        imp.setCodMercadologico3(rst.getString("merc3"));
+                        imp.setCodMercadologico4(rst.getString("merc4"));
+                        imp.setCodMercadologico5(rst.getString("merc5"));
+                        imp.setNcm(rst.getString("ncm"));
+                        imp.setMargem(rst.getDouble("margem"));
+                        imp.setPrecovenda(rst.getDouble("precovenda"));
+                        imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
+                        imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
+                        result.add(imp);
+                    }
                 }
             }
         }
@@ -167,21 +339,22 @@ public class RootacDAO extends InterfaceDAO {
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
-                    + " f.CODIFABRIC as id,\n"
-                    + " f.FORC35RAZA as razao\n,"
-                    + " f.FORC10APEL as fantasia,\n"
-                    + " f.FORC15CGC as cnpj,\n"
-                    + " f.FORC19INSC as ie_rg,\n"
-                    + " f.FORC35ENDE as endereco,\n"
-                    + " f.FORC20BAIR as bairro,\n"
-                    + " f.FORC20CIDA as municipio,\n"
-                    + " f.FORC20ESTA as uf,\n"
-                    + " f.FORC25FONE as telefone,\n"
-                    + " f.FORC10FAX as fax,\n"
-                    + " f.FORCMAILTO as email,\n"
-                    + " f.FORC400OBS1 as observacao\n"
-                    + "FROM RC008FOR f\n"
-                    + "ORDER BY f.CODIFABRIC"
+                    + " CODIFABRIC AS ID, "
+                    + " FORC35RAZA AS RAZAO, "
+                    + " FORC10APEL AS FANTASIA, "
+                    + " FORC15CGC AS CNPJ, "
+                    + " FORC19INSC AS IE_RG, "
+                    + " FORC35ENDE AS ENDERECO, "
+                    + " FORC20BAIR AS BAIRRO, "
+                    + " FORC20CIDA AS MUNICIPIO, "
+                    + " FORC08CEP AS CEP, "
+                    + " FORC02ESTA AS UF, "
+                    + " FORC25FONE AS TELEFONE, "
+                    + " FORC11FAX AS FAX, "
+                    + " FORCMAILTO AS EMAIL, "
+                    + " FORC40OBS1 AS OBSERVACAO "
+                    + "FROM RC008FOR "
+                    + "ORDER BY CODIFABRIC"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
@@ -270,31 +443,31 @@ public class RootacDAO extends InterfaceDAO {
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT\n"
-                    + " CLIC05CLIE as id,\n"
-                    + " CLIC35NOME as razao,\n"
-                    + " CLIC10APEL as fantasia,\n"
-                    + " CLIC15CGC as cnpj,\n"
-                    + " CLIC19RG as ie_rg,\n"
-                    + " CLIC35ENDE as endereco,\n"
-                    + " CLIC20BAIR as bairro,\n"
-                    + " CLIC20CIDA as nunicipio,\n"
-                    + " CLIC02ESTA as uf,\n"
-                    + " CLIC08CEP as cep,\n"
-                    + " CLIC18FONE as telefone,\n"
-                    + " CLIC11FAX as fax,\n"
-                    + " CLIC40OBS1 as observacao,\n"
-                    + " EMPRESNOME as empresa,\n"
-                    + " EMPRESENDE as empresaendereco,\n"
-                    + " EMPRESESTA as empresauf,\n"
-                    + " EMPRESCIDA as empresamunicipio,\n"
-                    + " EMPRESBAIR as empresabairro,\n"
-                    + " EMPRESCEP as empresacep,\n"
-                    + " EMPRESFONE as empresatelefone,\n"
-                    + " EMPRESFAX as empresafax,\n"
-                    + " CLIN14SALA as salario,\n"
-                    + " CLINLIMDES as limite,\n"
-                    + " CLINLIMCON as limiteconvenio,\n"
-                    + " ESTADOCOVI as estadocovil\n"
+                    + " CLIC05CLIE AS ID,\n"
+                    + " CLIC35NOME AS RAZAO,\n"
+                    + " CLIC10APEL AS FANTASIA,\n"
+                    + " CLIC15CGC AS CNPJ,\n"
+                    + " CLIC19RG AS IE_RG,\n"
+                    + " CLIC35ENDE AS ENDERECO,\n"
+                    + " CLIC20BAIR AS BAIRRO,\n"
+                    + " CLIC20CIDA AS MUNICIPIO,\n"
+                    + " CLIC02ESTA AS UF,\n"
+                    + " CLIC08CEP AS CEP,\n"
+                    + " CLIC18FONE AS TELEFONE,\n"
+                    + " CLIC11FAX AS FAX,\n"
+                    + " CLIC40OBS1 AS OBSERVACAO,\n"
+                    + " EMPRESNOME AS EMPRESA,\n"
+                    + " EMPRESENDE AS EMPRESAENDERECO,\n"
+                    + " EMPRESESTA AS EMPRESAUF,\n"
+                    + " EMPRESCIDA AS EMPRESAMUNICIPIO,\n"
+                    + " EMPRESBAIR AS EMPRESABAIRRO,\n"
+                    + " EMPRESACEP AS EMPRESACEP,\n"
+                    + " EMPRESFONE AS EMPRESATELEFONE,\n"
+                    + " EMPRESAFAX AS EMPRESAFAX,\n"
+                    + " CLIN14SALA AS SALARIO,\n"
+                    + " CLINLIMDES AS LIMITE,\n"
+                    + " CLINLIMCON AS LIMITECONVENIO,\n"
+                    + " ESTADOCIVI AS ESTADOCIVIL\n"
                     + "FROM RC042CLI\n"
                     + "ORDER BY CLIC05CLIE"
             )) {
@@ -321,7 +494,26 @@ public class RootacDAO extends InterfaceDAO {
                     imp.setEmpresaUf(rst.getString("empresauf"));
                     imp.setEmpresaTelefone(rst.getString("empresatelefone"));
                     imp.setSalario(rst.getDouble("salario"));
-                    imp.setValorLimite(rst.getDouble("limite"));
+                    imp.setValorLimite(rst.getDouble("LIMITECONVENIO"));
+                                        
+                    if ((rst.getString("ESTADOCIVIL") != null)
+                            && (!rst.getString("ESTADOCIVIL").trim().isEmpty())) {
+                        
+                        if ("S".equals(rst.getString("ESTADOCIVIL"))) {
+                            imp.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
+                        } else if ("C".equals(rst.getString("ESTADOCIVIL"))) {
+                            imp.setEstadoCivil(TipoEstadoCivil.CASADO);
+                        } else if ("V".equals(rst.getString("ESTADOCIVIL"))) {
+                            imp.setEstadoCivil(TipoEstadoCivil.VIUVO);
+                        } else if ("D".equals(rst.getString("ESTADOCIVIL"))) {
+                            imp.setEstadoCivil(TipoEstadoCivil.DIVORCIADO);
+                        } else {
+                            imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
+                        }
+                    } else {
+                        imp.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
+                    }
+                    
                     imp.setPermiteCheque(true);
                     imp.setPermiteCreditoRotativo(true);
                     result.add(imp);
@@ -330,4 +522,46 @@ public class RootacDAO extends InterfaceDAO {
         }
         return result;
     }
+    
+    public SqlVO consultar(String i_sql) throws Exception {
+        Statement stm = null;
+        ResultSet rst = null;
+
+        stm = ConexaoDBF.getConexao().createStatement();
+        rst = stm.executeQuery(i_sql);
+
+        SqlVO oSql = new SqlVO();
+
+        for (int i = 1; i <= rst.getMetaData().getColumnCount(); i++) {
+            oSql.vHeader.add(rst.getMetaData().getColumnName(i));
+        }
+
+        while (rst.next()) {
+            List<String> vColuna = new ArrayList();
+
+            for (int i = 1; i <= rst.getMetaData().getColumnCount(); i++) {
+                vColuna.add(rst.getString(i));
+            }
+
+            oSql.vConsulta.add(vColuna);
+        }
+
+        stm.close();
+
+        return oSql;
+    }
+
+    public String executar(String i_sql) throws Exception {
+        Statement stm = null;
+
+        try {
+            stm = ConexaoAccess.getConexao().createStatement();
+            int result = stm.executeUpdate(i_sql);
+            stm.close();
+            return "Executado com sucesso: " + result + " registros afetados.";
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+    
 }

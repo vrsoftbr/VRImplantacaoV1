@@ -602,6 +602,11 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by r.COD_PROD\n"
             )) {
                 while (rst.next()) {
+                    
+                    double qtdEmbUtilizado = 0;
+                    qtdEmbUtilizado = rst.getDouble("PESO") * 1000 ;
+                    
+                    
                     ReceitaIMP imp = new ReceitaIMP();
                     imp.setImportloja(getLojaOrigem());
                     imp.setImportsistema(getSistema());
@@ -609,8 +614,8 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdproduto(rst.getString("COD_PROD"));
                     imp.setDescricao(rst.getString("NOMERECEITA"));
                     imp.setFichatecnica(rst.getString("RECEITA"));
-                    imp.setQtdembalagemreceita(rst.getInt("PESO") == 0 ? 1 : rst.getInt("PESO"));
-                    imp.setQtdembalagemproduto(rst.getInt("QTDE_PRODUCAO_UND") == 0 ? 1 : rst.getInt("QTDE_PRODUCAO_UND"));
+                    imp.setQtdembalagemreceita((int) qtdEmbUtilizado);
+                    imp.setQtdembalagemproduto((rst.getInt("QTDE_PRODUCAO_UND") == 0 ? 1 : rst.getInt("QTDE_PRODUCAO_UND")) * 1000);
                     imp.setRendimento(rst.getInt("QTDE_PRODUCAO_KG"));
                     imp.getProdutos().add(rst.getString("ITEM"));
                     result.add(imp);
