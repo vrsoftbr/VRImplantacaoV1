@@ -37,7 +37,7 @@ public class Main {
 
             System.out.println("os.name " + OSName);
 
-            if (OSName.toUpperCase().contains("LINUX")) {            
+            if (OSName.toUpperCase().contains("LINUX")) {
                 for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                     if ("Metal".equals(info.getName())) {
                         UIManager.getDefaults().put("TitledBorder.font", new Font("Tahoma", Font.PLAIN, 10));
@@ -45,6 +45,8 @@ public class Main {
                         break;
                     }
                 }
+            } else {
+                Util.setLookAndFeel();
             }
 
             
