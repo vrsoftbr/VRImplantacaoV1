@@ -46,14 +46,12 @@ public class OrionTechGUI extends VRInternalFrame {
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
-        chkEliminarDigito.setSelected(params.getBool(SISTEMA, "ELIMINAR_DIGITO"));
         txtHost.setText(params.getWithNull("localhost", SISTEMA, "HOST"));
         txtDatabase.setArquivo(params.getWithNull("C:\\Thotal\\thot.FDB", SISTEMA, "DATABASE"));
         txtPorta.setText(params.getWithNull("3050", SISTEMA, "PORTA"));
         txtUsuario.setText(params.getWithNull("SYSDBA", SISTEMA, "USUARIO"));
         txtSenha.setText(params.getWithNull("148786", SISTEMA, "SENHA"));
         txtComplemento.setText(params.getWithNull("", SISTEMA, "COMPLEMENTO"));
-        cbxUfPautaFiscal.setSelectedIndex(params.getInt(0, SISTEMA, "UF_PAUTA_FISCAL"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
@@ -61,14 +59,12 @@ public class OrionTechGUI extends VRInternalFrame {
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.gravarParametros(params, SISTEMA);
-        params.put(chkEliminarDigito.isSelected(), SISTEMA, "ELIMINAR_DIGITO");
         params.put(txtHost.getText(), SISTEMA, "HOST");
         params.put(txtDatabase.getArquivo(), SISTEMA, "DATABASE");
         params.put(txtPorta.getText(), SISTEMA, "PORTA");
         params.put(txtUsuario.getText(), SISTEMA, "USUARIO");
         params.put(txtSenha.getText(), SISTEMA, "SENHA");
         params.put(txtComplemento.getText(), SISTEMA, "COMPLEMENTO");
-        params.put(cbxUfPautaFiscal.getSelectedIndex(), SISTEMA, "UF_PAUTA_FISCAL");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         
         if (cliente != null) {
@@ -91,7 +87,6 @@ public class OrionTechGUI extends VRInternalFrame {
         ConexaoFirebird.encoding = "WIN1252";
         initComponents();
         tabProdutos.setOpcoesDisponiveis(dao);
-        tabProdutos.tabParametros.add(pnlProdutoCustom);
         
         this.tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
             @Override
@@ -321,11 +316,6 @@ public class OrionTechGUI extends VRInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        pnlProdutoCustom = new vrframework.bean.panel.VRPanel();
-        chkEliminarDigito = new vrframework.bean.checkBox.VRCheckBox();
-        jLabel3 = new javax.swing.JLabel();
-        cbxUfPautaFiscal = new javax.swing.JComboBox();
-        jLabel5 = new javax.swing.JLabel();
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
         jLabel1 = new javax.swing.JLabel();
@@ -357,6 +347,7 @@ public class OrionTechGUI extends VRInternalFrame {
         chkUnifProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
+        tabBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         vRPanel6 = new vrframework.bean.panel.VRPanel();
         tabsConn = new javax.swing.JTabbedPane();
         jPanel4 = new javax.swing.JPanel();
@@ -375,51 +366,6 @@ public class OrionTechGUI extends VRInternalFrame {
         btnConectar = new javax.swing.JToggleButton();
         txtComplemento = new vrframework.bean.textField.VRTextField();
         vRLabel22 = new vrframework.bean.label.VRLabel();
-
-        chkEliminarDigito.setText("Eliminar dígito final dos produtos de balança");
-        chkEliminarDigito.setToolTipText("<html>\n<p>Quando esta opção é marcada o digito no final dos PLUs dos produtos de balança é <b>removido</b></p>\n</html>");
-
-        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel3.setText("CUSTOM");
-
-        cbxUfPautaFiscal.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO" }));
-        cbxUfPautaFiscal.setToolTipText("Utilizado para encontrar a alíquota \"Fora do Estado\" na Pauta Fiscal");
-
-        jLabel5.setText("UF Pauta Fiscal (Fora do estado)");
-        jLabel5.setToolTipText("Utilizado para encontrar a alíquota \"Fora do Estado\" na Pauta Fiscal");
-
-        javax.swing.GroupLayout pnlProdutoCustomLayout = new javax.swing.GroupLayout(pnlProdutoCustom);
-        pnlProdutoCustom.setLayout(pnlProdutoCustomLayout);
-        pnlProdutoCustomLayout.setHorizontalGroup(
-            pnlProdutoCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlProdutoCustomLayout.createSequentialGroup()
-                .addGap(19, 19, 19)
-                .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(cbxUfPautaFiscal, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-            .addGroup(pnlProdutoCustomLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlProdutoCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3)
-                    .addGroup(pnlProdutoCustomLayout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(chkEliminarDigito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        pnlProdutoCustomLayout.setVerticalGroup(
-            pnlProdutoCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlProdutoCustomLayout.createSequentialGroup()
-                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkEliminarDigito, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlProdutoCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(cbxUfPautaFiscal)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
 
         setTitle("Importação Orion Tech");
         setToolTipText("");
@@ -721,6 +667,7 @@ public class OrionTechGUI extends VRInternalFrame {
         );
 
         tabs.addTab("Unificação", vRPanel2);
+        tabs.addTab("Balança", tabBalanca);
 
         vRPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Origem - Firebird"));
         vRPanel6.setPreferredSize(new java.awt.Dimension(350, 350));
@@ -1023,14 +970,12 @@ public class OrionTechGUI extends VRInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
     private vrframework.bean.button.VRButton btnMigrar;
-    private javax.swing.JComboBox cbxUfPautaFiscal;
     private vrframework.bean.checkBox.VRCheckBox chkCBloqueado;
     private vrframework.bean.checkBox.VRCheckBox chkCObservacao2;
     private vrframework.bean.checkBox.VRCheckBox chkCSituacaoCadastro;
     private vrframework.bean.checkBox.VRCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkContasAPagar;
-    private vrframework.bean.checkBox.VRCheckBox chkEliminarDigito;
     private vrframework.bean.checkBox.VRCheckBox chkFBloqueado;
     private vrframework.bean.checkBox.VRCheckBox chkFCnpj;
     private vrframework.bean.checkBox.VRCheckBox chkFContatos;
@@ -1049,10 +994,8 @@ public class OrionTechGUI extends VRInternalFrame {
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel4;
-    private vrframework.bean.panel.VRPanel pnlProdutoCustom;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel tabBalanca;
     private vrframework.bean.panel.VRPanel tabClienteDados;
     private vrframework.bean.tabbedPane.VRTabbedPane tabClientes;
     private vrframework.bean.panel.VRPanel tabImpFornecedor;

@@ -76,6 +76,7 @@ public class OrionTechDAO extends InterfaceDAO implements MapaTributoProvider {
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
                 OpcaoProduto.PRODUTOS,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                 OpcaoProduto.DATA_CADASTRO,
                 OpcaoProduto.DATA_ALTERACAO,
                 OpcaoProduto.EAN,
