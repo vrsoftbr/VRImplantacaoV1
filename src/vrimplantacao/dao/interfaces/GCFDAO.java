@@ -210,7 +210,10 @@ public class GCFDAO extends InterfaceDAO {
                     "order by produto, ano, mes, dia"
             )) {
                 while (rst.next()) {
-                    pisCofinsList.put(rst.getString("produto"), new int[] { rst.getInt("piscofinscredito"), rst.getInt("piscofinsdebito"), });
+                    pisCofinsList.put(rst.getString("produto"), new int[] { 
+                        Utils.stringToInt(rst.getString("piscofinscredito")),
+                        Utils.stringToInt(rst.getString("piscofinsdebito"))
+                    });
                 }
             }
             
