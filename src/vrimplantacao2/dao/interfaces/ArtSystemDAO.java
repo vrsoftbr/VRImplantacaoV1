@@ -13,6 +13,7 @@ import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -297,6 +298,16 @@ public class ArtSystemDAO extends InterfaceDAO {
                     imp.setUf(rst.getString("uf"));
                     imp.setTel_principal(rst.getString("ddd") + rst.getString("telefone"));
                     imp.setObservacao(rst.getString("observacao"));
+
+                    if ((rst.getString("telefone") != null)
+                            && (!rst.getString("telefone").trim().isEmpty())) {
+                        imp.addTelefone(
+                                rst.getString("tel_contato") != null ? rst.getString("tel_contato") : "TELEFONE",
+                                rst.getString("ddd") + rst.getString("telefone")
+                        );
+                    }
+                    
+                    
                     result.add(imp);
                 }
             }
@@ -381,7 +392,8 @@ public class ArtSystemDAO extends InterfaceDAO {
                     + "	cli.CLINLIMCPR as valor_limite,\n"
                     + "	cli.CLINCVNSAL as salario,\n"
                     + "	cli.CLINCVNLIM as limite_convenio,\n"
-                    + "	cli.CLICSEXTIP as sexo\n"
+                    + "	cli.CLICSEXTIP as sexo,\n"
+                    + " cli.CLINID_STA as status\n"
                     + "from dbo.ASENTENT f\n"
                     + "left join dbo.ASCEPCEP cep on cep.CEPNID_CEP = f.ENTNID_CEP\n"
                     + "left join dbo.ASCEPBAI bai on bai.BAINID_BAI = cep.CEPNID_BAI\n"
@@ -429,6 +441,29 @@ public class ArtSystemDAO extends InterfaceDAO {
                     imp.setSalario(rst.getDouble("salario"));
                     imp.setPermiteCreditoRotativo(true);
                     imp.setPermiteCheque(true);
+                    
+                    if (null != rst.getString("status")) switch (rst.getString("status")) {
+                        case "232":
+                            imp.setBloqueado(true);
+                            break;
+                        case "233":
+                            imp.setBloqueado(false);
+                            break;
+                        case "263":
+                            imp.setBloqueado(true);
+                            break;
+                        default:
+                            imp.setBloqueado(false);
+                            break;
+                    }
+                    
+                    if ((rst.getString("telefone") != null)
+                            && (!rst.getString("telefone").trim().isEmpty())) {
+                        imp.addTelefone(
+                                rst.getString("tel_contato") != null ? rst.getString("tel_contato") : "TELEFONE",
+                                rst.getString("ddd") + rst.getString("telefone")
+                        );
+                    }
                     result.add(imp);
                 }
             }
