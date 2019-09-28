@@ -16,9 +16,12 @@ import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -287,6 +290,7 @@ public class OrionTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    coalesce(jd.CNPJ, fs.CPF) cnpj,\n" +
                     "    coalesce(jd.IE, fs.RG) inscricaoestadual,\n" +
                     "    jd.IM inscricaomunicipal,\n" +
+                    "    coalesce(pesemp.ATIVO, 'S') ativo,\n" +
                     "    endp.LOGRADOURO,\n" +
                     "    endp.NUMERO,\n" +
                     "    endp.COMPLEMENTO,\n" +
@@ -304,6 +308,9 @@ public class OrionTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    p.OBSERVACAO\n" +
                     "from\n" +
                     "    pessoa p\n" +
+                    "    left join pesemp on\n" +
+                    "       p.chavepes = pesemp.chavepes and\n" +
+                    "       pesemp.chaveemp = " + getLojaOrigem() + "\n" +
                     "    left join fisica fs on\n" +
                     "        p.CHAVEPES = fs.CHAVEPES\n" +
                     "    left join JURIDICA jd on\n" +
@@ -360,7 +367,30 @@ public class OrionTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj_cpf(rst.getString("cnpj"));
+                    imp.setIe_rg(rst.getString("inscricaoestadual"));
+                    imp.setInsc_municipal(rst.getString("inscricaomunicipal"));
+                    imp.setAtivo(!"N".equals(rst.getString("ativo")));
+                    imp.setEndereco(rst.getString("LOGRADOURO"));
+                    imp.setNumero(rst.getString("NUMERO"));
+                    imp.setComplemento(rst.getString("COMPLEMENTO"));
+                    imp.setBairro(rst.getString("BAIRRO"));
+                    imp.setIbge_municipio(rst.getInt("ibgemunicipio"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setCob_endereco(rst.getString("cob_endereco"));
+                    imp.setCob_numero(rst.getString("cob_numero"));
+                    imp.setCob_complemento(rst.getString("cob_complemento"));
+                    imp.setCob_bairro(rst.getString("cob_bairro"));
+                    imp.setCob_ibge_municipio(rst.getInt("cob_ibgemunicipio"));
+                    imp.setCob_cep(rst.getString("cob_cep"));
+                    imp.setValor_minimo_pedido(rst.getDouble("PEDIDOMINIMO"));
+                    imp.setDatacadastro(rst.getDate("datacadastro"));
+                    imp.setObservacao(rst.getString("OBSERVACAO"));
+                                        
+                    addContatosFornecedor(imp);
                     
                     result.add(imp);
                 }
@@ -368,6 +398,264 @@ public class OrionTechDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         
         return result;
+    }
+
+    private void addContatosFornecedor(FornecedorIMP imp) throws Exception {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    f.FUNCAO,\n" +
+                    "    f.CNIAG ddd,\n" +
+                    "    f.CAACNG telefone,\n" +
+                    "    f.ORDEM\n" +
+                    "from\n" +
+                    "    FONEPESSOA f\n" +
+                    "where\n" +
+                    "    f.CHAVEPES = " + imp.getImportId() + "\n" +
+                    "order by\n" +
+                    "    f.ORDEM"
+            )) {
+                while (rst.next()) {
+                    String desc;
+                    switch (rst.getString("funcao")) {
+                        case "C": desc = "COBRANCA"; break;
+                        case "P": desc = "PRINCIPAL"; break;
+                        default : desc = "TELEFONE";
+                    }                    
+                    imp.addTelefone(desc, String.format(
+                            "%s%s",
+                            rst.getString("ddd"),
+                            rst.getString("telefone")
+                    ));
+                }
+            }
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    f.FUNCAO,\n" +
+                    "    f.email\n" +
+                    "from\n" +
+                    "    emailpes f\n" +
+                    "where\n" +
+                    "    f.CHAVEPES = " + imp.getImportId() + "\n" +
+                    "order by\n" +
+                    "    f.ORDEM"
+            )) {
+                int cont = 1;
+                while (rst.next()) {
+                    imp.addEmail("EMAIL " + cont, rst.getString("email"), TipoContato.COMERCIAL);
+                    cont++;
+                }
+            }
+        }
+    }
+
+    @Override
+    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+        List<ProdutoFornecedorIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    ""
+            )) {
+                while (rst.next()) {
+                
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<ClienteIMP> getClientes() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    p.CHAVEPES id,\n" +
+                    "    p.NOME razao,\n" +
+                    "    coalesce(jd.NOMEFANTASIA, fs.APELIDO) fantasia,\n" +
+                    "    coalesce(jd.CNPJ, fs.CPF) cnpj,\n" +
+                    "    coalesce(jd.IE, fs.RG) inscricaoestadual,\n" +
+                    "    jd.IM inscricaomunicipal,\n" +
+                    "    fs.ORGAO orgaoemissor,\n" +
+                    "    coalesce(pesemp.ATIVO, 'S') ativo,\n" +
+                    "    endp.LOGRADOURO,\n" +
+                    "    endp.NUMERO,\n" +
+                    "    endp.COMPLEMENTO,\n" +
+                    "    endp.BAIRRO,\n" +
+                    "    endp.ibgemunicipio,\n" +
+                    "    endp.cep,\n" +
+                    "    fs.ESTCIVIL estadocivil,\n" +
+                    "    fs.NASCIMENTO datanascimento,\n" +
+                    "    fs.SEXO,\n" +
+                    "    fs.TRABALHO empresa,\n" +
+                    "    fs.ADMISSAO dataadmissao,\n" +
+                    "    fs.CARGO,\n" +
+                    "    fs.SALARIO,\n" +
+                    "    fs.CONJUGE,\n" +
+                    "    p.CADCREDIARIO permitecreditorotativo,\n" +
+                    "    p.CADCHEQUE permitecheque,\n" +
+                    "    p.COMENTARIO observacao, \n" +
+                    "    p.OBSERVACAO observacao2,\n" +
+                    "    endc.LOGRADOURO cob_endereco,\n" +
+                    "    endc.NUMERO cob_numero,\n" +
+                    "    endc.COMPLEMENTO cob_complemento,\n" +
+                    "    endc.BAIRRO cob_bairro,\n" +
+                    "    endc.ibgemunicipio cob_ibgemunicipio,\n" +
+                    "    endc.cep cob_cep,\n" +
+                    "    p.CADASTRO datacadastro\n" +
+                    "from\n" +
+                    "    pessoa p\n" +
+                    "    left join pesemp on\n" +
+                    "        p.CHAVEPES = pesemp.CHAVEPES and\n" +
+                    "        pesemp.CHAVEEMP = " + getLojaOrigem() + "\n" +
+                    "    left join fisica fs on\n" +
+                    "        p.CHAVEPES = fs.CHAVEPES\n" +
+                    "    left join JURIDICA jd on\n" +
+                    "        p.CHAVEPES = jd.CHAVEPES\n" +
+                    "    left join (\n" +
+                    "        select\n" +
+                    "            endp.CHAVEPES,\n" +
+                    "            ep.LOGRADOURO,\n" +
+                    "            ep.NUMERO,\n" +
+                    "            ep.COMPLEMENTO,\n" +
+                    "            ep.BAIRRO,\n" +
+                    "            mun.CODIBGE ibgemunicipio,\n" +
+                    "            cep.CODIGO cep\n" +
+                    "        from\n" +
+                    "            ENDPESSOA endp\n" +
+                    "        left join ENDERECO ep on\n" +
+                    "            ep.CHAVEEND = endp.CHAVEEND\n" +
+                    "        left join MUNICIPIO mun on\n" +
+                    "            ep.CHAVEMUN = mun.CHAVEMUN\n" +
+                    "        left join cep on\n" +
+                    "            ep.CHAVECEP = cep.CHAVECEP\n" +
+                    "        where\n" +
+                    "            endp.FUNCAO = 'P'\n" +
+                    "     ) endp on\n" +
+                    "        endp.CHAVEPES = p.CHAVEPES\n" +
+                    "     left join (\n" +
+                    "        select\n" +
+                    "            endp.CHAVEPES,\n" +
+                    "            ep.LOGRADOURO,\n" +
+                    "            ep.NUMERO,\n" +
+                    "            ep.COMPLEMENTO,\n" +
+                    "            ep.BAIRRO,\n" +
+                    "            mun.CODIBGE ibgemunicipio,\n" +
+                    "            cep.CODIGO cep\n" +
+                    "        from\n" +
+                    "            ENDPESSOA endp\n" +
+                    "        left join ENDERECO ep on\n" +
+                    "            ep.CHAVEEND = endp.CHAVEEND\n" +
+                    "        left join MUNICIPIO mun on\n" +
+                    "            ep.CHAVEMUN = mun.CHAVEMUN\n" +
+                    "        left join cep on\n" +
+                    "            ep.CHAVECEP = cep.CHAVECEP\n" +
+                    "        where\n" +
+                    "            endp.FUNCAO = 'C'\n" +
+                    "     ) endc on\n" +
+                    "        endc.CHAVEPES = p.CHAVEPES\n" +
+                    "where\n" +
+                    "    p.CLIENTE = 'S'\n" +
+                    "order by\n" +
+                    "    p.CHAVEPES"
+            )) {
+                while (rst.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
+                    imp.setCnpj(rst.getString("cnpj"));
+                    imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
+                    imp.setInscricaoMunicipal(rst.getString("inscricaomunicipal"));
+                    imp.setOrgaoemissor(rst.getString("orgaoemissor"));
+                    imp.setAtivo(!"N".equals(rst.getString("ativo")));
+                    imp.setEndereco(rst.getString("LOGRADOURO"));
+                    imp.setNumero(rst.getString("NUMERO"));
+                    imp.setComplemento(rst.getString("COMPLEMENTO"));
+                    imp.setBairro(rst.getString("BAIRRO"));
+                    imp.setMunicipioIBGE(rst.getString("ibgemunicipio"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setEstadoCivil(rst.getString("estadocivil"));
+                    imp.setDataNascimento(rst.getDate("datanascimento"));
+                    imp.setSexo(rst.getString("SEXO"));
+                    imp.setEmpresa(rst.getString("empresa"));
+                    imp.setDataAdmissao(rst.getDate("dataadmissao"));
+                    imp.setCargo(rst.getString("CARGO"));
+                    imp.setSalario(rst.getDouble("SALARIO"));
+                    imp.setNomeConjuge(rst.getString("CONJUGE"));
+                    imp.setPermiteCreditoRotativo("S".equals(rst.getString("permitecreditorotativo")));
+                    imp.setPermiteCheque("S".equals(rst.getString("permitecheque")));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setObservacao2(rst.getString("observacao2"));
+                    imp.setCobrancaEndereco(rst.getString("cob_endereco"));
+                    imp.setCobrancaNumero(rst.getString("cob_numero"));
+                    imp.setCobrancaComplemento(rst.getString("cob_complemento"));
+                    imp.setBairro(rst.getString("cob_bairro"));
+                    imp.setMunicipioIBGE(rst.getString("cob_ibgemunicipio"));
+                    imp.setCobrancaCep(rst.getString("cob_cep"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    
+                    addContatosCliente(imp);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    private void addContatosCliente(ClienteIMP imp) throws Exception {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    f.FUNCAO,\n" +
+                    "    f.CNIAG ddd,\n" +
+                    "    f.CAACNG telefone,\n" +
+                    "    f.ORDEM\n" +
+                    "from\n" +
+                    "    FONEPESSOA f\n" +
+                    "where\n" +
+                    "    f.CHAVEPES = " + imp.getId() + "\n" +
+                    "order by\n" +
+                    "    f.ORDEM"
+            )) {
+                while (rst.next()) {
+                    String desc;
+                    switch (rst.getString("funcao")) {
+                        case "C": desc = "COBRANCA"; break;
+                        case "P": desc = "PRINCIPAL"; break;
+                        default : desc = "TELEFONE";
+                    }                    
+                    imp.addTelefone(desc, String.format(
+                            "%s%s",
+                            rst.getString("ddd"),
+                            rst.getString("telefone")
+                    ));
+                }
+            }
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    f.FUNCAO,\n" +
+                    "    f.email\n" +
+                    "from\n" +
+                    "    emailpes f\n" +
+                    "where\n" +
+                    "    f.CHAVEPES = " + imp.getId() + "\n" +
+                    "order by\n" +
+                    "    f.ORDEM"
+            )) {
+                int cont = 1;
+                while (rst.next()) {
+                    imp.addEmail("EMAIL " + cont, rst.getString("email"), TipoContato.COMERCIAL);
+                    cont++;
+                }
+            }
+        }
     }
     
 }

@@ -221,6 +221,10 @@ public class ClienteIMP {
     public void setMunicipioIBGE(int municipioIBGE) {
         this.municipioIBGE = municipioIBGE;
     }
+    
+    public void setMunicipioIBGE(String municipioIBGE) {
+        this.municipioIBGE = Utils.stringToInt(municipioIBGE);
+    }
 
     public String getMunicipio() {
         return municipio;
@@ -292,6 +296,14 @@ public class ClienteIMP {
 
     public void setSexo(TipoSexo sexo) {
         this.sexo = sexo;
+    }
+    
+    public void setSexo(String sexo) {
+        if (sexo == null) {
+            this.sexo = TipoSexo.MASCULINO;
+            return;
+        }
+        this.sexo = "F".equals(sexo.trim().substring(1)) ? TipoSexo.FEMININO : TipoSexo.MASCULINO;
     }
 
     public String getEmpresa() {
