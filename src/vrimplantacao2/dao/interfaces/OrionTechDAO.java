@@ -144,12 +144,9 @@ public class OrionTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    preco.PC custo,\n" +
                     "    preco.PVN preco,\n" +
                     "    p.ATIVO,\n" +
-                    "    substring(lpad(I.CEST, 7, '0') from 1 for 2) || '.' ||\n" +
-                    "        substring(lpad(I.CEST, 7, '0') from 3 for 3) || '.' ||\n" +
-                    "        substring(lpad(I.CEST, 7, '0') from 6 for 2) as CEST,\n" +
+                    "    i.CEST,\n" +
                     "    i.TIPI ncm,\n" +
                     "    P.NRSTPIS as COD_NATUREZA_RECEITA,\n" +
-                    "    iif(CP.TRIBUTACAO = 'T', 50, 70) as PIS_CST_E,\n" +
                     "    P.CSTPIS as PIS_CST_S,\n" +
                     "    icmps.CHAVEICM icms_id,\n" +
                     "    P.LUCROPREVST as MVA\n" +
@@ -226,7 +223,6 @@ public class OrionTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCest(rst.getString("CEST"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setPiscofinsCstDebito(rst.getString("PIS_CST_S"));
-                    imp.setPiscofinsCstDebito(rst.getString("PIS_CST_E"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("COD_NATUREZA_RECEITA"));
                     imp.setIcmsDebitoId(rst.getString("icms_id"));
                     imp.setIcmsDebitoForaEstadoId(rst.getString("icms_id"));
