@@ -462,7 +462,7 @@ public class GCFDAO extends InterfaceDAO {
         return result;
     }
 
-    /*@Override
+    @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         
@@ -504,7 +504,7 @@ public class GCFDAO extends InterfaceDAO {
         }
         
         return result;
-    }*/
+    }
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
