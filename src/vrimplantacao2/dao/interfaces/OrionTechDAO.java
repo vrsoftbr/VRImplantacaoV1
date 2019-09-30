@@ -354,7 +354,7 @@ public class OrionTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "     ) endc on\n" +
                     "        endc.CHAVEPES = p.CHAVEPES\n" +
                     "where\n" +
-                    "    p.fornecedor = 'S'\n" +
+                    "    p.fornecedor = 'S' or p.transportador = 'S'\n" +
                     "order by\n" +
                     "    p.CHAVEPES"
             )) {
