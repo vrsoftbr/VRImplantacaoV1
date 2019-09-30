@@ -702,10 +702,13 @@
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
+                      <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="409" max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="353" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -714,7 +717,9 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="146" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="124" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -729,6 +734,17 @@
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFornecedorActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoFornecedor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Produto Fornecedor"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
+                    </Property>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkProdutoFornecedorActionPerformed"/>
                   </Events>
                 </Component>
               </SubComponents>
