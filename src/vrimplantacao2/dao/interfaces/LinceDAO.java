@@ -575,6 +575,7 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select\n"
                     + "r.COD_PROD,\n"
                     + "p.DESCRICAO as DESC_PROD,\n"
+                    + "p.FLG_UNIDADE_VENDA as unidade,\n"
                     + "coalesce(r.NOME_ETIQUETA, p.DESCRICAO) as NOMERECEITA,\n"
                     + "r.VLR_TOTAL,\n"
                     + "r.VLR_PRECO_UND,\n"
@@ -605,8 +606,7 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     double qtdEmbUtilizado = 0;
                     qtdEmbUtilizado = rst.getDouble("PESO") * 1000 ;
-                    
-                    
+                                        
                     ReceitaIMP imp = new ReceitaIMP();
                     imp.setImportloja(getLojaOrigem());
                     imp.setImportsistema(getSistema());
@@ -616,7 +616,34 @@ public class LinceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFichatecnica(rst.getString("RECEITA"));
                     imp.setQtdembalagemreceita((int) qtdEmbUtilizado);
                     imp.setQtdembalagemproduto((rst.getInt("QTDE_PRODUCAO_UND") == 0 ? 1 : rst.getInt("QTDE_PRODUCAO_UND")) * 1000);
-                    imp.setRendimento(rst.getInt("QTDE_PRODUCAO_KG"));
+                    
+
+                        if ((rst.getDouble("QTDE_PRODUCAO_KG") > 0)
+                                && (rst.getDouble("QTDE_PRODUCAO_UND") == 0)) {
+                            
+                            imp.setRendimento(rst.getDouble("QTDE_PRODUCAO_KG"));
+                            
+                        } else if ((rst.getDouble("QTDE_PRODUCAO_KG") == 0)
+                                && (rst.getDouble("QTDE_PRODUCAO_UND") > 0)) {
+                            
+                            imp.setRendimento(rst.getDouble("QTDE_PRODUCAO_UND"));
+                            
+                        } else if ((rst.getDouble("QTDE_PRODUCAO_KG") > 0) &&
+                                (rst.getDouble("QTDE_PRODUCAO_UND") > 0)) {
+                                                        
+                            if (rst.getString("unidade").contains("KG")) {
+                                
+                                imp.setRendimento(rst.getDouble("QTDE_PRODUCAO_KG"));
+                                
+                            } else {
+                                
+                                imp.setRendimento(rst.getDouble("QTDE_PRODUCAO_UND"));
+                            }                            
+                            
+                        } else {
+                            imp.setRendimento(0);
+                        }
+                    
                     imp.getProdutos().add(rst.getString("ITEM"));
                     result.add(imp);
                 }
