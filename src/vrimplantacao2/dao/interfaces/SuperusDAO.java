@@ -33,6 +33,12 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  * @author Leandro
  */
 public class SuperusDAO extends InterfaceDAO {
+    
+    public static final String HOST = "localhost";
+    public static final String PORT = "1521";
+    public static final String USER = "xe";
+    public static final String DATABASE = "xe";
+    public static final String PASSWORD = "smart";
 
     public String v_codEmpresaConv;
     

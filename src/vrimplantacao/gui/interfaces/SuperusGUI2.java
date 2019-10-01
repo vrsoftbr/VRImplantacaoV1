@@ -32,11 +32,11 @@ public class SuperusGUI2 extends VRInternalFrame {
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
-        txtHost.setText(params.get(SISTEMA, "HOST"));
-        txtDatabase.setText(params.get(SISTEMA, "DATABASE"));
-        txtPorta.setText(params.get(SISTEMA, "PORTA"));
-        txtUsuario.setText(params.get(SISTEMA, "USUARIO"));
-        txtSenha.setText(params.get(SISTEMA, "SENHA"));
+        txtHost.setText(params.getWithNull(SuperusDAO.HOST, SISTEMA, "HOST"));
+        txtDatabase.setText(params.getWithNull(SuperusDAO.DATABASE, SISTEMA, "DATABASE"));
+        txtPorta.setText(params.getWithNull(SuperusDAO.PORT, SISTEMA, "PORTA"));
+        txtUsuario.setText(params.getWithNull(SuperusDAO.USER, SISTEMA, "USUARIO"));
+        txtSenha.setText(params.getWithNull(SuperusDAO.PASSWORD, SISTEMA, "SENHA"));
         txtStrConexao.setText(params.get(SISTEMA, "STR_CONN"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
