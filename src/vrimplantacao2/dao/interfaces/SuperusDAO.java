@@ -461,7 +461,7 @@ public class SuperusDAO extends InterfaceDAO {
                     + "from\n"
                     + "  PESSOAS p\n"
                     + "  join CLIENTES c on p.codigo = c.codigo\n"
-                    + ("".equals(v_codEmpresaConv) ? "where c.codigoconvenio = 0\n" : "where c.codigoconvenio not in (" + v_codEmpresaConv) + ")\n"
+                    + ("".equals(v_codEmpresaConv) ? "where c.codigoconvenio = 0\n" : "where c.codigoconvenio not in (" + v_codEmpresaConv+ ")\n") 
                     + "order by p.codigo"
             )) {
                 while (rst.next()) {
