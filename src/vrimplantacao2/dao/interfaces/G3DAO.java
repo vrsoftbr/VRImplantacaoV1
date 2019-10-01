@@ -135,9 +135,8 @@ public class G3DAO extends InterfaceDAO {
                     + "	p.CST_COFINS_SAIDA,\n"
                     + "	p.CST_COFINS_ENTRADA,\n"
                     + "	p.cod_nat_rec AS naturezareceita,\n"
-                    + "	p.icms,\n"
-                    + "	p.tributacao,\n"
-                    + "	p.ALIQUOTA_ICMS,\n"
+                    + "	p.COD_CST_DENTRO,\n"
+                    + "	p.COD_CST_FORA,\n"
                     + "	p.ALIQUOTA_ICMS_DENTRO,\n"
                     + "	p.ALIQUOTA_ICMS_FORA,\n"
                     + "	p.ALIQUOTA_ICMS_ST_DENTRO,\n"
@@ -151,8 +150,43 @@ public class G3DAO extends InterfaceDAO {
                     + "LEFT JOIN unidade_produto u ON u.ID = p.ID_UNIDADE_PRODUTO\n"
                     + "ORDER BY p.ID"
             )) {
-
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                }
             }
+        }
+        return null;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.ATACADO) {
+            try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "SELECT \n"
+                        + "	id, \n"
+                        + "	qtd_atacado,\n"
+                        + "	valor_venda_atacado,\n"
+                        + "	valor_venda\n"
+                        + "FROM produto \n"
+                        + "WHERE qtd_atacado > 1\n"
+                        + "AND coalesce(valor_venda_atacado, 0) > 0"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id"));
+                        imp.setQtdEmbalagem(rst.getInt("qtd_atacado"));
+                        imp.setPrecovenda(rst.getDouble("valor_venda"));
+                        imp.setAtacadoPreco(rst.getDouble("valor_venda_atacado"));
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
         }
         return null;
     }
@@ -194,6 +228,7 @@ public class G3DAO extends InterfaceDAO {
         return null;
     }
 
+    @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
 
