@@ -127,7 +127,7 @@ import vrimplantacao2.gui.interfaces.FlashGUI;
 import vrimplantacao2.gui.interfaces.FortGUI;
 import vrimplantacao2.gui.interfaces.FortiGUI;
 import vrimplantacao2.gui.interfaces.GDoorGUI;
-import vrimplantacao2.gui.interfaces.GR7GUI;
+import vrimplantacao2.gui.interfaces.GR7_2GUI;
 import vrimplantacao2.gui.interfaces.GTechGUI;
 import vrimplantacao2.gui.interfaces.GetWayGUI;
 import vrimplantacao2.gui.interfaces.GuiaSistemasGUI;
@@ -263,7 +263,6 @@ public final class MenuGUI extends VRMdiFrame {
     public SimSoftGUI formImportarSimSoft = null;
     public FaucomGUI formImportarFaucom = null;
     public SIMSGUI formImportarSIMS = null;
-    public GR7GUI formImportarGR7 = null;
     public SuperusGUI formImportarSuperus = null;
     public SofgceGUI formImportarSofgce = null;
     public ImportacoesDiversasGUI formImportacoesDiversas = null;
@@ -3224,18 +3223,8 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemSIMSActionPerformed
 
     private void jMenuItemGR7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGR7ActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarGR7 == null || formImportarGR7.isClosed()) {
-                formImportarGR7 = new GR7GUI(this);
-            }
-
-            formImportarGR7.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
+       
+        GR7_2GUI.exibir(this);
     }//GEN-LAST:event_jMenuItemGR7ActionPerformed
 
     private void mnuImportarNCMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuImportarNCMActionPerformed

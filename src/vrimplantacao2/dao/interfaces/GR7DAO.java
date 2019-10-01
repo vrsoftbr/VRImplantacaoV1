@@ -9,9 +9,12 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -44,6 +47,37 @@ public class GR7DAO extends InterfaceDAO {
         return "GR7";
     }
 
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet(Arrays.asList(new OpcaoProduto[]{
+            OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+            OpcaoProduto.PRODUTOS,
+            OpcaoProduto.ATIVO,
+            OpcaoProduto.DESC_COMPLETA,
+            OpcaoProduto.DESC_GONDOLA,
+            OpcaoProduto.DESC_REDUZIDA,
+            OpcaoProduto.DATA_CADASTRO,
+            OpcaoProduto.EAN,
+            OpcaoProduto.EAN_EM_BRANCO,
+            OpcaoProduto.TIPO_EMBALAGEM_EAN,
+            OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.CUSTO,
+            OpcaoProduto.MARGEM,
+            OpcaoProduto.PRECO,
+            OpcaoProduto.ESTOQUE,
+            OpcaoProduto.PESAVEL,
+            OpcaoProduto.NCM,
+            OpcaoProduto.CEST,
+            OpcaoProduto.ICMS,
+            OpcaoProduto.PIS_COFINS,
+            OpcaoProduto.NATUREZA_RECEITA,
+            OpcaoProduto.ATACADO,
+            OpcaoProduto.VALIDADE,
+            OpcaoProduto.MERCADOLOGICO,
+            OpcaoProduto.MERCADOLOGICO_PRODUTO,
+        }));
+    }
+    
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> vResult = new ArrayList<>();

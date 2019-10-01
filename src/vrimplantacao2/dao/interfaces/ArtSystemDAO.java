@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -133,9 +134,12 @@ public class ArtSystemDAO extends InterfaceDAO {
                     + "	p.PROCCDCEST as cest,\n"
                     + "	inc.INCCCSTSAI as pis_saida,\n"
                     + "	inc.INCCCSTENT as pis_entrada,\n"
-                    + "	icm.FIGCCODCST as cst,\n"
-                    + "	icm.FIGNTRIALI as aliquota, \n"
-                    + "	icm.FIGNTRIRED as reducao,\n"
+                    + "	icm_e.FIGCCODCST as cst_entrada,\n"
+                    + "	icm_e.FIGNTRIALI as aliquota_entrada, \n"
+                    + "	icm_e.FIGNTRIRED as reducao_entrada,\n"
+                    + "	icm_s.FIGCCODCST as cst_saida,\n"
+                    + "	icm_s.FIGNTRIALI as aliquota_saida, \n"
+                    + "	icm_s.FIGNTRIRED as reducao_saida,\n"
                     + "	p.PRODDATCAD as datacadastro,\n"
                     + "	p.PRONPESBRU as peso_bruto,\n"
                     + "	p.PRONPESLIQ as peso_liquido,\n"
@@ -150,7 +154,10 @@ public class ArtSystemDAO extends InterfaceDAO {
                     + "left join dbo.ASPROEST est on est.ESTNID_PRO = p.PRONID_PRO and est.ESTNID_LOJ = " + getLojaOrigem() + "\n"
                     + "left join dbo.ASPROPRE pre on pre.PRENID_PRO = p.PRONID_PRO and pre.PRENID_LOJ = " + getLojaOrigem() + "\n"
                     + "left join dbo.ASPROINC inc on inc.INCNID_ING = pre.PRENID_INC and INCNID_INT = 121\n"
-                    + "left join dbo.ASPROFIG icm on icm.FIGNIDFIGU = pre.PRENIDFIGU"
+                    + "left join dbo.ASPROFIG icm_e on icm_e.FIGNIDFIGU = pre.PRENIDFIGU and icm_e.FIGCCODCFO is null and icm_e.FIGNTIPCFO = 1\n"
+                    + "	and icm_e.FIGCTIPCAD is null and icm_e.FIGCORIGEM = 'SP' and icm_e.FIGCDESTIN = 'SP'\n"
+                    + "left join dbo.ASPROFIG icm_s on icm_s.FIGNIDFIGU = pre.PRENIDFIGU and icm_s.FIGCCODCFO is null and icm_s.FIGNTIPCFO = 2\n"
+                    + "	and icm_s.FIGCTIPCAD is null and icm_s.FIGCORIGEM = 'SP' and icm_s.FIGCDESTIN = 'SP'"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
@@ -194,13 +201,6 @@ public class ArtSystemDAO extends InterfaceDAO {
                         imp.setDataCadastro(rst.getDate("datacadastro"));
                         imp.setPesoBruto(rst.getDouble("peso_bruto"));
                         imp.setPesoLiquido(rst.getDouble("peso_liquido"));
-                        imp.setNcm(rst.getString("ncm"));
-                        imp.setCest(rst.getString("cest"));
-                        imp.setPiscofinsCstDebito(rst.getString("pis_saida"));
-                        imp.setPiscofinsCstCredito(rst.getString("pis_entrada"));
-                        imp.setIcmsCst(rst.getString("cst"));
-                        imp.setIcmsAliq(rst.getDouble("aliquota"));
-                        imp.setIcmsReducao(rst.getDouble("reducao"));
                         imp.setMargem(rst.getDouble("margem"));
                         imp.setPrecovenda(rst.getDouble("precovenda"));
                         imp.setCustoComImposto(rst.getDouble("custo"));
@@ -208,6 +208,16 @@ public class ArtSystemDAO extends InterfaceDAO {
                         imp.setEstoque(rst.getDouble("estoque"));
                         imp.setEstoqueMinimo(rst.getDouble("estoque_minimo"));
                         imp.setEstoqueMaximo(rst.getDouble("estoque_maximo"));
+                        imp.setNcm(rst.getString("ncm"));
+                        imp.setCest(rst.getString("cest"));
+                        imp.setPiscofinsCstDebito(rst.getString("pis_saida"));
+                        imp.setPiscofinsCstCredito(rst.getString("pis_entrada"));
+                        imp.setIcmsCstSaida(rst.getInt("cst_saida"));
+                        imp.setIcmsAliqSaida(rst.getDouble("aliquota_saida"));
+                        imp.setIcmsReducaoSaida(rst.getDouble("reducao_saida"));
+                        imp.setIcmsCstEntrada(rst.getInt("cst_entrada"));
+                        imp.setIcmsAliqEntrada(rst.getDouble("aliquota_entrada"));
+                        imp.setIcmsReducaoEntrada(rst.getDouble("reducao_entrada"));                        
                         result.add(imp);
                     }
                 }
@@ -248,7 +258,7 @@ public class ArtSystemDAO extends InterfaceDAO {
     
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
-        List<FornecedorIMP> result = new ArrayList<>();
+        List<FornecedorIMP> result = new ArrayList<>();       
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -263,6 +273,7 @@ public class ArtSystemDAO extends InterfaceDAO {
                     + "	f.ENTNENDNUM as numero,\n"
                     + "	f.ENTCENDCOM as complemento,\n"
                     + "	f.ENTCE_MAIL as email,\n"
+                    + " f2.FNCCCONPAG as condicao_pagamento,\n"
                     + "	bai.BAICDESCRI as bairro,\n"
                     + "	mun.MUNCDESCRI as municipio,\n"
                     + "	mun.MUNCCODIBG as municipio_ibge,\n"
@@ -272,6 +283,7 @@ public class ArtSystemDAO extends InterfaceDAO {
                     + "	tel.TELMOBSERV as tel_contato,\n"
                     + "	obs.OBSMOBSERV as observacao\n"
                     + "from dbo.ASENTENT f\n"
+                    + "left join dbo.ASENTFNC f2 on f2.FNCNID_ENT = f.ENTNID_ENT\n"
                     + "left join dbo.ASCEPCEP cep on cep.CEPNID_CEP = f.ENTNID_CEP\n"
                     + "left join dbo.ASCEPBAI bai on bai.BAINID_BAI = cep.CEPNID_BAI\n"
                     + "left join dbo.ASCEPMUN mun on mun.MUNNID_MUN = bai.BAINID_MUN\n"
@@ -298,15 +310,97 @@ public class ArtSystemDAO extends InterfaceDAO {
                     imp.setUf(rst.getString("uf"));
                     imp.setTel_principal(rst.getString("ddd") + rst.getString("telefone"));
                     imp.setObservacao(rst.getString("observacao"));
+                          
+                    if ((rst.getString("condicao_pagamento") != null)
+                            && (!rst.getString("condicao_pagamento").trim().isEmpty())) {
 
-                    if ((rst.getString("telefone") != null)
-                            && (!rst.getString("telefone").trim().isEmpty())) {
-                        imp.addTelefone(
-                                rst.getString("tel_contato") != null ? rst.getString("tel_contato") : "TELEFONE",
-                                rst.getString("ddd") + rst.getString("telefone")
-                        );
+                        if ("/AV".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(0);
+                        } else if ("0".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(0);
+                        } else if ("0/AV".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(0);
+                        } else if ("0/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(0);
+                        } else if ("1/AV".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(1);
+                        } else if ("10/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(10);
+                        } else if ("13/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(13);
+                        } else if ("14/D".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(14);
+                        } else if ("14/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(14);
+                        } else if ("15/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(15);
+                        } else if ("17/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(17);
+                        } else if ("18/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(18);
+                        } else if ("19/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(19);
+                        } else if ("20/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(20);
+                        } else if ("21/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(21);
+                        } else if ("22/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(22);
+                        } else if ("27/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(27);
+                        } else if ("28/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(28);
+                        } else if ("29/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(29);
+                        } else if ("3/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(3);
+                        } else if ("30/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(30);
+                        } else if ("32/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(32);
+                        } else if ("4/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(4);
+                        } else if ("5/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(5);
+                        } else if ("6/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(6);
+                        } else if ("60/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(60);
+                        } else if ("7/AV".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(7);
+                        } else if ("7/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(7);
+                        } else if ("8/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(8);
+                        } else if ("9/DD".equals(rst.getString("condicao_pagamento").trim())) {
+                            imp.setCondicaoPagamento(9);
+                        } else {
+                            imp.setCondicaoPagamento(0);
+                        }
                     }
                     
+                    
+                    try (Statement stm2 = ConexaoSqlServer.getConexao().createStatement()) {
+                        try (ResultSet rst2 = stm2.executeQuery(
+                                "select \n"
+                                + " TELNCODDDD as ddd, "
+                                + " TELNNUMTEL as telefone, "
+                                + " TELMOBSERV as tel_contato \n"
+                                + "  from dbo.ASENTTEL \n"
+                                + " where TELNID_ENT not in(select CLINID_ENT from dbo.ASENTCLI)\n"
+                                + "   and TELNID_ENT = " + imp.getImportId()
+                        )) {
+                            while (rst2.next()) {
+                                if ((rst2.getString("telefone") != null)
+                                        && (!rst2.getString("telefone").trim().isEmpty())) {
+                                    imp.addTelefone(
+                                            rst2.getString("tel_contato") != null ? rst2.getString("tel_contato") : "TELEFONE",
+                                            rst2.getString("ddd") + rst2.getString("telefone")
+                                    );
+                                }
+                            }
+                        }
+                    }
                     
                     result.add(imp);
                 }
@@ -390,7 +484,7 @@ public class ArtSystemDAO extends InterfaceDAO {
                     + "	cli.CLIDNASABE as nascimento,\n"
                     + "	cli.CLIDDATCAD as cadastro,\n"
                     + "	cli.CLINLIMCPR as valor_limite,\n"
-                    + "	cli.CLINCVNSAL as salario,\n"
+                    + "	cli.CLINCVNSAL as saldo,\n"
                     + "	cli.CLINCVNLIM as limite_convenio,\n"
                     + "	cli.CLICSEXTIP as sexo,\n"
                     + " cli.CLINID_STA as status\n"
@@ -437,8 +531,7 @@ public class ArtSystemDAO extends InterfaceDAO {
                     imp.setDataNascimento(rst.getDate("nascimento"));
                     imp.setDataCadastro(rst.getDate("cadastro"));
                     imp.setSexo("M".equals(rst.getString("sexo")) ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
-                    imp.setValorLimite(rst.getDouble("valor_limite"));
-                    imp.setSalario(rst.getDouble("salario"));
+                    imp.setValorLimite(rst.getDouble("saldo"));
                     imp.setPermiteCreditoRotativo(true);
                     imp.setPermiteCheque(true);
                     
@@ -457,12 +550,26 @@ public class ArtSystemDAO extends InterfaceDAO {
                             break;
                     }
                     
-                    if ((rst.getString("telefone") != null)
-                            && (!rst.getString("telefone").trim().isEmpty())) {
-                        imp.addTelefone(
-                                rst.getString("tel_contato") != null ? rst.getString("tel_contato") : "TELEFONE",
-                                rst.getString("ddd") + rst.getString("telefone")
-                        );
+                    try (Statement stm2 = ConexaoSqlServer.getConexao().createStatement()) {
+                        try (ResultSet rst2 = stm2.executeQuery(
+                                "select \n"
+                                + " TELNCODDDD as ddd, "
+                                + " TELNNUMTEL as telefone, "
+                                + " TELMOBSERV as tel_contato \n"
+                                + "  from dbo.ASENTTEL \n"
+                                + " where TELNID_ENT in (select CLINID_ENT from dbo.ASENTCLI)\n"
+                                + "   and TELNID_ENT = " + imp.getId()
+                        )) {
+                            while (rst2.next()) {
+                                if ((rst2.getString("telefone") != null)
+                                        && (!rst2.getString("telefone").trim().isEmpty())) {
+                                    imp.addTelefone(
+                                            rst2.getString("tel_contato") != null ? rst2.getString("tel_contato") : "TELEFONE",
+                                            rst2.getString("ddd") + rst2.getString("telefone")
+                                    );
+                                }
+                            }
+                        }
                     }
                     result.add(imp);
                 }
