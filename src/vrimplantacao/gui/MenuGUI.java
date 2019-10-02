@@ -126,6 +126,7 @@ import vrimplantacao2.gui.interfaces.FenixGUI;
 import vrimplantacao2.gui.interfaces.FlashGUI;
 import vrimplantacao2.gui.interfaces.FortGUI;
 import vrimplantacao2.gui.interfaces.FortiGUI;
+import vrimplantacao2.gui.interfaces.G3GUI;
 import vrimplantacao2.gui.interfaces.GDoorGUI;
 import vrimplantacao2.gui.interfaces.GR7_2GUI;
 import vrimplantacao2.gui.interfaces.GTechGUI;
@@ -686,6 +687,7 @@ public final class MenuGUI extends VRMdiFrame {
         jMenu10 = new javax.swing.JMenu();
         mnuDLink = new javax.swing.JMenuItem();
         mnuSTI3 = new javax.swing.JMenuItem();
+        mnuG3 = new javax.swing.JMenuItem();
         mnuOrion = new javax.swing.JMenu();
         jMenuItemOrion = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -2125,6 +2127,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu10.add(mnuSTI3);
+
+        mnuG3.setText("G3");
+        mnuG3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuG3ActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuG3);
 
         mnuDatabase.add(jMenu10);
 
@@ -4127,6 +4137,11 @@ public final class MenuGUI extends VRMdiFrame {
         WeberGUI.exibir(this);
     }//GEN-LAST:event_mnuiWeberActionPerformed
 
+    private void mnuG3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuG3ActionPerformed
+        // TODO add your handling code here:
+        G3GUI.exibir(this);
+    }//GEN-LAST:event_mnuG3ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4268,6 +4283,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuFlatan;
     private javax.swing.JMenuItem mnuFort;
     private javax.swing.JMenuItem mnuForti;
+    private javax.swing.JMenuItem mnuG3;
     private javax.swing.JMenuItem mnuGDoor;
     private javax.swing.JMenuItem mnuGTech;
     private javax.swing.JMenuItem mnuHRTech;
@@ -4388,6 +4404,9 @@ public final class MenuGUI extends VRMdiFrame {
             
             if ("lince".equals(param)) {
                 LinceGUI.exibir(this, true);
+            }
+            if ("g3".equals(param)) {
+                G3GUI.exibir(this, true);
             }
         }
     }
