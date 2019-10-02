@@ -18,6 +18,7 @@ import vrimplantacao2.vo.cadastro.notafiscal.NotaSaida;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaSaidaItem;
 import vrimplantacao2.vo.cadastro.notafiscal.SituacaoNfe;
 import vrimplantacao2.vo.cadastro.notafiscal.SituacaoNotaEntrada;
+import vrimplantacao2.vo.cadastro.notafiscal.SituacaoNotaSaida;
 import vrimplantacao2.vo.importacao.NotaFiscalIMP;
 import vrimplantacao2.vo.importacao.NotaFiscalItemIMP;
 import vrimplantacao2.vo.importacao.NotaOperacao;
@@ -350,7 +351,7 @@ public class NotaFiscalRepository {
         //private double valorBaseSubstituicao = 0;// numeric(11,2) NOT NULL,
         //n.setValorIcmsSubstituicao(imp.getValorIcmsSubstituicao());
         //private boolean impressao = true;//boolean NOT NULL,
-        //private SituacaoNotaSaida situacaoNotaSaida = SituacaoNotaSaida.FINALIZADO;// id_situacaonotasaida integer NOT NULL,
+        n.setSituacaoNotaSaida(SituacaoNotaSaida.FINALIZADO);
         
         //TODO: INCLUIR IMPORTAÇÃO DE TRANSPORTADORES DEPOIS        
         //private int idMotoristaTransportador = -1;// id_motoristatransportador integer,

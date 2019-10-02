@@ -22,12 +22,10 @@ import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.dao.cadastro.venda.MultiStatementIterator;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
-import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
@@ -39,6 +37,7 @@ import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
@@ -1322,6 +1321,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setObservacoes(rst.getString("observacao"));
                     imp.setTelefone(rst.getString("telefone1"));
                     imp.setDiaPagamento(rst.getInt("vencimento1"));
+                    imp.setDataInicio(rst.getDate("datahora_cadastro"));
+                    imp.setDataTermino(Utils.getDataAtual());
 
                     result.add(imp);
 
@@ -1329,6 +1330,58 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<ConveniadoIMP> getConveniado() throws Exception {
+        List<ConveniadoIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoOracle.createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    c.id id_cliente,\n" +
+                    "    c.descritivo nome,\n" +
+                    "    c.datahora_cadastro,\n" +
+                    "    c.logradouro,\n" +
+                    "    c.endereco,\n" +
+                    "    c.numero,\n" +
+                    "    c.complemento,\n" +
+                    "    c.bairro,\n" +
+                    "    c.cidade,\n" +
+                    "    c.estado,\n" +
+                    "    c.cep,\n" +
+                    "    c.telefone1,\n" +
+                    "    c.telefone2,\n" +
+                    "    c.observacao,\n" +
+                    "    c.cnpj_cpf,\n" +
+                    "    c.inscricao_rg,\n" +
+                    "    cc.id id_empresa,\n" +
+                    "    cc.descritivo nome_empresa,\n" +
+                    "    cc.bloqueado,\n" +
+                    "    c.limite,\n" +
+                    "    c.situacao\n" +        
+                    "from\n" +
+                    "    clientes c,\n" +
+                    "    conveniadas cc\n" +
+                    "where\n" +
+                    "    c.empresa_convenio = cc.id\n" +
+                    "order by\n" +
+                    "    c.id"
+            )) {
+                while(rs.next()) {
+                    ConveniadoIMP imp = new ConveniadoIMP();
+                    imp.setId(rs.getString("id_cliente"));
+                    imp.setNome(rs.getString("nome"));
+                    imp.setIdEmpresa(rs.getString("id_empresa"));
+                    imp.setCnpj(rs.getString("cnpj_cpf"));
+                    imp.setConvenioLimite(rs.getDouble("limite"));
+                    imp.setLojaCadastro(Integer.parseInt(getLojaOrigem()));
+                    imp.setSituacaoCadastro(rs.getInt("situacao") == 1 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
+                    
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 
@@ -1513,7 +1566,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	and tipo_conta = 1\n"
                     + "	and pagamento is null\n"
                     + "	and not tipo_cadastro is null\n"
-                    + "	and plano_conta in (" + getPlanosContaStr() + ")\n"
+                    + " and cl.id is not null\n"
+                    //+ "	and plano_conta in (" + getPlanosContaStr() + ")\n"
                     + "order by id";
             LOG.fine("SQL a ser executado:\n" + sql);
             try (ResultSet rst = stm.executeQuery(sql)) {
@@ -1669,7 +1723,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    parcela <> 0 and\n" +
                     "    not tipo_cadastro is null and\n" +
                     "    pagamento is null and\n" +
-                    "    trunc(vencimento) >= '" + new SimpleDateFormat("dd/MM/yyyy").format(dataVencimentoContaPagar)+ "'\n" +
+                    "    trunc(vencimento) >= '" + new SimpleDateFormat("dd/MM/yyyy").format(dataVencimentoContaPagar)+ "' and\n" +
+                    "    id_cadastro is not null\n" +        
                     "order by\n" +
                     "    vencimento"
             )) {
