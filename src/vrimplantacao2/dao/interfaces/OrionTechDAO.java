@@ -72,8 +72,39 @@ public class OrionTechDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
+        List<MercadologicoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct\n" +
+                    "    m.CODGRU merc1,\n" +
+                    "    m.NOMEGRU merc1_desc,\n" +
+                    "    m.CODSGR merc2,\n" +
+                    "    m.NOMESGR merc2_desc\n" +
+                    "from\n" +
+                    "    ODB$RESCLASPROD m\n" +
+                    "where\n" +
+                    "    not m.CODGRU is null\n" +
+                    "order by\n" +
+                    "    merc1, merc2"
+            )) {
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setMerc1ID(rst.getString("merc1"));
+                    imp.setMerc1Descricao(rst.getString("merc1_desc"));
+                    imp.setMerc2ID(rst.getString("merc2"));
+                    imp.setMerc2Descricao(rst.getString("merc2_desc"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
         //CONJPROD
-        return super.getMercadologicos(); //To change body of generated methods, choose Tools | Templates.
+        
+        return result;
     }
 
     @Override
@@ -85,9 +116,9 @@ public class OrionTechDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.DATA_ALTERACAO,
                 OpcaoProduto.EAN,
                 OpcaoProduto.EAN_EM_BRANCO,
-                //OpcaoProduto.MERCADOLOGICO,
-                //OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
-                //OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
                 OpcaoProduto.QTD_EMBALAGEM_COTACAO,
                 OpcaoProduto.QTD_EMBALAGEM_EAN,
                 OpcaoProduto.TIPO_EMBALAGEM_EAN,
@@ -131,6 +162,8 @@ public class OrionTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    upper(p.UNIDADE) unidade,\n" +
                     "    p.AGRANEL pesavel,\n" +
                     "    0 validade,\n" +
+                    "    merc.codgru merc1,\n" +
+                    "    merc.codsgr merc2,\n" +
                     "    p.NOME descricaocompleta,\n" +
                     "    p.NOMEECF decricaoreduzida,\n" +
                     "    p.PRODREF id_familia,\n" +
@@ -163,6 +196,8 @@ public class OrionTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "        ) a group by 1, 2\n" +
                     "    ) ean on\n" +
                     "        ean.CHAVEPRO = p.CHAVEPRO\n" +
+                    "    left join ODB$RESCLASPROD merc on\n" +
+                    "        merc.chavepro = p.chavepro\n" +
                     "    left join estoqprod est on\n" +
                     "        pe.CHAVEPRE = est.CHAVEPRE\n" +
                     "    left join PRODCTRLPRECO preco on\n" +
@@ -205,6 +240,9 @@ public class OrionTechDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.seteBalanca("S".equals(rst.getString("pesavel")));
                         imp.setValidade(rst.getInt("validade"));
                     }
+                    
+                    imp.setCodMercadologico1(rst.getString("merc1"));
+                    imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoGondola(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("decricaoreduzida"));
