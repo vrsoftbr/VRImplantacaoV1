@@ -110,7 +110,7 @@ public class PautaFiscalDAO {
                     "		ant.codigoatual = p.id\n" +
                     "	join produtoaliquota pa on\n" +
                     "		pa.id_produto = p.id\n" +
-                    "		and pa.id_estado = (select f.id_estado from loja l join fornecedor f on l.id_fornecedor = l.id where l.id = " + idLojaVR + ")\n" +
+                    "		and pa.id_estado = (select f.id_estado from loja l join fornecedor f on l.id_fornecedor = f.id where l.id = " + idLojaVR + ")\n" +
                     "where\n" +
                     "	ant.impsistema = '" + sistema + "'\n" +
                     "	and ant.imploja = '" + loja + "'\n" +

@@ -469,7 +469,15 @@ public class AriusGUI extends VRInternalFrame {
                             
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
-                    }                  
+                    } else if (tab.getSelectedIndex() == 5) {
+                        if(chkConvEmpresa.isSelected()) {
+                            importador.importarConvenioEmpresa();
+                        }
+                        
+                        if(chkConvConveniado.isSelected()) {
+                            importador.importarConvenioConveniado();
+                        }
+                    }                 
                     
                     gravarParametros();
                     
@@ -587,6 +595,10 @@ public class AriusGUI extends VRInternalFrame {
         chkPdvVendas = new vrframework.bean.checkBox.VRCheckBox();
         txtDtIInicioVenda = new org.jdesktop.swingx.JXDatePicker();
         txtDtTerminoVenda = new org.jdesktop.swingx.JXDatePicker();
+        tabConv = new javax.swing.JPanel();
+        chkConvEmpresa = new vrframework.bean.checkBox.VRCheckBox();
+        chkConvConveniado = new vrframework.bean.checkBox.VRCheckBox();
+        chkConvRecebimento = new vrframework.bean.checkBox.VRCheckBox();
         vRTabbedPane1 = new vrframework.bean.tabbedPane.VRTabbedPane();
         pnlConexao = new vrframework.bean.panel.VRPanel();
         txtUsuarioOracle = new vrframework.bean.textField.VRTextField();
@@ -1228,6 +1240,56 @@ public class AriusGUI extends VRInternalFrame {
 
         tab.addTab("Vendas", tabVendas);
 
+        chkConvEmpresa.setText("Empresas");
+        chkConvEmpresa.setEnabled(true);
+        chkConvEmpresa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkConvEmpresaActionPerformed(evt);
+            }
+        });
+
+        chkConvConveniado.setText("Conveniados");
+        chkConvConveniado.setEnabled(true);
+        chkConvConveniado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkConvConveniadoActionPerformed(evt);
+            }
+        });
+
+        chkConvRecebimento.setText("Recebimentos em aberto");
+        chkConvRecebimento.setEnabled(true);
+        chkConvRecebimento.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkConvRecebimentoActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout tabConvLayout = new javax.swing.GroupLayout(tabConv);
+        tabConv.setLayout(tabConvLayout);
+        tabConvLayout.setHorizontalGroup(
+            tabConvLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabConvLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tabConvLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkConvEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkConvConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkConvRecebimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(445, Short.MAX_VALUE))
+        );
+        tabConvLayout.setVerticalGroup(
+            tabConvLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tabConvLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkConvEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkConvConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkConvRecebimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(257, Short.MAX_VALUE))
+        );
+
+        tab.addTab("Convenio", tabConv);
+
         pnlConexao.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Origem - ORACLE"));
         pnlConexao.setPreferredSize(new java.awt.Dimension(350, 350));
 
@@ -1504,6 +1566,18 @@ public class AriusGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFTipoEmpresaActionPerformed
 
+    private void chkConvEmpresaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkConvEmpresaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkConvEmpresaActionPerformed
+
+    private void chkConvConveniadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkConvConveniadoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkConvConveniadoActionPerformed
+
+    private void chkConvRecebimentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkConvRecebimentoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkConvRecebimentoActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectarOracle;
     private vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTrib;
@@ -1524,6 +1598,9 @@ public class AriusGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkContasAPagar;
     private vrframework.bean.checkBox.VRCheckBox chkContatos;
+    private vrframework.bean.checkBox.VRCheckBox chkConvConveniado;
+    private vrframework.bean.checkBox.VRCheckBox chkConvEmpresa;
+    private vrframework.bean.checkBox.VRCheckBox chkConvRecebimento;
     private vrframework.bean.checkBox.VRCheckBox chkEstadoCivil;
     private vrframework.bean.checkBox.VRCheckBox chkFTipoEmpresa;
     private vrframework.bean.checkBox.VRCheckBox chkFamilia;
@@ -1574,6 +1651,7 @@ public class AriusGUI extends VRInternalFrame {
     private vrimplantacao2.gui.interfaces.custom.arius.AriusPlanoContasChequeGUI tabCheque;
     private vrframework.bean.tabbedPane.VRTabbedPane tabCliente;
     private vrframework.bean.panel.VRPanel tabClienteDados;
+    private javax.swing.JPanel tabConv;
     private vrframework.bean.panel.VRPanel tabDados;
     private vrframework.bean.panel.VRPanel tabFornecedor;
     private vrimplantacao2.gui.interfaces.custom.arius.AriusPlanoContasRotativoGUI tabRotativo;

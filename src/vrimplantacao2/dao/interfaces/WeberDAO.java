@@ -11,12 +11,16 @@ import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -24,7 +28,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Importacao
  */
-public class WeberDAO extends InterfaceDAO{
+public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
@@ -166,9 +170,61 @@ public class WeberDAO extends InterfaceDAO{
                    imp.setPiscofinsNaturezaReceita(rs.getString("piscofinsnaturezareceita"));
                    imp.setIcmsAliq(rs.getDouble("icmsaliqsaida"));
                    imp.setIcmsCst(rs.getString("icmscstsaida"));
+                   imp.setPautaFiscalId(imp.getImportId());
                    
                    result.add(imp);
                } 
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    id_produto,\n" +
+                    "    nome_produto,\n" +
+                    "    ncm,\n" +
+                    "    tabicm aliquota_debito_id,\n" +
+                    "    icm.tabicm_st cst_debito,\n" +
+                    "    icm.tabicm_aliq icms_aliquota_debito,\n" +
+                    "    icm_aliq aliquota_credito,\n" +
+                    "    icm_cst cst_credito,\n" +
+                    "    icm_pbc aliquota_reducao_credito,\n" +
+                    "    icm_stperc aliquota_final_credito,\n" +
+                    "    icm_mva\n" +
+                    "from\n" +
+                    "    est_produtos p\n" +
+                    "join tab_icm icm on p.tabicm = icm.id_tabicm\n" +
+                    "where\n" +
+                    "    icm_mva > 0\n" +
+                    "order by\n" +
+                    "    2"
+            )) {
+                while (rst.next()) {
+                    PautaFiscalIMP imp = new PautaFiscalIMP();
+                    
+                    imp.setId(rst.getString("id_produto"));
+                    imp.setIva(rst.getDouble("icm_mva"));
+                    imp.setIvaAjustado(imp.getIva());
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setAliquotaDebito(rst.getInt("cst_debito"), rst.getDouble("icms_aliquota_debito"), 0.0);
+                    imp.setAliquotaDebitoForaEstado(rst.getInt("cst_debito"), rst.getDouble("icms_aliquota_debito"), 0.0);
+                    double reducao = 0;
+                    if(rst.getDouble("aliquota_reducao_credito") == 100) {
+                        reducao = 0;
+                    } else {
+                        reducao = rst.getDouble("aliquota_reducao_credito");
+                    }
+                    imp.setAliquotaCredito(0, rst.getDouble("aliquota_credito"), reducao);
+                    imp.setAliquotaCreditoForaEstado(0, rst.getDouble("aliquota_credito"), reducao);
+                    
+                    result.add(imp);
+                }
             }
         }
         return result;
@@ -462,6 +518,25 @@ public class WeberDAO extends InterfaceDAO{
                     imp.setObservacao(rs.getString("observacao"));
                     
                     result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    id_tabicm id,\n" +
+                    "    tabicm_descricao descricao\n" +
+                    "from\n" +
+                    "    tab_icm"
+            )) {
+                while(rs.next()) {
+                    result.add(new MapaTributoIMP(rs.getString("id"), rs.getString("descricao")));
                 }
             }
         }
