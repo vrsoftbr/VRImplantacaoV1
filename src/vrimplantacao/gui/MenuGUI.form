@@ -1252,6 +1252,14 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuSTI3ActionPerformed"/>
                           </Events>
                         </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuG3">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="G3"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuG3ActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                       </SubComponents>
                     </Menu>
                     <Menu class="javax.swing.JMenu" name="mnuOrion">
