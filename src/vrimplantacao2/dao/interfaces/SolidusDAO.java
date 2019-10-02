@@ -80,6 +80,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     private Date vendasDataInicio = null;
     private Date vendasDataTermino = null;
     private Date notasDataInicio = null;
+    private Date notasDataTermino = null;
     private List<Entidade> entidadesCheques;
     private List<Entidade> entidadesCreditoRotativo;
     private List<Entidade> entidadesConvenio;
@@ -1257,6 +1258,10 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
         this.notasDataInicio = notasDataInicio;
     }
 
+    public void setNotasDataTermino(Date notasDataTermino) {
+        this.notasDataTermino = notasDataTermino;
+    }
+
     public void setEntidadesConvenio(List<Entidade> entidadesConvenio) {
         this.entidadesConvenio = entidadesConvenio;
     }
@@ -1585,7 +1590,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    nf.tipo_operacao in (0,1) and\n" +
                     "    nf.tipo_nf in (0,1) and\n" +
                     //"    nf.tipo_operacao = 0 and\n" + //TODO: Excluir esta linha quando incluir a nota de saida
-                    "    nf.dta_emissao >= " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + "\n" +
+                    "    nf.dta_emissao >= " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " and\n" +
+                    "    nf.dta_emissao <= " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n" +
                     "order by\n" +
                     "    nf.dta_emissao"
             )) {
