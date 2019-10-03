@@ -7,6 +7,7 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -128,6 +129,10 @@ public class G3DAO extends InterfaceDAO {
                     + "	p.CST_PIS_ENTRADA,\n"
                     + "	p.CST_COFINS_SAIDA,\n"
                     + "	p.CST_COFINS_ENTRADA,\n"
+                    + "	gps.cst AS cst_grupo_pis_saida,\n"
+                    + "	gpe.cst AS cst_grupo_pis_entrada,\n"
+                    + "	gcs.cst AS cst_grupo_cofins_saida,\n"
+                    + "	gcs.cst AS cst_grupo_cofins_entrada,\n"
                     + "	p.cod_nat_rec AS naturezareceita,\n"
                     + "	p.COD_CST_DENTRO,\n"
                     + "	p.COD_CST_FORA,\n"
@@ -143,6 +148,10 @@ public class G3DAO extends InterfaceDAO {
                     + "	case p.EXCLUIDO when 0 then 'ATIVO' ELSE 'EXCLUIDO' end situacaocadastro\n"
                     + "FROM produto p\n"
                     + "LEFT JOIN unidade_produto u ON u.ID = p.ID_UNIDADE_PRODUTO\n"
+                    + "LEFT JOIN grupopis gps ON gps.id = p.id_grupo_pis_saida\n"
+                    + "LEFT JOIN grupopis gpe ON gpe.id = p.id_grupo_pis_entrada\n"
+                    + "LEFT JOIN grupocofins gcs ON gcs.id = p.id_grupo_cofins_saida\n"
+                    + "LEFT JOIN grupocofins gce ON gce.id = p.id_grupo_cofins_entrada\n"
                     + "ORDER BY p.ID"
             )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
@@ -186,7 +195,15 @@ public class G3DAO extends InterfaceDAO {
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(ean);
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    
+                    if ((rst.getString("descricaocompleta") != null)
+                            && (!rst.getString("descricaocompleta").trim().isEmpty())) {
+
+                        imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    } else {
+                        imp.setDescricaoCompleta(rst.getString("descricaoreduzida"));
+                    }
+                    
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setCodMercadologico1(rst.getString("mercadologico"));
@@ -203,8 +220,8 @@ public class G3DAO extends InterfaceDAO {
                     imp.setSituacaoCadastro("ATIVO".equals(rst.getString("situacaocadastro")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstDebito(rst.getString("CST_PIS_SAIDA"));
-                    imp.setPiscofinsCstCredito(rst.getString("CST_PIS_ENTRADA"));
+                    imp.setPiscofinsCstDebito(rst.getString("cst_grupo_pis_saida"));
+                    imp.setPiscofinsCstCredito(rst.getString("cst_grupo_pis_entrada"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
                     imp.setIcmsCstSaida(rst.getInt("COD_CST_DENTRO"));
                     imp.setIcmsCstEntrada(rst.getInt("COD_CST_FORA"));
@@ -253,15 +270,15 @@ public class G3DAO extends InterfaceDAO {
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-
+        
         if (opt == OpcaoProduto.ATACADO) {
             try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "SELECT \n"
                         + "	id, \n"
                         + "	qtd_atacado,\n"
-                        + "	valor_venda_atacado,\n"
-                        + "	valor_venda\n"
+                        + "	TRUNCATE(valor_venda_atacado, 2) precoatacaco,\n"
+                        + "	truncate(valor_venda, 2) precovenda\n"
                         + "FROM produto \n"
                         + "WHERE qtd_atacado > 1\n"
                         + "AND coalesce(valor_venda_atacado, 0) > 0"
@@ -270,14 +287,15 @@ public class G3DAO extends InterfaceDAO {
                         int codigoAtual = new ProdutoAnteriorDAO().getCodigoAnterior2(getSistema(), getLojaOrigem(), rst.getString("id"));
 
                         if (codigoAtual > 0) {
+                            
                             ProdutoIMP imp = new ProdutoIMP();
                             imp.setImportLoja(getLojaOrigem());
                             imp.setImportSistema(getSistema());
                             imp.setImportId(rst.getString("id"));
                             imp.setEan("999999" + String.valueOf(codigoAtual));
                             imp.setQtdEmbalagem(rst.getInt("qtd_atacado"));
-                            imp.setPrecovenda(rst.getDouble("valor_venda"));
-                            imp.setAtacadoPreco(rst.getDouble("valor_venda_atacado"));
+                            imp.setPrecovenda(rst.getDouble("precovenda"));
+                            imp.setAtacadoPreco(rst.getDouble("precoatacaco"));
                             result.add(imp);
                         }
                     }
