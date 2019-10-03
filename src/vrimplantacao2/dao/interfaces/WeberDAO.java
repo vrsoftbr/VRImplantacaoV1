@@ -122,14 +122,19 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    cofinse_aliq as piscofinscstdebito,\n" +
                     "    pis_cofins_entrada as piscofinscstcredito,\n" +
                     "    pis_nat_rec as piscofinsnaturezareceita,\n" +
-                    "    icm_cst as icmscstsaida,\n" +
-                    "    icm_aliq as icmsaliqsaida,\n" +
+                    "    icm_cst as icms_cst_credito,\n" +
+                    "    icm_aliq as icms_credito,\n" +
+                    "    icm_pbc icms_reducao_credito,\n" +
+                    "    icm.tabicm_st icms_cst_debito,\n" +
+                    "    icm.tabicm_aliq icms_debito,\n" +
+                    "    icm.tabicm_pbc icms_reducao_debito,\n" +
                     "    tipo_prod as tipoproduto,\n" +
                     "    p.icm_mva\n" +
                     "from\n" +
                     "    est_produtos p\n" +
                     "left join est_atual e on p.id_produto = e.id_produto and\n" +
                     "    e.id_loja = " + getLojaOrigem() + "\n" +
+                    "left join tab_icm icm on p.tabicm = icm.id_tabicm\n" +
                     "order by\n" +
                     "    p.id_produto"
             )) {
@@ -153,7 +158,6 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                    imp.setDataAlteracao(rs.getDate("dataalteracao"));
                    imp.seteBalanca("S".equals(rs.getString("balanca")));
                    imp.setValidade(rs.getInt("validade"));
-                   
                    imp.setSituacaoCadastro(rs.getInt("situacao") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                    imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
@@ -168,8 +172,32 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                    imp.setPiscofinsCstCredito(rs.getString("piscofinscstcredito"));
                    imp.setPiscofinsCstDebito(rs.getString("piscofinscstdebito"));
                    imp.setPiscofinsNaturezaReceita(rs.getString("piscofinsnaturezareceita"));
-                   imp.setIcmsAliq(rs.getDouble("icmsaliqsaida"));
-                   imp.setIcmsCst(rs.getString("icmscstsaida"));
+                   
+                   //Aliquota de saída
+                   imp.setIcmsAliqSaida(rs.getDouble("icms_debito"));
+                   imp.setIcmsCstSaida(rs.getInt("icms_cst_debito"));
+                   
+                   double reducao = rs.getDouble("icms_reducao_debito");
+                   imp.setIcmsReducaoSaida(reducao == 100 ? 0 : reducao);
+                   
+                   //Alíquota de saída fora estado
+                   imp.setIcmsAliqSaidaForaEstado(rs.getDouble("icms_debito"));
+                   imp.setIcmsCstSaidaForaEstado(rs.getInt("icms_cst_debito"));
+                   imp.setIcmsReducaoSaidaForaEstado(reducao == 100 ? 0 : reducao);
+                   
+                   //Aliquota de entrada
+                   imp.setIcmsAliqEntrada(rs.getDouble("icms_credito"));
+                   imp.setIcmsCstEntrada(Integer.parseInt(Utils.formataNumero(rs.getString("icms_cst_credito"))));
+                   
+                   reducao = rs.getDouble("icms_reducao_credito");
+                   imp.setIcmsReducaoEntrada(reducao == 100 ? 0 : reducao);
+                   
+                   //Aliquota de entrada fora estado
+                   imp.setIcmsAliqEntradaForaEstado(rs.getDouble("icms_credito"));
+                   imp.setIcmsCstEntradaForaEstado(Integer.parseInt(Utils.formataNumero(rs.getString("icms_cst_credito"))));
+                   imp.setIcmsReducaoEntradaForaEstado(reducao == 100 ? 0 : reducao);
+                   
+                   //Pauta Fiscal
                    imp.setPautaFiscalId(imp.getImportId());
                    
                    result.add(imp);

@@ -1388,7 +1388,12 @@ public class ProdutoRepository {
         vo.setCodigoBarras(Utils.stringToLong(imp.getEan()));
         double desconto = imp.getAtacadoPorcentagem();
         if (desconto == 0 && imp.getAtacadoPreco() > 0 && imp.getAtacadoPreco() != imp.getPrecovenda()) {
-            desconto = MathUtils.round(100 - ((imp.getAtacadoPreco() / (imp.getPrecovenda() == 0 ? 1 : imp.getPrecovenda())) * 100), 2);
+            //desconto = MathUtils.round(100 - ((imp.getAtacadoPreco() / (imp.getPrecovenda() == 0 ? 1 : imp.getPrecovenda())) * 100), 2);
+            desconto = (100 - ((imp.getAtacadoPreco() / (imp.getPrecovenda() == 0 ? 1 : imp.getPrecovenda())) * 100));
+            
+            if ("9999994530".equals(imp.getEan())) {
+                System.out.println(desconto + " - " + imp.getAtacadoPreco() + " - " + imp.getPrecovenda());
+            }
         }
         vo.setDesconto(desconto);
         return vo;

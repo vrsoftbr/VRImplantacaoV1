@@ -618,7 +618,7 @@
                         </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuFabTech">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="FabTech"/>
+                            <Property name="text" type="java.lang.String" value="SabTech"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuFabTechActionPerformed"/>
