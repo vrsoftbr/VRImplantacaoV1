@@ -70,10 +70,10 @@ public class SabTechGUI extends VRInternalFrame implements ConexaoEvent {
         this.title = "Importação " + SISTEMA;
 
         conexao.host = "localhost";
-        conexao.database = "dbSav";
+        conexao.database = dao.database;
         conexao.port = "1433";
-        conexao.user = "sa";
-        conexao.pass = "senhas";
+        conexao.user = dao.user_banco;
+        conexao.pass = dao.pass_banco;
 
         tabProdutos.setOpcoesDisponiveis(dao);
 
