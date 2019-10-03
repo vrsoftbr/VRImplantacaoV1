@@ -239,7 +239,7 @@ public class GCFDAO extends InterfaceDAO {
                     "    NULLIF(P.DBA_GIT_CODIGO_PAI,0) ID_FAMILIA,\n" +
                     "    P.DBA_GIT_PESO_VND PESO,\n" +
                     "    EST.DBA_CADCESTQ_ESTOQUE ESTOQUE,\n" +
-                    "    coalesce(MRG.DBA_CAD_MRG_LUCRO, merc.dba_ncc_margem1, merc.dba_ncc_margem2, merc.dba_ncc_margem3) MARGEM,\n" +
+                    "    coalesce(merc.dba_ncc_margem1, merc.dba_ncc_margem2, merc.dba_ncc_margem3, MRG.DBA_CAD_MRG_LUCRO) MARGEM,\n" +
                     "    P.DBA_GIT_CUS_REP CUSTOCOMIMPOSTO,\n" +
                     "    P.DBA_GIT_CUS_ULT_ENT_BRU CUSTOMSEMIMPOSTO,\n" +
                     "    p.DBA_GIT_PRC_VEN" + getNivel() + " PRECO,\n" +
@@ -250,7 +250,12 @@ public class GCFDAO extends InterfaceDAO {
                     "	ICMS.TRIBUTACAO,\n" +
                     "	ICMS.ALIQUOTA,\n" +
                     "	ICMS.REDUCAO,\n" +
-                    "	CEST.dba_itematrib_cestq_fiscal cest\n" +
+                    "	CEST.dba_itematrib_cestq_fiscal cest,\n" +
+                    "	TO_NUMBER(SUBSTR(P.DBA_GIT_FILLER, 97, 5))/1000 AS MARGEM_NIVEL_1,\n" +
+                    "   TO_NUMBER(SUBSTR(P.DBA_GIT_FILLER, 102, 5))/1000 AS MARGEM_NIVEL_2,\n" +
+                    "   TO_NUMBER(SUBSTR(P.DBA_GIT_FILLER, 107, 5))/1000 AS MARGEM_NIVEL_3,\n" +
+                    "   TO_NUMBER(SUBSTR(P.DBA_GIT_FILLER, 112, 5))/1000 AS MARGEM_NIVEL_4,\n" +
+                    "   TO_NUMBER(SUBSTR(P.DBA_GIT_FILLER, 117, 5))/1000 AS MARGEM_NIVEL_5\n" +
                     "from\n" +
                     "    A_CADCITEM p\n" +
                     "    LEFT JOIN A_CADCLOJA EMP ON EMP.DBA_LOJ_CODIGO_1 = " + getLojaOrigem() + "\n" +
@@ -348,7 +353,7 @@ public class GCFDAO extends InterfaceDAO {
                     imp.setPesoBruto(rst.getDouble("PESO"));
                     imp.setPesoLiquido(rst.getDouble("PESO"));
                     imp.setEstoque(rst.getDouble("ESTOQUE"));
-                    imp.setMargem(rst.getDouble("MARGEM"));
+                    imp.setMargem(rst.getDouble("MARGEM_NIVEL_1"));
                     imp.setCustoComImposto(rst.getDouble("CUSTOCOMIMPOSTO"));
                     imp.setCustoSemImposto(rst.getDouble("CUSTOMSEMIMPOSTO"));
                     imp.setPrecovenda(rst.getDouble("PRECO"));
