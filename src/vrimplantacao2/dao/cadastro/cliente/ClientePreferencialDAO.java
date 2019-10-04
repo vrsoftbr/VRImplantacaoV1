@@ -332,7 +332,10 @@ public class ClientePreferencialDAO {
                 if(opt.contains(OpcaoCliente.ESTADO_CIVIL)) {
                     sql.put("id_tipoestadocivil", vo.getTipoEstadoCivil().getID());
                 }
-
+                if(opt.contains(OpcaoCliente.VENCIMENTO_ROTATVO)) {
+                    sql.put("vencimentocreditorotativo", vo.getVencimentoCreditoRotativo());
+                }
+                
                 sql.setWhere("id = " + vo.getId());
                 stm.execute(sql.getUpdate());
             }

@@ -128,6 +128,8 @@ public class ProdutoRepository {
                     //</editor-fold>
                     
                     ProdutoAnteriorVO anterior = provider.anterior().get(keys.get(0), keys.get(1), keys.get(2));
+                    provider.getFornecedorAnterior().createTable();
+                    
                     if (anterior == null) {
                         rep.append("01|Produto não importado anteriormente");
                         

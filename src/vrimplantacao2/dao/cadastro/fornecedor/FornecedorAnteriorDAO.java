@@ -85,7 +85,7 @@ public class FornecedorAnteriorDAO {
         }
     }
     
-    private void createTable() throws Exception {
+    public void createTable() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute(
                 "do $$\n" +

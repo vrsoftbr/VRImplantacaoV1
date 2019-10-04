@@ -159,7 +159,7 @@
                           <Component id="chkProdutoFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="chkContaPagar" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="485" max="32767" attributes="0"/>
+                      <EmptySpace pref="491" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -237,6 +237,7 @@
                               <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCliIERG" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkBloqueado" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCVencimento" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace pref="482" max="32767" attributes="0"/>
                       </Group>
@@ -251,7 +252,9 @@
                           <Component id="chkCliIERG" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkBloqueado" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="191" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkCVencimento" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace pref="168" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -278,6 +281,11 @@
                     <Property name="text" type="java.lang.String" value="IE/RG"/>
                   </Properties>
                 </Component>
+                <Component class="javax.swing.JCheckBox" name="chkCVencimento">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Vencimento Rotativo"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="javax.swing.JPanel" name="tablCreditoRotativo">
@@ -295,7 +303,7 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="500" max="32767" attributes="0"/>
+                          <EmptySpace pref="506" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -332,7 +340,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCheque" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="538" max="32767" attributes="0"/>
+                          <EmptySpace pref="544" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -369,7 +377,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="pnlDadosDataVenda" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="300" max="32767" attributes="0"/>
+                          <EmptySpace pref="306" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -487,7 +495,7 @@
                           <Component id="cbxUnifFornecedores" min="-2" max="-2" attributes="0"/>
                           <Component id="cbxUnifCliPreferencial" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="309" max="32767" attributes="0"/>
+                      <EmptySpace pref="315" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -561,7 +569,7 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="txtBancoDadosFirebird" pref="294" max="32767" attributes="0"/>
+                                  <Component id="txtBancoDadosFirebird" pref="300" max="32767" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="vRLabel3" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
