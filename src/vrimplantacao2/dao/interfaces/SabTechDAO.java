@@ -72,7 +72,8 @@ public class SabTechDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.VALIDADE,
             OpcaoProduto.MERCADOLOGICO,
             OpcaoProduto.MERCADOLOGICO_PRODUTO,
-            OpcaoProduto.MAPA_TRIBUTACAO,}));
+            OpcaoProduto.MAPA_TRIBUTACAO
+        }));
     }
 
     @Override
@@ -106,22 +107,16 @@ public class SabTechDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select distinct\n"
-                    + "	coalesce(ltrim(rtrim(p.Depto)),'') codMercadologico1,\n"
-                    + "	c.descricao mercadologico1,\n"
-                    + "	coalesce(ltrim(rtrim(p.Classe)),'') codMercadologico2,\n"
-                    + "	d.descricao mercadologico2\n"
-                    + "from\n"
-                    + "	CPro_Produto p\n"
-                    + "	LEFT OUTER JOIN CPro_Classe c ON\n"
-                    + "		p.Classe = c.Classe\n"
-                    + "	LEFT OUTER JOIN CPro_Depto d ON\n"
-                    + "		p.Depto = d.Depto\n"
-                    + "where\n"
-                    + "	coalesce(ltrim(rtrim(p.Depto)),'') != '' and\n"
-                    + "	coalesce(ltrim(rtrim(p.Classe)),'') != ''\n"
-                    + "order by\n"
-                    + "	codMercadologico1, codMercadologico2"
+                    "select \n"
+                    + "	distinct \n"
+                    + "	m1.Depto as codMercadologico1,\n"
+                    + " m1.Descricao as mercadologico1,\n"
+                    + "	m2.Classe as codMercadologico2,\n"
+                    + " m2.Descricao as mercadologico2\n"
+                    + "from dbo.CPro_Produto p\n"
+                    + "inner join dbo.CPro_Depto m1 on m1.Depto = p.Depto\n"
+                    + "inner join dbo.CPro_Classe m2 on m2.Classe = p.Classe\n"
+                    + "order by m1.Depto, m2.Classe"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
@@ -132,7 +127,8 @@ public class SabTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMerc1Descricao(rst.getString("mercadologico1"));
                     imp.setMerc2ID(rst.getString("codMercadologico2"));
                     imp.setMerc2Descricao(rst.getString("mercadologico2"));
-
+                    imp.setMerc3ID("1");
+                    imp.setMerc3Descricao(imp.getMerc2Descricao());
                     result.add(imp);
                 }
             }
@@ -145,282 +141,34 @@ public class SabTechDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            /*
-             "SELECT \n" +
-             "	dbo.CPro_Produto.Produto, \n" +
-             "	dbo.CPro_Produto.Tipo, \n" +
-             "	dbo.CPro_Produto.CodBarras, \n" +
-             "	dbo.CPro_Produto.CodFabric, \n" +
-             "	dbo.CPro_Produto.CodOriginal, \n" +
-             "	dbo.CPro_Produto.Unidade, \n" +
-             "	dbo.CPro_Produto.Unidade2, \n" +
-             "   dbo.CPro_Produto.Unidade2TP, \n" +
-             "	dbo.CPro_Produto.Unidade3, \n" +
-             "	dbo.CPro_Produto.Unidade3TP, \n" +
-             "	dbo.CPro_Produto.DescricaoCurta, \n" +
-             "	dbo.CPro_Produto.Descricao, \n" +
-             "	dbo.CPro_Produto.DescricaoCodBarras, \n" +
-             "   dbo.CPro_Produto.DescricaoNF, \n" +
-             "	dbo.CPro_Produto.NomeCientifico, \n" +
-             "	dbo.CPro_Produto.DescricaoLonga, \n" +
-             "	dbo.CPro_Produto.Descritivo, \n" +
-             "	dbo.CPro_Produto.Fabricante, \n" +
-             "	dbo.CPro_Fabricante.Descricao AS FabDesc, \n" +
-             "   dbo.CPro_Produto.Depto, \n" +
-             "	dbo.CPro_Produto.Validade, \n" +
-             "	dbo.CPro_Depto.Descricao AS DepDesc, \n" +
-             "	dbo.CPro_Produto.Classe, \n" +
-             "	dbo.CPro_Classe.Descricao AS ClaDesc, \n" +
-             "	dbo.CPro_Produto.DtInv, \n" +
-             "   dbo.CPro_Produto.EstMin, \n" +
-             "	dbo.CPro_Produto.EstMax, \n" +
-             "	dbo.CPro_Produto.EstAtual, \n" +
-             "	0 AS EstReservado, \n" +
-             "	dbo.CPro_Produto.EstAtual AS EstDisponivel, \n" +
-             "	dbo.CPro_Produto.EstInv, \n" +
-             "	dbo.CPro_Produto.EstAlt, \n" +
-             "   dbo.CPro_Produto.EstAdmDtInv, \n" +
-             "	dbo.CPro_Produto.EstAdmInv, \n" +
-             "	dbo.CPro_Produto.EstAdmAlt, \n" +
-             "	dbo.CPro_Produto.EstAdmAtual, \n" +
-             "	dbo.CPro_Produto.Moeda, \n" +
-             "	dbo.CPro_Produto.ST_BaseCalculo, \n" +
-             "   dbo.CPro_Produto.ST_ICMSEntrada, \n" +
-             "	dbo.CPro_Produto.ST_ICMSSaida, \n" +
-             "	dbo.CPro_Produto.ST_ICMSPagar, \n" +
-             "	dbo.CPro_Produto.ST_ICMSDestino, \n" +
-             "	dbo.CPro_Produto.ST_ICMSDestino_Red, \n" +
-             "   dbo.CPro_Produto.ST_ICMSOrigem, \n" +
-             "	dbo.CPro_Produto.ST_ICMSOrigem_Red, \n" +
-             "	dbo.CPro_Produto.IVA, \n" +
-             "	dbo.CPro_Produto.Pauta, \n" +
-             "	dbo.CPro_Produto.ValorCusto, \n" +
-             "   dbo.CPro_Produto.ValorCusto * dbo.CGe_MoedaDefault.Valor AS ValorCustoReais, \n" +
-             "	dbo.CPro_Produto.Imp_FreteInternacional_P, \n" +
-             "   dbo.CPro_Produto.ValorIPI, \n" +
-             "	dbo.CPro_Produto.ValorIPI * dbo.CGe_MoedaDefault.Valor AS ValorIPIReais, \n" +
-             "	dbo.CPro_Produto.ValorCusto_SubTotal_1, \n" +
-             "	dbo.CPro_Produto.ST_ICMSPro, \n" +
-             "   dbo.CPro_Produto.ST_ValorICMSPro, \n" +
-             "	dbo.CPro_Produto.ValorCusto_SubTotal_2, \n" +
-             "	dbo.CPro_Produto.Frete, \n" +
-             "	dbo.CPro_Produto.ValorFrete, \n" +
-             "	dbo.CPro_Produto.Imposto, \n" +
-             "	dbo.CPro_Produto.ValorImposto, \n" +
-             "   dbo.CPro_Produto.Outros, \n" +
-             "	dbo.CPro_Produto.ValorOutros, \n" +
-             "	dbo.CPro_Produto.ValorCusto_SubTotal_3, \n" +
-             "	dbo.CPro_Produto.Desconto, \n" +
-             "	dbo.CPro_Produto.ValorDesconto, \n" +
-             "	dbo.CPro_Produto.ValorAnt, \n" +
-             "   dbo.CPro_Produto.ValorMed, \n" +
-             "	dbo.CPro_Produto.ValorAtual, \n" +
-             "	dbo.CPro_Produto.ValorAtual * dbo.CGe_MoedaDefault.Valor AS ValorAtualReais, \n" +
-             "	dbo.CPro_Produto.CalcVlMedio, \n" +
-             "   dbo.CGe_MoedaDefault.Valor AS VlMoeda,\n" +
-             "   (SELECT SUM(ValorCustoTotalReais) AS Expr1\n" +
-             "       FROM dbo.VwCPro_ComposicaoCusto\n" +
-             "       WHERE (ProdutoComp = dbo.CPro_Produto.Produto)) AS ValorCustoComposicao, \n" +
-             "	dbo.CPro_Produto.Lucro, \n" +
-             "	dbo.CPro_Produto.VlVenda, \n" +
-             "	dbo.F_CriptoPrecoVenda(dbo.CPro_Produto.VlVenda) AS VlVendaCripto, \n" +
-             "   dbo.CPro_Produto.VlVenda * dbo.CGe_MoedaDefault.Valor AS VlVendaReais, \n" +
-             "	dbo.CPro_Produto.LucroMin, \n" +
-             "	dbo.CPro_Produto.VlVendaMin, \n" +
-             "   dbo.CPro_Produto.VlVendaMin * dbo.CGe_MoedaDefault.Valor AS VlVendaMinReais, \n" +
-             "	dbo.CPro_Produto.IPI_Venda_ST, \n" +
-             "	dbo.CPro_Produto.IPI_Venda_Aliquota, \n" +
-             "   CASE WHEN (ISNULL(dbo.CPro_Produto.IPI_Venda_Aliquota, 0) / 100) = 0 THEN 0 ELSE ((dbo.CPro_Produto.VlVenda * dbo.CGe_MoedaDefault.Valor) * (ISNULL(dbo.CPro_Produto.IPI_Venda_Aliquota, 0) / 100)) \n" +
-             "   END AS IPI_Venda_Valor, \n" +
-             "	CASE WHEN (ISNULL(dbo.CPro_Produto.IPI_Venda_Aliquota, 0) / 100) = 0 THEN (dbo.CPro_Produto.VlVenda * dbo.CGe_MoedaDefault.Valor) \n" +
-             "   ELSE ((dbo.CPro_Produto.VlVenda * dbo.CGe_MoedaDefault.Valor) * (1 + (ISNULL(dbo.CPro_Produto.IPI_Venda_Aliquota, 0) / 100))) END AS IPI_Venda_ValorVenda, \n" +
-             "	dbo.CPro_Produto.Lucro02, \n" +
-             "   dbo.CPro_Produto.VlVenda02, \n" +
-             "	dbo.CPro_Produto.VlVenda02 * dbo.CGe_MoedaDefault.Valor AS VlVenda02Reais, \n" +
-             "	dbo.CPro_Produto.LucroMin02, dbo.CPro_Produto.VlVendaMin02, \n" +
-             "   dbo.CPro_Produto.VlVendaMin02 * dbo.CGe_MoedaDefault.Valor AS VlVendaMin02Reais, \n" +
-             "	dbo.CPro_Produto.Promocao, \n" +
-             "	dbo.CPro_Produto.PromVista, \n" +
-             "	dbo.CPro_Produto.PromPrazo, \n" +
-             "	dbo.CPro_Produto.LucroProm, \n" +
-             "   dbo.CPro_Produto.VlVendaProm, \n" +
-             "	dbo.CPro_Produto.VlVendaProm * dbo.CGe_MoedaDefault.Valor AS VlVendaPromReais, \n" +
-             "	dbo.CPro_Produto.ComissaoTipo, \n" +
-             "	dbo.CPro_Produto.ComissaoPorc, \n" +
-             "   dbo.CPro_Produto.DetalhaPro, \n" +
-             "	dbo.CPro_Produto.DescontoPro, \n" +
-             "	dbo.CPro_Produto.ICMSTabela, \n" +
-             "	dbo.CPro_TabICMS.Descricao AS ICMSDesc, \n" +
-             "	dbo.CPro_ST.SubstituicaoTributaria AS ICMS_SubstTrib, \n" +
-             "   dbo.CPro_Produto.ValorVendaST, \n" +
-             "	dbo.CPro_Produto.ICMSTabela_CliFinal, \n" +
-             "	CPro_TabICMS_CliFinal.Descricao AS ICMS_CliFinal_Desc, \n" +
-             "	CPro_ST_CliFinal.SubstituicaoTributaria AS ICMS_CliFinal_SubstTrib, \n" +
-             "   dbo.CPro_Produto.ICMSTabela_Dev_Cli, \n" +
-             "	CPro_TabICMS_Dev_Cli.Descricao AS ICMS_Dev_Cli_Desc, \n" +
-             "	CPro_ST_Dev_Cli.SubstituicaoTributaria AS ICMS_Dev_Cli_SubstTrib, \n" +
-             "   dbo.CPro_Produto.ICMSTabela_Dev_CliFinal, \n" +
-             "	CPro_TabICMS_Dev_CliFinal.Descricao AS ICMS_Dev_CliFinal_Desc, \n" +
-             "	CPro_ST_Dev_CliFinal.SubstituicaoTributaria AS ICMS_Dev_CliFinal_SubstTrib, \n" +
-             "   dbo.CPro_Produto.ICMSTabela_Dev_For, \n" +
-             "	CPro_TabICMS_Dev_For.Descricao AS ICMS_Dev_For_Desc, \n" +
-             "	CPro_ST_Dev_For.SubstituicaoTributaria AS ICMS_Dev_For_SubstTrib, \n" +
-             "	dbo.CPro_Produto.PISTabela, \n" +
-             "   dbo.CPro_TabPIS.Descricao AS PISDesc, \n" +
-             "	dbo.CPro_TabPIS.Aliquota AS PISAliquota, \n" +
-             "	dbo.CPro_TabPIS_ST.ST + ' - ' + dbo.CPro_TabPIS_ST.Descricao AS PIS_SitTrib, \n" +
-             "	dbo.CPro_Produto.COFINSTabela, \n" +
-             "   dbo.CPro_TabCOFINS.Descricao AS COFINSDesc, \n" +
-             "	dbo.CPro_TabCOFINS.Aliquota AS COFINSAliquota, \n" +
-             "	dbo.CPro_TabCOFINS_ST.ST + ' - ' + dbo.CPro_TabCOFINS_ST.Descricao AS COFINS_SitTrib, \n" +
-             "   dbo.CPro_Produto.CESTTabela, \n" +
-             "	dbo.CPro_TabCEST.CEST_Codigo, \n" +
-             "	dbo.CPro_TabCEST.Item AS CEST_Item, \n" +
-             "	dbo.CPro_TabCEST_Segmento.CEST_Segmento, \n" +
-             "   dbo.CPro_TabCEST_Segmento.Descricao AS CEST_Seg_Desc, \n" +
-             "	dbo.CPro_TabCEST_Segmento.CEST_Segmento + ' - ' + dbo.CPro_TabCEST_Segmento.Descricao AS CEST_Seg_Completa, \n" +
-             "   dbo.CPro_TabCEST.NCM AS CEST_NCM, \n" +
-             "	dbo.CPro_TabCEST.Descricao AS CEST_Desc, \n" +
-             "	dbo.CPro_Produto.PesoUM, \n" +
-             "	dbo.CPro_Produto.QtdeCX, \n" +
-             "	dbo.CPro_Produto.PesoBruto, \n" +
-             "	dbo.CPro_Produto.PAtivo, \n" +
-             "   dbo.CPro_Produto.Local1, \n" +
-             "	dbo.CPro_Produto.Local2, \n" +
-             "	dbo.CPro_Produto.Local3, \n" +
-             "	dbo.CPro_Produto.Local4, \n" +
-             "	ISNULL(dbo.CPro_Produto.Local1, '') + ' ' + ISNULL(dbo.CPro_Produto.Local2, '') + ' ' + ISNULL(dbo.CPro_Produto.Local3, '') + ' ' + ISNULL(dbo.CPro_Produto.Local4, '') AS ProLoc, \n" +
-             "	dbo.CPro_Produto.OT1, \n" +
-             "	dbo.CPro_Produto.OT2, \n" +
-             "	dbo.CPro_Produto.OT3, \n" +
-             "	dbo.CPro_Produto.OF1_1, \n" +
-             "   dbo.CPro_Produto.OF1_2, \n" +
-             "	dbo.CPro_Produto.OF1_3, \n" +
-             "	dbo.CPro_Produto.OF1_4, \n" +
-             "	dbo.CPro_Produto.OF1_5, \n" +
-             "	dbo.CPro_Produto.OF1_6, \n" +
-             "	dbo.CPro_Produto.OF2_1, \n" +
-             "	dbo.CPro_Produto.OF2_2, \n" +
-             "	dbo.CPro_Produto.OF2_3, \n" +
-             "   dbo.CPro_Produto.Grade, \n" +
-             "	dbo.CPro_Produto.Modelo, \n" +
-             "	dbo.CPro_Produto.Tamanho, \n" +
-             "	dbo.CPro_Produto.FotoP, \n" +
-             "	dbo.CPro_Produto.FotoG, \n" +
-             "	dbo.CPro_Produto.DtReajuste, \n" +
-             "	dbo.CPro_Produto.StatusFM, \n" +
-             "   dbo.CPro_Produto.Formula, \n" +
-             "	dbo.CPro_Produto.Imp, \n" +
-             "	dbo.CPro_Produto.ConexaoImp, \n" +
-             "	dbo.CPro_Produto.Inativo, \n" +
-             "	dbo.CPro_Produto.SelCompra, \n" +
-             "	dbo.CPro_Produto.ConexaoCompra, \n" +
-             "	dbo.CPro_Produto.QtdeCompra, \n" +
-             "   dbo.CPro_Produto.ClaFiscal, \n" +
-             "	dbo.CPro_Produto.VendaManterValor, \n" +
-             "	dbo.CPro_Produto.VendaAlteraDescr, \n" +
-             "	dbo.CPro_Produto.Balanca, \n" +
-             "	dbo.CPro_Produto.BalancaCheckout, \n" +
-             "	dbo.CPro_Produto.Espessura, \n" +
-             "   dbo.CPro_Produto.RegistroAlterado\n" +
-             "FROM \n" +
-             "	dbo.CPro_Produto \n" +
-             "	LEFT OUTER JOIN dbo.CPro_TabICMS ON\n" +
-             "		dbo.CPro_Produto.ICMSTabela = dbo.CPro_TabICMS.Codigo \n" +
-             "	LEFT OUTER JOIN dbo.CPro_ST ON\n" +
-             "		dbo.CPro_TabICMS.ST = dbo.CPro_ST.ST \n" +
-             "	LEFT OUTER JOIN dbo.CPro_TabICMS AS CPro_TabICMS_CliFinal ON\n" +
-             "		dbo.CPro_Produto.ICMSTabela_CliFinal = CPro_TabICMS_CliFinal.Codigo \n" +
-             "	LEFT OUTER JOIN dbo.CPro_ST AS CPro_ST_CliFinal ON\n" +
-             "		CPro_TabICMS_CliFinal.ST = CPro_ST_CliFinal.ST \n" +
-             "	LEFT OUTER JOIN dbo.CPro_TabICMS AS CPro_TabICMS_Dev_Cli ON\n" +
-             "		dbo.CPro_Produto.ICMSTabela_Dev_Cli = CPro_TabICMS_Dev_Cli.Codigo \n" +
-             "	LEFT OUTER JOIN dbo.CPro_ST AS CPro_ST_Dev_Cli ON\n" +
-             "		CPro_TabICMS_Dev_Cli.ST = CPro_ST_Dev_Cli.ST \n" +
-             "	LEFT OUTER JOIN  dbo.CPro_TabICMS AS CPro_TabICMS_Dev_CliFinal ON\n" +
-             "		dbo.CPro_Produto.ICMSTabela_Dev_CliFinal = CPro_TabICMS_Dev_CliFinal.Codigo \n" +
-             "	LEFT OUTER JOIN dbo.CPro_ST AS CPro_ST_Dev_CliFinal ON\n" +
-             "		CPro_TabICMS_Dev_CliFinal.ST = CPro_ST_Dev_CliFinal.ST \n" +
-             "	LEFT OUTER JOIN dbo.CPro_TabICMS AS CPro_TabICMS_Dev_For ON\n" +
-             "		dbo.CPro_Produto.ICMSTabela_Dev_For = CPro_TabICMS_Dev_For.Codigo \n" +
-             "	LEFT OUTER JOIN dbo.CPro_ST AS CPro_ST_Dev_For ON\n" +
-             "		CPro_TabICMS_Dev_For.ST = CPro_ST_Dev_For.ST \n" +
-             "	LEFT OUTER JOIN dbo.CPro_TabPIS ON\n" +
-             "		dbo.CPro_Produto.PISTabela = dbo.CPro_TabPIS.PISTabela \n" +
-             "	LEFT OUTER JOIN dbo.CPro_TabPIS_ST ON\n" +
-             "		dbo.CPro_TabPIS.ST = dbo.CPro_TabPIS_ST.ST \n" +
-             "	LEFT OUTER JOIN dbo.CPro_TabCOFINS ON\n" +
-             "		dbo.CPro_Produto.COFINSTabela = dbo.CPro_TabCOFINS.COFINSTabela\n" +
-             "	LEFT OUTER JOIN dbo.CPro_TabCEST ON\n" +
-             "		dbo.CPro_Produto.CESTTabela = dbo.CPro_TabCEST.CEST\n" +
-             "	LEFT OUTER JOIN dbo.CPro_TabCEST_Segmento ON\n" +
-             "		dbo.CPro_TabCEST.CEST_Segmento = dbo.CPro_TabCEST_Segmento.CEST_Segmento\n" +
-             "	LEFT OUTER JOIN dbo.CPro_TabCOFINS_ST ON\n" +
-             "		dbo.CPro_TabCOFINS.ST = dbo.CPro_TabCOFINS_ST.ST\n" +
-             "	LEFT OUTER JOIN dbo.CPro_Classe ON\n" +
-             "		dbo.CPro_Produto.Classe = dbo.CPro_Classe.Classe\n" +
-             "	LEFT OUTER JOIN dbo.CPro_Depto ON\n" +
-             "		dbo.CPro_Produto.Depto = dbo.CPro_Depto.Depto\n" +
-             "	LEFT OUTER JOIN dbo.CPro_Fabricante ON\n" +
-             "		dbo.CPro_Produto.Fabricante = dbo.CPro_Fabricante.Fabricante\n" +
-             "	LEFT OUTER JOIN dbo.CGe_MoedaDefault ON\n" +
-             "		dbo.CPro_Produto.Moeda = dbo.CGe_MoedaDefault.Moeda"
-             */
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
-                    + "	dbo.CPro_Produto.Produto id,\n"
-                    + "	dbo.CPro_Produto.CodBarras ean,\n"
-                    + "	dbo.CPro_Produto.Unidade unidade, \n"
-                    + "	dbo.CPro_Produto.Balanca balanca,\n"
-                    + "	dbo.CPro_Produto.Validade validade,\n"
-                    + "	dbo.CPro_Produto.Descricao descricaocompleta,\n"
-                    + "   dbo.CPro_Produto.DescricaoCurta descricaoreduzida,\n"
-                    + "   dbo.CPro_Produto.Depto codMercadologico1, \n"
-                    + "	dbo.CPro_Depto.Descricao AS mercadologico1, \n"
-                    + "	dbo.CPro_Produto.Classe codMercadologico2, \n"
-                    + "	dbo.CPro_Classe.Descricao AS mercadologico2,\n"
-                    + "	dbo.CPro_Produto.PesoBruto pesobruto,\n"
-                    + "   dbo.CPro_Produto.EstMin estoqueminimo, \n"
-                    + "	dbo.CPro_Produto.EstMax estoquemaximo, \n"
-                    + "	dbo.CPro_Produto.EstAtual estoque,\n"
-                    + "	dbo.CPro_Produto.ValorCusto custosemimposto,\n"
-                    + "	dbo.CPro_Produto.Lucro margem,\n"
-                    + "	dbo.CPro_Produto.VlVenda precovenda,\n"
-                    + "	case dbo.CPro_Produto.Inativo when 1 then 0 else 1 end as situacaocadastro,\n"
-                    + "	dbo.CPro_Produto.ClaFiscal ncm,\n"
-                    + "	dbo.CPro_TabCEST.CEST_Codigo cest,\n"
-                    + "	dbo.CPro_TabPIS_ST.ST piscofins_cst,\n"
-                    + "   dbo.CPro_Produto.ST_ICMSEntrada icms_cst_ent,\n"
-                    + "	dbo.CPro_Produto.ST_ICMSSaida icms_cst_sai,\n"
-                    + "	dbo.CPro_Produto.ST_ICMSDestino icms_aliq_sai,\n"
-                    + "	dbo.CPro_Produto.ST_ICMSDestino_Red icms_red_sai,\n"
-                    + "   dbo.CPro_Produto.ST_ICMSOrigem icms_aliq_ent,\n"
-                    + "	dbo.CPro_Produto.ST_ICMSOrigem_Red icms_sai_ent\n"
-                    + "FROM \n"
-                    + "	dbo.CPro_Produto \n"
-                    + "	LEFT OUTER JOIN dbo.CPro_TabICMS ON\n"
-                    + "		dbo.CPro_Produto.ICMSTabela = dbo.CPro_TabICMS.Codigo \n"
-                    + "	LEFT OUTER JOIN dbo.CPro_TabICMS AS CPro_TabICMS_CliFinal ON\n"
-                    + "		dbo.CPro_Produto.ICMSTabela_CliFinal = CPro_TabICMS_CliFinal.Codigo \n"
-                    + "	LEFT OUTER JOIN dbo.CPro_TabICMS AS CPro_TabICMS_Dev_Cli ON\n"
-                    + "		dbo.CPro_Produto.ICMSTabela_Dev_Cli = CPro_TabICMS_Dev_Cli.Codigo \n"
-                    + "	LEFT OUTER JOIN  dbo.CPro_TabICMS AS CPro_TabICMS_Dev_CliFinal ON\n"
-                    + "		dbo.CPro_Produto.ICMSTabela_Dev_CliFinal = CPro_TabICMS_Dev_CliFinal.Codigo \n"
-                    + "	LEFT OUTER JOIN dbo.CPro_TabICMS AS CPro_TabICMS_Dev_For ON\n"
-                    + "		dbo.CPro_Produto.ICMSTabela_Dev_For = CPro_TabICMS_Dev_For.Codigo\n"
-                    + "	LEFT OUTER JOIN dbo.CPro_TabPIS ON\n"
-                    + "		dbo.CPro_Produto.PISTabela = dbo.CPro_TabPIS.PISTabela \n"
-                    + "	LEFT OUTER JOIN dbo.CPro_TabPIS_ST ON\n"
-                    + "		dbo.CPro_TabPIS.ST = dbo.CPro_TabPIS_ST.ST \n"
-                    + "	LEFT OUTER JOIN dbo.CPro_TabCOFINS ON\n"
-                    + "		dbo.CPro_Produto.COFINSTabela = dbo.CPro_TabCOFINS.COFINSTabela\n"
-                    + "	LEFT OUTER JOIN dbo.CPro_TabCEST ON\n"
-                    + "		dbo.CPro_Produto.CESTTabela = dbo.CPro_TabCEST.CEST\n"
-                    + "	LEFT OUTER JOIN dbo.CPro_Classe ON\n"
-                    + "		dbo.CPro_Produto.Classe = dbo.CPro_Classe.Classe\n"
-                    + "	LEFT OUTER JOIN dbo.CPro_Depto ON\n"
-                    + "		dbo.CPro_Produto.Depto = dbo.CPro_Depto.Depto\n"
-                    + "order by dbo.CPro_Produto.Produto"
+                    "select \n"
+                    + "	p.Produto as id,\n"
+                    + "	p.CodBarras as ean,\n"
+                    + "	p.Balanca,\n"
+                    + "	p.Validade,\n"
+                    + "	p.Unidade as tipoembalagem,\n"
+                    + "	p.Descricao as descricaocompleta,\n"
+                    + "	p.DescricaoCurta as descricaoreduzida,\n"
+                    + "	p.Depto as codMercadologico1,\n"
+                    + "	p.Classe as codMercadologico2,\n"
+                    + " p.PesoBruto pesobruto,\n"
+                    + "	p.EstMin as estoqueminimo,\n"
+                    + "	p.EstMax as estoquemaximo,\n"
+                    + "	p.EstAtual as estoque,\n"
+                    + "	p.ValorCusto as custo,\n"
+                    + "	p.VlVenda as precovenda,\n"
+                    + "	p.Lucro as margem,\n"
+                    + "	p.ICMSTabela as idicms,\n"
+                    + "	p.Inativo as situacaocadastro,\n"
+                    + "	p.ClaFiscal as ncm,\n"
+                    + "	REPLACE(ces.CEST_Codigo, '.', '') as cest,\n"
+                    + "	pis.ST as cst_pis,\n"
+                    + "	cof.ST as cst_cofins\n"
+                    + "from dbo.CPro_Produto p\n"
+                    + "left join dbo.CPro_TabCEST ces on ces.CEST = p.CESTTabela\n"
+                    + "left join dbo.CPro_TabPIS pis on pis.PISTabela = p.PISTabela\n"
+                    + "left join dbo.CPro_TabCOFINS cof on cof.COFINSTabela = p.COFINSTabela"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -428,33 +176,31 @@ public class SabTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
-                    imp.setTipoEmbalagem(rst.getString("unidade"));
-                    imp.seteBalanca(rst.getBoolean("balanca"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.seteBalanca(rst.getBoolean("Balanca"));
                     imp.setValidade(rst.getInt("validade"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setCodMercadologico1(rst.getString("codMercadologico1"));
                     imp.setCodMercadologico2(rst.getString("codMercadologico2"));
+                    imp.setCodMercadologico3("1");
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("pesobruto"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setEstoque(rst.getDouble("estoque"));
-                    imp.setCustoComImposto(rst.getDouble("custosemimposto"));
+                    imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setSituacaoCadastro(SituacaoCadastro.getById(rst.getInt("situacaocadastro")));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setPiscofinsCstCredito(rst.getInt("piscofins_cst"));
-                    imp.setIcmsCstEntrada(rst.getInt("icms_cst_ent"));
-                    imp.setIcmsAliqEntrada(rst.getDouble("icms_aliq_ent"));
-                    imp.setIcmsReducaoEntrada(rst.getDouble("icms_sai_ent"));
-                    imp.setIcmsCstSaida(rst.getInt("icms_cst_sai"));
-                    imp.setIcmsAliqSaida(rst.getDouble("icms_aliq_sai"));
-                    imp.setIcmsReducaoSaida(rst.getDouble("icms_red_sai"));
+                    imp.setPiscofinsCstDebito(rst.getString("cst_pis"));
+                    imp.setPiscofinsCstCredito(rst.getString("cst_cofins"));
+                    imp.setIcmsDebitoId(rst.getString("idicms"));
+                    imp.setIcmsCreditoId(rst.getString("idicms"));
                     vResult.add(imp);
                 }
             }
