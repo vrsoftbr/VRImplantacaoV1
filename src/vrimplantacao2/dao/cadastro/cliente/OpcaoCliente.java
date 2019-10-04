@@ -55,7 +55,8 @@ public enum OpcaoCliente {
     BLOQUEADO,
     CEP,
     COMPLEMENTO,
-    ESTADO_CIVIL;    
+    ESTADO_CIVIL,
+    SEXO;
     
     private static final Logger LOG = Logger.getLogger(OpcaoCliente.class.getName());
     private List<ClienteIMP> listaEspecial;

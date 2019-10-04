@@ -151,10 +151,12 @@
                                   <Component id="chkClienteBloqueado" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkClienteValorLimite" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkSexoCliente" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="198" max="32767" attributes="0"/>
+                          <EmptySpace pref="149" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -166,6 +168,7 @@
                               <Component id="chkClientePreferencial" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkClienteBloqueado" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkClienteValorLimite" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkSexoCliente" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
@@ -193,6 +196,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkClienteValorLimite">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Valor Limite"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkSexoCliente">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Sexo"/>
                   </Properties>
                 </Component>
               </SubComponents>

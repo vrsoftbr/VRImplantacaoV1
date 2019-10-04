@@ -432,7 +432,7 @@ public class SabTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValorLimite(rst.getDouble("Limite"));
                     imp.setDataCadastro(rst.getDate("Desde"));
                     imp.setDataNascimento(rst.getDate("Nascimento"));
-                    imp.setSexo("MASCULINO".equals(rst.getString("Sexo")) ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
+                    imp.setSexo("Masculino".equals(rst.getString("Sexo")) ? TipoSexo.MASCULINO : TipoSexo.FEMININO);
                     imp.setTelefone(Utils.formataNumero(rst.getString("Fone1")));
 
                     if ((rst.getString("Fone2") != null)

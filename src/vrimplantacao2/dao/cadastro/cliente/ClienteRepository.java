@@ -220,6 +220,9 @@ public class ClienteRepository {
                     if (opt.contains(OpcaoCliente.CELULAR)) {
                         atualizarClientePreferencial(vo, opt);
                     }
+                    if (opt.contains(OpcaoCliente.SEXO)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
                 }
                 notificar();
             }
