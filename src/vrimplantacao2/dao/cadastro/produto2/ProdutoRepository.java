@@ -240,11 +240,13 @@ public class ProdutoRepository {
     }
     
     public void atualizar(List<ProdutoIMP> produtos, OpcaoProduto... opcoes) throws Exception {
-        usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
+        Set<OpcaoProduto> op = new HashSet<>(Arrays.asList(opcoes));
+        usarConversaoDeAliquotaSimples = !op.contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
         importarSomenteLoja = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_INDIVIDUAL_LOJA);
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         
-        
+        System.out.print(usarConversaoDeAliquotaSimples);
+                
         LOG.finer("Entrando no método atualizar; produtos(" + produtos.size() + ") opcoes(" + opcoes.length + ")");
         //<editor-fold defaultstate="collapsed" desc="Separa as opções entre 'com lista especial' e 'sem lista especial'">
         Set<OpcaoProduto> optComLista = new LinkedHashSet<>();

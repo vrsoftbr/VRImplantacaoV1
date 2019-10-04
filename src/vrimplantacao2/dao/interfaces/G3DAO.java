@@ -65,12 +65,19 @@ public class G3DAO extends InterfaceDAO {
             OpcaoProduto.NCM,
             OpcaoProduto.CEST,
             OpcaoProduto.ICMS,
+            OpcaoProduto.ICMS_SAIDA,
+            OpcaoProduto.ICMS_SAIDA_FORA_ESTADO,
+            OpcaoProduto.ICMS_ENTRADA,
+            OpcaoProduto.ICMS_ENTRADA_FORA_ESTADO,
+            OpcaoProduto.ICMS_CONSUMIDOR,
+            OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA,
             OpcaoProduto.PIS_COFINS,
             OpcaoProduto.NATUREZA_RECEITA,
             OpcaoProduto.ATACADO,
             OpcaoProduto.VALIDADE,
             OpcaoProduto.MERCADOLOGICO,
-            OpcaoProduto.MERCADOLOGICO_PRODUTO,}));
+            OpcaoProduto.MERCADOLOGICO_PRODUTO
+        }));
     }
 
     @Override
@@ -109,8 +116,7 @@ public class G3DAO extends InterfaceDAO {
             try (ResultSet rst = stm.executeQuery(
                     "SELECT \n"
                     + "	p.ID AS id,\n"
-                    + "	p.descricao AS descricaocompleta,\n"
-                    + "	p.DESCRICAO_PDV AS descricaoreduzida,\n"
+                    + "	p.DESCRICAO_PDV AS descricao,\n"
                     + "	p.ID_GRUPO AS mercadologico,\n"
                     + "	p.lucro AS margem,\n"
                     + "	p.valor_compra AS custosemimposto,\n"
@@ -138,12 +144,8 @@ public class G3DAO extends InterfaceDAO {
                     + "	p.COD_CST_FORA,\n"
                     + "	p.ALIQUOTA_ICMS_DENTRO,\n"
                     + "	p.ALIQUOTA_ICMS_FORA,\n"
-                    + "	p.ALIQUOTA_ICMS_ST_DENTRO,\n"
-                    + "	p.ALIQUOTA_ICMS_ST_FORA,\n"
                     + "	p.REDUCAO_BC_DENTRO,\n"
                     + "	p.REDUCAO_BC_FORA,\n"
-                    + "	p.REDUCAO_BC_ST_DENTRO,\n"
-                    + "	p.REDUCAO_BC_ST_FORA,\n"
                     + "	p.ECF_ICMS_ST AS aliquotaconsumidor,\n"
                     + "	case p.EXCLUIDO when 0 then 'ATIVO' ELSE 'EXCLUIDO' end situacaocadastro\n"
                     + "FROM produto p\n"
@@ -195,16 +197,8 @@ public class G3DAO extends InterfaceDAO {
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(ean);
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                    
-                    if ((rst.getString("descricaocompleta") != null)
-                            && (!rst.getString("descricaocompleta").trim().isEmpty())) {
-
-                        imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                    } else {
-                        imp.setDescricaoCompleta(rst.getString("descricaoreduzida"));
-                    }
-                    
-                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    imp.setDescricaoCompleta(rst.getString("descricao"));
+                    imp.setDescricaoReduzida(rst.getString("descricao"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setCodMercadologico1(rst.getString("mercadologico"));
                     imp.setCodMercadologico2("1");
@@ -223,13 +217,30 @@ public class G3DAO extends InterfaceDAO {
                     imp.setPiscofinsCstDebito(rst.getString("cst_grupo_pis_saida"));
                     imp.setPiscofinsCstCredito(rst.getString("cst_grupo_pis_entrada"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("naturezareceita"));
+                    
+                    /* icms dentro estado */
                     imp.setIcmsCstSaida(rst.getInt("COD_CST_DENTRO"));
-                    imp.setIcmsCstEntrada(rst.getInt("COD_CST_FORA"));
-                    imp.setIcmsAliqSaida(rst.getDouble("ALIQUOTA_ICMS_DENTRO"));
-                    imp.setIcmsAliqEntrada(rst.getDouble("ALIQUOTA_ICMS_FORA"));
-                    imp.setIcmsReducaoSaida(rst.getDouble("REDUCAO_BC_ST_DENTRO"));
-                    imp.setIcmsReducaoEntrada(rst.getDouble("REDUCAO_BC_ST_FORA"));
+                    imp.setIcmsCstEntrada(rst.getInt("COD_CST_DENTRO"));
 
+                    imp.setIcmsAliqSaida(rst.getDouble("ALIQUOTA_ICMS_DENTRO"));
+                    imp.setIcmsAliqEntrada(rst.getDouble("ALIQUOTA_ICMS_DENTRO"));
+
+                    imp.setIcmsReducaoSaida(rst.getDouble("REDUCAO_BC_DENTRO"));
+                    imp.setIcmsReducaoEntrada(rst.getDouble("REDUCAO_BC_DENTRO"));
+                    
+                    /* icms fora estado */
+                    imp.setIcmsCstSaidaForaEstado(rst.getInt("COD_CST_FORA"));
+                    imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("COD_CST_FORA"));
+                    imp.setIcmsCstEntradaForaEstado(rst.getInt("COD_CST_FORA"));
+
+                    imp.setIcmsAliqSaidaForaEstado(rst.getDouble("ALIQUOTA_ICMS_FORA"));
+                    imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("ALIQUOTA_ICMS_FORA"));
+                    imp.setIcmsAliqEntradaForaEstado(rst.getDouble("ALIQUOTA_ICMS_FORA"));
+
+                    imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("REDUCAO_BC_FORA"));
+                    imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("REDUCAO_BC_FORA"));
+                    imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("REDUCAO_BC_FORA"));
+                    
                     if (rst.getString("aliquotaconsumidor").contains("18")) {
                         imp.setIcmsCstConsumidor("0");
                         imp.setIcmsAliqConsumidor(18);
