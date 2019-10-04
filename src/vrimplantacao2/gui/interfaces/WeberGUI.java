@@ -214,7 +214,7 @@ public class WeberGUI extends VRInternalFrame {
                                 opcoes.add(OpcaoCliente.INSCRICAO_ESTADUAL);
                             }
                             if (chkCVencimento.isSelected()) {
-                                opcoes.add(OpcaoCliente.VENCIMENTO_ROTATVO);
+                                opcoes.add(OpcaoCliente.VENCIMENTO_ROTATIVO);
                             }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));

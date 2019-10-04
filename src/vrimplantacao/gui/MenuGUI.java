@@ -171,6 +171,7 @@ import vrimplantacao2.gui.interfaces.RPInfoGUI;
 import vrimplantacao2.gui.interfaces.RepleisGUI;
 import vrimplantacao2.gui.interfaces.SDInformaticaGUI;
 import vrimplantacao2.gui.interfaces.STI3GUI;
+import vrimplantacao2.gui.interfaces.SabTechGUI;
 import vrimplantacao2.gui.interfaces.SambaNetGUI;
 import vrimplantacao2.gui.interfaces.SatecfeGUI;
 import vrimplantacao2.gui.interfaces.SavGUI;
@@ -1507,7 +1508,7 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu6.add(mnuIdealSoft);
 
-        mnuFabTech.setText("FabTech");
+        mnuFabTech.setText("SabTech");
         mnuFabTech.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 mnuFabTechActionPerformed(evt);
@@ -3575,17 +3576,7 @@ public final class MenuGUI extends VRMdiFrame {
 
     private void mnuFabTechActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuFabTechActionPerformed
         // TODO add your handling code here:
-        try {
-            this.setWaitCursor();
-            if (formImportarFabTech == null || formImportarFabTech.isClosed()) {
-                formImportarFabTech = new FabTechGUI(this);
-            }
-            formImportarFabTech.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
+        SabTechGUI.exibir(this);
     }//GEN-LAST:event_mnuFabTechActionPerformed
 
     private void jMenuItemTiTecnologiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemTiTecnologiaActionPerformed

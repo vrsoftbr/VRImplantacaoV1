@@ -242,11 +242,13 @@ public class ProdutoRepository {
     }
     
     public void atualizar(List<ProdutoIMP> produtos, OpcaoProduto... opcoes) throws Exception {
-        usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
+        Set<OpcaoProduto> op = new HashSet<>(Arrays.asList(opcoes));
+        usarConversaoDeAliquotaSimples = !op.contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
         importarSomenteLoja = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_INDIVIDUAL_LOJA);
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         
-        
+        System.out.print(usarConversaoDeAliquotaSimples);
+                
         LOG.finer("Entrando no método atualizar; produtos(" + produtos.size() + ") opcoes(" + opcoes.length + ")");
         //<editor-fold defaultstate="collapsed" desc="Separa as opções entre 'com lista especial' e 'sem lista especial'">
         Set<OpcaoProduto> optComLista = new LinkedHashSet<>();
@@ -1390,7 +1392,12 @@ public class ProdutoRepository {
         vo.setCodigoBarras(Utils.stringToLong(imp.getEan()));
         double desconto = imp.getAtacadoPorcentagem();
         if (desconto == 0 && imp.getAtacadoPreco() > 0 && imp.getAtacadoPreco() != imp.getPrecovenda()) {
-            desconto = MathUtils.round(100 - ((imp.getAtacadoPreco() / (imp.getPrecovenda() == 0 ? 1 : imp.getPrecovenda())) * 100), 2);
+            //desconto = MathUtils.round(100 - ((imp.getAtacadoPreco() / (imp.getPrecovenda() == 0 ? 1 : imp.getPrecovenda())) * 100), 2);
+            desconto = (100 - ((imp.getAtacadoPreco() / (imp.getPrecovenda() == 0 ? 1 : imp.getPrecovenda())) * 100));
+            
+            if ("9999994530".equals(imp.getEan())) {
+                System.out.println(desconto + " - " + imp.getAtacadoPreco() + " - " + imp.getPrecovenda());
+            }
         }
         vo.setDesconto(desconto);
         return vo;

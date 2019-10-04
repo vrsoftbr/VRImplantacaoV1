@@ -220,7 +220,7 @@ public class ClienteRepository {
                     if (opt.contains(OpcaoCliente.CELULAR)) {
                         atualizarClientePreferencial(vo, opt);
                     }
-                    if (opt.contains(OpcaoCliente.VENCIMENTO_ROTATVO)) {
+                    if (opt.contains(OpcaoCliente.VENCIMENTO_ROTATIVO)) {
                         atualizarClientePreferencial(vo, opt);
                     }
                 }
