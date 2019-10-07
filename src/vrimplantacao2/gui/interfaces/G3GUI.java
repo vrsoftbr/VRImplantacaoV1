@@ -64,10 +64,10 @@ public class G3GUI extends VRInternalFrame implements ConexaoEvent {
         this.title = "Importação " + SISTEMA;
 
         conexaoMySQL.host = "localhost";
-        conexaoMySQL.database = "automacao";
+        conexaoMySQL.database = "gtech-gestao";
         conexaoMySQL.port = "3306";
-        conexaoMySQL.user = "root";
-        conexaoMySQL.pass = "rm123";
+        conexaoMySQL.user = "g3_informatica";
+        conexaoMySQL.pass = "#g31nf#";
         conexaoMySQL.setOnConectar(this);
 
         carregarParametros();
