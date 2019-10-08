@@ -284,7 +284,7 @@ public class DataSyncGUI extends VRInternalFrame {
         chkReiniciarIDClienteUnif = new vrframework.bean.checkBox.VRCheckBox();
         txtReiniciarIDClienteUnif = new vrframework.bean.textField.VRTextField();
 
-        setTitle("Importação CFSoft/SiaECF");
+        setTitle("Importação DataSync Maximus");
         setToolTipText("");
 
         conexao.setSistema("");
