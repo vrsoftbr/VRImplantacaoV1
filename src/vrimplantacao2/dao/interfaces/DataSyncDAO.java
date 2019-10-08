@@ -12,7 +12,9 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.SituacaoCheque;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -190,6 +192,9 @@ public class DataSyncDAO extends InterfaceDAO {
                     imp.setPesoLiquido(rst.getDouble("pesoliquodo"));
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setMargem(rst.getDouble("margem"));
+                    if ("2530".equals(imp.getImportId())) {
+                        System.out.println("Achou");
+                    }
                     imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setCustoSemImposto(rst.getDouble("custo"));
                     imp.setPrecovenda(rst.getDouble("preco"));
@@ -370,6 +375,58 @@ public class DataSyncDAO extends InterfaceDAO {
         
         return result;
     }
-    
+
+    @Override
+    public List<ChequeIMP> getCheques() throws Exception {
+        List<ChequeIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()){
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n" +
+                    "	receber_id as id,\n" +
+                    "	c.cpf as cpf,\n" +
+                    "	cheque_numero as numerocheque,\n" +
+                    "	cheque_agencia as agencia,\n" +
+                    "	cheque_cc as conta,\n" +
+                    "	data_emissao as date,\n" +
+                    "	desconto_data as datadeposito,\n" +
+                    "	documento as numerocupom,\n" +
+                    "	documento as ecf,\n" +
+                    "	valor_bruto as valor,\n" +
+                    "	c.rg as rg,\n" +
+                    "	c.fone as telefone,\n" +
+                    "	c.nome_razao as nome,\n" +
+                    "	cheque_banco+' '+historico+' '+cr.obs as  observacao,\n" +
+                    "	status as situacaocheque,\n" +
+                    "	juros_dia as valorjuros\n" +
+                    "from contas_receber cr\n" +
+                    "	left join clientes c\n" +
+                    "		on c.cliente_id = cr.devedor_id\n" +
+                    "where cheque_numero is not null and EMPRESA_ID = " + getLojaOrigem())){
+                while (rst.next()){
+                    ChequeIMP imp = new ChequeIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setCpf(rst.getString("cpf"));
+                    imp.setCpf(rst.getString("numerocheque"));
+                    imp.setAgencia(rst.getString("agencia"));
+                    imp.setConta(rst.getString("conta"));
+                    imp.setDate(rst.getDate("date"));
+                    imp.setDataDeposito(rst.getDate("datadeposito"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setRg(rst.getString("rg"));
+                    imp.setTelefone(rst.getString("telefone"));
+                    imp.setNome(rst.getString("nome"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setSituacaoCheque("Pendente".equals(rst.getString("situacaocheque")) ? SituacaoCheque.ABERTO : SituacaoCheque.BAIXADO);
+                    imp.setValorJuros(rst.getDouble("valorjuros"));
+                    
+                    result.add(imp);
+                    
+                            
+                }
+            }
+        }
+        return result; //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

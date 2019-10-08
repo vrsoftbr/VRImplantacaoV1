@@ -7,7 +7,6 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -288,7 +287,7 @@ public class G3DAO extends InterfaceDAO {
                         "SELECT \n"
                         + "	id, \n"
                         + "	qtd_atacado,\n"
-                        + "	TRUNCATE(valor_venda_atacado, 2) precoatacaco,\n"
+                        + "	TRUNCATE(valor_venda_atacado, 2) precoatacado,\n"
                         + "	truncate(valor_venda, 2) precovenda\n"
                         + "FROM produto \n"
                         + "WHERE qtd_atacado > 1\n"
@@ -306,7 +305,7 @@ public class G3DAO extends InterfaceDAO {
                             imp.setEan("999999" + String.valueOf(codigoAtual));
                             imp.setQtdEmbalagem(rst.getInt("qtd_atacado"));
                             imp.setPrecovenda(rst.getDouble("precovenda"));
-                            imp.setAtacadoPreco(rst.getDouble("precoatacaco"));
+                            imp.setAtacadoPreco(rst.getDouble("precoatacado"));
                             result.add(imp);
                         }
                     }
