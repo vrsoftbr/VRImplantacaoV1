@@ -690,7 +690,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     "join pdv_ecfs e on c.id_ecf = e.id_ecf\n" +
                     "where\n" +
                     "    c.id_data between '" + dataInicio + "' and '" + dataTermino + "' and\n" +
-                    "    c.id_final = 1 and\n" +
+                    "    c.id_final = 995 and\n" +
                     "    c.fin_loja = " + idLojaCliente + "\n" +
                     "order by\n" +
                     "    c.id_data, c.id_ecf";
@@ -733,7 +733,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                         String id = rst.getString("numerocupom") + "-" + rst.getString("ecf") + "-" + rst.getString("data");
 
                         next.setId(rst.getString("id"));
-                        next.setVenda(rst.getString("id"));
+                        next.setVenda(id);
                         next.setProduto(rst.getString("produto"));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
