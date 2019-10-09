@@ -190,7 +190,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pre.DEPTO_COFINS,\n"
                     + "	cof.CST as cstcofins,\n"
                     + "	cof.DESCRICAO as descricaopis,\n"
-                    + "	pre.DEPTO_ICMS,\n"
+                    + "	pre.DEPTO_ICMS icmsid,\n"
                     + "	icm.CST_ICMS as csticms,\n"
                     + "	icm.AL_ICMS as aliqicms,\n"
                     + "	icm.RED_BC_ICMS as reduicms,\n"
@@ -230,9 +230,8 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstDebito(rst.getInt("cstpis"));
                     imp.setPiscofinsCstCredito(rst.getInt("cstcofins"));
                     imp.setPiscofinsNaturezaReceita(rst.getInt("naturezareceita"));
-                    imp.setIcmsCst(rst.getInt("csticms"));
-                    imp.setIcmsAliq(rst.getDouble("aliqicms"));
-                    imp.setIcmsReducao(rst.getDouble("reduicms"));
+                    imp.setIcmsDebitoId(rst.getString("icmsid"));
+                    imp.setIcmsCreditoId(rst.getString("icmsid"));
                     vResult.add(imp);
                 }
             }
