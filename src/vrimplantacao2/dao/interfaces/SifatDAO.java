@@ -628,10 +628,11 @@ public class SifatDAO extends InterfaceDAO {
         return new VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
     }
 
-    /*@Override
-     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-     return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
-     }*/
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+    }
+     
     private static class VendaIterator implements Iterator<VendaIMP> {
 
         private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
