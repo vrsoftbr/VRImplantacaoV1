@@ -92,10 +92,18 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stmt = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rs = stmt.executeQuery(
-                    "select codaliq, descricao from aliquota_icms"
+                    "select\n"
+                    + "	icm.DEPTO_ICMS as id,\n"
+                    + "	icm.CST_ICMS as cst,\n"
+                    + "	icm.AL_ICMS as aliquota,\n"
+                    + "	icm.RED_BC_ICMS as reducao,\n"
+                    + "	icm.DESCRICAO as descricao\n"
+                    + "from supnasc.ce01t icm\n"
+                    + "where operacao = 1\n"
+                    + "order by icm.CST_ICMS"
             )) {
                 while (rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("codaliq"), rs.getString("descricao")));
+                    result.add(new MapaTributoIMP(rs.getString("id"), rs.getString("descricao")));
                 }
             }
         }
