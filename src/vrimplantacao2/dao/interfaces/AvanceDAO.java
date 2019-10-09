@@ -122,7 +122,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.codigo id,\n"
                     + "	p.cadastro datacadastro,\n"
                     + "	p.embalagem qtdcotacao,\n"
-                    + " coalesce(ean.codbarra, '0') as codbarra, \n"
+                    + " coalesce(case when ean.codbarra = '' then '0' ELSE ean.codbarra END, '0') codbarra, \n"
                     + " p.codbalanca, \n"
                     + "	CASE WHEN p.codbalanca != 0 THEN p.codbalanca ELSE ean.codbarra END ean,\n"
                     + "	CASE WHEN p.codbalanca != 0 THEN 1 ELSE ean.qtd_embalagem END qtdembalagem,\n"
@@ -381,13 +381,17 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     if ((rst.getString("EMAIL") != null)
                             && (!rst.getString("EMAIL").trim().isEmpty())) {
+                        String email = "";
+                        if(rst.getString("EMAIL").length() > 50) {
+                            email = rst.getString("EMAIL").substring(0, 50);
+                        }
                         imp.addContato(
                                 "2",
                                 "EMAIL",
                                 null,
                                 null,
                                 TipoContato.COMERCIAL,
-                                rst.getString("EMAIL").toLowerCase()
+                                email.toLowerCase()
                         );
                     }
                     if ((rst.getString("VENDEDOR") != null)
@@ -559,7 +563,9 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setInscricaoMunicipal("ISENTO");
                     }
 
-                    imp.setOrgaoemissor(rst.getString("orgemissor").replace("'", ""));
+                    if(rst.getString("orgemissor") != null && !"".equals(rst.getString("orgemissor").trim())) {
+                        imp.setOrgaoemissor(rst.getString("orgemissor").replace("'", ""));
+                    }
                     imp.setNomePai(rst.getString("pai"));
                     imp.setNomeMae(rst.getString("mae"));
                     imp.setNomeConjuge(rst.getString("conjuge"));
