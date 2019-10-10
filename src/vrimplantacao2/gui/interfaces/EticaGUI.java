@@ -337,6 +337,7 @@ public class EticaGUI extends VRInternalFrame implements ConexaoEvent {
         chkUnifProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
+        vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
 
         setTitle("Importação Etica");
         setToolTipText("");
@@ -679,6 +680,7 @@ public class EticaGUI extends VRInternalFrame implements ConexaoEvent {
         );
 
         tabs.addTab("Unificação", tabUnificacao);
+        tabs.addTab("Balança", vRImportaArquivBalancaPanel1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -770,6 +772,7 @@ public class EticaGUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.panel.VRPanel tabProdutos;
     private vrframework.bean.panel.VRPanel tabUnificacao;
     private vrframework.bean.tabbedPane.VRTabbedPane tabs;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     // End of variables declaration//GEN-END:variables

@@ -98,7 +98,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	icm.AL_ICMS as aliquota,\n"
                     + "	icm.RED_BC_ICMS as reducao,\n"
                     + "	icm.DESCRICAO as descricao\n"
-                    + "from supnasc.ce01t icm\n"
+                    + "from ce01t icm\n"
                     + "where operacao = 1\n"
                     + "order by icm.CST_ICMS"
             )) {
@@ -504,7 +504,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "(select sum(coalesce(valor, 0)) from bdsifat.cf11 where dc = 'C' and cliente = a.cliente) - "
                         + "(select sum(coalesce(valor, 0)) from bdsifat.cf11 where historico like '%ESTORNO%' and cliente = a.cliente)"
                         + " valor\n"
-                        + "from bdsifat.cf11 a\n"
+                        + "from cf11 a\n"
                         + "where loja = " + getLojaOrigem()
                 )) {
                     while (rst.next()) {
