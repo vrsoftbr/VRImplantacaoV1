@@ -182,6 +182,7 @@ import vrimplantacao2.gui.interfaces.SiaCriareByFileGUI;
 import vrimplantacao2.gui.interfaces.SiaCriareDbfGUI;
 import vrimplantacao2.gui.interfaces.SiacGUI;
 import vrimplantacao2.gui.interfaces.SifatGUI;
+import vrimplantacao2.gui.interfaces.Sifat_2GUI;
 import vrimplantacao2.gui.interfaces.SigmaGUI;
 import vrimplantacao2.gui.interfaces.SisMouraGUI;
 import vrimplantacao2.gui.interfaces.SoftcomGUI;
@@ -3641,19 +3642,8 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuEsSystemActionPerformed
 
     private void mnuSifatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSifatActionPerformed
-        // TODO add your handling code here:
-        try {
-            this.setWaitCursor();
-            if (formImportarSifat == null || formImportarSifat.isClosed()) {
-                formImportarSifat = new SifatGUI(this);
-            }
-
-            formImportarSifat.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
+        // TODO add your handling code here:        
+        Sifat_2GUI.exibir(this);
     }//GEN-LAST:event_mnuSifatActionPerformed
 
     private void mnuApolloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuApolloActionPerformed
