@@ -2,10 +2,13 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 
 /**
  *
@@ -57,6 +60,76 @@ public class AdmMacenoDAO extends InterfaceDAO {
                     imp.setCobrancaUf(rst.getString("CLI47"));
                     imp.setObservacao2(rst.getString("CLI58"));
                     imp.setOrgaoemissor(rst.getString("CLI71"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	CCM01 id_cliente,\n" +
+                    "	CCM03 datacadastro,\n" +
+                    "	CCM04 vencimento,\n" +
+                    "	CCM07 valor,\n" +
+                    "	CCM09 cupom\n" +
+                    "from\n" +
+                    "	FILE003\n" +
+                    "where\n" +
+                    "	CCM08 = 'D'"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    imp.setId(String.format("%s-%s-%s-%s-%s", 
+                            rst.getString("id_cliente"),
+                            rst.getString("datacadastro"),
+                            rst.getString("vencimento"),
+                            rst.getString("valor"),
+                            rst.getString("cupom")
+                    ));
+                    imp.setIdCliente(rst.getString("id_cliente"));
+                    imp.setDataEmissao(rst.getDate("datacadastro"));
+                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setNumeroCupom(rst.getString("cupom"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoPagamentoAgrupadoIMP> getCreditoRotativoPagamentoAgrupado() throws Exception {
+        List<CreditoRotativoPagamentoAgrupadoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "	CCM01 id_cliente,\n" +
+                    "	sum(CCM07) valor\n" +
+                    "from \n" +
+                    "	FILE003\n" +
+                    "where\n" +
+                    "	CCM08 = 'C'\n" +
+                    "group by\n" +
+                    "	CCM01"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoPagamentoAgrupadoIMP imp = new CreditoRotativoPagamentoAgrupadoIMP();
+                    
+                    imp.setIdCliente(rst.getString("id_cliente"));
+                    imp.setValor(rst.getDouble("valor"));
                     
                     result.add(imp);
                 }

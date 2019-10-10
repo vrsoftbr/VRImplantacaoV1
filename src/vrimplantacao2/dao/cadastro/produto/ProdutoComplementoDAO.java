@@ -134,8 +134,8 @@ public class ProdutoComplementoDAO {
                 sql.putNull("dataultimaentrada");
                 sql.put("custosemimposto", vo.getCustoSemImposto());
                 sql.put("custocomimposto", vo.getCustoComImposto());
-                sql.put("custosemimpostoanterior", 0);
-                sql.put("custocomimpostoanterior", 0);
+                sql.put("custosemimpostoanterior", vo.getCustoAnteriorSemImposto());
+                sql.put("custocomimpostoanterior", vo.getCustoAnteriorSemImposto());
                 sql.put("precovenda", vo.getPrecoVenda());
                 sql.put("precovendaanterior", 0);
                 sql.put("dataprimeiraentrada", vo.getDataPrimeiraAlteracao());
@@ -277,12 +277,18 @@ public class ProdutoComplementoDAO {
             if (opt.contains(OpcaoProduto.CUSTO)) {
                 sql.put("custocomimposto", complemento.getCustoComImposto());
                 sql.put("custosemimposto", complemento.getCustoSemImposto());
+                sql.put("custosemimpostoanterior", complemento.getCustoAnteriorSemImposto());
+                sql.put("custocomimpostoanterior", complemento.getCustoAnteriorComImposto());
             }
             if (opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO)) {
                 sql.put("custocomimposto", complemento.getCustoComImposto());
             }
             if (opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO)) {
                 sql.put("custosemimposto", complemento.getCustoSemImposto());
+            }
+            if(opt.contains(OpcaoProduto.CUSTO_ANTERIOR)) {
+                sql.put("custosemimpostoanterior", complemento.getCustoAnteriorSemImposto());
+                sql.put("custocomimpostoanterior", complemento.getCustoAnteriorComImposto());
             }
             if (opt.contains(OpcaoProduto.ESTOQUE)) {
                 if (opt.contains(OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE)) {

@@ -1012,6 +1012,8 @@ public class ProdutoRepository {
         complemento.setPrecoVenda(imp.getPrecovenda());
         complemento.setCustoSemImposto(imp.getCustoSemImposto());
         complemento.setCustoComImposto(imp.getCustoComImposto());
+        complemento.setCustoAnteriorSemImposto(imp.getCustoAnteriorSemImposto());
+        complemento.setCustoAnteriorComImposto(imp.getCustoAnteriorComImposto());
         complemento.setDescontinuado(imp.isDescontinuado());
         complemento.setSituacaoCadastro(imp.getSituacaoCadastro());
         complemento.setTipoProduto(imp.getTipoProduto());

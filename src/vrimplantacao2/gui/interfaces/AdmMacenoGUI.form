@@ -149,9 +149,13 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="chkRotativoPagamento" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
-                      <EmptySpace pref="267" max="32767" attributes="0"/>
+                      <EmptySpace pref="93" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -161,7 +165,10 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="chkRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkRotativoPagamento" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace pref="22" max="32767" attributes="0"/>
                   </Group>
               </Group>
@@ -188,6 +195,17 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkRotativoActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkRotativoPagamento">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Pagamento (Cr&#xe9;dito Rotativo)"/>
+                <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="true" type="code"/>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkRotativoPagamentoActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>
