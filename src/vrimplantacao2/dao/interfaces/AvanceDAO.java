@@ -4,16 +4,23 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
+import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ChequeIMP;
@@ -24,6 +31,8 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.InventarioIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -42,6 +51,45 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public String getSistema() {
         return "Avance";
+    }
+    
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                new OpcaoProduto[] {
+                    OpcaoProduto.MERCADOLOGICO,
+                    OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                    OpcaoProduto.FAMILIA,
+                    OpcaoProduto.FAMILIA_PRODUTO,
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.PRODUTOS,
+                    OpcaoProduto.EAN,
+                    OpcaoProduto.EAN_EM_BRANCO,
+                    OpcaoProduto.DATA_CADASTRO,
+                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                    OpcaoProduto.PESAVEL,
+                    OpcaoProduto.VALIDADE,
+                    OpcaoProduto.DESC_COMPLETA,
+                    OpcaoProduto.DESC_GONDOLA,
+                    OpcaoProduto.DESC_REDUZIDA,
+                    OpcaoProduto.ESTOQUE_MAXIMO,
+                    OpcaoProduto.ESTOQUE_MINIMO,
+                    OpcaoProduto.PRECO,
+                    OpcaoProduto.CUSTO,
+                    OpcaoProduto.ESTOQUE,
+                    OpcaoProduto.ATIVO,
+                    OpcaoProduto.NCM,
+                    OpcaoProduto.CEST,
+                    OpcaoProduto.PIS_COFINS,
+                    OpcaoProduto.NATUREZA_RECEITA,
+                    OpcaoProduto.ICMS,
+                    OpcaoProduto.PAUTA_FISCAL,
+                    OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                    OpcaoProduto.MARGEM
+                }
+        ));
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -66,7 +114,18 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT codigo, nome FROM depto ORDER BY 1"
+                    "SELECT\n" +
+                    "	distinct\n" +
+                    "	d.CODIGO cod_merc1,\n" +
+                    "	d.NOME descmerc1,\n" +
+                    "	g.CODIGO cod_merc2,\n" +
+                    "	g.NOME descmerc2\n" +
+                    "FROM\n" +
+                    "	cadmer p\n" +
+                    "JOIN depto d ON p.DEPART = d.CODIGO\n" +
+                    "JOIN grupo g ON p.GRUPO = g.CODIGO\n" +
+                    "ORDER BY\n" +
+                    "	1, 3"
             )) {
                 while (rst.next()) {
 
@@ -74,9 +133,13 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
 
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    imp.setMerc1ID(rst.getString("codigo"));
-                    imp.setMerc1Descricao(rst.getString("nome"));
-
+                    imp.setMerc1ID(rst.getString("cod_merc1"));
+                    imp.setMerc1Descricao(rst.getString("descmerc1"));
+                    imp.setMerc2ID(rst.getString("cod_merc2"));
+                    imp.setMerc2Descricao(rst.getString("descmerc2"));
+                    imp.setMerc3ID(rst.getString("cod_merc2"));
+                    imp.setMerc3Descricao(rst.getString("descmerc2"));
+                    
                     result.add(imp);
 
                 }
@@ -112,7 +175,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    @Override
+   @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
 
@@ -132,6 +195,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.descricao descricaocompleta,\n"
                     + "	p.descecf descricaoreduzida,\n"
                     + "	p.depart mercadologico1,\n"
+                    + " p.grupo mercadologico2,\n"        
                     + "	p.id_familia,\n"
                     + "	p.peso_bruto,\n"
                     + "	p.peso_liquido,\n"
@@ -141,6 +205,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.dentrouf margem,\n"
                     + "	p.custo custosemimposto,\n"
                     + "	p.custofinal custocomimposto,\n"
+                    + " p.custoant custoanteriorsemimposto,\n"        
+                    + " p.custofinalant custoanteriorcomimposto,\n"        
                     + "	p.atualvenda precovenda,\n"
                     + "	p.inativo situacaocadastro,\n"
                     + "	ncm.ncm,\n"
@@ -211,6 +277,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDescricaoGondola(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setCodMercadologico1(rst.getString("mercadologico1"));
+                    imp.setCodMercadologico2(rst.getString("mercadologico2"));
+                    imp.setCodMercadologico3(rst.getString("mercadologico2"));
                     imp.setIdFamiliaProduto(rst.getString("id_familia"));
                     imp.setPesoBruto(rst.getDouble("peso_bruto"));
                     imp.setPesoLiquido(rst.getDouble("peso_liquido"));
@@ -220,6 +288,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setCustoAnteriorSemImposto(rst.getDouble("custoanteriorsemimposto"));
+                    imp.setCustoAnteriorComImposto(rst.getDouble("custoanteriorcomimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setSituacaoCadastro((rst.getInt("situacaocadastro") == 1 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO));
                     imp.setNcm(rst.getString("ncm"));
@@ -229,12 +299,49 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsNaturezaReceita(Utils.stringToInt(rst.getString("piscofins_nat_receita")));
                     imp.setIcmsDebitoId(rst.getString("aliquota"));
                     imp.setIcmsCreditoId(rst.getString("aliquota"));
+                    imp.setPautaFiscalId(imp.getImportId());
 
                     result.add(imp);
                 }
             }
         }
 
+        return result;
+    }
+
+    @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT\n" +
+                    "	p.codigo id_produto,\n" +
+                    "	p.ALIQUOTA id_aliquota,\n" +
+                    "	p.CST,\n" +
+                    "	p.mva,\n" +
+                    "	ncm.ncm\n" +
+                    "FROM\n" +
+                    "	cadmer p\n" +
+                    "LEFT JOIN ncm ON ncm.id = p.id_ncm\n" +
+                    "WHERE\n" +
+                    "	p.mva > 0 and\n" +
+                    "	ncm.ncm IS NOT null"
+            )) {
+                while(rs.next()) {
+                    PautaFiscalIMP imp = new PautaFiscalIMP();
+                    imp.setId(rs.getString("id_produto"));
+                    imp.setIva(rs.getDouble("mva"));
+                    imp.setIvaAjustado(imp.getIva());
+                    imp.setNcm(rs.getString("ncm"));
+                    imp.setAliquotaCreditoId(rs.getString("id_aliquota"));
+                    imp.setAliquotaCreditoForaEstadoId(rs.getString("id_aliquota"));
+                    imp.setAliquotaDebitoId(rs.getString("id_aliquota"));
+                    imp.setAliquotaDebitoForaEstadoId(rs.getString("id_aliquota"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
         return result;
     }
 
@@ -761,6 +868,45 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setIdAliquotaCredito(rst.getString("ALIQUOTA"));
                         result.add(imp);
                     }
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT\n" +
+                    "	p.id,	\n" +
+                    "	p.id_produto,\n" +
+                    "	pc.inicio datainicio,\n" +
+                    "	pc.fim datafim,\n" +
+                    "	p.promocao precopromocao,\n" +
+                    "	p.venda precovenda,\n" +
+                    "	p.status\n" +
+                    "FROM\n" +
+                    "	promocao_itens as p\n" +
+                    "JOIN promocao_cab as pc ON p.id_promocao_cab = pc.id\n" +
+                    "WHERE\n" +
+                    "	cast(pc.fim AS DATE) >= NOW() and\n" +
+                    "	pc.id_loja = " + getLojaOrigem() + " and\n" +
+                    "	pc.status = 0\n" +
+                    "ORDER BY\n" +
+                    "	pc.fim")) {
+                while(rs.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    imp.setIdProduto(rs.getString("id_produto"));
+                    imp.setDataInicio(rs.getDate("datainicio"));
+                    imp.setDataFim(rs.getDate("datafim"));
+                    imp.setPrecoOferta(rs.getDouble("precopromocao"));
+                    imp.setPrecoNormal(rs.getDouble("precovenda"));
+                    imp.setSituacaoOferta(SituacaoOferta.ATIVO);
+                    imp.setTipoOferta(TipoOfertaVO.CAPA);
+                    
+                    result.add(imp);
                 }
             }
         }

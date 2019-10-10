@@ -43,6 +43,8 @@ public class ProdutoIMP {
     private double margem = 0;
     private double custoSemImposto = 0;
     private double custoComImposto = 0;    
+    private double custoAnteriorSemImposto = 0;
+    private double custoAnteriorComImposto = 0;
     private double precovenda = 0;    
     
     private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
@@ -217,6 +219,14 @@ public class ProdutoIMP {
 
     public double getCustoComImposto() {
         return custoComImposto;
+    }
+    
+    public double getCustoAnteriorSemImposto() {
+        return custoAnteriorSemImposto;
+    }
+    
+    public double getCustoAnteriorComImposto() {
+        return custoAnteriorComImposto;
     }
 
     public double getPrecovenda() {
@@ -417,6 +427,14 @@ public class ProdutoIMP {
 
     public void setCustoComImposto(double custoComImposto) {
         this.custoComImposto = custoComImposto;
+    }
+    
+    public void setCustoAnteriorSemImposto(double custoAnteriorSemImposto) {
+        this.custoAnteriorSemImposto = custoAnteriorSemImposto;
+    }
+    
+    public void setCustoAnteriorComImposto(double custoAnteriorComImposto) {
+        this.custoAnteriorComImposto = custoAnteriorComImposto;
     }
 
     public void setPrecovenda(double precovenda) {

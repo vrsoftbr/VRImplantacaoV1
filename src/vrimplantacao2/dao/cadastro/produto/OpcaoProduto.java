@@ -28,6 +28,11 @@ public enum OpcaoProduto {
         public String toString() {
             return "Custo Sem Imposto";
         }
+    }, CUSTO_ANTERIOR {
+        @Override
+        public String toString() {
+            return "Custo Anterior";
+        }
     }, ESTOQUE {
         @Override
         public String toString() {
