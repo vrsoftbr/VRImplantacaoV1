@@ -5,6 +5,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.CestVO;
 import vrimplantacao2.dao.cadastro.produto.PisCofinsDAO;
 import vrimplantacao2.utils.Factory;
+import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.enums.NaturezaReceitaVO;
 import vrimplantacao2.vo.enums.NcmVO;
@@ -163,7 +164,7 @@ public class ProdutoVO {
     }
 
     public void setMargem(double margem) {
-        this.margem = margem;
+        this.margem = MathUtils.trunc(margem, 2, 999999.99D);
     }
 
     public void setNcm(NcmVO ncm) {

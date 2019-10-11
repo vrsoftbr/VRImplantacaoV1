@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
@@ -117,13 +118,13 @@ public class G3DAO extends InterfaceDAO {
                     + "	p.ID AS id,\n"
                     + "	p.DESCRICAO_PDV AS descricao,\n"
                     + "	p.ID_GRUPO AS mercadologico,\n"
-                    + "	p.lucro AS margem,\n"
-                    + "	p.valor_compra AS custosemimposto,\n"
-                    + "	p.valor_custo AS custocomimposto,\n"
-                    + "	p.VALOR_VENDA AS precovenda,\n"
+                    + "	TRUNCATE(p.lucro,2) margem,\n"
+                    + "	TRUNCATE(p.valor_compra, 2) custosemimposto,\n"
+                    + "	TRUNCATE(p.valor_custo, 2) custocomimposto,\n"
+                    + "	TRUNCATE(p.VALOR_VENDA, 2) precovenda,\n"
                     + "	p.DATA_CADASTRO AS datacadastro,\n"
-                    + "	p.ESTOQUE_MAX AS estoquemaximo,\n"
-                    + "	p.ESTOQUE_MIN AS estoqueminimo,\n"
+                    + "	TRUNCATE(p.ESTOQUE_MAX, 0) estoquemaximo,\n"
+                    + "	TRUNCATE(p.ESTOQUE_MIN, 0) estoqueminimo,\n"
                     + "	p.QTD_ESTOQUE AS estoque,\n"
                     + "	p.GTIN,\n"
                     + "	p.EAN,\n"
@@ -162,7 +163,7 @@ public class G3DAO extends InterfaceDAO {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
 
-                    String ean = rst.getString("GTIN");
+                    String ean = Utils.formataNumero(rst.getString("GTIN"));
 
                     long codigoProduto;
 
