@@ -16,6 +16,8 @@ public class ProdutoComplementoVO {
     private double troca = 0;
     private double custoSemImposto = 0;
     private double custoComImposto = 0;
+    private double custoAnteriorSemImposto = 0;
+    private double custoAnteriorComImposto = 0;
     private double precoVenda = 0;
     private double precoDiaSeguinte = 0;
     private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
@@ -58,6 +60,14 @@ public class ProdutoComplementoVO {
         this.custoComImposto = MathUtils.round(custoComImposto, 4, 9999999D);
     }
 
+    public void setCustoAnteriorSemImposto(double custoAnteriorSemImposto) {
+        this.custoAnteriorSemImposto = MathUtils.round(custoAnteriorSemImposto, 4, 9999999D);
+    }
+    
+    public void setCustoAnteriorComImposto(double custoAnteriorComImposto) {
+        this.custoAnteriorComImposto = MathUtils.round(custoAnteriorComImposto, 4, 9999999D);
+    }
+    
     public void setPrecoVenda(double precoVenda) {
         this.precoVenda = MathUtils.round(precoVenda, 4, 9999999D);
     }
@@ -108,6 +118,14 @@ public class ProdutoComplementoVO {
 
     public double getCustoComImposto() {
         return custoComImposto;
+    }
+    
+    public double getCustoAnteriorSemImposto() {
+        return custoAnteriorSemImposto;
+    }
+    
+    public double getCustoAnteriorComImposto() {
+        return custoAnteriorComImposto;
     }
 
     public double getPrecoVenda() {

@@ -92,6 +92,7 @@ import vrimplantacao.vo.Formulario;
 import vrimplantacao2.gui.component.sqleditor.SQLEditor;
 import vrimplantacao2.gui.interfaces.ASoftGUI;
 import vrimplantacao2.gui.interfaces.AcomGUI;
+import vrimplantacao2.gui.interfaces.AdmMacenoGUI;
 import vrimplantacao2.gui.interfaces.AlphaSysGUI;
 import vrimplantacao2.gui.interfaces.ApolloGUI;
 import vrimplantacao2.gui.interfaces.ArtSystemGUI;
@@ -181,6 +182,7 @@ import vrimplantacao2.gui.interfaces.SiaCriareByFileGUI;
 import vrimplantacao2.gui.interfaces.SiaCriareDbfGUI;
 import vrimplantacao2.gui.interfaces.SiacGUI;
 import vrimplantacao2.gui.interfaces.SifatGUI;
+import vrimplantacao2.gui.interfaces.Sifat_2GUI;
 import vrimplantacao2.gui.interfaces.SigmaGUI;
 import vrimplantacao2.gui.interfaces.SisMouraGUI;
 import vrimplantacao2.gui.interfaces.SoftcomGUI;
@@ -198,7 +200,6 @@ import vrimplantacao2.gui.interfaces.SysmoPostgresGUI;
 import vrimplantacao2.gui.interfaces.TGAGUI;
 import vrimplantacao2.gui.interfaces.TiTecnologiaGUI;
 import vrimplantacao2.gui.interfaces.TopSystemGUI;
-import vrimplantacao2.gui.interfaces.TopSystemGUI2;
 import vrimplantacao2.gui.interfaces.TopSystemGUI3;
 import vrimplantacao2.gui.interfaces.TstiGUI;
 import vrimplantacao2.gui.interfaces.UmPontoDoisGUI;
@@ -701,6 +702,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuDtCom = new javax.swing.JMenuItem();
         mnuSiaCriareDbf = new javax.swing.JMenuItem();
         mnuVCash = new javax.swing.JMenuItem();
+        mnuAdmRioPreto = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuCache = new javax.swing.JMenu();
@@ -2229,6 +2231,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuOrion.add(mnuVCash);
 
+        mnuAdmRioPreto.setText("ADM (Rio Preto)");
+        mnuAdmRioPreto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAdmRioPretoActionPerformed(evt);
+            }
+        });
+        mnuOrion.add(mnuAdmRioPreto);
+
         mnuDatabase.add(mnuOrion);
 
         mnuDB2.setText("IBM DB2");
@@ -3632,19 +3642,8 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuEsSystemActionPerformed
 
     private void mnuSifatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSifatActionPerformed
-        // TODO add your handling code here:
-        try {
-            this.setWaitCursor();
-            if (formImportarSifat == null || formImportarSifat.isClosed()) {
-                formImportarSifat = new SifatGUI(this);
-            }
-
-            formImportarSifat.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
+        // TODO add your handling code here:        
+        Sifat_2GUI.exibir(this);
     }//GEN-LAST:event_mnuSifatActionPerformed
 
     private void mnuApolloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuApolloActionPerformed
@@ -4133,6 +4132,10 @@ public final class MenuGUI extends VRMdiFrame {
         G3GUI.exibir(this);
     }//GEN-LAST:event_mnuG3ActionPerformed
 
+    private void mnuAdmRioPretoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAdmRioPretoActionPerformed
+        AdmMacenoGUI.exibir(this);
+    }//GEN-LAST:event_mnuAdmRioPretoActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4223,6 +4226,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuASoft;
     private javax.swing.JMenuItem mnuAcertarIdsProdutos;
     private javax.swing.JMenuItem mnuAcom;
+    private javax.swing.JMenuItem mnuAdmRioPreto;
     private javax.swing.JMenu mnuAjuda;
     private javax.swing.JMenuItem mnuAjudaSobre;
     private javax.swing.JMenuItem mnuAlphaSys;
