@@ -22,7 +22,6 @@ public class ContaPagarIMP {
     private Date dataEmissao;
     private Date dataEntrada;
     private Timestamp dataHoraAlteracao;
-    @Deprecated
     private double valor = 0;
     private String observacao;
     private List<ContaPagarVencimentoIMP> vencimentos = new ArrayList<>();
@@ -74,13 +73,11 @@ public class ContaPagarIMP {
     public void setDataHoraAlteracao(Timestamp dataHoraAlteracao) {
         this.dataHoraAlteracao = dataHoraAlteracao;
     }
-
-    @Deprecated
+    
     public double getValor() {
         return valor;
     }
 
-    @Deprecated
     public void setValor(double valor) {
         this.valor = valor;
     }
