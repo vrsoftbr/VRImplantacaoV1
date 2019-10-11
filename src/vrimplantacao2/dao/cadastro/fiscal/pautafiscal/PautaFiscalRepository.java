@@ -233,9 +233,11 @@ public class PautaFiscalRepository {
         if (ppauta.getId_aliquotaCredito() != 0) {
             result.setId_aliquotaCredito(ppauta.getId_aliquotaCredito());
         }
+        
         if (ppauta.getId_aliquotaCreditoForaEstado() != 0) {
             result.setId_aliquotaCreditoForaEstado(ppauta.getId_aliquotaCreditoForaEstado());
         }
+        
         if (ppauta.getId_aliquotaDebito() != 0) {
             result.setId_aliquotaDebito(ppauta.getId_aliquotaDebito());
         }
@@ -243,6 +245,22 @@ public class PautaFiscalRepository {
             result.setId_aliquotaDebitoForaEstado(ppauta.getId_aliquotaDebitoForaEstado());
         }
         
+        if (result.getId_aliquotaCredito() == -1) {
+            result.setId_aliquotaCredito(ppauta.getId_aliquotaCredito());
+        }
+        
+        if (result.getId_aliquotaCreditoForaEstado() == -1) {
+            result.setId_aliquotaCreditoForaEstado(ppauta.getId_aliquotaCreditoForaEstado());
+        }
+        
+        if (result.getId_aliquotaDebito() == -1) {
+            result.setId_aliquotaDebito(ppauta.getId_aliquotaDebito());
+        }
+        
+        if(result.getId_aliquotaDebitoForaEstado() == -1) {
+            result.setId_aliquotaDebitoForaEstado(ppauta.getId_aliquotaDebitoForaEstado());
+        }
+       
         return result;
     }
     

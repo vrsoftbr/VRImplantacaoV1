@@ -231,6 +231,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    tabicm aliquota_debito_id,\n" +
                     "    icm.tabicm_st cst_debito,\n" +
                     "    icm.tabicm_aliq icms_aliquota_debito,\n" +
+                    "    icm.tabicm_pbc icms_aliquota_debito_reducao,\n" +        
                     "    icm_aliq aliquota_credito,\n" +
                     "    icm_cst cst_credito,\n" +
                     "    icm_pbc aliquota_reducao_credito,\n" +
@@ -251,9 +252,15 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIva(rst.getDouble("icm_mva"));
                     imp.setIvaAjustado(imp.getIva());
                     imp.setNcm(rst.getString("ncm"));
+                    double reducao = 0;
+                    if(rst.getDouble("icms_aliquota_debito_reducao") == 100) {
+                        reducao = 0;
+                    } else {
+                        reducao = rst.getDouble("icms_aliquota_debito_reducao");
+                    }
                     imp.setAliquotaDebito(rst.getInt("cst_debito"), rst.getDouble("icms_aliquota_debito"), 0.0);
                     imp.setAliquotaDebitoForaEstado(rst.getInt("cst_debito"), rst.getDouble("icms_aliquota_debito"), 0.0);
-                    double reducao = 0;
+                    
                     if(rst.getDouble("aliquota_reducao_credito") == 100) {
                         reducao = 0;
                     } else {
