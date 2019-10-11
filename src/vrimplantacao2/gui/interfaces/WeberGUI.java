@@ -228,8 +228,8 @@ public class WeberGUI extends VRInternalFrame {
                             importador.importarCheque();
                         }
                         if(chkPdvVendas.isSelected()) {
-                            //dao.setDataInicioVenda(edtDtVendaIni.getDate());
-                            //dao.setDataTerminoVenda(edtDtVendaFim.getDate());
+                            dao.setDataInicioVenda(edtDtVendaIni.getDate());
+                            dao.setDataTerminoVenda(edtDtVendaFim.getDate());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                     } else if (tab.getSelectedIndex() == 3) {
