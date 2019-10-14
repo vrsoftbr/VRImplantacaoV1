@@ -230,7 +230,7 @@ public class PautaFiscalRepository {
     private PautaFiscalVO converterPauta(PautaFiscalIMP imp, ProdutoPautaVO ppauta) throws Exception {
         PautaFiscalVO result = converterPauta(imp, ppauta.getNcm());
         
-        if (ppauta.getId_aliquotaCredito() != 0) {
+        /*if (ppauta.getId_aliquotaCredito() != 0) {
             result.setId_aliquotaCredito(ppauta.getId_aliquotaCredito());
         }
         
@@ -243,7 +243,7 @@ public class PautaFiscalRepository {
         }
         if (ppauta.getId_aliquotaDebitoForaEstado() != 0) {
             result.setId_aliquotaDebitoForaEstado(ppauta.getId_aliquotaDebitoForaEstado());
-        }
+        }*/
         
         if (result.getId_aliquotaCredito() == -1) {
             result.setId_aliquotaCredito(ppauta.getId_aliquotaCredito());

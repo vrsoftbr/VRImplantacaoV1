@@ -32,6 +32,7 @@ import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemVO;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
+import vrimplantacao2.vo.importacao.ContaPagarVencimentoIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -81,6 +82,8 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.ATACADO,
             OpcaoProduto.VALIDADE,
             OpcaoProduto.MERCADOLOGICO,
+            OpcaoProduto.FAMILIA,
+            OpcaoProduto.FAMILIA_PRODUTO,
             OpcaoProduto.MERCADOLOGICO_PRODUTO,
             OpcaoProduto.MAPA_TRIBUTACAO
         }));
@@ -109,7 +112,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> vResult = new ArrayList<>();
@@ -193,7 +196,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pre.ESTOQUE_MAX as estoquemaximo,\n"
                     + "	pre.DEPTO_PIS,\n"
                     + "	pis.CST as cstpis,\n"
-                    + "	pis.nat_operacao as naturezaceita,\n"
+                    + "	pis.nat_operacao as naturezareceita,\n"
                     + "	pis.DESCRICAO as descricaopis,\n"
                     + "	pre.DEPTO_COFINS,\n"
                     + "	cof.CST as cstcofins,\n"
@@ -270,12 +273,13 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	f.TELEFONE as telefone,\n"
                     + "	f.FAX as fax,\n"
                     + "	f.CELULAR as celular,\n"
-                    + "	f.EMAIL as email,\n"
+                    + "	SUBSTR(f.EMAIL, 1, 50) as email,\n"
                     + "	f.SITE as site,\n"
                     + "	f.DIA_VENCIMENTO as diavencimento,\n"
                     + "	f.OBSERVACAO as observacao,\n"
                     + "	f.PRAZO_ENTREGA as prazoentrega,\n"
-                    + "	f.PRAZO_PGTO as prazopagto\n"
+                    + "	f.PRAZO_PGTO as prazopagto,\n"
+                    + " f.DT_CADASTRO as datacadastro\n"
                     + "from cd02 f\n"
                     + "where f.E_FORNECEDOR = 1\n"
                     + "order by f.CODIGO"
@@ -290,7 +294,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setEndereco(rst.getString("endereco"));
                     imp.setNumero(rst.getString("numero"));
-                    imp.setComplemento(rst.getString("complemnto"));
+                    imp.setComplemento(rst.getString("complemento"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("municipio"));
                     imp.setIbge_municipio(rst.getInt("municipioibge"));
@@ -377,7 +381,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.TELEFONE as telefone,\n"
                     + "	c.FAX as fax,\n"
                     + "	c.CELULAR as celular,\n"
-                    + "	c.EMAIL as email,\n"
+                    + "	SUBSTR(c.EMAIL, 1, 50) as email,\n"
                     + "	c.SITE as site,\n"
                     + "	c.DIA_VENCIMENTO as diavencimento,\n"
                     + "	c.OBSERVACAO as observacao,\n"
@@ -395,7 +399,8 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.DT_ADMISSAO as dataadmissao,\n"
                     + "	c.RENDA_MENSAL as salario,\n"
                     + "	c.PROFISSAO as cargo,\n"
-                    + "	c.CPF_CONJUGE as cpfconjuge\n"
+                    + "	c.CPF_CONJUGE as cpfconjuge,\n"
+                    + " c.DT_CADASTRO as datacadastro\n"
                     + "from cd02 c\n"
                     + "where c.E_CLIENTE  = 1\n"
                     + "order by c.CODIGO"
@@ -474,7 +479,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where DC = 'D'\n"
                     + "and historico like '%VENDA%'\n"
                     + "and loja = " + getLojaOrigem()
-                    + "order by data"
+                    + " order by data"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
@@ -649,21 +654,66 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where pag.ENTIDADE in (select codigo from cd02 where E_FORNECEDOR = 1)\n"
                     + "and pag.DT_PGTO is null\n"
                     + "and pag.LOJA = " + getLojaOrigem() + " \n"
-                    + "and pag.NF_NUMERO is not null\n"
-                    + "order by pag.EMISSAO"
+                    + "order by pag.ENTIDADE, pag.NF_NUMERO, pag.NUM_TITULO"
             )) {
                 while (rst.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
 
-                    imp.setId(rst.getString("numeroNF") + "-" + rst.getString("dataemissao") + "-" + rst.getString("idfornecedor") + "-" + rst.getString("totalparcelas"));
+                    String numeroDocumento = "0";
+
+                    if ((rst.getString("numeroNF") != null)
+                            && (!rst.getString("numeroNF").trim().isEmpty())
+                            && (!"0".equals(rst.getString("numeroNF").trim()))) {
+                        numeroDocumento = rst.getString("numeroNF");
+                    } else {
+                        numeroDocumento = rst.getString("numerodocumento");
+                    }
+
+                    imp.setId(numeroDocumento + "-" + rst.getString("dataemissao") + "-" + rst.getString("idfornecedor") + "-" + rst.getString("totalparcelas"));
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
                     imp.setDataEntrada(rst.getDate("dataemissao"));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
-                    imp.setDataHoraAlteracao(rst.getTimestamp("dataemissao"));
-                    imp.setNumeroDocumento(rst.getString("numeroNF"));
-                    imp.setValor(rst.getDouble("valorNF"));
+                    imp.setNumeroDocumento(numeroDocumento);
                     imp.setObservacao(rst.getString("observacao"));
-                    imp.addVencimento(rst.getDate("datavencimento"), rst.getDouble("valorparcela"));
+                    imp.setValor(rst.getDouble("valorNF"));
+                    
+                    try (Statement stm2 = ConexaoMySQL.getConexao().createStatement()) {
+                        try (ResultSet rst2 = stm2.executeQuery(
+                                "select\n"
+                                + " pag.PARCELA as parcela,\n"
+                                + " pag.VENCIMENTO as datavencimento,\n"
+                                + " pag.VR_TITULO as valorparcela,\n"
+                                + " pag.HISTORICO as observacao\n"
+                                + "from cf22 pag\n"
+                                + "where pag.ENTIDADE in (select codigo from cd02 where E_FORNECEDOR = 1)\n"
+                                + "and pag.DT_PGTO is null\n"
+                                + "and pag.LOJA = " + getLojaOrigem() + "\n"
+                                + "and pag.NUM_TITULO = '" + numeroDocumento + "'\n"
+                                + "and pag.EMISSAO = '" + rst.getString("dataemissao") + "'\n"
+                                + "and pag.ENTIDADE = " + rst.getString("idfornecedor") + "\n"
+                                + "and pag.TOTAL_PARCELAS = " + rst.getString("totalparcelas") + "\n"
+                                + "union all \n"
+                                + "select\n"
+                                + " pag.PARCELA as parcela,\n"
+                                + " pag.VENCIMENTO as datavencimento,\n"
+                                + " pag.VR_TITULO as valorparcela,\n"                                        
+                                + " pag.HISTORICO as observacao\n"
+                                + "from cf22 pag\n"
+                                + "where pag.ENTIDADE in (select codigo from cd02 where E_FORNECEDOR = 1)\n"
+                                + "and pag.DT_PGTO is null\n"
+                                + "and pag.LOJA = " + getLojaOrigem() + "\n"
+                                + "and pag.NF_NUMERO = '" + numeroDocumento + "'\n"
+                                + "and pag.EMISSAO = '" + rst.getString("dataemissao") + "'\n"
+                                + "and pag.ENTIDADE = " + rst.getString("idfornecedor") + "\n"
+                                + "and pag.TOTAL_PARCELAS = " + rst.getString("totalparcelas") + "\n"                                
+                        )) {
+                            while (rst2.next()) {
+                                ContaPagarVencimentoIMP parc = imp.addVencimento(rst2.getDate("datavencimento"), rst2.getDouble("valorparcela"));
+                                parc.setNumeroParcela(Utils.stringToInt(rst2.getString("parcela"), 1));
+                                parc.setObservacao(rst2.getString("observacao"));                                
+                            }
+                        }
+                    }                    
                     result.add(imp);
                 }
             }
@@ -691,7 +741,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
     }
-     
+
     private static class VendaIterator implements Iterator<VendaIMP> {
 
         private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
@@ -863,7 +913,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaItemIterator(String idLojaCliente, java.util.Date dataInicio, java.util.Date dataTermino) throws Exception {
             this.sql
                     = "select \n"
-                    + "	ven.ECF as ecf,\n"                    
+                    + "	ven.ECF as ecf,\n"
                     + "	ite.CAIXA as caixa,\n"
                     + "	ite.NUMERO as numero,\n"
                     + "	ite.ITEM as sequencia,\n"

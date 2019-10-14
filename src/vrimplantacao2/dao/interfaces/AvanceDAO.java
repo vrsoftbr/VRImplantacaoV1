@@ -1013,7 +1013,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	AND cg.id = csg.id_grupo\n" +
                     "WHERE\n" +
                     "	pagamento IS NULL and\n" +
-                    "	csg.id IN (SELECT id FROM contasgrupo where nome LIKE '%L%j%4')\n" +
+                    "	csg.id IN (SELECT id FROM contasgrupo where nome LIKE '%L%j%" + idLojaContaPagar + "')\n" +
                     "ORDER BY\n" +
                     "	vencimento"
             )) {
