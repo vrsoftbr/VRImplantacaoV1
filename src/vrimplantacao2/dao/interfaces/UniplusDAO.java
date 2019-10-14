@@ -6,12 +6,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
-import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.SituacaoCheque;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -145,103 +147,94 @@ public class UniplusDAO extends InterfaceDAO {
         List<ProdutoIMP> result = new ArrayList<>();
         try(Statement stm = ConexaoPostgres.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	p.id,\n"
-                    + "	p.codigo, \n"
-                    + "	p.ean, \n"
-                    + "	p.inativo, \n"
-                    + " p.diasvencimento as validade,\n"
-                    + "	p.nome as descricaocompleta, \n"
-                    + "	p.nomeecf as descricaoreduzida, \n"
-                    + "	p.nome as descricaogondola, \n"
-                    + "	p.datacadastro, \n"
-                    + "	p.unidademedida as unidade, \n"
-                    + "	1 qtdembalagem, \n"
-                    + "	p.custoindireto custooperacional,\n"
-                    + " p.percentuallucroajustado margemlucro,\n"
-                    + " p.precocusto,\n" 
-                    + "	p.preco,"        
-                    + "	preco.percentualmarkupajustado margem, \n"
-                    + "	preco.precoultimacompra custosemimposto,\n"
-                    + "	preco.precocusto custocomimposto,\n"
-                    + "	preco.preco as precovenda,\n"
-                    + "	p.quantidademinima, \n"
-                    + "	p.quantidademaxima, \n"
-                    + "	e.quantidade, \n"
-                    + "	p.tributacao, \n"
-                    + "	p.situacaotributaria as cst, \n"
-                    + "	p.cstpis, \n"
-                    + "	p.cstcofins, \n"
-                    + "	p.cstpisentrada, \n"
-                    + "	p.icmsentrada as icmscredito, \n"
-                    + "	p.icmssaida as icmsdebito, \n"
-                    + "	p.aliquotaicmsinterna, \n"
-                    + "	p.pesavel, \n"
-                    + "	p.ncm, \n"
-                    + "	p.idcest, \n"
-                    + "	cest.codigo as cest, \n"
-                    + "	p.cstpisentrada, \n"
-                    + "	p.cstpis, \n"
-                    + "	p.idfamilia, \n"
-                    + "	p.idhierarquia as merc1, \n"
-                    + "	p.idhierarquia as merc2, \n"
-                    + "	p.idhierarquia as merc3,\n"
-                    + "	r.codigo naturezareceita\n"
-                    + "from \n"
-                    + "	produto p\n"
-                    + "	join filial f on\n"
-                    + "		f.id = " + getLojaOrigem() + "\n"
-                    + "	left join formacaoprecoproduto preco on\n"
-                    + "		preco.idproduto = p.id and\n"
-                    + "		preco.idfilial = f.id\n"
-                    + "	left join saldoestoque e on\n"
-                    + "		e.idproduto = p.id and\n"
-                    + "		e.codigoproduto = p.codigo and\n"
-                    + "		e.idfilial = f.id\n"
-                    + "	left join cest on\n"
-                    + "		cest.id = p.idcest\n"
-                    + "	left join\n"
-                    + "		receitasemcontribuicao r on p.idreceitasemcontribuicao = r.id\n"
-                    + " order by \n"
-                    + "	p.codigo"
+                    "select \n" +
+                    "	p.id,\n" +
+                    "	p.codigo, \n" +
+                    "	case when p.pesavel = 1 then p.codigo else coalesce(nullif(trim(p.ean),''), p.codigo) end ean, \n" +
+                    "	p.inativo, \n" +
+                    "	p.diasvencimento as validade,\n" +
+                    "	p.nome as descricaocompleta, \n" +
+                    "	p.nomeecf as descricaoreduzida, \n" +
+                    "	p.nome as descricaogondola, \n" +
+                    "	p.datacadastro, \n" +
+                    "	p.unidademedida as unidade, \n" +
+                    "	1 qtdembalagem, \n" +
+                    "	p.custoindireto custooperacional,\n" +
+                    "	p.percentuallucroajustado margemlucro,\n" +
+                    "	p.precocusto, \n" +
+                    "	p.preco,        \n" +
+                    "	preco.percentualmarkupajustado margem, \n" +
+                    "	preco.precoultimacompra custosemimposto,\n" +
+                    "	preco.precocusto custocomimposto,\n" +
+                    "	preco.preco as precovenda,\n" +
+                    "	p.quantidademinima, \n" +
+                    "	p.quantidademaxima, \n" +
+                    "	e.quantidade, \n" +
+                    "	p.tributacao, \n" +
+                    "	p.situacaotributaria as cst, \n" +
+                    "	p.cstpis, \n" +
+                    "	p.cstcofins, \n" +
+                    "	p.cstpisentrada, \n" +
+                    "	p.icmsentrada as icmscredito, \n" +
+                    "	p.icmssaida as icmsdebito, \n" +
+                    "	p.aliquotaicmsinterna, \n" +
+                    "	p.pesavel, \n" +
+                    "	p.ncm, \n" +
+                    "	p.idcest, \n" +
+                    "	cest.codigo as cest, \n" +
+                    "	p.cstpisentrada, \n" +
+                    "	p.cstpis, \n" +
+                    "	p.idfamilia, \n" +
+                    "	p.idhierarquia as merc1, \n" +
+                    "	p.idhierarquia as merc2, \n" +
+                    "	p.idhierarquia as merc3,\n" +
+                    "	r.codigo naturezareceita\n" +
+                    "from \n" +
+                    "	produto p\n" +
+                    "	join filial f on\n" +
+                    "		f.id = " + getLojaOrigem() + "\n" +
+                    "	left join formacaoprecoproduto preco on\n" +
+                    "		preco.idproduto = p.id and\n" +
+                    "		preco.idfilial = f.id\n" +
+                    "	left join saldoestoque e on\n" +
+                    "		e.idproduto = p.id and\n" +
+                    "		e.codigoproduto = p.codigo and\n" +
+                    "		e.idfilial = f.id\n" +
+                    "	left join cest on\n" +
+                    "		cest.id = p.idcest\n" +
+                    "	left join\n" +
+                    "		receitasemcontribuicao r on p.idreceitasemcontribuicao = r.id\n" +
+                    " order by \n" +
+                    "	p.id"
             )) {
+                Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while(rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("codigo"));
-                    if(rs.getString("ean") != null && !"".equals(rs.getString("ean"))) {
-                        if(rs.getString("ean").length() > 14) {
-                            imp.setEan(rs.getString("ean").substring(0, 14));
-                        } else {
-                            imp.setEan(rs.getString("ean"));
-                        }
-                    }
+                    
                     imp.setSituacaoCadastro(rs.getInt("inativo") == 1 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setDescricaoCompleta(rs.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
                     
-                    if ((rs.getString("ean") != null)
-                            && (!rs.getString("ean").trim().isEmpty())) {
-
-                        if (rs.getString("ean").length() <= 6) {
-                            imp.seteBalanca(true);
-                        } else {
-                            imp.seteBalanca(false);
-                        }
+                    ProdutoBalancaVO bal = balanca.get(rs.getString("ean"));
+                    if (bal == null) {
+                        imp.setEan(rs.getString("ean"));
+                        imp.seteBalanca(rs.getBoolean("pesavel"));                    
+                        imp.setTipoEmbalagem(rs.getString("unidade"));
+                        imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                        imp.setValidade(rs.getInt("validade"));
                     } else {
-                        imp.seteBalanca(false);
+                        imp.setEan(String.valueOf(bal.getCodigo()));
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
+                        imp.setQtdEmbalagem(1);
+                        imp.setValidade(rs.getInt(bal.getValidade()));
                     }
                     
-                    //imp.seteBalanca((rs.getInt("pesavel") == 1));
-                    imp.setValidade(rs.getInt("validade"));
-                    //if (imp.isBalanca() && (forcarIdProdutoQuandoPesavel || "".equals(Utils.acertarTexto(imp.getEan())))) {
-                    //    imp.setEan(imp.getImportId()); 
-                    //}
                     imp.setDataCadastro(rs.getDate("datacadastro"));
-                    imp.setTipoEmbalagem(rs.getString("unidade"));
-                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     if((rs.getDouble("precovenda") == 0) && (rs.getDouble("custocomimposto") == 0)) {
                         imp.setCustoSemImposto(rs.getDouble("precocusto"));
                         imp.setCustoComImposto(rs.getDouble("precocusto"));
