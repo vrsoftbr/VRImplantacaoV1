@@ -649,7 +649,8 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pag.VENCIMENTO as datavencimento,\n"
                     + "	pag.VR_NF as valorNF,\n"
                     + "	pag.VR_TITULO as valorparcela,\n"
-                    + "	pag.HISTORICO as observacao\n"
+                    + "	pag.HISTORICO as observacao,\n"
+                    + "	pag.ESPECIE as especie\n"
                     + "from cf22 pag\n"
                     + "where pag.ENTIDADE in (select codigo from cd02 where E_FORNECEDOR = 1)\n"
                     + "and pag.DT_PGTO is null\n"
@@ -669,15 +670,19 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                         numeroDocumento = rst.getString("numerodocumento");
                     }
 
-                    imp.setId(numeroDocumento + "-" + rst.getString("dataemissao") + "-" + rst.getString("idfornecedor") + "-" + rst.getString("totalparcelas"));
+                    imp.setId(rst.getString("id"));
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
                     imp.setDataEntrada(rst.getDate("dataemissao"));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setNumeroDocumento(numeroDocumento);
-                    imp.setObservacao(rst.getString("observacao"));
-                    imp.setValor(rst.getDouble("valorNF"));
+                    ContaPagarVencimentoIMP parc = imp.addVencimento(rst.getDate("datavencimento"), rst.getDouble("valorparcela"));
+                    parc.setNumeroParcela(Utils.stringToInt(rst.getString("parcela"), 1));
+                    parc.setObservacao("VALOR TOTAL " + rst.getString("valorNF") 
+                            + " NUMERO DE PARCELAS " + rst.getString("totalparcelas")
+                            + " PARCELA DA CONTA " + rst.getString("parcela")
+                            + "..." + rst.getString("observacao"));
                     
-                    try (Statement stm2 = ConexaoMySQL.getConexao().createStatement()) {
+                    /*try (Statement stm2 = ConexaoMySQL.getConexao().createStatement()) {
                         try (ResultSet rst2 = stm2.executeQuery(
                                 "select\n"
                                 + " pag.PARCELA as parcela,\n"
@@ -713,7 +718,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                                 parc.setObservacao(rst2.getString("observacao"));                                
                             }
                         }
-                    }                    
+                    }*/                    
                     result.add(imp);
                 }
             }
@@ -805,12 +810,12 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaIMP();
-                        String id = rst.getString("datavenda") + "-" + rst.getString("numero") + "-" + rst.getString("ecf");
+                        String id = rst.getString("loja") + "-" + rst.getString("caixa") + "-" + rst.getString("numero");
                         if (!uk.add(id)) {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
                         next.setId(id);
-                        next.setNumeroCupom(Utils.stringToInt(rst.getString("numerocupom")));
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("cupomfiscal")));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
                         next.setData(rst.getDate("datavenda"));
                         next.setIdClientePreferencial(rst.getString("idcliente"));
@@ -913,6 +918,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaItemIterator(String idLojaCliente, java.util.Date dataInicio, java.util.Date dataTermino) throws Exception {
             this.sql
                     = "select \n"
+                    + " ven.LOJA as loja,\n"
                     + "	ven.ECF as ecf,\n"
                     + "	ite.CAIXA as caixa,\n"
                     + "	ite.NUMERO as numero,\n"
@@ -965,8 +971,8 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String idVenda = rst.getString("datavenda") + "-" + rst.getString("numero") + "-" + rst.getString("ecf");
-                        String id = rst.getString("datavenda") + "-" + rst.getString("numero") + "-" + rst.getString("ecf") + "-" + rst.getString("idproduto");
+                        String idVenda = rst.getString("loja") + "-" + rst.getString("caixa") + "-" + rst.getString("numero");
+                        String id = rst.getString("loja") + "-" + rst.getString("caixa") + "-" + rst.getString("numero") + "-" + rst.getString("idproduto");
 
                         next.setId(id);
                         next.setVenda(idVenda);
