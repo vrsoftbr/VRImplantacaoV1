@@ -189,6 +189,7 @@ import vrimplantacao2.gui.interfaces.SoftcomGUI;
 import vrimplantacao2.gui.interfaces.SofttechGUI;
 import vrimplantacao2.gui.interfaces.SolidusGUI;
 import vrimplantacao2.gui.interfaces.SolutionSuperaGUI;
+import vrimplantacao2.gui.interfaces.SophyxGUI;
 import vrimplantacao2.gui.interfaces.SriGUI;
 import vrimplantacao2.gui.interfaces.SuperGUI;
 import vrimplantacao2.gui.interfaces.SuperLoja10GUI;
@@ -587,6 +588,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuEtica = new javax.swing.JMenuItem();
         mnuThotau = new javax.swing.JMenuItem();
         mnuiWeber = new javax.swing.JMenuItem();
+        mnuiSophyx = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -1337,6 +1339,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuFirebird2.add(mnuiWeber);
+
+        mnuiSophyx.setText("Sophyx");
+        mnuiSophyx.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuiSophyxActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuiSophyx);
 
         mnuDatabase.add(mnuFirebird2);
 
@@ -4136,6 +4146,10 @@ public final class MenuGUI extends VRMdiFrame {
         AdmMacenoGUI.exibir(this);
     }//GEN-LAST:event_mnuAdmRioPretoActionPerformed
 
+    private void mnuiSophyxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuiSophyxActionPerformed
+        SophyxGUI.exibir(this);
+    }//GEN-LAST:event_mnuiSophyxActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4370,6 +4384,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuWmsi;
     private javax.swing.JMenuItem mnuWmsi1;
     private javax.swing.JMenuItem mnuZpf;
+    private javax.swing.JMenuItem mnuiSophyx;
     private javax.swing.JMenuItem mnuiWeber;
     private javax.swing.JMenuItem mnupdvvendaitem;
     private vrframework.bean.toolBar.VRToolBar tlbAtalho;
