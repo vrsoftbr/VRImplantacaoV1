@@ -25,9 +25,8 @@ import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.BancoDAO;
 import vrimplantacao.dao.cadastro.FornecedorDAO;
-import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
-import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.devolucao.receber.ReceberDevolucaoDAO;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
@@ -36,6 +35,7 @@ import vrimplantacao2.dao.cadastro.verba.receber.ReceberVerbaDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.cadastro.financeiro.ReceberDevolucaoVO;
 import vrimplantacao2.vo.cadastro.financeiro.ReceberVerbaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -330,7 +330,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     "order by\n" +
                     "	id"
             )) {
-                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
+                Map<Integer, vrimplantacao2.vo.cadastro.ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
 
                     ProdutoIMP imp = new ProdutoIMP();
@@ -431,19 +431,12 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                             qtdNormal++;
                         }                        
                     } else if (v_usar_arquivoBalanca) {
-                        ProdutoBalancaVO produtoBalanca;
-                        long codigoProduto;
-                        codigoProduto = Long.parseLong(Utils.formataNumero(imp.getEan().trim()));
-                        if (codigoProduto <= Integer.MAX_VALUE) {
-                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                        } else {
-                            produtoBalanca = null;
-                        }
-                        if (produtoBalanca != null) {
+                        ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(imp.getEan(), -2));
+                        if (bal != null) {
                             qtdBalanca++;
                             imp.seteBalanca(true);
-                            imp.setTipoEmbalagem("P".equals(produtoBalanca.getPesavel()) ? "KG" : "UN");
-                            imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rst.getInt("VALIDADE"));
+                            imp.setTipoEmbalagem("P".equals(bal.getPesavel()) ? "KG" : "UN");
+                            imp.setValidade(bal.getValidade() > 1 ? bal.getValidade() : rst.getInt("VALIDADE"));
                         } else {
                             qtdNormal++;
                             imp.setValidade(0);
