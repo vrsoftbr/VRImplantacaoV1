@@ -815,13 +815,30 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                             LOG.warning("Venda " + id + " já existe na listagem");
                         }
                         next.setId(id);
-                        next.setNumeroCupom(Utils.stringToInt(rst.getString("cupomfiscal")));
-                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                        
+                        String numeroCupom = "";
+                        if ((rst.getString("cupomfiscal") != null)
+                                && (!rst.getString("cupomfiscal").trim().isEmpty())
+                                && (!"0".equals(rst.getString("cupomfiscal").trim()))) {
+                            
+                            numeroCupom = rst.getString("cupomfiscal");
+                        } else {
+                            numeroCupom = rst.getString("numero");
+                        }                        
+                        
+                        next.setNumeroCupom(Utils.stringToInt(numeroCupom));
+                        next.setEcf(Utils.stringToInt(rst.getString("caixa")));
                         next.setData(rst.getDate("datavenda"));
                         next.setIdClientePreferencial(rst.getString("idcliente"));
 
-                        String horaInicio = timestampDate.format(rst.getDate("datavenda")) + " " + rst.getString("horavenda");
-                        String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " " + rst.getString("horavenda");
+                        
+                        String horavenda = rst.getString("horavenda");
+                        if ((horavenda).contains("::")) {
+                            horavenda = "00:00:00";
+                        }                        
+                        
+                        String horaInicio = timestampDate.format(rst.getDate("datavenda")) + " " + horavenda;
+                        String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " " + horavenda;
 
                         if ((rst.getString("cancelado") != null)
                                 && (!rst.getString("cancelado").trim().isEmpty())) {
