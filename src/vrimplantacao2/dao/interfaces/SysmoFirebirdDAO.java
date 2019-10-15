@@ -14,6 +14,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -151,14 +152,14 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     + "	ccf idfornecedor,\n"
                     + "	qnt qtdembalagem,\n"
                     + "	uni,\n"
-                    + "	(select \n"
+                    + "	(select top 1\n"
                     + "		ref \n"
                     + "	from \n"
                     + "		gceref01 ref \n"
                     + "	where \n"
                     + "		ref.cfr = forn.ccf and \n"
                     + "		ref.pro = forn.pro\n"
-                    + "		limit 1) as referencia,\n"
+                    + ") as referencia,\n"
                     + "	dtr dataalteracao\n"
                     + "from\n"
                     + "	gcefor01 forn \n"
@@ -468,4 +469,111 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
         }
         return result;
     }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n" +
+                    "	C.EMP id_empresa,\n" +
+                    "	C.TDC tipo_doc, --CV = CONVENIO\n" +
+                    "	C.NUM numerodoc,\n" +
+                    "	C.SER seriedoc,\n" +
+                    "	C.CCF id_cliente,\n" +
+                    "	C.PST parcela,\n" +
+                    "	C.VPT valorparcela,\n" +
+                    "	C.VBX valorbaixado,\n" +
+                    "	C.DPV dataprevisao,\n" +
+                    "	C.DTV datavencimento,\n" +
+                    "	C.DTE dataemissao,\n" +
+                    "	RG.DSC AS DESCRICAOORIGEM,\n" +
+                    "	C.VTD valortotal,\n" +
+                    "	T.NOM AS NCF,\n" +
+                    "	cast(C.NDB AS numeric(18, 1)) AS NDB,\n" +
+                    "	C.NSQ seq,\n" +
+                    "	cast((C.VPT+C.VAD) AS numeric (18, 2)) AS LIQ,\n" +
+                    "	T.CGC cnpjcpf,\n" +
+                    "	C.PC_MULTA multa,\n" +
+                    "	T2.NOM AS NOME_BANCO,\n" +
+                    "	C.CMP observacoes,\n" +
+                    "	C.NR_SEQUENCIAL\n" +
+                    "FROM \n" +
+                    "	CRCDOC01 C\n" +
+                    "	LEFT OUTER JOIN TRSTRA01 T ON\n" +
+                    "		C.CCF = T.COD\n" +
+                    "	LEFT OUTER JOIN TB_PEFINDOCUMENTO D ON\n" +
+                    "		(D.CD_EMPRESA = C.EMP)\n" +
+                    "		AND (D.CD_TIPODOCUMENTO = C.TDC)\n" +
+                    "		AND (D.NR_DOCUMENTO = C.NUM)\n" +
+                    "		AND (D.TX_SERIE = C.SER)\n" +
+                    "		AND (D.CD_TRANSACIONADOR = C.CCF)\n" +
+                    "		AND (D.NR_PRESTACAO = C.PST)\n" +
+                    "	LEFT OUTER JOIN TB_PEFINSITUACAODOCUMENTO S ON\n" +
+                    "		(S.CD_CODIGO = D.FL_SITUACAOATUAL)\n" +
+                    "	LEFT OUTER JOIN TB_FINANCEIROEDILOG EDI ON (\n" +
+                    "		EDI.CD_EMPRESA = C.EMP\n" +
+                    "		AND EDI.CD_TIPODOCUMENTO = C.TDC\n" +
+                    "		AND EDI.NR_DOCUMENTO = C.NUM\n" +
+                    "		AND EDI.TX_SERIE = C.SER\n" +
+                    "		AND EDI.CD_TRANSACIONADOR = C.CCF\n" +
+                    "		AND EDI.NR_PRESTACAO = C.PST\n" +
+                    "	)\n" +
+                    "	LEFT OUTER JOIN TRSTRA01 T2 ON (\n" +
+                    "		EDI.CD_BANCO = T2.COD\n" +
+                    "		AND EDI.FL_ULTIMAOPERACAO = 'S'\n" +
+                    "	)\n" +
+                    "	LEFT OUTER JOIN GCEORG01 RG ON\n" +
+                    "		RG.COD = C.ORG\n" +
+                    "WHERE\n" +
+                    "	C.EMP >= 1\n" +
+                    "	AND C.TDC IS NOT NULL\n" +
+                    "	AND C.NUM >= 1\n" +
+                    "	AND C.SER IS NOT NULL\n" +
+                    "	AND C.PST > -1\n" +
+                    "	and c.emp = " + getLojaOrigem() + "\n" +
+                    "	and c.vbx < c.vtd --Sem baixa\n" +
+                    "ORDER BY \n" +
+                    "	C.EMP,\n" +
+                    "	C.TDC,\n" +
+                    "	C.NUM,\n" +
+                    "	C.SER,\n" +
+                    "	T.NOM,\n" +
+                    "	C.PST"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(String.format(
+                            "%s-%s-%s-%s-%s-%s",
+                            rst.getString("id_empresa"),
+                            rst.getString("tipo_doc"),
+                            rst.getString("numerodoc"),
+                            rst.getString("seriedoc"),
+                            rst.getString("id_cliente"),
+                            rst.getString("parcela")
+                    ));
+                    imp.setNumeroCupom(rst.getString("numerodoc"));
+                    imp.setEcf(rst.getString("seriedoc"));
+                    imp.setIdCliente(rst.getString("id_cliente"));
+                    imp.setParcela(rst.getShort("parcela"));
+                    imp.setDataVencimento(rst.getDate("datavencimento"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setValor(rst.getDouble("valorparcela"));
+                    imp.setMulta(rst.getDouble("multa"));
+                    imp.setObservacao(String.format(
+                            "%s CPL: %s",
+                            rst.getString("observacoes"),
+                            rst.getString("DESCRICAOORIGEM")
+                    ));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
 }
