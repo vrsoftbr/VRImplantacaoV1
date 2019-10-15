@@ -1,16 +1,22 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import vrframework.remote.ItemComboVO;
+import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
@@ -36,6 +42,8 @@ import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
@@ -50,6 +58,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
     private Date dataInventario;
     public String idLojaContaPagar;
 
+    private static final Logger LOG = Logger.getLogger(AvanceDAO.class.getName());
+    
     @Override
     public String getSistema() {
         return "Avance";
@@ -1034,5 +1044,286 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
+    }
+    
+    private Date dataInicioVenda;
+    private Date dataTerminoVenda;
+
+    public void setDataInicioVenda(Date dataInicioVenda) {
+        this.dataInicioVenda = dataInicioVenda;
+    }
+
+    public void setDataTerminoVenda(Date dataTerminoVenda) {
+        this.dataTerminoVenda = dataTerminoVenda;
+    }
+
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+    }
+
+    private static class VendaIterator implements Iterator<VendaIMP> {
+
+        public final static SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+        public final static SimpleDateFormat TIMESTAMP = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+        private Statement stm = ConexaoMySQL.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaIMP next;
+        private Set<String> uk = new HashSet<>();
+
+        private void obterNext() {
+            try {
+
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaIMP();
+                        String id = rst.getString("id");
+                        if (!uk.add(id)) {
+                            LOG.warning("Venda " + id + " já existe na listagem");
+                        }
+                        next.setId(id);
+                        next.setNumeroCupom(Utils.stringToInt(rst.getString("cupom")));
+                        next.setEcf(Utils.stringToInt(rst.getString("caixa")));
+                        next.setData(rst.getDate("data"));
+                        next.setIdClientePreferencial(rst.getString("id_cliente"));
+                        String horaInicio = FORMAT.format(rst.getDate("data")) + " " + rst.getString("hora");
+                        String horaTermino = FORMAT.format(rst.getDate("data")) + " " + rst.getString("hora");
+                        next.setHoraInicio(TIMESTAMP.parse(horaInicio));
+                        next.setHoraTermino(TIMESTAMP.parse(horaTermino));
+                        next.setCancelado(rst.getInt("cancelado") == 1);
+                        next.setSubTotalImpressora(rst.getDouble("valor"));
+                        next.setCpf(rst.getString("cpf"));
+                        next.setNomeCliente(rst.getString("nome"));
+                        String endereco = "";
+                        endereco = rst.getString("endereco") + ", " + rst.getString("bairro") + ", " +
+                                rst.getString("numero") + " - " + rst.getString("cidade") + ", " + 
+                                rst.getString("uf") + " - " + rst.getString("cep");
+                        next.setEnderecoCliente(endereco);
+                    }
+                }
+            } catch (SQLException | ParseException ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            this.sql
+                    = "SELECT\n" +
+                    "	concat(v.NOTA, v.CAIXA, v.`DATA`) id, \n" +
+                    "	v.NOTA cupom,\n" +
+                    "	v.CAIXA,\n" +
+                    "	v.`DATA`,\n" +
+                    "	max(v.datahora) datahora,\n" +
+                    "	max(v.HORA) hora,\n" +
+                    "	round(sum(coalesce(v.valor, 0) * quant), 2) valor,\n" +
+                    "	v.ecf,\n" +
+                    "	v.`STATUS`,\n" +
+                    "	max(v.CANCELADO) cancelado,\n" +
+                    "	v.CLIENTE id_cliente,\n" +
+                    "	c.nome,\n" +
+                    "   c.cpf,\n" +
+                    "	c.endereco,\n" +
+                    "	c.bairro,\n" +
+                    "	c.numero,\n" +
+                    "	c.cidade,\n" +
+                    "	c.uf,\n" +
+                    "	c.cep,\n" +
+                    "	c.telefone,\n" +
+                    "	v.coo,\n" +
+                    "	v.ccf\n" +
+                    "FROM\n" +
+                    "	vendas v\n" +
+                    "LEFT JOIN clientes c ON v.CLIENTE = c.codigo\n" +
+                    "WHERE\n" +
+                    "	v.`DATA` BETWEEN '" + FORMAT.format(dataInicio) + "' AND '" + FORMAT.format(dataTermino) + "' and\n" +
+                    "	v.loja = " + idLojaCliente + " and\n" +
+                    "	v.e_transferencia = 0 and\n" +
+                    "	v.nao_bx_estoque = 0 and\n" +
+                    " 	v.caixa <> '999'\n" +
+                    "GROUP BY\n" +
+                    "	v.NOTA,\n" +
+                    "	v.USUARIO,\n" +
+                    "	v.CAIXA,\n" +
+                    "	v.`DATA`,\n" +
+                    "	v.ecf,\n" +
+                    "	v.`STATUS`,\n" +
+                    "	v.CLIENTE,\n" +
+                    "	v.coo,\n" +
+                    "	v.ccf\n" +
+                    "ORDER  BY\n" +
+                    "	v.CAIXA, v.data, v.HORA";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaIMP next() {
+            obterNext();
+            VendaIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+    }
+
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+
+        private Statement stm = ConexaoMySQL.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaItemIMP next;
+
+        private void obterNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaItemIMP();
+
+                        next.setId(rst.getString("id"));
+                        next.setVenda(rst.getString("id_venda"));
+                        next.setProduto(rst.getString("id_produto"));
+                        next.setDescricaoReduzida(rst.getString("descricao"));
+                        next.setQuantidade(rst.getDouble("quantidade"));
+                        next.setPrecoVenda(rst.getDouble("valor"));
+                        next.setCancelado(rst.getInt("cancelado") == 1);
+                        next.setCodigoBarras(rst.getString("ean"));
+                        next.setUnidadeMedida(rst.getString("unidade"));
+
+                        if (rst.getString("aliquota") != null && !"".equals(rst.getString("aliquota"))) {
+                            switch (rst.getString("aliquota").trim()) {
+                                case "F":
+                                    next.setIcmsAliq(0);
+                                    next.setIcmsCst(60);
+                                    next.setIcmsReduzido(0);
+                                    break;
+
+                                case "I":
+                                    next.setIcmsAliq(0);
+                                    next.setIcmsCst(40);
+                                    next.setIcmsReduzido(0);
+                                    break;
+                                
+                                case "N":
+                                    next.setIcmsAliq(0);
+                                    next.setIcmsCst(41);
+                                    next.setIcmsReduzido(0);
+                                    break;
+
+                                case "T01":
+                                    next.setIcmsAliq(7);
+                                    next.setIcmsCst(0);
+                                    next.setIcmsReduzido(0);
+                                    break;
+
+                                case "T02":
+                                    next.setIcmsAliq(12);
+                                    next.setIcmsCst(0);
+                                    next.setIcmsReduzido(0);
+                                    break;
+
+                                case "T03":
+                                    next.setIcmsAliq(18);
+                                    next.setIcmsCst(0);
+                                    next.setIcmsReduzido(0);
+                                    break;
+
+                                case "T04":
+                                    next.setIcmsAliq(25);
+                                    next.setIcmsCst(0);
+                                    next.setIcmsReduzido(0);
+                                    break;
+
+                                case "T05":
+                                    next.setIcmsAliq(30);
+                                    next.setIcmsCst(0);
+                                    next.setIcmsReduzido(0);
+                                    break;
+
+                                default:
+                                    next.setIcmsAliq(0);
+                                    next.setIcmsCst(40);
+                                    next.setIcmsReduzido(0);
+                                    break;
+                            }
+                        }
+
+                    }
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
+            this.sql
+                    = "SELECT\n" +
+                    "	v.id,\n" +
+                    "   CONCAT(v.NOTA, v.CAIXA, v.`DATA`) id_venda,\n" +
+                    "	v.CAIXA,\n" +
+                    "	v.NOTA cupom,\n" +
+                    "	v.`DATA`,\n" +
+                    "	v.CODBARRA ean,\n" +
+                    "	v.CODIGO id_produto,\n" +
+                    "   c.unidade,\n" +
+                    "	v.DESCRICAO,\n" +
+                    "	v.itemno sequenceia,\n" +
+                    "	v.QUANT quantidade,\n" +
+                    "	v.valor,\n" +
+                    "	v.ALIQUOTA,\n" +
+                    "	v.cancelado\n" +
+                    "FROM\n" +
+                    "	vendas v\n" +
+                    "JOIN cadmer c ON v.CODIGO = c.Codigo\n" +
+                    "WHERE\n" +
+                    "	v.`DATA` BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "' and\n" +
+                    "	v.loja = " + idLojaCliente + " and\n" +
+                    "	v.e_transferencia = 0 and\n" +
+                    "	v.nao_bx_estoque = 0 and\n" +
+                    " 	v.caixa <> '999'\n" +
+                    "ORDER  BY\n" +
+                    "	v.CAIXA, \n" +
+                    "	v.data, \n" +
+                    "	v.HORA	";
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            obterNext();
+            VendaItemIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
     }
 }
