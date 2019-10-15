@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
@@ -219,7 +220,7 @@ public class UniplusDAO extends InterfaceDAO {
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rs.getString("descricaogondola"));
                     
-                    ProdutoBalancaVO bal = balanca.get(rs.getString("ean"));
+                    ProdutoBalancaVO bal = balanca.get(Utils.stringToInt(rs.getString("ean")));
                     if (bal == null) {
                         imp.setEan(rs.getString("ean"));
                         imp.seteBalanca(rs.getBoolean("pesavel"));                    
