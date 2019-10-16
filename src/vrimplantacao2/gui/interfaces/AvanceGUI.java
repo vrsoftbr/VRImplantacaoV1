@@ -214,8 +214,8 @@ public class AvanceGUI extends VRInternalFrame {
                             importador.importarCheque();
                         }
                         if(chkPdvVendas.isSelected()) {
-                            //dao.setDataInicioVenda(edtDtVendaIni.getDate());
-                            //dao.setDataTerminoVenda(edtDtVendaFim.getDate());
+                            avanceDAO.setDataInicioVenda(edtDtVendaIni.getDate());
+                            avanceDAO.setDataTerminoVenda(edtDtVendaFim.getDate());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                     } else if (tab.getSelectedIndex() == 3) {
