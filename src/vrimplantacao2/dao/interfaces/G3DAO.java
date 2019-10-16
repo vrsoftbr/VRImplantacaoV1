@@ -266,7 +266,7 @@ public class G3DAO extends InterfaceDAO {
                         imp.setIcmsAliqConsumidor(0);
                         imp.setIcmsReducaoConsumidor(0);
                     } else {
-                        imp.setIcmsCstConsumidor("60");
+                        imp.setIcmsCstConsumidor("40");
                         imp.setIcmsAliqConsumidor(0);
                         imp.setIcmsReducaoConsumidor(0);
                     }
