@@ -20,18 +20,18 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
-import vrimplantacao2.dao.interfaces.SophyxDAO;
+import vrimplantacao2.dao.interfaces.MobilityDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
-public class SophyxGUI extends VRInternalFrame {
+public class MobilityGUI extends VRInternalFrame {
 
-    private static final String NOME_SISTEMA = "Sophyx";
+    private static final String NOME_SISTEMA = "Mobility";
     private static final String SERVIDOR_SQL = "Firebird";
-    private static SophyxGUI instance;
+    private static MobilityGUI instance;
 
-    private final SophyxDAO dao = new SophyxDAO();
+    private final MobilityDAO dao = new MobilityDAO();
     private final ConexaoFirebird connSQL = new ConexaoFirebird();
 
     private String vLojaCliente = "-1";
@@ -72,7 +72,7 @@ public class SophyxGUI extends VRInternalFrame {
         params.salvar();
     }
 
-    private SophyxGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private MobilityGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
 
@@ -264,7 +264,7 @@ public class SophyxGUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new SophyxGUI(i_mdiFrame);
+                instance = new MobilityGUI(i_mdiFrame);
             }
 
             instance.setVisible(true);
@@ -332,7 +332,7 @@ public class SophyxGUI extends VRInternalFrame {
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
 
         setResizable(true);
-        setTitle("Importação Sophyx");
+        setTitle("Importação Mobility");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }

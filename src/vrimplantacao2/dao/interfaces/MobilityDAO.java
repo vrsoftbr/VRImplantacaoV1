@@ -3,9 +3,13 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -27,17 +31,56 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
         return "MOBILITY";
     }
     
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                new OpcaoProduto[]{
+                    OpcaoProduto.MERCADOLOGICO,
+                    OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                    OpcaoProduto.FAMILIA,
+                    OpcaoProduto.FAMILIA_PRODUTO,
+                    OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                    OpcaoProduto.PRODUTOS,
+                    OpcaoProduto.EAN,
+                    OpcaoProduto.EAN_EM_BRANCO,
+                    OpcaoProduto.DATA_CADASTRO,
+                    OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                    OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                    OpcaoProduto.PESAVEL,
+                    OpcaoProduto.VALIDADE,
+                    OpcaoProduto.DESC_COMPLETA,
+                    OpcaoProduto.DESC_GONDOLA,
+                    OpcaoProduto.DESC_REDUZIDA,
+                    OpcaoProduto.ESTOQUE_MAXIMO,
+                    OpcaoProduto.ESTOQUE_MINIMO,
+                    OpcaoProduto.PRECO,
+                    OpcaoProduto.CUSTO,
+                    OpcaoProduto.ESTOQUE,
+                    OpcaoProduto.ATIVO,
+                    OpcaoProduto.NCM,
+                    OpcaoProduto.CEST,
+                    OpcaoProduto.PIS_COFINS,
+                    OpcaoProduto.NATUREZA_RECEITA,
+                    OpcaoProduto.ICMS,
+                    OpcaoProduto.PAUTA_FISCAL,
+                    OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                    OpcaoProduto.MARGEM
+                }
+        ));
+    }
+    
     public List<Estabelecimento> getLojaCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
-        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        /*try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select * from lojas"
             )) {
-                while(rs.next()) {
+                while(rs.next()) {*/
                     result.add(new Estabelecimento("1", "CAMAROTTO BOX"));
-                }
-            }
-        }
+                //}
+            //}
+        //}
         return result;
     }
     
@@ -185,7 +228,9 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rs.getString("codigo_interno"));
                     imp.setEan(rs.getString("ean"));
                     if(rs.getInt("pesado") != 0) {
-                        imp.setEan(imp.getImportId());
+                        if(imp.getEan() != null && !"".equals(imp.getEan())) {
+                            imp.setEan(imp.getEan().substring(0, imp.getEan().length() - 1));
+                        }
                         imp.seteBalanca(true);
                     }                    
                     imp.setValidade(rs.getInt("validade"));
@@ -361,8 +406,8 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                                     TipoContato.COMERCIAL,
                                     rs.getString("email"));
                     }
-                    if(rs.getString("observacao") != null && !"".equals(rs.getString("observacao"))) {
-                        imp.setObservacao(rs.getString("observacao"));
+                    if(rs.getString("observacoes") != null && !"".equals(rs.getString("observacoes"))) {
+                        imp.setObservacao(rs.getString("observacoes"));
                     }
                     imp.setPrazoEntrega(rs.getInt("prazo_entrega"));
                     imp.setDatacadastro(rs.getDate("data_cadastro"));
