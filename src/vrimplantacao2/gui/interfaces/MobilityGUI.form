@@ -9,7 +9,7 @@
   </NonVisualComponents>
   <Properties>
     <Property name="resizable" type="boolean" value="true"/>
-    <Property name="title" type="java.lang.String" value="Importa&#xe7;&#xe3;o Sophyx"/>
+    <Property name="title" type="java.lang.String" value="Importa&#xe7;&#xe3;o Mobility"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>

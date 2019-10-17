@@ -61,7 +61,7 @@ import vrimplantacao.gui.interfaces.JMasterGUI;
 import vrimplantacao.gui.interfaces.LogusGUI;
 import vrimplantacao.gui.interfaces.Maximus_DatasyncGUI;
 import vrimplantacao.gui.interfaces.MilenioGUI;
-import vrimplantacao.gui.interfaces.MobilityGUI;
+import vrimplantacao2.gui.interfaces.MobilityGUI;
 import vrimplantacao.gui.interfaces.PCSistemasGUI;
 import vrimplantacao.gui.interfaces.RMSGUI;
 import vrimplantacao.gui.interfaces.RMSGUI_2;
@@ -2804,20 +2804,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItem15ActionPerformed
 
     private void jMenuItemMobilityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemMobilityActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarMobility == null || formImportarMobility.isClosed()) {
-                formImportarMobility = new MobilityGUI(this);
-            }
-
-            formImportarMobility.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
-
+        MobilityGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemMobilityActionPerformed
 
     private void jMenuItemSysPDVSQLServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSysPDVSQLServerActionPerformed

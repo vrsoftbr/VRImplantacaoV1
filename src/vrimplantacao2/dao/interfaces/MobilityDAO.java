@@ -24,11 +24,11 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author Importacao
  */
-public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
+public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "SOPHYX";
+        return "MOBILITY";
     }
     
     @Override
@@ -70,6 +70,20 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
         ));
     }
     
+    public List<Estabelecimento> getLojaCliente() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+        /*try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select * from lojas"
+            )) {
+                while(rs.next()) {*/
+                    result.add(new Estabelecimento("1", "CAMAROTTO BOX"));
+                //}
+            //}
+        //}
+        return result;
+    }
+    
     @Override
     public List<MapaTributoIMP> getTributacao() throws Exception {
         List<MapaTributoIMP> result = new ArrayList<>();
@@ -93,54 +107,40 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
     
-    public List<Estabelecimento> getLojaCliente() throws Exception {
-        List<Estabelecimento> result = new ArrayList<>();
-        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "    id,\n" +
-                    "    s_razao_social razaosocial\n" +
-                    "from\n" +
-                    "    lojas"
-            )) {
-                while(rs.next()) {
-                    result.add(new Estabelecimento(rs.getString("id"), rs.getString("razaosocial")));
-                }
-            }
-        }
-        return result;
-    }
-
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
         try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "    g.id codmercadologico1,\n" +
-                    "    g.s_descricao descricao1,\n" +
-                    "    d.id codmercadologico2,\n" +
-                    "    d.s_descricao descricao2,\n" +
-                    "    s.id codmercadolodico3,\n" +
-                    "    s.s_descricao descricao3\n" +
-                    "from\n" +
-                    "    departamentos d\n" +
-                    "join grupos g on d.id_grupo = g.id\n" +
-                    "join sessoes s on d.id = s.id_departamento\n" +
-                    "order by\n" +
-                    "    g.id, d.id, s.id"
+                    " SELECT \n" +
+                    "	DISTINCT\n" +
+                    "	P.GRUPO,\n" +
+                    "	M1.S_DESCRICAO AS MERC1,\n" +
+                    "	P.DEPARTAMENTO, \n" +
+                    "	M2.S_DESCRICAO AS MERC2,\n" +
+                    "	P.SESSAO, \n" +
+                    "	M3.S_DESCRICAO AS MERC3\n" +
+                    "FROM\n" +
+                    "	PRODUTOS P\n" +
+                    "INNER JOIN GRUPOS M1 ON M1.ID = P.GRUPO\n" +
+                    "INNER JOIN DEPARTAMENTOS M2 ON M2.ID = P.DEPARTAMENTO\n" +
+                    "INNER JOIN SESSOES M3 ON M3.ID = P.SESSAO\n" +
+                    "ORDER BY\n" +
+                    "	P.GRUPO,\n" +
+                    "	P.DEPARTAMENTO,\n" +
+                    "	P.SESSAO"
             )) {
                 while(rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setMerc1ID(rs.getString("codmercadologico1"));
-                    imp.setMerc1Descricao(rs.getString("descricao1"));
-                    imp.setMerc2ID(rs.getString("codmercadologico2"));
-                    imp.setMerc2Descricao(rs.getString("descricao2"));
-                    imp.setMerc3ID(rs.getString("codmercadologico3"));
-                    imp.setMerc3Descricao(rs.getString("descricao3"));
+                    imp.setMerc1ID(rs.getString("GRUPO"));
+                    imp.setMerc1Descricao(rs.getString("MERC1"));
+                    imp.setMerc2ID(rs.getString("DEPARTAMENTO"));
+                    imp.setMerc2Descricao(rs.getString("MERC2"));
+                    imp.setMerc3ID(rs.getString("SESSAO"));
+                    imp.setMerc3Descricao(rs.getString("MERC3"));
                     
                     result.add(imp);
                 }
@@ -148,19 +148,19 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
+    
     @Override
     public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
         List<FamiliaProdutoIMP> result = new ArrayList<>();
         try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "    id,\n" +
-                    "    s_descricao descricao\n" +
-                    "from\n" +
-                    "    familias\n" +
-                    "order by    \n" +
-                    "    s_descricao"
+                    "SELECT\n" +
+                    "	ID,\n" +
+                    "	S_DESCRICAO\n" +
+                    "FROM\n" +
+                    "	FAMILIAS\n" +
+                    "ORDER BY\n" +
+                    "	ID"
             )) {
                 while(rs.next()) {
                     FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
@@ -168,7 +168,7 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rs.getString("id"));
-                    imp.setDescricao(rs.getString("descricao"));
+                    imp.setDescricao(rs.getString("S_DESCRICAO"));
                     
                     result.add(imp);
                 }
@@ -176,34 +176,7 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
-    @Override
-    public List<ProdutoIMP> getEANs() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
-            try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "    p.codigo_interno id,\n" +
-                    "    s_codigo ean\n" +
-                    "from\n" +
-                    "    cod_auxiliares c\n" +
-                    "join produtos p on c.id_produto = p.id"
-            )) {
-                while(rs.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rs.getString("id"));
-                    imp.setEan(rs.getString("ean"));
-                    
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
+    
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
@@ -255,7 +228,9 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rs.getString("codigo_interno"));
                     imp.setEan(rs.getString("ean"));
                     if(rs.getInt("pesado") != 0) {
-                        imp.setEan(imp.getImportId());
+                        if(imp.getEan() != null && !"".equals(imp.getEan())) {
+                            imp.setEan(imp.getEan().substring(0, imp.getEan().length() - 1));
+                        }
                         imp.seteBalanca(true);
                     }                    
                     imp.setValidade(rs.getInt("validade"));
@@ -291,7 +266,34 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
+    
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    p.codigo_interno id,\n" +
+                    "    s_codigo ean\n" +
+                    "from\n" +
+                    "    cod_auxiliares c\n" +
+                    "join produtos p on c.id_produto = p.id"
+            )) {
+                while(rs.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rs.getString("id"));
+                    imp.setEan(rs.getString("ean"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
@@ -404,8 +406,8 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
                                     TipoContato.COMERCIAL,
                                     rs.getString("email"));
                     }
-                    if(rs.getString("observacao") != null && !"".equals(rs.getString("observacao"))) {
-                        imp.setObservacao(rs.getString("observacao"));
+                    if(rs.getString("observacoes") != null && !"".equals(rs.getString("observacoes"))) {
+                        imp.setObservacao(rs.getString("observacoes"));
                     }
                     imp.setPrazoEntrega(rs.getInt("prazo_entrega"));
                     imp.setDatacadastro(rs.getDate("data_cadastro"));
@@ -416,7 +418,7 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-
+    
     @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
@@ -454,7 +456,7 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
+
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
@@ -526,5 +528,4 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
         }
         return result;
     }
-    
 }

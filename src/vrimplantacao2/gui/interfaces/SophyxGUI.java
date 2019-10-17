@@ -84,7 +84,7 @@ public class SophyxGUI extends VRInternalFrame {
 
         tabProdutos.setOpcoesDisponiveis(dao);
         
-        /*tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
 
             @Override
             public MapaTributoProvider getProvider() {
@@ -107,7 +107,7 @@ public class SophyxGUI extends VRInternalFrame {
                 return mdiFrame;
             }
             
-        });*/
+        });
         
         centralizarForm();
         this.setMaximum(false);
@@ -332,7 +332,7 @@ public class SophyxGUI extends VRInternalFrame {
         pnlBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
 
         setResizable(true);
-        setTitle("Importação Weber");
+        setTitle("Importação Sophyx");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
