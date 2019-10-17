@@ -139,7 +139,7 @@
                                           </Group>
                                       </Group>
                                   </Group>
-                                  <EmptySpace min="0" pref="126" max="32767" attributes="0"/>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
@@ -1042,6 +1042,10 @@
                                   <Component id="chkPesoBruto" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkPesoLiquido" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkVolumeEmbalagem" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkVolumeQtd" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -1074,7 +1078,11 @@
                               <Component id="chkVendaPdv" min="-2" max="-2" attributes="0"/>
                               <Component id="chkFabricante" min="-2" max="-2" attributes="0"/>
                               <Component id="chkPesoBruto" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkPesoLiquido" min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="chkPesoLiquido" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkVolumeEmbalagem" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="chkVolumeQtd" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
                           <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
                       </Group>
@@ -1158,6 +1166,16 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPesoLiquido">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Peso L&#xed;quido"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkVolumeEmbalagem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Emb. Volume"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkVolumeQtd">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Qtd. Volume"/>
                   </Properties>
                 </Component>
               </SubComponents>

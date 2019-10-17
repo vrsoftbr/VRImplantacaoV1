@@ -180,8 +180,8 @@ public class ProdutoDAO {
             sql.put("impostomedioestadual", 0);
             sql.put("id_tipocompra", 0);
             sql.put("numeroparcela", 0);
-            sql.put("id_tipoembalagemvolume", vo.getTipoEmbalagem().getId());
-            sql.put("volume", 1.0);
+            sql.put("id_tipoembalagemvolume", vo.getTipoEmbalagemVolume().getId());
+            sql.put("volume", vo.getVolume());
             sql.put("id_normacompra", vo.getNormaCompra().getId());
             sql.putNull("lastro");
             sql.putNull("camadas");
@@ -323,6 +323,12 @@ public class ProdutoDAO {
         }
         if (opt.contains(OpcaoProduto.DIVISAO_PRODUTO)) {
             sql.put("id_divisaofornecedor", vo.getIdDivisaoFornecedor());
+        }
+        if (opt.contains(OpcaoProduto.VOLUME_TIPO_EMBALAGEM)) {
+            sql.put("id_tipoembalagemvolume", vo.getTipoEmbalagemVolume().getId());
+        }
+        if (opt.contains(OpcaoProduto.VOLUME_QTD)) {
+            sql.put("volume", vo.getVolume());
         }
 
         sql.setWhere("id = " + vo.getId());

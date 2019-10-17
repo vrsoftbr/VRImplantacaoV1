@@ -47,6 +47,8 @@ public class ProdutoVO {
     private int idComprador = 1;
     private boolean aceitaMultiplicacaoPDV = true;
     private int idDivisaoFornecedor = 0;
+    private TipoEmbalagem tipoEmbalagemVolume = TipoEmbalagem.UN;
+    private double volume = 1.0;
     
     private final MultiMap<Long, ProdutoAutomacaoVO> eans = new MultiMap<>(
         new Factory<ProdutoAutomacaoVO>() {
@@ -378,6 +380,22 @@ public class ProdutoVO {
 
     public void setIdDivisaoFornecedor(int idDivisaoFornecedor) {
         this.idDivisaoFornecedor = idDivisaoFornecedor;
+    }
+
+    public TipoEmbalagem getTipoEmbalagemVolume() {
+        return tipoEmbalagemVolume;
+    }
+
+    public void setTipoEmbalagemVolume(TipoEmbalagem tipoEmbalagemVolume) {
+        this.tipoEmbalagemVolume = tipoEmbalagemVolume == null ? TipoEmbalagem.UN : tipoEmbalagemVolume;
+    }
+
+    public double getVolume() {
+        return volume;
+    }
+
+    public void setVolume(double volume) {
+        this.volume = volume;
     }
     
 }
