@@ -3,14 +3,19 @@ package vrimplantacao2.dao.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -18,6 +23,7 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -28,16 +34,52 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvider {
 
     public boolean v_usar_arquivoBalanca;
-    public String lojaMesmoID;
+    public String complemento;
 
     @Override
     public String getSistema() {
-        if(lojaMesmoID == null){ 
-            lojaMesmoID = "";
+        if (complemento != null && !"".equals(complemento.trim())) {
+            return "Sysmo - " + complemento;
+        } else {
+            return "Sysmo";
         }
-        return "Sysmo" + lojaMesmoID;
     }
 
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.QTD_EMBALAGEM_COTACAO,
+                OpcaoProduto.QTD_EMBALAGEM_EAN,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST,
+                OpcaoProduto.CUSTO,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.ESTOQUE_MAXIMO,
+                OpcaoProduto.ESTOQUE_MINIMO,
+                OpcaoProduto.ICMS,
+                OpcaoProduto.PIS_COFINS,
+                OpcaoProduto.NATUREZA_RECEITA
+        ));
+    }
+    
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> lojas = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
@@ -64,24 +106,33 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
         List<MapaTributoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "      distinct\n"
-                    + "      fiscal.cod,\n"
-                    + "      fiscal.dsc,\n"
-                    + "      fiscal.ctr,\n"
-                    + "      fiscal.ica,\n"
-                    + "      fiscal.icr,\n"
-                    + "      fiscal.icf\n"
-                    + "from\n"
-                    + "    gceffs01 fiscal\n"
-                    + "where\n"
-                    + "     fiscal.ufo = 'RJ' and\n"
-                    + "     fiscal.ufd = 'RJ' and\n"
-                    + "     fiscal.rgf = 0\n"
-                    + "order by\n"
-                    + "     fiscal.cod")) {
+                    "select distinct\n" +
+                    "	  fiscal.ctr,\n" +
+                    "	  fiscal.ica,\n" +
+                    "	  fiscal.icr,\n" +
+                    "	  fiscal.icf\n" +
+                    "from\n" +
+                    "	gceffs01 fiscal\n" +
+                    "where\n" +
+                    "	 fiscal.ufo = 'SC' and\n" +
+                    "	 fiscal.ufd = 'SC' and\n" +
+                    "	 fiscal.rgf = 0\n" +
+                    "order by\n" +
+                    "	 fiscal.ctr")) {
                 while (rs.next()) {
-                    result.add(new MapaTributoIMP(rs.getString("cod"), rs.getString("dsc")));
+                    String id = String.format("%s-%s-%s-%s",
+                            rs.getString("ctr"),
+                            rs.getString("ica"),
+                            rs.getString("icr"),
+                            rs.getString("icf")
+                    );
+                    result.add(new MapaTributoIMP(
+                            id, 
+                            id,
+                            rs.getInt("ctr"),
+                            rs.getDouble("ica"),
+                            rs.getDouble("icr")
+                    ));
                 }
             }
         }
@@ -93,33 +144,37 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
         List<MercadologicoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + " coalesce(dep.cod, 1) mercadologico1,\n"
-                    + " coalesce(dep.dsc, 'DIVERSOS') descmercadologico1,\n"
-                    + " coalesce(cat.cod, 1) mercadologico2,\n"
-                    + " coalesce(cat.dsc, dep.dsc) descmercadologico2,\n"
-                    + " coalesce(subcat.cod, 1) mercadologico3,\n"
-                    + " coalesce(subcat.dsc, cat.dsc) descmercadologico3,\n"
-                    + " coalesce(seg.cod, 1) mercadologico4,\n"
-                    + " coalesce(seg.dsc, subcat.dsc) descmercadologico4,\n"
-                    + " coalesce(subseg.cod, 1) mercadologico5,\n"
-                    + " coalesce(subseg.dsc, seg.dsc) descmercadologico5\n"
-                 + " from\n"
-                    + " gcesec01 cat\n"
-                 + " left join\n"
-                    + " gcegrp01 subcat on cat.cod = subcat.sec and\n"
-                    + " cat.dep = subcat.dep\n"
-                 + " join gcedep01 dep on cat.dep = dep.cod and\n"
-                    + " subcat.dep = dep.cod\n"
-                 + " join gceseg01 seg on dep.cod = seg.dep and\n"
-                    + " cat.cod = seg.ctg and\n"
-                    + " subcat.cod = seg.sct\n"
-                 + " left join gcessg01 subseg on dep.cod = subseg.dep and\n"
-                    + " cat.cod = subseg.ctg and\n"
-                    + " subcat.cod = subseg.sct and\n"
-                    + " seg.cod = subseg.seg\n"
-                 + " order by\n"
-                    + " dep.cod, cat.cod")) {
+                    "select\n" +
+                    "	coalesce(dep.cod, 1) mercadologico1,\n" +
+                    "	coalesce(dep.dsc, 'DIVERSOS') descmercadologico1,\n" +
+                    "	coalesce(cat.cod, 1) mercadologico2,\n" +
+                    "	coalesce(cat.dsc, dep.dsc) descmercadologico2,\n" +
+                    "	coalesce(subcat.cod, 1) mercadologico3,\n" +
+                    "	coalesce(subcat.dsc, cat.dsc) descmercadologico3\n" +
+//                    "	coalesce(seg.cod, 1) mercadologico4,\n" +
+//                    "	coalesce(seg.dsc, subcat.dsc) descmercadologico4,\n" +
+//                    "	coalesce(subseg.cod, 1) mercadologico5,\n" +
+//                    "	coalesce(subseg.dsc, seg.dsc) descmercadologico5\n" +
+                    "from\n" +
+                    "	gcesec01 cat\n" +
+                    "	left join gcegrp01 subcat on\n" +
+                    "		cat.cod = subcat.sec and\n" +
+                    "		cat.dep = subcat.dep\n" +
+                    "	left join gcedep01 dep on\n" +
+                    "		cat.dep = dep.cod and\n" +
+                    "		subcat.dep = dep.cod\n" +
+//                    "	left join gceseg01 seg on\n" +
+//                    "		dep.cod = seg.dep and\n" +
+//                    "		cat.cod = seg.ctg and\n" +
+//                    "		subcat.cod = seg.sct\n" +
+//                    "	left join gcessg01 subseg on\n" +
+//                    "		dep.cod = subseg.dep and\n" +
+//                    "		cat.cod = subseg.ctg and\n" +
+//                    "		subcat.cod = subseg.sct and\n" +
+//                    "		seg.cod = subseg.seg\n" +
+                    "order by\n" +
+                    " 	dep.cod, cat.cod"
+            )) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -130,10 +185,10 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setMerc2Descricao(rs.getString("descmercadologico2"));
                     imp.setMerc3ID(rs.getString("mercadologico3"));
                     imp.setMerc3Descricao(rs.getString("descmercadologico3"));
-                    imp.setMerc4ID(rs.getString("mercadologico4"));
+                    /*imp.setMerc4ID(rs.getString("mercadologico4"));
                     imp.setMerc4Descricao(rs.getString("descmercadologico4"));
                     imp.setMerc5ID(rs.getString("mercadologico5"));
-                    imp.setMerc5Descricao(rs.getString("descmercadologico5"));
+                    imp.setMerc5Descricao(rs.getString("descmercadologico5"));*/
                     
                     result.add(imp);
                 }
@@ -186,72 +241,126 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
     }
 
     @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    ""
+            )) {
+                while (rst.next()) {
+                
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "      distinct\n"
-                    + "      prod.cod as id,\n"
-                    + "      prod.dsc as descricaocompleta,\n"
-                    + "      prod.dsr as descricaoresumida,\n"
-                    + "      prod.dsr as descricaogondola,\n"
-                    + "      coalesce(prod.dep, 1) as mercadologico1,\n"
-                    + "      coalesce(prod.sec, 1) as mercadologico2,\n"
-                    + "      coalesce(prod.grp, 1) as mercadologico3,\n"
-                    + "      coalesce(prod.seg, 1) as mercadologico4,\n"
-                    + "      coalesce(prod.ssg, 1) as mercadologico5,\n"
-                    + "      prod.dtc as datacadastro,\n"
-                    + "      cast(ean.bar as bigint) as ean,\n"
-                    + "      prod.emb as qtdembalagem,\n"
-                    + "      prod.uni as tipoembalagem,\n"
-                    + "      prod.tip as balanca,\n"
-                    + "      val.dvl as validade,\n"
-                    + "      prod.fl_situacao as ativo,\n"
-                    + "      prod.psb as pesobruto,\n"
-                    + "      prod.psl as pesoliquido,\n"
-                    + "      prod.clf as ncm,\n"
-                    + "      custo.cci as custocomimposto,\n"
-                    + "      custo.csi as custosemimposto,\n"
-                    + "      preco.mrg as margem,\n"
-                    + "      preco.pv1 as vlvenda,\n"
-                    + "      est.nr_quantidade as estoque,\n"
-                    + "      proest.emn as estoquemin,\n"
-                    + "      proest.emx as estoquemax,\n"
-                    + "      prod.cd_especificadorst as cest,\n"
-                    + "      custo.icm as icmscredito,\n"
-                    + "      fis.ctr as cstdebito,\n"
-                    + "      fis.icf as icmsdebito,\n"
-                    + "      fis.icr as icmsreducao,\n"
-                    + "      prod.fpc as piscofins\n"
-                    + "from\n"
-                    + "      gcepro02 as prod\n"
-                    + "left join gcebar01 as ean on ean.pro = prod.cod\n"
-                    + "left join gcepro05 as custo on custo.cod = prod.cod\n"
-                    + "left join gcepro04 as preco on preco.cod = prod.cod\n"
-                    + "join spsemp00 as emp on emp.cod = custo.emp\n"
-                    + "left join gcepro06 val on emp.cod = val.emp and\n"
-                    + "     val.cod = prod.cod\n"
-                    + "join tb_produtoestoque est on prod.cod = est.cd_produto\n"
-                    + "left join (select\n"
-                    + "            fiscal.cod,\n"
-                    + "            fiscal.ctr,\n"
-                    + "            fiscal.ica,\n"
-                    + "            fiscal.icr,\n"
-                    + "            fiscal.icf\n"
-                    + "      from\n"
-                    + "          gceffs01 fiscal\n"
-                    + "      where\n"
-                    + "           fiscal.ufo = 'RJ' and\n"
-                    + "           fiscal.ufd = 'RJ' and\n"
-                    + "           fiscal.rgf = 0) as fis on prod.ffs = fis.cod\n"
-                    + "join gcepro03 as proest on prod.cod = proest.cod and\n"
-                    + "     proest.emp = emp.cod and\n"
-                    + "     est.cd_empresa = emp.cod and\n"
-                    + "     emp.cod = preco.emp and\n"
-                    + "     emp.cod = " + getLojaOrigem() + "\n"
-                    + "order by\n"
-                    + "      prod.cod")) {
+                    "with icms as (\n" +
+                    "    select distinct\n" +
+                    "          fiscal.cod,\n" +
+                    "          fiscal.dsc,\n" +
+                    "          fiscal.ctr,\n" +
+                    "          fiscal.ica,\n" +
+                    "          fiscal.icr,\n" +
+                    "          fiscal.icf\n" +
+                    "    from\n" +
+                    "        gceffs01 fiscal\n" +
+                    "    where\n" +
+                    "         fiscal.ufo = 'SC' and\n" +
+                    "         fiscal.ufd = 'SC' and\n" +
+                    "         fiscal.rgf = 0\n" +
+                    "    order by\n" +
+                    "         fiscal.cod\n" +
+                    "),\n" +
+                    "piscof as (\n" +
+                    "    select\n" +
+                    "        COD id,\n" +
+                    "        NOP cfop,\n" +
+                    "        DSF descricao,\n" +
+                    "        CTP cst,\n" +
+                    "        nrp naturezareceita\n" +
+                    "    from\n" +
+                    "        GCEFFS02\n" +
+                    "    where\n" +
+                    "        COD > 0\n" +
+                    "        and RGF = 0\n" +
+                    "        and DTX is null\n" +
+                    "    order by\n" +
+                    "        ctp\n" +
+                    ")\n" +
+                    "select distinct\n" +
+                    "    prod.cod as id,\n" +
+                    "    prod.dsc as descricaocompleta,\n" +
+                    "    prod.dsr as descricaoresumida,\n" +
+                    "    prod.dsr as descricaogondola,\n" +
+                    "    coalesce(prod.dep, 1) as mercadologico1,\n" +
+                    "    coalesce(prod.sec, 1) as mercadologico2,\n" +
+                    "    coalesce(prod.grp, 1) as mercadologico3,\n" +
+                    "    coalesce(prod.seg, 1) as mercadologico4,\n" +
+                    "    coalesce(prod.ssg, 1) as mercadologico5,\n" +
+                    "    prod.dtc as datacadastro,\n" +
+                    "    cast(ean.bar as bigint) as ean,\n" +
+                    "    prod.emb as qtdembalagem,\n" +
+                    "    prod.uni as tipoembalagem,\n" +
+                    "    prod.tip as balanca,\n" +
+                    "    val.dvl as validade,\n" +
+                    "    prod.fl_situacao as ativo,\n" +
+                    "    prod.psb as pesobruto,\n" +
+                    "    prod.psl as pesoliquido,\n" +
+                    "    prod.clf as ncm,\n" +
+                    "    custo.cci as custocomimposto,\n" +
+                    "    custo.csi as custosemimposto,\n" +
+                    "    preco.mrg as margem,\n" +
+                    "    preco.pv1 as vlvenda,\n" +
+                    "    est.nr_quantidade as estoque,\n" +
+                    "    proest.emn as estoquemin,\n" +
+                    "    proest.emx as estoquemax,\n" +
+                    "    prod.cd_especificadorst as cest,\n" +
+                    "    custo.icm as icmscredito,\n" +
+                    "    fis.ctr as cstdebito,\n" +
+                    "    fis.icf as icmsdebito,\n" +
+                    "    fis.icr as icmsreducao,\n" +
+                    "    pis_e.cst pis_e_cst,\n" +
+                    "    pis_s.naturezareceita pis_s_natrec,\n" +
+                    "    pis_s.cst pis_s_cst\n" +
+                    "from\n" +
+                    "    gcepro02 as prod\n" +
+                    "    left join gcebar01 as ean on\n" +
+                    "        ean.pro = prod.cod\n" +
+                    "    left join gcepro05 as custo on\n" +
+                    "        custo.cod = prod.cod\n" +
+                    "    left join gcepro04 as preco on\n" +
+                    "        preco.cod = prod.cod\n" +
+                    "    join spsemp00 as emp on\n" +
+                    "        emp.cod = custo.emp\n" +
+                    "    left join gcepro06 val on emp.cod = val.emp and\n" +
+                    "         val.cod = prod.cod\n" +
+                    "    join tb_produtoestoque est on\n" +
+                    "        prod.cod = est.cd_produto\n" +
+                    "    left join icms as fis on\n" +
+                    "        prod.ffs = fis.cod\n" +
+                    "    left join piscof pis_e on\n" +
+                    "        prod.fpc = pis_e.id and\n" +
+                    "        pis_e.cfop = 1102\n" +
+                    "    left join piscof pis_s on\n" +
+                    "        prod.fpc = pis_s.id and\n" +
+                    "        pis_s.cfop = 5102\n" +
+                    "    join gcepro03 as proest on \n" +
+                    "        prod.cod = proest.cod and\n" +
+                    "        proest.emp = emp.cod and\n" +
+                    "        est.cd_empresa = emp.cod and\n" +
+                    "        emp.cod = preco.emp and\n" +
+                    "        emp.cod = " + getLojaOrigem() + "\n" +
+                    "order by\n" +
+                    "      prod.cod"
+            )) {
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -264,39 +373,29 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setCodMercadologico1(rs.getString("mercadologico1"));
                     imp.setCodMercadologico2(rs.getString("mercadologico2"));
                     imp.setCodMercadologico3(rs.getString("mercadologico3"));
-                    imp.setCodMercadologico4(rs.getString("mercadologico4"));
-                    imp.setCodMercadologico5(rs.getString("mercadologico5"));
+                    /*imp.setCodMercadologico4(rs.getString("mercadologico4"));
+                    imp.setCodMercadologico5(rs.getString("mercadologico5"));*/
                     imp.setDataCadastro(rs.getDate("datacadastro"));
-                    imp.setQtdEmbalagem(rs.getInt("qtdembalagem") == 0 ? 1 : rs.getInt("qtdembalagem"));
-                    imp.setEan(Utils.stringLong(rs.getString("ean")));
                     imp.setValidade(rs.getInt("validade"));
-                   
-                        if(("B".equals(rs.getString("balanca").trim()))) {
-                        if (v_usar_arquivoBalanca) {
-                            ProdutoBalancaVO produtoBalanca;
-                            long codigoProduto;
-                            codigoProduto = Long.parseLong(imp.getImportId().trim());
-                            if (codigoProduto <= Integer.MAX_VALUE) {
-                                produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                            } else {
-                                produtoBalanca = null;
-                            }
-                            if (produtoBalanca != null) {
-                                imp.seteBalanca(true);
-                                imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : rs.getInt("validade"));
-                            } else {
-                                imp.setValidade(0);
-                                imp.seteBalanca(false);
-                            }
-                        }
+                    
+                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rs.getString("id"), -2));
+                    if (bal != null) {
+                        imp.seteBalanca(true);
+                        imp.setValidade(bal.getValidade());
+                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
+                        imp.setEan(imp.getImportId());
+                        imp.setQtdEmbalagem(1);
                     } else {
-                        imp.seteBalanca(rs.getString("tipoembalagem").contains("KG") ? true : false);
+                        imp.seteBalanca("B".equals(rs.getString("balanca")));
                         imp.setValidade(rs.getInt("validade"));
+                        imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
+                        imp.setEan(rs.getString("ean"));
+                        imp.setQtdEmbalagem(rs.getInt("qtdembalagem") == 0 ? 1 : rs.getInt("qtdembalagem"));
                     }
+                    
                     imp.setSituacaoCadastro("A".equals(rs.getString("ativo")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setPesoBruto(rs.getInt("pesobruto"));
                     imp.setPesoLiquido(rs.getInt("pesoliquido"));
-                    imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
@@ -306,18 +405,21 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setEstoqueMinimo(rs.getDouble("estoquemin"));
                     imp.setEstoqueMaximo(rs.getDouble("estoquemax"));
                     imp.setCest(rs.getString("cest"));
-                    imp.setIcmsAliqEntrada(rs.getDouble("icmscredito"));
+                    //imp.setIcmsAliqEntrada(rs.getDouble("icmscredito"));
                     imp.setIcmsCstSaida(rs.getInt("cstdebito"));
                     imp.setIcmsAliqSaida(rs.getDouble("icmsdebito"));
-                    imp.setIcmsReducao(rs.getDouble("icmsreducao"));
+                    imp.setIcmsReducaoSaida(rs.getDouble("icmsreducao"));
+                    
+                    imp.setIcmsCstEntrada(rs.getInt("cstdebito"));
+                    imp.setIcmsAliqEntrada(rs.getDouble("icmsdebito"));
+                    imp.setIcmsReducaoEntrada(rs.getDouble("icmsreducao"));
+                    
+                    //imp.setPautaFiscalId(lojaMesmoID);
 
-                    if (Utils.stringToInt(rs.getString("piscofins")) == 1) {
-                        imp.setPiscofinsCstCredito(50);
-                        imp.setPiscofinsCstDebito(1);
-                    } else {
-                        imp.setPiscofinsCstCredito(71);
-                        imp.setPiscofinsCstDebito(7);
-                    }
+                    imp.setPiscofinsCstCredito(rs.getInt("pis_e_cst"));
+                    imp.setPiscofinsCstDebito(rs.getInt("pis_s_cst"));
+                    imp.setPiscofinsNaturezaReceita(rs.getInt("pis_s_natrec"));
+                    
                     result.add(imp);
                 }
             }
