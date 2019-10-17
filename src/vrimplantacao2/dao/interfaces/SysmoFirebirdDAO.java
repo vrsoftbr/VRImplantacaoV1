@@ -76,7 +76,9 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                 OpcaoProduto.ESTOQUE_MINIMO,
                 OpcaoProduto.ICMS,
                 OpcaoProduto.PIS_COFINS,
-                OpcaoProduto.NATUREZA_RECEITA
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.VOLUME_QTD,
+                OpcaoProduto.VOLUME_TIPO_EMBALAGEM
         ));
     }
     
@@ -329,7 +331,9 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     "    fis.icr as icmsreducao,\n" +
                     "    pis_e.cst pis_e_cst,\n" +
                     "    pis_s.naturezareceita pis_s_natrec,\n" +
-                    "    pis_s.cst pis_s_cst\n" +
+                    "    pis_s.cst pis_s_cst,\n" +
+                    "    prod.fcv unidade_volume,\n" +
+                    "    prod.qem qtd_volume\n" +
                     "from\n" +
                     "    gcepro02 as prod\n" +
                     "    left join gcebar01 as ean on\n" +
@@ -419,6 +423,9 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setPiscofinsCstCredito(rs.getInt("pis_e_cst"));
                     imp.setPiscofinsCstDebito(rs.getInt("pis_s_cst"));
                     imp.setPiscofinsNaturezaReceita(rs.getInt("pis_s_natrec"));
+                    
+                    imp.setTipoEmbalagemVolume(rs.getString("unidade_volume"));
+                    imp.setVolume(rs.getDouble("qtd_volume"));
                     
                     result.add(imp);
                 }
