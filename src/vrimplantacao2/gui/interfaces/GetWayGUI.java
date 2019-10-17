@@ -54,6 +54,7 @@ public class GetWayGUI extends VRInternalFrame {
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
+        txtLojaMesmoID.setText(params.get(SISTEMA, "COMPLEMENTO"));
         txtHost.setText(params.get(SISTEMA, "HOST"));
         txtDatabase.setText(params.get(SISTEMA, "DATABASE"));
         txtPorta.setText(params.get(SISTEMA, "PORTA"));
@@ -75,6 +76,7 @@ public class GetWayGUI extends VRInternalFrame {
 
     private void gravarParametros() throws Exception {
         Parametros params = Parametros.get();
+        params.put(txtLojaMesmoID.getText(), SISTEMA, "COMPLEMENTO");
         params.put(txtHost.getText(), SISTEMA, "HOST");
         params.put(txtDatabase.getText(), SISTEMA, "DATABASE");
         params.put(txtPorta.getText(), SISTEMA, "PORTA");
