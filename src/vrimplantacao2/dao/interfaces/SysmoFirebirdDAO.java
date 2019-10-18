@@ -18,6 +18,8 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
+import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
@@ -209,7 +211,7 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     + "	ccf idfornecedor,\n"
                     + "	qnt qtdembalagem,\n"
                     + "	uni,\n"
-                    + "	(select top 1\n"
+                    + "	(select first 1\n"
                     + "		ref \n"
                     + "	from \n"
                     + "		gceref01 ref \n"
@@ -433,71 +435,91 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
         }
         return result;
     }
+    
+    private TipoFornecedor getTipoFornecedor(int codigo) {
+        switch (codigo) {
+            case 2: return TipoFornecedor.ATACADO;
+            case 3: return TipoFornecedor.DISTRIBUIDOR;
+            //case 4: return TipoFornecedor.SEMTIPO;
+            case 5: return TipoFornecedor.INDUSTRIA;
+            //case 6: return TipoFornecedor.SEMTIPO;
+            case 7: return TipoFornecedor.PRESTADOR;
+            case 8: return TipoFornecedor.PRESTADOR;
+            default: return TipoFornecedor.INDUSTRIA;
+        }
+    }
 
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + " t.cod as id,\n"
-                    + " t.nom as nome,\n"
-                    + " t.cgc as cpfcnpj,\n"
-                    + " t.pss as tipopessoa,\n"
-                    + " t.fan as fantasia,\n"
-                    + " t.log as endereco,\n"
-                    + " t.num as numero,\n"
-                    + " t.bai as bairro,\n"
-                    + " t.cmp as complemento,\n"
-                    + " t.mun as municipio,\n"
-                    + " t.cep,\n"
-                    + " t.cxp as caixapostal,\n"
-                    + " t.tel,\n"
-                    + " t.fax,\n"
-                    + " t.cel,\n"
-                    + " t.ins as ie,\n"
-                    + " t.oex as orgaoexp,\n"
-                    + " t.dtn as datanascimento,\n"
-                    + " t.eml as email,\n"
-                    + " t.emn as emailnf,\n"
-                    + " t.obs,\n"
-                    + " t.dtc as datacadastro,\n"
-                    + " t.dtm as datamovimentacao,\n"
-                    + " t.lcr as limitecredito\n"
-                    + "from\n"
-                    + "    trstra01 t\n"
-                    + "where\n"
-                    + "     t.tip not in ('D', 'C')")) {
+                    "select\n" +
+                    "    t.cod id,\n" +
+                    "    t.nom razaosocial,\n" +
+                    "    t.fan fantasia,\n" +
+                    "    t.cgc cnpj,\n" +
+                    "    t.ins inscricaoestadual,\n" +
+                    "    cast((case when t.dbl > '30.12.1899' then 'S' else '' end) as VARCHAR(1)) as bloqueado,\n" +
+                    "    t.log endereco,\n" +
+                    "    t.num numero,\n" +
+                    "    t.cmp complemento,\n" +
+                    "    t.bai bairro,\n" +
+                    "    cd.ibg municipioibge,\n" +
+                    "    cd.dsc municipio,\n" +
+                    "    cd.est uf,\n" +
+                    "    t.cep,\n" +
+                    "    cd.ddd, \n" +
+                    "    t.tel telefone,\n" +
+                    "    t.cel celular,\n" +
+                    "    t.fax,\n" +
+                    "    t.oex orgaoexpeditor,\n" +
+                    "    t.dtc datacadastro,\n" +
+                    "    fcp.fss simplesnacional,\n" +
+                    "    t.obs observacao,\n" +
+                    "    fcp.prz prazoentrega,\n" +
+                    "    t.grp tipofornecedor,\n" +
+                    "    t.emn email\n" +
+                    "from\n" +
+                    "    trstra01 t\n" +
+                    "    left join trsmun01 cd on\n" +
+                    "        t.mun = cd.cod\n" +
+                    "    left join trstra03 fcp on\n" +
+                    "        t.cod = fcp.cod\n" +
+                    "where\n" +
+                    "    t.tip not in ('D', 'C')\n" +
+                    "order by\n" +
+                    "    t.cod"
+            )) {
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
-                    imp.setRazao(rs.getString("nome"));
-                    imp.setCnpj_cpf(Utils.stringLong(rs.getString("cpfcnpj")));
+                    imp.setRazao(rs.getString("razaosocial"));
                     imp.setFantasia(rs.getString("fantasia"));
+                    imp.setCnpj_cpf(Utils.stringLong(rs.getString("cnpj")));
+                    imp.setIe_rg(rs.getString("inscricaoestadual"));
+                    imp.setBloqueado("S".equals(rs.getString("bloqueado")));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
-                    imp.setBairro(rs.getString("bairro"));
                     imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setIbge_municipio(rs.getInt("municipioibge"));
                     imp.setMunicipio(rs.getString("municipio"));
+                    imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
-                    imp.setTel_principal(rs.getString("tel"));
-                    if (!"".equals(rs.getString("fax"))) {
-                        imp.addContato("1", "Fax", rs.getString("fax"), null, TipoContato.COMERCIAL, null);
-                    }
-                    if (!"".equals(rs.getString("cel"))) {
-                        imp.addContato("2", "Celular", rs.getString("cel"), null, TipoContato.COMERCIAL, null);
-                    }
-                    imp.setIe_rg(rs.getString("ie"));
-                    if (!"".equals(rs.getString("email"))) {
-                        imp.addContato("3", "Email", null, null, TipoContato.FISCAL, rs.getString("email").toLowerCase());
-                    }
-                    if (!"".equals(rs.getString("emailnf"))) {
-                        imp.addContato("4", "Email NF", null, null, TipoContato.NFE, rs.getString("emailnf").toLowerCase());
-                    }
-                    imp.setObservacao(rs.getString("obs"));
+                    imp.setTel_principal(String.format("(%s)%s", rs.getString("ddd"), rs.getString("telefone")));
+                    imp.addCelular("CELULAR", String.format("(%s)%s", rs.getString("ddd"), rs.getString("celular")));
+                    imp.addTelefone("FAX", String.format("(%s)%s", rs.getString("ddd"), rs.getString("fax")));
+                    imp.addEmail("NFE", rs.getString("email"), TipoContato.NFE);
                     imp.setDatacadastro(rs.getDate("datacadastro"));
+                    if ("S".equals(rs.getString("simplesnacional"))) {
+                        imp.setTipoEmpresa(TipoEmpresa.EPP_SIMPLES);
+                    }                    
+                    imp.setObservacao(rs.getString("obs"));
+                    imp.setPrazoEntrega(rs.getInt("prazoentrega"));
+                    imp.setTipoFornecedor(getTipoFornecedor(rs.getInt("tipofornecedor")));
 
                     result.add(imp);
                 }
