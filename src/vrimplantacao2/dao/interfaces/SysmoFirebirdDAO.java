@@ -80,7 +80,10 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.VOLUME_QTD,
-                OpcaoProduto.VOLUME_TIPO_EMBALAGEM
+                OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
+                OpcaoProduto.PAUTA_FISCAL,
+                OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                OpcaoProduto.FABRICANTE
         ));
     }
     
@@ -250,10 +253,48 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
         
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select distinct\n" +
+                    "    fis.cod id,\n" +
+                    "    p.clf ncm,\n" +
+                    "    fis.ufd uf,\n" +
+                    "    fis.sta mva,\n" +
+                    "    fis.ica aliquota,\n" +
+                    "    fis.icr reduzido,\n" +
+                    "    fis.icf aliquotafinal\n" +
+                    "from\n" +
+                    "    gceffs01 fis\n" +
+                    "    join gcepro02 p on\n" +
+                    "        p.ffs = fis.cod\n" +
+                    "where\n" +
+                    "     fis.ufo = 'SC' and\n" +
+                    "     fis.ufd = 'SC' and\n" +
+                    "     fis.rgf = 0 and\n" +
+                    "     fis.sta > 0\n" +
+                    "order by\n" +
+                    "     fis.cod"
             )) {
                 while (rst.next()) {
-                
+                    PautaFiscalIMP imp = new PautaFiscalIMP();
+                    
+                    imp.setId(rst.getString("id"));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setIva(rst.getDouble("mva"));
+                    imp.setIvaAjustado(rst.getDouble("mva"));
+                    int cst = 0;
+                    double aliquota = rst.getDouble("aliquota");
+                    double reduzido = rst.getDouble("reduzido");
+                    
+                    if (reduzido > 0) {
+                        cst = 20;
+                    }
+                    
+                    imp.setAliquotaCredito(cst, aliquota, reduzido);
+                    imp.setAliquotaCreditoForaEstado(cst, aliquota, reduzido);
+                    imp.setAliquotaDebito(cst, aliquota, reduzido);
+                    imp.setAliquotaDebitoForaEstado(cst, aliquota, reduzido);
+                    
+                    result.add(imp);
                 }
             }
         }
@@ -335,7 +376,9 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     "    pis_s.naturezareceita pis_s_natrec,\n" +
                     "    pis_s.cst pis_s_cst,\n" +
                     "    prod.fcv unidade_volume,\n" +
-                    "    prod.qem qtd_volume\n" +
+                    "    prod.gtr qtd_volume,\n" +
+                    "    prod.ffs id_pautafiscal,\n" +
+                    "    (select first 1 ccf from gcefor01 where dtr is null and pro = prod.cod) id_fabricante\n" +
                     "from\n" +
                     "    gcepro02 as prod\n" +
                     "    left join gcebar01 as ean on\n" +
@@ -420,7 +463,7 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setIcmsAliqEntrada(rs.getDouble("icmsdebito"));
                     imp.setIcmsReducaoEntrada(rs.getDouble("icmsreducao"));
                     
-                    //imp.setPautaFiscalId(lojaMesmoID);
+                    imp.setPautaFiscalId(rs.getString("id_pautafiscal"));
 
                     imp.setPiscofinsCstCredito(rs.getInt("pis_e_cst"));
                     imp.setPiscofinsCstDebito(rs.getInt("pis_s_cst"));
@@ -428,6 +471,7 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     
                     imp.setTipoEmbalagemVolume(rs.getString("unidade_volume"));
                     imp.setVolume(rs.getDouble("qtd_volume"));
+                    imp.setFornecedorFabricante(rs.getString("id_fabricante"));
                     
                     result.add(imp);
                 }
@@ -458,7 +502,7 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     "    t.cod id,\n" +
                     "    t.nom razaosocial,\n" +
                     "    t.fan fantasia,\n" +
-                    "    t.cgc cnpj,\n" +
+                    "    cast(t.cgc as bigint) cnpj,\n" +
                     "    t.ins inscricaoestadual,\n" +
                     "    cast((case when t.dbl > '30.12.1899' then 'S' else '' end) as VARCHAR(1)) as bloqueado,\n" +
                     "    t.log endereco,\n" +
@@ -498,7 +542,7 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setImportId(rs.getString("id"));
                     imp.setRazao(rs.getString("razaosocial"));
                     imp.setFantasia(rs.getString("fantasia"));
-                    imp.setCnpj_cpf(Utils.stringLong(rs.getString("cnpj")));
+                    imp.setCnpj_cpf(rs.getString("cnpj"));
                     imp.setIe_rg(rs.getString("inscricaoestadual"));
                     imp.setBloqueado("S".equals(rs.getString("bloqueado")));
                     imp.setEndereco(rs.getString("endereco"));
