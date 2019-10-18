@@ -29,6 +29,7 @@ import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemVO;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -38,6 +39,7 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
@@ -219,7 +221,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
-                    imp.seteBalanca(rst.getInt("fracionado") == 1);
+                    imp.seteBalanca(rst.getInt("balanca") == 1);
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
@@ -250,6 +252,20 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
         return vResult;
     }
 
+    @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    ""
+            )) {
+                
+            }
+        }
+        return null;
+    }
+    
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> vResult = new ArrayList<>();
@@ -506,8 +522,9 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
             try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select distinct a.cliente,\n"
-                        + "(select sum(coalesce(valor, 0)) from bdsifat.cf11 where dc = 'C' and cliente = a.cliente) - "
-                        + "(select sum(coalesce(valor, 0)) from bdsifat.cf11 where historico like '%ESTORNO%' and cliente = a.cliente)"
+                        + "(select sum(coalesce(valor, 0)) from cf11 where dc = 'C' and cliente = a.cliente) "
+                                //+ "- "
+                        //+ "(select sum(coalesce(valor, 0)) from cf11 where historico like '%ESTORNO%' and cliente = a.cliente)"
                         + " valor\n"
                         + "from cf11 a\n"
                         + "where loja = " + getLojaOrigem()
