@@ -275,6 +275,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 produto.setPesoBruto(linha.getDouble("pesobruto"));
                 produto.setPesoLiquido(linha.getDouble("pesoliquido"));
                 produto.setDataCadastro(getData(linha.getString("datacadastro")));
+                produto.setDataAlteracao(getData(linha.getString("dataalteracao")));
                 produto.setValidade(linha.getInt("validade"));
                 produto.setMargem(linha.getDouble("margem"));
                 produto.setEstoqueMaximo(linha.getDouble("estoquemaximo"));

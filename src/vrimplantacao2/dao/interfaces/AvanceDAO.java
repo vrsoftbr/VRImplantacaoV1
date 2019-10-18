@@ -220,6 +220,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " p.custoant custoanteriorsemimposto,\n"
                     + " p.custofinalant custoanteriorcomimposto,\n"
                     + "	p.atualvenda precovenda,\n"
+                    + " est.venda_atual precovendaloja,\n"        
                     + "	p.inativo situacaocadastro,\n"
                     + "	ncm.ncm,\n"
                     + "	p.cest,\n"
@@ -303,6 +304,9 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoAnteriorSemImposto(rst.getDouble("custoanteriorsemimposto"));
                     imp.setCustoAnteriorComImposto(rst.getDouble("custoanteriorcomimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
+                    if(rst.getDouble("precovendaloja") != 0) {
+                        imp.setPrecovenda(rst.getDouble("precovendaloja"));
+                    }
                     imp.setSituacaoCadastro((rst.getInt("situacaocadastro") == 1 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));

@@ -1206,6 +1206,13 @@ public class ProdutoRepository {
         if (comprador != null) {
             vo.setIdComprador(comprador);
         }
+        
+        if (imp.getTipoEmbalagemVolume() == null || imp.getTipoEmbalagemVolume().trim().equals("")) {
+            vo.setTipoEmbalagemVolume(vo.getTipoEmbalagem());
+        } else {
+            vo.setTipoEmbalagemVolume(TipoEmbalagem.getTipoEmbalagem(imp.getTipoEmbalagemVolume()));
+        }
+        vo.setVolume(imp.getVolume());
 
         return vo;
     }

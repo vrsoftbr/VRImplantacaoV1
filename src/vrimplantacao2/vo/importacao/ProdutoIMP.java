@@ -109,6 +109,9 @@ public class ProdutoIMP {
     
     private String divisao;
     
+    private String tipoEmbalagemVolume;
+    private double volume = 1;
+    
     public String getImportSistema() {
         return importSistema;
     }
@@ -865,6 +868,22 @@ public class ProdutoIMP {
 
     public void setDivisao(String divisao) {
         this.divisao = divisao;
+    }
+
+    public String getTipoEmbalagemVolume() {
+        return tipoEmbalagemVolume;
+    }
+
+    public void setTipoEmbalagemVolume(String tipoEmbalagemVolume) {
+        this.tipoEmbalagemVolume = tipoEmbalagemVolume;
+    }
+
+    public double getVolume() {
+        return volume;
+    }
+
+    public void setVolume(double volume) {
+        this.volume = volume;
     }
     
 }

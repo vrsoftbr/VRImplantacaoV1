@@ -330,7 +330,9 @@ public enum OpcaoProduto {
      * Faz com que o sistema grave os EANs que são menores que 7 dígitos nos
      * produtos unitários.
      */
-    IMPORTAR_EAN_MENORES_QUE_7_DIGITOS;
+    IMPORTAR_EAN_MENORES_QUE_7_DIGITOS, 
+    VOLUME_TIPO_EMBALAGEM, 
+    VOLUME_QTD;
 
     public static Set<OpcaoProduto> getAll() {
         return new HashSet<>(Arrays.asList(OpcaoProduto.values()));
