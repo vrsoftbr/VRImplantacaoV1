@@ -22,6 +22,7 @@ import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -83,7 +84,9 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                 OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
                 OpcaoProduto.PAUTA_FISCAL,
                 OpcaoProduto.PAUTA_FISCAL_PRODUTO,
-                OpcaoProduto.FABRICANTE
+                OpcaoProduto.FABRICANTE,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO
         ));
     }
     
@@ -276,7 +279,7 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                 while (rst.next()) {
                     PautaFiscalIMP imp = new PautaFiscalIMP();
                     
-                    imp.setId(rst.getString("id"));
+                    imp.setId(String.format("%s-%s", rst.getString("id"), rst.getString("ncm")));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setUf(rst.getString("uf"));
                     imp.setIva(rst.getDouble("mva"));
@@ -295,6 +298,32 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setAliquotaDebitoForaEstado(cst, aliquota, reduzido);
                     
                     result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        
+        ProdutoParaFamiliaHelper agrupador = new ProdutoParaFamiliaHelper(result);
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "Select\n" +
+                    "    S.CHV id,\n" +
+                    "    P.DSC descricao\n" +
+                    "from\n" +
+                    "    GCESML01 S\n" +
+                    "    left join GCEPRO02 P on\n" +
+                    "        S.Pro = P.cod\n" +
+                    "order by\n" +
+                    "    1, 2"
+            )) {
+                while (rst.next()) {
+                    agrupador.gerarFamilia(rst.getString("id"), rst.getString("descricao"));
                 }
             }
         }
@@ -350,6 +379,7 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     "    coalesce(prod.grp, 1) as mercadologico3,\n" +
                     "    coalesce(prod.seg, 1) as mercadologico4,\n" +
                     "    coalesce(prod.ssg, 1) as mercadologico5,\n" +
+                    "    (select first 1 chv from gcesml01 where pro = prod.cod) id_familiaproduto,\n" +
                     "    prod.dtc as datacadastro,\n" +
                     "    cast(ean.bar as bigint) as ean,\n" +
                     "    prod.emb as qtdembalagem,\n" +
@@ -424,6 +454,7 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setCodMercadologico3(rs.getString("mercadologico3"));
                     /*imp.setCodMercadologico4(rs.getString("mercadologico4"));
                     imp.setCodMercadologico5(rs.getString("mercadologico5"));*/
+                    imp.setIdFamiliaProduto(rs.getString("id_familiaproduto"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setValidade(rs.getInt("validade"));
                     
@@ -463,7 +494,7 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setIcmsAliqEntrada(rs.getDouble("icmsdebito"));
                     imp.setIcmsReducaoEntrada(rs.getDouble("icmsreducao"));
                     
-                    imp.setPautaFiscalId(rs.getString("id_pautafiscal"));
+                    imp.setPautaFiscalId(String.format("%s-%s", rs.getString("id_pautafiscal"), rs.getString("ncm")));
 
                     imp.setPiscofinsCstCredito(rs.getInt("pis_e_cst"));
                     imp.setPiscofinsCstDebito(rs.getInt("pis_s_cst"));
