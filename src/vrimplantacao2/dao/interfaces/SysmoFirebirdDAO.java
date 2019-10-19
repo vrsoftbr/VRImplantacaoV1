@@ -609,66 +609,77 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
         try (Statement stm = ConexaoFirebird
                 .getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "      t.cod as id,\n"
-                    + "      t.nom as nome,\n"
-                    + "      t.cgc as cpfcnpj,\n"
-                    + "      t.pss as tipopessoa,\n"
-                    + "      t.fan as fantasia,\n"
-                    + "      t.log as endereco,\n"
-                    + "      t.num as numero,\n"
-                    + "      t.bai as bairro,\n"
-                    + "      t.cmp as complemento,\n"
-                    + "      t.mun as municipio,\n"
-                    + "      t.cep,\n"
-                    + "      t.cxp as caixapostal,\n"
-                    + "      t.tel,\n"
-                    + "      t.fax,\n"
-                    + "      t.cel,\n"
-                    + "      t.ins as ie,\n"
-                    + "      t.oex as orgaoexp,\n"
-                    + "      t.dtn as datanascimento,\n"
-                    + "      t.eml as email,\n"
-                    + "      t.emn as emailnf,\n"
-                    + "      t.obs,\n"
-                    + "      t.dtc as datacadastro,\n"
-                    + "      t.dtm as datamovimentacao,\n"
-                    + "      --(select vlc from trsccv01 tr where tr.cod = t.cod) as limitecredito,\n"
-                    + "      conv.vlc as limitecredito, \n"        
-                    + "      case when conv.dbl is null\n"
-                    + "      then 0 else 1 end bloqueado \n"
-                    + "from\n"
-                    + "    trstra01 t\n"
-                    + "left join trsccv01 conv on t.cod = conv.cod\n"
-                    + "where\n"
-                    + "     t.tip in ('D', 'C') and\n"
-                    + "    emp = " + getLojaOrigem() + "\n"        
-                    + "order by\n"
-                    + "     t.cod")) {
+                    "select\n" +
+                    "    t.cod id,\n" +
+                    "    cast(t.cgc as bigint) cnpj,\n" +
+                    "    t.ins inscricaoestadual,\n" +
+                    "    t.oex orgaoexpeditor,\n" +
+                    "    t.nom razaosocial,\n" +
+                    "    t.fan fantasia,\n" +
+                    "    cast((case when t.dbl > '30.12.1899' then 'S' else '' end) as VARCHAR(1)) as bloqueado,\n" +
+                    "    t.dbl databloqueio,\n" +
+                    "    t.log endereco,\n" +
+                    "    t.num numero,\n" +
+                    "    t.cmp complemento,\n" +
+                    "    t.bai bairro,\n" +
+                    "    cd.ibg municipioibge,\n" +
+                    "    cd.dsc municipio,\n" +
+                    "    cd.est uf,\n" +
+                    "    t.cep,\n" +
+                    "    t.dtn datanascimento,\n" +
+                    "    t.dtc datacadastro,\n" +
+                    "    cv.ctl limite,\n" +
+                    "    t.obs observacao,\n" +
+                    "    cv.dvc diavencimento,\n" +
+                    "    cd.ddd, \n" +
+                    "    t.tel telefone,\n" +
+                    "    t.cel celular,\n" +
+                    "    t.fax,\n" +
+                    "    t.grp tipofornecedor,\n" +
+                    "    t.emn email\n" +
+                    "from\n" +
+                    "    trstra01 t\n" +
+                    "    left join trsmun01 cd on\n" +
+                    "        t.mun = cd.cod\n" +
+                    "    left join trsccv01 cv on\n" +
+                    "        cv.cod = t.cod and\n" +
+                    "        cv.cad = 0 and\n" +
+                    "        cv.ptc = t.cod\n" +
+                    "where\n" +
+                    "    t.tip in ('D', 'C') or\n" +
+                    "    t.cod in (select distinct ccf from CRCDOC01)\n" +
+                    "order by\n" +
+                    "    t.cod"
+            )) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rs.getString("id"));
-                    imp.setRazao(rs.getString("nome"));
-                    imp.setCnpj(Utils.stringLong(rs.getString("cpfcnpj")));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setInscricaoestadual(rs.getString("inscricaoestadual"));
+                    imp.setOrgaoemissor(rs.getString("orgaoexpeditor"));
+                    imp.setRazao(rs.getString("razaosocial"));
                     imp.setFantasia(rs.getString("fantasia"));
+                    imp.setBloqueado("S".equals(rs.getString("bloqueado")));
+                    imp.setDataBloqueio(rs.getDate("databloqueio"));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
-                    imp.setBairro(rs.getString("bairro"));
                     imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipioIBGE(rs.getInt("municipioibge"));
+                    imp.setMunicipio(rs.getString("municipio"));
+                    imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
-                    imp.setTelefone(rs.getString("tel"));
-                    imp.setFax(rs.getString("fax"));
-                    imp.setCelular(rs.getString("cel"));
-                    imp.setInscricaoestadual(rs.getString("ie"));
                     imp.setDataNascimento(rs.getDate("datanascimento"));
-                    imp.setEmail(rs.getString("email").toLowerCase());
-                    imp.addEmail(rs.getString("emailnf").toLowerCase(), TipoContato.NFE);
                     imp.setDataCadastro(rs.getDate("datacadastro"));
-                    imp.setLimiteCompra(rs.getDouble("limitecredito"));
-                    imp.setBloqueado(rs.getBoolean("bloqueado"));
-                    imp.setObservacao(rs.getString("obs"));
-                    imp.setOrgaoemissor(rs.getString("orgaoexp"));
-
+                    imp.setValorLimite(rs.getDouble("limite"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    imp.setDiaVencimento(rs.getInt("diavencimento"));
+                    
+                    imp.setTelefone(String.format("(%s)%s", rs.getString("ddd"), rs.getString("telefone")));
+                    imp.setFax(String.format("(%s)%s", rs.getString("ddd"), rs.getString("fax")));
+                    imp.setCelular(String.format("(%s)%s", rs.getString("ddd"), rs.getString("celular")));                    
+                    imp.setEmail(rs.getString("email").toLowerCase());
+                    
                     result.add(imp);
                 }
             }
