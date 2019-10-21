@@ -72,15 +72,15 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
     
     public List<Estabelecimento> getLojaCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
-        /*try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select * from lojas"
+                    "select id, s_nome_fantasia fantasia from configuracoes"
             )) {
-                while(rs.next()) {*/
-                    result.add(new Estabelecimento("1", "CAMAROTTO BOX"));
-                //}
-            //}
-        //}
+                while(rs.next()) {
+                    result.add(new Estabelecimento(rs.getString("id"), rs.getString("fantasia")));
+                }
+            }
+        }
         return result;
     }
     
@@ -207,16 +207,21 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     "   p.data_inclusao,\n" +
                     "   p.s_ncm ncm,\n" +
                     "   p.f_mva_st mva,\n" +
-                    "   p.icms,\n" +
+                    "   p.icms icms_credito,\n" +
+                    "   p.st cst_credito,\n" +
+                    "   p.f_porcent_red_icms icms_red_credito,\n" +
+                    "   a.s_tipo tipoaliquota,\n" +
+                    "   a.f_taxa icms_debito,\n" +
+                    "   a.f_reducao_base_calculo icms_red_debito,\n" +
                     "   p.s_cod_cst_pis_entrada pis_entrada,\n" +
                     "   p.s_cod_cst_pis_saida pis_saida,\n" +
                     "   p.s_cod_cst_cofins_entrada cofins_entrada,\n" +
                     "   p.s_cod_cst_cofins_saida cofins_saida,\n" +
                     "   p.s_cest cest,\n" +
-                    "   p.aliquota id_aliquotadebito,\n" +
-                    "   p.s_cod_pis_saida naturezareceita\n" +        
+                    "   p.s_cod_pis_saida naturezareceita\n" +
                     "from\n" +
                     "    produtos p\n" +
+                    "left join aliquotas a on p.aliquota = a.id\n" +
                     "order by\n" +
                     "    p.id"
             )) {
@@ -258,7 +263,37 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstCredito(rs.getString("pis_entrada"));
                     imp.setPiscofinsCstDebito(rs.getString("pis_saida"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
-                    imp.setIcmsDebitoId(rs.getString("id_aliquotadebito"));
+                    
+                    // Icms debito
+                    imp.setIcmsAliqSaida(rs.getDouble("icms_debito"));
+                    imp.setIcmsReducaoSaida(rs.getDouble("icms_red_debito"));
+                    
+                    if(rs.getString("tipoaliquota") != null && !"".equals(rs.getString("tipoaliquota"))) {
+                        switch(rs.getString("tipoaliquota").trim()) {
+                            case "F" : imp.setIcmsCstSaida(60);
+                                break;
+                            case "I" : imp.setIcmsCstSaida(40);
+                                break;
+                            case "N" : imp.setIcmsCstSaida(41);
+                                break;
+                            case "T" : imp.setIcmsCstSaida(0);
+                                break;
+                            default : imp.setIcmsCstSaida(40);
+                                break;
+                        }
+                    }
+                    imp.setIcmsAliqSaidaForaEstado(imp.getIcmsAliqSaida());
+                    imp.setIcmsCstSaidaForaEstado(imp.getIcmsCstSaida());
+                    imp.setIcmsReducaoSaidaForaEstado(imp.getIcmsReducaoSaida());
+                    
+                    //Icms Credito
+                    imp.setIcmsAliqEntrada(rs.getDouble("icms_credito"));
+                    imp.setIcmsReducaoEntrada(rs.getDouble("icms_red_credito"));
+                    imp.setIcmsCstEntrada(rs.getInt("cst_credito"));
+                    
+                    imp.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqEntrada());
+                    imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstEntrada());
+                    imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoEntrada());
                     
                     result.add(imp);
                 }
@@ -300,7 +335,7 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
         try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
-                    "    id,\n" +
+                    "    i_numero id,\n" +
                     "    ativo,\n" +
                     "    razao_social,\n" +
                     "    nome_fantasia,\n" +
@@ -493,10 +528,11 @@ public class MobilityDAO extends InterfaceDAO implements MapaTributoProvider {
                     "from \n" +
                     "    clientes\n" +
                     "order by\n" +
-                    "    id "
+                    "    id"
             )) {
                 while(rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
+                    
                     imp.setId(rs.getString("id"));
                     imp.setRazao(rs.getString("nome"));
                     imp.setAtivo(rs.getInt("ativo") == 1);
