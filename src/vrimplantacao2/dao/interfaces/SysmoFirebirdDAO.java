@@ -405,7 +405,7 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     "    pis_e.cst pis_e_cst,\n" +
                     "    pis_s.naturezareceita pis_s_natrec,\n" +
                     "    pis_s.cst pis_s_cst,\n" +
-                    "    prod.fcv unidade_volume,\n" +
+                    "    prod.gun unidade_volume,\n" +
                     "    prod.gtr qtd_volume,\n" +
                     "    prod.ffs id_pautafiscal,\n" +
                     "    (select first 1 ccf from gcefor01 where dtr is null and pro = prod.cod) id_fabricante\n" +
@@ -500,8 +500,14 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setPiscofinsCstDebito(rs.getInt("pis_s_cst"));
                     imp.setPiscofinsNaturezaReceita(rs.getInt("pis_s_natrec"));
                     
-                    imp.setTipoEmbalagemVolume(rs.getString("unidade_volume"));
-                    imp.setVolume(rs.getDouble("qtd_volume"));
+                    
+                    if (Utils.acertarTexto(rs.getString("unidade_volume"), 2).equals("GR")) {
+                        imp.setTipoEmbalagemVolume("KG");
+                        imp.setVolume(rs.getDouble("qtd_volume") / 1000);
+                    } else {
+                        imp.setTipoEmbalagemVolume(rs.getString("unidade_volume"));
+                        imp.setVolume(rs.getDouble("qtd_volume"));
+                    }
                     imp.setFornecedorFabricante(rs.getString("id_fabricante"));
                     
                     result.add(imp);
