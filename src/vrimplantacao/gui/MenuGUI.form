@@ -1725,14 +1725,6 @@
                 <Property name="text" type="java.lang.String" value="Avan&#xe7;adas"/>
               </Properties>
               <SubComponents>
-                <MenuItem class="javax.swing.JMenuItem" name="mnuMapeamentoMercadologico">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Mapeamento de Mercadol&#xf3;gico"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuMapeamentoMercadologicoActionPerformed"/>
-                  </Events>
-                </MenuItem>
                 <MenuItem class="javax.swing.JMenuItem" name="mnuImportarNCM">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Importar NCM da Legisla&#xe7;&#xe3;o"/>

@@ -19,7 +19,6 @@ import vrframework.gui.SobreGUI;
 import vrframework.remote.Arquivo;
 import vrimplantacao.classe.Global;
 import vrimplantacao.dao.DataProcessamentoDAO;
-import vrimplantacao.gui.assistente.mapamercadologico.MapaMercadologicoGUI;
 import vrimplantacao.gui.assistente.parametro.ParametroGUI;
 import vrimplantacao.gui.cadastro.LojaConsultaGUI;
 import vrimplantacao.gui.interfaces.AcertarCodigoInternoGUI;
@@ -750,7 +749,6 @@ public final class MenuGUI extends VRMdiFrame {
         mnuScripts = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         mnuAvancadas = new javax.swing.JMenu();
-        mnuMapeamentoMercadologico = new javax.swing.JMenuItem();
         mnuImportarNCM = new javax.swing.JMenuItem();
         mnuParametros = new javax.swing.JMenuItem();
         mnuParametros1 = new javax.swing.JMenuItem();
@@ -2562,14 +2560,6 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuAvancadas.setText("Avançadas");
 
-        mnuMapeamentoMercadologico.setText("Mapeamento de Mercadológico");
-        mnuMapeamentoMercadologico.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuMapeamentoMercadologicoActionPerformed(evt);
-            }
-        });
-        mnuAvancadas.add(mnuMapeamentoMercadologico);
-
         mnuImportarNCM.setText("Importar NCM da Legislação");
         mnuImportarNCM.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -3148,10 +3138,6 @@ public final class MenuGUI extends VRMdiFrame {
             this.setDefaultCursor();
         }
     }//GEN-LAST:event_jMenuItemSciActionPerformed
-
-    private void mnuMapeamentoMercadologicoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMapeamentoMercadologicoActionPerformed
-        MapaMercadologicoGUI.Exibir(this);
-    }//GEN-LAST:event_mnuMapeamentoMercadologicoActionPerformed
 
     private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
         // TODO add your handling code here:
@@ -4310,7 +4296,6 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuLogus;
     private javax.swing.JMenuItem mnuLyncis;
     private javax.swing.JMenuItem mnuMSIInfor;
-    private javax.swing.JMenuItem mnuMapeamentoMercadologico;
     private javax.swing.JMenuItem mnuMarket;
     private javax.swing.JMenuBar mnuMenu;
     private javax.swing.JMenuItem mnuMrs;
