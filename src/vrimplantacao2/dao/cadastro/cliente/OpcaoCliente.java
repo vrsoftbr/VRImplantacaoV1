@@ -57,7 +57,8 @@ public enum OpcaoCliente {
     COMPLEMENTO,
     ESTADO_CIVIL,
     VENCIMENTO_ROTATIVO,
-    SEXO;    
+    SEXO,
+    DATA_CADASTRO;    
     
     private static final Logger LOG = Logger.getLogger(OpcaoCliente.class.getName());
     private List<ClienteIMP> listaEspecial;

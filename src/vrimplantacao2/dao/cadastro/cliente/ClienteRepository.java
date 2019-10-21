@@ -223,6 +223,15 @@ public class ClienteRepository {
                     if (opt.contains(OpcaoCliente.VENCIMENTO_ROTATIVO)) {
                         atualizarClientePreferencial(vo, opt);
                     }
+                    if (opt.contains(OpcaoCliente.SEXO)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.DATA_CADASTRO)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.OBSERVACOES)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
                 }
                 notificar();
             }
