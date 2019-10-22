@@ -50,6 +50,7 @@ public class ProdutoRepository {
     private boolean naoTransformarEANemUN = false;
     private boolean usarConversaoDeAliquotaSimples = true;
     private boolean importarMenoresQue7Digitos = false;
+    private boolean copiarIcmsDebitoParaCredito = false;
     public boolean importarSomenteLoja = false;
     
     private Map<String, Entry<String, Integer>> divisoes;
@@ -77,7 +78,8 @@ public class ProdutoRepository {
 
     public void salvar(List<ProdutoIMP> produtos) throws Exception {
         usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
-        importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);        
+        importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
+        copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
         
         LOG.finest("Abrindo a transação");
         provider.begin();        
@@ -246,6 +248,7 @@ public class ProdutoRepository {
         usarConversaoDeAliquotaSimples = !op.contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
         importarSomenteLoja = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_INDIVIDUAL_LOJA);
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
+        copiarIcmsDebitoParaCredito = op.contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
         
         System.out.print(usarConversaoDeAliquotaSimples);
                 
@@ -429,6 +432,7 @@ public class ProdutoRepository {
     public void unificar(List<ProdutoIMP> produtos) throws Exception {
         usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
+        copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
         
         provider.begin();
         try {
@@ -813,22 +817,26 @@ public class ProdutoRepository {
             }
         }
         
-        
-        if (idIcmsCredito != null) {
-            aliqCredito = provider.tributo().getAliquotaByMapaId(idIcmsCredito);
-            creditoForaEstado = provider.tributo().getAliquotaByMapaId(idIcmsCredito);            
+        if (copiarIcmsDebitoParaCredito) {
+            aliqCredito = aliqDebito;
+            creditoForaEstado = debitoForaEstado;
         } else {
-            int icmsCstEntrada = imp.getIcmsCstEntrada();
-            double icmsAliqEntrada = 0;
-            double icmsReducaoEntrada = 0;
+            if (idIcmsCredito != null) {
+                aliqCredito = provider.tributo().getAliquotaByMapaId(idIcmsCredito);
+                creditoForaEstado = provider.tributo().getAliquotaByMapaId(idIcmsCredito);            
+            } else {
+                int icmsCstEntrada = imp.getIcmsCstEntrada();
+                double icmsAliqEntrada = 0;
+                double icmsReducaoEntrada = 0;
 
-            if (icmsCstEntrada == 20 || icmsCstEntrada == 0) {
-                icmsAliqEntrada = imp.getIcmsAliqEntrada();
-                icmsReducaoEntrada = imp.getIcmsReducaoEntrada();
+                if (icmsCstEntrada == 20 || icmsCstEntrada == 0) {
+                    icmsAliqEntrada = imp.getIcmsAliqEntrada();
+                    icmsReducaoEntrada = imp.getIcmsReducaoEntrada();
+                }
+
+                aliqCredito = provider.tributo().getIcms(icmsCstEntrada, icmsAliqEntrada, icmsReducaoEntrada);
+                creditoForaEstado = provider.tributo().getIcms(icmsCstEntrada, icmsAliqEntrada, icmsReducaoEntrada);
             }
-            
-            aliqCredito = provider.tributo().getIcms(icmsCstEntrada, icmsAliqEntrada, icmsReducaoEntrada);
-            creditoForaEstado = provider.tributo().getIcms(icmsCstEntrada, icmsAliqEntrada, icmsReducaoEntrada);
         }
 
         aliquota.setAliquotaCredito(aliqCredito);
@@ -944,37 +952,41 @@ public class ProdutoRepository {
             }
         }
         
-        
-        if (idIcmsCredito != null) {
-            aliqCredito = provider.tributo().getAliquotaByMapaId(idIcmsCredito);
-            creditoForaEstado = provider.tributo().getAliquotaByMapaId(idIcmsCreditoForaEstado);
-            if (creditoForaEstado == null) {
-                creditoForaEstado = aliqCredito;
-            }
+        if (copiarIcmsDebitoParaCredito) {
+            aliqCredito = aliqDebito;
+            creditoForaEstado = debitoForaEstado;
         } else {
-            
-            int icmsCstEntrada = imp.getIcmsCstEntrada();
-            double icmsAliqEntrada = 0;
-            double icmsReducaoEntrada = 0;
+            if (idIcmsCredito != null) {
+                aliqCredito = provider.tributo().getAliquotaByMapaId(idIcmsCredito);
+                creditoForaEstado = provider.tributo().getAliquotaByMapaId(idIcmsCreditoForaEstado);
+                if (creditoForaEstado == null) {
+                    creditoForaEstado = aliqCredito;
+                }
+            } else {
 
-            int icmsCstEntradaForaEstado = imp.getIcmsCstEntradaForaEstado();
-            double icmsAliqEntradaForaEstado = 0;
-            double icmsReducaoEntradaForaEstado = 0;
-            
-            if (icmsCstEntrada == 20 || icmsCstEntrada == 0) {
-                icmsAliqEntrada = imp.getIcmsAliqEntrada();
-                icmsReducaoEntrada = imp.getIcmsReducaoEntrada();
-            }
-            if (icmsCstEntradaForaEstado == 20 || icmsCstEntradaForaEstado == 0) {
-                icmsAliqEntradaForaEstado = imp.getIcmsAliqEntradaForaEstado();
-                icmsReducaoEntradaForaEstado = imp.getIcmsReducaoEntradaForaEstado();
-            }
-            
-            aliqCredito = provider.tributo().getIcms(icmsCstEntrada, icmsAliqEntrada, icmsReducaoEntrada);
-            creditoForaEstado = provider.tributo().getIcms(icmsCstEntradaForaEstado, icmsAliqEntradaForaEstado, icmsReducaoEntradaForaEstado);
-            
-            if (creditoForaEstado == null) {
-                creditoForaEstado = aliqCredito;
+                int icmsCstEntrada = imp.getIcmsCstEntrada();
+                double icmsAliqEntrada = 0;
+                double icmsReducaoEntrada = 0;
+
+                int icmsCstEntradaForaEstado = imp.getIcmsCstEntradaForaEstado();
+                double icmsAliqEntradaForaEstado = 0;
+                double icmsReducaoEntradaForaEstado = 0;
+
+                if (icmsCstEntrada == 20 || icmsCstEntrada == 0) {
+                    icmsAliqEntrada = imp.getIcmsAliqEntrada();
+                    icmsReducaoEntrada = imp.getIcmsReducaoEntrada();
+                }
+                if (icmsCstEntradaForaEstado == 20 || icmsCstEntradaForaEstado == 0) {
+                    icmsAliqEntradaForaEstado = imp.getIcmsAliqEntradaForaEstado();
+                    icmsReducaoEntradaForaEstado = imp.getIcmsReducaoEntradaForaEstado();
+                }
+
+                aliqCredito = provider.tributo().getIcms(icmsCstEntrada, icmsAliqEntrada, icmsReducaoEntrada);
+                creditoForaEstado = provider.tributo().getIcms(icmsCstEntradaForaEstado, icmsAliqEntradaForaEstado, icmsReducaoEntradaForaEstado);
+
+                if (creditoForaEstado == null) {
+                    creditoForaEstado = aliqCredito;
+                }
             }
         }
 
