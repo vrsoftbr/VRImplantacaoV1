@@ -177,11 +177,13 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             chkCest.setVisible(opt.contains(OpcaoProduto.CEST));
             chkPautaFiscal.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL_PRODUTO));
             chkPautaFiscalProduto.setVisible(opt.contains(OpcaoProduto.PAUTA_FISCAL));
+            chkCopiarIcmsDebitoNaEntrada.setVisible(opt.contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO));
             tabImportacao.add(pnlImpTributacao);
             if (opt.contains(OpcaoProduto.PAUTA_FISCAL)) {
                 tabParametros.add(pnlOptPautaFiscal);
             }
-            if (opt.contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA)) {
+            if (opt.contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA)||
+                    opt.contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO)) {
                 tabParametros.add(pnlOptIcms);
             }
         }
@@ -311,6 +313,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         pnlOptIcms = new vrframework.bean.panel.VRPanel();
         jLabel11 = new javax.swing.JLabel();
         chkAliquotaCompleta = new vrframework.bean.checkBox.VRCheckBox();
+        chkCopiarIcmsDebitoNaEntrada = new vrframework.bean.checkBox.VRCheckBox();
         scrollImportação = new javax.swing.JScrollPane();
         tabImportacao = new vrframework.bean.panel.VRPanel();
         pnlImpMercadologico = new vrframework.bean.panel.VRPanel();
@@ -624,8 +627,12 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         org.openide.awt.Mnemonics.setLocalizedText(jLabel11, "ICMS");
         jLabel11.setPreferredSize(new java.awt.Dimension(132, 14));
 
-        org.openide.awt.Mnemonics.setLocalizedText(chkAliquotaCompleta, "USAR CONVERSAO ALIQUOTA COMPLETA");
+        org.openide.awt.Mnemonics.setLocalizedText(chkAliquotaCompleta, "Usar conversão de aliquota completa");
         chkAliquotaCompleta.setToolTipText("Selecione essa opção para que ao importar o associado, seja gerado também o associado para preço e custo.");
+
+        org.openide.awt.Mnemonics.setLocalizedText(chkCopiarIcmsDebitoNaEntrada, "Copiar ICMS débito na entrada");
+        chkCopiarIcmsDebitoNaEntrada.setToolTipText("Marque está opção quando o cliente utilizar a margem bruta do GetWay para calcular seus preços");
+        chkCopiarIcmsDebitoNaEntrada.setEnabled(true);
 
         javax.swing.GroupLayout pnlOptIcmsLayout = new javax.swing.GroupLayout(pnlOptIcms);
         pnlOptIcms.setLayout(pnlOptIcmsLayout);
@@ -637,6 +644,10 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkAliquotaCompleta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(325, Short.MAX_VALUE))
+                .addGroup(pnlOptIcmsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(chkCopiarIcmsDebitoNaEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkAliquotaCompleta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(181, Short.MAX_VALUE))
         );
         pnlOptIcmsLayout.setVerticalGroup(
             pnlOptIcmsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -645,6 +656,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 .addGroup(pnlOptIcmsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkAliquotaCompleta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkCopiarIcmsDebitoNaEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1163,6 +1176,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
     public vrframework.bean.checkBox.VRCheckBox chkCest;
     public vrframework.bean.checkBox.VRCheckBox chkComprador;
     public vrframework.bean.checkBox.VRCheckBox chkCompradorProduto;
+    public vrframework.bean.checkBox.VRCheckBox chkCopiarIcmsDebitoNaEntrada;
     public vrframework.bean.checkBox.VRCheckBox chkCusto;
     public vrframework.bean.checkBox.VRCheckBox chkCustoComImposto;
     public vrframework.bean.checkBox.VRCheckBox chkCustoSemImposto;
@@ -1290,6 +1304,8 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
             parametros.put(3, concat(params, "PAUTA_OPCAO" ));
         }
         parametros.put(chkPautaUsarEansMenores.isSelected(), concat(params, "PAUTA_USAR_EANS_MENORES" ));
+        parametros.put(chkCopiarIcmsDebitoNaEntrada.isSelected(), concat(params, "COPIAR_DEBITO_NO_CREDITO" ));
+        
     }
 
     public void carregarParametros(Parametros parametros, String... params) {
@@ -1307,6 +1323,7 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
         }
         rdbPautaEanActionPerformed(null);
         chkPautaUsarEansMenores.setSelected(parametros.getBool(concat(params, "PAUTA_USAR_EANS_MENORES" )));
+        chkCopiarIcmsDebitoNaEntrada.setSelected(parametros.getBool(concat(params, "COPIAR_DEBITO_NO_CREDITO" )));
         
     }
     
@@ -1332,6 +1349,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
                 if (chkManterEANsMenores.isSelected()) {
                     opt.add(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
+                }            
+                if (chkCopiarIcmsDebitoNaEntrada.isSelected()) {
+                    opt.add(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
                 }
                 opt.addAll(getParametrosExtras());
                 importador.importarProduto(opt.toArray(new OpcaoProduto[]{}));
@@ -1502,6 +1522,9 @@ public class ChecksProdutoPanelGUI extends javax.swing.JTabbedPane {
                 }
                 if (chkVolumeQtd.isSelected()) {
                     opcoes.add(OpcaoProduto.VOLUME_QTD);
+                }            
+                if (chkCopiarIcmsDebitoNaEntrada.isSelected()) {
+                    opcoes.add(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
                 }
                 opcoes.addAll(getParametrosExtras());
                 if (!opcoes.isEmpty()) {

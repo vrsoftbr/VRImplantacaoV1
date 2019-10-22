@@ -69,7 +69,6 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        checksProdutoPanelGUI1 = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabModel = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabProdutos = new vrframework.bean.panel.VRPanel();
         txtDelimitadorProd = new javax.swing.JTextField();
@@ -181,26 +180,23 @@ public class PlanilhaV2GUI extends VRInternalFrame {
         txtSistema = new javax.swing.JTextField();
         txtCodLojaOrigem = new javax.swing.JTextField();
 
-        checksProdutoPanelGUI1.setMaximumSize(new java.awt.Dimension(3728, 38));
-        checksProdutoPanelGUI1.setPreferredSize(new java.awt.Dimension(900, 38));
-
         setResizable(true);
         setTitle("Importação de Planilha");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
@@ -1265,7 +1261,6 @@ public class PlanilhaV2GUI extends VRInternalFrame {
     private vrframework.bean.button.VRButton btnFornDados;
     private vrframework.bean.button.VRButton btnMapaTribut;
     private vrframework.bean.button.VRButton btnMigrar;
-    private vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI checksProdutoPanelGUI1;
     private javax.swing.JCheckBox chkCNPJCli;
     private vrframework.bean.checkBox.VRCheckBox chkCliCheques;
     private vrframework.bean.checkBox.VRCheckBox chkCliEvenContatos;

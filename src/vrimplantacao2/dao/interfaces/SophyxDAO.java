@@ -116,31 +116,35 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
         List<MercadologicoIMP> result = new ArrayList<>();
         try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "    g.id codmercadologico1,\n" +
-                    "    g.s_descricao descricao1,\n" +
-                    "    d.id codmercadologico2,\n" +
-                    "    d.s_descricao descricao2,\n" +
-                    "    s.id codmercadolodico3,\n" +
-                    "    s.s_descricao descricao3\n" +
-                    "from\n" +
-                    "    departamentos d\n" +
-                    "join grupos g on d.id_grupo = g.id\n" +
-                    "join sessoes s on d.id = s.id_departamento\n" +
-                    "order by\n" +
-                    "    g.id, d.id, s.id"
+                    " SELECT \n" +
+                    "	DISTINCT\n" +
+                    "	P.GRUPO,\n" +
+                    "	M1.S_DESCRICAO AS MERC1,\n" +
+                    "	P.DEPARTAMENTO, \n" +
+                    "	M2.S_DESCRICAO AS MERC2,\n" +
+                    "	P.SESSAO, \n" +
+                    "	M3.S_DESCRICAO AS MERC3\n" +
+                    "FROM\n" +
+                    "	PRODUTOS P\n" +
+                    "INNER JOIN GRUPOS M1 ON M1.ID = P.GRUPO\n" +
+                    "INNER JOIN DEPARTAMENTOS M2 ON M2.ID = P.DEPARTAMENTO\n" +
+                    "INNER JOIN SESSOES M3 ON M3.ID = P.SESSAO\n" +
+                    "ORDER BY\n" +
+                    "	P.GRUPO,\n" +
+                    "	P.DEPARTAMENTO,\n" +
+                    "	P.SESSAO"
             )) {
                 while(rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
-                    imp.setMerc1ID(rs.getString("codmercadologico1"));
-                    imp.setMerc1Descricao(rs.getString("descricao1"));
-                    imp.setMerc2ID(rs.getString("codmercadologico2"));
-                    imp.setMerc2Descricao(rs.getString("descricao2"));
-                    imp.setMerc3ID(rs.getString("codmercadologico3"));
-                    imp.setMerc3Descricao(rs.getString("descricao3"));
+                    imp.setMerc1ID(rs.getString("GRUPO"));
+                    imp.setMerc1Descricao(rs.getString("MERC1"));
+                    imp.setMerc2ID(rs.getString("DEPARTAMENTO"));
+                    imp.setMerc2Descricao(rs.getString("MERC2"));
+                    imp.setMerc3ID(rs.getString("SESSAO"));
+                    imp.setMerc3Descricao(rs.getString("MERC3"));
                     
                     result.add(imp);
                 }
@@ -234,16 +238,21 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
                     "   p.data_inclusao,\n" +
                     "   p.s_ncm ncm,\n" +
                     "   p.f_mva_st mva,\n" +
-                    "   p.icms,\n" +
+                    "   p.icms icms_credito,\n" +
+                    "   p.st cst_credito,\n" +
+                    "   p.f_porcent_red_icms icms_red_credito,\n" +
+                    "   a.s_tipo tipoaliquota,\n" +
+                    "   a.f_taxa icms_debito,\n" +
+                    "   a.f_reducao_base_calculo icms_red_debito,\n" +
                     "   p.s_cod_cst_pis_entrada pis_entrada,\n" +
                     "   p.s_cod_cst_pis_saida pis_saida,\n" +
                     "   p.s_cod_cst_cofins_entrada cofins_entrada,\n" +
                     "   p.s_cod_cst_cofins_saida cofins_saida,\n" +
                     "   p.s_cest cest,\n" +
-                    "   p.aliquota id_aliquotadebito,\n" +
-                    "   p.s_cod_pis_saida naturezareceita\n" +        
+                    "   p.s_cod_pis_saida naturezareceita\n" +
                     "from\n" +
                     "    produtos p\n" +
+                    "left join aliquotas a on p.aliquota = a.id\n" +
                     "order by\n" +
                     "    p.id"
             )) {
@@ -255,7 +264,9 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rs.getString("codigo_interno"));
                     imp.setEan(rs.getString("ean"));
                     if(rs.getInt("pesado") != 0) {
-                        imp.setEan(imp.getImportId());
+                        if(imp.getEan() != null && !"".equals(imp.getEan())) {
+                            imp.setEan(imp.getEan().substring(0, imp.getEan().length() - 1));
+                        }
                         imp.seteBalanca(true);
                     }                    
                     imp.setValidade(rs.getInt("validade"));
@@ -283,7 +294,37 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPiscofinsCstCredito(rs.getString("pis_entrada"));
                     imp.setPiscofinsCstDebito(rs.getString("pis_saida"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
-                    imp.setIcmsDebitoId(rs.getString("id_aliquotadebito"));
+                    
+                    // Icms debito
+                    imp.setIcmsAliqSaida(rs.getDouble("icms_debito"));
+                    imp.setIcmsReducaoSaida(rs.getDouble("icms_red_debito"));
+                    
+                    if(rs.getString("tipoaliquota") != null && !"".equals(rs.getString("tipoaliquota"))) {
+                        switch(rs.getString("tipoaliquota").trim()) {
+                            case "F" : imp.setIcmsCstSaida(60);
+                                break;
+                            case "I" : imp.setIcmsCstSaida(40);
+                                break;
+                            case "N" : imp.setIcmsCstSaida(41);
+                                break;
+                            case "T" : imp.setIcmsCstSaida(0);
+                                break;
+                            default : imp.setIcmsCstSaida(40);
+                                break;
+                        }
+                    }
+                    imp.setIcmsAliqSaidaForaEstado(imp.getIcmsAliqSaida());
+                    imp.setIcmsCstSaidaForaEstado(imp.getIcmsCstSaida());
+                    imp.setIcmsReducaoSaidaForaEstado(imp.getIcmsReducaoSaida());
+                    
+                    //Icms Credito
+                    imp.setIcmsAliqEntrada(rs.getDouble("icms_credito"));
+                    imp.setIcmsReducaoEntrada(rs.getDouble("icms_red_credito"));
+                    imp.setIcmsCstEntrada(rs.getInt("cst_credito"));
+                    
+                    imp.setIcmsAliqEntradaForaEstado(imp.getIcmsAliqEntrada());
+                    imp.setIcmsCstEntradaForaEstado(imp.getIcmsCstEntrada());
+                    imp.setIcmsReducaoEntradaForaEstado(imp.getIcmsReducaoEntrada());
                     
                     result.add(imp);
                 }
@@ -298,7 +339,7 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
         try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
-                    "    id,\n" +
+                    "    i_numero id,\n" +
                     "    ativo,\n" +
                     "    razao_social,\n" +
                     "    nome_fantasia,\n" +
@@ -404,8 +445,8 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
                                     TipoContato.COMERCIAL,
                                     rs.getString("email"));
                     }
-                    if(rs.getString("observacao") != null && !"".equals(rs.getString("observacao"))) {
-                        imp.setObservacao(rs.getString("observacao"));
+                    if(rs.getString("observacoes") != null && !"".equals(rs.getString("observacoes"))) {
+                        imp.setObservacao(rs.getString("observacoes"));
                     }
                     imp.setPrazoEntrega(rs.getInt("prazo_entrega"));
                     imp.setDatacadastro(rs.getDate("data_cadastro"));
@@ -424,16 +465,17 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
                     "    pf.id,\n" +
-                    "    id_fornecedor,\n" +
+                    "    f.i_numero id_fornecedor,\n" +
                     "    p.codigo_interno id_produto,\n" +
                     "    case when s_sequencial = '' then p.codigo_interno\n" +
                     "    else s_sequencial end as codexterno,\n" +
                     "    i_embalagem embalagem,\n" +
                     "    s_unidade_medida unidade,\n" +
-                    "    pf.d_data_compra dataalteracao\n" +        
+                    "    pf.d_data_compra dataalteracao        \n" +
                     "from\n" +
                     "    codigo_ref_fornecedor pf\n" +
                     "join produtos p on pf.id_produto = p.id\n" +
+                    "join fornecedores f on pf.id_fornecedor = f.id\n" +
                     "order by\n" +
                     "    pf.id_fornecedor, p.codigo_interno"
             )) {

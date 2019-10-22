@@ -535,15 +535,17 @@ public class Importador {
      * importados e aqueles que não possuirem EAN maior que 999999 são gravados
      * apenas na tabela implantacao.codant_produto.
      *
+     * @param opcoes
      * @throws Exception
      */
-    public void unificarProdutos() throws Exception {
+    public void unificarProdutos(OpcaoProduto... opcoes) throws Exception {
         ProgressBar.setStatus("Carregando produtos (Unificação)...");
         List<ProdutoIMP> produtos = getInterfaceDAO().getProdutos();
         ProdutoRepositoryProvider provider = new ProdutoRepositoryProvider();
         provider.setSistema(getInterfaceDAO().getSistema());
         provider.setLoja(getInterfaceDAO().getLojaOrigem());
         provider.setLojaVR(getLojaVR());
+        provider.setOpcoes(opcoes);
         new ProdutoRepository(provider).unificar(produtos);
     }
 

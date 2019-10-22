@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import vrframework.classe.Conexao;
-import vrframework.classe.Util;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.MercadologicoMapaVO;
 import vrimplantacao.vo.vrimplantacao.MercadologicoVO;

@@ -402,8 +402,16 @@
                           <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                           <Component id="jLabel11" min="-2" pref="132" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
+<<<<<<< HEAD
                           <Component id="chkAliquotaCompleta" min="-2" max="-2" attributes="0"/>
                           <EmptySpace pref="325" max="32767" attributes="0"/>
+=======
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkCopiarIcmsDebitoNaEntrada" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkAliquotaCompleta" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace pref="181" max="32767" attributes="0"/>
+>>>>>>> e5c8ff8fdbdbdb77d3c53b2250bf80eb5a895441
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -415,6 +423,8 @@
                               <Component id="jLabel11" alignment="3" min="-2" pref="23" max="-2" attributes="0"/>
                               <Component id="chkAliquotaCompleta" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkCopiarIcmsDebitoNaEntrada" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
@@ -435,8 +445,17 @@
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAliquotaCompleta">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="USAR CONVERSAO ALIQUOTA COMPLETA"/>
+                    <Property name="text" type="java.lang.String" value="Usar convers&#xe3;o de aliquota completa"/>
                     <Property name="toolTipText" type="java.lang.String" value="Selecione essa op&#xe7;&#xe3;o para que ao importar o associado, seja gerado tamb&#xe9;m o associado para pre&#xe7;o e custo."/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCopiarIcmsDebitoNaEntrada">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Copiar ICMS d&#xe9;bito na entrada"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Marque est&#xe1; op&#xe7;&#xe3;o quando o cliente utilizar a margem bruta do GetWay para calcular seus pre&#xe7;os"/>
+                    <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="true" type="code"/>
+                    </Property>
                   </Properties>
                 </Component>
               </SubComponents>

@@ -337,7 +337,13 @@ public enum OpcaoProduto {
      */
     IMPORTAR_EAN_MENORES_QUE_7_DIGITOS, 
     VOLUME_TIPO_EMBALAGEM, 
-    VOLUME_QTD;
+    VOLUME_QTD, 
+    IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO {
+        @Override
+        public String toString() {
+            return "Importar - Copiar ICMS débito no crédito";
+        }        
+    };
 
     public static Set<OpcaoProduto> getAll() {
         return new HashSet<>(Arrays.asList(OpcaoProduto.values()));

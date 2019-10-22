@@ -17,7 +17,6 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
-import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.AvanceDAO;
 import vrimplantacao2.dao.interfaces.Importador;
@@ -48,11 +47,33 @@ public class AvanceGUI extends VRInternalFrame {
         }
     }
     
+    private void carregarTipoDocumentoCP() throws Exception {
+        cmbPlanoContaPagar.removeAllItems();
+        cmbPlanoContaPagar.setModel(new DefaultComboBoxModel());
+        cmbPlanoContaPagar.removeAllItems();
+        cmbPlanoContaPagar.setModel(new DefaultComboBoxModel());
+        for (ItemComboVO item : avanceDAO.getTipoCarteiraContaPagar()) {
+            cmbPlanoContaPagar.addItem(item);
+        }
+    }
+    
+    private void carregarTipoCarteira() throws Exception {
+        cmbTipoCarteira.removeAllItems();
+        cmbTipoCarteira.setModel(new DefaultComboBoxModel());
+        cmbTipoCarteira.removeAllItems();
+        cmbTipoCarteira.setModel(new DefaultComboBoxModel());
+        for (ItemComboVO item : avanceDAO.getTipoCarteira()) {
+            cmbTipoCarteira.addItem(item);
+            cmbTipoCarteiraCheque.addItem(item);
+        }
+    }
+    
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         conexaoMySQL.carregarParametros();
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
+        chkTemArquivoBalanca.setSelected(params.getBool(SISTEMA, "TEM_ARQUIVO_BALANCA"));
     }
 
     private void gravarParametros() throws Exception {
@@ -68,6 +89,7 @@ public class AvanceGUI extends VRInternalFrame {
             params.put(vr.id, SISTEMA, "LOJA_VR");
             vLojaVR = vr.id;
         }
+        params.put(chkTemArquivoBalanca.isSelected(), SISTEMA, "TEM_ARQUIVO_BALANCA");
         params.salvar();
     }
 
@@ -97,6 +119,8 @@ public class AvanceGUI extends VRInternalFrame {
                 carregarLojaVR();
                 carregarLojaCliente();
                 carregarTipoDocumento();
+                carregarTipoCarteira();
+                carregarTipoDocumentoCP();
             }
         });
 
@@ -168,7 +192,10 @@ public class AvanceGUI extends VRInternalFrame {
                     avanceDAO.i_balanca = chkTemArquivoBalanca.isSelected();
                     avanceDAO.v_contaRotativo = ((ItemComboVO) cmbTipoDocRotativo.getSelectedItem()).id;
                     avanceDAO.v_contaCheque = ((ItemComboVO) cmbTipoDocCheque.getSelectedItem()).id;
-
+                    avanceDAO.v_carteiraCheque = ((ItemComboVO) cmbTipoCarteiraCheque.getSelectedItem()).id;
+                    avanceDAO.v_contaCarteira = ((ItemComboVO) cmbTipoCarteira.getSelectedItem()).id;
+                    avanceDAO.v_carteiraContaPagar = ((ItemComboVO) cmbPlanoContaPagar.getSelectedItem()).id;
+                    
                     if (tab.getSelectedIndex() == 0) {
                         tabProdutos.setImportador(importador);
                         tabProdutos.executarImportacao();
@@ -182,6 +209,18 @@ public class AvanceGUI extends VRInternalFrame {
                         if(chkContaPagar.isSelected()) {
                             importador.importarContasPagar(OpcaoContaPagar.NOVOS);
                         } 
+                        if(chkEndereco.isSelected()) {
+                            importador.atualizarFornecedor(OpcaoFornecedor.ENDERECO);
+                        }
+                        if(chkCondPagamento.isSelected()) {
+                            importador.atualizarFornecedor(OpcaoFornecedor.CONDICAO_PAGAMENTO);
+                        }
+                        if(chkContato.isSelected()) {
+                            importador.atualizarFornecedor(OpcaoFornecedor.CONTATOS);
+                        }
+                        if(chkPrazoEntrega.isSelected()) {
+                            importador.atualizarFornecedor(OpcaoFornecedor.PRAZO_FORNECEDOR);
+                        }
                     } else if (tab.getSelectedIndex() == 2) {
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(
@@ -190,6 +229,9 @@ public class AvanceGUI extends VRInternalFrame {
                                     OpcaoCliente.VALOR_LIMITE, 
                                     OpcaoCliente.SITUACAO_CADASTRO,
                                     OpcaoCliente.EMAIL);
+                        }
+                        if (chkClienteEventual.isSelected()) {
+                            importador.importarClienteEventual();
                         }
                         {
                             List<OpcaoCliente> opcoes = new ArrayList<>();
@@ -201,6 +243,25 @@ public class AvanceGUI extends VRInternalFrame {
                             }
                             if (chkCVencimento.isSelected()) {
                                 opcoes.add(OpcaoCliente.VENCIMENTO_ROTATIVO);
+                            }
+                            if (chkEstCivil.isSelected()) {
+                                opcoes.add(OpcaoCliente.ESTADO_CIVIL);
+                            }
+                            if (chkSexo.isSelected()) {
+                                opcoes.add(OpcaoCliente.SEXO);
+                            }
+                            if (chkDataCadastro.isSelected()) {
+                                opcoes.add(OpcaoCliente.DATA_CADASTRO);
+                            }
+                            if (chkPermiteRotativo.isSelected()) {
+                                opcoes.add(OpcaoCliente.PERMITE_CHEQUE);
+                                opcoes.add(OpcaoCliente.PERMITE_CREDITOROTATIVO);
+                            }
+                            if (chkValorLimite.isSelected()) {
+                               opcoes.add(OpcaoCliente.VALOR_LIMITE);
+                            }
+                            if (chkObservacao.isSelected()) {
+                                opcoes.add(OpcaoCliente.OBSERVACOES);
                             }
                             if (!opcoes.isEmpty()) {
                                 importador.atualizarClientePreferencial(opcoes.toArray(new OpcaoCliente[]{}));
@@ -266,20 +327,37 @@ public class AvanceGUI extends VRInternalFrame {
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkContaPagar = new javax.swing.JCheckBox();
-        jLabel2 = new javax.swing.JLabel();
-        txtLojaCP = new javax.swing.JTextField();
+        chkEndereco = new javax.swing.JCheckBox();
+        chkContato = new javax.swing.JCheckBox();
+        chkCondPagamento = new javax.swing.JCheckBox();
+        chkPrazoEntrega = new javax.swing.JCheckBox();
+        cmbPlanoContaPagar = new javax.swing.JComboBox();
+        jLabel6 = new javax.swing.JLabel();
         tabCliente = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabClienteDados = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkBloqueado = new vrframework.bean.checkBox.VRCheckBox();
         chkCliIERG = new vrframework.bean.checkBox.VRCheckBox();
         chkCVencimento = new javax.swing.JCheckBox();
+        chkEstCivil = new javax.swing.JCheckBox();
+        chkSexo = new javax.swing.JCheckBox();
+        chkDataCadastro = new javax.swing.JCheckBox();
+        chkPermiteRotativo = new javax.swing.JCheckBox();
+        chkValorLimite = new javax.swing.JCheckBox();
+        chkObservacao = new javax.swing.JCheckBox();
+        chkClienteEventual = new javax.swing.JCheckBox();
         tablCreditoRotativo = new javax.swing.JPanel();
         chkRotativo = new vrframework.bean.checkBox.VRCheckBox();
         cmbTipoDocRotativo = new javax.swing.JComboBox();
+        cmbTipoCarteira = new javax.swing.JComboBox();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         tabCheque = new vrframework.bean.panel.VRPanel();
         chkCheque = new vrframework.bean.checkBox.VRCheckBox();
         cmbTipoDocCheque = new javax.swing.JComboBox();
+        cmbTipoCarteiraCheque = new javax.swing.JComboBox();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
         tabVenda = new vrframework.bean.panel.VRPanel();
         pnlDadosDataVenda = new vrframework.bean.panel.VRPanel();
         pnlPdvVendaDatas = new vrframework.bean.panel.VRPanel();
@@ -363,7 +441,15 @@ public class AvanceGUI extends VRInternalFrame {
 
         chkContaPagar.setText("Conta a Pagar");
 
-        jLabel2.setText("Loja (Informar a loja que será importado no contas a pagar)");
+        chkEndereco.setText("Endereço");
+
+        chkContato.setText("Contatos");
+
+        chkCondPagamento.setText("Cond. Pagamento");
+
+        chkPrazoEntrega.setText("Prazo Entrega");
+
+        jLabel6.setText("Carteira");
 
         javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
         tabFornecedor.setLayout(tabFornecedorLayout);
@@ -372,29 +458,43 @@ public class AvanceGUI extends VRInternalFrame {
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2)
                     .addGroup(tabFornecedorLayout.createSequentialGroup()
-                        .addComponent(txtLojaCP, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkContaPagar)))
-                .addContainerGap(277, Short.MAX_VALUE))
+                        .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(15, 15, 15)
+                        .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkEndereco)
+                            .addComponent(chkContato))
+                        .addGap(18, 18, 18)
+                        .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkPrazoEntrega)
+                            .addComponent(chkCondPagamento)))
+                    .addComponent(chkContaPagar)
+                    .addComponent(cmbPlanoContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6))
+                .addContainerGap(229, Short.MAX_VALUE))
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel2)
+                .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkEndereco)
+                    .addComponent(chkCondPagamento))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtLojaCP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkContaPagar))
-                .addContainerGap(215, Short.MAX_VALUE))
+                    .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkContato)
+                    .addComponent(chkPrazoEntrega))
+                .addGap(18, 18, 18)
+                .addComponent(chkContaPagar)
+                .addGap(7, 7, 7)
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cmbPlanoContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(180, Short.MAX_VALUE))
         );
 
         tab.addTab("Fornecedores", tabFornecedor);
@@ -415,6 +515,20 @@ public class AvanceGUI extends VRInternalFrame {
 
         chkCVencimento.setText("Vencimento Rotativo");
 
+        chkEstCivil.setText("Estado Civil");
+
+        chkSexo.setText("Sexo");
+
+        chkDataCadastro.setText("Data Cadastro");
+
+        chkPermiteRotativo.setText("Permite Rotativo e Cheque");
+
+        chkValorLimite.setText("Valor Limite");
+
+        chkObservacao.setText("Observação");
+
+        chkClienteEventual.setText("Cliente Eventual");
+
         javax.swing.GroupLayout tabClienteDadosLayout = new javax.swing.GroupLayout(tabClienteDados);
         tabClienteDados.setLayout(tabClienteDadosLayout);
         tabClienteDadosLayout.setHorizontalGroup(
@@ -422,29 +536,60 @@ public class AvanceGUI extends VRInternalFrame {
             .addGroup(tabClienteDadosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCVencimento))
-                .addContainerGap(439, Short.MAX_VALUE))
+                    .addGroup(tabClienteDadosLayout.createSequentialGroup()
+                        .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkCVencimento)
+                            .addComponent(chkObservacao)
+                            .addComponent(chkClienteEventual))
+                        .addGap(38, 38, 38)
+                        .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkValorLimite)
+                            .addComponent(chkPermiteRotativo)
+                            .addComponent(chkDataCadastro)
+                            .addComponent(chkSexo)
+                            .addComponent(chkEstCivil)))
+                    .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(246, Short.MAX_VALUE))
         );
         tabClienteDadosLayout.setVerticalGroup(
             tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabClienteDadosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkEstCivil))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkSexo)
+                    .addComponent(chkClienteEventual))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkDataCadastro))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkCVencimento)
+                    .addComponent(chkPermiteRotativo))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkValorLimite)
+                    .addComponent(chkObservacao))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkCVencimento)
-                .addContainerGap(190, Short.MAX_VALUE))
+                .addContainerGap(142, Short.MAX_VALUE))
         );
 
         tabCliente.addTab("Dados", tabClienteDados);
 
         chkRotativo.setText("Crédito Rotativo");
+
+        cmbTipoDocRotativo.setEnabled(false);
+
+        jLabel2.setText("Carteira");
+
+        jLabel3.setText("Documento");
 
         javax.swing.GroupLayout tablCreditoRotativoLayout = new javax.swing.GroupLayout(tablCreditoRotativo);
         tablCreditoRotativo.setLayout(tablCreditoRotativoLayout);
@@ -452,10 +597,18 @@ public class AvanceGUI extends VRInternalFrame {
             tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tablCreditoRotativoLayout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tablCreditoRotativoLayout.createSequentialGroup()
+                .addContainerGap(23, Short.MAX_VALUE)
                 .addGroup(tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbTipoCarteira, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
+                .addGap(8, 8, 8)
+                .addGroup(tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3)
                     .addComponent(cmbTipoDocRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(352, Short.MAX_VALUE))
+                .addGap(119, 119, 119))
         );
         tablCreditoRotativoLayout.setVerticalGroup(
             tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -463,13 +616,25 @@ public class AvanceGUI extends VRInternalFrame {
                 .addGap(10, 10, 10)
                 .addComponent(chkRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cmbTipoDocRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(239, Short.MAX_VALUE))
+                .addGroup(tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel3))
+                .addGap(5, 5, 5)
+                .addGroup(tablCreditoRotativoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cmbTipoCarteira, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbTipoDocRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(224, Short.MAX_VALUE))
         );
 
         tabCliente.addTab("Crédito Rotativo", tablCreditoRotativo);
 
         chkCheque.setText("Cheque");
+
+        cmbTipoDocCheque.setEnabled(false);
+
+        jLabel4.setText("Carteira");
+
+        jLabel5.setText("Documento");
 
         javax.swing.GroupLayout tabChequeLayout = new javax.swing.GroupLayout(tabCheque);
         tabCheque.setLayout(tabChequeLayout);
@@ -478,18 +643,32 @@ public class AvanceGUI extends VRInternalFrame {
             .addGroup(tabChequeLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cmbTipoCarteiraCheque, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cmbTipoDocCheque, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(347, Short.MAX_VALUE))
+                    .addComponent(jLabel4))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(tabChequeLayout.createSequentialGroup()
+                        .addComponent(cmbTipoDocCheque, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 128, Short.MAX_VALUE))
+                    .addGroup(tabChequeLayout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         tabChequeLayout.setVerticalGroup(
             tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabChequeLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cmbTipoDocCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(237, Short.MAX_VALUE))
+                .addGap(7, 7, 7)
+                .addGroup(tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel5))
+                .addGap(7, 7, 7)
+                .addGroup(tabChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cmbTipoCarteiraCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbTipoDocCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(215, Short.MAX_VALUE))
         );
 
         tabCliente.addTab("Cheque", tabCheque);
@@ -728,15 +907,29 @@ public class AvanceGUI extends VRInternalFrame {
     private javax.swing.JCheckBox chkCVencimento;
     private vrframework.bean.checkBox.VRCheckBox chkCheque;
     private vrframework.bean.checkBox.VRCheckBox chkCliIERG;
+    private javax.swing.JCheckBox chkClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
+    private javax.swing.JCheckBox chkCondPagamento;
     private javax.swing.JCheckBox chkContaPagar;
+    private javax.swing.JCheckBox chkContato;
+    private javax.swing.JCheckBox chkDataCadastro;
+    private javax.swing.JCheckBox chkEndereco;
+    private javax.swing.JCheckBox chkEstCivil;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private javax.swing.JCheckBox chkObservacao;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
+    private javax.swing.JCheckBox chkPermiteRotativo;
+    private javax.swing.JCheckBox chkPrazoEntrega;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
+    private javax.swing.JCheckBox chkSexo;
     private javax.swing.JCheckBox chkTemArquivoBalanca;
+    private javax.swing.JCheckBox chkValorLimite;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
+    private javax.swing.JComboBox cmbPlanoContaPagar;
+    private javax.swing.JComboBox cmbTipoCarteira;
+    private javax.swing.JComboBox cmbTipoCarteiraCheque;
     private javax.swing.JComboBox cmbTipoDocCheque;
     private javax.swing.JComboBox cmbTipoDocRotativo;
     private vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel conexaoMySQL;
@@ -744,6 +937,10 @@ public class AvanceGUI extends VRInternalFrame {
     private org.jdesktop.swingx.JXDatePicker edtDtVendaIni;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private vrframework.bean.panel.VRPanel pnlDadosDataVenda;
     private vrframework.bean.panel.VRPanel pnlLoja;
     private vrframework.bean.panel.VRPanel pnlPdvVendaDatas;
@@ -757,7 +954,6 @@ public class AvanceGUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel tabUnificacao;
     private vrframework.bean.panel.VRPanel tabVenda;
     private javax.swing.JPanel tablCreditoRotativo;
-    private javax.swing.JTextField txtLojaCP;
     private vrframework.bean.label.VRLabel vRLabel1;
     // End of variables declaration//GEN-END:variables
 

@@ -91,6 +91,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         result.add(OpcaoProduto.PAUTA_FISCAL_PRODUTO);
         result.add(INVENTARIO);
         result.add(OpcaoProduto.OFERTA);
+        result.add(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
 
         return result;
     }

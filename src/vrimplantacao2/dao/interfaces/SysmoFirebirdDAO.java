@@ -22,6 +22,7 @@ import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -80,7 +81,12 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                 OpcaoProduto.PIS_COFINS,
                 OpcaoProduto.NATUREZA_RECEITA,
                 OpcaoProduto.VOLUME_QTD,
-                OpcaoProduto.VOLUME_TIPO_EMBALAGEM
+                OpcaoProduto.VOLUME_TIPO_EMBALAGEM,
+                OpcaoProduto.PAUTA_FISCAL,
+                OpcaoProduto.PAUTA_FISCAL_PRODUTO,
+                OpcaoProduto.FABRICANTE,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO
         ));
     }
     
@@ -250,10 +256,74 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
         
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "select distinct\n" +
+                    "    fis.cod id,\n" +
+                    "    p.clf ncm,\n" +
+                    "    fis.ufd uf,\n" +
+                    "    fis.sta mva,\n" +
+                    "    fis.ica aliquota,\n" +
+                    "    fis.icr reduzido,\n" +
+                    "    fis.icf aliquotafinal\n" +
+                    "from\n" +
+                    "    gceffs01 fis\n" +
+                    "    join gcepro02 p on\n" +
+                    "        p.ffs = fis.cod\n" +
+                    "where\n" +
+                    "     fis.ufo = 'SC' and\n" +
+                    "     fis.ufd = 'SC' and\n" +
+                    "     fis.rgf = 0 and\n" +
+                    "     fis.sta > 0\n" +
+                    "order by\n" +
+                    "     fis.cod"
             )) {
                 while (rst.next()) {
-                
+                    PautaFiscalIMP imp = new PautaFiscalIMP();
+                    
+                    imp.setId(String.format("%s-%s", rst.getString("id"), rst.getString("ncm")));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setIva(rst.getDouble("mva"));
+                    imp.setIvaAjustado(rst.getDouble("mva"));
+                    int cst = 0;
+                    double aliquota = rst.getDouble("aliquota");
+                    double reduzido = rst.getDouble("reduzido");
+                    
+                    if (reduzido > 0) {
+                        cst = 20;
+                    }
+                    
+                    imp.setAliquotaCredito(cst, aliquota, reduzido);
+                    imp.setAliquotaCreditoForaEstado(cst, aliquota, reduzido);
+                    imp.setAliquotaDebito(cst, aliquota, reduzido);
+                    imp.setAliquotaDebitoForaEstado(cst, aliquota, reduzido);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        
+        ProdutoParaFamiliaHelper agrupador = new ProdutoParaFamiliaHelper(result);
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "Select\n" +
+                    "    S.CHV id,\n" +
+                    "    P.DSC descricao\n" +
+                    "from\n" +
+                    "    GCESML01 S\n" +
+                    "    left join GCEPRO02 P on\n" +
+                    "        S.Pro = P.cod\n" +
+                    "order by\n" +
+                    "    1, 2"
+            )) {
+                while (rst.next()) {
+                    agrupador.gerarFamilia(rst.getString("id"), rst.getString("descricao"));
                 }
             }
         }
@@ -309,6 +379,7 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     "    coalesce(prod.grp, 1) as mercadologico3,\n" +
                     "    coalesce(prod.seg, 1) as mercadologico4,\n" +
                     "    coalesce(prod.ssg, 1) as mercadologico5,\n" +
+                    "    (select first 1 chv from gcesml01 where pro = prod.cod) id_familiaproduto,\n" +
                     "    prod.dtc as datacadastro,\n" +
                     "    cast(ean.bar as bigint) as ean,\n" +
                     "    prod.emb as qtdembalagem,\n" +
@@ -334,8 +405,10 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     "    pis_e.cst pis_e_cst,\n" +
                     "    pis_s.naturezareceita pis_s_natrec,\n" +
                     "    pis_s.cst pis_s_cst,\n" +
-                    "    prod.fcv unidade_volume,\n" +
-                    "    prod.qem qtd_volume\n" +
+                    "    prod.gun unidade_volume,\n" +
+                    "    prod.gtr qtd_volume,\n" +
+                    "    prod.ffs id_pautafiscal,\n" +
+                    "    (select first 1 ccf from gcefor01 where dtr is null and pro = prod.cod) id_fabricante\n" +
                     "from\n" +
                     "    gcepro02 as prod\n" +
                     "    left join gcebar01 as ean on\n" +
@@ -381,6 +454,7 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setCodMercadologico3(rs.getString("mercadologico3"));
                     /*imp.setCodMercadologico4(rs.getString("mercadologico4"));
                     imp.setCodMercadologico5(rs.getString("mercadologico5"));*/
+                    imp.setIdFamiliaProduto(rs.getString("id_familiaproduto"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setValidade(rs.getInt("validade"));
                     
@@ -420,14 +494,21 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setIcmsAliqEntrada(rs.getDouble("icmsdebito"));
                     imp.setIcmsReducaoEntrada(rs.getDouble("icmsreducao"));
                     
-                    //imp.setPautaFiscalId(lojaMesmoID);
+                    imp.setPautaFiscalId(String.format("%s-%s", rs.getString("id_pautafiscal"), rs.getString("ncm")));
 
                     imp.setPiscofinsCstCredito(rs.getInt("pis_e_cst"));
                     imp.setPiscofinsCstDebito(rs.getInt("pis_s_cst"));
                     imp.setPiscofinsNaturezaReceita(rs.getInt("pis_s_natrec"));
                     
-                    imp.setTipoEmbalagemVolume(rs.getString("unidade_volume"));
-                    imp.setVolume(rs.getDouble("qtd_volume"));
+                    
+                    if (Utils.acertarTexto(rs.getString("unidade_volume"), 2).equals("GR")) {
+                        imp.setTipoEmbalagemVolume("KG");
+                        imp.setVolume(rs.getDouble("qtd_volume") / 1000);
+                    } else {
+                        imp.setTipoEmbalagemVolume(rs.getString("unidade_volume"));
+                        imp.setVolume(rs.getDouble("qtd_volume"));
+                    }
+                    imp.setFornecedorFabricante(rs.getString("id_fabricante"));
                     
                     result.add(imp);
                 }
@@ -458,7 +539,7 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     "    t.cod id,\n" +
                     "    t.nom razaosocial,\n" +
                     "    t.fan fantasia,\n" +
-                    "    t.cgc cnpj,\n" +
+                    "    cast(t.cgc as bigint) cnpj,\n" +
                     "    t.ins inscricaoestadual,\n" +
                     "    cast((case when t.dbl > '30.12.1899' then 'S' else '' end) as VARCHAR(1)) as bloqueado,\n" +
                     "    t.log endereco,\n" +
@@ -498,7 +579,7 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
                     imp.setImportId(rs.getString("id"));
                     imp.setRazao(rs.getString("razaosocial"));
                     imp.setFantasia(rs.getString("fantasia"));
-                    imp.setCnpj_cpf(Utils.stringLong(rs.getString("cnpj")));
+                    imp.setCnpj_cpf(rs.getString("cnpj"));
                     imp.setIe_rg(rs.getString("inscricaoestadual"));
                     imp.setBloqueado("S".equals(rs.getString("bloqueado")));
                     imp.setEndereco(rs.getString("endereco"));
@@ -534,66 +615,77 @@ public class SysmoFirebirdDAO extends InterfaceDAO implements MapaTributoProvide
         try (Statement stm = ConexaoFirebird
                 .getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "      t.cod as id,\n"
-                    + "      t.nom as nome,\n"
-                    + "      t.cgc as cpfcnpj,\n"
-                    + "      t.pss as tipopessoa,\n"
-                    + "      t.fan as fantasia,\n"
-                    + "      t.log as endereco,\n"
-                    + "      t.num as numero,\n"
-                    + "      t.bai as bairro,\n"
-                    + "      t.cmp as complemento,\n"
-                    + "      t.mun as municipio,\n"
-                    + "      t.cep,\n"
-                    + "      t.cxp as caixapostal,\n"
-                    + "      t.tel,\n"
-                    + "      t.fax,\n"
-                    + "      t.cel,\n"
-                    + "      t.ins as ie,\n"
-                    + "      t.oex as orgaoexp,\n"
-                    + "      t.dtn as datanascimento,\n"
-                    + "      t.eml as email,\n"
-                    + "      t.emn as emailnf,\n"
-                    + "      t.obs,\n"
-                    + "      t.dtc as datacadastro,\n"
-                    + "      t.dtm as datamovimentacao,\n"
-                    + "      --(select vlc from trsccv01 tr where tr.cod = t.cod) as limitecredito,\n"
-                    + "      conv.vlc as limitecredito, \n"        
-                    + "      case when conv.dbl is null\n"
-                    + "      then 0 else 1 end bloqueado \n"
-                    + "from\n"
-                    + "    trstra01 t\n"
-                    + "left join trsccv01 conv on t.cod = conv.cod\n"
-                    + "where\n"
-                    + "     t.tip in ('D', 'C') and\n"
-                    + "    emp = " + getLojaOrigem() + "\n"        
-                    + "order by\n"
-                    + "     t.cod")) {
+                    "select\n" +
+                    "    t.cod id,\n" +
+                    "    cast(t.cgc as bigint) cnpj,\n" +
+                    "    t.ins inscricaoestadual,\n" +
+                    "    t.oex orgaoexpeditor,\n" +
+                    "    t.nom razaosocial,\n" +
+                    "    t.fan fantasia,\n" +
+                    "    cast((case when t.dbl > '30.12.1899' then 'S' else '' end) as VARCHAR(1)) as bloqueado,\n" +
+                    "    t.dbl databloqueio,\n" +
+                    "    t.log endereco,\n" +
+                    "    t.num numero,\n" +
+                    "    t.cmp complemento,\n" +
+                    "    t.bai bairro,\n" +
+                    "    cd.ibg municipioibge,\n" +
+                    "    cd.dsc municipio,\n" +
+                    "    cd.est uf,\n" +
+                    "    t.cep,\n" +
+                    "    t.dtn datanascimento,\n" +
+                    "    t.dtc datacadastro,\n" +
+                    "    cv.ctl limite,\n" +
+                    "    t.obs observacao,\n" +
+                    "    cv.dvc diavencimento,\n" +
+                    "    cd.ddd, \n" +
+                    "    t.tel telefone,\n" +
+                    "    t.cel celular,\n" +
+                    "    t.fax,\n" +
+                    "    t.grp tipofornecedor,\n" +
+                    "    t.emn email\n" +
+                    "from\n" +
+                    "    trstra01 t\n" +
+                    "    left join trsmun01 cd on\n" +
+                    "        t.mun = cd.cod\n" +
+                    "    left join trsccv01 cv on\n" +
+                    "        cv.cod = t.cod and\n" +
+                    "        cv.cad = 0 and\n" +
+                    "        cv.ptc = t.cod\n" +
+                    "where\n" +
+                    "    t.tip in ('D', 'C') or\n" +
+                    "    t.cod in (select distinct ccf from CRCDOC01)\n" +
+                    "order by\n" +
+                    "    t.cod"
+            )) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rs.getString("id"));
-                    imp.setRazao(rs.getString("nome"));
-                    imp.setCnpj(Utils.stringLong(rs.getString("cpfcnpj")));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setInscricaoestadual(rs.getString("inscricaoestadual"));
+                    imp.setOrgaoemissor(rs.getString("orgaoexpeditor"));
+                    imp.setRazao(rs.getString("razaosocial"));
                     imp.setFantasia(rs.getString("fantasia"));
+                    imp.setBloqueado("S".equals(rs.getString("bloqueado")));
+                    imp.setDataBloqueio(rs.getDate("databloqueio"));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
-                    imp.setBairro(rs.getString("bairro"));
                     imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipioIBGE(rs.getInt("municipioibge"));
+                    imp.setMunicipio(rs.getString("municipio"));
+                    imp.setUf(rs.getString("uf"));
                     imp.setCep(rs.getString("cep"));
-                    imp.setTelefone(rs.getString("tel"));
-                    imp.setFax(rs.getString("fax"));
-                    imp.setCelular(rs.getString("cel"));
-                    imp.setInscricaoestadual(rs.getString("ie"));
                     imp.setDataNascimento(rs.getDate("datanascimento"));
-                    imp.setEmail(rs.getString("email").toLowerCase());
-                    imp.addEmail(rs.getString("emailnf").toLowerCase(), TipoContato.NFE);
                     imp.setDataCadastro(rs.getDate("datacadastro"));
-                    imp.setLimiteCompra(rs.getDouble("limitecredito"));
-                    imp.setBloqueado(rs.getBoolean("bloqueado"));
-                    imp.setObservacao(rs.getString("obs"));
-                    imp.setOrgaoemissor(rs.getString("orgaoexp"));
-
+                    imp.setValorLimite(rs.getDouble("limite"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    imp.setDiaVencimento(rs.getInt("diavencimento"));
+                    
+                    imp.setTelefone(String.format("(%s)%s", rs.getString("ddd"), rs.getString("telefone")));
+                    imp.setFax(String.format("(%s)%s", rs.getString("ddd"), rs.getString("fax")));
+                    imp.setCelular(String.format("(%s)%s", rs.getString("ddd"), rs.getString("celular")));                    
+                    imp.setEmail(rs.getString("email").toLowerCase());
+                    
                     result.add(imp);
                 }
             }
