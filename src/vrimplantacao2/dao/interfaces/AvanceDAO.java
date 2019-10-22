@@ -1027,17 +1027,18 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.promocao precopromocao,\n"
                     + "	p.venda precovenda,\n"
                     + "	p.status\n"
-                    + "FROM\n"
+                  + "FROM\n"
                     + "	promocao_itens as p\n"
-                    + "JOIN promocao_cab as pc ON p.id_promocao_cab = pc.id\n"
-                    + "WHERE\n"
+                  + "JOIN promocao_cab as pc ON p.id_promocao_cab = pc.id\n"
+                  + "WHERE\n"
                     + "	cast(pc.fim AS DATE) >= NOW() and\n"
                     + "	pc.id_loja = " + getLojaOrigem() + " and\n"
                     + "	pc.status = 0\n"
-                    + "ORDER BY\n"
+                  + "ORDER BY\n"
                     + "	pc.fim")) {
                 while (rs.next()) {
                     OfertaIMP imp = new OfertaIMP();
+                    
                     imp.setIdProduto(rs.getString("id_produto"));
                     imp.setDataInicio(rs.getDate("datainicio"));
                     imp.setDataFim(rs.getDate("datafim"));
