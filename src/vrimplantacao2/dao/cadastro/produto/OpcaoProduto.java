@@ -148,6 +148,11 @@ public enum OpcaoProduto {
         public String toString() {
             return "Pesavel";
         }
+    }, MARGEM_MINIMA {
+       @Override
+       public String toString() {
+           return "Margem Mínima";
+       }
     }, MARGEM {
         @Override
         public String toString() {

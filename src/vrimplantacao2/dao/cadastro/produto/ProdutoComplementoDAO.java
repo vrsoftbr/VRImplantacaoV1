@@ -223,6 +223,12 @@ public class ProdutoComplementoDAO {
                 if (opt.contains(OpcaoProduto.ESTOQUE)) {
                     sql.put("estoque", vo.getEstoque());
                 }
+                if (opt.contains(OpcaoProduto.ESTOQUE_MINIMO)) {
+                    sql.put("estoqueminimo", vo.getEstoqueMinimo());
+                }
+                if (opt.contains(OpcaoProduto.ESTOQUE_MAXIMO)) {
+                    sql.put("estoquemaximo", vo.getEstoqueMaximo());
+                }
                 if (opt.contains(OpcaoProduto.TROCA)) {
                     sql.put("troca", vo.getTroca());
                 }

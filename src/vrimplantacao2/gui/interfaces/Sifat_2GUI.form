@@ -226,10 +226,14 @@
                                   <EmptySpace min="21" pref="21" max="-2" attributes="0"/>
                                   <Component id="chkPagamentoRotativo" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCepCliente" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="434" max="32767" attributes="0"/>
+                          <EmptySpace pref="414" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -237,7 +241,10 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkClientePreferencial" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCepCliente" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
@@ -261,6 +268,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPagamentoRotativo">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Pagamento Rotativo"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCepCliente">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Cep"/>
                   </Properties>
                 </Component>
               </SubComponents>
