@@ -397,7 +397,7 @@ public class SolidusGUI extends VRInternalFrame {
                         if (chkNotasFiscais.isSelected()) {
                             dao.setNotasDataInicio(edtDtNotaIni.getDate());
                             dao.setNotasDataTermino(edtDtNotaFim.getDate());
-                            importador.importarNotas(OpcaoNotaFiscal.IMP_EXCLUIR_NOTAS_EXISTENTES_IMPORTADAS);
+                            importador.importarNotas(OpcaoNotaFiscal.IMP_REIMPORTAR_ITENS_DE_NOTAS_EXISTENTES);
                         }
                         if (chkCvEmpresa.isSelected()) {
                             importador.importarConvenioEmpresa();

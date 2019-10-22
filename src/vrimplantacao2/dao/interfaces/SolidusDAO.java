@@ -1681,6 +1681,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    nfi.per_aliq_icms icms_aliq,\n" +
                     "    nfi.per_red_bc_icms icms_red,\n" +
                     "    nfi.val_icms icms_valor,\n" +
+                    "    nfi.val_bc_icms icms_bc,\n" +
                     "    nfi.val_bc_st icms_bc_st,\n" +
                     "    nfi.val_icms_st icms_st,\n" +
                     "    nfi.val_base_ipi ipi_base,\n" +
@@ -1741,6 +1742,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     item.setIcmsValor(rst.getDouble("icms_valor"));
                     item.setIcmsBaseCalculoST(rst.getDouble("icms_bc_st"));
                     item.setIcmsValorST(rst.getDouble("icms_st"));
+                    item.setIcmsBaseCalculo(rst.getDouble("icms_bc"));
                     item.setIpiValorBase(rst.getDouble("ipi_base"));
                     item.setIpiValor(rst.getDouble("ipi_valor"));
                     item.setPisCofinsCst(Utils.stringToInt(rst.getString("pis_cst")));
