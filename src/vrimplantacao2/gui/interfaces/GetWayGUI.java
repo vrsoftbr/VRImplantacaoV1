@@ -72,6 +72,7 @@ public class GetWayGUI extends VRInternalFrame {
         chkPesquisarKG.setSelected(params.getBool(SISTEMA, "PESQUISAR_KG_DESCRICAO"));
         chkUtilizarIdIcmsNaEntrada.setSelected(params.getBool(SISTEMA, "UTILIZAR_ID_ICMS_NA_ENTRADA"));
         chkUtilizarEmbalagemCompra.setSelected(params.getBool(SISTEMA, "UTILIZAR_EMBALAGEM_DE_COMPRA"));
+        chkCopiarIcmsDebitoNaEntrada.setSelected(params.getBool(SISTEMA, "COPIAR_ICMS_DEBITO"));
     }
 
     private void gravarParametros() throws Exception {
@@ -92,6 +93,7 @@ public class GetWayGUI extends VRInternalFrame {
         params.put(chkUtilizarIdIcmsNaEntrada.isSelected(), SISTEMA, "UTILIZAR_ID_ICMS_NA_ENTRADA");
         params.put(chkUtilizarEmbalagemCompra.isSelected(), SISTEMA, "UTILIZAR_EMBALAGEM_DE_COMPRA");
         params.put((txtDataFimOferta.getDate() != null ? new java.sql.Date(txtDataFimOferta.getDate().getTime()) : null), SISTEMA, "DATA_FIM_OFERTA");
+        params.put(chkCopiarIcmsDebitoNaEntrada.isSelected(), SISTEMA, "COPIAR_ICMS_DEBITO");
 
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
         if (cliente != null) {
@@ -266,6 +268,7 @@ public class GetWayGUI extends VRInternalFrame {
                     importador.setLojaVR(idLojaVR);
                     
                     getWayDAO.setUtilizarEmbalagemDeCompra(chkUtilizarEmbalagemCompra.isSelected());
+                    getWayDAO.setCopiarIcmsDebitoNaEntrada(chkCopiarIcmsDebitoNaEntrada.isSelected());
 
                     if (tabs.getSelectedIndex() == 1) {
                         if (chkFamiliaProduto.isSelected()) {
@@ -553,6 +556,7 @@ public class GetWayGUI extends VRInternalFrame {
         chkUtilizarIdIcmsNaEntrada = new vrframework.bean.checkBox.VRCheckBox();
         chkForcarUnidade = new vrframework.bean.checkBox.VRCheckBox();
         chkUtilizarEmbalagemCompra = new vrframework.bean.checkBox.VRCheckBox();
+        chkCopiarIcmsDebitoNaEntrada = new vrframework.bean.checkBox.VRCheckBox();
         vRTabbedPane2 = new vrframework.bean.tabbedPane.VRTabbedPane();
         vRPanel7 = new vrframework.bean.panel.VRPanel();
         chkFamiliaProduto = new vrframework.bean.checkBox.VRCheckBox();
@@ -746,6 +750,10 @@ public class GetWayGUI extends VRInternalFrame {
         chkUtilizarEmbalagemCompra.setText("Utilizar embalagem de compra");
         chkUtilizarEmbalagemCompra.setToolTipText("<html>\n<p>Selecione essa opção caso o cliente não utilize setor de balança para determinar quais são os produtos pesáveis.</p>\n<p>Caso o cliente não envie carga para a balança, pode ser que o campo setor de balança não esteja preenchido<br> \ne nem o campo tipo de embalagem está correto, neste caso a rotina irá verificar se a palavra KG pode ser encontrado nos produtos<br>\n<b>OBS: Nesta opção, não será possível importar os pesáveis unitários.</b> \n</html>");
 
+        chkCopiarIcmsDebitoNaEntrada.setText("Copiar ICMS débito na entrada");
+        chkCopiarIcmsDebitoNaEntrada.setToolTipText("Marque está opção quando o cliente utilizar a margem bruta do GetWay para calcular seus preços");
+        chkCopiarIcmsDebitoNaEntrada.setEnabled(true);
+
         javax.swing.GroupLayout tabParametrosLayout = new javax.swing.GroupLayout(tabParametros);
         tabParametros.setLayout(tabParametrosLayout);
         tabParametrosLayout.setHorizontalGroup(
@@ -766,22 +774,20 @@ public class GetWayGUI extends VRInternalFrame {
                                 .addGroup(tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(chkUsarMargemBruta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkUsarQtdCotacaoProdFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(chkUsarQtdCotacaoProdFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(chkCopiarIcmsDebitoNaEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(83, 83, 83)
                                 .addGroup(tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(chkForcarUnidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(chkUtilizarIdIcmsNaEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(chkPesquisarKG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkUtilizarEmbalagemCompra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(0, 30, Short.MAX_VALUE))
-                    .addGroup(tabParametrosLayout.createSequentialGroup()
-                        .addGroup(tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(chkUtilizarEmbalagemCompra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(tabParametrosLayout.createSequentialGroup()
                                 .addComponent(jLabel3)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(txtDataFimOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         tabParametrosLayout.setVerticalGroup(
@@ -807,7 +813,9 @@ public class GetWayGUI extends VRInternalFrame {
                     .addComponent(chkUsarQtdCotacaoProdFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkForcarUnidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkUtilizarEmbalagemCompra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkUtilizarEmbalagemCompra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCopiarIcmsDebitoNaEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
                 .addGroup(tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
@@ -1678,6 +1686,7 @@ public class GetWayGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkConvConveniado;
     private vrframework.bean.checkBox.VRCheckBox chkConvEmpresa;
     private vrframework.bean.checkBox.VRCheckBox chkConvRecebimento;
+    private vrframework.bean.checkBox.VRCheckBox chkCopiarIcmsDebitoNaEntrada;
     private vrframework.bean.checkBox.VRCheckBox chkCustoComImposto;
     private vrframework.bean.checkBox.VRCheckBox chkCustoSemImposto;
     private vrframework.bean.checkBox.VRCheckBox chkDesconsiderarSetorBalanca;
