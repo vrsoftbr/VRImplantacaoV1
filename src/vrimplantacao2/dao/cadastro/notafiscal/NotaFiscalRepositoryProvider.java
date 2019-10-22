@@ -117,12 +117,12 @@ public class NotaFiscalRepositoryProvider {
         notaFiscalAnteriorDAO.atualizar(anterior);
     }
 
-    public void eliminarNotaEntrada(int codigoAtual) throws Exception {
-        notaEntradaDAO.eliminarNota(codigoAtual);
+    public void eliminarNotaEntrada(int codigoAtual, boolean apagarApenasItens) throws Exception {
+        notaEntradaDAO.eliminarNota(codigoAtual, apagarApenasItens);
     }
 
-    public void eliminarNotaSaida(int codigoAtual) throws Exception {
-        notaSaidaDAO.eliminarNota(codigoAtual);
+    public void eliminarNotaSaida(int codigoAtual, boolean apagarApenasItens) throws Exception {
+        notaSaidaDAO.eliminarNota(codigoAtual, apagarApenasItens);
     }
 
     public Integer getIdNotaEntrada(NotaFiscalIMP imp) throws Exception {
@@ -167,6 +167,14 @@ public class NotaFiscalRepositoryProvider {
 
     public int getIdFornecedorLoja() throws Exception {
         return new LojaDAO().getIdFornecedor(lojaVR);
+    }
+
+    public void atualizarSaida(NotaSaida ns) {
+        this.notaSaidaDAO.atualizar(ns);
+    }
+
+    public void atualizarEntrada(NotaEntrada ne) {
+        this.notaEntradaDAO.atualizar(ne);
     }
     
 }

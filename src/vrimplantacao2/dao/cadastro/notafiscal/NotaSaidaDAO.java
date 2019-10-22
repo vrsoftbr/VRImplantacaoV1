@@ -75,11 +75,13 @@ public class NotaSaidaDAO {
         }
     }
 
-    public void eliminarNota(int id) throws Exception {
+    public void eliminarNota(int id, boolean apagarApenasItens) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("delete from notasaidaitemimportacaoxml where id_notasaidaitem in (select id from notasaidaitem where id_notasaida = " + id + ")");
             stm.execute("delete from notasaidaitem where id_notasaida = " + id);
-            stm.execute("delete from notasaida where id = " + id);
+            if (!apagarApenasItens) {
+                stm.execute("delete from notasaida where id = " + id);
+            }
         }
     }
 
@@ -240,6 +242,10 @@ public class NotaSaidaDAO {
             stm.execute(sql.getInsert());
             
         }
+    }
+
+    public void atualizar(NotaSaida ns) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

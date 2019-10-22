@@ -3,6 +3,7 @@ package vrimplantacao2.dao.cadastro.notafiscal;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
@@ -81,11 +82,13 @@ public class NotaEntradaDAO {
         }
     }
 
-    public void eliminarNota(int id) throws Exception {
+    public void eliminarNota(int id, boolean apagarApenasItens) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("delete from notaentradaitemimportacaoxml where id_notaentradaitem in (select id from notaentradaitem where id_notaentrada = " + id + ")");
             stm.execute("delete from notaentradaitem where id_notaentrada = " + id);
-            stm.execute("delete from notaentrada where id = " + id);
+            if (!apagarApenasItens) {
+                stm.execute("delete from notaentrada where id = " + id);
+            }
         }
     }
 
@@ -257,6 +260,10 @@ public class NotaEntradaDAO {
             }
             
         }
+    }
+
+    public void atualizar(NotaEntrada ne) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }
