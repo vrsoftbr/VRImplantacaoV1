@@ -37,6 +37,7 @@ public class NotaFiscalRepositoryProvider {
     private ProdutoComplementoDAO produtoComplementoDAO;
     private PisCofinsDAO pisCofinsDAO;
     private MapaTributacaoDAO mapaTributacaoDAO;
+    private FornecedorAnteriorDAO fornedorAnteriorDAO;
 
     public NotaFiscalRepositoryProvider(String sistema, String lojaOrigem, int lojaVR) throws Exception {
         
@@ -46,7 +47,7 @@ public class NotaFiscalRepositoryProvider {
         
         this.notaEntradaDAO = new NotaEntradaDAO();
         this.notaSaidaDAO = new NotaSaidaDAO();
-        this.fornecedorAnteriorDAO = new FornecedorAnteriorDAO();
+        this.fornecedorAnteriorDAO = fornedorAnteriorDAO;
         this.clienteEventualAnteriorDAO = new ClienteEventualAnteriorDAO();
         this.notaFiscalAnteriorDAO = new NotaFiscalAnteriorDAO();
         this.produtoAnteriorDAO = new ProdutoAnteriorDAO();
@@ -55,6 +56,7 @@ public class NotaFiscalRepositoryProvider {
         this.pisCofinsDAO = new PisCofinsDAO();
         this.mapaTributacaoDAO = new MapaTributacaoDAO();
         this.mapaTributacaoDAO.createTable();
+        this.fornedorAnteriorDAO = new FornecedorAnteriorDAO();
         
     }
 
@@ -76,14 +78,6 @@ public class NotaFiscalRepositoryProvider {
 
     public int getTipoNotaSaida() throws Exception {
         return notaSaidaDAO.getTipoNotaSaida();
-    }
-
-    public Integer getFornecedorById(String id) throws Exception {
-        return fornecedorAnteriorDAO.getByIdAnterior(getSistema(), getLojaOrigem(), id);
-    }
-
-    public Integer getClienteEventual(String id) throws Exception {
-        return clienteEventualAnteriorDAO.getByIdAnterior(getSistema(), getLojaOrigem(), id);
     }
 
     //<editor-fold defaultstate="collapsed" desc="NOTIFICAÇÃO">
@@ -117,16 +111,24 @@ public class NotaFiscalRepositoryProvider {
         notaFiscalAnteriorDAO.atualizar(anterior);
     }
 
-    public void eliminarNotaEntrada(int codigoAtual, boolean apagarApenasItens) throws Exception {
-        notaEntradaDAO.eliminarNota(codigoAtual, apagarApenasItens);
+    public void eliminarItensNotaEntrada(int codigoAtual) throws Exception {
+        notaEntradaDAO.eliminarItens(codigoAtual);
+    }
+    
+    public void eliminarNotaEntrada(int codigoAtual) throws Exception {
+        notaEntradaDAO.eliminarNota(codigoAtual);
     }
 
-    public void eliminarNotaSaida(int codigoAtual, boolean apagarApenasItens) throws Exception {
-        notaSaidaDAO.eliminarNota(codigoAtual, apagarApenasItens);
+    public void eliminarItensNotaSaida(int codigoAtual) throws Exception {
+        notaSaidaDAO.eliminarItens(codigoAtual);
     }
 
-    public Integer getIdNotaEntrada(NotaFiscalIMP imp) throws Exception {
-        return notaEntradaDAO.getNota(imp, getLojaVR());
+    public void eliminarNotaSaida(int codigoAtual) throws Exception {
+        notaSaidaDAO.eliminarNota(codigoAtual);
+    }
+
+    public Integer getIdNotaEntrada(NotaFiscalIMP imp, int idFornecedor) throws Exception {
+        return notaEntradaDAO.getNota(imp, idFornecedor, getLojaVR());
     }
 
     public Integer getIdNotaSaida(NotaFiscalIMP imp) throws Exception {
@@ -175,6 +177,14 @@ public class NotaFiscalRepositoryProvider {
 
     public void atualizarEntrada(NotaEntrada ne) {
         this.notaEntradaDAO.atualizar(ne);
+    }
+
+    public Map<String, Integer> getFornecedores() throws Exception {
+        return fornedorAnteriorDAO.getFornecedoresImportados(sistema, lojaOrigem);
+    }
+
+    public Map<String, Integer> getClientesEventuais() throws Exception {
+        return clienteEventualAnteriorDAO.getClientesEventuaisImportados(sistema, lojaOrigem);
     }
     
 }

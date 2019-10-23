@@ -75,13 +75,17 @@ public class NotaSaidaDAO {
         }
     }
 
-    public void eliminarNota(int id, boolean apagarApenasItens) throws Exception {
+    public void eliminarNota(int id) throws Exception {
+        eliminarItens(id);
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute("delete from notasaida where id = " + id);
+        }
+    }
+    
+    public void eliminarItens(int id) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("delete from notasaidaitemimportacaoxml where id_notasaidaitem in (select id from notasaidaitem where id_notasaida = " + id + ")");
             stm.execute("delete from notasaidaitem where id_notasaida = " + id);
-            if (!apagarApenasItens) {
-                stm.execute("delete from notasaida where id = " + id);
-            }
         }
     }
 

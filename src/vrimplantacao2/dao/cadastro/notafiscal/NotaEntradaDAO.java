@@ -3,7 +3,6 @@ package vrimplantacao2.dao.cadastro.notafiscal;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
@@ -82,27 +81,32 @@ public class NotaEntradaDAO {
         }
     }
 
-    public void eliminarNota(int id, boolean apagarApenasItens) throws Exception {
+    public void eliminarNota(int id) throws Exception {
+        eliminarItens(id);
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute("delete from notaentrada where id = " + id);
+        }
+    }
+    
+    public void eliminarItens(int id) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute("delete from notaentradaitemimportacaoxml where id_notaentradaitem in (select id from notaentradaitem where id_notaentrada = " + id + ")");
             stm.execute("delete from notaentradaitem where id_notaentrada = " + id);
-            if (!apagarApenasItens) {
-                stm.execute("delete from notaentrada where id = " + id);
-            }
         }
     }
 
-    public Integer getNota(NotaFiscalIMP imp, int idLojaVR) throws Exception {
+    public Integer getNota(NotaFiscalIMP imp, int idFornecedor, int idLojaVR) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select id from notaentrada n\n" +
+            String sql = "select id from notaentrada n\n" +
                     "where\n" +
                     "	n.id_loja = " + idLojaVR + " and\n" +
-                    "	n.modelo = '" + imp.getModelo() + "' and\n" +
-                    "	n.serie = '" + imp.getSerie() + "' and\n" +
+                    "   n.id_fornecedor = " + idFornecedor + " and\n" +
                     "	n.numeronota = " + imp.getNumeroNota() + " and\n" +
-                    "	n.dataentrada = '" + new SimpleDateFormat("yyyy-MM-dd").format(imp.getDataEntradaSaida()) + "'"
-            )) {
+                    "	n.dataentrada = '" + new SimpleDateFormat("yyyy-MM-dd").format(imp.getDataEntradaSaida()) + "'";
+            
+            LOG.fine(sql);
+            
+            try (ResultSet rst = stm.executeQuery(sql)) {
                 if (rst.next()) {
                     return rst.getInt("id") > 0 ? rst.getInt("id") : null;
                 }

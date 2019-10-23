@@ -1614,7 +1614,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSerie(rst.getString("serie"));
                     imp.setNumeroNota(Utils.stringToInt(rst.getString("numeronota")));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
-                    imp.setDataEntradaSaida(rst.getDate("dataentradasaida"));
+                    imp.setDataEntradaSaida(rst.getDate("dataemissao"));
+                    //imp.setDataEntradaSaida(rst.getDate("dataentradasaida"));
                     imp.setValorTotal(rst.getDouble("total_nota"));
                     imp.setTipoDestinatario(imp.getOperacao() == NotaOperacao.ENTRADA ? TipoDestinatario.FORNECEDOR : TipoDestinatario.CLIENTE_EVENTUAL);
                     imp.setIdDestinatario(rst.getString("cod_parceiro"));
