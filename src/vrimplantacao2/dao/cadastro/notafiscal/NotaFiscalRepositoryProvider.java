@@ -171,11 +171,11 @@ public class NotaFiscalRepositoryProvider {
         return new LojaDAO().getIdFornecedor(lojaVR);
     }
 
-    public void atualizarSaida(NotaSaida ns) {
+    public void atualizarSaida(NotaSaida ns) throws Exception {
         this.notaSaidaDAO.atualizar(ns);
     }
 
-    public void atualizarEntrada(NotaEntrada ne) {
+    public void atualizarEntrada(NotaEntrada ne) throws Exception {
         this.notaEntradaDAO.atualizar(ne);
     }
 

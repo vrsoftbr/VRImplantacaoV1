@@ -120,6 +120,7 @@ public class NotaFiscalRepository {
                         this.provider.salvarEntrada(ne);
                         idNotaEntrada = ne.getId();
                     } else {
+                        ne.setId(idNotaEntrada);
                         this.provider.atualizarEntrada(ne);
                     }
                     //Incluir itens da nota
@@ -157,6 +158,7 @@ public class NotaFiscalRepository {
                         this.provider.salvarSaida(ns);
                         idNotaSaida = ns.getId();
                     } else {
+                        ns.setId(idNotaSaida);
                         this.provider.atualizarSaida(ns);
                     }
                     //Incluir itens na nota
@@ -280,6 +282,28 @@ public class NotaFiscalRepository {
     public NotaEntrada converterNotaEntrada(NotaFiscalIMP imp) throws Exception {
         NotaEntrada n = new NotaEntrada();
         
+        double valorIcmsBaseCalculo = 0;
+        double valorIcms = 0;
+        double valorIcmsST = 0;
+        double valorIpi = 0;
+        double valorFrete = 0;
+        double valorDesconto = 0;
+        double valorOutraDespesa = 0;
+        double valorProduto = 0;
+        double valorTotal = 0;
+        
+        for (NotaFiscalItemIMP item: imp.getItens()) {
+            valorIcmsBaseCalculo += item.getIcmsBaseCalculo();
+            valorIcms += item.getIcmsValor();
+            valorIcmsST += item.getIcmsValorST();
+            valorIpi += item.getIpiValor();
+            valorFrete += item.getValorFrete();
+            valorDesconto += item.getValorDesconto();
+            valorOutraDespesa += item.getValorOutras();
+            valorProduto += item.getValorTotalProduto();
+            valorTotal += item.getValorTotal();
+        }
+        
         n.setIdLoja(this.provider.getLojaVR());
         n.setNumeroNota(imp.getNumeroNota());
         Integer fornecedor = fornecedores.get(imp.getIdDestinatario());
@@ -287,21 +311,21 @@ public class NotaFiscalRepository {
             throw new Exception("Fornecedor não encontrado " + imp.getIdDestinatario());
         }
         n.setIdFornecedor(fornecedor);
-        n.setDataEntrada(imp.getDataEntradaSaida());
+        n.setDataEntrada(imp.getDataEmissao());
         n.setIdTipoEntrada(this.tipoNotaEntrada);
         n.setDataEmissao(imp.getDataEmissao());
         n.setDataHoraLancamento(getTimestamp(imp.getDataHoraAlteracao()));
         
-        n.setValorIpi(imp.getValorIpi());
-        n.setValorFrete(imp.getValorFrete());
-        n.setValorDesconto(imp.getValorDesconto());
-        n.setValorOutraDespesa(imp.getValorOutrasDespesas());
+        n.setValorIpi(valorIpi);
+        n.setValorFrete(valorFrete);
+        n.setValorDesconto(valorDesconto);
+        n.setValorOutraDespesa(valorOutraDespesa);
         n.setValorDespesaAdicional(0);
-        n.setValorIcms(imp.getValorIcms());
-        n.setValorIcmsSubstituicao(imp.getValorIcmsSubstituicao());
+        n.setValorIcms(valorIcms);
+        n.setValorIcmsSubstituicao(valorIcmsST);
         
-        n.setValorMercadoria(imp.getValorProduto());
-        n.setValorTotal(imp.getValorTotal());
+        n.setValorMercadoria(valorProduto);
+        n.setValorTotal(valorTotal);
         n.setIdUsuario(0);
         // private boolean impressao = false;// boolean NOT NULL,
         n.setProdutorRural(imp.isProdutorRural());
@@ -313,7 +337,7 @@ public class NotaFiscalRepository {
         n.setSituacaoNotaEntrada(SituacaoNotaEntrada.FINALIZADO);
         n.setSerie(imp.getSerie());
         // private double valorGuiaSubstituicao = 0;// numeric(11,2),
-        // private double valorBaseCalculo = 0;// numeric(11,2),
+        n.setValorBaseCalculo(valorIcmsBaseCalculo);
         // private int aplicaAliquota = -1;// integer NOT NULL,
         // private double valorBaseSubstituicao = 0;// numeric(11,2) NOT NULL,
         // private double valorFunrural = 0;// numeric(11,2) NOT NULL,
@@ -350,6 +374,28 @@ public class NotaFiscalRepository {
     
     public NotaSaida converterNotaSaida(NotaFiscalIMP imp) throws Exception {
         NotaSaida n = new NotaSaida();        
+               
+        double valorIcmsBaseCalculo = 0;
+        double valorIpi = 0;
+        double valorProduto = 0;
+        double valorIcms = 0;
+        double valorIcmsST = 0;
+        double valorFrete = 0;
+        double valorDesconto = 0;
+        double valorOutraDespesa = 0;
+        double valorTotal = 0;
+        
+        for (NotaFiscalItemIMP item: imp.getItens()) {
+            valorIcmsBaseCalculo += item.getIcmsBaseCalculo();
+            valorIpi += item.getIpiValor();
+            valorProduto += item.getValorTotalProduto();
+            valorIcms += item.getIcmsValor();
+            valorIcmsST += item.getIcmsValorST();
+            valorFrete += item.getValorFrete();
+            valorDesconto += item.getValorDesconto();
+            valorOutraDespesa += item.getValorOutras();
+            valorTotal += item.getValorTotal();
+        }
         
         n.setIdLoja(provider.getLojaVR());
         n.setNumeroNota(imp.getNumeroNota());
@@ -363,7 +409,7 @@ public class NotaFiscalRepository {
                 n.setIdFornecedor(fornecedor);
                 break;
             case CLIENTE_EVENTUAL:
-                Integer clienteeventual = clientesEventuais.get(imp.getIdDestinatario());
+                Integer clienteeventual = clientesEventuais.get((String) imp.getIdDestinatario());
                 if (clienteeventual == null) {
                     throw new Exception("Cliente eventual não encontrado " + imp.getIdDestinatario());
                 }
@@ -374,18 +420,18 @@ public class NotaFiscalRepository {
         n.setDataHoraEmissao(getTimestamp(imp.getDataEmissao()));
         n.setDataSaida(imp.getDataEntradaSaida());
         
-        n.setValorIpi(imp.getValorIpi());
-        n.setValorFrete(imp.getValorFrete());
-        n.setValorOutrasDespesas(imp.getValorOutrasDespesas());
-        n.setValorProduto(imp.getValorProduto()); 
-        n.setValorIcms(imp.getValorIcms());
+        n.setValorIpi(valorIpi);
+        n.setValorFrete(valorFrete);
+        n.setValorOutrasDespesas(valorOutraDespesa);
+        n.setValorProduto(valorProduto); 
+        n.setValorIcms(valorIcms);
         n.setValorSeguro(imp.getValorSeguro());
-        n.setValorDesconto(imp.getValorDesconto());
+        n.setValorDesconto(valorDesconto);
         
-        n.setValorTotal(imp.getValorTotal());
-        //private double valorBaseCalculo = 0;// numeric(11,2) NOT NULL,
+        n.setValorTotal(valorTotal);
+        n.setValorBaseCalculo(valorIcmsBaseCalculo);
         //private double valorBaseSubstituicao = 0;// numeric(11,2) NOT NULL,
-        //n.setValorIcmsSubstituicao(imp.getValorIcmsSubstituicao());
+        n.setValorIcmsSubstituicao(valorIcmsST);
         //private boolean impressao = true;//boolean NOT NULL,
         n.setSituacaoNotaSaida(SituacaoNotaSaida.FINALIZADO);
         

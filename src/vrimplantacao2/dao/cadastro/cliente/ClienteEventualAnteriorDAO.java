@@ -215,7 +215,7 @@ public class ClienteEventualAnteriorDAO {
                     "	not codigoatual is null";
             LOG.fine(sql);
             try (ResultSet rst = stm.executeQuery(sql)) {
-                if (rst.next()) {
+                while (rst.next()) {
                     result.put(rst.getString("id"), rst.getInt("codigoatual"));
                 }
             }

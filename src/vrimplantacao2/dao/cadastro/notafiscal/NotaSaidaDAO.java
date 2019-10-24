@@ -1,6 +1,7 @@
 package vrimplantacao2.dao.cadastro.notafiscal;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -105,6 +106,35 @@ public class NotaSaidaDAO {
             }
         }
         return null;
+    }
+
+    public void atualizar(NotaSaida ns) throws Exception {
+        
+        SQLBuilder sql = new SQLBuilder();
+        
+        sql.setSchema("public");
+        sql.setTableName("notasaida");
+        sql.put("valoripi", ns.getValorIpi());
+        sql.put("valorfrete", ns.getValorFrete());
+        sql.put("valoroutrasdespesas", ns.getValorOutrasDespesas());
+        sql.put("valorproduto", ns.getValorProduto());
+        sql.put("valortotal", ns.getValorTotal());
+        sql.put("valorbasecalculo", ns.getValorBaseCalculo());
+        sql.put("valoricms", ns.getValorIcms());
+        sql.put("valorbasesubstituicao", ns.getValorBaseSubstituicao());
+        sql.put("valoricmssubstituicao", ns.getValorIcmsSubstituicao());
+        sql.put("valorseguro", ns.getValorSeguro());
+        sql.put("valordesconto", ns.getValorDesconto());
+        sql.put("valorafrmm", ns.getValorafrmm());
+        sql.put("valorFcp", ns.getValorFcp());
+        sql.put("valorFcpSt", ns.getValorFcpSt());
+        sql.put("valorIcmsDesonerado", ns.getValorIcmsDesonerado());
+        sql.setWhere("id = " + ns.getId());
+        
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(sql.getUpdate());
+        }
+        
     }
 
     public void salvar(NotaSaida ns) throws Exception {
@@ -246,10 +276,6 @@ public class NotaSaidaDAO {
             stm.execute(sql.getInsert());
             
         }
-    }
-
-    public void atualizar(NotaSaida ns) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

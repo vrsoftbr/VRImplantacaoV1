@@ -115,6 +115,37 @@ public class NotaEntradaDAO {
         return null;
     }
 
+    public void atualizar(NotaEntrada ne) throws Exception {
+        
+        SQLBuilder sql = new SQLBuilder();
+        sql.setTableName("notaentrada");
+        sql.put("valoripi", ne.getValorIpi());
+        sql.put("valorfrete", ne.getValorFrete());
+        sql.put("valordesconto", ne.getValorDesconto());
+        sql.put("valoroutradespesa", ne.getValorOutraDespesa());
+        sql.put("valordespesaadicional", ne.getValorDespesaAdicional());
+        sql.put("valormercadoria", ne.getValorMercadoria());
+        sql.put("valortotal", ne.getValorTotal());
+        sql.put("valoricms", ne.getValorIcms());
+        sql.put("valoricmssubstituicao", ne.getValorIcmsSubstituicao());
+        sql.put("valorguiasubstituicao", ne.getValorGuiaSubstituicao());
+        sql.put("valorbasecalculo", ne.getValorBaseCalculo());
+        sql.put("valorbasesubstituicao", ne.getValorBaseSubstituicao());
+        sql.put("valorfunrural", ne.getValorFunrural());
+        sql.put("valordescontoboleto", ne.getValorDescontoBoleto());
+        sql.put("valoricmssn", ne.getValorIcmsSN());
+        sql.put("valordespesafrete", ne.getValorDespesaFrete());
+        sql.put("valorfcp", ne.getValorFcp());
+        sql.put("valorfcpst", ne.getValorFcpST());
+        sql.put("valoricmsdesonerado", ne.getValorIcmsDesonerado());
+        sql.put("valorsuframa", ne.getValorSuframa());        
+        sql.setWhere("id = " + ne.getId());
+                
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(sql.getUpdate());
+        }
+    }
+
     public void salvar(NotaEntrada ne) throws Exception {
         SQLBuilder sql = new SQLBuilder();
         sql.setTableName("notaentrada");
@@ -264,10 +295,6 @@ public class NotaEntradaDAO {
             }
             
         }
-    }
-
-    public void atualizar(NotaEntrada ne) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }
