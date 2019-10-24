@@ -596,6 +596,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     imp.setCondicaoPagamento(Utils.stringToInt(Utils.formataNumero(rst.getString("condpagamento"))));
                     imp.setPrazoEntrega(rst.getInt("prev_entrega"));
+                    
                     if(rst.getInt("produtor_rural") == 1) {
                         imp.setProdutorRural();
                     }
