@@ -1226,10 +1226,10 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setEcf(Utils.stringToInt(rst.getString("caixa")));
                         next.setData(rst.getDate("data"));
                         next.setIdClientePreferencial(rst.getString("id_cliente"));
-                        String horaInicio = FORMAT.format(rst.getDate("data")) + " " + rst.getString("hora");
-                        String horaTermino = FORMAT.format(rst.getDate("data")) + " " + rst.getString("hora");
-                        next.setHoraInicio(TIMESTAMP.parse(horaInicio));
-                        next.setHoraTermino(TIMESTAMP.parse(horaTermino));
+                        //String horaInicio = FORMAT.format(rst.getDate("data")) + " " + rst.getString("hora");
+                        //String horaTermino = FORMAT.format(rst.getDate("data")) + " " + rst.getString("hora");
+                        next.setHoraInicio(TIMESTAMP.parse(rst.getString("datahora")));
+                        next.setHoraTermino(TIMESTAMP.parse(rst.getString("datahora")));
                         next.setCancelado(rst.getInt("cancelado") == 1);
                         next.setSubTotalImpressora(rst.getDouble("valor"));
                         next.setCpf(rst.getString("cpf"));
@@ -1250,7 +1250,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "SELECT\n" +
-                    "	concat(v.NOTA, v.CAIXA, v.`DATA`) id, \n" +
+                    "	concat(v.NOTA, v.CAIXA, v.datahora, v.ccf) id, \n" +
                     "	v.NOTA cupom,\n" +
                     "	v.CAIXA,\n" +
                     "	v.`DATA`,\n" +
@@ -1262,7 +1262,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	max(v.CANCELADO) cancelado,\n" +
                     "	v.CLIENTE id_cliente,\n" +
                     "	c.nome,\n" +
-                    "   c.cpf,\n" +
+                    "	c.cpf,\n" +
                     "	c.endereco,\n" +
                     "	c.bairro,\n" +
                     "	c.numero,\n" +
@@ -1280,19 +1280,28 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	v.loja = " + idLojaCliente + " and\n" +
                     "	v.e_transferencia = 0 and\n" +
                     "	v.nao_bx_estoque = 0 and\n" +
-                    " 	v.caixa <> '999'\n" +
+                    "	v.caixa <> '999' and\n" +
+                    "   v.valor > 0\n" +
                     "GROUP BY\n" +
                     "	v.NOTA,\n" +
-                    "	v.USUARIO,\n" +
                     "	v.CAIXA,\n" +
                     "	v.`DATA`,\n" +
                     "	v.ecf,\n" +
                     "	v.`STATUS`,\n" +
                     "	v.CLIENTE,\n" +
+                    "	c.nome,\n" +
+                    "	c.cpf,\n" +
+                    "	c.endereco,\n" +
+                    "	c.bairro,\n" +
+                    "	c.numero,\n" +
+                    "	c.cidade,\n" +
+                    "	c.uf,\n" +
+                    "	c.cep,\n" +
+                    "	c.telefone,\n" +
                     "	v.coo,\n" +
                     "	v.ccf\n" +
                     "ORDER  BY\n" +
-                    "	v.CAIXA, v.data, v.HORA";
+                    "	v.CAIXA, v.data, v.datahora";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
@@ -1410,7 +1419,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = "SELECT\n" +
                     "	v.id,\n" +
-                    "   CONCAT(v.NOTA, v.CAIXA, v.`DATA`) id_venda,\n" +
+                    "   CONCAT(v.NOTA, v.CAIXA, v.datahora, v.ccf) id_venda,\n" +
                     "	v.CAIXA,\n" +
                     "	v.NOTA cupom,\n" +
                     "	v.`DATA`,\n" +
@@ -1431,7 +1440,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	v.loja = " + idLojaCliente + " and\n" +
                     "	v.e_transferencia = 0 and\n" +
                     "	v.nao_bx_estoque = 0 and\n" +
-                    " 	v.caixa <> '999'\n" +
+                    " 	v.caixa <> '999' and\n" +
+                    "   v.valor > 0\n" +
                     "ORDER  BY\n" +
                     "	v.CAIXA, \n" +
                     "	v.data, \n" +
