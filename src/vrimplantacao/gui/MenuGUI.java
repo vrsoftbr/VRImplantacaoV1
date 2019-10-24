@@ -194,6 +194,7 @@ import vrimplantacao2.gui.interfaces.SuperGUI;
 import vrimplantacao2.gui.interfaces.SuperLoja10GUI;
 import vrimplantacao2.gui.interfaces.SuperServerGUI;
 import vrimplantacao2.gui.interfaces.SyncTecGUI;
+import vrimplantacao2.gui.interfaces.SysERPGUI;
 import vrimplantacao2.gui.interfaces.SysPdvGUI;
 import vrimplantacao2.gui.interfaces.SysmoFirebirdGUI;
 import vrimplantacao2.gui.interfaces.SysmoPostgresGUI;
@@ -631,6 +632,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuHercules = new javax.swing.JMenuItem();
         mnuSav = new javax.swing.JMenuItem();
         mnuArtSystem = new javax.swing.JMenuItem();
+        mnuSysERP = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1681,6 +1683,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuArtSystem);
+
+        mnuSysERP.setText("SysERP");
+        mnuSysERP.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSysERPActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuSysERP);
 
         mnuDatabase.add(mnuSqlServer2);
 
@@ -4123,6 +4133,10 @@ public final class MenuGUI extends VRMdiFrame {
         SophyxGUI.exibir(this);
     }//GEN-LAST:event_mnuiSophyxActionPerformed
 
+    private void mnuSysERPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSysERPActionPerformed
+        SysERPGUI.exibir(this);
+    }//GEN-LAST:event_mnuSysERPActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4339,6 +4353,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSuper;
     private javax.swing.JMenuItem mnuSuperLoja10;
     private javax.swing.JMenuItem mnuSyncTech;
+    private javax.swing.JMenuItem mnuSysERP;
     private javax.swing.JMenuItem mnuSysmoFirebird;
     private javax.swing.JMenuItem mnuSysmoPostgres;
     private javax.swing.JMenuItem mnuTga;

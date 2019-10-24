@@ -41,6 +41,7 @@ public class ProdutoIMP {
     private double troca = 0;
     
     private double margem = 0;
+    private double margemMinima = 0;
     private double custoSemImposto = 0;
     private double custoComImposto = 0;    
     private double custoAnteriorSemImposto = 0;
@@ -884,6 +885,20 @@ public class ProdutoIMP {
 
     public void setVolume(double volume) {
         this.volume = volume;
+    }
+
+    /**
+     * @return the margemMinima
+     */
+    public double getMargemMinima() {
+        return margemMinima;
+    }
+
+    /**
+     * @param margemMinima the margemMinima to set
+     */
+    public void setMargemMinima(double margemMinima) {
+        this.margemMinima = margemMinima;
     }
     
 }

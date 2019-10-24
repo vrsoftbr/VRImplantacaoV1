@@ -29,6 +29,7 @@ import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemVO;
+import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -38,6 +39,7 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
@@ -49,6 +51,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(SifatDAO.class.getName());
+    public String db = "";
 
     @Override
     public String getSistema() {
@@ -69,10 +72,14 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.EAN_EM_BRANCO,
             OpcaoProduto.TIPO_EMBALAGEM_EAN,
             OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.QTD_EMBALAGEM_COTACAO,
             OpcaoProduto.CUSTO,
+            OpcaoProduto.MARGEM_MINIMA,
             OpcaoProduto.MARGEM,
             OpcaoProduto.PRECO,
             OpcaoProduto.ESTOQUE,
+            OpcaoProduto.ESTOQUE_MINIMO,
+            OpcaoProduto.ESTOQUE_MAXIMO,
             OpcaoProduto.PESAVEL,
             OpcaoProduto.NCM,
             OpcaoProduto.CEST,
@@ -101,7 +108,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	icm.AL_ICMS as aliquota,\n"
                     + "	icm.RED_BC_ICMS as reducao,\n"
                     + "	icm.DESCRICAO as descricao\n"
-                    + "from ce01t icm\n"
+                    + "from CE01T icm\n"
                     + "where operacao = 1\n"
                     + "order by icm.CST_ICMS"
             )) {
@@ -114,29 +121,6 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
-        List<FamiliaProdutoIMP> vResult = new ArrayList<>();
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + " ID_FAMILIA as id,\n"
-                    + "	DESCRICAO as descricao\n"
-                    + "from ce27"
-            )) {
-                while (rst.next()) {
-                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rst.getString("id"));
-                    imp.setDescricao(rst.getString("descricao"));
-                    vResult.add(imp);
-                }
-            }
-        }
-        return vResult;
-    }
-
-    @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
@@ -146,7 +130,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	NOME_GRUPO as merc1_desc,\n"
                     + "	ID_SUBGRUPO as merc2, \n"
                     + "	NOME_SUBGRUPO as merc2_desc\n"
-                    + "from ce07\n"
+                    + "from CE07\n"
                     + "order by ID_GRUPO, ID_SUBGRUPO"
             )) {
                 while (rst.next()) {
@@ -167,6 +151,29 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> vResult = new ArrayList<>();
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + " ID_FAMILIA as id,\n"
+                    + "	DESCRICAO as descricao\n"
+                    + "from CE27"
+            )) {
+                while (rst.next()) {
+                    FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descricao"));
+                    vResult.add(imp);
+                }
+            }
+        }
+        return vResult;
+    }
+    
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> vResult = new ArrayList<>();
 
@@ -181,6 +188,8 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pro.DESCRICAO as descricaocompleta,\n"
                     + "	pro.ABREVIACAO as descricaoreduzida,\n"
                     + "	pro.UNIDADE as tipoembalagem,\n"
+                    + " pro.UN_COMPRA AS tipoembalagemcotacao,\n"
+                    + " pro.QTDE_COMPRA AS qtdembalagemcotacao,\n"
                     + "	pro.PESO as peso,\n"
                     + "	pro.FAMILIA as idfamilia,\n"
                     + "	pro.GRUPO as merc1,\n"
@@ -189,6 +198,8 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pro.CEST as cest,\n"
                     + "	pro.DT_CADASTRO as datacadastro,\n"
                     + "	pre.ATIVO as situacaocadastro,\n"
+                    + " pre.ML_MAXIMA AS margem,\n"
+                    + " pre.ML_MINIMA as margemminima,\n"
                     + "	pre.PRECO_CUSTO as custo,\n"
                     + "	pre.PRECO_VENDA as precovenda,\n"
                     + "	pre.ESTOQUE as estoque,\n"
@@ -206,11 +217,11 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	icm.AL_ICMS as aliqicms,\n"
                     + "	icm.RED_BC_ICMS as reduicms,\n"
                     + "	icm.DESCRICAO as descricaoicms\n"
-                    + "from ce01 pro\n"
-                    + "left join ce01e pre on pre.ID_PRODUTO = pro.ID_PRODUTO and pre.LOJA = " + getLojaOrigem() + "\n"
-                    + "left join ce61 pis on pis.ID = pre.DEPTO_PIS\n"
-                    + "left join ce61 cof on cof.ID = pre.DEPTO_COFINS\n"
-                    + "left join ce01t icm on icm.DEPTO_ICMS = pre.DEPTO_ICMS and icm.OPERACAO = 1\n"
+                    + "from CE01 pro\n"
+                    + "left join CE01E pre on pre.ID_PRODUTO = pro.ID_PRODUTO and pre.LOJA = " + getLojaOrigem() + "\n"
+                    + "left join CE61 pis on pis.ID = pre.DEPTO_PIS\n"
+                    + "left join CE61 cof on cof.ID = pre.DEPTO_COFINS\n"
+                    + "left join CE01T icm on icm.DEPTO_ICMS = pre.DEPTO_ICMS and icm.OPERACAO = 1\n"
                     + "order by pro.ID_PRODUTO"
             )) {
                 while (rst.next()) {
@@ -219,10 +230,13 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
                     imp.setEan(rst.getString("ean"));
-                    imp.seteBalanca(rst.getInt("fracionado") == 1);
+                    imp.seteBalanca(rst.getInt("balanca") == 1);
+                    imp.setValidade(rst.getInt("validade"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setTipoEmbalagemCotacao(rst.getString("tipoembalagemcotacao"));
+                    imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagemcotacao"));
                     imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setPesoLiquido(rst.getDouble("peso"));
                     imp.setCodMercadologico1(rst.getString("merc1"));
@@ -235,9 +249,12 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setMargemMinima(rst.getDouble("margemminima"));
+                    imp.setMargem(rst.getDouble("margem"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
                     imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
                     imp.setPiscofinsCstDebito(rst.getInt("cstpis"));
                     imp.setPiscofinsCstCredito(rst.getInt("cstcofins"));
                     imp.setPiscofinsNaturezaReceita(rst.getInt("naturezareceita"));
@@ -250,6 +267,20 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
         return vResult;
     }
 
+    @Override
+    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
+        List<PautaFiscalIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    ""
+            )) {
+                
+            }
+        }
+        return null;
+    }
+    
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> vResult = new ArrayList<>();
@@ -280,7 +311,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	f.PRAZO_ENTREGA as prazoentrega,\n"
                     + "	f.PRAZO_PGTO as prazopagto,\n"
                     + " f.DT_CADASTRO as datacadastro\n"
-                    + "from cd02 f\n"
+                    + "from CD02 f\n"
                     + "where f.E_FORNECEDOR = 1\n"
                     + "order by f.CODIGO"
             )) {
@@ -305,6 +336,8 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIe_rg(rst.getString("ie_rg"));
                     imp.setDatacadastro(rst.getDate("datacadastro"));
                     imp.setPrazoEntrega(rst.getInt("prazoentrega"));
+                    imp.setPrazoPedido(rst.getInt("prazoentrega"));
+                    imp.setCondicaoPagamento(rst.getInt("prazopagto"));
                     imp.setObservacao(rst.getString("observacao"));
 
                     if ((rst.getString("fax") != null)
@@ -401,7 +434,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.PROFISSAO as cargo,\n"
                     + "	c.CPF_CONJUGE as cpfconjuge,\n"
                     + " c.DT_CADASTRO as datacadastro\n"
-                    + "from cd02 c\n"
+                    + "from CD02 c\n"
                     + "where c.E_CLIENTE  = 1\n"
                     + "order by c.CODIGO"
             )) {
@@ -418,6 +451,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setMunicipio(rst.getString("municipio"));
                     imp.setMunicipioIBGE(rst.getInt("municipioibge"));
                     imp.setUf(rst.getString("uf"));
+                    imp.setCep(rst.getString("cep"));
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setCnpj(rst.getString("cnpj"));
                     imp.setInscricaoestadual(rst.getString("ie_rg"));
@@ -465,7 +499,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select "
+                    /*"select "
                     + "id, "
                     + "cliente, "
                     + "loja, "
@@ -475,21 +509,36 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "faturado, "
                     + "valor,\n"
                     + "ADDDATE(data, interval 30 day) vencimento\n"
-                    + "from cf11\n"
+                    + "from CF11\n"
                     + "where DC = 'D'\n"
                     + "and historico like '%VENDA%'\n"
                     + "and loja = " + getLojaOrigem()
-                    + " order by data"
+                    + " order by data"*/
+                    "select\n"
+                    + "	r.ID_TITULO as id,\n"
+                    + "	r.CAIXA as caixa,\n"
+                    + "	r.NUM_TITULO as numerocupom,\n"
+                    + "	r.EMISSAO as dataemissao,\n"
+                    + "	r.VENCIMENTO as datavencimento,\n"
+                    + "	r.VALOR as valor,\n"
+                    + "	r.CLIENTE as idcliente,\n"
+                    + "	r.HISTORICO as observacao\n"
+                    + "from CF04 r \n"
+                    + "where DATAPGTO is NULL\n"
+                    + "and r.LOJA = " + getLojaOrigem() + "\n"
+                    + "and IND_RP = 'R'\n"
+                    + "order by r.EMISSAO"
             )) {
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rst.getString("id"));
-                    imp.setIdCliente(rst.getString("cliente"));
-                    imp.setNumeroCupom(rst.getString("venda"));
+                    imp.setIdCliente(rst.getString("idcliente"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
                     imp.setEcf(rst.getString("caixa"));
                     imp.setValor(rst.getDouble("valor"));
-                    imp.setDataEmissao(rst.getDate("emissao"));
-                    imp.setDataVencimento(rst.getDate("vencimento"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setDataVencimento(rst.getDate("datavencimento"));
+                    imp.setObservacao(rst.getString("observacao"));
                     vResult.add(imp);
                 }
             }
@@ -506,10 +555,11 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
             try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
                         "select distinct a.cliente,\n"
-                        + "(select sum(coalesce(valor, 0)) from bdsifat.cf11 where dc = 'C' and cliente = a.cliente) - "
-                        + "(select sum(coalesce(valor, 0)) from bdsifat.cf11 where historico like '%ESTORNO%' and cliente = a.cliente)"
+                        + "(select sum(coalesce(valor, 0)) from CF11 where dc = 'C' and cliente = a.cliente) "
+                                //+ "- "
+                        //+ "(select sum(coalesce(valor, 0)) from cf11 where historico like '%ESTORNO%' and cliente = a.cliente)"
                         + " valor\n"
-                        + "from cf11 a\n"
+                        + "from CF11 a\n"
                         + "where loja = " + getLojaOrigem()
                 )) {
                     while (rst.next()) {
@@ -651,8 +701,8 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pag.VR_TITULO as valorparcela,\n"
                     + "	pag.HISTORICO as observacao,\n"
                     + "	pag.ESPECIE as especie\n"
-                    + "from cf22 pag\n"
-                    + "where pag.ENTIDADE in (select codigo from cd02 where E_FORNECEDOR = 1)\n"
+                    + "from CF22 pag\n"
+                    + "where pag.ENTIDADE in (select codigo from CD02 where E_FORNECEDOR = 1)\n"
                     + "and pag.DT_PGTO is null\n"
                     + "and pag.LOJA = " + getLojaOrigem() + " \n"
                     + "order by pag.ENTIDADE, pag.NF_NUMERO, pag.NUM_TITULO"
@@ -776,7 +826,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ven.CANCELADO as cancelado,\n"
                     + "	ven.NFE_CHAVE as chaveNFE,\n"
                     + "	ven.NOME_CONSUMIDOR as nomecliente\n"
-                    + "from cf01 ven \n"
+                    + "from CF01 ven \n"
                     + "where ven.LOJA = " + idLojaCliente
                     + " and ven.EMISSAO >= '" + dataInicio + "' and ven.EMISSAO <= '" + dataTermino + "'";
 
@@ -953,8 +1003,8 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ite.CANCELADO as cancelado,\n"
                     + "	ven.EMISSAO datavenda\n"
                     + "from cf02 ite\n"
-                    + "inner join ce01 pro on pro.ID_PRODUTO = ite.ID_PRODUTO\n"
-                    + "inner join cf01 ven on ven.NUMERO = ite.NUMERO \n"
+                    + "inner join CE01 pro on pro.ID_PRODUTO = ite.ID_PRODUTO\n"
+                    + "inner join CF01 ven on ven.NUMERO = ite.NUMERO \n"
                     + "	and ven.CAIXA = ite.CAIXA \n"
                     + "	and ven.LOJA = ite.LOJA\n"
                     + " and ven.LOJA = " + idLojaCliente

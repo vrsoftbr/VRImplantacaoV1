@@ -227,10 +227,11 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
                     "   p.unidade,\n" +
                     "   p.margem,\n" +
                     "   p.f_ult_preco_compra custoanterior,\n" +
-                    "   p.preco_compra custosemimposto,\n" +
-                    "   p.preco_custo custocomimposto,\n" +
+                    "   p.preco_compra custocomimposto,\n" +
+                    "   p.preco_custo custosemimposto,\n" +
                     "   p.preco_venda1 precovenda,\n" +
                     "   p.pesado,\n" +
+                    "   p.alt_balanca enviabalanca,\n" +        
                     "   p.validade,\n" +
                     "   p.estoque_max,\n" +
                     "   p.estoque_min,\n" +
@@ -263,10 +264,9 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("codigo_interno"));
                     imp.setEan(rs.getString("ean"));
-                    if(rs.getInt("pesado") != 0) {
-                        if(imp.getEan() != null && !"".equals(imp.getEan())) {
-                            imp.setEan(imp.getEan().substring(0, imp.getEan().length() - 1));
-                        }
+                    if(rs.getInt("pesado") != 0 ||
+                            (rs.getLong("ean") == rs.getLong("codigo_interno") && rs.getInt("enviabalanca") == 1)) {
+                        imp.setEan(imp.getImportId());
                         imp.seteBalanca(true);
                     }                    
                     imp.setValidade(rs.getInt("validade"));
@@ -308,6 +308,11 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
                             case "N" : imp.setIcmsCstSaida(41);
                                 break;
                             case "T" : imp.setIcmsCstSaida(0);
+                                break;
+                            case "R" : imp.setIcmsCstSaida(20);
+                                if(rs.getDouble("icms_red_debito") == 0) {
+                                    imp.setIcmsCstSaida(0);
+                                }
                                 break;
                             default : imp.setIcmsCstSaida(40);
                                 break;
@@ -395,14 +400,14 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
                     if(rs.getString("telefone") != null
                             && !"0".equals(rs.getString("telefone"))
                                 && !"".equals(rs.getString("telefone"))) {
-                        imp.setTel_principal(rs.getString("ddd") + rs.getString("telefone"));
+                        imp.setTel_principal(rs.getString("telefone"));
                     }
                     if(rs.getString("telefone2") != null
                             && !"0".equals(rs.getString("telefone2"))
                                 && !"".equals(rs.getString("telefone2"))) {
                         imp.addContato("1", 
                                     "TELEFONE2", 
-                                    (rs.getString("ddd2") + rs.getString("telefone2")), 
+                                    (rs.getString("telefone2")), 
                                     null, 
                                     TipoContato.COMERCIAL,
                                     null);
@@ -423,7 +428,7 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.addContato("3", 
                                     "CELULAR", 
                                     null, 
-                                    (rs.getString("ddd_cel") + rs.getString("celular")), 
+                                    (rs.getString("ddd_cel") + "" + rs.getString("celular")), 
                                     TipoContato.COMERCIAL,
                                     null);
                     }

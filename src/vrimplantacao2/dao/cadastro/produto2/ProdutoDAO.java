@@ -124,6 +124,7 @@ public class ProdutoDAO {
             sql.put("larguraembalagem", 0);
             sql.put("alturaembalagem", 0);
             sql.put("perda", 0.0);
+            sql.put("margemminima", vo.getMargemMinima());
             sql.put("margem", vo.getMargem());
             sql.put("verificacustotabela", false);
             sql.put("percentualipi", 0.0);
@@ -259,6 +260,9 @@ public class ProdutoDAO {
         if (opt.contains(OpcaoProduto.NATUREZA_RECEITA)) {
             NaturezaReceitaVO nat = vo.getPisCofinsNaturezaReceita();
             sql.put("tiponaturezareceita", nat != null ? nat.getCodigo() : null);
+        }
+        if (opt.contains(OpcaoProduto.MARGEM_MINIMA)) {
+            sql.put("margemminima", vo.getMargemMinima());
         }
         if (opt.contains(OpcaoProduto.MARGEM)) {
             sql.put("margem", vo.getMargem());

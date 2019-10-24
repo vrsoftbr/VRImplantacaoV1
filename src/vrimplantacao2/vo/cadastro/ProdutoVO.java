@@ -30,6 +30,7 @@ public class ProdutoVO {
     private int validade = 0;
     private double pesoBruto = 0;
     private double pesoLiquido = 0;
+    private double margemMinima = 0;
     private double margem = 0;
     private NcmVO ncm = new NcmVO();
     private PisCofinsVO pisCofinsDebito = PisCofinsDAO.PISCOFINS_DEBITO_PADRAO;
@@ -396,6 +397,20 @@ public class ProdutoVO {
 
     public void setVolume(double volume) {
         this.volume = volume;
+    }
+
+    /**
+     * @return the margemMinima
+     */
+    public double getMargemMinima() {
+        return margemMinima;
+    }
+
+    /**
+     * @param margemMinima the margemMinima to set
+     */
+    public void setMargemMinima(double margemMinima) {
+        this.margemMinima = margemMinima;
     }
     
 }

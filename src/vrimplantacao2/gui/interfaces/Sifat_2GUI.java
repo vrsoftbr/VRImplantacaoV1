@@ -158,6 +158,7 @@ public class Sifat_2GUI extends VRInternalFrame implements ConexaoEvent {
                     Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
+                    dao.db = conexaoMySQL.database;
 
                     if (tabs.getSelectedIndex() == 1) {
 
@@ -167,14 +168,42 @@ public class Sifat_2GUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
+                        
+                        List<OpcaoFornecedor> opForn = new ArrayList<>();
+                        if (chkPrazoPedidoForn.isSelected()) {
+                            opForn.add(OpcaoFornecedor.PRAZO_PEDIDO_FORNECEDOR);
+                        }
+                        
+                        if (chkCondPagamentoForn.isSelected()) {
+                            opForn.add(OpcaoFornecedor.CONDICAO_PAGAMENTO); 
+                        }
+                        
+                        if (!opForn.isEmpty()) {
+                            importador.atualizarFornecedor(opForn.toArray(new OpcaoFornecedor[]{}));
+                        }
+                        
                         if (chkContasPagar.isSelected()) {
                             importador.importarContasPagar(OpcaoContaPagar.NOVOS);
                         }                            
                         if (chkClientePreferencial.isSelected()) {
                             importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
                         }
+                        
+                        List<OpcaoCliente> opt = new ArrayList<>();
+                        
+                        if (chkCepCliente.isSelected()) {
+                            opt.add(OpcaoCliente.CEP);
+                        }
+                        
+                        if (!opt.isEmpty()) {
+                            importador.atualizarClientePreferencial(opt.toArray(new OpcaoCliente[]{}));
+                        }
+                        
                         if (chkCreditoRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
+                        }
+                        if (chkPagamentoRotativo.isSelected()) {
+                            dao.importarPagamentoRotativo();
                         }
 
                         if ((chkVenda.isSelected())
@@ -222,18 +251,23 @@ public class Sifat_2GUI extends VRInternalFrame implements ConexaoEvent {
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkContasPagar = new vrframework.bean.checkBox.VRCheckBox();
+        chkPrazoPedidoForn = new vrframework.bean.checkBox.VRCheckBox();
+        chkCondPagamentoForn = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        chkPagamentoRotativo = new vrframework.bean.checkBox.VRCheckBox();
+        chkCepCliente = new vrframework.bean.checkBox.VRCheckBox();
         vRPanel1 = new vrframework.bean.panel.VRPanel();
         vRLabel2 = new vrframework.bean.label.VRLabel();
         txtDataIniVenda = new vrframework.bean.textField.VRTextField();
         vRLabel3 = new vrframework.bean.label.VRLabel();
         txtDataFimVenda = new vrframework.bean.textField.VRTextField();
         chkVenda = new vrframework.bean.checkBox.VRCheckBox();
+        vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         txtLojaOrigem = new vrframework.bean.textField.VRTextField();
 
-        setTitle("Importação GZ Sistemas");
+        setTitle("Importação Sifat");
         setToolTipText("");
 
         vRLabel1.setText("Loja (Cliente):");
@@ -284,6 +318,10 @@ public class Sifat_2GUI extends VRInternalFrame implements ConexaoEvent {
 
         chkContasPagar.setText("Contas a Pagar");
 
+        chkPrazoPedidoForn.setText("Prazo Pedido");
+
+        chkCondPagamentoForn.setText("Condição Pagamento");
+
         javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
         tabFornecedor.setLayout(tabFornecedorLayout);
         tabFornecedorLayout.setHorizontalGroup(
@@ -291,18 +329,26 @@ public class Sifat_2GUI extends VRInternalFrame implements ConexaoEvent {
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(tabFornecedorLayout.createSequentialGroup()
+                        .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkPrazoPedidoForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCondPagamentoForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(398, Short.MAX_VALUE))
+                .addContainerGap(283, Short.MAX_VALUE))
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkPrazoPedidoForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCondPagamentoForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(194, Short.MAX_VALUE))
+                .addContainerGap(265, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Fornecedores", tabFornecedor);
@@ -311,6 +357,10 @@ public class Sifat_2GUI extends VRInternalFrame implements ConexaoEvent {
 
         chkCreditoRotativo.setText("Crédito Rotativo");
 
+        chkPagamentoRotativo.setText("Pagamento Rotativo");
+
+        chkCepCliente.setText("Cep");
+
         javax.swing.GroupLayout tabClientesLayout = new javax.swing.GroupLayout(tabClientes);
         tabClientes.setLayout(tabClientesLayout);
         tabClientesLayout.setHorizontalGroup(
@@ -318,18 +368,28 @@ public class Sifat_2GUI extends VRInternalFrame implements ConexaoEvent {
             .addGroup(tabClientesLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(tabClientesLayout.createSequentialGroup()
+                        .addGap(21, 21, 21)
+                        .addComponent(chkPagamentoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(tabClientesLayout.createSequentialGroup()
+                        .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCepCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(378, Short.MAX_VALUE))
+                .addContainerGap(414, Short.MAX_VALUE))
         );
         tabClientesLayout.setVerticalGroup(
             tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabClientesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCepCliente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(194, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkPagamentoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(246, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Clientes", tabClientes);
@@ -361,7 +421,7 @@ public class Sifat_2GUI extends VRInternalFrame implements ConexaoEvent {
                             .addComponent(vRLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtDataFimVenda, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(chkVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(283, Short.MAX_VALUE))
+                .addContainerGap(364, Short.MAX_VALUE))
         );
         vRPanel1Layout.setVerticalGroup(
             vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -376,12 +436,13 @@ public class Sifat_2GUI extends VRInternalFrame implements ConexaoEvent {
                 .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtDataIniVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtDataFimVenda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(167, Short.MAX_VALUE))
+                .addContainerGap(242, Short.MAX_VALUE))
         );
 
         tabImportacao.addTab("Vendas", vRPanel1);
 
         tabs.addTab("Importação", tabImportacao);
+        tabs.addTab("Balança", vRImportaArquivBalancaPanel1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -390,7 +451,7 @@ public class Sifat_2GUI extends VRInternalFrame implements ConexaoEvent {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 517, Short.MAX_VALUE)
+                    .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 598, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -402,7 +463,7 @@ public class Sifat_2GUI extends VRInternalFrame implements ConexaoEvent {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
+                .addComponent(tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(vRLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -443,10 +504,14 @@ public class Sifat_2GUI extends VRInternalFrame implements ConexaoEvent {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private vrframework.bean.button.VRButton btnMigrar;
+    private vrframework.bean.checkBox.VRCheckBox chkCepCliente;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
+    private vrframework.bean.checkBox.VRCheckBox chkCondPagamentoForn;
     private vrframework.bean.checkBox.VRCheckBox chkContasPagar;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
+    private vrframework.bean.checkBox.VRCheckBox chkPagamentoRotativo;
+    private vrframework.bean.checkBox.VRCheckBox chkPrazoPedidoForn;
     private vrframework.bean.checkBox.VRCheckBox chkVenda;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel conexaoMySQL;
@@ -461,6 +526,7 @@ public class Sifat_2GUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.textField.VRTextField txtDataFimVenda;
     private vrframework.bean.textField.VRTextField txtDataIniVenda;
     private vrframework.bean.textField.VRTextField txtLojaOrigem;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel1;
     private vrframework.bean.label.VRLabel vRLabel2;
     private vrframework.bean.label.VRLabel vRLabel3;
