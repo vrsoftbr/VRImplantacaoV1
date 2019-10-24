@@ -402,20 +402,14 @@
                           <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
                           <Component id="jLabel11" min="-2" pref="132" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-<<<<<<< HEAD
                           <Component id="chkAliquotaCompleta" min="-2" max="-2" attributes="0"/>
                           <EmptySpace pref="325" max="32767" attributes="0"/>
-=======
->>>>>>> 66d62ff11cca864d8b19b2a70574231252815e03
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="chkCopiarIcmsDebitoNaEntrada" min="-2" max="-2" attributes="0"/>
                               <Component id="chkAliquotaCompleta" min="-2" max="-2" attributes="0"/>
                           </Group>
-<<<<<<< HEAD
                           <EmptySpace pref="181" max="32767" attributes="0"/>
-=======
                           <EmptySpace pref="351" max="32767" attributes="0"/>
->>>>>>> 66d62ff11cca864d8b19b2a70574231252815e03
                       </Group>
                   </Group>
                 </DimensionLayout>
