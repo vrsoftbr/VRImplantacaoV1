@@ -1614,7 +1614,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSerie(rst.getString("serie"));
                     imp.setNumeroNota(Utils.stringToInt(rst.getString("numeronota")));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
-                    imp.setDataEntradaSaida(rst.getDate("dataentradasaida"));
+                    imp.setDataEntradaSaida(rst.getDate("dataemissao"));
+                    //imp.setDataEntradaSaida(rst.getDate("dataentradasaida"));
                     imp.setValorTotal(rst.getDouble("total_nota"));
                     imp.setTipoDestinatario(imp.getOperacao() == NotaOperacao.ENTRADA ? TipoDestinatario.FORNECEDOR : TipoDestinatario.CLIENTE_EVENTUAL);
                     imp.setIdDestinatario(rst.getString("cod_parceiro"));
@@ -1681,6 +1682,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    nfi.per_aliq_icms icms_aliq,\n" +
                     "    nfi.per_red_bc_icms icms_red,\n" +
                     "    nfi.val_icms icms_valor,\n" +
+                    "    nfi.val_bc_icms icms_bc,\n" +
                     "    nfi.val_bc_st icms_bc_st,\n" +
                     "    nfi.val_icms_st icms_st,\n" +
                     "    nfi.val_base_ipi ipi_base,\n" +
@@ -1741,6 +1743,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     item.setIcmsValor(rst.getDouble("icms_valor"));
                     item.setIcmsBaseCalculoST(rst.getDouble("icms_bc_st"));
                     item.setIcmsValorST(rst.getDouble("icms_st"));
+                    item.setIcmsBaseCalculo(rst.getDouble("icms_bc"));
                     item.setIpiValorBase(rst.getDouble("ipi_base"));
                     item.setIpiValor(rst.getDouble("ipi_valor"));
                     item.setPisCofinsCst(Utils.stringToInt(rst.getString("pis_cst")));
