@@ -918,9 +918,24 @@ public class ClienteRepository {
     
     public ClienteEventualContatoVO converterContatoEventual(ClienteContatoIMP impCont) {
         ClienteEventualContatoVO cont = new ClienteEventualContatoVO();
+        
+        String celular = "", telefone = "";
+        
+        if(impCont.getTelefone() != null && !"".equals(impCont.getTelefone())) {
+            if(impCont.getTelefone().length() > 14) {
+                telefone = impCont.getTelefone().substring(0, 14);
+            }
+        }
+        
+        if(impCont.getCelular() != null && !"".equals(impCont.getCelular())) {
+            if(impCont.getCelular().length() > 14) {
+                celular = impCont.getCelular().substring(0, 14);
+            }
+        }
+        
         cont.setNome(impCont.getNome());
-        cont.setTelefone(impCont.getTelefone());
-        cont.setCelular(impCont.getCelular());
+        cont.setTelefone(telefone);
+        cont.setCelular(celular);
         cont.setEmail(impCont.getEmail());
         return cont;
     }

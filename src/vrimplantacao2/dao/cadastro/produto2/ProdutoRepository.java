@@ -1119,6 +1119,7 @@ public class ProdutoRepository {
 
         vo.setFamiliaProduto(provider.getFamiliaProduto(imp.getIdFamiliaProduto()));
         vo.setMargem(imp.getMargem());
+        vo.setMargemMinima(imp.getMargemMinima());
         MercadologicoVO merc = provider.getMercadologico(
                 fillNull(imp.getCodMercadologico1()),
                 fillNull(imp.getCodMercadologico2()),

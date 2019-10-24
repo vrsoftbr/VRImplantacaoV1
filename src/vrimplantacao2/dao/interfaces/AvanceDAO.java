@@ -28,6 +28,7 @@ import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
@@ -518,7 +519,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "c.codibge,\n"
                     + "UPPER(u.uf) UFSIGLA,\n"
                     + "UPPER(u.descricao) NOMEESTADO,\n"
-                    + "f.fpagto_padr condpagamento\n"          
+                    + "f.fpagto_padr condpagamento,\n"          
+                    + "f.produtor_rural\n"        
                   + "FROM fornece f\n"
                     + "LEFT JOIN cidade c ON c.id = f.id_cidade\n"
                     + "LEFT JOIN uf u ON u.id = c.id_uf"
@@ -594,6 +596,9 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     imp.setCondicaoPagamento(Utils.stringToInt(Utils.formataNumero(rst.getString("condpagamento"))));
                     imp.setPrazoEntrega(rst.getInt("prev_entrega"));
+                    if(rst.getInt("produtor_rural") == 1) {
+                        imp.setProdutorRural();
+                    }
                     
                     adicionaContatosFornecedor(imp);
                     
@@ -668,7 +673,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
 
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
+                   "SELECT \n"
                     + "c.codigo,\n"
                     + "c.nome,\n"
                     + "c.nascimento,\n"
@@ -732,8 +737,10 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "c.cod_mun,\n"
                     + "c.id_pais,\n"
                     + "c.natureza_juridica,\n"
-                    + "c.endereco\n"
-                    + "FROM clientes c"
+                    + "c.endereco,\n"
+                    + "case when cadastro = '0000-00-00' then NOW()\n"
+                    + "	else cadastro end cadastro\n"        
+                  + "FROM clientes c"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -750,7 +757,6 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTelefone(rst.getString("telefone"));
                     imp.setEmail(rst.getString("email"));
                     imp.setDataNascimento(rst.getDate("nascimento"));
-                    imp.setDataCadastro(rst.getDate("conjnasc"));
 
                     if ((rst.getString("cpf") != null)
                             && (!rst.getString("cpf").trim().isEmpty())) {
@@ -842,6 +848,10 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                                 null
                         );
                     }
+                    if(rst.getString("cadastro") != null && !"0000-00-00".equals(rst.getString("cadastro").trim())) {
+                        imp.setDataCadastro(rst.getDate("cadastro"));
+                    }
+                    
                     result.add(imp);
                 }
             }
@@ -1027,17 +1037,18 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.promocao precopromocao,\n"
                     + "	p.venda precovenda,\n"
                     + "	p.status\n"
-                    + "FROM\n"
+                  + "FROM\n"
                     + "	promocao_itens as p\n"
-                    + "JOIN promocao_cab as pc ON p.id_promocao_cab = pc.id\n"
-                    + "WHERE\n"
+                  + "JOIN promocao_cab as pc ON p.id_promocao_cab = pc.id\n"
+                  + "WHERE\n"
                     + "	cast(pc.fim AS DATE) >= NOW() and\n"
                     + "	pc.id_loja = " + getLojaOrigem() + " and\n"
                     + "	pc.status = 0\n"
-                    + "ORDER BY\n"
+                  + "ORDER BY\n"
                     + "	pc.fim")) {
                 while (rs.next()) {
                     OfertaIMP imp = new OfertaIMP();
+                    
                     imp.setIdProduto(rs.getString("id_produto"));
                     imp.setDataInicio(rs.getDate("datainicio"));
                     imp.setDataFim(rs.getDate("datafim"));
