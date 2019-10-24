@@ -175,10 +175,16 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkPrazoPedidoForn" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkCondPagamentoForn" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <Component id="chkContasPagar" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="479" max="32767" attributes="0"/>
+                          <EmptySpace pref="283" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -186,7 +192,11 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="chkFornecedor" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="chkFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkPrazoPedidoForn" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkCondPagamentoForn" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkContasPagar" min="-2" max="-2" attributes="0"/>
                           <EmptySpace pref="265" max="32767" attributes="0"/>
@@ -203,6 +213,16 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkContasPagar">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Contas a Pagar"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPrazoPedidoForn">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Prazo Pedido"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCondPagamentoForn">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Condi&#xe7;&#xe3;o Pagamento"/>
                   </Properties>
                 </Component>
               </SubComponents>

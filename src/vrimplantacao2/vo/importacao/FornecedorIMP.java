@@ -54,6 +54,7 @@ public class FornecedorIMP {
     private String observacao;
     
     private int prazoEntrega = 0;
+    private int prazoPedido = 0;
     private int prazoVisita = 0;
     private int prazoSeguranca = 0;
     
@@ -602,5 +603,19 @@ public class FornecedorIMP {
 
     public void setIdBanco(int idBanco) {
         this.idBanco = idBanco;
+    }
+
+    /**
+     * @return the prazoPedido
+     */
+    public int getPrazoPedido() {
+        return prazoPedido;
+    }
+
+    /**
+     * @param prazoPedido the prazoPedido to set
+     */
+    public void setPrazoPedido(int prazoPedido) {
+        this.prazoPedido = prazoPedido;
     }
 }

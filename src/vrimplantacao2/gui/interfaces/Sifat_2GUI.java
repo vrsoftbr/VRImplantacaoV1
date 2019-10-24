@@ -168,6 +168,20 @@ public class Sifat_2GUI extends VRInternalFrame implements ConexaoEvent {
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
                         }
+                        
+                        List<OpcaoFornecedor> opForn = new ArrayList<>();
+                        if (chkPrazoPedidoForn.isSelected()) {
+                            opForn.add(OpcaoFornecedor.PRAZO_PEDIDO_FORNECEDOR);
+                        }
+                        
+                        if (chkCondPagamentoForn.isSelected()) {
+                            opForn.add(OpcaoFornecedor.CONDICAO_PAGAMENTO); 
+                        }
+                        
+                        if (!opForn.isEmpty()) {
+                            importador.atualizarFornecedor(opForn.toArray(new OpcaoFornecedor[]{}));
+                        }
+                        
                         if (chkContasPagar.isSelected()) {
                             importador.importarContasPagar(OpcaoContaPagar.NOVOS);
                         }                            
@@ -237,6 +251,8 @@ public class Sifat_2GUI extends VRInternalFrame implements ConexaoEvent {
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
         chkContasPagar = new vrframework.bean.checkBox.VRCheckBox();
+        chkPrazoPedidoForn = new vrframework.bean.checkBox.VRCheckBox();
+        chkCondPagamentoForn = new vrframework.bean.checkBox.VRCheckBox();
         tabClientes = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
@@ -302,6 +318,10 @@ public class Sifat_2GUI extends VRInternalFrame implements ConexaoEvent {
 
         chkContasPagar.setText("Contas a Pagar");
 
+        chkPrazoPedidoForn.setText("Prazo Pedido");
+
+        chkCondPagamentoForn.setText("Condição Pagamento");
+
         javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
         tabFornecedor.setLayout(tabFornecedorLayout);
         tabFornecedorLayout.setHorizontalGroup(
@@ -309,15 +329,23 @@ public class Sifat_2GUI extends VRInternalFrame implements ConexaoEvent {
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(tabFornecedorLayout.createSequentialGroup()
+                        .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkPrazoPedidoForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCondPagamentoForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(479, Short.MAX_VALUE))
+                .addContainerGap(283, Short.MAX_VALUE))
         );
         tabFornecedorLayout.setVerticalGroup(
             tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabFornecedorLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkPrazoPedidoForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkCondPagamentoForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(265, Short.MAX_VALUE))
@@ -478,10 +506,12 @@ public class Sifat_2GUI extends VRInternalFrame implements ConexaoEvent {
     private vrframework.bean.button.VRButton btnMigrar;
     private vrframework.bean.checkBox.VRCheckBox chkCepCliente;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
+    private vrframework.bean.checkBox.VRCheckBox chkCondPagamentoForn;
     private vrframework.bean.checkBox.VRCheckBox chkContasPagar;
     private vrframework.bean.checkBox.VRCheckBox chkCreditoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkPagamentoRotativo;
+    private vrframework.bean.checkBox.VRCheckBox chkPrazoPedidoForn;
     private vrframework.bean.checkBox.VRCheckBox chkVenda;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrimplantacao2.gui.component.conexao.mysql.ConexaoMySQLPanel conexaoMySQL;
