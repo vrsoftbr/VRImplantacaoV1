@@ -255,37 +255,39 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	prod.codprod id,\n" +
                     "	prod.dtinclui datacadastro,\n" +
                     "	prod.dtaltera dataalteracao,\n" +
-                    "	ean.ean,\n" +
+                    "	ean.ean codigobarras,\n" +
                     "	case when prod.qtd_emb < 1 then 1 else prod.qtd_emb end qtdembalagemcotacao,\n" +
                     "	ean.qtdembalagem,\n" +
                     "	prod.unidade,\n" +
                     "	prod.unidade_comp,\n" +
-                    "	case when prod.codsetor is null then 0 else 1 end e_balanca,\n" +
+                    "	case when prod.codsetor is null then 0 else 1 end balanca,\n" +
                     "	prod.validade,\n" +
                     "	prod.descricao descricaocompleta,\n" +
+                    "	prod.descricao descricaogondola,\n" +
                     "	prod.desc_pdv descricaoreduzida,\n" +
-                    "	coalesce(prod.codcreceita, 1) as merc1,\n" +
-                    "	coalesce(prod.codgrupo, 1) as merc2,\n" +
-                    "	coalesce(prod.codcategoria, 1) as merc3,\n" +
-                    "	fam.codfamilia id_familia,\n" +
+                    "	coalesce(prod.codcreceita, 1) as cod_mercadologico1,\n" +
+                    "	coalesce(prod.codgrupo, 1) as cod_mercadologico2,\n" +
+                    "	coalesce(prod.codcategoria, 1) as cod_mercadologico3,\n" +
+                    "	fam.codfamilia id_familiaproduto,\n" +
                     "	prod.peso_bruto pesobruto,\n" +
                     "	prod.peso_liq pesoliquido,\n" +
                     "	prod.estoque_max estoquemaximo,\n" +
                     "	prod.estoque_min estoqueminimo,\n" +
                     "	prod.estoque,\n" +
-                    "	prod.preco_cust custo,\n" +
-                    "	prod.preco_unit preco,\n" +
-                    "	prod.margem_bruta,\n" +
-                    "	prod.margem_param,\n" +
+                    "	prod.preco_cust custocomimposto,\n" +
+                    "	prod.preco_cust custosemimposto,\n" +
+                    "	prod.preco_unit precovenda,\n" +
+                    "	prod.margem_bruta margem,\n" +
+                    "	prod.margem_param margem_param,\n" +
                     "	prod.lucroliq margemliquidapraticada,\n" +
                     "	prod.ativo,\n" +
                     "	case when prod.descricao like '*%' then 1 else 0 end descontinuado,\n" +
                     "	prod.codncm ncm,\n" +
-                    "	prod.codcest cest,\n" +
-                    "	prod.cst_pisentrada piscofins_entrada,\n" +
-                    "	prod.cst_pissaida piscofins_saida,\n" +
-                    "	prod.nat_rec piscofins_natrec,\n" +
-                    "	prod.codaliq icms_saida_id,\n" +
+                    "	prod.codcest cest,	\n" +
+                    "	prod.cst_pisentrada piscofins_cst_credito,\n" +
+                    "	prod.cst_pissaida piscofins_cst_debito,\n" +
+                    "	prod.nat_rec piscofins_natureza_receita,\n" +
+                    "	prod.codaliq icms_debito_id,\n" +
                     "	prod.CODTRIB icms_cst_saida,\n" +
                     "	al.ALIQUOTA icms_aliquota_saida,\n" +
                     "	prod.PER_REDUC icms_reduzido_saida,\n" +
@@ -342,7 +344,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportId(rst.getString("id"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
-                    imp.setEan(rst.getString("ean"));
+                    imp.setEan(rst.getString("codigobarras"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagemcotacao"));
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem") == 0 ? 1 : rst.getInt("qtdembalagem"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));

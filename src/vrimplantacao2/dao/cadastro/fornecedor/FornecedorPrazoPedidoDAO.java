@@ -2,7 +2,6 @@ package vrimplantacao2.dao.cadastro.fornecedor;
 
 import java.sql.Statement;
 import vrframework.classe.Conexao;
-import vrimplantacao2.vo.cadastro.fornecedor.PrazoPedidoVO;
 
 /**
  *
@@ -10,14 +9,14 @@ import vrimplantacao2.vo.cadastro.fornecedor.PrazoPedidoVO;
  */
 public class FornecedorPrazoPedidoDAO {
 
-    public void salvarTodasLojas(PrazoPedidoVO prazoPedidoVO) throws Exception{
+    public void salvarTodasLojas(int idFornecedor, int diasPrazoPedido) throws Exception{
         try (Statement stm = Conexao.createStatement()) {
             stm.execute(
                     "do $$\n" +
                     "declare\n" +
-                    "	v_forn integer = " + prazoPedidoVO.getIdFornecedor() + ";\n" +
-                    "	v_diasentregapedido integer = " + prazoPedidoVO.getDiasEntregaPedido() + ";\n" +
-                    "	v_diasatualizapedidoparcial integer = " + prazoPedidoVO.getDiasAtualizaPedidoParcial() + ";\n" +
+                    "	v_forn integer = " + idFornecedor + ";\n" +
+                    "	v_diasentregapedido integer = " + diasPrazoPedido + ";\n" +
+                    "	v_diasatualizapedidoparcial integer = 0;\n" +
                     "	r record;\n" +
                     "begin\n" +
                     "	for r in select id from loja order by id\n" +

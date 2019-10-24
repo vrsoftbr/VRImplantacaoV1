@@ -107,6 +107,10 @@ public class FornecedorRepository {
                     if (imp.getPrazoEntrega() > 0 || imp.getPrazoSeguranca() > 0 || imp.getPrazoVisita() > 0) {
                         provider.gravarPrazoFornecedor(vo.getId(), imp.getPrazoEntrega(), imp.getPrazoVisita(), imp.getPrazoSeguranca());
                     }
+                    
+                    if (imp.getPrazoPedido() > 0) {
+                        provider.gravarPrazoPedidoFornecedor(vo.getId(), imp.getPrazoPedido());
+                    }
                 }
 
                 provider.next();
@@ -180,6 +184,12 @@ public class FornecedorRepository {
                     if (opt.contains(OpcaoFornecedor.PRAZO_FORNECEDOR)) {
                         if (imp.getPrazoEntrega() > 0 || imp.getPrazoSeguranca() > 0 || imp.getPrazoVisita() > 0) {
                             provider.gravarPrazoFornecedor(vo.getId(), imp.getPrazoEntrega(), imp.getPrazoVisita(), imp.getPrazoSeguranca());
+                        }
+                    }
+
+                    if (opt.contains(OpcaoFornecedor.PRAZO_PEDIDO_FORNECEDOR)) {
+                        if (imp.getPrazoPedido() > 0) {
+                            provider.gravarPrazoPedidoFornecedor(vo.getId(), imp.getPrazoPedido());
                         }
                     }
                 }
@@ -296,6 +306,10 @@ public class FornecedorRepository {
 
                     if (imp.getPrazoEntrega() > 0 || imp.getPrazoSeguranca() > 0 || imp.getPrazoVisita() > 0) {
                         provider.gravarPrazoFornecedor(vo.getId(), imp.getPrazoEntrega(), imp.getPrazoVisita(), imp.getPrazoSeguranca());
+                    }
+                    
+                    if (imp.getPrazoPedido() > 0) {
+                        provider.gravarPrazoPedidoFornecedor(vo.getId(), imp.getPrazoPedido());
                     }
                 }
 

@@ -336,6 +336,8 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIe_rg(rst.getString("ie_rg"));
                     imp.setDatacadastro(rst.getDate("datacadastro"));
                     imp.setPrazoEntrega(rst.getInt("prazoentrega"));
+                    imp.setPrazoPedido(rst.getInt("prazoentrega"));
+                    imp.setCondicaoPagamento(rst.getInt("prazopagto"));
                     imp.setObservacao(rst.getString("observacao"));
 
                     if ((rst.getString("fax") != null)
