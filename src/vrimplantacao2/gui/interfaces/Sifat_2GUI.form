@@ -49,7 +49,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="tabs" pref="379" max="32767" attributes="0"/>
+              <Component id="tabs" pref="383" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="vRLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -181,10 +181,12 @@
                                   <Component id="chkPrazoPedidoForn" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkCondPagamentoForn" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkObsFornecedor" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="chkContasPagar" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="283" max="32767" attributes="0"/>
+                          <EmptySpace pref="154" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -196,6 +198,7 @@
                               <Component id="chkFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkPrazoPedidoForn" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCondPagamentoForn" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkObsFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkContasPagar" min="-2" max="-2" attributes="0"/>
@@ -225,6 +228,11 @@
                     <Property name="text" type="java.lang.String" value="Condi&#xe7;&#xe3;o Pagamento"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkObsFornecedor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Observa&#xe7;&#xe3;o/Hist&#xf3;rico"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="vrframework.bean.panel.VRPanel" name="tabClientes">
@@ -250,10 +258,12 @@
                                   <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="chkCepCliente" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="chkBloqueadoCliente" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Component id="chkCreditoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="414" max="32767" attributes="0"/>
+                          <EmptySpace pref="339" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -264,6 +274,7 @@
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="chkClientePreferencial" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCepCliente" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="chkBloqueadoCliente" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkCreditoRotativo" min="-2" max="-2" attributes="0"/>
@@ -293,6 +304,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCepCliente">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cep"/>
+                  </Properties>
+                </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkBloqueadoCliente">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Bloqueado"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -376,7 +392,7 @@
             </Container>
           </SubComponents>
         </Container>
-        <Component class="vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel" name="vRImportaArquivBalancaPanel1">
+        <Component class="vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel" name="pnlBalanca">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Balan&#xe7;a">

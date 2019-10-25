@@ -32,13 +32,13 @@ public class NutricionalToledoDAO {
                     toledo.setPesavel("P");
                     toledo.setDescricao(util.acertarTexto(vToledo.get(i).substring(18, 67).replace("'", "").trim()));
                     toledo.setValidade(Integer.parseInt(vToledo.get(i).substring(15, 18)));
-                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 84)));
+                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 81)));
                 } else {
                     toledo.setCodigo(Integer.parseInt(vToledo.get(i).substring(3, 9)));
                     toledo.setPesavel("U");
                     toledo.setDescricao(util.acertarTexto(vToledo.get(i).substring(18, 67).replace("'", "").trim()));
                     toledo.setValidade(Integer.parseInt(vToledo.get(i).substring(15, 18)));
-                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 84)));
+                    toledo.setNutricional(Integer.parseInt(vToledo.get(i).substring(78, 81)));
                 }
             }
             result.add(toledo);
@@ -110,6 +110,10 @@ public class NutricionalToledoDAO {
         for (NutricionalToledoVO vo : toledo) {
             
             NutricionalToledoVO prod = getNutricionalProduto().get(vo.getId());
+            
+            if (prod == null) {
+                continue;
+            }
             
             try (Statement stm = Conexao.createStatement()) {
                 SQLBuilder sql = new SQLBuilder();
