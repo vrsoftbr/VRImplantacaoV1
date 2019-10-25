@@ -289,7 +289,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                 while (rst.next()) {
                     ReceitaBalancaIMP imp = new ReceitaBalancaIMP();
 
-                    imp.setId(rst.getString("ID_PRODUTO"));
+                    imp.setId(rst.getString("CODIGO"));
                     imp.setDescricao(rst.getString("DESCRICAO"));
                     imp.setReceita(rst.getString("INGREDIENTES"));
                     imp.getProdutos().add(rst.getString("ID_PRODUTO"));
