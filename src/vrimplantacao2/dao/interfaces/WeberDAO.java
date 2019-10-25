@@ -169,7 +169,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
                     imp.seteBalanca("S".equals(rs.getString("balanca")));
                     imp.setValidade(rs.getInt("validade"));
-                    imp.setSituacaoCadastro(rs.getInt("situacao") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setSituacaoCadastro(rs.getString("situacao") == "1" ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
                     imp.setPesoBruto(rs.getDouble("pesobruto"));
@@ -824,9 +824,10 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    (b.id_ecf || '' || \n"
                     + "    b.id_data || '' || \n"
                     + "    b.id_cupom || '' || \n"
-                    + "    b.id_final || '' ||\n"
+                    + "    icm || '' ||\n"
                     + "    id_seq || '' ||\n"
-                    + "    c.total) as id,\n"
+                    + "    c.total || '' ||\n"
+                    + "    id_seq ) as id,\n"
                     + "    c.id_seq sequencia,\n"
                     + "    c.cod_prod id_produto,\n"
                     + "    c.cod_prod ean,\n"
