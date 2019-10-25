@@ -191,19 +191,19 @@ public class HRTechDAO extends InterfaceDAO {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n" +
+                    "declare @loja integer = " + getLojaOrigem() + ";\n" +
+                    "select \n" +
                     "	p.codigoplu id, \n" +
                     "	case  \n" +
-                    "		when p.estc13codi = '' then  \n" +
-                    "		p.codigoplu  \n" +
-                    "	else p.estc13codi end ean,\n" +
+                    "		when p.estc13codi = '' then p.codigoplu  \n" +
+                    "		else p.estc13codi \n" +
+                    "	end ean,\n" +
                     "	p.estc35desc descricaocompleta,\n" +
                     "	p.descreduzi descricaoreduzida,\n" +
                     "	p.dtcadastro,\n" +
                     "	p.situacao,\n" +
                     "	p.estc01peso pesavel,\n" +
-                    "	coalesce(bal.diasvalida, 0) validade,\n" +
-                    "	coalesce(bal.peso_varia, '') peso,\n" +
+                    "	coalesce(bal.validade, 0) validade,\n" +
                     "	p.estc03seto merc1, \n" +
                     "	p.estc03grup merc2, \n" +
                     "	p.estc03subg merc3, \n" +
@@ -224,39 +224,55 @@ public class HRTechDAO extends InterfaceDAO {
                     "	ts.situatribu cst,\n" +
                     "	ts.aliquotapdv icms,\n" +
                     "	ts.mrger icmsreducao,\n" +
-                    "	pis.cstpis cstpis,\n" +
-                    "	pis.cstcof cstcofins\n" +
+                    "	pis_s.cstpis pis_cst_s,\n" +
+                    "	pis_e.cstpis pis_cst_e,\n" +
+                    "	pis_s.nat_rec_pis pis_natrec\n" +
                     "from\n" +
                     "	fl300est p\n" +
-                    "join fl304ven v on (p.codigoplu = v.codigoplu)\n" +
-                    "join fl309est e on (p.codigoplu = e.codigoplu) and \n" +
-                    "	 v.codigoloja = e.codigoloja\n" +
-                    "join fl303cus c on (p.codigoplu = c.codigoplu) and\n" +
-                    "	v.codigoloja = c.codigoloja\n" +
-                    "join fltabncm_pro ncm on (p.codigoplu = ncm.codigoplu)\n" +
-                    "join fl301est est on (p.codigoplu = est.codigoplu) and\n" +
-                    "	est.codigoloja = v.codigoloja\n" +
-                    "join fltribut ts on (est.codtribsai = ts.codigotrib) and\n" +
-                    "	v.codigoloja = ts.codigoloja\n" +
-                    "left join fl328bal bal on (p.codigoplu = bal.codigoplu)\n" +
-                    "left join hrpdv_prepara_pro pis on (pis.codigoplu = p.codigoplu) and\n" +
-                    "	pis.codigoloja = v.codigoloja\n" +
-                    "where\n" +
-                    "	v.codigoloja = " + getLojaOrigem() + "\n" +
+                    "	join fl304ven v on \n" +
+                    "		p.codigoplu = v.codigoplu and\n" +
+                    "		v.CODIGOLOJA = @loja\n" +
+                    "	join fl309est e on \n" +
+                    "		p.codigoplu = e.codigoplu and \n" +
+                    "		v.codigoloja = e.codigoloja\n" +
+                    "	join fl303cus c on \n" +
+                    "		p.codigoplu = c.codigoplu and\n" +
+                    "		v.codigoloja = c.codigoloja\n" +
+                    "	join fltabncm_pro ncm on \n" +
+                    "		p.codigoplu = ncm.codigoplu\n" +
+                    "	left join fltabncm_pis pis_e on\n" +
+                    "		ncm.codigoplu = p.codigoplu and\n" +
+                    "		ncm.cod_ncm = pis_e.codigo and\n" +
+                    "		pis_e.id_opera = 1\n" +
+                    "	left join fltabncm_pis pis_s on\n" +
+                    "		ncm.codigoplu = p.codigoplu and\n" +
+                    "		ncm.cod_ncm = pis_s.codigo and\n" +
+                    "		pis_s.id_opera = 21\n" +
+                    "	join fl301est est on \n" +
+                    "		p.codigoplu = est.codigoplu and\n" +
+                    "		est.codigoloja = v.codigoloja\n" +
+                    "	join fltribut ts on \n" +
+                    "		est.codtribsai = ts.codigotrib and\n" +
+                    "		v.codigoloja = ts.codigoloja\n" +
+                    "	left join (\n" +
+                    "		select\n" +
+                    "			codigoplu,\n" +
+                    "			max(diasvalida) validade\n" +
+                    "		from\n" +
+                    "			fl328bal\n" +
+                    "		group by\n" +
+                    "			codigoplu\n" +
+                    "	) bal on \n" +
+                    "		p.codigoplu = bal.codigoplu\n" +
                     "order by\n" +
-                    "	p.codigoplu")) {
+                    "	p.codigoplu"
+            )) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    String id = rs.getString("id");
-                    id = id.substring(0, id.length() - 1);
-                    imp.setImportId(id);
-                    if (rs.getString("id").equals(rs.getString("ean"))) {
-                        imp.setEan(id);
-                    } else {
-                        imp.setEan(rs.getString("ean"));
-                    }
+                    imp.setImportId(rs.getString("id"));
+                    imp.setEan(rs.getString("ean"));
                     imp.setDescricaoCompleta(Utils.acertarTexto(rs.getString("descricaocompleta")));
                     imp.setDescricaoGondola(Utils.acertarTexto(rs.getString("descricaocompleta")));
                     imp.setDescricaoReduzida(Utils.acertarTexto(rs.getString("descricaoreduzida")));
@@ -277,8 +293,6 @@ public class HRTechDAO extends InterfaceDAO {
                     imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
                     imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
                     imp.setNcm(rs.getString("ncm"));
-                    //imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
-                    //imp.setDataAlteracao(rs.getDate("dataalteracao"));
                     imp.setIcmsAliq(rs.getDouble("icms"));
                     imp.setIcmsCst(rs.getString("cst"));
                     imp.setIcmsReducao(rs.getDouble("icmsreducao"));
@@ -286,8 +300,9 @@ public class HRTechDAO extends InterfaceDAO {
                     imp.setIcmsCstEntrada(rs.getInt("cst"));
                     imp.setIcmsAliqSaida(rs.getDouble("icms"));
                     imp.setIcmsCstSaida(rs.getInt("cst"));
-                    imp.setPiscofinsCstCredito(rs.getString("cstcofins"));
-                    imp.setPiscofinsCstDebito(rs.getString("cstpis"));
+                    imp.setPiscofinsCstCredito(rs.getString("pis_cst_e"));
+                    imp.setPiscofinsCstDebito(rs.getString("pis_cst_s"));
+                    imp.setPiscofinsNaturezaReceita(rs.getString("pis_natrec"));
                     imp.setCest(rs.getString("cest"));
                     imp.seteBalanca("S".equals(rs.getString("pesavel")));
                     imp.setValidade(rs.getInt("validade"));

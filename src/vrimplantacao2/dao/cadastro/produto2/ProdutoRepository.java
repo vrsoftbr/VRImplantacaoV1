@@ -249,8 +249,6 @@ public class ProdutoRepository {
         importarSomenteLoja = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_INDIVIDUAL_LOJA);
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
         copiarIcmsDebitoParaCredito = op.contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
-        
-        System.out.print(usarConversaoDeAliquotaSimples);
                 
         LOG.finer("Entrando no método atualizar; produtos(" + produtos.size() + ") opcoes(" + opcoes.length + ")");
         //<editor-fold defaultstate="collapsed" desc="Separa as opções entre 'com lista especial' e 'sem lista especial'">
@@ -281,6 +279,8 @@ public class ProdutoRepository {
 
             try {
                 provider.begin();
+                
+                LOG.info("importarSomenteLoja: " + importarSomenteLoja);
                 
                 LOG.info("Produtos a serem atualizados: " + organizados.size());
 
@@ -328,9 +328,13 @@ public class ProdutoRepository {
                         anterior = provider.anterior().get(chaveProd);
                     } else {
                         anterior = provider.anterior().getLojaImp(chaveProd);
-                    }                    
+                    }
+                    
+                    LOG.finer("Chave Prod: " + Arrays.deepToString(chaveProd));
 
                     if (anterior != null && anterior.getCodigoAtual() != null) {
+                        
+                        LOG.finer("Anterior encontrado: " + anterior.getImportId() + " - " + anterior.getDescricao());
 
                         //<editor-fold defaultstate="collapsed" desc="Preparando variáveis">
                         int id = anterior.getCodigoAtual().getId();
