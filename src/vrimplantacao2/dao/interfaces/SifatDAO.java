@@ -29,6 +29,7 @@ import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemVO;
+import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -41,6 +42,7 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -92,7 +94,8 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.FAMILIA,
             OpcaoProduto.FAMILIA_PRODUTO,
             OpcaoProduto.MERCADOLOGICO_PRODUTO,
-            OpcaoProduto.MAPA_TRIBUTACAO
+            OpcaoProduto.MAPA_TRIBUTACAO,
+            OpcaoProduto.RECEITA_BALANCA,
         }));
     }
 
@@ -268,17 +271,34 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
-    public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
-        List<PautaFiscalIMP> result = new ArrayList<>();
+    public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
+        List<ReceitaBalancaIMP> result = new ArrayList<>();
         
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    ""
+                    "SELECT \n"
+                    + "	ID_PRODUTO, \n"
+                    + "	CODIGO, \n"
+                    + "	DESCRICAO, \n"
+                    + "	COALESCE(RENDIMENTO_RECEITA, 1) as RENDIMENTO_RECEITA, \n"
+                    + "	INGREDIENTES \n"
+                    + "FROM CE01 \n"
+                    + "WHERE INGREDIENTES IS NOT NULL\n"
+                    + "AND INGREDIENTES <> ''"
             )) {
-                
+                while (rst.next()) {
+                    ReceitaBalancaIMP imp = new ReceitaBalancaIMP();
+
+                    imp.setId(rst.getString("CODIGO"));
+                    imp.setDescricao(rst.getString("DESCRICAO"));
+                    imp.setReceita(rst.getString("INGREDIENTES"));
+                    imp.getProdutos().add(rst.getString("ID_PRODUTO"));
+                    result.add(imp);
+                }
             }
         }
-        return null;
+        
+        return result;
     }
     
     @Override
@@ -308,6 +328,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	f.SITE as site,\n"
                     + "	f.DIA_VENCIMENTO as diavencimento,\n"
                     + "	f.OBSERVACAO as observacao,\n"
+                    + " f.HISTORICO as historico,\n"
                     + "	f.PRAZO_ENTREGA as prazoentrega,\n"
                     + "	f.PRAZO_PGTO as prazopagto,\n"
                     + " f.DT_CADASTRO as datacadastro\n"
@@ -339,6 +360,12 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrazoPedido(rst.getInt("prazoentrega"));
                     imp.setCondicaoPagamento(rst.getInt("prazopagto"));
                     imp.setObservacao(rst.getString("observacao"));
+                    
+                    if ((rst.getString("historico") != null)
+                            && (!rst.getString("historico").trim().isEmpty())) {
+
+                        imp.setObservacao(imp.getObservacao() + " - " + rst.getString("historico"));
+                    }
 
                     if ((rst.getString("fax") != null)
                             && (!rst.getString("fax").trim().isEmpty())) {
@@ -433,7 +460,8 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	c.RENDA_MENSAL as salario,\n"
                     + "	c.PROFISSAO as cargo,\n"
                     + "	c.CPF_CONJUGE as cpfconjuge,\n"
-                    + " c.DT_CADASTRO as datacadastro\n"
+                    + " c.DT_CADASTRO as datacadastro,"
+                            + "c.STATUS_CREDITO as status\n"
                     + "from CD02 c\n"
                     + "where c.E_CLIENTE  = 1\n"
                     + "order by c.CODIGO"
@@ -466,6 +494,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEmpresa(rst.getString("empresa"));
                     imp.setSalario(rst.getDouble("salario"));
                     imp.setCargo(rst.getString("cargo"));
+                    imp.setBloqueado(rst.getInt("status") == 2);
 
                     if ((rst.getString("fax") != null)
                             && (!rst.getString("fax").trim().isEmpty())) {
@@ -517,7 +546,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select\n"
                     + "	r.ID_TITULO as id,\n"
                     + "	r.CAIXA as caixa,\n"
-                    + "	r.NUM_TITULO as numerocupom,\n"
+                    + "	r.CF as numerocupom,\n"
                     + "	r.EMISSAO as dataemissao,\n"
                     + "	r.VENCIMENTO as datavencimento,\n"
                     + "	r.VALOR as valor,\n"
