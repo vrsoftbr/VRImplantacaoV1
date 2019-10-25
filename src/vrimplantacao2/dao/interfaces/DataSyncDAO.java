@@ -25,6 +25,12 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class DataSyncDAO extends InterfaceDAO {
 
+    private String tipoPreco = "VAREJO";
+
+    public void setTipoPreco(String tipoPreco) {
+        this.tipoPreco = tipoPreco == null ? "VAREJO" : tipoPreco;
+    }
+
     @Override
     public String getSistema() {
         return "DataSync";
@@ -32,7 +38,7 @@ public class DataSyncDAO extends InterfaceDAO {
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select EMPRESA_ID, RAZAO_SOCIAL from MAXIMUS_BASE.dbo.EMPRESAS order by 1"
@@ -42,7 +48,7 @@ public class DataSyncDAO extends InterfaceDAO {
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -79,103 +85,106 @@ public class DataSyncDAO extends InterfaceDAO {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-                
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "declare @empresa integer =  " + getLojaOrigem() + ";\n" +
-                    "select\n" +
-                    "	e.ESTOQUE_ID id,\n" +
-                    "	e.DATA_CADASTRO,\n" +
-                    "	ean.CODIGO_BARRA ean,\n" +
-                    "	1 qtdembalagem,\n" +
-                    "	un.DESCRICAO unidade,\n" +
-                    "	e.BALANCA,\n" +
-                    "	e.VALIDADE_DIAS validade,\n" +
-                    "	e.DESCRICAO,\n" +
-                    "	e.DESCRICAO_REDUZ,\n" +
-                    "	e.GRUPO_ID,\n" +
-                    "	e.SECAO_ID,\n" +
-                    "	e.SETOR_ID,\n" +
-                    "	e.ESTOQUE_ID_PAI,\n" +
-                    "	e.PESO pesobruto,\n" +
-                    "	e.PESO_LIQUIDO pesoliquodo,\n" +
-                    "	coalesce(estoque.QUANTIDADE, 0) estoque,\n" +
-                    "	round(pr.VALOR, 2) preco,\n" +
-                    "	coalesce(round(\n" +
-                    "		(select top 1 a.custo_bruto from \n" +
-                    "			ESTOQUE_FORMACAO_PRECOS a\n" +
-                    "		where\n" +
-                    "			a.ESTOQUE_ID = f.ESTOQUE_ID and\n" +
-                    "			a.EMPRESA_ID = @empresa\n" +
-                    "		order by a.NF_ID desc)\n" +
-                    "	,2),0) custo,\n" +
-                    "	coalesce(round(\n" +
-                    "		(select top 1 a.MARGEN_LUCRO from \n" +
-                    "			ESTOQUE_FORMACAO_PRECOS a\n" +
-                    "			join NOTA_FISCAL_COMPRA nf on a.NF_ID = nf.NF_ID\n" +
-                    "		where\n" +
-                    "			a.ESTOQUE_ID = f.ESTOQUE_ID and\n" +
-                    "			a.EMPRESA_ID = @empresa\n" +
-                    "		order by nf.DATA_EMISSAO desc)\n" +
-                    "	,2),0) margem,\n" +
-                    "	case e.INATIVO when 1 then 0 else 1 end ativo,\n" +
-                    "	e.CODIGO_NCM ncm,\n" +
-                    "	e.CODIGO_CEST cest,\n" +
-                    "	f.SAI_CST_PIS piscofins_cst_sai,\n" +
-                    "	f.ENT_CST_PIS piscofins_cst_ent,\n" +
-                    "	f.SAI_PIS_NATUREZA_RECEITA_ID piscofins_natureza_receita,\n" +
-                    "	f.SAI_CST_DENTRO_EST,\n" +
-                    "	f.SAI_CST_FORA_EST,\n" +
-                    "	f.SAI_ICMS_DENTRO_EST,\n" +
-                    "	f.SAI_ICMS_FORA_EST,\n" +
-                    "	e.FABRICANTE_ID\n" +
-                    "from\n" +
-                    "	ESTOQUE e\n" +
-                    "	left join (\n" +
-                    "		select\n" +
-                    "			estoque_id,\n" +
-                    "			CODIGO_BARRA\n" +
-                    "		from\n" +
-                    "			ESTOQUE\n" +
-                    "		where\n" +
-                    "			not CODIGO_BARRA is null\n" +
-                    "		union\n" +
-                    "		select\n" +
-                    "			ESTOQUE_ID,\n" +
-                    "			CODIGO_BARRA\n" +
-                    "		from\n" +
-                    "			ESTOQUE_CODIGOS_BARRAS\n" +
-                    "		where\n" +
-                    "			not CODIGO_BARRA is null\n" +
-                    "	) ean on e.ESTOQUE_ID = ean.ESTOQUE_ID\n" +
-                    "	left join ESTOQUE_UNIDADES un on\n" +
-                    "		e.UNIDADE_ID_VENDA = un.UNIDADE_ID\n" +
-                    "	left join (\n" +
-                    "		SELECT\n" +
-                    "		  e1.ESTOQUE_ID,\n" +
-                    "		  sum(ISNULL(dbo.FN_ESTOQUE_CONTA(e1.ESTOQUE_ID, ec.EMPRESA_ID, ec.CONTA_EST_ID), 0) + \n" +
-                    "		  ISNULL(dbo.FN_ESTOQUE_COMPROMETIDO(e1.ESTOQUE_ID, ec.EMPRESA_ID, ec.CONTA_EST_ID, 1), 0)) AS QUANTIDADE\n" +
-                    "		FROM ESTOQUE e1\n" +
-                    "		LEFT JOIN ESTOQUE_CONTAS ec\n" +
-                    "		  ON (ec.DEL IS NULL\n" +
-                    "		  OR ec.DEL = 0)\n" +
-                    "		group by e1.ESTOQUE_ID\n" +
-                    "	) estoque on\n" +
-                    "		estoque.ESTOQUE_ID = e.ESTOQUE_ID\n" +
-                    "	left join ESTOQUE_TABELA_PRECOS pr on\n" +
-                    "		pr.EMPRESA_ID = @empresa and\n" +
-                    "		pr.ESTOQUE_ID = e.ESTOQUE_ID and\n" +
-                    "		pr.DESCRICAO = 'VAREJO'\n" +
-                    "	left join ESTOQUE_DADOS_FISCAIS f on\n" +
-                    "		f.EMPRESA_ID = @empresa and\n" +
-                    "		f.ESTOQUE_ID = e.ESTOQUE_ID\n" +
-                    //"--where e.ESTOQUE_ID = 20368\n" +
-                    "order by\n" +
-                    "	1"
+                    "declare @empresa integer =  " + getLojaOrigem() + ";\n"
+                    + "select\n"
+                    + "	e.ESTOQUE_ID id,\n"
+                    + "	e.DATA_CADASTRO,\n"
+                    + "	ean.CODIGO_BARRA ean,\n"
+                    + "	1 qtdembalagem,\n"
+                    + "	un.DESCRICAO unidade,\n"
+                    + "	e.BALANCA,\n"
+                    + "	e.VALIDADE_DIAS validade,\n"
+                    + "	replace(e.descricao,'***',' RC') descricao,\n"
+                    + "	replace(e.descricao_reduz,'***',' RC') descricao_reduz,\n"
+                    + "	e.GRUPO_ID,\n"
+                    + "	e.SECAO_ID,\n"
+                    + "	e.SETOR_ID,\n"
+                    + "	e.ESTOQUE_ID_PAI,\n"
+                    + "	e.PESO pesobruto,\n"
+                    + "	e.PESO_LIQUIDO pesoliquido,\n"
+                    + "	coalesce(estoque.QUANTIDADE, 0) estoque,\n"
+                    + "	round(pr.VALOR, 2) preco,\n"
+                    + "	coalesce(round(\n"
+                    + "		(select top 1 a.custo_bruto from \n"
+                    + "			ESTOQUE_FORMACAO_PRECOS a\n"
+                    + "		where\n"
+                    + "			a.ESTOQUE_ID = f.ESTOQUE_ID and\n"
+                    + "			a.EMPRESA_ID = @empresa\n"
+                    + "		order by a.NF_ID desc)\n"
+                    + "	,2),0) custo,\n"
+                    + "	coalesce(round(\n"
+                    + "		(select top 1 a.MARGEN_LUCRO from \n"
+                    + "			ESTOQUE_FORMACAO_PRECOS a\n"
+                    + "			join NOTA_FISCAL_COMPRA nf on a.NF_ID = nf.NF_ID\n"
+                    + "		where\n"
+                    + "			a.ESTOQUE_ID = f.ESTOQUE_ID and\n"
+                    + "			a.EMPRESA_ID = @empresa\n"
+                    + "		order by nf.DATA_EMISSAO desc)\n"
+                    + "	,2),0) margem,\n"
+                    + "	case e.INATIVO when 1 then 0 else 1 end descontinuado,\n"
+                    + "	case when e.DEL = 1 or e.inativo =1 then 0 else 1 end situacaocadastro,\n"
+                    + "	e.CODIGO_NCM ncm,\n"
+                    + "	e.CODIGO_CEST cest,\n"
+                    + "	f.SAI_CST_PIS piscofins_cst_sai,\n"
+                    + "	f.ENT_CST_PIS piscofins_cst_ent,\n"
+                    + "	nr.codigo piscofins_natureza_receita,\n"
+                    + "	f.SAI_CST_DENTRO_EST,\n"
+                    + "	f.SAI_CST_FORA_EST,\n"
+                    + "	f.SAI_ICMS_DENTRO_EST,\n"
+                    + "	f.SAI_ICMS_FORA_EST,\n"
+                    + "	e.FABRICANTE_ID\n"
+                    + "from\n"
+                    + "	ESTOQUE e\n"
+                    + "	left join (\n"
+                    + "		select\n"
+                    + "			estoque_id,\n"
+                    + "			CODIGO_BARRA\n"
+                    + "		from\n"
+                    + "			ESTOQUE\n"
+                    + "		where\n"
+                    + "			not CODIGO_BARRA is null\n"
+                    + "		union\n"
+                    + "		select\n"
+                    + "			ESTOQUE_ID,\n"
+                    + "			CODIGO_BARRA\n"
+                    + "		from\n"
+                    + "			ESTOQUE_CODIGOS_BARRAS\n"
+                    + "		where\n"
+                    + "			not CODIGO_BARRA is null\n"
+                    + "	) ean on e.ESTOQUE_ID = ean.ESTOQUE_ID\n"
+                    + "	left join ESTOQUE_UNIDADES un on\n"
+                    + "		e.UNIDADE_ID_VENDA = un.UNIDADE_ID\n"
+                    + "	left join (\n"
+                    + "		SELECT\n"
+                    + "		  e1.ESTOQUE_ID,\n"
+                    + "		  ISNULL(dbo.FN_ESTOQUE_CONTA(e1.ESTOQUE_ID, ec.EMPRESA_ID, ec.CONTA_EST_ID), 0) + \n"
+                    + "		  ISNULL(dbo.FN_ESTOQUE_COMPROMETIDO(e1.ESTOQUE_ID, ec.EMPRESA_ID, ec.CONTA_EST_ID, 1), 0) AS QUANTIDADE\n"
+                    + "		FROM ESTOQUE e1\n"
+                    + "		LEFT JOIN ESTOQUE_CONTAS ec\n"
+                    + "		  ON (ec.DEL IS NULL\n"
+                    + "		  OR ec.DEL = 0)\n"
+                    + "		where\n"
+                    + "			ec.EMPRESA_ID = @empresa\n"
+                    + "	) estoque on\n"
+                    + "		estoque.ESTOQUE_ID = e.ESTOQUE_ID\n"
+                    + "	left join ESTOQUE_TABELA_PRECOS pr on\n"
+                    + "		pr.EMPRESA_ID = @empresa and\n"
+                    + "		pr.ESTOQUE_ID = e.ESTOQUE_ID and\n"
+                    + "		pr.DESCRICAO = 'ATACADO'\n"
+                    + "	left join ESTOQUE_DADOS_FISCAIS f on\n"
+                    + "		f.EMPRESA_ID = @empresa and\n"
+                    + "		f.ESTOQUE_ID = e.ESTOQUE_ID\n"
+                    + "   left join ESTOQUE_NATUREZA_RECEITA nr on\n"
+                    + "           nr.REGISTRO_ID = f.sai_pis_natureza_receita_id\n"
+                    + "order by\n"
+                    + "	1"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
@@ -189,16 +198,14 @@ public class DataSyncDAO extends InterfaceDAO {
                     imp.setDescricaoGondola(rst.getString("DESCRICAO"));
                     imp.setDescricaoReduzida(rst.getString("DESCRICAO_REDUZ"));
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
-                    imp.setPesoLiquido(rst.getDouble("pesoliquodo"));
+                    imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setMargem(rst.getDouble("margem"));
-                    if ("2530".equals(imp.getImportId())) {
-                        System.out.println("Achou");
-                    }
                     imp.setCustoComImposto(rst.getDouble("custo"));
                     imp.setCustoSemImposto(rst.getDouble("custo"));
                     imp.setPrecovenda(rst.getDouble("preco"));
-                    imp.setSituacaoCadastro(rst.getInt("ativo") == 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setSituacaoCadastro(rst.getInt("situacaocadastro"));
+                    imp.setDescontinuado(rst.getBoolean("descontinuado"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getString("piscofins_cst_sai"));
@@ -215,52 +222,52 @@ public class DataSyncDAO extends InterfaceDAO {
                     imp.setIcmsAliqEntradaForaEstado(rst.getDouble("SAI_ICMS_FORA_EST"));
                     imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("SAI_ICMS_FORA_EST"));
                     imp.setFornecedorFabricante(rst.getString("FABRICANTE_ID"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	f.FORNECEDOR_ID id,\n" +
-                    "	f.NOME_RAZAO razao,\n" +
-                    "	f.FANTASIA fantasia,\n" +
-                    "	coalesce(f.CNPJ, f.CPF) cnpj,\n" +
-                    "	f.IE,\n" +
-                    "	f.ATIVO,\n" +
-                    "	f.ENDERECO,\n" +
-                    "	f.NUMERO,\n" +
-                    "	f.COMPLEMENTO,\n" +
-                    "	f.BAIRRO,\n" +
-                    "	cd.CIDADE_ID ibge_municipio,\n" +
-                    "	cd.NOME municipio,\n" +
-                    "	cd.UF uf,\n" +
-                    "	f.CEP,\n" +
-                    "	f.FONE,\n" +
-                    "	f.CELULAR,\n" +
-                    "	f.FAX,\n" +
-                    "	f.SUFRAMA,\n" +
-                    "	f.OBS,	\n" +
-                    "	f.PRAZO_ENTREGA\n" +
-                    "from\n" +
-                    "	FORNECEDORES f\n" +
-                    "	left join CIDADES cd on\n" +
-                    "		cd.CIDADE_ID = f.CIDADE_ID\n" +
-                    "order by\n" +
-                    "	f.FORNECEDOR_ID;"
+                    "select\n"
+                    + "	f.FORNECEDOR_ID id,\n"
+                    + "	f.NOME_RAZAO razao,\n"
+                    + "	f.FANTASIA fantasia,\n"
+                    + "	coalesce(f.CNPJ, f.CPF) cnpj,\n"
+                    + "	f.IE,\n"
+                    + "	f.ATIVO,\n"
+                    + "	f.ENDERECO,\n"
+                    + "	f.NUMERO,\n"
+                    + "	f.COMPLEMENTO,\n"
+                    + "	f.BAIRRO,\n"
+                    + "	cd.CIDADE_ID ibge_municipio,\n"
+                    + "	cd.NOME municipio,\n"
+                    + "	cd.UF uf,\n"
+                    + "	f.CEP,\n"
+                    + "	f.FONE,\n"
+                    + "	f.CELULAR,\n"
+                    + "	f.FAX,\n"
+                    + "	f.SUFRAMA,\n"
+                    + "	f.OBS,	\n"
+                    + "	f.PRAZO_ENTREGA\n"
+                    + "from\n"
+                    + "	FORNECEDORES f\n"
+                    + "	left join CIDADES cd on\n"
+                    + "		cd.CIDADE_ID = f.CIDADE_ID\n"
+                    + "order by\n"
+                    + "	f.FORNECEDOR_ID;"
             )) {
                 while (rst.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
@@ -283,61 +290,61 @@ public class DataSyncDAO extends InterfaceDAO {
                     imp.setSuframa(rst.getString("SUFRAMA"));
                     imp.setObservacao(rst.getString("OBS"));
                     imp.setPrazoEntrega(rst.getInt("PRAZO_ENTREGA"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        
+
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "	c.CLIENTE_ID id,\n" +
-                    "	coalesce(nullif(c.CNPJ,''),c.CPF) cnpj,\n" +
-                    "	c.IE,\n" +
-                    "	c.NOME_RAZAO razao,\n" +
-                    "	c.FANTASIA,\n" +
-                    "	c.ATIVO,\n" +
-                    "	c.ENDERECO,\n" +
-                    "	c.NUMERO,\n" +
-                    "	c.COMPLEMENTO,\n" +
-                    "	c.BAIRRO,\n" +
-                    "	c.CIDADE_ID,\n" +
-                    "	cd.NOME cidade,\n" +
-                    "	cd.UF,\n" +
-                    "	c.CEP,\n" +
-                    "	c.EST_CIVIL,\n" +
-                    "	c.DATA_CADASTRO,\n" +
-                    "	c.DATA_NASCIMENTO,\n" +
-                    "	c.SEXO,\n" +
-                    "	c.PROFISSAO,\n" +
-                    "	c.VR_RENDA salario,\n" +
-                    "	c.VR_LIMITE limite,\n" +
-                    "	c.NOME_PAI,\n" +
-                    "	c.NOME_MAE,\n" +
-                    "	c.CONJ_NOME conjuge,\n" +
-                    "	c.OBS,\n" +
-                    "	c.FONE,\n" +
-                    "	c.FAX,\n" +
-                    "	c.CELULAR,\n" +
-                    "	c.EMAIL\n" +
-                    "from \n" +
-                    "	CLIENTES c\n" +
-                    "	left join CIDADES cd on\n" +
-                    "		cd.CIDADE_ID = c.CIDADE_ID\n" +
-                    "order by\n" +
-                    "	id"
+                    "select\n"
+                    + "	c.CLIENTE_ID id,\n"
+                    + "	coalesce(nullif(c.CNPJ,''),c.CPF) cnpj,\n"
+                    + "	c.IE,\n"
+                    + "	c.NOME_RAZAO razao,\n"
+                    + "	c.FANTASIA,\n"
+                    + "	c.ATIVO,\n"
+                    + "	c.ENDERECO,\n"
+                    + "	c.NUMERO,\n"
+                    + "	c.COMPLEMENTO,\n"
+                    + "	c.BAIRRO,\n"
+                    + "	c.CIDADE_ID,\n"
+                    + "	cd.NOME cidade,\n"
+                    + "	cd.UF,\n"
+                    + "	c.CEP,\n"
+                    + "	c.EST_CIVIL,\n"
+                    + "	c.DATA_CADASTRO,\n"
+                    + "	c.DATA_NASCIMENTO,\n"
+                    + "	c.SEXO,\n"
+                    + "	c.PROFISSAO,\n"
+                    + "	c.VR_RENDA salario,\n"
+                    + "	c.VR_LIMITE limite,\n"
+                    + "	c.NOME_PAI,\n"
+                    + "	c.NOME_MAE,\n"
+                    + "	c.CONJ_NOME conjuge,\n"
+                    + "	c.OBS,\n"
+                    + "	c.FONE,\n"
+                    + "	c.FAX,\n"
+                    + "	c.CELULAR,\n"
+                    + "	c.EMAIL\n"
+                    + "from \n"
+                    + "	CLIENTES c\n"
+                    + "	left join CIDADES cd on\n"
+                    + "		cd.CIDADE_ID = c.CIDADE_ID\n"
+                    + "order by\n"
+                    + "	id"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
-                    
+
                     imp.setId(rst.getString("id"));
                     imp.setCnpj(rst.getString("cnpj"));
                     imp.setInscricaoestadual(rst.getString("IE"));
@@ -367,42 +374,42 @@ public class DataSyncDAO extends InterfaceDAO {
                     imp.setFax(rst.getString("FAX"));
                     imp.setCelular(rst.getString("CELULAR"));
                     imp.setEmail(rst.getString("EMAIL"));
-                    
+
                     result.add(imp);
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<ChequeIMP> getCheques() throws Exception {
         List<ChequeIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()){
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select \n" +
-                    "	receber_id as id,\n" +
-                    "	c.cpf as cpf,\n" +
-                    "	cheque_numero as numerocheque,\n" +
-                    "	cheque_agencia as agencia,\n" +
-                    "	cheque_cc as conta,\n" +
-                    "	data_emissao as date,\n" +
-                    "	desconto_data as datadeposito,\n" +
-                    "	documento as numerocupom,\n" +
-                    "	documento as ecf,\n" +
-                    "	valor_bruto as valor,\n" +
-                    "	c.rg as rg,\n" +
-                    "	c.fone as telefone,\n" +
-                    "	c.nome_razao as nome,\n" +
-                    "	cheque_banco+' '+historico+' '+cr.obs as  observacao,\n" +
-                    "	status as situacaocheque,\n" +
-                    "	juros_dia as valorjuros\n" +
-                    "from contas_receber cr\n" +
-                    "	left join clientes c\n" +
-                    "		on c.cliente_id = cr.devedor_id\n" +
-                    "where cheque_numero is not null and EMPRESA_ID = " + getLojaOrigem())){
-                while (rst.next()){
+                    "select \n"
+                    + "	receber_id as id,\n"
+                    + "	c.cpf as cpf,\n"
+                    + "	cheque_numero as numerocheque,\n"
+                    + "	cheque_agencia as agencia,\n"
+                    + "	cheque_cc as conta,\n"
+                    + "	data_emissao as date,\n"
+                    + "	desconto_data as datadeposito,\n"
+                    + "	documento as numerocupom,\n"
+                    + "	documento as ecf,\n"
+                    + "	valor_bruto as valor,\n"
+                    + "	c.rg as rg,\n"
+                    + "	c.fone as telefone,\n"
+                    + "	c.nome_razao as nome,\n"
+                    + "	cheque_banco+' '+historico+' '+cr.obs as  observacao,\n"
+                    + "	status as situacaocheque,\n"
+                    + "	juros_dia as valorjuros\n"
+                    + "from contas_receber cr\n"
+                    + "	left join clientes c\n"
+                    + "		on c.cliente_id = cr.devedor_id\n"
+                    + "where cheque_numero is not null and EMPRESA_ID = " + getLojaOrigem())) {
+                while (rst.next()) {
                     ChequeIMP imp = new ChequeIMP();
                     imp.setId(rst.getString("id"));
                     imp.setCpf(rst.getString("cpf"));
@@ -419,14 +426,13 @@ public class DataSyncDAO extends InterfaceDAO {
                     imp.setObservacao(rst.getString("observacao"));
                     imp.setSituacaoCheque("Pendente".equals(rst.getString("situacaocheque")) ? SituacaoCheque.ABERTO : SituacaoCheque.BAIXADO);
                     imp.setValorJuros(rst.getDouble("valorjuros"));
-                    
+
                     result.add(imp);
-                    
-                            
+
                 }
             }
         }
         return result; //To change body of generated methods, choose Tools | Templates.
     }
-    
+
 }

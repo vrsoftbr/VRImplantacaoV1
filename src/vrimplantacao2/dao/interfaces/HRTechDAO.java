@@ -69,30 +69,62 @@ public class HRTechDAO extends InterfaceDAO {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "	(select gruc03seto from fl100dpt m1 where gruc03grup = '' and gruc03subg = '' and gruc03fami = '' and gruc03subf = '' and m1.gruc03seto = m.gruc03seto) codmerc1,\n"
-                    + "	(select m1.gruc35desc from fl100dpt m1 where gruc03grup = '' and gruc03subg = '' and gruc03fami = '' and gruc03subf = '' and m1.gruc03seto = m.gruc03seto) descmerc1,\n"
-                    + "	(select gruc03grup from fl100dpt m1 where gruc03subg = '' and gruc03fami = '' and gruc03subf = '' and m1.gruc03seto = m.gruc03seto and m1.gruc03grup = m.gruc03grup) codmerc2,\n"
-                    + "	(select m1.gruc35desc from fl100dpt m1 where gruc03subg = '' and gruc03fami = '' and gruc03subf = '' and m1.gruc03seto = m.gruc03seto and m1.gruc03grup = m.gruc03grup) descmerc2,\n"
-                    + "	(select gruc03subg from fl100dpt m1 where gruc03fami = '' and gruc03subf = '' and m1.gruc03seto = m.gruc03seto and m1.gruc03grup = m.gruc03grup and m1.gruc03subg = m.gruc03subg) codmerc3,\n"
-                    + "	(select m1.gruc35desc from fl100dpt m1 where gruc03fami = '' and gruc03subf = '' and m1.gruc03seto = m.gruc03seto and m1.gruc03grup = m.gruc03grup and m1.gruc03subg = m.gruc03subg) descmerc3,\n"
-                    + "	(select gruc03fami from fl100dpt m1 where gruc03subf = '' and m1.gruc03seto = m.gruc03seto and m1.gruc03grup = m.gruc03grup and m1.gruc03subg = m.gruc03subg and m1.gruc03fami = m.gruc03fami) codmerc4,\n"
-                    + "	(select m1.gruc35desc from fl100dpt m1 where gruc03subf = '' and m1.gruc03seto = m.gruc03seto and m1.gruc03grup = m.gruc03grup and m1.gruc03subg = m.gruc03subg and m1.gruc03fami = m.gruc03fami) descmerc4,\n"
-                    + "	(select gruc03subf from fl100dpt m1 where m1.gruc03seto = m.gruc03seto and m1.gruc03grup = m.gruc03grup and m1.gruc03subg = m.gruc03subg and m1.gruc03fami = m.gruc03fami and m1.gruc03subf = m.gruc03subf) codmerc5,\n"
-                    + "	(select m1.gruc35desc from fl100dpt m1 where m1.gruc03seto = m.gruc03seto and m1.gruc03grup = m.gruc03grup and m1.gruc03subg = m.gruc03subg and m1.gruc03fami = m.gruc03fami and m1.gruc03subf = m.gruc03subf) descmerc5\n"
+                    + "	m1.codmerc1,\n"
+                    + "	m1.descmerc1,\n"
+                    + "	m2.codmerc2,\n"
+                    + "	m2.descmerc2,\n"
+                    + "	m3.codmerc3,\n"
+                    + "	m3.descmerc3,\n"
+                    + "	m4.codmerc4,\n"
+                    + "	m4.descmerc4\n"
                     + "from\n"
-                    + "	fl100dpt m\n"
-                    + "where\n"
-                    + "	(select gruc03seto from fl100dpt m1 where gruc03grup = '' and gruc03subg = '' and gruc03fami = '' and gruc03subf = '' and m1.gruc03seto = m.gruc03seto) != '' and\n"
-                    + "	(select gruc03grup from fl100dpt m1 where gruc03subg = '' and gruc03fami = '' and gruc03subf = '' and m1.gruc03seto = m.gruc03seto and m1.gruc03grup = m.gruc03grup) != '' and\n"
-                    + "	(select gruc03subg from fl100dpt m1 where gruc03fami = '' and gruc03subf = '' and m1.gruc03seto = m.gruc03seto and m1.gruc03grup = m.gruc03grup and m1.gruc03subg = m.gruc03subg) != '' and\n"
-                    + "	(select gruc03fami from fl100dpt m1 where gruc03subf = '' and m1.gruc03seto = m.gruc03seto and m1.gruc03grup = m.gruc03grup and m1.gruc03subg = m.gruc03subg and m1.gruc03fami = m.gruc03fami) != '' and\n"
-                    + "	(select gruc03subf from fl100dpt m1 where m1.gruc03seto = m.gruc03seto and m1.gruc03grup = m.gruc03grup and m1.gruc03subg = m.gruc03subg and m1.gruc03fami = m.gruc03fami and m1.gruc03subf = m.gruc03subf) != ''\n"
-                    + "order by\n"
-                    + "	m.gruc03seto, \n"
-                    + "	m.gruc03grup, \n"
-                    + "	m.gruc03subg, \n"
-                    + "	m.gruc03fami, \n"
-                    + "	m.gruc03subf")) {
+                    + "	(\n"
+                    + "		select\n"
+                    + "			gruc03seto codmerc1,\n"
+                    + "			gruc35desc descmerc1\n"
+                    + "		from\n"
+                    + "			fl100dpt s\n"
+                    + "		where\n"
+                    + "			gruc03seto != '' and gruc03grup = '' and gruc03subg = '' and gruc03fami = '' and gruc03subf = ''\n"
+                    + "	) m1\n"
+                    + "	join (\n"
+                    + "		select\n"
+                    + "			gruc03seto codmerc1,\n"
+                    + "			gruc03grup codmerc2,\n"
+                    + "			gruc35desc descmerc2\n"
+                    + "		from\n"
+                    + "			fl100dpt s\n"
+                    + "		where\n"
+                    + "			gruc03seto != '' and gruc03grup != '' and gruc03subg = '' and gruc03fami = '' and gruc03subf = ''\n"
+                    + "	) m2 on\n"
+                    + "		m1.codmerc1 = m2.codmerc1\n"
+                    + "	join (\n"
+                    + "			select\n"
+                    + "			gruc03seto codmerc1,\n"
+                    + "			gruc03grup codmerc2,\n"
+                    + "			gruc03subg codmerc3,\n"
+                    + "			gruc35desc descmerc3\n"
+                    + "		from\n"
+                    + "			fl100dpt s\n"
+                    + "		where\n"
+                    + "			gruc03seto != '' and gruc03grup != '' and gruc03subg != '' and gruc03fami = '' and gruc03subf = ''\n"
+                    + "	) m3 on\n"
+                    + "		m2.codmerc1 = m3.codmerc1 and m2.codmerc2 = m3.codmerc2\n"
+                    + "	join (\n"
+                    + "			select\n"
+                    + "			gruc03seto codmerc1,\n"
+                    + "			gruc03grup codmerc2,\n"
+                    + "			gruc03subg codmerc3,\n"
+                    + "			gruc03fami codmerc4,\n"
+                    + "			gruc35desc descmerc4\n"
+                    + "		from\n"
+                    + "			fl100dpt s\n"
+                    + "		where\n"
+                    + "			gruc03seto != '' and gruc03grup != '' and gruc03subg != '' and gruc03fami != '' and gruc03subf = ''\n"
+                    + "	) m4 on\n"
+                    + "		m3.codmerc1 = m4.codmerc1 and m3.codmerc2 = m4.codmerc2 and m3.codmerc3 = m4.codmerc3\n"
+                    + "where m1.codmerc1 >= 200 \n"
+                    + "	order by 1,3,5,7")) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
                     imp.setImportLoja(getLojaOrigem());
@@ -105,8 +137,8 @@ public class HRTechDAO extends InterfaceDAO {
                     imp.setMerc3Descricao(rs.getString("descmerc3"));
                     imp.setMerc4ID(rs.getString("codmerc4"));
                     imp.setMerc4Descricao(rs.getString("descmerc4"));
-                    imp.setMerc5ID(rs.getString("codmerc5"));
-                    imp.setMerc5Descricao(rs.getString("descmerc5"));
+                    //imp.setMerc5ID(rs.getString("codmerc5"));
+                    //imp.setMerc5Descricao(rs.getString("descmerc5"));
 
                     result.add(imp);
                 }
@@ -125,7 +157,7 @@ public class HRTechDAO extends InterfaceDAO {
                     + "	estc13codi ean,\n"
                     + "	qtd_emb_vd quantidade,\n"
                     + "	por_des_vd desconto\n"
-                  + "from\n"
+                    + "from\n"
                     + "	FL322EAN")) {
                 while (rs.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -191,507 +223,511 @@ public class HRTechDAO extends InterfaceDAO {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n" +
-                    "	p.codigoplu id, \n" +
-                    "	case  \n" +
-                    "		when p.estc13codi = '' then  \n" +
-                    "		p.codigoplu  \n" +
-                    "	else p.estc13codi end ean,\n" +
-                    "	p.estc35desc descricaocompleta,\n" +
-                    "	p.descreduzi descricaoreduzida,\n" +
-                    "	p.dtcadastro,\n" +
-                    "	p.situacao,\n" +
-                    "	p.estc01peso pesavel,\n" +
-                    "	coalesce(bal.diasvalida, 0) validade,\n" +
-                    "	coalesce(bal.peso_varia, '') peso,\n" +
-                    "	p.estc03seto merc1, \n" +
-                    "	p.estc03grup merc2, \n" +
-                    "	p.estc03subg merc3, \n" +
-                    "	p.estc03fami merc4, \n" +
-                    "	p.estc03subf merc5,\n" +
-                    "	est.estn05mrge margem,\n" +
-                    "	est.qtd_emb_co qtdembalagemcotacao,\n" +
-                    "	est.qtd_emb_vd qtdembalagem,\n" +
-                    "	est.tip_emb_vd embalagem,\n" +
-                    "	v.vendaatua venda,\n" +
-                    "	c.custoliqui custocomimposto,\n" +
-                    "	c.custorepos custosemimposto,\n" +
-                    "	e.estoqueatu estoque,\n" +
-                    "	est.estn10maxi estoquemaximo,\n" +
-                    "	est.estn10mini estoqueminimo,\n" +
-                    "	ncm.cod_ncm ncm,\n" +
-                    "	ncm.id_cest cest,\n" +
-                    "	ts.situatribu cst,\n" +
-                    "	ts.aliquotapdv icms,\n" +
-                    "	ts.mrger icmsreducao,\n" +
-                    "	pis.cstpis cstpis,\n" +
-                    "	pis.cstcof cstcofins\n" +
-                    "from\n" +
-                    "	fl300est p\n" +
-                    "join fl304ven v on (p.codigoplu = v.codigoplu)\n" +
-                    "join fl309est e on (p.codigoplu = e.codigoplu) and \n" +
-                    "	 v.codigoloja = e.codigoloja\n" +
-                    "join fl303cus c on (p.codigoplu = c.codigoplu) and\n" +
-                    "	v.codigoloja = c.codigoloja\n" +
-                    "join fltabncm_pro ncm on (p.codigoplu = ncm.codigoplu)\n" +
-                    "join fl301est est on (p.codigoplu = est.codigoplu) and\n" +
-                    "	est.codigoloja = v.codigoloja\n" +
-                    "join fltribut ts on (est.codtribsai = ts.codigotrib) and\n" +
-                    "	v.codigoloja = ts.codigoloja\n" +
-                    "left join fl328bal bal on (p.codigoplu = bal.codigoplu)\n" +
-                    "left join hrpdv_prepara_pro pis on (pis.codigoplu = p.codigoplu) and\n" +
-                    "	pis.codigoloja = v.codigoloja\n" +
-                    "where\n" +
-                    "	v.codigoloja = " + getLojaOrigem() + "\n" +
-                    "order by\n" +
-                    "	p.codigoplu")) {
-                while (rs.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    String id = rs.getString("id");
-                    id = id.substring(0, id.length() - 1);
-                    imp.setImportId(id);
-                    if (rs.getString("id").equals(rs.getString("ean"))) {
-                        imp.setEan(id);
-                    } else {
-                        imp.setEan(rs.getString("ean"));
-                    }
-                    imp.setDescricaoCompleta(Utils.acertarTexto(rs.getString("descricaocompleta")));
-                    imp.setDescricaoGondola(Utils.acertarTexto(rs.getString("descricaocompleta")));
-                    imp.setDescricaoReduzida(Utils.acertarTexto(rs.getString("descricaoreduzida")));
-                    imp.setSituacaoCadastro(rs.getInt("situacao") == 0 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
-                    imp.setDataCadastro(rs.getDate("dtcadastro"));
-                    imp.setCodMercadologico1(rs.getString("merc1"));
-                    imp.setCodMercadologico2(rs.getString("merc2"));
-                    imp.setCodMercadologico3(rs.getString("merc3"));
-                    imp.setCodMercadologico4(rs.getString("merc4"));
-                    imp.setCodMercadologico5(rs.getString("merc5"));
-                    imp.setCustoComImposto(rs.getDouble("custocomimposto"));
-                    imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
-                    imp.setMargem(rs.getDouble("margem"));
-                    imp.setPrecovenda(rs.getDouble("venda"));
-                    imp.setTipoEmbalagem(rs.getString("embalagem"));
-                    imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagemcotacao"));
-                    imp.setEstoque(rs.getDouble("estoque"));
-                    imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
-                    imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
-                    imp.setNcm(rs.getString("ncm"));
-                    //imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
-                    //imp.setDataAlteracao(rs.getDate("dataalteracao"));
-                    imp.setIcmsAliq(rs.getDouble("icms"));
-                    imp.setIcmsCst(rs.getString("cst"));
-                    imp.setIcmsReducao(rs.getDouble("icmsreducao"));
-                    imp.setIcmsAliqEntrada(rs.getDouble("icms"));
-                    imp.setIcmsCstEntrada(rs.getInt("cst"));
-                    imp.setIcmsAliqSaida(rs.getDouble("icms"));
-                    imp.setIcmsCstSaida(rs.getInt("cst"));
-                    imp.setPiscofinsCstCredito(rs.getString("cstcofins"));
-                    imp.setPiscofinsCstDebito(rs.getString("cstpis"));
-                    imp.setCest(rs.getString("cest"));
-                    imp.seteBalanca("S".equals(rs.getString("pesavel")));
-                    imp.setValidade(rs.getInt("validade"));
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<FornecedorIMP> getFornecedores() throws Exception {
-        List<FornecedorIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	f.codigoenti id_fornecedor,\n" +
-                    "	f.datusucada datacadastro,\n" +
-                    "	cpf.nomeentida razao,\n" +
-                    "	cpf.nomapelido fantasia,\n" +
-                    "	cpf.codinsc_rg rgie,\n" +
-                    "	cpf.numcgc_cpf cnpj,\n" +
-                    "	cpf.tipempresa tipo,\n" +
-                    "	cpf.datanascim datanascimento,\n" +
-                    "	cpf.codcepcome cep,\n" +
-                    "	cpf.compcomerc numero,\n" +
-                    "	f.forn02visi prazovisita,\n" +
-                    "	f.forn02pent prazoentrega,\n" +
-                    "	rtrim(pg.nomcondpgt) condicaopagamento,\n" +
-                    "	f.diasemanas,\n" +
-                    "	f.prod_rural produtorural,\n" +
-                    "	ltrim(cep.titulo + ' ' + cep.logradouro) endereco,\n" +
-                    "	cep.bairro,\n" +
-                    "	cep.cidade,\n" +
-                    "	cep.estado,\n" +
-                    "	tel.telefone01 telefone\n" +
-                    "from \n" +
-                    "	FL800FOR f\n" +
-                    "left join flcgccpf cpf on (f.id_entidade = cpf.id_entidade)\n" +
-                    "left join fl423cep cep on (f.codigoenti = cep.codigoenti)\n" +
-                    "left join fltelefo_cad tel on (f.codigoenti = tel.id_cadastro)\n" +
-                    "left join flcondpg pg on (f.codcondpgt = pg.codcondpgt)\n" +
-                    "where\n" +
-                    "	cep.tipocadast = 'FOR' and\n" +
-                    "	tel.TP_CADASTRO = 'FOR'\n" +
-                    "order by\n" +
-                    "	f.codigoenti")) {
-                while (rs.next()) {
-                    FornecedorIMP imp = new FornecedorIMP();
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rs.getString("id_fornecedor"));
-                    imp.setDatacadastro(rs.getDate("datacadastro"));
-                    imp.setRazao(Utils.acertarTexto(rs.getString("razao")));
-                    imp.setFantasia(Utils.acertarTexto(rs.getString("fantasia")));
-                    imp.setIe_rg(rs.getString("rgie"));
-                    imp.setCnpj_cpf(rs.getString("cnpj"));
-                    imp.setTipo_inscricao("J".equals(rs.getString("tipo")) ? TipoInscricao.JURIDICA : TipoInscricao.FISICA);
-                    imp.setCep(rs.getString("cep"));
-                    imp.setNumero(rs.getString("numero"));
-                    imp.setPrazoVisita(rs.getInt("prazovisita"));
-                    imp.setPrazoEntrega(rs.getInt("prazoentrega"));
-                    
-                    String pagamento[] = rs.getString("condicaopagamento").split("/");
-                    for(String pag : pagamento) {
-                        imp.setCondicaoPagamento(Utils.stringToInt(pag.trim()));
-                    }
-                    if (rs.getInt("produtorural") == 1) {
-                        imp.setProdutorRural();
-                    }
-                    imp.setEndereco(rs.getString("endereco"));
-                    imp.setBairro(rs.getString("bairro"));
-                    imp.setMunicipio(rs.getString("cidade"));
-                    imp.setUf(rs.getString("estado"));
-                    imp.setTel_principal(rs.getString("telefone"));
-                    imp.copiarEnderecoParaCobranca();
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-    
-    /*
-    Este método foi copiado para trazer a importação de funcionários
-    que está em uma tabela especifíca no HRTech. Pois é necessário
-    para a importação de contas a pagar dos funcionários. Após usar o mesmo,
-    comentar este método e descomentar o método principal getFornecedores()
-    @Override
-    public List<FornecedorIMP> getFornecedores() throws Exception {
-        List<FornecedorIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	'U' + fun.codigoenti id_fornecedor,\n" +
-                    "	getdate() datacadastro,\n" +
-                    "	cpf.nomeentida razao,\n" +
-                    "	cpf.nomapelido fantasia,\n" +
-                    "	cpf.codinsc_rg rgie,\n" +
-                    "	cpf.numcgc_cpf cnpj,\n" +
-                    "	cpf.tipempresa tipo,\n" +
-                    "	cpf.datanascim datanascimento,\n" +
-                    "	cpf.codceplent cep,\n" +
-                    "	cpf.complocent numero,\n" +
-                    "	0 prazovisita,\n" +
-                    "	0 prazoentrega,\n" +
-                    "	0 condicaopagamento,\n" +
-                    "	0 diasemanas,\n" +
-                    "	0 produtorural,\n" +
-                    "	ltrim(cep.titulo + ' ' + cep.logradouro) endereco,\n" +
-                    "	cep.bairro,\n" +
-                    "	cep.cidade,\n" +
-                    "	cep.estado,\n" +
-                    "	0 telefone\n" +
-                    "from \n" +
-                    "	FL040FUN fun\n" +
-                    "join \n" +
-                    "	flcgccpf cpf on (fun.codcgccpfs = cpf.codigoenti)\n" +
-                    "left join fl423cep cep on (fun.codigoenti = cep.codigoenti) and\n" +
-                    "	cep.tipocadast = 'FUN'")) {
-                while (rs.next()) {
-                    FornecedorIMP imp = new FornecedorIMP();
-                    imp.setImportSistema(getSistema());
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportId(rs.getString("id_fornecedor"));
-                    imp.setDatacadastro(rs.getDate("datacadastro"));
-                    imp.setRazao(Utils.acertarTexto(rs.getString("razao")));
-                    imp.setFantasia(Utils.acertarTexto(rs.getString("fantasia")));
-                    imp.setIe_rg(rs.getString("rgie"));
-                    imp.setCnpj_cpf(rs.getString("cnpj"));
-                    imp.setTipo_inscricao("J".equals(rs.getString("tipo")) ? TipoInscricao.JURIDICA : TipoInscricao.FISICA);
-                    imp.setCep(rs.getString("cep"));
-                    imp.setNumero(rs.getString("numero"));
-                    imp.setPrazoVisita(rs.getInt("prazovisita"));
-                    imp.setPrazoEntrega(rs.getInt("prazoentrega"));
-                    
-                    String pagamento[] = rs.getString("condicaopagamento").split("/");
-                    for(String pag : pagamento) {
-                        imp.setCondicaoPagamento(Utils.stringToInt(pag.trim()));
-                    }
-                    if (rs.getInt("produtorural") == 1) {
-                        imp.setProdutorRural();
-                    }
-                    imp.setEndereco(rs.getString("endereco"));
-                    imp.setBairro(rs.getString("bairro"));
-                    imp.setMunicipio(rs.getString("cidade"));
-                    imp.setUf(rs.getString("estado"));
-                    imp.setTel_principal(rs.getString("telefone"));
-                    imp.copiarEnderecoParaCobranca();
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }*/
-
-    @Override
-    public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
-        List<ProdutoFornecedorIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	codigoenti id_fornecedor,\n"
-                    + "	codigoplu id_produto,\n"
-                    + "	coalesce(dataaltera, '') dataalteracao,\n"
-                    + "	coalesce(qtd_emb_co, 1) qtdcotacao,\n"
-                    + "	coalesce(referencia, '') referencia\n"
-                    + "from \n"
-                    + "	FL324FOR \n"
-                    + "where\n"
-                    + "	codigoenti != '' and\n"
-                    + "	codigoenti not in (100001)\n"
-                    + "order by\n"
-                    + "	codigoenti, codigoplu")) {
-                while (rs.next()) {
-                    ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setIdFornecedor(rs.getString("id_fornecedor"));
-                    String id_produto = rs.getString("id_produto");
-                    id_produto = rs.getString("id_produto").substring(0, id_produto.length() - 1);
-                    imp.setIdProduto(id_produto);
-                    imp.setQtdEmbalagem(rs.getDouble("qtdcotacao"));
-                    imp.setDataAlteracao(rs.getDate("dataalteracao"));
-                    imp.setCodigoExterno(rs.getString("referencia"));
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<ClienteIMP> getClientes() throws Exception {
-        List<ClienteIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "    c.codigoenti id,\n"
-                    + "    cpf.nomeentida razao,\n"
-                    + "    cpf.nomapelido fantasia,\n"
-                    + "    cpf.codinsc_rg rgie,\n"
-                    + "    cpf.numcgc_cpf cnpj,\n"
-                    + "    cpf.datanascim datanascimento,\n"
-                    + "    c.clin12limi limite,\n"
-                    + "    c.clic01stat situacao,\n"
-                    + "    c.codigosexo sexo,\n"
-                    + "    c.estadocivi estadocivil,\n"
-                    + "    c.datacadast datacadastro,\n"
-                    + "    cpf.codcepresi cep,\n"
-                    + "    cpf.compreside numero,\n"
-                    + "    ltrim(cep.titulo + ' ' + cep.logradouro) endereco,\n"
-                    + "    cep.bairro,\n"
-                    + "    cep.cidade,\n"
-                    + "    cep.estado,\n"
-                    + "    tel.telefone01 telefone\n"
-                    + "from\n"
-                    + "    FL400CLI c \n"
-                    + "left join\n"
-                    + "    flcgccpf cpf on (c.codcgccpfs = cpf.codigoenti)\n"
-                    + "left join\n"
-                    + "    fl423cep cep on (c.id_cliente = cep.id_cliente) and\n"
-                    + "    cpf.codcepresi = cep.codigocep\n"
-                    + "left join\n"
-                    + "    fltelefo_cad tel on (c.id_cliente = tel.id_cadastro)\n"
-                    + "where\n"
-                    + "    cep.tipocadast = 'CLI'\n"
-                    + "union\n"
-                    + "select \n"
-                    + "	distinct\n"
-                    + "	f.codigoenti id,\n"
-                    + "	cpf.nomeentida razao,\n"
-                    + "	cpf.nomapelido fantasia,\n"
-                    + "	cpf.codinsc_rg rgie,\n"
-                    + "	cpf.numcgc_cpf cnpj,\n"
-                    + "	cpf.datanascim datanascimento,\n"
-                    + "	0 limite,\n"
-                    + "	1 situacao,\n"
-                    + "	'M' sexo,\n"
-                    + "	0 estadocivil,\n"
-                    + "	f.datusucada datacadastro,\n"
-                    + "	cpf.codcepcome cep,\n"
-                    + "	cpf.compcomerc numero,\n"
-                    + "	ltrim(cep.titulo + ' ' + cep.logradouro) endereco,\n"
-                    + "	cep.bairro,\n"
-                    + "	cep.cidade,\n"
-                    + "	cep.estado,\n"
-                    + "	tel.telefone01 telefone\n"
-                    + "from \n"
-                    + "	FL800FOR f\n"
-                    + "left join flcgccpf cpf on (f.id_entidade = cpf.id_entidade)\n"
-                    + "left join fl423cep cep on (f.codigoenti = cep.codigoenti)\n"
-                    + "left join fltelefo_cad tel on (f.codigoenti = tel.id_cadastro)\n"
-                    + "join FL700FIN cr on (f.codigoenti = cr.codigoenti)\n"
-                    + "where\n"
-                    + "	cep.tipocadast = 'FOR' and\n"
-                    + "	tel.TP_CADASTRO = 'FOR' and\n"
-                    + "	cr.TIPOLANCAM = 'R'")) {
-                while (rs.next()) {
-                    ClienteIMP imp = new ClienteIMP();
-                    imp.setId(rs.getString("id"));
-                    imp.setRazao(rs.getString("razao"));
-                    imp.setInscricaoestadual(rs.getString("rgie").trim());
-                    imp.setCnpj(rs.getString("cnpj"));
-                    imp.setDataNascimento(rs.getDate("datanascimento"));
-                    imp.setValorLimite(rs.getDouble("limite"));
-                    imp.setAtivo(rs.getInt("situacao") == 0 ? true : false);
-                    imp.setSexo("F".equals(rs.getString("sexo")) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
-                    imp.setEstadoCivil(rs.getInt("estadocivil") == 0 ? TipoEstadoCivil.CASADO : TipoEstadoCivil.SOLTEIRO);
-                    imp.setDataCadastro(rs.getDate("datacadastro"));
-                    imp.setCep(rs.getString("cep"));
-                    imp.setNumero(rs.getString("numero"));
-                    imp.setEndereco(rs.getString("endereco"));
-                    imp.setBairro(rs.getString("bairro"));
-                    imp.setMunicipio(rs.getString("cidade"));
-                    imp.setUf(rs.getString("estado"));
-                    imp.setTelefone(rs.getString("telefone"));
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
-        List<CreditoRotativoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
-                    "select \n" +
-                    "	distinct\n" +
-                    "	f.codi_relacio id,\n" +
-                    "	cl.codigoenti idcliente,\n" +
-                    "	f.numcgc_cpf cnpj,\n" +
-                    "	f.numeroecf ecf,\n" +
-                    "	f.numerocoo coo,\n" +
-                    "	f.datamovime data,\n" +
-                    "	f.vdg_dia valor,\n" +
-                    "	f.datadeposi vencimento \n" +
-                    "from \n" +
-                    "	vw305fin f\n" +
-                    "join flcgccpf cpf on cast(f.numcgc_cpf as bigint) = cast(cpf.numcgc_cpf as bigint)\n" +
-                    "join fl400cli cl on cpf.codigoenti = cl.codcgccpfs and\n" +
-                    "	cl.id_entidade = cpf.id_entidade\n" +
-                    "where  \n" +
-                    "	f.datamovime >= '2005-01-01 00:00:00' and \n" +
-                    "	f.codigofina in ('007') and \n" +
-                    "	(ORIGEM != CASE WHEN \n" +
-                    "		DATAMOVIME > '20131231' THEN 'C' ELSE '\\' END OR \n" +
-                    "	 EXISTS (SELECT \n" +
-                    "			CODI_RELACIO \n" +
-                    "		 FROM \n" +
-                    "			FL404CON \n" +
-                    "            WHERE \n" +
-                    "			CODIGOLOJA = f.CODIGOLOJA AND \n" +
-                    "			CODI_RELACIO = f.CODI_RELACIO)) and\n" +
-                    "	f.codigoloja = " + getLojaOrigem() + "\n" +
-                    "order by\n" +
-                    "	f.datamovime")) {
-                while (rs.next()) {
-                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    imp.setId(rs.getString("id"));
-                    imp.setIdCliente(rs.getString("idcliente"));
-                    imp.setCnpjCliente(rs.getString("cnpj"));
-                    imp.setEcf(rs.getString("ecf"));
-                    imp.setNumeroCupom(rs.getString("coo"));
-                    imp.setDataEmissao(rs.getDate("data"));
-                    imp.setDataVencimento(rs.getDate("vencimento"));
-                    imp.setValor(rs.getDouble("valor"));
-
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    /*
-    O código do fornecedor foi alterado para trazer os títulos de funcionários
-    que está em uma tabela especifica para funcionários. Antes, é necessário importar
-    os funcionários como fornecedor.
-    */
-    @Override
-    public List<ContaPagarIMP> getContasPagar() throws Exception {
-        List<ContaPagarIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "	numerolanc id,\n"
-                    + "	case \n" +
-                      " when tipocadast = 'U' \n" +
-                      " then 'U' + codigoenti \n" +
-                      " else \n" +
-                      " codigoenti end idfornecedor,\n"
-                    + "	notafiscal documento,\n"
-                    + "	parcela,\n"
-                    + "	datemissao emissao,\n"
-                    + "	datvencime vencimento,\n"
-                    + "	vlrtotalnf valor,\n"
-                    + "	historico observacao,\n"
-                    + " cast(datpagto as date) pagamento\n"
-                    + "from\n"
-                    + "	FL700FIN\n"
+                    + "	p.codigoplu id, \n"
+                    + "	case  \n"
+                    + "		when p.estc13codi = '' then  \n"
+                    + "		p.codigoplu  \n"
+                    + "	else p.estc13codi end ean,\n"
+                    + "	p.estc35desc descricaocompleta,\n"
+                    + "	p.descreduzi descricaoreduzida,\n"
+                    + "	p.dtcadastro,\n"
+                    + "	case when p.estc01linh = 'S' then 1 else 0 end situacao,\n"
+                    + "	case when p.estc01peso = 'S' then 1 else 0 end pesavel,\n"
+                    + "	coalesce(bal.diasvalida, 0) validade,\n"
+                    + "	coalesce(bal.peso_varia, '') peso,\n"
+                    + "	p.estc03seto merc1, \n"
+                    + "	p.estc03grup merc2, \n"
+                    + "	p.estc03subg merc3, \n"
+                    + "	p.estc03fami merc4, \n"
+                    + "	p.estc03subf merc5,\n"
+                    + "	est.estn05mrge margem,\n"
+                    + "	est.qtd_emb_co qtdembalagemcotacao,\n"
+                    + "	est.qtd_emb_vd qtdembalagem,\n"
+                    + "	est.tip_emb_vd embalagem,\n"
+                    + "	v.vendaatua venda,\n"
+                    + "	c.custoliqui custocomimposto,\n"
+                    + "	c.custorepos custosemimposto,\n"
+                    + "	e.estoqueatu estoque,\n"
+                    + "	est.estn10maxi estoquemaximo,\n"
+                    + "	est.estn10mini estoqueminimo,\n"
+                    + "	ncm.cod_ncm ncm,\n"
+                    + "	ncm.id_cest cest,\n"
+                    + "	ts.situatribu cst,\n"
+                    + "	ts.valoricm icms,\n"
+                    + "	ts.mrger icmsreducao,\n"
+                    + "	pis.cstpis cstpis,\n"
+                    + "	pis.cstcof cstcofins\n"
+                   // + "x.nat_rec_pis naturezareceita\n"
+                    + " from\n"
+                    + "	fl300est p\n"
+                    + " join fl304ven v on (p.codigoplu = v.codigoplu)\n"
+                    + " join fl309est e on (p.codigoplu = e.codigoplu) and \n"
+                    + "	 v.codigoloja = e.codigoloja\n"
+                    + " join fl303cus c on (p.codigoplu = c.codigoplu) and\n"
+                    + "	v.codigoloja = c.codigoloja\n"
+                    + " join fltabncm_pro ncm on (p.codigoplu = ncm.codigoplu)\n"
+                    + " join fl301est est on (p.codigoplu = est.codigoplu) and\n"
+                    + "	est.codigoloja = v.codigoloja\n"
+                    + " join fltribut ts on (est.codtribsai = ts.codigotrib) and\n"
+                    + "	v.codigoloja = ts.codigoloja\n"
+                    + " left join fl328bal bal on (p.codigoplu = bal.codigoplu)\n"
+                    + " left join hrpdv_prepara_pro pis on (pis.codigoplu = p.codigoplu) and\n"
+                    + "	pis.codigoloja = v.codigoloja\n"
+                    + " join fltabncm_pis x on x.codigo = pis.cod_ncm	\n"
                     + "where\n"
-                    + "	codigoloja = " + getLojaOrigem() + " and\n"
-                    + "	tipolancam = 'P'\n"
-                    + "order by\n"
-                    + "	datvencime")) {
+                    + "	v.codigoloja = " +getLojaOrigem() + "\n"
+                        + "	order by\n"
+                        + "	p.codigoplu"
+                
+                
+                    )) {
                 while (rs.next()) {
-                    ContaPagarIMP imp = new ContaPagarIMP();
-                    imp.setId(rs.getString("id"));
-                    imp.setNumeroDocumento(rs.getString("documento"));
-                    imp.setDataEmissao(rs.getDate("emissao"));
-                    imp.setDataEntrada(rs.getDate("emissao"));
-                    imp.setIdFornecedor(rs.getString("idfornecedor"));
-                    imp.setValor(rs.getDouble("valor"));
-                    String dataPagamento = rs.getString("pagamento");
-                    if ((dataPagamento != null) && (!"1900-01-01".equals(dataPagamento))) {
-                        imp.setObservacao(rs.getString("observacao").trim() + " - FLAG_BAIXADO");
-                    } else {
-                        imp.setObservacao(rs.getString("observacao").trim());
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        String id = rs.getString("id");
+                        //id = id.substring(0, id.length() - 1);
+                        imp.setImportId(id);
+                        if (rs.getString("id").equals(rs.getString("ean"))) {
+                            imp.setEan(id);
+                        } else {
+                            imp.setEan(rs.getString("ean"));
+                        }
+                        imp.setDescricaoCompleta(Utils.acertarTexto(rs.getString("descricaocompleta")));
+                        imp.setDescricaoGondola(Utils.acertarTexto(rs.getString("descricaocompleta")));
+                        imp.setDescricaoReduzida(Utils.acertarTexto(rs.getString("descricaoreduzida")));
+                        imp.setSituacaoCadastro(rs.getInt("situacao") == 0 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                        imp.setDataCadastro(rs.getDate("dtcadastro"));
+                        imp.setCodMercadologico1(rs.getString("merc1"));
+                        imp.setCodMercadologico2(rs.getString("merc2"));
+                        imp.setCodMercadologico3(rs.getString("merc3"));
+                        imp.setCodMercadologico4(rs.getString("merc4"));
+                        imp.setCodMercadologico5(rs.getString("merc5"));
+                        imp.setCustoComImposto(rs.getDouble("custocomimposto"));
+                        imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
+                        imp.setMargem(rs.getDouble("margem"));
+                        imp.setPrecovenda(rs.getDouble("venda"));
+                        imp.setTipoEmbalagem(rs.getString("embalagem"));
+                        imp.setQtdEmbalagemCotacao(rs.getInt("qtdembalagemcotacao"));
+                        imp.setEstoque(rs.getDouble("estoque"));
+                        imp.setEstoqueMaximo(rs.getDouble("estoquemaximo"));
+                        imp.setEstoqueMinimo(rs.getDouble("estoqueminimo"));
+                        imp.setNcm(rs.getString("ncm"));
+                        //imp.setPiscofinsNaturezaReceita(rs.getString("naturezareceita"));
+                        //imp.setDataAlteracao(rs.getDate("dataalteracao"));
+                        imp.setIcmsAliq(rs.getDouble("icms"));
+                        imp.setIcmsCst(rs.getString("cst"));
+                        imp.setIcmsReducao(rs.getDouble("icmsreducao"));
+                        imp.setIcmsAliqEntrada(rs.getDouble("icms"));
+                        imp.setIcmsCstEntrada(rs.getInt("cst"));
+                        imp.setIcmsAliqSaida(rs.getDouble("icms"));
+                        imp.setIcmsCstSaida(rs.getInt("cst"));
+                        imp.setPiscofinsCstCredito(rs.getString("cstcofins"));
+                        imp.setPiscofinsCstDebito(rs.getString("cstpis"));
+                        imp.setCest(rs.getString("cest"));
+                        imp.seteBalanca("S".equals(rs.getString("pesavel")));
+                        imp.setValidade(rs.getInt("validade"));
+
+                        result.add(imp);
                     }
-                    imp.addVencimento(rs.getDate("vencimento"), imp.getValor());
-                    result.add(imp);
                 }
             }
+            return result;
         }
-        return result;
-    }
 
-    @Override
-    public Iterator<VendaIMP> getVendaIterator() throws Exception {
-        return new VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
-    }
+        @Override
+        public List<FornecedorIMP> getFornecedores() throws Exception {
+            List<FornecedorIMP> result = new ArrayList<>();
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select \n"
+                        + "	f.codigoenti id_fornecedor,\n"
+                        + "	f.datusucada datacadastro,\n"
+                        + "	cpf.nomeentida razao,\n"
+                        + "	cpf.nomapelido fantasia,\n"
+                        + "	cpf.codinsc_rg rgie,\n"
+                        + "	cpf.numcgc_cpf cnpj,\n"
+                        + "	cpf.tipempresa tipo,\n"
+                        + "	cpf.datanascim datanascimento,\n"
+                        + "	cpf.codcepcome cep,\n"
+                        + "	cpf.compcomerc numero,\n"
+                        + "	f.forn02visi prazovisita,\n"
+                        + "	f.forn02pent prazoentrega,\n"
+                        + "	rtrim(pg.nomcondpgt) condicaopagamento,\n"
+                        + "	f.diasemanas,\n"
+                        + "	f.prod_rural produtorural,\n"
+                        + "	ltrim(cep.titulo + ' ' + cep.logradouro) endereco,\n"
+                        + "	cep.bairro,\n"
+                        + "	cep.cidade,\n"
+                        + "	cep.estado,\n"
+                        + "	tel.telefone01 telefone\n"
+                        + "from \n"
+                        + "	FL800FOR f\n"
+                        + "left join flcgccpf cpf on (f.id_entidade = cpf.id_entidade)\n"
+                        + "left join fl423cep cep on (f.codigoenti = cep.codigoenti)\n"
+                        + "left join fltelefo_cad tel on (f.codigoenti = tel.id_cadastro)\n"
+                        + "left join flcondpg pg on (f.codcondpgt = pg.codcondpgt)\n"
+                        + "where\n"
+                        + "	cep.tipocadast = 'FOR' and\n"
+                        + "	tel.TP_CADASTRO = 'FOR'\n"
+                        + "order by\n"
+                        + "	f.codigoenti")) {
+                    while (rs.next()) {
+                        FornecedorIMP imp = new FornecedorIMP();
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportId(rs.getString("id_fornecedor"));
+                        imp.setDatacadastro(rs.getDate("datacadastro"));
+                        imp.setRazao(Utils.acertarTexto(rs.getString("razao")));
+                        imp.setFantasia(Utils.acertarTexto(rs.getString("fantasia")));
+                        imp.setIe_rg(rs.getString("rgie"));
+                        imp.setCnpj_cpf(rs.getString("cnpj"));
+                        imp.setTipo_inscricao("J".equals(rs.getString("tipo")) ? TipoInscricao.JURIDICA : TipoInscricao.FISICA);
+                        imp.setCep(rs.getString("cep"));
+                        imp.setNumero(rs.getString("numero"));
+                        imp.setPrazoVisita(rs.getInt("prazovisita"));
+                        imp.setPrazoEntrega(rs.getInt("prazoentrega"));
 
-    @Override
-    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
-        return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
-    }
+                        String pagamento[] = rs.getString("condicaopagamento").split("/");
+                        for (String pag : pagamento) {
+                            imp.setCondicaoPagamento(Utils.stringToInt(pag.trim()));
+                        }
+                        if (rs.getInt("produtorural") == 1) {
+                            imp.setProdutorRural();
+                        }
+                        imp.setEndereco(rs.getString("endereco"));
+                        imp.setBairro(rs.getString("bairro"));
+                        imp.setMunicipio(rs.getString("cidade"));
+                        imp.setUf(rs.getString("estado"));
+                        imp.setTel_principal(rs.getString("telefone"));
+                        imp.copiarEnderecoParaCobranca();
+
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+
+        /*
+         Este método foi copiado para trazer a importação de funcionários
+         que está em uma tabela especifíca no HRTech. Pois é necessário
+         para a importação de contas a pagar dos funcionários. Após usar o mesmo,
+         comentar este método e descomentar o método principal getFornecedores()
+         @Override
+         public List<FornecedorIMP> getFornecedores() throws Exception {
+         List<FornecedorIMP> result = new ArrayList<>();
+         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+         try (ResultSet rs = stm.executeQuery(
+         "select \n" +
+         "	'U' + fun.codigoenti id_fornecedor,\n" +
+         "	getdate() datacadastro,\n" +
+         "	cpf.nomeentida razao,\n" +
+         "	cpf.nomapelido fantasia,\n" +
+         "	cpf.codinsc_rg rgie,\n" +
+         "	cpf.numcgc_cpf cnpj,\n" +
+         "	cpf.tipempresa tipo,\n" +
+         "	cpf.datanascim datanascimento,\n" +
+         "	cpf.codceplent cep,\n" +
+         "	cpf.complocent numero,\n" +
+         "	0 prazovisita,\n" +
+         "	0 prazoentrega,\n" +
+         "	0 condicaopagamento,\n" +
+         "	0 diasemanas,\n" +
+         "	0 produtorural,\n" +
+         "	ltrim(cep.titulo + ' ' + cep.logradouro) endereco,\n" +
+         "	cep.bairro,\n" +
+         "	cep.cidade,\n" +
+         "	cep.estado,\n" +
+         "	0 telefone\n" +
+         "from \n" +
+         "	FL040FUN fun\n" +
+         "join \n" +
+         "	flcgccpf cpf on (fun.codcgccpfs = cpf.codigoenti)\n" +
+         "left join fl423cep cep on (fun.codigoenti = cep.codigoenti) and\n" +
+         "	cep.tipocadast = 'FUN'")) {
+         while (rs.next()) {
+         FornecedorIMP imp = new FornecedorIMP();
+         imp.setImportSistema(getSistema());
+         imp.setImportLoja(getLojaOrigem());
+         imp.setImportId(rs.getString("id_fornecedor"));
+         imp.setDatacadastro(rs.getDate("datacadastro"));
+         imp.setRazao(Utils.acertarTexto(rs.getString("razao")));
+         imp.setFantasia(Utils.acertarTexto(rs.getString("fantasia")));
+         imp.setIe_rg(rs.getString("rgie"));
+         imp.setCnpj_cpf(rs.getString("cnpj"));
+         imp.setTipo_inscricao("J".equals(rs.getString("tipo")) ? TipoInscricao.JURIDICA : TipoInscricao.FISICA);
+         imp.setCep(rs.getString("cep"));
+         imp.setNumero(rs.getString("numero"));
+         imp.setPrazoVisita(rs.getInt("prazovisita"));
+         imp.setPrazoEntrega(rs.getInt("prazoentrega"));
+                    
+         String pagamento[] = rs.getString("condicaopagamento").split("/");
+         for(String pag : pagamento) {
+         imp.setCondicaoPagamento(Utils.stringToInt(pag.trim()));
+         }
+         if (rs.getInt("produtorural") == 1) {
+         imp.setProdutorRural();
+         }
+         imp.setEndereco(rs.getString("endereco"));
+         imp.setBairro(rs.getString("bairro"));
+         imp.setMunicipio(rs.getString("cidade"));
+         imp.setUf(rs.getString("estado"));
+         imp.setTel_principal(rs.getString("telefone"));
+         imp.copiarEnderecoParaCobranca();
+
+         result.add(imp);
+         }
+         }
+         }
+         return result;
+         }*/
+        @Override
+        public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
+            List<ProdutoFornecedorIMP> result = new ArrayList<>();
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select \n"
+                        + "	codigoenti id_fornecedor,\n"
+                        + "	codigoplu id_produto,\n"
+                        + "	coalesce(dataaltera, '') dataalteracao,\n"
+                        + "	coalesce(qtd_emb_co, 1) qtdcotacao,\n"
+                        + "	coalesce(referencia, '') referencia\n"
+                        + "from \n"
+                        + "	FL324FOR \n"
+                        + "where\n"
+                        + "	codigoenti != '' and\n"
+                        + "	codigoenti not in (100001)\n"
+                        + "order by\n"
+                        + "	codigoenti, codigoplu")) {
+                    while (rs.next()) {
+                        ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setIdFornecedor(rs.getString("id_fornecedor"));
+                        String id_produto = rs.getString("id_produto");
+                        id_produto = rs.getString("id_produto").substring(0, id_produto.length() - 1);
+                        imp.setIdProduto(id_produto);
+                        imp.setQtdEmbalagem(rs.getDouble("qtdcotacao"));
+                        imp.setDataAlteracao(rs.getDate("dataalteracao"));
+                        imp.setCodigoExterno(rs.getString("referencia"));
+
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+
+        @Override
+        public List<ClienteIMP> getClientes() throws Exception {
+            List<ClienteIMP> result = new ArrayList<>();
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select \n"
+                        + "    c.codigoenti id,\n"
+                        + "    cpf.nomeentida razao,\n"
+                        + "    cpf.nomapelido fantasia,\n"
+                        + "    cpf.codinsc_rg rgie,\n"
+                        + "    cpf.numcgc_cpf cnpj,\n"
+                        + "    cpf.datanascim datanascimento,\n"
+                        + "    c.clin12limi limite,\n"
+                        + "    c.clic01stat situacao,\n"
+                        + "    c.codigosexo sexo,\n"
+                        + "    c.estadocivi estadocivil,\n"
+                        + "    c.datacadast datacadastro,\n"
+                        + "    cpf.codcepresi cep,\n"
+                        + "    cpf.compreside numero,\n"
+                        + "    ltrim(cep.titulo + ' ' + cep.logradouro) endereco,\n"
+                        + "    cep.bairro,\n"
+                        + "    cep.cidade,\n"
+                        + "    cep.estado,\n"
+                        + "    tel.telefone01 telefone\n"
+                        + "from\n"
+                        + "    FL400CLI c \n"
+                        + "left join\n"
+                        + "    flcgccpf cpf on (c.codcgccpfs = cpf.codigoenti)\n"
+                        + "left join\n"
+                        + "    fl423cep cep on (c.id_cliente = cep.id_cliente) and\n"
+                        + "    cpf.codcepresi = cep.codigocep\n"
+                        + "left join\n"
+                        + "    fltelefo_cad tel on (c.id_cliente = tel.id_cadastro)\n"
+                        + "where\n"
+                        + "    cep.tipocadast = 'CLI'\n"
+                        + "union\n"
+                        + "select \n"
+                        + "	distinct\n"
+                        + "	f.codigoenti id,\n"
+                        + "	cpf.nomeentida razao,\n"
+                        + "	cpf.nomapelido fantasia,\n"
+                        + "	cpf.codinsc_rg rgie,\n"
+                        + "	cpf.numcgc_cpf cnpj,\n"
+                        + "	cpf.datanascim datanascimento,\n"
+                        + "	0 limite,\n"
+                        + "	1 situacao,\n"
+                        + "	'M' sexo,\n"
+                        + "	0 estadocivil,\n"
+                        + "	f.datusucada datacadastro,\n"
+                        + "	cpf.codcepcome cep,\n"
+                        + "	cpf.compcomerc numero,\n"
+                        + "	ltrim(cep.titulo + ' ' + cep.logradouro) endereco,\n"
+                        + "	cep.bairro,\n"
+                        + "	cep.cidade,\n"
+                        + "	cep.estado,\n"
+                        + "	tel.telefone01 telefone\n"
+                        + "from \n"
+                        + "	FL800FOR f\n"
+                        + "left join flcgccpf cpf on (f.id_entidade = cpf.id_entidade)\n"
+                        + "left join fl423cep cep on (f.codigoenti = cep.codigoenti)\n"
+                        + "left join fltelefo_cad tel on (f.codigoenti = tel.id_cadastro)\n"
+                        + "join FL700FIN cr on (f.codigoenti = cr.codigoenti)\n"
+                        + "where\n"
+                        + "	cep.tipocadast = 'FOR' and\n"
+                        + "	tel.TP_CADASTRO = 'FOR' and\n"
+                        + "	cr.TIPOLANCAM = 'R'")) {
+                    while (rs.next()) {
+                        ClienteIMP imp = new ClienteIMP();
+                        imp.setId(rs.getString("id"));
+                        imp.setRazao(rs.getString("razao"));
+                        imp.setInscricaoestadual(rs.getString("rgie").trim());
+                        imp.setCnpj(rs.getString("cnpj"));
+                        imp.setDataNascimento(rs.getDate("datanascimento"));
+                        imp.setValorLimite(rs.getDouble("limite"));
+                        imp.setAtivo(rs.getInt("situacao") == 0 ? true : false);
+                        imp.setSexo("F".equals(rs.getString("sexo")) ? TipoSexo.FEMININO : TipoSexo.MASCULINO);
+                        imp.setEstadoCivil(rs.getInt("estadocivil") == 0 ? TipoEstadoCivil.CASADO : TipoEstadoCivil.SOLTEIRO);
+                        imp.setDataCadastro(rs.getDate("datacadastro"));
+                        imp.setCep(rs.getString("cep"));
+                        imp.setNumero(rs.getString("numero"));
+                        imp.setEndereco(rs.getString("endereco"));
+                        imp.setBairro(rs.getString("bairro"));
+                        imp.setMunicipio(rs.getString("cidade"));
+                        imp.setUf(rs.getString("estado"));
+                        imp.setTelefone(rs.getString("telefone"));
+
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+
+        @Override
+        public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+            List<CreditoRotativoIMP> result = new ArrayList<>();
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select \n"
+                        + "	distinct\n"
+                        + "	f.codi_relacio id,\n"
+                        + "	cl.codigoenti idcliente,\n"
+                        + "	f.numcgc_cpf cnpj,\n"
+                        + "	f.numeroecf ecf,\n"
+                        + "	f.numerocoo coo,\n"
+                        + "	f.datamovime data,\n"
+                        + "	f.vdg_dia valor,\n"
+                        + "	f.datadeposi vencimento \n"
+                        + "from \n"
+                        + "	vw305fin f\n"
+                        + "join flcgccpf cpf on cast(f.numcgc_cpf as bigint) = cast(cpf.numcgc_cpf as bigint)\n"
+                        + "join fl400cli cl on cpf.codigoenti = cl.codcgccpfs and\n"
+                        + "	cl.id_entidade = cpf.id_entidade\n"
+                        + "where  \n"
+                        + "	f.datamovime >= '2005-01-01 00:00:00' and \n"
+                        + "	f.codigofina in ('007') and \n"
+                        + "	(ORIGEM != CASE WHEN \n"
+                        + "		DATAMOVIME > '20131231' THEN 'C' ELSE '\\' END OR \n"
+                        + "	 EXISTS (SELECT \n"
+                        + "			CODI_RELACIO \n"
+                        + "		 FROM \n"
+                        + "			FL404CON \n"
+                        + "            WHERE \n"
+                        + "			CODIGOLOJA = f.CODIGOLOJA AND \n"
+                        + "			CODI_RELACIO = f.CODI_RELACIO)) and\n"
+                        + "	f.codigoloja = " + getLojaOrigem() + "\n"
+                        + "order by\n"
+                        + "	f.datamovime")) {
+                    while (rs.next()) {
+                        CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                        imp.setId(rs.getString("id"));
+                        imp.setIdCliente(rs.getString("idcliente"));
+                        imp.setCnpjCliente(rs.getString("cnpj"));
+                        imp.setEcf(rs.getString("ecf"));
+                        imp.setNumeroCupom(rs.getString("coo"));
+                        imp.setDataEmissao(rs.getDate("data"));
+                        imp.setDataVencimento(rs.getDate("vencimento"));
+                        imp.setValor(rs.getDouble("valor"));
+
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+
+        /*
+         O código do fornecedor foi alterado para trazer os títulos de funcionários
+         que está em uma tabela especifica para funcionários. Antes, é necessário importar
+         os funcionários como fornecedor.
+         */
+        @Override
+        public List<ContaPagarIMP> getContasPagar() throws Exception {
+            List<ContaPagarIMP> result = new ArrayList<>();
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rs = stm.executeQuery(
+                        "select\n"
+                        + "	numerolanc id,\n"
+                        + "	case \n"
+                        + " when tipocadast = 'U' \n"
+                        + " then 'U' + codigoenti \n"
+                        + " else \n"
+                        + " codigoenti end idfornecedor,\n"
+                        + "	notafiscal documento,\n"
+                        + "	parcela,\n"
+                        + "	datemissao emissao,\n"
+                        + "	datvencime vencimento,\n"
+                        + "	vlrtotalnf valor,\n"
+                        + "	historico observacao,\n"
+                        + " cast(datpagto as date) pagamento\n"
+                        + "from\n"
+                        + "	FL700FIN\n"
+                        + "where\n"
+                        + "	codigoloja = " + getLojaOrigem() + " and\n"
+                        + "	tipolancam = 'P'\n"
+                        + "order by\n"
+                        + "	datvencime")) {
+                    while (rs.next()) {
+                        ContaPagarIMP imp = new ContaPagarIMP();
+                        imp.setId(rs.getString("id"));
+                        imp.setNumeroDocumento(rs.getString("documento"));
+                        imp.setDataEmissao(rs.getDate("emissao"));
+                        imp.setDataEntrada(rs.getDate("emissao"));
+                        imp.setIdFornecedor(rs.getString("idfornecedor"));
+                        imp.setValor(rs.getDouble("valor"));
+                        String dataPagamento = rs.getString("pagamento");
+                        if ((dataPagamento != null) && (!"1900-01-01".equals(dataPagamento))) {
+                            imp.setObservacao(rs.getString("observacao").trim() + " - FLAG_BAIXADO");
+                        } else {
+                            imp.setObservacao(rs.getString("observacao").trim());
+                        }
+                        imp.addVencimento(rs.getDate("vencimento"), imp.getValor());
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+
+        @Override
+        public Iterator<VendaIMP> getVendaIterator() throws Exception {
+            return new VendaIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+        }
+
+        @Override
+        public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+            return new VendaItemIterator(getLojaOrigem(), dataInicioVenda, dataTerminoVenda);
+        }
 
     private Date dataInicioVenda;
     private Date dataTerminoVenda;
@@ -702,6 +738,10 @@ public class HRTechDAO extends InterfaceDAO {
 
     public void setDataTerminoVenda(Date dataTerminoVenda) {
         this.dataTerminoVenda = dataTerminoVenda;
+    }
+
+    private String getlojaorigem() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     private static class VendaIterator implements Iterator<VendaIMP> {
@@ -761,7 +801,7 @@ public class HRTechDAO extends InterfaceDAO {
                     = "select\n"
                     + "	c.codi_relacio id,\n"
                     + "	coalesce(cl.codigoenti, '') idcliente,\n"
-                    + " case c.vdl_dia when 0.00 then 1 else 0 end cancelado,\n" 
+                    + " case c.vdl_dia when 0.00 then 1 else 0 end cancelado,\n"
                     + "	c.numerocaix ecf,\n"
                     + "	c.numerocupo coo,\n"
                     + "	c.datamovime data,\n"
@@ -858,7 +898,7 @@ public class HRTechDAO extends InterfaceDAO {
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select\n"
-                    + " it.codi_relacio + '-' + cast(coalesce(it.id_item, 1) as varchar) + '-' + cast(it.vdg_dia as varchar) id,\n" 
+                    + " it.codi_relacio + '-' + cast(coalesce(it.id_item, 1) as varchar) + '-' + cast(it.vdg_dia as varchar) id,\n"
                     + "	it.codi_relacio id_venda,\n"
                     + "	it.codigoplu id_produto,\n"
                     + "	pr.estc35desc descricao,\n"
