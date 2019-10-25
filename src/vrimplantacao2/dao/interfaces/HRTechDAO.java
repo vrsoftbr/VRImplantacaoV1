@@ -137,8 +137,6 @@ public class HRTechDAO extends InterfaceDAO {
                     imp.setMerc3Descricao(rs.getString("descmerc3"));
                     imp.setMerc4ID(rs.getString("codmerc4"));
                     imp.setMerc4Descricao(rs.getString("descmerc4"));
-                    //imp.setMerc5ID(rs.getString("codmerc5"));
-                    //imp.setMerc5Descricao(rs.getString("descmerc5"));
 
                     result.add(imp);
                 }
@@ -233,7 +231,7 @@ public class HRTechDAO extends InterfaceDAO {
                     "	p.estc35desc descricaocompleta,\n" +
                     "	p.descreduzi descricaoreduzida,\n" +
                     "	p.dtcadastro,\n" +
-                    "	p.situacao,\n" +
+                    "	p.ESTC01LINH ativo,\n" +
                     "	p.estc01peso pesavel,\n" +
                     "	coalesce(bal.validade, 0) validade,\n" +
                     "	p.estc03seto merc1, \n" +
@@ -308,13 +306,13 @@ public class HRTechDAO extends InterfaceDAO {
                     imp.setDescricaoCompleta(Utils.acertarTexto(rs.getString("descricaocompleta")));
                     imp.setDescricaoGondola(Utils.acertarTexto(rs.getString("descricaocompleta")));
                     imp.setDescricaoReduzida(Utils.acertarTexto(rs.getString("descricaoreduzida")));
-                    imp.setSituacaoCadastro(rs.getInt("situacao") == 0 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setSituacaoCadastro("N".equals(rs.getString("ativo")) ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
                     imp.setDataCadastro(rs.getDate("dtcadastro"));
                     imp.setCodMercadologico1(rs.getString("merc1"));
                     imp.setCodMercadologico2(rs.getString("merc2"));
                     imp.setCodMercadologico3(rs.getString("merc3"));
                     imp.setCodMercadologico4(rs.getString("merc4"));
-                    imp.setCodMercadologico5(rs.getString("merc5"));
+                    //poimp.setCodMercadologico5(rs.getString("merc5"));
                     imp.setCustoComImposto(rs.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rs.getDouble("custosemimposto"));
                     imp.setMargem(rs.getDouble("margem"));
@@ -364,7 +362,7 @@ public class HRTechDAO extends InterfaceDAO {
                     + "	cpf.compcomerc numero,\n"
                     + "	f.forn02visi prazovisita,\n"
                     + "	f.forn02pent prazoentrega,\n"
-                    + "	rtrim(pg.nomcondpgt) condicaopagamento,\n"
+                    + "	coalesce(rtrim(pg.nomcondpgt),'') condicaopagamento,\n"
                     + "	f.diasemanas,\n"
                     + "	f.prod_rural produtorural,\n"
                     + "	ltrim(cep.titulo + ' ' + cep.logradouro) endereco,\n"
