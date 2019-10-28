@@ -40,7 +40,13 @@ public enum OpcaoFornecedor {
     BANCO_PADRAO,
     COMPLEMENTO,
     CEP, 
-    EMAIL, CONTATO_NOME, TIPO_CONTATO, CELULAR, BLOQUEADO;
+    EMAIL, 
+    CONTATO_NOME, 
+    TIPO_CONTATO, 
+    CELULAR, 
+    BLOQUEADO, 
+    EMITE_NFE, 
+    PERMITE_NF_SEM_PEDIDO;
     
     private List<FornecedorIMP> listaEspecial;
 
