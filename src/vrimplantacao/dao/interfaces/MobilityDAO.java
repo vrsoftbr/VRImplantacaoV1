@@ -41,7 +41,6 @@ import vrimplantacao.vo.vrimplantacao.ProdutoVO;
 import vrimplantacao.vo.vrimplantacao.ReceberChequeVO;
 import vrimplantacao.vo.vrimplantacao.ReceberCreditoRotativoVO;
 
-@Deprecated
 public class MobilityDAO {
     
     //CARREGAMENTOS
