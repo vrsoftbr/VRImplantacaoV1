@@ -116,7 +116,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    e.est_min estminimo,\n"
                     + "    e.est_atual estoque,\n"
                     + "    p.balanca,\n"
-                    + "    replace(p.situacao, '*', 1) situacao,\n"
+                    + "    replace(replace(replace(situacao, '',1),'2',0),'3',0) situacao,\n"
                     + "    p.unm_emb_qtd as qtdembalagem,\n"
                     + "    p.unm as tipoembalagem,\n"
                     + "    p.dias_validade as validade,\n"
@@ -169,7 +169,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataAlteracao(rs.getDate("dataalteracao"));
                     imp.seteBalanca("S".equals(rs.getString("balanca")));
                     imp.setValidade(rs.getInt("validade"));
-                    imp.setSituacaoCadastro(rs.getString("situacao") == "1" ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    imp.setSituacaoCadastro(Utils.stringToInt(rs.getString("situacao"))== 1 ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
                     imp.setTipoEmbalagem(rs.getString("tipoembalagem"));
                     imp.setPesoBruto(rs.getDouble("pesobruto"));
