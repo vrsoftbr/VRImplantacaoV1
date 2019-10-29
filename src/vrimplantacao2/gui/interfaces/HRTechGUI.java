@@ -40,11 +40,11 @@ public class HRTechGUI extends VRInternalFrame {
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         tabProdutos.carregarParametros(params, SISTEMA);
-        txtHost.setText(params.get(SISTEMA, "HOST"));
-        txtDatabase.setText(params.get(SISTEMA, "DATABASE"));
-        txtPorta.setText(params.get(SISTEMA, "PORTA"));
-        txtUsuario.setText(params.get(SISTEMA, "USUARIO"));
-        txtSenha.setText(params.get(SISTEMA, "SENHA"));
+        txtHost.setText(params.getWithNull("localhost", SISTEMA, "HOST"));
+        txtDatabase.setText(params.getWithNull("HRTECH", SISTEMA, "DATABASE"));
+        txtPorta.setText(params.getWithNull("1433", SISTEMA, "PORTA"));
+        txtUsuario.setText(params.getWithNull("sa", SISTEMA, "USUARIO"));
+        txtSenha.setText(params.getWithNull("HR", SISTEMA, "SENHA"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
@@ -75,7 +75,6 @@ public class HRTechGUI extends VRInternalFrame {
         super(i_mdiFrame);
         initComponents();        
         this.title = "Importação " + SISTEMA;
-        carregarParametros();
         centralizarForm();
         tabProdutos.setOpcoesDisponiveis(dao);
         tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
@@ -104,6 +103,7 @@ public class HRTechGUI extends VRInternalFrame {
         });
         tabProdutos.btnMapaTribut.setEnabled(false);
         this.setMaximum(false);
+        carregarParametros();
     }
 
     public void validarDadosAcesso() throws Exception {
