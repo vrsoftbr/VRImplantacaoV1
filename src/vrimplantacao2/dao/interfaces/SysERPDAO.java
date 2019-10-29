@@ -128,7 +128,7 @@ public class SysERPDAO extends InterfaceDAO {
                         if (rs.getString("ean") != null && !"".equals(rs.getString("ean"))) {
                             String eanSTR = rs.getString("ean"), novoEAN;
 
-                            novoEAN = eanSTR.substring(2, eanSTR.length() - 2);
+                            novoEAN = eanSTR.substring(2, eanSTR.length() - 3);
 
                             imp.setEan(novoEAN);
                         }
@@ -218,7 +218,7 @@ public class SysERPDAO extends InterfaceDAO {
                     imp.setAtivo(rs.getInt("situacaocadastro") == 1);
                     
                     if(rs.getString("email") != null && !"".equals(rs.getString("email"))) {
-                        imp.addContato("1", "EMAIL", null, null, TipoContato.COMERCIAL, rs.getString("email"));
+                        imp.addContato("1", "EMAIL", null, null, TipoContato.COMERCIAL, rs.getString("email").substring(0, 50));
                     }
                     
                     if(rs.getString("obs") != null && !"".equals(rs.getString("obs"))) {
