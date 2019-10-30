@@ -232,7 +232,45 @@ public class AtmaDAO extends InterfaceDAO {
                     + "order by pes.ID_PES"
             )) {
                 while (rst.next()) {
+                    FornecedorIMP imp = new FornecedorIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setRazao(rst.getString("razao"));
+                    imp.setFantasia(rst.getString("fantasia"));
 
+                    if ((rst.getString("cpf") != null)
+                            && (!rst.getString("cpf").trim().isEmpty())) {
+                        imp.setCnpj_cpf(rst.getString("cpf"));
+                    } else {
+                        imp.setCnpj_cpf(rst.getString("cnpj"));
+                    }
+
+                    if ((rst.getString("rg") != null)
+                            && (!rst.getString("rg").trim().isEmpty())) {
+                        imp.setIe_rg(rst.getString("rg"));
+                    } else {
+                        imp.setIe_rg(rst.getString("inscricaoestaual"));
+                    }
+
+                    imp.setEndereco(rst.getString("endereco"));
+                    imp.setNumero(rst.getString("numero"));
+                    imp.setComplemento(rst.getString("complemento"));
+                    imp.setCep(rst.getString("cep"));
+                    imp.setBairro(rst.getString("bairro"));
+                    imp.setMunicipio(rst.getString("municipio"));
+                    imp.setIbge_municipio(rst.getInt("municipioIbge"));
+                    imp.setUf(rst.getString("uf"));
+                    imp.setIbge_uf(rst.getInt("ufIbge"));                    
+                    imp.setCob_endereco(rst.getString("enderecocob"));
+                    imp.setCob_numero(rst.getString("numerocob"));
+                    imp.setCob_complemento(rst.getString("complementocob"));
+                    imp.setCob_cep(rst.getString("cepcob"));
+                    imp.setCob_bairro(rst.getString("bairrocob"));
+                    imp.setCob_municipio(rst.getString("municpioCob"));
+                    imp.setCob_ibge_municipio(rst.getInt("municipioIbgeCob"));
+                    imp.setCob_uf(rst.getString("ufCob"));
+                    imp.setCob_ibge_uf(rst.getInt("ufIbgeCob"));                    
                 }
             }
         }
