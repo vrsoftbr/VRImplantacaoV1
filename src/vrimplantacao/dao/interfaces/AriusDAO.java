@@ -117,7 +117,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
-        return "ARIUS";
+        return "Arius";
     }
 
     @Override
@@ -136,7 +136,9 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "order by descritivo")) {
                 while (rs.next()) {
                     result.add(new MapaTributoIMP(rs.getString("id"),
-                            rs.getString("descritivo")));
+                            rs.getString("descritivo") 
+                                    + "(ALI: " + rs.getString("icms_venda")
+                                    + " RED: " + rs.getString("reducao_venda") + ")"));
                 }
             }
         }
@@ -366,11 +368,12 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
-                    if("S".equals(rst.getString("balanca"))){
-                        imp.setEan(rst.getString("id").substring(0, rst.getString("id").length() - 1));
-                    } else {
+                    //if("S".equals(rst.getString("balanca"))){
+                        //imp.setEan(rst.getString("id").substring(0, rst.getString("id").length() - 1));
+                        
+                    //} else {
                         imp.setEan(rst.getString("codigobarras"));
-                    }
+                    //}
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem_compra"));
 
@@ -557,7 +560,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     String email = Utils.acertarTexto(rst.getString("email")).toLowerCase();
                     if (!"".equals(email)) {
-                        imp.addContato("1", "Email", "", "", TipoContato.COMERCIAL, email);
+                        imp.addContato("1", "Email", "", "", TipoContato.COMERCIAL, (email.length() > 50 ? email.substring(0, 50) : email));
                     }
                     if ((rst.getString("telefone2") != null)
                             && (!rst.getString("telefone2").trim().isEmpty())) {
