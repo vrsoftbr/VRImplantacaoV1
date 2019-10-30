@@ -949,9 +949,9 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setTipoDesconto(TipoDesconto.getById(ln.getInt("tipodesconto")));
             }
             imp.setIdAliquota(ln.getInt("id_aliquota"));
-            /*imp.setIcmsCst(ln.getInt("icms_cst"));
-             imp.setIcmsAliq(ln.getDouble("icms_aliq"));
-             imp.setIcmsReduzido(ln.getDouble("icms_red"));*/
+            imp.setIcmsCst(ln.getInt("icms_cst"));
+            imp.setIcmsAliq(ln.getDouble("icms_aliq"));
+            imp.setIcmsReduzido(ln.getDouble("icms_red"));
             imp.setContadorDoc(ln.getInt("contadordoc"));
 
             /*if (!hasNext()) {

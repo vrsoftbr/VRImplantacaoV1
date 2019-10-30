@@ -147,7 +147,7 @@ public class G3DAO extends InterfaceDAO {
                     + "	p.REDUCAO_BC_DENTRO,\n"
                     + "	p.REDUCAO_BC_FORA,\n"
                     + "	p.ECF_ICMS_ST AS aliquotaconsumidor,\n"
-                    + "	case p.EXCLUIDO when 0 then 'ATIVO' ELSE 'EXCLUIDO' end situacaocadastro\n"
+                    + "	case p.DESATIVADO when 0 then 'ATIVO' ELSE 'INATIVO' end situacaocadastro\n"
                     + "FROM produto p\n"
                     + "LEFT JOIN unidade_produto u ON u.ID = p.ID_UNIDADE_PRODUTO\n"
                     + "LEFT JOIN grupopis gps ON gps.id = p.id_grupo_pis_saida\n"

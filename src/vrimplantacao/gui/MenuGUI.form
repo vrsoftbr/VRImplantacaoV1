@@ -791,12 +791,12 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuArtSystemActionPerformed"/>
                           </Events>
                         </MenuItem>
-                        <MenuItem class="javax.swing.JMenuItem" name="mnuSysERP">
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuiSysERP">
                           <Properties>
                             <Property name="text" type="java.lang.String" value="SysERP"/>
                           </Properties>
                           <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuSysERPActionPerformed"/>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuiSysERPActionPerformed"/>
                           </Events>
                         </MenuItem>
                       </SubComponents>

@@ -336,11 +336,12 @@ public class ProdutoDAO {
         }
 
         sql.setWhere("id = " + vo.getId());
-
+        String strSql = sql.getUpdate();
+        LOG.fine(strSql);
         try {
             if (!sql.isEmpty()) {
                 try (Statement stm = Conexao.createStatement()) {
-                    stm.execute(sql.getUpdate());
+                    stm.execute(strSql);
                 }
             }
         } catch (Exception e) {

@@ -97,9 +97,6 @@ public class NotaFiscalRepository {
                     //</editor-fold>
                     
                     //<editor-fold defaultstate="collapsed" desc="Apagar nota importada">
-                    if (imp.getNumeroNota() == 319365) {
-                        System.out.println("Achou " + idNotaEntrada);
-                    }
                     if (idNotaEntrada != null) {
                         if (apagarApenasItens && notaImportada) {
                             provider.eliminarItensNotaEntrada(idNotaEntrada);

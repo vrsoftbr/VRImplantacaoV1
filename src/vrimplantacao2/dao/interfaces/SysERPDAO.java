@@ -62,9 +62,9 @@ public class SysERPDAO extends InterfaceDAO {
                     imp.setImportSistema(getSistema());
                     imp.setMerc1ID(rs.getString("grp_codigo"));
                     imp.setMerc1Descricao(rs.getString("grp_descricao"));
-                    imp.setMerc2ID(rs.getString("1"));
+                    imp.setMerc2ID("1");
                     imp.setMerc2Descricao(rs.getString("grp_descricao"));
-                    imp.setMerc3ID(rs.getString("1"));
+                    imp.setMerc3ID("1");
                     imp.setMerc3Descricao(rs.getString("grp_descricao"));
 
                     result.add(imp);
@@ -126,22 +126,15 @@ public class SysERPDAO extends InterfaceDAO {
 
                     if (rs.getInt("pesavel") == 1) {
                         if (rs.getString("ean") != null && !"".equals(rs.getString("ean"))) {
-                            String eanSTR = rs.getString("ean"), novoEAN, digito;
+                            String eanSTR = rs.getString("ean"), novoEAN;
 
-                            novoEAN = eanSTR.substring(2, eanSTR.length());
-
-                            digito = novoEAN.substring(5, 6);
-
-                            if ("0".equals(digito)) {
-                                novoEAN = novoEAN.substring(2, 5);
-                            } else {
-                                novoEAN = novoEAN.substring(2, 6);
-                            }
+                            novoEAN = eanSTR.substring(2, eanSTR.length() - 3);
 
                             imp.setEan(novoEAN);
                         }
                         imp.seteBalanca(true);
                     }
+                    
                     imp.setPrecovenda(rs.getDouble("precovenda"));
                     imp.setDataCadastro(rs.getDate("datacadastro"));
                     imp.setSituacaoCadastro(rs.getInt("situacaocadastro") == 1
@@ -154,6 +147,7 @@ public class SysERPDAO extends InterfaceDAO {
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
                     imp.setQtdEmbalagem(rs.getInt("qtdembalagem"));
+                    
                     imp.setPiscofinsCstDebito(rs.getString("piscofinsdebito"));
                     imp.setPiscofinsCstCredito(rs.getString("piscofinscredito"));
                     imp.setPiscofinsNaturezaReceita(rs.getString("natureza"));
@@ -224,7 +218,11 @@ public class SysERPDAO extends InterfaceDAO {
                     imp.setAtivo(rs.getInt("situacaocadastro") == 1);
                     
                     if(rs.getString("email") != null && !"".equals(rs.getString("email"))) {
-                        imp.addContato("1", "EMAIL", null, null, TipoContato.COMERCIAL, rs.getString("email"));
+                        String email = rs.getString("email");
+                        if(rs.getString("email").length() > 50) {
+                            email = rs.getString("email").substring(0, 50);
+                        }
+                        imp.addContato("1", "EMAIL", null, null, TipoContato.COMERCIAL, email);
                     }
                     
                     if(rs.getString("obs") != null && !"".equals(rs.getString("obs"))) {
@@ -263,11 +261,14 @@ public class SysERPDAO extends InterfaceDAO {
                 while(rs.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
                     
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
                     imp.setIdProduto(rs.getString("id_produto"));
                     imp.setIdFornecedor(rs.getString("id_fornecedor"));
                     imp.setCodigoExterno(rs.getString("codigoexterno"));
                     
                     result.add(imp);
+                    
                 }
             }
         }

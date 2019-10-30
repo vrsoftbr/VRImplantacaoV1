@@ -525,6 +525,8 @@ public class FornecedorRepository {
         vo.setTipoEmpresa(imp.getTipoEmpresa());
         vo.setTipoPagamento(imp.getTipoPagamento());
         vo.setIdBanco(imp.getIdBanco() == 0 ? 804 : imp.getIdBanco());
+        vo.setUtilizaNfe(imp.isEmiteNfe());
+        vo.setPermiteNfSemPedido(imp.isPermiteNfSemPedido());
         
         //<editor-fold defaultstate="collapsed" desc="ENDEREÇO">
         vo.setEndereco(imp.getEndereco());

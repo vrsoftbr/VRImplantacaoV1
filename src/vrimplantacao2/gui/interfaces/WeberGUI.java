@@ -75,7 +75,7 @@ public class WeberGUI extends VRInternalFrame {
     private WeberGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();
-
+        ConexaoFirebird.encoding = "WIN1252";
         this.title = "Importação " + NOME_SISTEMA;
 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());

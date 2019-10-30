@@ -143,7 +143,7 @@ public class VendaRepository {
                     cont++;
                     venda.getItens().add(item);
 
-                    Integer produto = provider.getProdutoPorMapeamento(impItem.getCodigoBarras());
+                    Integer produto = provider.getProdutoPorMapeamento(impItem.getProduto());
 
                     if ( produto == null && opt.contains(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR) ) {    
                         produto = provider.getProdutoPorCodigoAnterior(impItem.getProduto());

@@ -28,7 +28,6 @@ import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
-import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ChequeIMP;
@@ -912,54 +911,53 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ChequeIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "SELECT \n"
-                    + "ch.id, \n"
-                    + "ch.emissao, \n"
-                    + "ch.documento, \n"
-                    + "ch.vencimento,\n"
-                    + "ch.cupom,\n"
-                    + "ch.valor,\n"
-                    + "ch.valorpago,\n"
-                    + "(ch.valor - ch.valorpago) valorconta, \n"
-                    + "ch.historico,\n"
-                    + "ch.caixa,\n"
-                    + "b.codigo,\n"
-                    + "ch.ncheque,\n"
-                    + "ch.numbanco,\n"
-                    + "ch.agencia,\n"
-                    + "ch.cpfcgc,\n"
-                    + "ch.caixa,\n"
-                    + "ch.datahora_alteracao,\n"
-                    + "ch.cpfcgc AS cpfcnpj_cheque,\n"
-                    + "c.cpf AS cpf_cliente,\n"
-                    + "c.rg AS rg_cliente,\n"
-                    + "c.nome AS nome_cliente,\n"
-                    + "c.cgc AS cgc_cliente,\n"
-                    + "c.inscr AS inscr_cliente,\n"
-                    + "c.telefone AS telefone_cliente\n"
-                    + "FROM receb ch\n"
-                    + "LEFT JOIN bancos b ON b.id = ch.id_banco\n"
-                    + "LEFT JOIN clientes c ON c.codigo = ch.codcli\n"
-                    + "WHERE ch.id_banco = " + v_carteiraCheque + "\n"
-                    + "AND pagamento IS NULL"
+                    "SELECT\n" +
+                    "	r.id,\n" +
+                    "	r.emissao,\n" +
+                    "	r.documento,\n" +
+                    "	r.ncheque cheque,\n" +
+                    "	r.tipodoc,\n" +
+                    "	r.codcli cliente,\n" +
+                    "	c.nome,\n" +
+                    "	c.telefone,\n" +
+                    "	r.vencimento,\n" +
+                    "	r.valor_original valor,\n" +
+                    "	r.historico,\n" +
+                    "	r.numbanco banco,\n" +
+                    "	r.agencia,\n" +
+                    "	r.cpfcgc cpf,\n" +
+                    "	r.caixa,\n" +
+                    "   r.datahora_alteracao\n" +       
+                    "FROM\n" +
+                    "	receb r\n" +
+                    "LEFT JOIN clientes c ON r.codcli = c.codigo\n" +
+                    "WHERE\n" +
+                    "	r.id_banco = " + v_carteiraCheque + " and\n" +
+                    "	r.pago = 0 and\n" +
+                    "	r.cancelado = 0 and\n" +
+                    "   r.valor_original > 0\n" +        
+                    "ORDER BY\n" +
+                    "	r.emissao"
             )) {
                 while (rst.next()) {
                     ChequeIMP imp = new ChequeIMP();
+                    
                     imp.setId(rst.getString("id"));
-                    imp.setCpf(rst.getString("cpfcnpj_cheque"));
-                    imp.setNumeroCheque(rst.getString("ncheque"));
+                    imp.setCpf(rst.getString("cpf"));
+                    imp.setNumeroCheque(rst.getString("cheque"));
                     imp.setAgencia(rst.getString("agencia"));
-                    imp.setBanco(rst.getInt("codigo"));
+                    imp.setBanco(rst.getInt("banco"));
                     imp.setNumeroCupom(rst.getString("documento"));
                     imp.setEcf(rst.getString("caixa"));
-                    imp.setValor(rst.getDouble("valorconta"));
+                    imp.setValor(rst.getDouble("valor"));
                     imp.setObservacao(rst.getString("historico"));
-                    imp.setNome(rst.getString("nome_cliente"));
-                    imp.setTelefone(rst.getString("telefone_cliente"));
+                    imp.setNome(rst.getString("nome"));
+                    imp.setTelefone(rst.getString("telefone"));
                     imp.setDate(rst.getDate("emissao"));
                     imp.setDataDeposito(rst.getDate("vencimento"));
                     imp.setDataHoraAlteracao(rst.getTimestamp("datahora_alteracao"));
                     imp.setAlinea(0);
+                    
                     result.add(imp);
                 }
             }
@@ -1148,15 +1146,13 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	p.vencimento,\n" +
                     "	p.valor,\n" +
                     "	p.valor_original,\n" +
-                    "	p.historico,\n" +
-                    "	c.nome planoconta,\n" +
-                    "	cg.nome planogrupo,\n" +
-                    "	csg.nome planosubgrupo\n" +
+                    "	p.historico\n" +
                     "FROM	\n" +
                     "	pagto p\n" +
                     "WHERE\n" +
                     "	pagamento IS NULL and\n" +
-                    "	p.id_banco = " + v_carteiraContaPagar + "\n" +
+                    "	p.id_banco = " + v_carteiraContaPagar + " and\n" +
+                    "   p.emissao >= '2019-01-01'\n" +        
                     "ORDER BY\n" +
                     "	vencimento"
             )) {
@@ -1167,10 +1163,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdFornecedor(rs.getString("id_for"));
                     imp.setNumeroDocumento(rs.getString("documento"));
                     imp.setDataEmissao(rs.getDate("emissao"));
-                    imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valor_original"));
-                    imp.setObservacao("Plano de conta: " + rs.getString("planoconta") + 
-                            " - " + rs.getString("planogrupo") + " - " + rs.getString("planosubgrupo") + " Histórico: " + 
-                            rs.getString("historico"));
+                    imp.addVencimento(rs.getDate("vencimento"), rs.getDouble("valor"));
+                    imp.setObservacao(rs.getString("historico"));
                     
                     result.add(imp);
                 }

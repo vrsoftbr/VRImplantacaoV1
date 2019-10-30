@@ -65,6 +65,8 @@ public class FornecedorIMP {
     private TipoEmpresa tipoEmpresa = TipoEmpresa.LUCRO_REAL;
     private TipoPagamento tipoPagamento;
     private int idBanco;
+    private boolean emiteNfe = false;
+    private boolean permiteNfSemPedido = false;
 
     public Set<Integer> getCondicoesPagamentos() {
         return condicoesPagamentos;
@@ -618,4 +620,21 @@ public class FornecedorIMP {
     public void setPrazoPedido(int prazoPedido) {
         this.prazoPedido = prazoPedido;
     }
+
+    public void setEmiteNfe(boolean emiteNfe) {
+        this.emiteNfe = emiteNfe;
+    }
+
+    public boolean isEmiteNfe() {
+        return emiteNfe;
+    }
+
+    public void setPermiteNfSemPedido(boolean permiteNfSemPedido) {
+        this.permiteNfSemPedido = permiteNfSemPedido;
+    }
+
+    public boolean isPermiteNfSemPedido() {
+        return permiteNfSemPedido;
+    }
+    
 }

@@ -19,6 +19,7 @@ import vrframework.gui.SobreGUI;
 import vrframework.remote.Arquivo;
 import vrimplantacao.classe.Global;
 import vrimplantacao.dao.DataProcessamentoDAO;
+import vrimplantacao.gui.assistente.mapamercadologico.MapaMercadologicoGUI;
 import vrimplantacao.gui.assistente.parametro.ParametroGUI;
 import vrimplantacao.gui.cadastro.LojaConsultaGUI;
 import vrimplantacao.gui.interfaces.AcertarCodigoInternoGUI;
@@ -60,7 +61,6 @@ import vrimplantacao.gui.interfaces.JMasterGUI;
 import vrimplantacao.gui.interfaces.LogusGUI;
 import vrimplantacao.gui.interfaces.Maximus_DatasyncGUI;
 import vrimplantacao.gui.interfaces.MilenioGUI;
-import vrimplantacao2.gui.interfaces.MobilityGUI;
 import vrimplantacao.gui.interfaces.PCSistemasGUI;
 import vrimplantacao.gui.interfaces.RMSGUI;
 import vrimplantacao.gui.interfaces.RMSGUI_2;
@@ -154,6 +154,7 @@ import vrimplantacao2.gui.interfaces.LiteciGUI;
 import vrimplantacao2.gui.interfaces.LyncisGUI;
 import vrimplantacao2.gui.interfaces.MSIInforGUI;
 import vrimplantacao2.gui.interfaces.MarketGUI;
+import vrimplantacao2.gui.interfaces.MobilityGUI;
 import vrimplantacao2.gui.interfaces.MrsGUI;
 import vrimplantacao2.gui.interfaces.MultiPdvGUI;
 import vrimplantacao2.gui.interfaces.OpenGUI;
@@ -233,7 +234,6 @@ public final class MenuGUI extends VRMdiFrame {
     public IdealGUI formImportarIdeal = null;
     public ImportacaoLogVendaGUI formImportacaoLogVendaGUI = null;
     public RMSGUI formImportarRM = null;
-    public MobilityGUI formImportarMobility = null;
     public GdoorGUI formImportarGdoor = null;
     public WisaSoftGUI_2 formImportarWisaSoft = null;
     public SoftaExGUI formImportarSoftaEx = null;
@@ -632,7 +632,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuHercules = new javax.swing.JMenuItem();
         mnuSav = new javax.swing.JMenuItem();
         mnuArtSystem = new javax.swing.JMenuItem();
-        mnuSysERP = new javax.swing.JMenuItem();
+        mnuiSysERP = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1684,13 +1684,13 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuSqlServer2.add(mnuArtSystem);
 
-        mnuSysERP.setText("SysERP");
-        mnuSysERP.addActionListener(new java.awt.event.ActionListener() {
+        mnuiSysERP.setText("SysERP");
+        mnuiSysERP.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuSysERPActionPerformed(evt);
+                mnuiSysERPActionPerformed(evt);
             }
         });
-        mnuSqlServer2.add(mnuSysERP);
+        mnuSqlServer2.add(mnuiSysERP);
 
         mnuDatabase.add(mnuSqlServer2);
 
@@ -3149,6 +3149,10 @@ public final class MenuGUI extends VRMdiFrame {
         }
     }//GEN-LAST:event_jMenuItemSciActionPerformed
 
+    private void mnuMapeamentoMercadologicoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMapeamentoMercadologicoActionPerformed
+        MapaMercadologicoGUI.Exibir(this);
+    }//GEN-LAST:event_mnuMapeamentoMercadologicoActionPerformed
+
     private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
         // TODO add your handling code here:
         GZSistemasGUI.exibir(this);
@@ -4133,9 +4137,9 @@ public final class MenuGUI extends VRMdiFrame {
         SophyxGUI.exibir(this);
     }//GEN-LAST:event_mnuiSophyxActionPerformed
 
-    private void mnuSysERPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSysERPActionPerformed
+    private void mnuiSysERPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuiSysERPActionPerformed
         SysERPGUI.exibir(this);
-    }//GEN-LAST:event_mnuSysERPActionPerformed
+    }//GEN-LAST:event_mnuiSysERPActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -4353,7 +4357,6 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSuper;
     private javax.swing.JMenuItem mnuSuperLoja10;
     private javax.swing.JMenuItem mnuSyncTech;
-    private javax.swing.JMenuItem mnuSysERP;
     private javax.swing.JMenuItem mnuSysmoFirebird;
     private javax.swing.JMenuItem mnuSysmoPostgres;
     private javax.swing.JMenuItem mnuTga;
@@ -4372,6 +4375,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuWmsi1;
     private javax.swing.JMenuItem mnuZpf;
     private javax.swing.JMenuItem mnuiSophyx;
+    private javax.swing.JMenuItem mnuiSysERP;
     private javax.swing.JMenuItem mnuiWeber;
     private javax.swing.JMenuItem mnupdvvendaitem;
     private vrframework.bean.toolBar.VRToolBar tlbAtalho;
