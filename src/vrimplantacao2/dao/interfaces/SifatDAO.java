@@ -190,6 +190,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pro.validade as validade,\n"
                     + "	pro.DESCRICAO as descricaocompleta,\n"
                     + "	pro.ABREVIACAO as descricaoreduzida,\n"
+                    + " pro.REFERENCIA as compl_descricao,\n"
                     + "	pro.UNIDADE as tipoembalagem,\n"
                     + " pro.UN_COMPRA AS tipoembalagemcotacao,\n"
                     + " pro.QTDE_COMPRA AS qtdembalagemcotacao,\n"
@@ -235,8 +236,18 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEan(rst.getString("ean"));
                     imp.seteBalanca(rst.getInt("balanca") == 1);
                     imp.setValidade(rst.getInt("validade"));
-                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
-                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    
+                    
+                    String complDescricao = null;
+                    
+                    if ((rst.getString("compl_descricao") != null)
+                            && (!rst.getString("compl_descricao").trim().isEmpty())) {
+
+                        complDescricao = " " + rst.getString("compl_descricao");
+                    }
+                                                            
+                    imp.setDescricaoCompleta(rst.getString("descricaocompleta") + (complDescricao == null ? "" : complDescricao));                    
+                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida") + (complDescricao == null ? "" : complDescricao));
                     imp.setDescricaoGondola(imp.getDescricaoCompleta());
                     imp.setTipoEmbalagemCotacao(rst.getString("tipoembalagemcotacao"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagemcotacao"));

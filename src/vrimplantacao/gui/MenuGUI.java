@@ -195,6 +195,7 @@ import vrimplantacao2.gui.interfaces.SuperGUI;
 import vrimplantacao2.gui.interfaces.SuperLoja10GUI;
 import vrimplantacao2.gui.interfaces.SuperServerGUI;
 import vrimplantacao2.gui.interfaces.SyncTecGUI;
+import vrimplantacao2.gui.interfaces.SysERPGUI;
 import vrimplantacao2.gui.interfaces.SysPdvGUI;
 import vrimplantacao2.gui.interfaces.SysmoFirebirdGUI;
 import vrimplantacao2.gui.interfaces.SysmoPostgresGUI;
@@ -631,6 +632,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuHercules = new javax.swing.JMenuItem();
         mnuSav = new javax.swing.JMenuItem();
         mnuArtSystem = new javax.swing.JMenuItem();
+        mnuiSysERP = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -749,7 +751,6 @@ public final class MenuGUI extends VRMdiFrame {
         mnuScripts = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         mnuAvancadas = new javax.swing.JMenu();
-        mnuMapeamentoMercadologico = new javax.swing.JMenuItem();
         mnuImportarNCM = new javax.swing.JMenuItem();
         mnuParametros = new javax.swing.JMenuItem();
         mnuParametros1 = new javax.swing.JMenuItem();
@@ -1683,6 +1684,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuSqlServer2.add(mnuArtSystem);
 
+        mnuiSysERP.setText("SysERP");
+        mnuiSysERP.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuiSysERPActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuiSysERP);
+
         mnuDatabase.add(mnuSqlServer2);
 
         jMenu7.setText("Oracle");
@@ -2560,14 +2569,6 @@ public final class MenuGUI extends VRMdiFrame {
         mnuFerramentas.add(jSeparator1);
 
         mnuAvancadas.setText("Avançadas");
-
-        mnuMapeamentoMercadologico.setText("Mapeamento de Mercadológico");
-        mnuMapeamentoMercadologico.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuMapeamentoMercadologicoActionPerformed(evt);
-            }
-        });
-        mnuAvancadas.add(mnuMapeamentoMercadologico);
 
         mnuImportarNCM.setText("Importar NCM da Legislação");
         mnuImportarNCM.addActionListener(new java.awt.event.ActionListener() {
@@ -4136,6 +4137,10 @@ public final class MenuGUI extends VRMdiFrame {
         SophyxGUI.exibir(this);
     }//GEN-LAST:event_mnuiSophyxActionPerformed
 
+    private void mnuiSysERPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuiSysERPActionPerformed
+        SysERPGUI.exibir(this);
+    }//GEN-LAST:event_mnuiSysERPActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4309,7 +4314,6 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuLogus;
     private javax.swing.JMenuItem mnuLyncis;
     private javax.swing.JMenuItem mnuMSIInfor;
-    private javax.swing.JMenuItem mnuMapeamentoMercadologico;
     private javax.swing.JMenuItem mnuMarket;
     private javax.swing.JMenuBar mnuMenu;
     private javax.swing.JMenuItem mnuMrs;
@@ -4371,6 +4375,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuWmsi1;
     private javax.swing.JMenuItem mnuZpf;
     private javax.swing.JMenuItem mnuiSophyx;
+    private javax.swing.JMenuItem mnuiSysERP;
     private javax.swing.JMenuItem mnuiWeber;
     private javax.swing.JMenuItem mnupdvvendaitem;
     private vrframework.bean.toolBar.VRToolBar tlbAtalho;
