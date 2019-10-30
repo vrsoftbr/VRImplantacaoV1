@@ -27,6 +27,7 @@ import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
+import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -321,15 +322,10 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	ncm.id_cest cest,\n" +
                     "	est.codtribsai,\n" +
                     "	est.codtribent,\n" +
-                    /*"	ts.situatribu icms_cst_s,\n" +
-                    "	ts.aliquotapdv icms_aliq_s,\n" +
-                    "	ts.mrger icms_red_s,\n" +
-                    "	te.situatribu icms_cst_e,\n" +
-                    "	te.aliquotapdv icms_aliq_e,\n" +
-                    "	te.mrger icms_red_e,\n" +*/
                     "	pis_s.cstpis pis_cst_s,\n" +
                     "	pis_e.cstpis pis_cst_e,\n" +
-                    "	pis_s.nat_rec_pis pis_natrec\n" +
+                    "	pis_s.nat_rec_pis pis_natrec,\n" +
+                    "	coalesce(ext.tipo_item,'') tipo_item\n" +
                     "from\n" +
                     "	fl300est p\n" +
                     "	join fl304ven v on \n" +
@@ -354,12 +350,6 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	join fl301est est on \n" +
                     "		p.codigoplu = est.codigoplu and\n" +
                     "		est.codigoloja = v.codigoloja\n" +
-                    /*"	join fltribut ts on \n" +
-                    "		est.codtribsai = ts.codigotrib and\n" +
-                    "		v.codigoloja = ts.codigoloja\n" +
-                    "	join fltribut te on \n" +
-                    "		est.codtribent = te.codigotrib and\n" +
-                    "		v.codigoloja = te.codigoloja\n" +*/
                     "	left join (\n" +
                     "		select\n" +
                     "			codigoplu,\n" +
@@ -370,6 +360,8 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "			codigoplu\n" +
                     "	) bal on \n" +
                     "		p.codigoplu = bal.codigoplu\n" +
+                    "	left join FL300EXT ext on\n" +
+                    "           ext.codigoplu = p.codigoplu\n" +
                     "order by\n" +
                     "	p.codigoplu"
             )) {
@@ -403,13 +395,13 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoId(rs.getString("codtribsai"));
                     imp.setIcmsCreditoId(rs.getString("codtribent"));
                     
-                    /*imp.setIcmsCstEntrada(rs.getInt("icms_cst_e"));
-                    imp.setIcmsAliqEntrada(rs.getDouble("icms_aliq_e"));
-                    imp.setIcmsReducaoEntrada(rs.getDouble("icms_red_e"));
-                    
-                    imp.setIcmsCstSaida(rs.getInt("icms_cst_s"));
-                    imp.setIcmsAliqSaida(rs.getDouble("icms_aliq_s"));
-                    imp.setIcmsReducaoSaida(rs.getDouble("icms_red_s"));*/
+                    switch (rs.getString("tipo_item")) {
+                        case "02": imp.setTipoProduto(TipoProduto.EMBALAGEM); break;
+                        case "07": imp.setTipoProduto(TipoProduto.MATERIAL_USO_E_CONSUMO); break;
+                        case "09": imp.setTipoProduto(TipoProduto.SERVICOS); break;
+                        case "08": imp.setTipoProduto(TipoProduto.ATIVO_IMOBILIZADO); break;
+                        case "99": imp.setTipoProduto(TipoProduto.OUTROS); break;
+                    }
                                         
                     imp.setPiscofinsCstCredito(rs.getString("pis_cst_e"));
                     imp.setPiscofinsCstDebito(rs.getString("pis_cst_s"));
@@ -455,7 +447,8 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.CEST,
                 OpcaoProduto.ICMS,
                 OpcaoProduto.PIS_COFINS,
-                OpcaoProduto.NATUREZA_RECEITA
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.TIPO_PRODUTO
         ));
     }
 
