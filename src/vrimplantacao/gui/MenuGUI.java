@@ -97,6 +97,7 @@ import vrimplantacao2.gui.interfaces.ApolloGUI;
 import vrimplantacao2.gui.interfaces.ArtSystemGUI;
 import vrimplantacao2.gui.interfaces.AsefeGUI;
 import vrimplantacao2.gui.interfaces.AtenasGUI;
+import vrimplantacao2.gui.interfaces.AtmaGUI;
 import vrimplantacao2.gui.interfaces.AutoSystemGUI;
 import vrimplantacao2.gui.interfaces.AutomaqGUI;
 import vrimplantacao2.gui.interfaces.AvanceGUI;
@@ -633,6 +634,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSav = new javax.swing.JMenuItem();
         mnuArtSystem = new javax.swing.JMenuItem();
         mnuiSysERP = new javax.swing.JMenuItem();
+        mnuAtma = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1691,6 +1693,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuiSysERP);
+
+        mnuAtma.setText("Atma");
+        mnuAtma.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAtmaActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuAtma);
 
         mnuDatabase.add(mnuSqlServer2);
 
@@ -4141,6 +4151,11 @@ public final class MenuGUI extends VRMdiFrame {
         SysERPGUI.exibir(this);
     }//GEN-LAST:event_mnuiSysERPActionPerformed
 
+    private void mnuAtmaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAtmaActionPerformed
+        // TODO add your handling code here:
+        AtmaGUI.exibir(this);
+    }//GEN-LAST:event_mnuAtmaActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4240,6 +4255,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuArtSystem;
     private javax.swing.JMenuItem mnuAsefe;
     private javax.swing.JMenuItem mnuAtenas;
+    private javax.swing.JMenuItem mnuAtma;
     private javax.swing.JMenuItem mnuAutoSystem;
     private javax.swing.JMenuItem mnuAutoSystem1;
     private javax.swing.JMenuItem mnuAutomaq;
