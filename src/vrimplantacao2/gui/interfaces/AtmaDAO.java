@@ -8,12 +8,19 @@ package vrimplantacao2.gui.interfaces;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoFornecedor;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -28,6 +35,35 @@ public class AtmaDAO extends InterfaceDAO {
     @Override
     public String getSistema() {
         return "Atma";
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet(Arrays.asList(new OpcaoProduto[]{
+            OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+            OpcaoProduto.PRODUTOS,
+            OpcaoProduto.ATIVO,
+            OpcaoProduto.DESC_COMPLETA,
+            OpcaoProduto.DESC_GONDOLA,
+            OpcaoProduto.DESC_REDUZIDA,
+            OpcaoProduto.DATA_CADASTRO,
+            OpcaoProduto.EAN,
+            OpcaoProduto.EAN_EM_BRANCO,
+            OpcaoProduto.TIPO_EMBALAGEM_EAN,
+            OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.CUSTO,
+            OpcaoProduto.MARGEM,
+            OpcaoProduto.PRECO,
+            OpcaoProduto.ESTOQUE,
+            OpcaoProduto.PESAVEL,
+            OpcaoProduto.NCM,
+            OpcaoProduto.CEST,
+            OpcaoProduto.ICMS,
+            OpcaoProduto.PIS_COFINS,
+            OpcaoProduto.NATUREZA_RECEITA,
+            OpcaoProduto.VALIDADE,
+            OpcaoProduto.MERCADOLOGICO,
+            OpcaoProduto.MERCADOLOGICO_PRODUTO,}));
     }
 
     @Override
@@ -107,43 +143,94 @@ public class AtmaDAO extends InterfaceDAO {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "pro.ID_PROD as id,\n"
-                    + "pro.CD_AUXILIAR as ean,\n"
-                    + "pro.BALANCA as balanca,\n"
-                    + "pro.BALANCADIAS as validade,\n"
-                    + "pro.DESCRICAO as descricaocompleta,\n"
-                    + "pro.DESCRICAOR as descricaoreduzida,\n"
-                    + "unv.SIGLA as tipoembalagem,\n"
-                    + "unc.SIGLA as tipoembalagem_cotacao,\n"
-                    + "ncm.CODIGO as ncm,\n"
-                    + "ces.CD_CEST as cest,\n"
-                    + "pro.PESO as pesobruto,\n"
-                    + "pro.PESO_L peseoliquido,\n"
-                    + "pro.DT_CAD as datacadastro,\n"
-                    + "pre.PER_LUCRO_EFETIVO as margem,\n"
-                    + "pre.VR_CUSTO_REPOSICAO as custocomimposto,\n"
-                    + "pre.VR_CUSTO_AQUISICAO as custosemimposto,\n"
-                    + "pre.VR_VENDA_ATUAL as precovenda,\n"
-                    + "est.QTDE as estoque,\n"
-                    + "est.QTDE_MAXIMA as estoquemaximo,\n"
-                    + "est.QTDE_MINIMA as estoqueminimo\n"
+                    + " pro.ID_PROD as id,\n"
+                    + " pro.CD_AUXILIAR as ean,\n"
+                    + " pro.BALANCA as balanca,\n"
+                    + " pro.BALANCADIAS as validade,\n"
+                    + " pro.DESCRICAO as descricaocompleta,\n"
+                    + " pro.DESCRICAOR as descricaoreduzida,\n"
+                    + " unv.SIGLA as tipoembalagem,\n"
+                    + " unc.SIGLA as tipoembalagem_cotacao,\n"
+                    + " ncm.CODIGO as ncm,\n"
+                    + " ces.CD_CEST as cest,\n"
+                    + " pro.PESO as pesobruto,\n"
+                    + " pro.PESO_L peseoliquido,\n"
+                    + " pro.DT_CAD as datacadastro,\n"
+                    + " pre.PER_LUCRO_EFETIVO as margem,\n"
+                    + " pre.VR_CUSTO_REPOSICAO as custocomimposto,\n"
+                    + " pre.VR_CUSTO_AQUISICAO as custosemimposto,\n"
+                    + " pre.VR_VENDA_ATUAL as precovenda,\n"
+                    + " est.QTDE as estoque,\n"
+                    + " est.QTDE_MAXIMA as estoquemaximo,\n"
+                    + " est.QTDE_MINIMA as estoqueminimo,\n"
+                    + " sit.DESCRICAO as situacaocadastro\n"
                     + "from dbo.EQ_PROD pro\n"
+                    + "left join dbo.TB_TIPO_SITUACAO sit on sit.ID_TIPO_SITUACAO = pre.ID_TIPO_SITUACAO\n"
                     + "left join dbo.TB_UNID unv on unv.ID_UNID = pro.ID_UNID_V\n"
                     + "left join dbo.TB_UNID unc on unc.ID_UNID = pro.ID_UNID_C\n"
                     + "left join dbo.TB_NCM ncm on ncm.ID_NCM = pro.ID_NCM\n"
                     + "left join dbo.TB_CEST as ces on ces.ID_CEST = ncm.ID_CEST\n"
                     + "left join dbo.EQ_PROD_QTDE est on est.ID_PROD = pro.ID_PROD\n"
-                    + "	 and est.ID_EMP = 1\n"
+                    + "	 and est.ID_EMP = " + getLojaOrigem() + "\n"
                     + "	 and est.ID_TIPO_ESTOQUE = 1\n"
                     + "left join dbo.EQ_PROD_COM pre on pre.ID_PROD = pro.ID_PROD \n"
                     + "	 and pre.ID_EMP = " + getLojaOrigem()
             )) {
                 while (rst.next()) {
-
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("ean"));
+                    imp.seteBalanca("SIM".equals(rst.getString("balanca")));
+                    imp.setValidade(rst.getInt("validade"));
+                    imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
+                    imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    imp.setTipoEmbalagemCotacao(rst.getString("tipoembalagem_cotacao"));
+                    imp.setPesoBruto(rst.getDouble("pesobruto"));
+                    imp.setPesoLiquido(rst.getDouble("peseoliquido"));
+                    imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setNcm(rst.getString("ncm"));
+                    imp.setCest(rst.getString("cest"));
+                    imp.setMargem(rst.getDouble("margem"));
+                    imp.setCustoComImposto(rst.getDouble("custocomimposto"));
+                    imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
+                    imp.setPrecovenda(rst.getDouble("precovenda"));
+                    imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
+                    imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
+                    imp.setSituacaoCadastro("ATIVO".equals(rst.getString("situacaocadastro")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getEANs() throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "	ean.ID_PROD as id,\n"
+                    + "	ean.EAN13 as codigobarras\n"
+                    + "from EQ_PROD_EAN ean"
+            )) {
+                while (rst.next()) {
+                    ProdutoIMP imp = new ProdutoIMP();
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setImportId(rst.getString("id"));
+                    imp.setEan(rst.getString("codigobarras"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -155,7 +242,7 @@ public class AtmaDAO extends InterfaceDAO {
                     "select \n"
                     + "	pes.ID_PES as id,\n"
                     + "	sit.DESCRICAO as situacaocadastro,\n"
-                    + "	ent.DESCRICAO as tipo,\n"
+                    + "	ent.DESCRICAO as tipofornecedor,\n"
                     + "	pes.CPF as cpf,\n"
                     + "	pes.RG as rg,\n"
                     + "	pes.CNPJ as cnpj,\n"
@@ -261,7 +348,7 @@ public class AtmaDAO extends InterfaceDAO {
                     imp.setMunicipio(rst.getString("municipio"));
                     imp.setIbge_municipio(rst.getInt("municipioIbge"));
                     imp.setUf(rst.getString("uf"));
-                    imp.setIbge_uf(rst.getInt("ufIbge"));                    
+                    imp.setIbge_uf(rst.getInt("ufIbge"));
                     imp.setCob_endereco(rst.getString("enderecocob"));
                     imp.setCob_numero(rst.getString("numerocob"));
                     imp.setCob_complemento(rst.getString("complementocob"));
@@ -270,11 +357,101 @@ public class AtmaDAO extends InterfaceDAO {
                     imp.setCob_municipio(rst.getString("municpioCob"));
                     imp.setCob_ibge_municipio(rst.getInt("municipioIbgeCob"));
                     imp.setCob_uf(rst.getString("ufCob"));
-                    imp.setCob_ibge_uf(rst.getInt("ufIbgeCob"));                    
+                    imp.setCob_ibge_uf(rst.getInt("ufIbgeCob"));
+                    imp.setDatacadastro(rst.getDate("datacadastro"));
+                    imp.setPrazoEntrega(rst.getInt("prazoentrega"));
+                    imp.setPrazoPedido(rst.getInt("prazoentrega"));
+                    imp.setPrazoVisita(rst.getInt("diasvisita"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setTel_principal(rst.getString("telefone"));
+
+                    if ("ATIVO".equals(rst.getString("situacaocadastro"))) {
+                        imp.setAtivo(true);
+                    } else if ("INATIVO".equals(rst.getString("situacaocadastro"))) {
+                        imp.setAtivo(false);
+                    } else if ("BLOQUEADO".equals(rst.getString("situacaocadastro"))) {
+                        imp.setBloqueado(true);
+                        imp.setAtivo(true);
+                    } else {
+                        imp.setBloqueado(false);
+                        imp.setAtivo(true);
+                    }
+
+                    if ((rst.getString("tipofornecedor") != null)
+                            && (!rst.getString("tipofornecedor").trim().isEmpty())) {
+
+                        if (rst.getString("tipofornecedor").contains("INDUSTRIA")) {
+                            imp.setTipoFornecedor(TipoFornecedor.INDUSTRIA);
+                        } else if (rst.getString("tipofornecedor").contains("ATACADISTA\\VAREJISTA")) {
+                            imp.setTipoFornecedor(TipoFornecedor.ATACADO);
+                        } else if (rst.getString("tipofornecedor").contains("PRODUTOR RURAL")) {
+                            imp.setTipoFornecedor(TipoFornecedor.PRODUTORRURAL);
+                        } else {
+                            imp.setTipoFornecedor(TipoFornecedor.ATACADO);
+                        }
+                    }
+
+                    if ((rst.getString("fax") != null)
+                            && (!rst.getString("fax").trim().isEmpty())) {
+
+                        imp.addTelefone("FAX", rst.getString("fax"));
+                    }
+                    if ((rst.getString("celular") != null)
+                            && (!rst.getString("celular").trim().isEmpty())) {
+
+                        imp.addCelular("CELULAR", rst.getString("celular"));
+                    }
+                    if ((rst.getString("telefonecob") != null)
+                            && (!rst.getString("telefonecob").trim().isEmpty())) {
+
+                        imp.addTelefone("TELEFONE COB", rst.getString("telefonecob"));
+                    }
+                    if ((rst.getString("faxcob") != null)
+                            && (!rst.getString("faxcob").trim().isEmpty())) {
+
+                        imp.addTelefone("FAX COB", rst.getString("faxcob"));
+                    }
+                    if ((rst.getString("celularcob") != null)
+                            && (!rst.getString("celularcob").trim().isEmpty())) {
+
+                        imp.addCelular("CELULAR COB", rst.getString("celularcob"));
+                    }
+                    if ((rst.getString("telefoneent") != null)
+                            && (!rst.getString("telefoneent").trim().isEmpty())) {
+
+                        imp.addTelefone("TELEFONE ENT", rst.getString("telefoneent"));
+                    }
+                    if ((rst.getString("faxent") != null)
+                            && (!rst.getString("faxent").trim().isEmpty())) {
+
+                        imp.addTelefone("FAX ENT", rst.getString("faxent"));
+                    }
+                    if ((rst.getString("celularent") != null)
+                            && (!rst.getString("celularent").trim().isEmpty())) {
+
+                        imp.addCelular("CELULAR ENT", rst.getString("celularent"));
+                    }
+                    if ((rst.getString("email") != null)
+                            && (!rst.getString("email").trim().isEmpty())) {
+
+                        imp.addEmail("EMAIL", rst.getString("email").toLowerCase(), TipoContato.COMERCIAL);
+                    }
+                    if ((rst.getString("emailXml") != null)
+                            && (!rst.getString("emailXml").trim().isEmpty())) {
+
+                        imp.addEmail("EMAIL XML", rst.getString("emailXml").toLowerCase(), TipoContato.NFE);
+                    }
+                    if ((rst.getString("emailfinanceiro") != null)
+                            && (!rst.getString("emailfinanceiro").trim().isEmpty())) {
+
+                        imp.addEmail("EMAIL FIN", rst.getString("emailfinanceiro").toLowerCase(), TipoContato.FINANCEIRO);
+                    }
+
+                    result.add(imp);
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
