@@ -937,6 +937,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setDescricaoReduzida(ln.getString("descricaoreduzida"));
             imp.setQuantidade(ln.getDouble("quantidade"));
             imp.setPrecoVenda(ln.getDouble("precovenda"));
+            imp.setTotalBruto(ln.getDouble("totalbruto"));
             imp.setCancelado("S".equals(Utils.acertarTexto(ln.getString("cancelado"))));
             if (!"".equals(ln.getString("tipocancelamento"))) {
                 imp.setTipoCancelamento(TipoCancelamento.getById(ln.getInt("tipocancelamento")));
