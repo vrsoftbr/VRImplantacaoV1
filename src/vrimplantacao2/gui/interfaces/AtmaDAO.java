@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
@@ -69,6 +70,25 @@ public class AtmaDAO extends InterfaceDAO {
             OpcaoProduto.MERCADOLOGICO_PRODUTO,}));
     }
 
+    public List<Estabelecimento> getLojasCliente() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "ID_EMP as codigo, \n"
+                    + "FANTASIA as nome \n"
+                    + "from dbo.CG_EMP \n"
+                    + "order by ID_EMP"
+            )) {
+                while (rst.next()) {
+                    result.add(new Estabelecimento(rst.getString("codigo"), rst.getString("nome")));
+                }
+            }
+        }
+        return result;
+    }
+    
     @Override
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
         Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
