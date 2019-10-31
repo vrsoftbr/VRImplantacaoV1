@@ -66,8 +66,9 @@ public class AtmaDAO extends InterfaceDAO {
             OpcaoProduto.PIS_COFINS,
             OpcaoProduto.NATUREZA_RECEITA,
             OpcaoProduto.VALIDADE,
-            OpcaoProduto.MERCADOLOGICO,
-            OpcaoProduto.MERCADOLOGICO_PRODUTO,}));
+            OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
+            OpcaoProduto.MERCADOLOGICO_PRODUTO
+        }));
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -174,6 +175,9 @@ public class AtmaDAO extends InterfaceDAO {
                     + " pro.DESCRICAOR as descricaoreduzida,\n"
                     + " unv.SIGLA as tipoembalagem,\n"
                     + " unc.SIGLA as tipoembalagem_cotacao,\n"
+                    + " pro.ID_DPTO_D as merc1,\n"
+                    + " pro.ID_DPTO_G as merc2,\n"
+                    + " pro.ID_DPTO_SG as merc3,"
                     + " ncm.CODIGO as ncm,\n"
                     + " ces.CD_CEST as cest,\n"
                     + " pro.PESO as pesobruto,\n"
@@ -187,8 +191,7 @@ public class AtmaDAO extends InterfaceDAO {
                     + " est.QTDE_MAXIMA as estoquemaximo,\n"
                     + " est.QTDE_MINIMA as estoqueminimo,\n"
                     + " sit.DESCRICAO as situacaocadastro\n"
-                    + "from dbo.EQ_PROD pro\n"
-                    + "left join dbo.TB_TIPO_SITUACAO sit on sit.ID_TIPO_SITUACAO = pre.ID_TIPO_SITUACAO\n"
+                    + "from dbo.EQ_PROD pro\n"                    
                     + "left join dbo.TB_UNID unv on unv.ID_UNID = pro.ID_UNID_V\n"
                     + "left join dbo.TB_UNID unc on unc.ID_UNID = pro.ID_UNID_C\n"
                     + "left join dbo.TB_NCM ncm on ncm.ID_NCM = pro.ID_NCM\n"
@@ -197,7 +200,8 @@ public class AtmaDAO extends InterfaceDAO {
                     + "	 and est.ID_EMP = " + getLojaOrigem() + "\n"
                     + "	 and est.ID_TIPO_ESTOQUE = 1\n"
                     + "left join dbo.EQ_PROD_COM pre on pre.ID_PROD = pro.ID_PROD \n"
-                    + "	 and pre.ID_EMP = " + getLojaOrigem()
+                    + "	 and pre.ID_EMP = " + getLojaOrigem() + "\n"
+                    + "left join dbo.TB_TIPO_SITUACAO sit on sit.ID_TIPO_SITUACAO = pre.ID_TIPO_SITUACAO"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -215,6 +219,9 @@ public class AtmaDAO extends InterfaceDAO {
                     imp.setPesoBruto(rst.getDouble("pesobruto"));
                     imp.setPesoLiquido(rst.getDouble("peseoliquido"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
+                    imp.setCodMercadologico1(rst.getString("merc1"));
+                    imp.setCodMercadologico2(rst.getString("merc2"));
+                    imp.setCodMercadologico3(rst.getString("merc3"));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setMargem(rst.getDouble("margem"));
@@ -375,7 +382,6 @@ public class AtmaDAO extends InterfaceDAO {
                     imp.setIbge_uf(rst.getInt("ufIbge"));
                     imp.setCob_endereco(rst.getString("enderecocob"));
                     imp.setCob_numero(rst.getString("numerocob"));
-                    imp.setCob_complemento(rst.getString("complementocob"));
                     imp.setCob_cep(rst.getString("cepcob"));
                     imp.setCob_bairro(rst.getString("bairrocob"));
                     imp.setCob_municipio(rst.getString("municpioCob"));
@@ -620,7 +626,6 @@ public class AtmaDAO extends InterfaceDAO {
                     imp.setUfIBGE(rst.getInt("ufIbge"));
                     imp.setCobrancaEndereco(rst.getString("enderecocob"));
                     imp.setCobrancaNumero(rst.getString("numerocob"));
-                    imp.setCobrancaComplemento(rst.getString("complementocob"));
                     imp.setCobrancaCep(rst.getString("cepcob"));
                     imp.setCobrancaBairro(rst.getString("bairrocob"));
                     imp.setCobrancaMunicipio(rst.getString("municpioCob"));
