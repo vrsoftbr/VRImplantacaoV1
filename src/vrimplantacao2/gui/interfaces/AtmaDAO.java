@@ -803,6 +803,7 @@ public class AtmaDAO extends InterfaceDAO {
                     }
 
                     result.add(imp);
+                    
                 }
             }
         }
