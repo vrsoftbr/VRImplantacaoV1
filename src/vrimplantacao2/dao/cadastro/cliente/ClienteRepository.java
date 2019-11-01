@@ -162,7 +162,7 @@ public class ClienteRepository {
             MultiMap<String, ClientePreferencialAnteriorVO> anteriores = provider.preferencial().getAnteriores();
             //</editor-fold>
             
-            setNotificacao("Atualizando cliente preferêncial...", clientes.size());
+            setNotificacao("Atualizando cliente preferencial...", clientes.size());
             for (ClienteIMP imp: clientes) {                
                 ClientePreferencialAnteriorVO anterior = anteriores.get(
                        provider.getSistema(),
@@ -230,6 +230,12 @@ public class ClienteRepository {
                         atualizarClientePreferencial(vo, opt);
                     }
                     if (opt.contains(OpcaoCliente.OBSERVACOES)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.RAZAO)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.BAIRRO)) {
                         atualizarClientePreferencial(vo, opt);
                     }
                 }
