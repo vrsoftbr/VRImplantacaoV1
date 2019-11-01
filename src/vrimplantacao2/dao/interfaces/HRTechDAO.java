@@ -8,20 +8,26 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoEstadoCivil;
+import vrimplantacao2.vo.enums.TipoProduto;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -316,15 +322,10 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	ncm.id_cest cest,\n" +
                     "	est.codtribsai,\n" +
                     "	est.codtribent,\n" +
-                    /*"	ts.situatribu icms_cst_s,\n" +
-                    "	ts.aliquotapdv icms_aliq_s,\n" +
-                    "	ts.mrger icms_red_s,\n" +
-                    "	te.situatribu icms_cst_e,\n" +
-                    "	te.aliquotapdv icms_aliq_e,\n" +
-                    "	te.mrger icms_red_e,\n" +*/
                     "	pis_s.cstpis pis_cst_s,\n" +
                     "	pis_e.cstpis pis_cst_e,\n" +
-                    "	pis_s.nat_rec_pis pis_natrec\n" +
+                    "	pis_s.nat_rec_pis pis_natrec,\n" +
+                    "	coalesce(ext.tipo_item,'') tipo_item\n" +
                     "from\n" +
                     "	fl300est p\n" +
                     "	join fl304ven v on \n" +
@@ -349,12 +350,6 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	join fl301est est on \n" +
                     "		p.codigoplu = est.codigoplu and\n" +
                     "		est.codigoloja = v.codigoloja\n" +
-                    /*"	join fltribut ts on \n" +
-                    "		est.codtribsai = ts.codigotrib and\n" +
-                    "		v.codigoloja = ts.codigoloja\n" +
-                    "	join fltribut te on \n" +
-                    "		est.codtribent = te.codigotrib and\n" +
-                    "		v.codigoloja = te.codigoloja\n" +*/
                     "	left join (\n" +
                     "		select\n" +
                     "			codigoplu,\n" +
@@ -365,6 +360,8 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "			codigoplu\n" +
                     "	) bal on \n" +
                     "		p.codigoplu = bal.codigoplu\n" +
+                    "	left join FL300EXT ext on\n" +
+                    "           ext.codigoplu = p.codigoplu\n" +
                     "order by\n" +
                     "	p.codigoplu"
             )) {
@@ -398,13 +395,13 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoId(rs.getString("codtribsai"));
                     imp.setIcmsCreditoId(rs.getString("codtribent"));
                     
-                    /*imp.setIcmsCstEntrada(rs.getInt("icms_cst_e"));
-                    imp.setIcmsAliqEntrada(rs.getDouble("icms_aliq_e"));
-                    imp.setIcmsReducaoEntrada(rs.getDouble("icms_red_e"));
-                    
-                    imp.setIcmsCstSaida(rs.getInt("icms_cst_s"));
-                    imp.setIcmsAliqSaida(rs.getDouble("icms_aliq_s"));
-                    imp.setIcmsReducaoSaida(rs.getDouble("icms_red_s"));*/
+                    switch (rs.getString("tipo_item")) {
+                        case "02": imp.setTipoProduto(TipoProduto.EMBALAGEM); break;
+                        case "07": imp.setTipoProduto(TipoProduto.MATERIAL_USO_E_CONSUMO); break;
+                        case "09": imp.setTipoProduto(TipoProduto.SERVICOS); break;
+                        case "08": imp.setTipoProduto(TipoProduto.ATIVO_IMOBILIZADO); break;
+                        case "99": imp.setTipoProduto(TipoProduto.OUTROS); break;
+                    }
                                         
                     imp.setPiscofinsCstCredito(rs.getString("pis_cst_e"));
                     imp.setPiscofinsCstDebito(rs.getString("pis_cst_s"));
@@ -450,12 +447,17 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                 OpcaoProduto.CEST,
                 OpcaoProduto.ICMS,
                 OpcaoProduto.PIS_COFINS,
-                OpcaoProduto.NATUREZA_RECEITA
+                OpcaoProduto.NATUREZA_RECEITA,
+                OpcaoProduto.TIPO_PRODUTO
         ));
     }
 
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
+        enderecosFOR = null;
+        enderecosFCO = null;
+        contatosFornecedor = null;
+        
         List<FornecedorIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
@@ -467,8 +469,10 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	cpf.codinsc_rg rgie,\n" +
                     "	cpf.numcgc_cpf cnpj,\n" +
                     "	cpf.tipempresa tipo,\n" +
+                    "	cpf.microempre,\n" +
                     "	cpf.datanascim datanascimento,\n" +
-                    "	cpf.codcepcome cep,\n" +
+                    "	coalesce(cpf.codcepcome,'') cep,\n" +
+                    "	coalesce(cpf.codcepcobr,'') cep_cob,\n" +
                     "	cpf.compcomerc numero,\n" +
                     "	f.forn02visi prazovisita,\n" +
                     "	f.forn02pent prazoentrega,	\n" +
@@ -481,7 +485,7 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	tel.TELEFONE02 fone2,\n" +
                     "	tel.TELEFAX01 fax,\n" +
                     "	tel.TELECELU celular,\n" +
-                    "        (select top 1 email from FL821EMA where codigoenti = f.codigoenti) email\n" +
+                    "   (select top 1 email from FL821EMA where codigoenti = f.codigoenti) email\n" +
                     "from \n" +
                     "	FL800FOR f\n" +
                     "	left join flcgccpf cpf on \n" +
@@ -496,7 +500,9 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	f.codigoenti in (select distinct CODIGOENTI from FL700FIN where tipolancam = 'P')\n" +
                     "order by\n" +
                     "	f.codigoenti"
-            )) {
+            )) {                
+                String msg = "Gerando lista de importação de fornecedores...";
+                int cont = 1;
                 while (rs.next()) {
                     FornecedorIMP imp = new FornecedorIMP();
                     imp.setImportSistema(getSistema());
@@ -510,6 +516,11 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setPrazoVisita(rs.getInt("prazovisita"));
                     imp.setPrazoEntrega(rs.getInt("prazoentrega"));
                     imp.setPrazoSeguranca(rs.getInt("prazoseguranca"));
+                    switch (rs.getString("microempre")) {
+                        case "S": imp.setTipoEmpresa(TipoEmpresa.ME_SIMPLES); break;
+                        //case "N": imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL); break;
+                        default: imp.setTipoEmpresa(TipoEmpresa.LUCRO_REAL); break;
+                    }
                     if (rs.getInt("produtorrural") == 1) {
                         imp.setProdutorRural();
                     }
@@ -520,27 +531,40 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.addCondicaoPagamento(Utils.stringToInt(pag.trim()));
                     }
                     
-                    Endereco end = obterEnderecoFOR(rs.getString("fornecedor_id"), rs.getString("cep"));
+                    Endereco end = obterEnderecoFOR(rs.getString("id_fornecedor"), rs.getString("cep"));
                     if (end == null) {
                         end = obterEnderecoHRCep(rs.getString("cep"));
-                        end.numero = rs.getString("numero");
+                        if (end != null) {
+                            end.numero = rs.getString("numero");
+                        } else {
+                            LOG.warning("Fornecedor sem endereço: " + imp.getImportId() + " - " + imp.getRazao());
+                        }
                     }                    
-                                        
-                    imp.setEndereco(end.logradouro);
-                    imp.setNumero(end.numero);
-                    imp.setBairro(end.bairro);
-                    imp.setMunicipio(end.cidade);
-                    imp.setUf(end.estado);
-                    imp.setCep(end.cep);
                     
-                    end = obterEnderecoFCO(rs.getString("fornecedor_id"), rs.getString("cep"));                    
-                                        
-                    imp.setCob_endereco(end.logradouro);
-                    imp.setCob_numero(end.numero);
-                    imp.setCob_bairro(end.bairro);
-                    imp.setCob_municipio(end.cidade);
-                    imp.setCob_uf(end.estado);
-                    imp.setCob_cep(end.cep);
+                    if (end != null) {
+                        imp.setEndereco(end.logradouro);
+                        imp.setNumero(end.numero);
+                        imp.setBairro(end.bairro);
+                        imp.setMunicipio(end.cidade);
+                        imp.setUf(end.estado);
+                        imp.setCep(end.cep);
+                    }
+                    
+                    {
+                        Endereco end2 = obterEnderecoFCO(rs.getString("id_fornecedor"), rs.getString("cep_cob"));
+                        if (end2 != null) {
+                            end = end2;
+                        }
+                    }
+                    
+                    if (end != null) {
+                        imp.setCob_endereco(end.logradouro);
+                        imp.setCob_numero(end.numero);
+                        imp.setCob_bairro(end.bairro);
+                        imp.setCob_municipio(end.cidade);
+                        imp.setCob_uf(end.estado);
+                        imp.setCob_cep(end.cep);
+                    }
                     
                     imp.setPermiteNfSemPedido(rs.getInt("recebe_nfe_s_ped") == 1);
                     
@@ -549,86 +573,158 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.addTelefone("FAX", rs.getString("fax"));
                     imp.addCelular("CELULAR", rs.getString("celular"));
                     imp.addEmail("EMAIL", rs.getString("email"), TipoContato.NFE);
+                    
+                    List<ContatoFornecedor> cts = getContatosFornecedor(imp.getImportId());
+                    if (cts != null) {
+                        for (ContatoFornecedor cf: cts) {
+                            imp.addContato(cf.nome, cf.telefone, "", TipoContato.COMERCIAL, cf.email);
+                        }
+                    }
 
                     result.add(imp);
+                    
+                    ProgressBar.setStatus(msg + cont);
+                    cont++;
                 }
             }
         }
+        
+        if (enderecosFOR != null) enderecosFOR.clear();
+        enderecosFOR = null;
+        if (enderecosFCO != null) enderecosFCO.clear();
+        enderecosFCO = null;
+        if (contatosFornecedor != null) contatosFornecedor.clear();
+        contatosFornecedor = null;
+        
         return result;
     }
     
-    private Endereco obterEnderecoFOR(String codigoEntidade, String codigoCep) throws Exception {
-        try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rs = st.executeQuery(
-                "select\n" +
-                "    cp.titulo,\n" +
-                "    cp.logradouro,\n" +
-                "    cpf.compcomerc numero,\n" +
-                "    cp.bairro,\n" +
-                "    cp.cidade,\n" +
-                "    cp.estado,\n" +
-                "    cpf.codcepcome cep\n" +
-                "from\n" +
-                "    fl423cep cp\n" +
-                "    join fl800for f on\n" +
-                "        f.codigoenti = cp.codigoenti\n" +
-                "    join flcgccpf cpf on \n" +
-                "        f.id_entidade = cpf.id_entidade\n" +
-                "where\n" +
-                "    cp.tipocadast = ('FOR') and\n" +
-                "    cp.codigoenti = '" + codigoEntidade + "' and\n" +
-                "    cp.codigocep = '" + codigoCep + "'"
-            )) {
-                if (rs.next()) {
-                    Endereco e = new Endereco();
-                    e.logradouro = rs.getString("titulo") + " " + rs.getString("logradouro");
-                    e.numero = rs.getString("numero");
-                    e.bairro = rs.getString("bairro");
-                    e.cidade = rs.getString("cidade");
-                    e.estado = rs.getString("estado");
-                    e.cep = rs.getString("cep");
-                    return e;
+    private Map<String, List<ContatoFornecedor>> contatosFornecedor;
+    private List<ContatoFornecedor> getContatosFornecedor(String idFornecedor) throws Exception {
+        if (contatosFornecedor == null) {
+            try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rs = st.executeQuery(
+                        "select distinct\n" +
+                        "    codigoenti id_cliente,\n" +
+                        "    depto,\n" +
+                        "    funcao,\n" +
+                        "    nome,\n" +
+                        "    telefone,\n" +
+                        "    email\n" +
+                        "from\n" +
+                        "    FL809FOR\n" +
+                        "order by\n" +
+                        "    id_cliente"
+                )) {
+                    contatosFornecedor = new HashMap<>();
+                    while (rs.next()) {
+                        List<ContatoFornecedor> cont = contatosFornecedor.get(rs.getString("id_cliente"));
+                        if (cont == null) {
+                            cont = new ArrayList<>();
+                            contatosFornecedor.put(rs.getString("id_cliente"), cont);
+                        }
+                        ContatoFornecedor ct = new ContatoFornecedor();
+                        ct.id_cliente = rs.getString("id_cliente");
+                        ct.depto = rs.getString("depto");
+                        ct.funcao = rs.getString("funcao");
+                        ct.nome = rs.getString("nome");
+                        ct.telefone = rs.getString("telefone");
+                        ct.email = rs.getString("email");
+                        cont.add(ct);
+                    }
                 }
             }
         }
-        return null;
+        return contatosFornecedor.get(idFornecedor);
     }
     
+    private class ContatoFornecedor {
+        String id_cliente;
+        String depto;
+        String funcao;
+        String nome;
+        String telefone;
+        String email;
+    }
+    
+    private MultiMap<String, Endereco> enderecosFOR;
+    private Endereco obterEnderecoFOR(String codigoEntidade, String codigoCep) throws Exception {
+        if (enderecosFOR == null) {
+            try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "    cp.codigoenti,\n" +
+                    "    cp.titulo,\n" +
+                    "    cp.logradouro,\n" +
+                    "    cpf.compcomerc numero,\n" +
+                    "    cp.bairro,\n" +
+                    "    cp.cidade,\n" +
+                    "    cp.estado,\n" +
+                    "    cpf.codcepcome cep\n" +
+                    "from\n" +
+                    "    fl423cep cp\n" +
+                    "    join fl800for f on\n" +
+                    "        f.codigoenti = cp.codigoenti\n" +
+                    "    join flcgccpf cpf on \n" +
+                    "        f.id_entidade = cpf.id_entidade\n" +
+                    "where\n" +
+                    "    cp.tipocadast = ('FOR')"
+                )) {
+                    enderecosFOR = new MultiMap<>();
+                    while (rs.next()) {
+                        Endereco e = new Endereco();
+                        e.logradouro = rs.getString("titulo") + " " + rs.getString("logradouro");
+                        e.numero = rs.getString("numero");
+                        e.bairro = rs.getString("bairro");
+                        e.cidade = rs.getString("cidade");
+                        e.estado = rs.getString("estado");
+                        e.cep = rs.getString("cep");
+                        enderecosFOR.put(e, rs.getString("codigoenti"), e.cep);
+                    }
+                }
+            }            
+        }
+        return enderecosFOR.get(codigoEntidade, codigoCep);
+    }
+    
+    private MultiMap<String, Endereco> enderecosFCO;
     private Endereco obterEnderecoFCO(String codigoEntidade, String codigoCep) throws Exception {
-        try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rs = st.executeQuery(
-                "select\n" +
-                "    cp.titulo,\n" +
-                "    cp.logradouro,\n" +
-                "    cpf.compcomerc numero,\n" +
-                "    cp.bairro,\n" +
-                "    cp.cidade,\n" +
-                "    cp.estado,\n" +
-                "    cpf.codcepcobr cep\n" +
-                "from\n" +
-                "    fl423cep cp\n" +
-                "    join fl800for f on\n" +
-                "        f.codigoenti = cp.codigoenti\n" +
-                "    join flcgccpf cpf on \n" +
-                "        f.id_entidade = cpf.id_entidade\n" +
-                "where\n" +
-                "    cp.tipocadast = ('FCO') and\n" +
-                "    cp.codigoenti = '" + codigoEntidade + "' and\n" +
-                "    cp.codigocep = '" + codigoCep + "'"
-            )) {
-                if (rs.next()) {
-                    Endereco e = new Endereco();
-                    e.logradouro = rs.getString("titulo") + " " + rs.getString("logradouro");
-                    e.numero = rs.getString("numero");
-                    e.bairro = rs.getString("bairro");
-                    e.cidade = rs.getString("cidade");
-                    e.estado = rs.getString("estado");
-                    e.cep = rs.getString("cep");
-                    return e;
+        if (enderecosFCO == null) {
+            try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "    cp.codigoenti,\n" +
+                    "    cp.titulo,\n" +
+                    "    cp.logradouro,\n" +
+                    "    cpf.compcomerc numero,\n" +
+                    "    cp.bairro,\n" +
+                    "    cp.cidade,\n" +
+                    "    cp.estado,\n" +
+                    "    cpf.codcepcome cep\n" +
+                    "from\n" +
+                    "    fl423cep cp\n" +
+                    "    join fl800for f on\n" +
+                    "        f.codigoenti = cp.codigoenti\n" +
+                    "    join flcgccpf cpf on \n" +
+                    "        f.id_entidade = cpf.id_entidade\n" +
+                    "where\n" +
+                    "    cp.tipocadast = ('FCO')"
+                )) {
+                    enderecosFCO = new MultiMap<>();
+                    while (rs.next()) {
+                        Endereco e = new Endereco();
+                        e.logradouro = rs.getString("titulo") + " " + rs.getString("logradouro");
+                        e.numero = rs.getString("numero");
+                        e.bairro = rs.getString("bairro");
+                        e.cidade = rs.getString("cidade");
+                        e.estado = rs.getString("estado");
+                        e.cep = rs.getString("cep");
+                        enderecosFCO.put(e, rs.getString("codigoenti"), e.cep);
+                    }
                 }
             }
         }
-        return null;
+        return enderecosFCO.get(codigoEntidade, codigoCep);
     }
     
     private Endereco obterEnderecoHRCep(String codigoCep) throws Exception {
@@ -645,6 +741,7 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                 "    from\n" +
                 "        hrcep..flcepcep\n" +
                 "    where\n" +
+                "        ltrim(rtrim(coalesce(codigocep,''))) != '' and\n" +
                 "        codigocep = '" + codigoCep + "'"
             )) {
                 if (rs.next()) {
