@@ -27,6 +27,7 @@ import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
+import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
@@ -45,7 +46,13 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
     public String getSistema() {
         return "Weber";
     }
-
+    
+    private String Encoding = "WIN1252";
+    
+    public void setEncoding (String Encoding) {
+        this.Encoding = Encoding == null ? "WIN1252" : Encoding;
+    }
+    
     @Override
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
@@ -80,7 +87,8 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     OpcaoProduto.ICMS,
                     OpcaoProduto.PAUTA_FISCAL,
                     OpcaoProduto.PAUTA_FISCAL_PRODUTO,
-                    OpcaoProduto.MARGEM
+                    OpcaoProduto.MARGEM,
+                    OpcaoProduto.OFERTA
                 }
         ));
     }
@@ -219,6 +227,42 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<OfertaIMP> getOfertas(Date dataTermino) throws Exception {
+        List<OfertaIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	id_produto idProduto,\n"
+                    + "	pre_promocao_datai dataInicio,\n"
+                    + "	pre_promocao_dataf dataFim,\n"
+                    + "	pre_promocao_preco precooferta,\n"
+                    + "	preco_venda precoNormal\n"
+                    + "from est_produtos\n"
+                    + "where\n"
+                    + "	pre_promocao_datai is not null\n"
+                    + "	and pre_promocao_dataf is not null\n"
+                    + "	and pre_promocao_datai <> '1899-12-30'\n"
+                    + "	and pre_promocao_dataf >= '2019-11-01'"
+            )) {
+            
+                while (rs.next()) {
+                    OfertaIMP imp = new OfertaIMP();
+                    imp.setIdProduto(rs.getString("idproduto"));
+                    imp.setDataInicio(rs.getDate("datainicio"));
+                    imp.setDataFim(rs.getDate("datafim"));
+                    imp.setPrecoNormal(rs.getDouble("preconormal"));
+                    imp.setPrecoOferta(rs.getDouble("precooferta"));
+                    
+                    result.add(imp);
+                
+                }
+            }
+        }
+        return result;
+    }
+    
+    
+    @Override
     public List<PautaFiscalIMP> getPautasFiscais(Set<OpcaoFiscal> opcoes) throws Exception {
         List<PautaFiscalIMP> result = new ArrayList<>();
 
@@ -332,8 +376,8 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rs.getString("id"));
-                    imp.setRazao(rs.getString("razao"));
-                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setRazao(Utils.acertarTexto(rs.getString("razao")));
+                    imp.setFantasia(Utils.acertarTexto(rs.getString("fantasia")));
                     imp.setCnpj_cpf(Utils.formataNumero(rs.getString("cnpj")));
                     imp.setIe_rg(rs.getString("inscricaoestadual"));
                     //imp.setAtivo(rs.getInt("situacao") == 1);
@@ -341,7 +385,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setComplemento(rs.getString("complemento"));
-                    imp.setBairro(rs.getString("bairro"));
+                    imp.setBairro(Utils.acertarTexto(rs.getString("bairro")));
                     imp.setMunicipio(rs.getString("municipio"));
                     imp.setIbge_municipio(rs.getInt("municipioibge"));
                     imp.setUf(rs.getString("uf"));
@@ -421,13 +465,13 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setId(rs.getString("id"));
                     imp.setCnpj(Utils.formataNumero(rs.getString("cnpj")));
                     imp.setInscricaoestadual(rs.getString("inscricaoestadual"));
-                    imp.setRazao(rs.getString("razao"));
-                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setRazao(Utils.acertarTexto(rs.getString("razao")));
+                    imp.setFantasia(Utils.acertarTexto(rs.getString("fantasia")));
                     imp.setAtivo("N".equals(rs.getString("bloqueado")));
                     imp.setEndereco(rs.getString("endereco"));
                     imp.setNumero(rs.getString("numero"));
                     imp.setComplemento(rs.getString("complemento"));
-                    imp.setBairro(rs.getString("bairro"));
+                    imp.setBairro(Utils.acertarTexto(rs.getString("bairro")));
                     imp.setMunicipio(rs.getString("municipio"));
                     imp.setMunicipioIBGE(rs.getInt("municipioibge"));
                     imp.setUf(rs.getString("uf"));
@@ -814,6 +858,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
 
+        
         public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "select\n"
