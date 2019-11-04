@@ -89,7 +89,7 @@ public class AtmaDAO extends InterfaceDAO {
         }
         return result;
     }
-    
+
     @Override
     public List<MercadologicoNivelIMP> getMercadologicoPorNivel() throws Exception {
         Map<String, MercadologicoNivelIMP> merc = new LinkedHashMap<>();
@@ -190,8 +190,9 @@ public class AtmaDAO extends InterfaceDAO {
                     + " est.QTDE as estoque,\n"
                     + " est.QTDE_MAXIMA as estoquemaximo,\n"
                     + " est.QTDE_MINIMA as estoqueminimo,\n"
-                    + " sit.DESCRICAO as situacaocadastro\n"
-                    + "from dbo.EQ_PROD pro\n"                    
+                    + " sit.DESCRICAO as situacaocadastro,\n"
+                    + " tri.tri.DESCRICAO as tributacao\n"
+                    + "from dbo.EQ_PROD pro\n"
                     + "left join dbo.TB_UNID unv on unv.ID_UNID = pro.ID_UNID_V\n"
                     + "left join dbo.TB_UNID unc on unc.ID_UNID = pro.ID_UNID_C\n"
                     + "left join dbo.TB_NCM ncm on ncm.ID_NCM = pro.ID_NCM\n"
@@ -201,7 +202,8 @@ public class AtmaDAO extends InterfaceDAO {
                     + "	 and est.ID_TIPO_ESTOQUE = 1\n"
                     + "left join dbo.EQ_PROD_COM pre on pre.ID_PROD = pro.ID_PROD \n"
                     + "	 and pre.ID_EMP = " + getLojaOrigem() + "\n"
-                    + "left join dbo.TB_TIPO_SITUACAO sit on sit.ID_TIPO_SITUACAO = pre.ID_TIPO_SITUACAO"
+                    + "left join dbo.TB_TIPO_SITUACAO sit on sit.ID_TIPO_SITUACAO = pre.ID_TIPO_SITUACAO\n"
+                    + "left join dbo.FS_GRADE_TRIB as tri on tri.ID_GRADE_TRIB = pre.ID_GRADE_TRIB"
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -232,6 +234,37 @@ public class AtmaDAO extends InterfaceDAO {
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setSituacaoCadastro("ATIVO".equals(rst.getString("situacaocadastro")) ? SituacaoCadastro.ATIVO : SituacaoCadastro.EXCLUIDO);
+
+                    if ((rst.getString("tributacao") != null)
+                            && (!rst.getString("tributacao").trim().isEmpty())) {
+
+                        if (rst.getString("tributacao").contains("PIS COFINS")) {
+                            imp.setPiscofinsCstDebito(1);
+                            imp.setPiscofinsCstCredito(50);
+                        } else if (rst.getString("tributacao").contains("ALIQUOTA ZERO")) {
+                            imp.setPiscofinsCstDebito(6);
+                            imp.setPiscofinsCstCredito(73);
+                        } else if (rst.getString("tributacao").contains("ALIQ. ZERO")) {
+                            imp.setPiscofinsCstDebito(6);
+                            imp.setPiscofinsCstCredito(73);
+                        } else if (rst.getString("tributacao").contains("MONO")) {
+                            imp.setPiscofinsCstDebito(4);
+                            imp.setPiscofinsCstCredito(70);
+                        } else if (rst.getString("tributacao").contains("SUBST")) {
+                            imp.setPiscofinsCstDebito(5);
+                            imp.setPiscofinsCstCredito(75);
+                        } else if (rst.getString("tributacao").contains("ISENTO")) {
+                            imp.setPiscofinsCstDebito(7);
+                            imp.setPiscofinsCstCredito(71);
+                        } else {
+                            imp.setPiscofinsCstDebito(7);
+                            imp.setPiscofinsCstCredito(71);
+                        }
+                    } else {
+                        imp.setPiscofinsCstDebito(7);
+                        imp.setPiscofinsCstCredito(71);
+                    }
+
                     result.add(imp);
                 }
             }
@@ -770,7 +803,7 @@ public class AtmaDAO extends InterfaceDAO {
                     }
 
                     result.add(imp);
-
+                    
                 }
             }
         }

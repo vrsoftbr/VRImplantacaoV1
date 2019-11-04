@@ -32,6 +32,7 @@ import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoPagamentoAgrupadoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
@@ -936,7 +937,13 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    c.codigoenti")) {
                 while (rs.next()) {
                     ClienteIMP imp = new ClienteIMP();
-                    imp.setId(rs.getString("id"));
+                    String id;
+                    try {
+                        id = String.valueOf(Integer.parseInt(rs.getString("id")));
+                    } catch (NumberFormatException ex) {
+                        id = rs.getString("id");
+                    }
+                    imp.setId(id);
                     imp.setRazao(rs.getString("razao"));
                     imp.setFantasia(rs.getString("fantasia"));
                     imp.setInscricaoestadual(rs.getString("rgie"));
@@ -977,51 +984,126 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select \n"
-                    + "	distinct\n"
-                    + "	f.codi_relacio id,\n"
-                    + "	cl.codigoenti idcliente,\n"
-                    + "	f.numcgc_cpf cnpj,\n"
-                    + "	f.numeroecf ecf,\n"
-                    + "	f.numerocoo coo,\n"
-                    + "	f.datamovime data,\n"
-                    + "	f.vdg_dia valor,\n"
-                    + "	f.datadeposi vencimento \n"
-                    + "from \n"
-                    + "	vw305fin f\n"
-                    + "join flcgccpf cpf on cast(f.numcgc_cpf as bigint) = cast(cpf.numcgc_cpf as bigint)\n"
-                    + "join fl400cli cl on cpf.codigoenti = cl.codcgccpfs and\n"
-                    + "	cl.id_entidade = cpf.id_entidade\n"
-                    + "where  \n"
-                    + "	f.datamovime >= '2005-01-01 00:00:00' and \n"
-                    + "	f.codigofina in ('007') and \n"
-                    + "	(ORIGEM != CASE WHEN \n"
-                    + "		DATAMOVIME > '20131231' THEN 'C' ELSE '\\' END OR \n"
-                    + "	 EXISTS (SELECT \n"
-                    + "			CODI_RELACIO \n"
-                    + "		 FROM \n"
-                    + "			FL404CON \n"
-                    + "            WHERE \n"
-                    + "			CODIGOLOJA = f.CODIGOLOJA AND \n"
-                    + "			CODI_RELACIO = f.CODI_RELACIO)) and\n"
-                    + "	f.codigoloja = " + getLojaOrigem() + "\n"
-                    + "order by\n"
-                    + "	f.datamovime")) {
+                    "Select \n" +
+                    "    vw305fin.codi_relacio id,\n" +
+                    "    fl400cli.id_cliente idcliente, \n" +
+                    "    vw305fin.codigoloja as numeroloja, \n" +
+                    "    flcgccpf.nomeentida as nomecliente, \n" +
+                    "    flcgccpf.numcgc_cpf as cnpj, \n" +
+                    "    fl410con.codcliconv as codigoconv, \n" +
+                    "    vw305fin.numeroecf ecf,\n" +
+                    "    vw305fin.numerocoo coo,\n" +
+                    "    fl410con.codclichap, \n" +
+                    "    vw305fin.datamovime as data, \n" +
+                    "    vw305fin.vdg_dia as valor,  \n" +
+                    "    vw305fin.datadeposi as vencimento, \n" +
+                    "    vw305fin.codi_relacio, \n" +
+                    "    SPACE(01) as atrazo,   \n" +
+                    "    qtdeCliCon=convert(numeric(10),0), \n" +
+                    "    qtdeCliEfe=Convert(Numeric(10),0), \n" +
+                    "    isnull(fl305obs.obsconv,space(80)) as obsconv  \n" +
+                    "from \n" +
+                    "	vw305fin  \n" +
+                    "	left outer join flcgccpf on \n" +
+                    "		vw305fin.numcgc_cpf=REPLACE(STR(flcgccpf.numcgc_cpf,15),' ','0')  \n" +
+                    "	left outer join fl400cli cl2 on \n" +
+                    "		cl2.ID_CLIENTE = case \n" +
+                    "			when CONVERT(numeric(15), case when vw305fin.numcgc_cpf='' then 0 end) < 999999999 then \n" +
+                    "				CONVERT(numeric(15), case when vw305fin.numcgc_cpf = '' then 0 end) \n" +
+                    "			else -1 \n" +
+                    "		end\n" +
+                    "	inner join fl400cli on \n" +
+                    "		fl400cli.id_entidade = case\n" +
+                    "			when flcgccpf.id_entidade IS null then cl2.id_entidade \n" +
+                    "			else flcgccpf.id_entidade \n" +
+                    "		end\n" +
+                    "	inner join fl410con on \n" +
+                    "		fl400cli.id_cliente = fl410con.id_cliente\n" +
+                    "	left outer join fl305obs on\n" +
+                    "		vw305fin.codi_relacio = fl305obs.codi_relacio and \n" +
+                    "		vw305fin.codigoloja = fl305obs.codigoloja\n" +
+                    "where \n" +
+                    "	vw305fin.vdg_dia > 0 and\n" +
+                    "	vw305fin.Codigoloja = " + getLojaOrigem() + " and \n" +
+                    "	fl410con.codCliconv = '000001' and\n" +
+                    "	codigofina in ('003','007') AND \n" +
+                    "	(\n" +
+                    "		vw305fin.ORIGEM != CASE WHEN vw305fin.DATAMOVIME > '20131231' THEN 'C' ELSE '\\' END OR\n" +
+                    "		EXISTS(SELECT CODI_RELACIO FROM FL404CON WHERE CODIGOLOJA=vw305fin .CODIGOLOJA AND CODI_RELACIO=vw305fin .CODI_RELACIO)\n" +
+                    "	)")) {
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rs.getString("id"));
-                    imp.setIdCliente(rs.getString("idcliente"));
+                    String idCliente;
+                    try {
+                        idCliente = String.valueOf(Integer.parseInt(rs.getString("idcliente")));
+                    } catch (NumberFormatException ex) {
+                        idCliente = rs.getString("idcliente");
+                    }                    
+                    imp.setIdCliente(idCliente);
                     imp.setCnpjCliente(rs.getString("cnpj"));
                     imp.setEcf(rs.getString("ecf"));
                     imp.setNumeroCupom(rs.getString("coo"));
                     imp.setDataEmissao(rs.getDate("data"));
                     imp.setDataVencimento(rs.getDate("vencimento"));
                     imp.setValor(rs.getDouble("valor"));
+                    imp.setObservacao(rs.getString("obsconv"));
 
                     result.add(imp);
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoPagamentoAgrupadoIMP> getCreditoRotativoPagamentoAgrupado() throws Exception {
+        List<CreditoRotativoPagamentoAgrupadoIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    "select id_cliente, sum(valorvenda) total from (\n" +
+                    "SELECT\n" +
+                    "	FL404CON.id_cliente,\n" +
+                    "	FL404CON.VALORVENDA\n" +
+                    "FROM\n" +
+                    "	fl404con inner\n" +
+                    "	join fl400cli on\n" +
+                    "		fl404con.id_cliente = fl400cli.id_cliente\n" +
+                    "	inner join flcgccpf on\n" +
+                    "		fl400cli.id_entidade = flcgccpf.id_entidade\n" +
+                    "	inner join HRTECH.dbo.fl305cup fl305cup on\n" +
+                    "		fl404con.codi_relacio = fl305cup.codi_relacio and\n" +
+                    "		replace(STR(LTRIM(RTRIM(flcgccpf.numcgc_cpf)),15),' ','0') = fl305cup.numcgc_cpf\n" +
+                    "	inner join HRTECH.dbo.fl305fin fl305fin on\n" +
+                    "		fl305cup.codi_relacio = fl305fin.codi_relacio and\n" +
+                    "		fl305cup.codigoloja = fl305fin.codigoloja\n" +
+                    "	Left outer join	HRTECH.dbo.fl410con fl410con on\n" +
+                    "		fl404con.id_cliente = fl410con.id_cliente\n" +
+                    "WHERE\n" +
+                    "	OPERACAO = 'P' AND\n" +
+                    "	NUMEROLOJA = 1 AND\n" +
+                    "	CODIGOCONV='000001' AND\n" +
+                    "	codigofina in ('003','007') and \n" +
+                    "	fl305cup.numcgc_cpf > '000000000000000' and\n" +
+                    "	fl305cup.numcgc_cpf is not null) a\n" +
+                    "group by id_cliente"
+            )) {
+                while (rs.next()) {
+                    CreditoRotativoPagamentoAgrupadoIMP imp = new CreditoRotativoPagamentoAgrupadoIMP();
+                    String idCliente;
+                    try {
+                        idCliente = String.valueOf(Integer.parseInt(rs.getString("id_cliente")));
+                    } catch (NumberFormatException ex) {
+                        idCliente = rs.getString("id_cliente");
+                    }                  
+                    imp.setIdCliente(idCliente);
+                    imp.setValor(rs.getDouble("total"));
+                    result.add(imp);
+                }
+            }
+        }
+        
         return result;
     }
 
