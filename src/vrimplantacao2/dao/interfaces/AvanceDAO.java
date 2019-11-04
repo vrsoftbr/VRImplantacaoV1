@@ -1224,7 +1224,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                         //String horaTermino = FORMAT.format(rst.getDate("data")) + " " + rst.getString("hora");
                         next.setHoraInicio(TIMESTAMP.parse(rst.getString("datahora")));
                         next.setHoraTermino(TIMESTAMP.parse(rst.getString("datahora")));
-                        next.setCancelado(rst.getInt("cancelado") == 1);
+                        //next.setCancelado(rst.getInt("cancelado") == 1);
                         next.setSubTotalImpressora(rst.getDouble("valor"));
                         next.setCpf(rst.getString("cpf"));
                         next.setNomeCliente(rst.getString("nome"));
@@ -1339,7 +1339,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("quantidade"));
                         next.setPrecoVenda(rst.getDouble("valor"));
-                        next.setCancelado(rst.getInt("cancelado") == 1);
+                        next.setCancelado(rst.getInt("cancelado") == 1 || rst.getInt("cancelado") == 2);
                         next.setCodigoBarras(rst.getString("ean"));
                         next.setUnidadeMedida(rst.getString("unidade"));
 
