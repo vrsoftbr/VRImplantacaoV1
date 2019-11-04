@@ -18,6 +18,7 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -27,6 +28,7 @@ import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -34,7 +36,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  *
  * @author lucasrafael
  */
-public class AtmaDAO extends InterfaceDAO {
+public class AtmaDAO extends InterfaceDAO implements MapaTributoProvider {
 
     @Override
     public String getSistema() {
@@ -67,7 +69,8 @@ public class AtmaDAO extends InterfaceDAO {
             OpcaoProduto.NATUREZA_RECEITA,
             OpcaoProduto.VALIDADE,
             OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
-            OpcaoProduto.MERCADOLOGICO_PRODUTO
+            OpcaoProduto.MERCADOLOGICO_PRODUTO,
+            OpcaoProduto.MAPA_TRIBUTACAO
         }));
     }
 
@@ -191,7 +194,8 @@ public class AtmaDAO extends InterfaceDAO {
                     + " est.QTDE_MAXIMA as estoquemaximo,\n"
                     + " est.QTDE_MINIMA as estoqueminimo,\n"
                     + " sit.DESCRICAO as situacaocadastro,\n"
-                    + " tri.tri.DESCRICAO as tributacao\n"
+                    + " tri.ID_GRADE_TRIB as idTrib,\n"
+                    + " tri.DESCRICAO as tributacao\n"
                     + "from dbo.EQ_PROD pro\n"
                     + "left join dbo.TB_UNID unv on unv.ID_UNID = pro.ID_UNID_V\n"
                     + "left join dbo.TB_UNID unc on unc.ID_UNID = pro.ID_UNID_C\n"
@@ -264,6 +268,9 @@ public class AtmaDAO extends InterfaceDAO {
                         imp.setPiscofinsCstDebito(7);
                         imp.setPiscofinsCstCredito(71);
                     }
+
+                    imp.setIcmsDebitoId(rst.getString("idTrib"));
+                    imp.setIcmsCreditoId(rst.getString("idTrib"));
 
                     result.add(imp);
                 }
@@ -803,7 +810,7 @@ public class AtmaDAO extends InterfaceDAO {
                     }
 
                     result.add(imp);
-                    
+
                 }
             }
         }
@@ -846,6 +853,26 @@ public class AtmaDAO extends InterfaceDAO {
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setDataVencimento(rst.getDate("datavenvimento"));
                     result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<MapaTributoIMP> getTributacao() throws Exception {
+        List<MapaTributoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select \n"
+                    + "	ID_GRADE_TRIB as id, \n"
+                    + "	DESCRICAO as descricao \n"
+                    + "from dbo.FS_GRADE_TRIB \n"
+                    + "where ATIVO = 'SIM'"
+            )) {
+                while (rs.next()) {
+                    result.add(new MapaTributoIMP(rs.getString("id"),
+                            rs.getString("descricao")));
                 }
             }
         }
