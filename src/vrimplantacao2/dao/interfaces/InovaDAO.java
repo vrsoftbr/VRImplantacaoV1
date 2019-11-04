@@ -6,10 +6,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import vrimplantacao.classe.ConexaoPostgres;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -105,6 +109,7 @@ public class InovaDAO extends InterfaceDAO {
                     "order by\n" +
                     "	1"
             )) {
+                Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     
@@ -113,11 +118,25 @@ public class InovaDAO extends InterfaceDAO {
                     imp.setImportId(rst.getString("id"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
-                    imp.setEan(rst.getString("ean"));
-                    imp.seteBalanca(rst.getBoolean("pesavel"));
-                    imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
-                    imp.setTipoEmbalagem(rst.getString("unidade"));
-                    imp.setValidade(rst.getInt("validade"));
+                    
+                    ProdutoBalancaVO bal = balanca.get(Utils.stringToInt(rst.getString("ean"), -2));
+                    if (bal != null) {
+                        imp.setEan(bal.getCodigo() + "");
+                        imp.setQtdEmbalagem(1);
+                        imp.seteBalanca(true);
+                        imp.setValidade(imp.getValidade());
+                        switch (bal.getPesavel()) {
+                            case "U": imp.setTipoEmbalagem("UN"); break;
+                            default : imp.setTipoEmbalagem("KG"); break;
+                        }
+                    } else {
+                        imp.setEan(rst.getString("ean"));
+                        imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
+                        imp.seteBalanca(rst.getBoolean("pesavel"));
+                        imp.setValidade(rst.getInt("validade"));
+                        imp.setTipoEmbalagem(rst.getString("unidade"));
+                    }
+                    
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoGondola(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
