@@ -1218,7 +1218,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setId(id);
                         next.setNumeroCupom(Utils.stringToInt(rst.getString("cupom")));
                         next.setEcf(Utils.stringToInt(rst.getString("caixa")));
-                        next.setData(rst.getDate("data"));
+                        next.setData(rst.getDate("datahora"));
                         next.setIdClientePreferencial(rst.getString("id_cliente"));
                         //String horaInicio = FORMAT.format(rst.getDate("data")) + " " + rst.getString("hora");
                         //String horaTermino = FORMAT.format(rst.getDate("data")) + " " + rst.getString("hora");
@@ -1244,7 +1244,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "SELECT\n" +
-                    "	concat(v.NOTA, v.CAIXA, v.datahora, v.ccf) id, \n" +
+                    "	concat(v.NOTA, v.CAIXA, v.datahora_alteracao, v.ccf) id, \n" +
                     "	v.NOTA cupom,\n" +
                     "	v.CAIXA,\n" +
                     "	v.`DATA`,\n" +
@@ -1413,7 +1413,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = "SELECT\n" +
                     "	v.id,\n" +
-                    "   CONCAT(v.NOTA, v.CAIXA, v.datahora, v.ccf) id_venda,\n" +
+                    "   CONCAT(v.NOTA, v.CAIXA, v.datahora_alteracao, v.ccf) id_venda,\n" +
                     "	v.CAIXA,\n" +
                     "	v.NOTA cupom,\n" +
                     "	v.`DATA`,\n" +
@@ -1430,7 +1430,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	vendas v\n" +
                     "JOIN cadmer c ON v.CODIGO = c.Codigo\n" +
                     "WHERE\n" +
-                    "	v.`DATA` BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND '" + VendaIterator.FORMAT.format(dataTermino) + "' and\n" +
+                    "	v.`DATA` BETWEEN '" + VendaIterator.FORMAT.format(dataInicio) + "' AND "
+                                      + "'" + VendaIterator.FORMAT.format(dataTermino) + "' AND\n" +
                     "	v.loja = " + idLojaCliente + " and\n" +
                     "	v.e_transferencia = 0 and\n" +
                     "	v.nao_bx_estoque = 0 and\n" +
@@ -1439,7 +1440,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     "ORDER  BY\n" +
                     "	v.CAIXA, \n" +
                     "	v.data, \n" +
-                    "	v.HORA	";
+                    "	v.HORA";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
         }
