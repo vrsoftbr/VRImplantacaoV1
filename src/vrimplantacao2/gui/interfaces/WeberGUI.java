@@ -204,7 +204,8 @@ public class WeberGUI extends VRInternalFrame {
                                     OpcaoCliente.CONTATOS, 
                                     OpcaoCliente.VALOR_LIMITE, 
                                     OpcaoCliente.SITUACAO_CADASTRO,
-                                    OpcaoCliente.EMAIL);
+                                    OpcaoCliente.EMAIL,
+                                    OpcaoCliente.BAIRRO);
                         }
                         {
                             List<OpcaoCliente> opcoes = new ArrayList<>();
@@ -220,6 +221,10 @@ public class WeberGUI extends VRInternalFrame {
                             
                             if (chkRazao.isSelected()) {
                                 opcoes.add(OpcaoCliente.RAZAO);
+                            }
+                            
+                            if (chkEnderecoCompleto.isSelected()) {
+                                opcoes.add(OpcaoCliente.ENDERECO_COMPLETO);
                             }
                             
                             if (!opcoes.isEmpty()) {
@@ -305,6 +310,7 @@ public class WeberGUI extends VRInternalFrame {
         chkCliIERG = new vrframework.bean.checkBox.VRCheckBox();
         chkCVencimento = new javax.swing.JCheckBox();
         chkRazao = new vrframework.bean.checkBox.VRCheckBox();
+        chkEnderecoCompleto = new vrframework.bean.checkBox.VRCheckBox();
         txtEncoding = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         tablCreditoRotativo = new javax.swing.JPanel();
@@ -461,6 +467,13 @@ public class WeberGUI extends VRInternalFrame {
             }
         });
 
+        chkEnderecoCompleto.setText("Endereço Completo");
+        chkEnderecoCompleto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkEnderecoCompletoActionPerformed(evt);
+            }
+        });
+
         txtEncoding.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtEncodingActionPerformed(evt);
@@ -476,17 +489,21 @@ public class WeberGUI extends VRInternalFrame {
             .addGroup(tabClienteDadosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(tabClienteDadosLayout.createSequentialGroup()
-                        .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(chkRazao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(29, 29, 29)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtEncoding, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkCVencimento))
+                    .addComponent(chkCVencimento)
+                    .addGroup(tabClienteDadosLayout.createSequentialGroup()
+                        .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(tabClienteDadosLayout.createSequentialGroup()
+                                .addComponent(chkRazao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(29, 29, 29)
+                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtEncoding, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(chkEnderecoCompleto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(481, Short.MAX_VALUE))
         );
         tabClienteDadosLayout.setVerticalGroup(
@@ -499,7 +516,9 @@ public class WeberGUI extends VRInternalFrame {
                     .addComponent(txtEncoding, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(tabClienteDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkCliIERG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkEnderecoCompleto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkBloqueado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -906,6 +925,10 @@ public class WeberGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtEncodingActionPerformed
 
+    private void chkEnderecoCompletoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkEnderecoCompletoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkEnderecoCompletoActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectarFirebird;
     private vrframework.bean.button.VRButton btnMigrar;
@@ -919,6 +942,7 @@ public class WeberGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkCliIERG;
     private vrframework.bean.checkBox.VRCheckBox chkClientePreferencial;
     private javax.swing.JCheckBox chkContaPagar;
+    private vrframework.bean.checkBox.VRCheckBox chkEnderecoCompleto;
     private vrframework.bean.checkBox.VRCheckBox chkFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkPdvVendas;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
