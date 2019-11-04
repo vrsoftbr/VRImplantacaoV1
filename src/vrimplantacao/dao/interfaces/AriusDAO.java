@@ -995,7 +995,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                 + (importarDeEmpresas ? " Empresas " : "")
                 + (importarDeFornecedores ? " Fornecedores " : "")
                 + (importarDeTransportadoras ? " Transportadoras " : "")
-                + (importarDeAdminCartao ? " Adminsitradora de Cartões " : "")
+                + (importarDeAdminCartao ? " Administradora de Cartões " : "")
                 + "]"
         );
 
@@ -1912,8 +1912,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    left join clientes c on v.id_cliente = c.id\n"
                     + "where\n"
                     + "    v.empresa = " + origem + "\n"
-                    + "    and to_char(v.data_hora, 'dd/MM/yyyy') >= '" + DATE_FORMAT.format(vendaDataInicio) + "'\n"
-                    + "    and to_char(v.data_hora, 'dd/MM/yyyy') <= '" + DATE_FORMAT.format(vendaDataTermino) + "'\n"
+                    + "    and v.data_hora >= '" + DATE_FORMAT.format(vendaDataInicio) + "'\n"
+                    + "    and v.data_hora <= '" + DATE_FORMAT.format(vendaDataTermino) + "'\n"
                     + "order by v.id";
             this.stm.setFetchSize(10000);
             this.rst = stm.executeQuery(sql);
@@ -2078,8 +2078,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    join produtos p on vi.produto = p.id\n"
                     + "where\n"
                     + "    v.empresa = " + origem + "\n"
-                    + "    and to_char(v.data_hora, 'dd/MM/yyyy') >= '" + DATE_FORMAT.format(vendaDataInicio) + "'\n"
-                    + "    and to_char(v.data_hora, 'dd/MM/yyyy') <= '" + DATE_FORMAT.format(vendaDataTermino) + "'\n"
+                    + "    and v.data_hora >= '" + DATE_FORMAT.format(vendaDataInicio) + "'\n"
+                    + "    and v.data_hora <= '" + DATE_FORMAT.format(vendaDataTermino) + "'\n"
                     + "order by vi.id";
             this.stm.setFetchSize(10000);
             this.rst = stm.executeQuery(sql);
