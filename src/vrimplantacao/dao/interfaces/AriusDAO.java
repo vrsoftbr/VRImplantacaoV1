@@ -950,7 +950,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                 + (importarDeEmpresas ? " Empresas " : "")
                 + (importarDeFornecedores ? " Fornecedores " : "")
                 + (importarDeTransportadoras ? " Transportadoras " : "")
-                + (importarDeAdminCartao ? " Adminsitradora de Cartões " : "")
+                + (importarDeAdminCartao ? " Administradora de Cartões " : "")
                 + "]"
         );
 
