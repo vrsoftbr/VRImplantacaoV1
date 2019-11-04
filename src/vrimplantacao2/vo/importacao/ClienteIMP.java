@@ -299,7 +299,7 @@ public class ClienteIMP {
     }
     
     public void setSexo(String sexo) {
-        if (sexo == null) {
+        if (sexo == null || sexo.trim().equals("")) {
             this.sexo = TipoSexo.MASCULINO;
             return;
         }

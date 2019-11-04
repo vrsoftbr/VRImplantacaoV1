@@ -15,6 +15,8 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoContato;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -169,5 +171,80 @@ public class InovaDAO extends InterfaceDAO {
     public List<Estabelecimento> getLojas() {
         return Arrays.asList(new Estabelecimento("1", "LOJA"));
     }
+
+    @Override
+    public List<ClienteIMP> getClientesPreferenciais() throws Exception {
+        List<ClienteIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	c.clienteid id,\n" +
+                    "	c.clientecpf cnpj,\n" +
+                    "	c.clienterg ierg,\n" +
+                    "	coalesce(nullif(trim(c.clienterazaosocial),''), c.clientenome) razaosocial,\n" +
+                    "	c.clientenome fantasia,\n" +
+                    "	c.clientestatus ativo,\n" +
+                    "	c.clienteendereco endereco,\n" +
+                    "	c.clientenumero numero,\n" +
+                    "	c.clientecomplemento complemento,\n" +
+                    "	c.clientebairro bairro,\n" +
+                    "	c.clientecidade cidade,\n" +
+                    "	c.clienteuf uf,\n" +
+                    "	c.clientecep cep,\n" +
+                    "	c.clientedatanascimento datanascimento,\n" +
+                    "	c.clientedatacriacao datacadastro,\n" +
+                    "	c.clientesexo sexo,\n" +
+                    "	c.clientedataultimaalteracao dataalteracao,\n" +
+                    "	c.clientelimitecredito limite,\n" +
+                    "	c.clienteobs observacao,\n" +
+                    "	c.clienteobsfinanceira,\n" +
+                    "	c.clienteobsnotafiscal,\n" +
+                    "	c.clientediavencimento diavencimento,\n" +
+                    "	c.clientetelefone,\n" +
+                    "	c.clientetelcomercial,\n" +
+                    "	c.clienteemail,\n" +
+                    "	c.clienteemailsecundario\n" +
+                    "from\n" +
+                    "	clientes c\n" +
+                    "order by\n" +
+                    "	id"
+            )) {
+                while (rs.next()) {
+                    ClienteIMP imp = new ClienteIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setCnpj(rs.getString("cnpj"));
+                    imp.setInscricaoestadual(rs.getString("ierg"));
+                    imp.setRazao(rs.getString("razaosocial"));
+                    imp.setFantasia(rs.getString("fantasia"));
+                    imp.setAtivo(rs.getBoolean("ativo"));
+                    imp.setEndereco(rs.getString("endereco"));
+                    imp.setNumero(rs.getString("numero"));
+                    imp.setComplemento(rs.getString("complemento"));
+                    imp.setBairro(rs.getString("bairro"));
+                    imp.setMunicipio(rs.getString("cidade"));
+                    imp.setUf(rs.getString("uf"));
+                    imp.setCep(rs.getString("cep"));
+                    imp.setDataNascimento(rs.getDate("datanascimento"));
+                    imp.setDataCadastro(rs.getDate("datacadastro"));
+                    imp.setSexo(rs.getString("sexo"));
+                    imp.setValorLimite(rs.getDouble("limite"));
+                    imp.setObservacao2(rs.getString("observacao"));
+                    imp.setDiaVencimento(Utils.stringToInt(rs.getString("diavencimento")));
+                    imp.setTelefone(rs.getString("clientetelefone"));
+                    imp.addTelefone("FONE COMERC.", rs.getString("clientetelcomercial"));
+                    imp.setEmail(rs.getString("clienteemail"));
+                    imp.addEmail(rs.getString("clienteemailsecundario"), TipoContato.COMERCIAL);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    
     
 }

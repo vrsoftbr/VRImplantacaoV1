@@ -12,6 +12,7 @@ import vrimplantacao.classe.ConexaoPostgres;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.InovaDAO;
 import vrimplantacao2.parametro.Parametros;
@@ -158,10 +159,30 @@ public class InovaGUI extends VRInternalFrame {
                     
                     if (tab.getSelectedIndex() == 0) {
                         tabProdutos.executarImportacao();
-                        
+                        if (chkCPreferencial.isSelected()) {
+                            importador.importarClientePreferencial(
+                                    OpcaoCliente.NOVOS, 
+                                    OpcaoCliente.CONTATOS
+                            );
+                        }
+                        if (chkCEventual.isSelected()) {
+                            importador.importarClienteEventual(
+                                    OpcaoCliente.NOVOS, 
+                                    OpcaoCliente.CONTATOS
+                            );
+                        }
+                        if (chkCCreditoRotativo.isSelected()) {
+                            importador.importarCreditoRotativo();
+                        }
                     } else if (tab.getSelectedIndex() == 1) {
                         if (cbxUnifProdutos.isSelected()) {  
                             importador.unificarProdutos();
+                        }
+                        if (cbxUnifClientePreferencial.isSelected()) {
+                            importador.unificarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
+                        }
+                        if (cbxUnifClientePreferencial.isSelected()) {
+                            importador.unificarClienteEventual(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
                         }
                     }                    
                     gravarParametros();
@@ -218,8 +239,14 @@ public class InovaGUI extends VRInternalFrame {
         tabImportacao = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
+        vRPanel1 = new vrframework.bean.panel.VRPanel();
+        chkCPreferencial = new vrframework.bean.checkBox.VRCheckBox();
+        chkCEventual = new vrframework.bean.checkBox.VRCheckBox();
+        chkCCreditoRotativo = new vrframework.bean.checkBox.VRCheckBox();
         tabUnificacao = new vrframework.bean.panel.VRPanel();
         cbxUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
+        cbxUnifClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
+        cbxUnifClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
         vRTabbedPane1 = new vrframework.bean.tabbedPane.VRTabbedPane();
         pnlConexao = new vrframework.bean.panel.VRPanel();
         txtUsuarioPostgres = new vrframework.bean.textField.VRTextField();
@@ -359,9 +386,48 @@ public class InovaGUI extends VRInternalFrame {
         tabImportacao.addTab("Balança", tabBalanca);
         tabImportacao.addTab("Produtos", tabProdutos);
 
+        chkCPreferencial.setText("Cliente Preferencial");
+
+        chkCEventual.setText("Cliente Eventual");
+
+        chkCCreditoRotativo.setText("Crédito Rotativo");
+
+        javax.swing.GroupLayout vRPanel1Layout = new javax.swing.GroupLayout(vRPanel1);
+        vRPanel1.setLayout(vRPanel1Layout);
+        vRPanel1Layout.setHorizontalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(vRPanel1Layout.createSequentialGroup()
+                        .addComponent(chkCPreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkCCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(330, Short.MAX_VALUE))
+        );
+        vRPanel1Layout.setVerticalGroup(
+            vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(vRPanel1Layout.createSequentialGroup()
+                        .addComponent(chkCPreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkCCreditoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkCEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(146, Short.MAX_VALUE))
+        );
+
+        tabImportacao.addTab("Clientes", vRPanel1);
+
         tab.addTab("Importação", tabImportacao);
 
         cbxUnifProdutos.setText("Unificar Produtos (Somente EANs válidos)");
+
+        cbxUnifClientePreferencial.setText("Unificar Cliente Preferencial (Somente CPF/CNPJ válidos)");
+
+        cbxUnifClienteEventual.setText("Unificar Cliente Eventual (Somente CPF/CNPJ válidos)");
 
         javax.swing.GroupLayout tabUnificacaoLayout = new javax.swing.GroupLayout(tabUnificacao);
         tabUnificacao.setLayout(tabUnificacaoLayout);
@@ -369,15 +435,22 @@ public class InovaGUI extends VRInternalFrame {
             tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabUnificacaoLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(cbxUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(327, Short.MAX_VALUE))
+                .addGroup(tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cbxUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbxUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbxUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(244, Short.MAX_VALUE))
         );
         tabUnificacaoLayout.setVerticalGroup(
             tabUnificacaoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabUnificacaoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(cbxUnifProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(194, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cbxUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cbxUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(150, Short.MAX_VALUE))
         );
 
         tab.addTab("Unificação", tabUnificacao);
@@ -613,7 +686,12 @@ public class InovaGUI extends VRInternalFrame {
     private javax.swing.JToggleButton btnConectarPostgres;
     private vrframework.bean.button.VRButton btnMigrar;
     private javax.swing.ButtonGroup buttonGroup1;
+    private vrframework.bean.checkBox.VRCheckBox cbxUnifClienteEventual;
+    private vrframework.bean.checkBox.VRCheckBox cbxUnifClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox cbxUnifProdutos;
+    private vrframework.bean.checkBox.VRCheckBox chkCCreditoRotativo;
+    private vrframework.bean.checkBox.VRCheckBox chkCEventual;
+    private vrframework.bean.checkBox.VRCheckBox chkCPreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkForcarIdProdutoQuandoPesavel;
     private vrframework.bean.checkBox.VRCheckBox chkVendas;
     private javax.swing.JComboBox cmbLojaOrigem;
@@ -645,6 +723,7 @@ public class InovaGUI extends VRInternalFrame {
     private vrframework.bean.label.VRLabel vRLabel6;
     private vrframework.bean.label.VRLabel vRLabel7;
     private vrframework.bean.label.VRLabel vRLabel8;
+    private vrframework.bean.panel.VRPanel vRPanel1;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane1;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
