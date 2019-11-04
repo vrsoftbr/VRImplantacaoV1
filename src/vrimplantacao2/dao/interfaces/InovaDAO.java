@@ -17,6 +17,7 @@ import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
@@ -174,6 +175,7 @@ public class InovaDAO extends InterfaceDAO {
 
     @Override
     public List<ClienteIMP> getClientesPreferenciais() throws Exception {
+        
         List<ClienteIMP> result = new ArrayList<>();
         
         try (Statement st = ConexaoPostgres.getConexao().createStatement()) {
@@ -243,8 +245,75 @@ public class InovaDAO extends InterfaceDAO {
         }
         
         return result;
+        
     }
-    
-    
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoPostgres.getConexao().createStatement()) {
+            try (ResultSet rs = st.executeQuery(
+                    "select\n" +
+                    "	c.contasreceberid id,\n" +
+                    "	c.contasreceberdataentrada emissao,\n" +
+                    "	c.contasrecebervencimento vencimento,\n" +
+                    "	c.contasrecebernumdoc cupom,\n" +
+                    "	c.contasrecebervalor valor,\n" +
+                    "	c.contasreceberobs observacao,\n" +
+                    "	c.contasreceberclienteid id_cliente,\n" +
+                    "	c.contasreceberparcela parcela,\n" +
+                    "	c.contasreceberjuros juros,\n" +
+                    "	c.contasrecebermulta multa,\n" +
+                    "	pags.valorpago,\n" +
+                    "	pags.datapago\n" +
+                    "from\n" +
+                    "	contasreceber c\n" +
+                    "	left join (\n" +
+                    "		select \n" +
+                    "			contasreceberformarecreceberid id_contareceber,\n" +
+                    "			sum(contasreceberformarecvalorrecebido) valorpago,\n" +
+                    "			max(contasreceberformarecdatahora) datapago\n" +
+                    "		from\n" +
+                    "			contasreceberformapagto\n" +
+                    "		group by\n" +
+                    "			1\n" +
+                    "	) pags on\n" +
+                    "		c.contasreceberid = pags.id_contareceber\n" +
+                    "order by\n" +
+                    "	1"
+            )) {
+                while (rs.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
+                    imp.setId(rs.getString("id"));
+                    imp.setDataEmissao(rs.getDate("emissao"));
+                    imp.setDataVencimento(rs.getDate("vencimento"));
+                    imp.setNumeroCupom(rs.getString("cupom"));
+                    imp.setValor(rs.getDouble("valor"));
+                    imp.setObservacao(rs.getString("observacao"));
+                    imp.setIdCliente(rs.getString("id_cliente"));
+                    imp.setParcela(rs.getInt("parcela"));
+                    imp.setJuros(rs.getDouble("juros"));
+                    imp.setMulta(rs.getDouble("multa"));
+                    
+                    if (rs.getDouble("valorpago") > 0) {
+                        imp.addPagamento(
+                                rs.getString("id"),                            
+                                rs.getDouble("valorpago"),
+                                0,
+                                0,
+                                rs.getDate("datapago"),
+                                rs.getString("observacao")
+                        );
+                    }
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
     
 }
