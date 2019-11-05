@@ -98,8 +98,8 @@ public class CreditoRotativoAnteriorDAO {
         }
     }
 
-    public MultiMap<String, CreditoRotativoAnteriorVO> getTodoCreditoRotativoAnterior() throws Exception {
-        MultiMap<String, CreditoRotativoAnteriorVO> result = new MultiMap<>();
+    public Map<String, CreditoRotativoAnteriorVO> getTodoCreditoRotativoAnterior() throws Exception {
+        Map<String, CreditoRotativoAnteriorVO> result = new LinkedHashMap<>();
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
@@ -121,10 +121,7 @@ public class CreditoRotativoAnteriorDAO {
                     "	left join recebercreditorotativo r on\n" +
                     "		ant.codigoatual = r.id\n" +
                     "order by\n" +
-                    "	ant.sistema,\n" +
-                    "	ant.loja,\n" +
-                    "	ant.id_cliente,\n" +
-                    "	ant.id"
+                    "	r.dataemissao"
             )) {
                 while (rst.next()) {
                     CreditoRotativoAnteriorVO vo = new CreditoRotativoAnteriorVO();
@@ -146,10 +143,13 @@ public class CreditoRotativoAnteriorDAO {
                     vo.setVencimento(rst.getDate("vencimento"));
                     vo.setValor(rst.getDouble("valor"));
                     result.put(
-                            vo,
-                            vo.getSistema(),
-                            vo.getLoja(),
-                            vo.getId()
+                            String.format(
+                                    "%s-%s-%s",
+                                    vo.getSistema(),
+                                    vo.getLoja(),
+                                    vo.getId()
+                            ),
+                            vo
                     );
                 }
             }

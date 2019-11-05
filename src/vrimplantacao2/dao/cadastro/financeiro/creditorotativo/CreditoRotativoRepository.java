@@ -276,7 +276,7 @@ public class CreditoRotativoRepository {
         pags.clear();
         System.gc();
         
-        MultiMap<String, CreditoRotativoAnteriorVO> rotativosAnteriores = provider.getTodoCreditoRotativoAnterior();
+        Map<String, CreditoRotativoAnteriorVO> rotativosAnteriores = provider.getTodoCreditoRotativoAnterior();
         MultiMap<String, CreditoRotativoItemAnteriorVO> baixasAnteriores = provider.getTodaBaixaAnterior();
         Map<Integer, Double> baixas = provider.getBaixas();
         

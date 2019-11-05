@@ -996,7 +996,7 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    fl410con.codclichap, \n" +
                     "    vw305fin.datamovime as data, \n" +
                     "    vw305fin.vdg_dia as valor,  \n" +
-                    "    vw305fin.datadeposi as vencimento, \n" +
+                    "    vw305fin.datamovime + 35 as vencimento, \n" +
                     "    vw305fin.codi_relacio, \n" +
                     "    SPACE(01) as atrazo,   \n" +
                     "    qtdeCliCon=convert(numeric(10),0), \n" +
@@ -1023,6 +1023,7 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		vw305fin.codi_relacio = fl305obs.codi_relacio and \n" +
                     "		vw305fin.codigoloja = fl305obs.codigoloja\n" +
                     "where \n" +
+                    "	vw305fin.datamovime>='2004-12-01 00:00:00' and\n" +
                     "	vw305fin.vdg_dia > 0 and\n" +
                     "	vw305fin.Codigoloja = " + getLojaOrigem() + " and \n" +
                     "	fl410con.codCliconv = '000001' and\n" +
@@ -1031,9 +1032,10 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		vw305fin.ORIGEM != CASE WHEN vw305fin.DATAMOVIME > '20131231' THEN 'C' ELSE '\\' END OR\n" +
                     "		EXISTS(SELECT CODI_RELACIO FROM FL404CON WHERE CODIGOLOJA=vw305fin .CODIGOLOJA AND CODI_RELACIO=vw305fin .CODI_RELACIO)\n" +
                     "	)")) {
+                
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    imp.setId(rs.getString("id"));
+                    imp.setId(String.format("%s-%.2f", rs.getString("id"), rs.getDouble("valor")));
                     String idCliente;
                     try {
                         idCliente = String.valueOf(Integer.parseInt(rs.getString("idcliente")));
@@ -1065,7 +1067,7 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "select id_cliente, sum(valorvenda) total from (\n" +
                     "SELECT\n" +
                     "	FL404CON.id_cliente,\n" +
-                    "	FL404CON.VALORVENDA\n" +
+                    "	FL404CON.VALORVENDA * (case when FL404CON.operacao = 'J' then -1 else 1 end) VALORVENDA\n" +
                     "FROM\n" +
                     "	fl404con inner\n" +
                     "	join fl400cli on\n" +
@@ -1081,8 +1083,6 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	Left outer join	HRTECH.dbo.fl410con fl410con on\n" +
                     "		fl404con.id_cliente = fl410con.id_cliente\n" +
                     "WHERE\n" +
-                    "	OPERACAO = 'P' AND\n" +
-                    "	NUMEROLOJA = 1 AND\n" +
                     "	CODIGOCONV='000001' AND\n" +
                     "	codigofina in ('003','007') and \n" +
                     "	fl305cup.numcgc_cpf > '000000000000000' and\n" +
