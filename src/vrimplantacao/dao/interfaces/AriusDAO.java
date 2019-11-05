@@ -22,6 +22,7 @@ import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -34,6 +35,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoEmpresa;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.enums.TipoSexo;
+import vrimplantacao2.vo.importacao.AssociadoIMP;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -877,7 +879,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "from\n" +
                     "   tabela_fornecedor tf \n" +
                     "join produtos_fornecedor pf on tf.produto = pf.produto and tf.fornecedor = pf.fornecedor \n" +
-                    "where not pf.referencia is null\n" +
+                    /*"where not pf.referencia is null\n" +*/
                     "order by tf.fornecedor, tf.produto"
             )) {
                 while (rst.next()) {
@@ -2397,4 +2399,31 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
         }
     }
     
+    @Override
+    public List<AssociadoIMP> getAssociados(Set<OpcaoAssociado> opt) throws Exception {
+        List<AssociadoIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "  produto_base as produtopai,\n"
+                    + "  produto as produtofilho,\n"
+                    + "  qtde,\n"
+                    + "  qtdeemb\n"
+                    + "from produtos_composicao \n"
+                    + "order by produto_base"
+            )) {
+                while (rst.next()) {
+                    AssociadoIMP imp = new AssociadoIMP();
+                    
+                    imp.setId(rst.getString("produtopai"));
+                    imp.setQtdEmbalagem(rst.getInt("qtde"));
+                    imp.setProdutoAssociadoId(rst.getString("produtofilho"));
+
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
 }
