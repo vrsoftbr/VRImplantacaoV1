@@ -506,6 +506,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    f.pedminimo,\n"
                     + "    f.datahora_cadastro,\n"
                     + "    f.observacao,\n"
+                    + "    f.observacao_pedido,\n"
                     + "    f.dias_vencto,\n"
                     + "    f.frequencia prazovisita,\n"
                     + "    f.entrega prazoentrega,\n"
@@ -534,7 +535,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSuframa(rst.getString("suframa"));
                     imp.setAtivo(rst.getBoolean("ativo"));
                     imp.setEndereco(rst.getString("endereco"));
-                    imp.setNumero(rst.getString("numero"));
+                    imp.setNumero(rst.getString("numero") != null ? (rst.getString("numero").replace("/", "").replace("-", "")) : "");
                     imp.setComplemento(rst.getString("complemento"));
                     imp.setBairro(rst.getString("bairro"));
                     imp.setMunicipio(rst.getString("cidade"));
@@ -544,8 +545,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setTel_principal(rst.getString("telefone1"));
                     imp.setValor_minimo_pedido(rst.getDouble("pedminimo"));
                     imp.setDatacadastro(rst.getDate("datahora_cadastro"));
-                    imp.setObservacao(rst.getString("observacao") + " Cond. pag: " + rst.getString("condpagto"));
-                    imp.setCondicaoPagamento(Utils.stringToInt(rst.getString("dias_vencto")));
+                    imp.setObservacao(rst.getString("observacao") + " - " + rst.getString("observacao_pedido"));
+                    imp.setCondicaoPagamento(Utils.stringToInt(rst.getString("condpagto")));
                     imp.setPrazoVisita(rst.getInt("prazovisita"));
                     imp.setPrazoEntrega(rst.getInt("prazoentrega"));
                     if ("T".equals(rst.getString("produtor"))) {
@@ -567,8 +568,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.addContato(
                                 "2",
                                 "Telefone 2",
-                                null,
                                 rst.getString("telefone2"),
+                                null,
                                 TipoContato.COMERCIAL,
                                 null
                         );
@@ -578,12 +579,56 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.addContato(
                                 "3",
                                 "Fax",
-                                null,
                                 rst.getString("fax"),
+                                null,
                                 TipoContato.COMERCIAL,
                                 null
                         );
                     }
+                    
+                    try (Statement stm2 = ConexaoOracle.getConexao().createStatement()) {
+                        try (ResultSet rst2 = stm2.executeQuery(
+                                "select \n"
+                                + "  fc.id as id_contato,\n"
+                                + "  fc.descritivo as contato,\n"
+                                + "  fc.depto,\n"
+                                + "  fc.fone as cont_telefone,\n"
+                                + "  fc.email as cont_email,\n"
+                                + "  fc.fone2 as cont_telefone2,\n"
+                                + "  fc.celular as cont_celular\n"
+                                + "from fornecedores_contatos fc\n"
+                                + "where fc.fornecedor = " + imp.getImportId()
+                        )) {
+                            while (rst2.next()) {
+                                
+                                String emailCont = rst2.getString("cont_email");
+                                
+                                if ((emailCont != null) &&
+                                        (!emailCont.trim().isEmpty())) {
+                                                                        
+                                    emailCont =  (emailCont.length() > 50 ? emailCont.substring(0, 50) : emailCont);
+                                }
+                                
+                                imp.addContato(
+                                        rst2.getString("id_contato"), 
+                                        rst2.getString("contato"), 
+                                        rst2.getString("cont_telefone"), 
+                                        rst2.getString("cont_celular"), 
+                                        TipoContato.COMERCIAL, 
+                                        emailCont
+                                );
+                                
+                                if ((rst2.getString("cont_telefone2") != null) &&
+                                        (!rst2.getString("cont_telefone2").trim().isEmpty())) {
+                                    imp.addTelefone(
+                                            rst2.getString("contato"),  
+                                            rst2.getString("cont_telefone2")
+                                    );
+                                }
+                            }
+                        }
+                    }
+                    
 
                     result.add(imp);
                 }

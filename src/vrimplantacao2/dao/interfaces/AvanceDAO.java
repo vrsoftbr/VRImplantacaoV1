@@ -1244,7 +1244,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "SELECT\n" +
-                    "	concat(v.NOTA, v.CAIXA, v.datahora_alteracao, v.ccf) id, \n" +
+                    "	concat(v.NOTA, v.CAIXA, coalesce(v.datahora_alteracao, v.DATA), v.ccf) id, \n" +
                     "	v.NOTA cupom,\n" +
                     "	v.CAIXA,\n" +
                     "	v.`DATA`,\n" +
@@ -1413,7 +1413,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = "SELECT\n" +
                     "	v.id,\n" +
-                    "   CONCAT(v.NOTA, v.CAIXA, v.datahora_alteracao, v.ccf) id_venda,\n" +
+                    "   CONCAT(v.NOTA, v.CAIXA, coalesce(v.datahora_alteracao, v.DATA), v.ccf) id_venda,\n" +
                     "	v.CAIXA,\n" +
                     "	v.NOTA cupom,\n" +
                     "	v.`DATA`,\n" +
@@ -1437,7 +1437,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	v.nao_bx_estoque = 0 and\n" +
                     " 	v.caixa <> '999' and\n" +
                     "   v.valor > 0\n" +
-                    "ORDER  BY\n" +
+                    "ORDER BY\n" +
                     "	v.CAIXA, \n" +
                     "	v.data, \n" +
                     "	v.HORA";
