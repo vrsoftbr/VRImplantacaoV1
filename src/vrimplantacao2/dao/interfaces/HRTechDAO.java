@@ -904,7 +904,7 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	tipocadast = ('CLI')\n" +
                     ")\n" +
                     "select \n" +
-                    "    c.codigoenti id,\n" +
+                    "    c.id_cliente id,\n" +
                     "    cpf.nomeentida razao,\n" +
                     "    cpf.nomapelido fantasia,\n" +
                     "    cpf.codinsc_rg rgie,\n" +
