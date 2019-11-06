@@ -232,7 +232,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	p.cst_pis_sai piscofins_saida,\n"
                     + "	p.cod_nat_receita piscofins_nat_receita,\n"
                     + "	p.cst icms_cst,\n"
-                    + "	p.aliquota\n"
+                    + "	p.aliquota,\n"
+                    + " p.ecotacao sugestaocotacao\n"        
                     + "FROM\n"
                     + "	cadmer p\n"
                     + "	LEFT JOIN codbarra ean ON p.codigo = ean.codigo\n"
@@ -319,6 +320,8 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsDebitoId(rst.getString("aliquota"));
                     imp.setIcmsCreditoId(rst.getString("aliquota"));
                     imp.setPautaFiscalId(imp.getImportId());
+                    
+                    imp.setSugestaoCotacao(rst.getInt("sugestaocotacao") == 1);
 
                     result.add(imp);
                 }
