@@ -50,6 +50,11 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
     private static final Logger LOG = Logger.getLogger(GetWayDAO.class.getName());
     
     private String complemento;
+    private String codigoConvenio = "000001";
+
+    public void setCodigoConvenio(String codigoConvenio) {
+        this.codigoConvenio = codigoConvenio == null || codigoConvenio.trim().equals("") ? "000001" : codigoConvenio;
+    }
 
     public void setComplemento(String complemento) {
         this.complemento = complemento;
@@ -1026,7 +1031,7 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	vw305fin.datamovime>='2004-12-01 00:00:00' and\n" +
                     "	vw305fin.vdg_dia > 0 and\n" +
                     "	vw305fin.Codigoloja = " + getLojaOrigem() + " and \n" +
-                    "	fl410con.codCliconv = '000001' and\n" +
+                    "	fl410con.codCliconv = '" + codigoConvenio + "' and\n" +
                     "	codigofina in ('003','007') AND \n" +
                     "	(\n" +
                     "		vw305fin.ORIGEM != CASE WHEN vw305fin.DATAMOVIME > '20131231' THEN 'C' ELSE '\\' END OR\n" +
@@ -1035,7 +1040,7 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                 
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    imp.setId(String.format("%s-%.2f", rs.getString("id"), rs.getDouble("valor")));
+                    imp.setId(String.format("%s-%s-%.2f", codigoConvenio, rs.getString("id"), rs.getDouble("valor")));
                     String idCliente;
                     try {
                         idCliente = String.valueOf(Integer.parseInt(rs.getString("idcliente")));
@@ -1083,7 +1088,7 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	Left outer join	HRTECH.dbo.fl410con fl410con on\n" +
                     "		fl404con.id_cliente = fl410con.id_cliente\n" +
                     "WHERE\n" +
-                    "	CODIGOCONV='000001' AND\n" +
+                    "	CODIGOCONV='" + codigoConvenio + "' AND\n" +
                     "	codigofina in ('003','007') and \n" +
                     "	fl305cup.numcgc_cpf > '000000000000000' and\n" +
                     "	fl305cup.numcgc_cpf is not null) a\n" +
