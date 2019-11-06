@@ -1122,27 +1122,30 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ContaPagarIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "	numerolanc id,\n"
-                    + "	case \n"
-                    + " when tipocadast = 'U' \n"
-                    + " then 'U' + codigoenti \n"
-                    + " else \n"
-                    + " codigoenti end idfornecedor,\n"
-                    + "	notafiscal documento,\n"
-                    + "	parcela,\n"
-                    + "	datemissao emissao,\n"
-                    + "	datvencime vencimento,\n"
-                    + "	vlrtotalnf valor,\n"
-                    + "	historico observacao,\n"
-                    + " cast(datpagto as date) pagamento\n"
-                    + "from\n"
-                    + "	FL700FIN\n"
-                    + "where\n"
-                    + "	codigoloja = " + getLojaOrigem() + " and\n"
-                    + "	tipolancam = 'P'\n"
-                    + "order by\n"
-                    + "	datvencime")) {
+                    "select\n" +
+                    "	numerolanc id,\n" +
+                    "	case \n" +
+                    "		when tipocadast = 'U' \n" +
+                    "		then 'U' + codigoenti \n" +
+                    "		else codigoenti\n" +
+                    "	end idfornecedor,\n" +
+                    "	notafiscal documento,\n" +
+                    "	parcela,\n" +
+                    "	datemissao emissao,\n" +
+                    "	datvencime vencimento,\n" +
+                    "	vlrtotalnf valor,\n" +
+                    "	historico observacao,\n" +
+                    "	cast(datpagto as date) pagamento\n" +
+                    "from\n" +
+                    "	FL700FIN\n" +
+                    "where\n" +
+                    "	FL700FIN.numerolanc > 0\n" +
+                    "	AND fl700FIN.CODIGOLOJA = " + getLojaOrigem() + "\n" +
+                    "	AND FL700FIN.TIPOLANCAM = 'P'\n" +
+                    "	AND FL700FIN.DATPAGTO <= '19000101'\n" +
+                    "	AND ISNULL(fl700fin.tipo_pagto,'') >= ' '\n" +
+                    "order by\n" +
+                    "	emissao")) {
                 while (rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
                     imp.setId(rs.getString("id"));
@@ -1150,13 +1153,7 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataEmissao(rs.getDate("emissao"));
                     imp.setDataEntrada(rs.getDate("emissao"));
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
-                    imp.setValor(rs.getDouble("valor"));
-                    
-                    if (rs.getDate("pagamento") == null) {
-                        imp.setIdTipoEntradaVR(210);
-                    } else {
-                        imp.setIdTipoEntradaVR(211);
-                    }
+                    imp.setValor(rs.getDouble("valor"));                  
                     imp.setObservacao(rs.getString("observacao"));
                     imp.addVencimento(rs.getDate("vencimento"), imp.getValor());
                     result.add(imp);
