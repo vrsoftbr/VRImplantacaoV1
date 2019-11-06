@@ -994,19 +994,12 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    fl400cli.id_cliente idcliente, \n" +
                     "    vw305fin.codigoloja as numeroloja, \n" +
                     "    flcgccpf.nomeentida as nomecliente, \n" +
-                    "    flcgccpf.numcgc_cpf as cnpj, \n" +
-                    "    fl410con.codcliconv as codigoconv, \n" +
+                    "    flcgccpf.numcgc_cpf as cnpj,\n" +
                     "    vw305fin.numeroecf ecf,\n" +
                     "    vw305fin.numerocoo coo,\n" +
-                    "    fl410con.codclichap, \n" +
                     "    vw305fin.datamovime as data, \n" +
                     "    vw305fin.vdg_dia as valor,  \n" +
-                    "    vw305fin.datamovime + 35 as vencimento, \n" +
-                    "    vw305fin.codi_relacio, \n" +
-                    "    SPACE(01) as atrazo,   \n" +
-                    "    qtdeCliCon=convert(numeric(10),0), \n" +
-                    "    qtdeCliEfe=Convert(Numeric(10),0), \n" +
-                    "    isnull(fl305obs.obsconv,space(80)) as obsconv  \n" +
+                    "    vw305fin.datamovime + 35 as vencimento\n" +
                     "from \n" +
                     "	vw305fin  \n" +
                     "	left outer join flcgccpf on \n" +
@@ -1022,16 +1015,12 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "			when flcgccpf.id_entidade IS null then cl2.id_entidade \n" +
                     "			else flcgccpf.id_entidade \n" +
                     "		end\n" +
-                    "	inner join fl410con on \n" +
-                    "		fl400cli.id_cliente = fl410con.id_cliente\n" +
                     "	left outer join fl305obs on\n" +
                     "		vw305fin.codi_relacio = fl305obs.codi_relacio and \n" +
                     "		vw305fin.codigoloja = fl305obs.codigoloja\n" +
                     "where \n" +
+                    //"	vw305fin.numcgc_cpf='000000883243466' and\n" +
                     "	vw305fin.datamovime>='2004-12-01 00:00:00' and\n" +
-                    "	vw305fin.vdg_dia > 0 and\n" +
-                    "	vw305fin.Codigoloja = " + getLojaOrigem() + " and \n" +
-                    "	fl410con.codCliconv = '" + codigoConvenio + "' and\n" +
                     "	codigofina in ('003','007') AND \n" +
                     "	(\n" +
                     "		vw305fin.ORIGEM != CASE WHEN vw305fin.DATAMOVIME > '20131231' THEN 'C' ELSE '\\' END OR\n" +
@@ -1054,7 +1043,6 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataEmissao(rs.getDate("data"));
                     imp.setDataVencimento(rs.getDate("vencimento"));
                     imp.setValor(rs.getDouble("valor"));
-                    imp.setObservacao(rs.getString("obsconv"));
 
                     result.add(imp);
                 }
@@ -1069,30 +1057,14 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = st.executeQuery(
-                    "select id_cliente, sum(valorvenda) total from (\n" +
                     "SELECT\n" +
                     "	FL404CON.id_cliente,\n" +
-                    "	FL404CON.VALORVENDA * (case when FL404CON.operacao = 'J' then -1 else 1 end) VALORVENDA\n" +
+                    "	sum(FL404CON.VALORVENDA * (case when FL404CON.operacao = 'J' then -1 else 1 end)) total\n" +
                     "FROM\n" +
-                    "	fl404con inner\n" +
-                    "	join fl400cli on\n" +
-                    "		fl404con.id_cliente = fl400cli.id_cliente\n" +
-                    "	inner join flcgccpf on\n" +
-                    "		fl400cli.id_entidade = flcgccpf.id_entidade\n" +
-                    "	inner join HRTECH.dbo.fl305cup fl305cup on\n" +
-                    "		fl404con.codi_relacio = fl305cup.codi_relacio and\n" +
-                    "		replace(STR(LTRIM(RTRIM(flcgccpf.numcgc_cpf)),15),' ','0') = fl305cup.numcgc_cpf\n" +
-                    "	inner join HRTECH.dbo.fl305fin fl305fin on\n" +
-                    "		fl305cup.codi_relacio = fl305fin.codi_relacio and\n" +
-                    "		fl305cup.codigoloja = fl305fin.codigoloja\n" +
-                    "	Left outer join	HRTECH.dbo.fl410con fl410con on\n" +
-                    "		fl404con.id_cliente = fl410con.id_cliente\n" +
-                    "WHERE\n" +
-                    "	CODIGOCONV='" + codigoConvenio + "' AND\n" +
-                    "	codigofina in ('003','007') and \n" +
-                    "	fl305cup.numcgc_cpf > '000000000000000' and\n" +
-                    "	fl305cup.numcgc_cpf is not null) a\n" +
-                    "group by id_cliente"
+                    "	fl404con\n" +
+                    //"where id_cliente = 165\n" +
+                    "group by\n" +
+                    "	id_cliente"
             )) {
                 while (rs.next()) {
                     CreditoRotativoPagamentoAgrupadoIMP imp = new CreditoRotativoPagamentoAgrupadoIMP();
