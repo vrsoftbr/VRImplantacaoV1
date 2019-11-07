@@ -182,6 +182,7 @@ import vrimplantacao2.gui.interfaces.ScefGUI;
 import vrimplantacao2.gui.interfaces.ShiGUI;
 import vrimplantacao2.gui.interfaces.SiaCriareByFileGUI;
 import vrimplantacao2.gui.interfaces.SiaCriareDbfGUI;
+import vrimplantacao2.gui.interfaces.SiaCriareMySqlGUI;
 import vrimplantacao2.gui.interfaces.SiacGUI;
 import vrimplantacao2.gui.interfaces.SifatGUI;
 import vrimplantacao2.gui.interfaces.Sifat_2GUI;
@@ -697,6 +698,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuDLink = new javax.swing.JMenuItem();
         mnuSTI3 = new javax.swing.JMenuItem();
         mnuG3 = new javax.swing.JMenuItem();
+        mnuG4 = new javax.swing.JMenuItem();
         mnuOrion = new javax.swing.JMenu();
         jMenuItemOrion = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -2176,6 +2178,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         jMenu10.add(mnuG3);
+
+        mnuG4.setText("Sia Criare (MySQL)");
+        mnuG4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuG4ActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuG4);
 
         mnuDatabase.add(jMenu10);
 
@@ -4170,6 +4180,10 @@ public final class MenuGUI extends VRMdiFrame {
         AtmaGUI.exibir(this);
     }//GEN-LAST:event_mnuAtmaActionPerformed
 
+    private void mnuG4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuG4ActionPerformed
+        SiaCriareMySqlGUI.exibir(this);
+    }//GEN-LAST:event_mnuG4ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4313,6 +4327,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuFort;
     private javax.swing.JMenuItem mnuForti;
     private javax.swing.JMenuItem mnuG3;
+    private javax.swing.JMenuItem mnuG4;
     private javax.swing.JMenuItem mnuGDoor;
     private javax.swing.JMenuItem mnuGTech;
     private javax.swing.JMenuItem mnuHRTech;
