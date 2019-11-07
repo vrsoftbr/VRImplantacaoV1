@@ -25,9 +25,11 @@ import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import static vrimplantacao2.dao.interfaces.SolidusDAO.DATE_FORMAT;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
+import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
@@ -76,7 +78,17 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
     private Date vendaDataTermino;
     private int tipoVenda = 1;
     private int idEstoque = 1;
+    private Date notasDataInicio = null;
+    private Date notasDataTermino = null;
 
+    public void setNotasDataInicio(Date notasDataInicio) {
+        this.notasDataInicio = notasDataInicio;
+    }
+
+    public void setNotasDataTermino(Date notasDataTermino) {
+        this.notasDataTermino = notasDataTermino;
+    }
+    
     public List<PlanoConta> getPlanosSelecionados() {
         return planosSelecionados;
     }
@@ -1454,7 +1466,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from arius.rec_t_entrada_nota nfe\n"
                     + "	inner join arius.rec_t_entrada_recebimento er\n"
                     + "		on nfe.id_entrada_recebimento = er.id_entrada_recebimento\n"
-                    + "where nfe.data_hora_emissao between '10-05-2018' and '01-11-2019'\n"
+                    + "where nfe.data_hora_emissao between " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
+                    + "and " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
                     + "order by id"
             )) {
                 while (rs.next()) {
@@ -1478,14 +1491,17 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValorDesconto(rs.getDouble("valordesconto"));
                     imp.setChaveNfe(rs.getString("chavenfe"));
                     imp.setXml(rs.getString("xml"));
+                    
+                    getNotasItem(imp);
+                    
+                    result.add(imp);
                 }
             }
         }
         return result;
     }
 
-    private void getNotaItem(NotaFiscalIMP imp) throws Exception {
-        List<NotaFiscalItemIMP> result = new ArrayList<>();
+    private void getNotasItem(NotaFiscalIMP imp) throws Exception {
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
@@ -1516,7 +1532,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from arius.fis_vs_notas_itens i\n"
                     + "	inner join rec_t_entrada_nota c\n"
                     + "		on i.numero_nf = c.numero_nota_fiscal\n"
-                    + "where c.data_hora_emissao between '2018-05-10' and '2019-11-01'\n"
+                    + "where c.data_hora_emissao between " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
+                    + "and " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
                     + "	order by numero_nf"
             )) {
                 while (rs.next()) {
@@ -1524,7 +1541,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     item.setId(rs.getString("id"));
                     item.setNotaFiscal(imp);
-                    item.setNumeroItem(idEstoque);
+                    item.setNumeroItem(rs.getInt("numeroitem"));
                     item.setIdProduto(rs.getString("idproduto"));
                     item.setNcm(rs.getString("ncm"));
                     item.setCest(rs.getString("cest"));

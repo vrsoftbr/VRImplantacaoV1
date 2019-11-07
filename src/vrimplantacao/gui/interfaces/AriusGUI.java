@@ -21,6 +21,7 @@ import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
 import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
+import vrimplantacao2.dao.cadastro.notafiscal.OpcaoNotaFiscal;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
@@ -399,7 +400,13 @@ public class AriusGUI extends VRInternalFrame {
                                 importador.importarReceitaBalanca(opcoes.toArray(new OpcaoReceitaBalanca[]{}));
                             }
                         }
-                                                
+                                
+                        if (chkNotasFiscais.isSelected()) {
+                            ariusDAO.setNotasDataInicio(edtDtNotaIni.getDate());
+                            ariusDAO.setNotasDataTermino(edtDtNotaFim.getDate());
+                            importador.importarNotas(OpcaoNotaFiscal.IMP_REIMPORTAR_ITENS_DE_NOTAS_IMPORTADAS);
+                        }
+                        
                     } else if (tab.getSelectedIndex() == 1) {
                         if (chkFornecedor.isSelected()) {
                             ariusDAO.setImportarDeTransportadoras(chkIncluirTransportadores.isSelected());
@@ -646,6 +653,11 @@ public class AriusGUI extends VRInternalFrame {
         chkConvEmpresa = new vrframework.bean.checkBox.VRCheckBox();
         chkConvConveniado = new vrframework.bean.checkBox.VRCheckBox();
         chkConvRecebimento = new vrframework.bean.checkBox.VRCheckBox();
+        vRPanel5 = new vrframework.bean.panel.VRPanel();
+        vRPanel7 = new vrframework.bean.panel.VRPanel();
+        chkNotasFiscais = new vrframework.bean.checkBox.VRCheckBox();
+        edtDtNotaIni = new org.jdesktop.swingx.JXDatePicker();
+        edtDtNotaFim = new org.jdesktop.swingx.JXDatePicker();
         vRTabbedPane1 = new vrframework.bean.tabbedPane.VRTabbedPane();
         pnlConexao = new vrframework.bean.panel.VRPanel();
         txtUsuarioOracle = new vrframework.bean.textField.VRTextField();
@@ -1382,6 +1394,54 @@ public class AriusGUI extends VRInternalFrame {
 
         tab.addTab("Convenio", tabConv);
 
+        vRPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Importar Notas Fiscais"));
+
+        chkNotasFiscais.setEnabled(true);
+        chkNotasFiscais.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkNotasFiscaisActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout vRPanel7Layout = new javax.swing.GroupLayout(vRPanel7);
+        vRPanel7.setLayout(vRPanel7Layout);
+        vRPanel7Layout.setHorizontalGroup(
+            vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel7Layout.createSequentialGroup()
+                .addComponent(chkNotasFiscais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(edtDtNotaIni, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(edtDtNotaFim, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(361, Short.MAX_VALUE))
+        );
+        vRPanel7Layout.setVerticalGroup(
+            vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                .addComponent(chkNotasFiscais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(edtDtNotaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(edtDtNotaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        javax.swing.GroupLayout vRPanel5Layout = new javax.swing.GroupLayout(vRPanel5);
+        vRPanel5.setLayout(vRPanel5Layout);
+        vRPanel5Layout.setHorizontalGroup(
+            vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        vRPanel5Layout.setVerticalGroup(
+            vRPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(vRPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(280, Short.MAX_VALUE))
+        );
+
+        tab.addTab("Outros", vRPanel5);
+
         pnlConexao.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Origem - ORACLE"));
         pnlConexao.setPreferredSize(new java.awt.Dimension(350, 350));
 
@@ -1674,6 +1734,12 @@ public class AriusGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkFornecedorDivisaoActionPerformed
 
+    private void chkNotasFiscaisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkNotasFiscaisActionPerformed
+        if (edtDtNotaIni.getDate() == null) {
+            edtDtNotaIni.setDate(new Date());
+        }
+    }//GEN-LAST:event_chkNotasFiscaisActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectarOracle;
     private vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton btnMapaTrib;
@@ -1713,6 +1779,7 @@ public class AriusGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
+    private vrframework.bean.checkBox.VRCheckBox chkNotasFiscais;
     private vrframework.bean.checkBox.VRCheckBox chkNumero;
     private vrframework.bean.checkBox.VRCheckBox chkNutricional;
     private vrframework.bean.checkBox.VRCheckBox chkNutricionalProduto;
@@ -1750,6 +1817,8 @@ public class AriusGUI extends VRInternalFrame {
     private vrframework.bean.comboBox.VRComboBox cmbLojaCliente;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
     private vrframework.bean.comboBox.VRComboBox cmbTipoVenda;
+    private org.jdesktop.swingx.JXDatePicker edtDtNotaFim;
+    private org.jdesktop.swingx.JXDatePicker edtDtNotaIni;
     private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel pnlBalanca;
     private vrframework.bean.panel.VRPanel pnlConexao;
     private vrframework.bean.tabbedPane.VRTabbedPane tab;
@@ -1784,6 +1853,8 @@ public class AriusGUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel vRPanel2;
     private vrframework.bean.panel.VRPanel vRPanel3;
     private vrframework.bean.panel.VRPanel vRPanel4;
+    private vrframework.bean.panel.VRPanel vRPanel5;
+    private vrframework.bean.panel.VRPanel vRPanel7;
     private vrframework.bean.tabbedPane.VRTabbedPane vRTabbedPane1;
     private vrframework.bean.toolBarPadrao.VRToolBarPadrao vRToolBarPadrao3;
     // End of variables declaration//GEN-END:variables
