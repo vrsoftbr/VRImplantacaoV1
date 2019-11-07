@@ -49,6 +49,9 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
+import vrimplantacao2.vo.importacao.NotaFiscalIMP;
+import vrimplantacao2.vo.importacao.NotaFiscalItemIMP;
+import vrimplantacao2.vo.importacao.NotaOperacao;
 import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -1423,6 +1426,131 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<NotaFiscalIMP> getNotasFiscais() throws Exception {
+        List<NotaFiscalIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select     \n"
+                    + "	nfe.id_entrada_recebimento as id,\n"
+                    + "	ind_oper as notaoperacao,\n"
+                    + "	er.id_participante as iddestinatario,\n"
+                    + "	nfe.modelo,\n"
+                    + "	nfe.serie,\n"
+                    + "	nfe.numero_nota_fiscal as numeronota,\n"
+                    + "	nfe.data_hora_emissao as dataemissao,\n"
+                    + "	nfe.valor_total_ipi as valoripi,\n"
+                    + "	nfe.valor_frete as valorfrete,\n"
+                    + "	nfe.valor_outras_despesas as valoroutrasdespesas,\n"
+                    + "	nfe.valor_total_produtos as valorproduto,\n"
+                    + "	nfe.valor_total_nota as valortotal,\n"
+                    // + " nfe.base_calculo_icms as valorbasecalculo,\n"
+                    + "	nfe.valor_icms as valoricms,\n"
+                    //+ " nfe.base_calculo_icms_substituicao as valorbasesubstituicao,\n"
+                    + "	nfe.valor_icms_substituicao as valoricmssubstituicao,\n"
+                    + "	nfe.valor_seguro as valorseguro,\n"
+                    + "	nfe.valor_desconto as valordesconto,\n"
+                    + "	nfe.chv_nfe as chavenfe,\n"
+                    + "	xml\n"
+                    + "from arius.rec_t_entrada_nota nfe\n"
+                    + "	inner join arius.rec_t_entrada_recebimento er\n"
+                    + "		on nfe.id_entrada_recebimento = er.id_entrada_recebimento\n"
+                    + "where nfe.data_hora_emissao between '10-05-2018' and '01-11-2019'\n"
+                    + "order by id"
+            )) {
+                while (rs.next()) {
+
+                    NotaFiscalIMP imp = new NotaFiscalIMP();
+                    imp.setId(rs.getString("id"));
+                    imp.setOperacao(rs.getInt("notaoperacao") == 0 ? NotaOperacao.ENTRADA : NotaOperacao.SAIDA);
+                    imp.setIdDestinatario(rs.getString("iddestinatario"));
+                    imp.setModelo(rs.getString("modelo"));
+                    imp.setSerie(rs.getString("serie"));
+                    imp.setNumeroNota(rs.getInt("numeronota"));
+                    imp.setDataEmissao(rs.getDate("dataemissao"));
+                    imp.setValorIpi(rs.getDouble("valoripi"));
+                    imp.setValorFrete(rs.getDouble("valorfrete"));
+                    imp.setValorOutrasDespesas(rs.getDouble("valoroutrasdespesas"));
+                    imp.setValorProduto(rs.getDouble("valorproduto"));
+                    imp.setValorTotal(rs.getDouble("valortotal"));
+                    imp.setValorIcms(rs.getDouble("valoricms"));
+                    imp.setValorIcmsSubstituicao(rs.getDouble("valoricmssubstituicao"));
+                    imp.setValorSeguro(rs.getDouble("valorseguro"));
+                    imp.setValorDesconto(rs.getDouble("valordesconto"));
+                    imp.setChaveNfe(rs.getString("chavenfe"));
+                    imp.setXml(rs.getString("xml"));
+                }
+            }
+        }
+        return result;
+    }
+
+    private void getNotaItem(NotaFiscalIMP imp) throws Exception {
+        List<NotaFiscalItemIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rs = stm.executeQuery(
+                    "select\n"
+                    + "	id_c170 as id,\n"
+                    + "	numero_nf as notafiscal,\n"
+                    + "	num_item as numeroitem,\n"
+                    + "	cod_item as idproduto,\n"
+                    + "	ncm,\n"
+                    + "	cest_a as cest,\n"
+                    + "	cfop,\n"
+                    + "	descr_compl as descricao,\n"
+                    + "	unid as unidade,\n"
+                    + "	ean,\n"
+                    + "	embalagem_a as quantidadeembalagem,\n"
+                    + "	qtd as quantidade,\n"
+                    + "	vl_item as valortotalproduto,\n"
+                    + "	cst_icms as icmscst,\n"
+                    + "	aliq_icms as icmsaliquota,\n"
+                    + "	valor_reducao_base_a as icmsreduzido,\n"
+                    + "	vl_bc_icms as icmsbasecalculo,\n"
+                    + "	vl_icms as icmsvalor,\n"
+                    + "	vl_bc_icms_st as icmsbasecalculost,\n"
+                    + "	vl_icms_st as icmsvalorst,\n"
+                    + "	vl_bc_ipi as ipivalorbase,\n"
+                    + "	vl_ipi as ipivalor,\n"
+                    + "	cst_pis as piscofinscst,\n"
+                    + "	cod_nat as tiponaturezareceita\n"
+                    + "from arius.fis_vs_notas_itens i\n"
+                    + "	inner join rec_t_entrada_nota c\n"
+                    + "		on i.numero_nf = c.numero_nota_fiscal\n"
+                    + "where c.data_hora_emissao between '2018-05-10' and '2019-11-01'\n"
+                    + "	order by numero_nf"
+            )) {
+                while (rs.next()) {
+                    NotaFiscalItemIMP item = imp.addItem();
+                    
+                    item.setId(rs.getString("id"));
+                    item.setNotaFiscal(imp);
+                    item.setNumeroItem(idEstoque);
+                    item.setIdProduto(rs.getString("idproduto"));
+                    item.setNcm(rs.getString("ncm"));
+                    item.setCest(rs.getString("cest"));
+                    item.setCfop(rs.getString("cfop"));
+                    item.setDescricao(rs.getString("descricao"));
+                    item.setUnidade(rs.getString("unidade"));
+                    item.setEan(rs.getString("ean"));
+                    item.setQuantidadeEmbalagem(rs.getInt("quantidadeembalagem"));
+                    item.setQuantidade(rs.getDouble("quantidade"));
+                    item.setValorTotalProduto(rs.getDouble("valortotalproduto"));
+                    item.setIcmsCst(rs.getInt("icmscst"));
+                    item.setIcmsAliquota(rs.getDouble("icmsaliquota"));
+                    item.setIcmsValor(rs.getDouble("icmsvalor"));
+                    item.setIcmsBaseCalculoST(rs.getDouble("icmsbasecalculost"));
+                    item.setIcmsValorST(rs.getDouble("icmsvalorst"));
+                    item.setIpiValorBase(rs.getDouble("ipivalorbase"));
+                    item.setIpiValor(rs.getDouble("ipivalor"));
+                    item.setPisCofinsCst(rs.getInt("piscofinscst"));
+                    item.setTipoNaturezaReceita(rs.getInt("tiponaturezareceita"));
+                }
+            }
+        }
+    }
+
+    
+    @Override
     public List<ConveniadoIMP> getConveniado() throws Exception {
         List<ConveniadoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoOracle.createStatement()) {
@@ -2540,7 +2668,6 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<DivisaoIMP> getDivisoes() throws Exception {
         List<DivisaoIMP> result = new ArrayList<>();
-
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"

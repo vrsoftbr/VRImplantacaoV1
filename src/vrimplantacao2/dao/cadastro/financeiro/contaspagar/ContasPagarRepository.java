@@ -89,6 +89,11 @@ public class ContasPagarRepository {
                     fornecedor = new FornecedorVO();
                     fornecedor.setId(fornecedorLoja);
                 }
+                
+                if (fornecedor == null) {                    
+                    provider.notificar();
+                    continue;
+                }
 
                 //Se for uma conta nova
                 if (anterior == null || anterior.getCodigoAtual() == null) {

@@ -79,7 +79,7 @@ public class CreditoRotativoProvider {
         return this.rotativoAnteriorDAO.getAnteriores(getSistema(), getLoja());
     }
     
-    public MultiMap<String, CreditoRotativoAnteriorVO> getTodoCreditoRotativoAnterior() throws Exception {
+    public Map<String, CreditoRotativoAnteriorVO> getTodoCreditoRotativoAnterior() throws Exception {
         return this.rotativoAnteriorDAO.getTodoCreditoRotativoAnterior();
     }
 

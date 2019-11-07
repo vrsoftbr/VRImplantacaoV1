@@ -50,6 +50,11 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
     private static final Logger LOG = Logger.getLogger(GetWayDAO.class.getName());
     
     private String complemento;
+    private String codigoConvenio = "000001";
+
+    public void setCodigoConvenio(String codigoConvenio) {
+        this.codigoConvenio = codigoConvenio == null || codigoConvenio.trim().equals("") ? "000001" : codigoConvenio;
+    }
 
     public void setComplemento(String complemento) {
         this.complemento = complemento;
@@ -899,7 +904,7 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	tipocadast = ('CLI')\n" +
                     ")\n" +
                     "select \n" +
-                    "    c.codigoenti id,\n" +
+                    "    c.id_cliente id,\n" +
                     "    cpf.nomeentida razao,\n" +
                     "    cpf.nomapelido fantasia,\n" +
                     "    cpf.codinsc_rg rgie,\n" +
@@ -989,19 +994,12 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    fl400cli.id_cliente idcliente, \n" +
                     "    vw305fin.codigoloja as numeroloja, \n" +
                     "    flcgccpf.nomeentida as nomecliente, \n" +
-                    "    flcgccpf.numcgc_cpf as cnpj, \n" +
-                    "    fl410con.codcliconv as codigoconv, \n" +
+                    "    flcgccpf.numcgc_cpf as cnpj,\n" +
                     "    vw305fin.numeroecf ecf,\n" +
                     "    vw305fin.numerocoo coo,\n" +
-                    "    fl410con.codclichap, \n" +
                     "    vw305fin.datamovime as data, \n" +
                     "    vw305fin.vdg_dia as valor,  \n" +
-                    "    vw305fin.datadeposi as vencimento, \n" +
-                    "    vw305fin.codi_relacio, \n" +
-                    "    SPACE(01) as atrazo,   \n" +
-                    "    qtdeCliCon=convert(numeric(10),0), \n" +
-                    "    qtdeCliEfe=Convert(Numeric(10),0), \n" +
-                    "    isnull(fl305obs.obsconv,space(80)) as obsconv  \n" +
+                    "    vw305fin.datamovime + 35 as vencimento\n" +
                     "from \n" +
                     "	vw305fin  \n" +
                     "	left outer join flcgccpf on \n" +
@@ -1017,23 +1015,21 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     "			when flcgccpf.id_entidade IS null then cl2.id_entidade \n" +
                     "			else flcgccpf.id_entidade \n" +
                     "		end\n" +
-                    "	inner join fl410con on \n" +
-                    "		fl400cli.id_cliente = fl410con.id_cliente\n" +
                     "	left outer join fl305obs on\n" +
                     "		vw305fin.codi_relacio = fl305obs.codi_relacio and \n" +
                     "		vw305fin.codigoloja = fl305obs.codigoloja\n" +
                     "where \n" +
-                    "	vw305fin.vdg_dia > 0 and\n" +
-                    "	vw305fin.Codigoloja = " + getLojaOrigem() + " and \n" +
-                    "	fl410con.codCliconv = '000001' and\n" +
+                    //"	vw305fin.numcgc_cpf='000000883243466' and\n" +
+                    "	vw305fin.datamovime>='2004-12-01 00:00:00' and\n" +
                     "	codigofina in ('003','007') AND \n" +
                     "	(\n" +
                     "		vw305fin.ORIGEM != CASE WHEN vw305fin.DATAMOVIME > '20131231' THEN 'C' ELSE '\\' END OR\n" +
                     "		EXISTS(SELECT CODI_RELACIO FROM FL404CON WHERE CODIGOLOJA=vw305fin .CODIGOLOJA AND CODI_RELACIO=vw305fin .CODI_RELACIO)\n" +
                     "	)")) {
+                
                 while (rs.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
-                    imp.setId(rs.getString("id"));
+                    imp.setId(String.format("%s-%s-%.2f", codigoConvenio, rs.getString("id"), rs.getDouble("valor")));
                     String idCliente;
                     try {
                         idCliente = String.valueOf(Integer.parseInt(rs.getString("idcliente")));
@@ -1047,7 +1043,6 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataEmissao(rs.getDate("data"));
                     imp.setDataVencimento(rs.getDate("vencimento"));
                     imp.setValor(rs.getDouble("valor"));
-                    imp.setObservacao(rs.getString("obsconv"));
 
                     result.add(imp);
                 }
@@ -1062,32 +1057,14 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
         
         try (Statement st = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = st.executeQuery(
-                    "select id_cliente, sum(valorvenda) total from (\n" +
                     "SELECT\n" +
                     "	FL404CON.id_cliente,\n" +
-                    "	FL404CON.VALORVENDA\n" +
+                    "	sum(FL404CON.VALORVENDA * (case when FL404CON.operacao = 'J' then -1 else 1 end)) total\n" +
                     "FROM\n" +
-                    "	fl404con inner\n" +
-                    "	join fl400cli on\n" +
-                    "		fl404con.id_cliente = fl400cli.id_cliente\n" +
-                    "	inner join flcgccpf on\n" +
-                    "		fl400cli.id_entidade = flcgccpf.id_entidade\n" +
-                    "	inner join HRTECH.dbo.fl305cup fl305cup on\n" +
-                    "		fl404con.codi_relacio = fl305cup.codi_relacio and\n" +
-                    "		replace(STR(LTRIM(RTRIM(flcgccpf.numcgc_cpf)),15),' ','0') = fl305cup.numcgc_cpf\n" +
-                    "	inner join HRTECH.dbo.fl305fin fl305fin on\n" +
-                    "		fl305cup.codi_relacio = fl305fin.codi_relacio and\n" +
-                    "		fl305cup.codigoloja = fl305fin.codigoloja\n" +
-                    "	Left outer join	HRTECH.dbo.fl410con fl410con on\n" +
-                    "		fl404con.id_cliente = fl410con.id_cliente\n" +
-                    "WHERE\n" +
-                    "	OPERACAO = 'P' AND\n" +
-                    "	NUMEROLOJA = 1 AND\n" +
-                    "	CODIGOCONV='000001' AND\n" +
-                    "	codigofina in ('003','007') and \n" +
-                    "	fl305cup.numcgc_cpf > '000000000000000' and\n" +
-                    "	fl305cup.numcgc_cpf is not null) a\n" +
-                    "group by id_cliente"
+                    "	fl404con\n" +
+                    //"where id_cliente = 165\n" +
+                    "group by\n" +
+                    "	id_cliente"
             )) {
                 while (rs.next()) {
                     CreditoRotativoPagamentoAgrupadoIMP imp = new CreditoRotativoPagamentoAgrupadoIMP();
@@ -1117,27 +1094,30 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
         List<ContaPagarIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rs = stm.executeQuery(
-                    "select\n"
-                    + "	numerolanc id,\n"
-                    + "	case \n"
-                    + " when tipocadast = 'U' \n"
-                    + " then 'U' + codigoenti \n"
-                    + " else \n"
-                    + " codigoenti end idfornecedor,\n"
-                    + "	notafiscal documento,\n"
-                    + "	parcela,\n"
-                    + "	datemissao emissao,\n"
-                    + "	datvencime vencimento,\n"
-                    + "	vlrtotalnf valor,\n"
-                    + "	historico observacao,\n"
-                    + " cast(datpagto as date) pagamento\n"
-                    + "from\n"
-                    + "	FL700FIN\n"
-                    + "where\n"
-                    + "	codigoloja = " + getLojaOrigem() + " and\n"
-                    + "	tipolancam = 'P'\n"
-                    + "order by\n"
-                    + "	datvencime")) {
+                    "select\n" +
+                    "	numerolanc id,\n" +
+                    "	case \n" +
+                    "		when tipocadast = 'U' \n" +
+                    "		then 'U' + codigoenti \n" +
+                    "		else codigoenti\n" +
+                    "	end idfornecedor,\n" +
+                    "	notafiscal documento,\n" +
+                    "	parcela,\n" +
+                    "	datemissao emissao,\n" +
+                    "	datvencime vencimento,\n" +
+                    "	vlrtotalnf valor,\n" +
+                    "	historico observacao,\n" +
+                    "	cast(datpagto as date) pagamento\n" +
+                    "from\n" +
+                    "	FL700FIN\n" +
+                    "where\n" +
+                    "	FL700FIN.numerolanc > 0\n" +
+                    "	AND fl700FIN.CODIGOLOJA = " + getLojaOrigem() + "\n" +
+                    "	AND FL700FIN.TIPOLANCAM = 'P'\n" +
+                    "	AND FL700FIN.DATPAGTO <= '19000101'\n" +
+                    "	AND ISNULL(fl700fin.tipo_pagto,'') >= ' '\n" +
+                    "order by\n" +
+                    "	emissao")) {
                 while (rs.next()) {
                     ContaPagarIMP imp = new ContaPagarIMP();
                     imp.setId(rs.getString("id"));
@@ -1145,13 +1125,7 @@ public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setDataEmissao(rs.getDate("emissao"));
                     imp.setDataEntrada(rs.getDate("emissao"));
                     imp.setIdFornecedor(rs.getString("idfornecedor"));
-                    imp.setValor(rs.getDouble("valor"));
-                    
-                    if (rs.getDate("pagamento") == null) {
-                        imp.setIdTipoEntradaVR(210);
-                    } else {
-                        imp.setIdTipoEntradaVR(211);
-                    }
+                    imp.setValor(rs.getDouble("valor"));                  
                     imp.setObservacao(rs.getString("observacao"));
                     imp.addVencimento(rs.getDate("vencimento"), imp.getValor());
                     result.add(imp);
