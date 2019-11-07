@@ -57,6 +57,7 @@ public class FornecedorIMP {
     private int prazoPedido = 0;
     private int prazoVisita = 0;
     private int prazoSeguranca = 0;
+    private String idDivisao;
     
     private Set<Integer> condicoesPagamentos = new LinkedHashSet<>();
     
@@ -85,6 +86,20 @@ public class FornecedorIMP {
                     ret.setImportLoja(FornecedorIMP.this.getImportLoja());
                     ret.setImportFornecedorId(FornecedorIMP.this.getImportId());
 
+                    return ret;
+                }
+            }
+    );
+    
+    private final MultiMap<String, FornecedorDivisaoIMP> divisoes = new MultiMap<>(
+            new Factory<FornecedorDivisaoIMP>() {
+                @Override
+                public FornecedorDivisaoIMP make() {
+                    FornecedorDivisaoIMP ret = new FornecedorDivisaoIMP();
+                    ret.setImportSistema(FornecedorIMP.this.getImportSistema());
+                    ret.setImportLoja(FornecedorIMP.this.getImportLoja());
+                    ret.setImportFornecedorId(FornecedorIMP.this.getImportId());
+                    
                     return ret;
                 }
             }
@@ -398,6 +413,10 @@ public class FornecedorIMP {
     public MultiMap<String, FornecedorPagamentoIMP> getPagamentos() {
         return pagamentos;
     }
+    
+    public MultiMap<String, FornecedorDivisaoIMP> getDivisoes() {
+        return divisoes;
+    }
 
     public void setCondicaoPagamento(int condicaoPagamento) {
         addCondicaoPagamento(condicaoPagamento);
@@ -459,14 +478,33 @@ public class FornecedorIMP {
             cont.setTelefone(telefone);
             cont.setCelular(celular);
             cont.setTipoContato(tipo);
-            cont.setEmail(email);
-            
-            return cont;
-            
+            cont.setEmail(email);            
+            return cont;            
         } else {
             return null;
-        }
+        }        
+    }
+    
+    /**
+     * Inclui as divisões dos fornecedor
+     * 
+     * @param id
+     * @param prazoVisita
+     * @param prazoEntrega
+     * @param prazoSeguranca
+     * @return Divisão cadastrada ou null quando o nome for vazio.
+    */    
+    public FornecedorDivisaoIMP addDivisao(String id, int prazoVisita, int prazoEntrega, int prazoSeguranca) {
         
+        FornecedorDivisaoIMP div = divisoes.make(id);
+        div.setImportSistema(getImportSistema());
+        div.setImportLoja(getImportLoja());
+        div.setImportFornecedorId(getImportId());
+        div.setImportId(id);
+        div.setPrazoEntrega(prazoEntrega);
+        div.setPrazoSeguranca(prazoSeguranca);
+        div.setPrazoVisita(prazoVisita);
+        return div;
     }
     
     /**
@@ -635,6 +673,20 @@ public class FornecedorIMP {
 
     public boolean isPermiteNfSemPedido() {
         return permiteNfSemPedido;
+    }
+
+    /**
+     * @return the idDivisao
+     */
+    public String getIdDivisao() {
+        return idDivisao;
+    }
+
+    /**
+     * @param idDivisao the idDivisao to set
+     */
+    public void setIdDivisao(String idDivisao) {
+        this.idDivisao = idDivisao;
     }
     
 }

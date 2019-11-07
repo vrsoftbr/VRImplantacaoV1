@@ -123,6 +123,10 @@ public class FornecedorRepositoryProvider {
     public MultiMap<String, Void> getPagamentos() throws Exception {
         return fornecedorPagamenDAO.getPagamentos();
     }
+    
+    public MultiMap<String, Void> getDivisoes() throws Exception {
+        return fornecedorPrazoDAO.getDivisoes(getLojaVR());
+    }
 
     public void gravarFornecedorContato(FornecedorContatoVO contato) throws Exception {
         fornecedorContatoDAO.salvar(contato);
@@ -136,8 +140,8 @@ public class FornecedorRepositoryProvider {
         pagamentoDAO.salvar(pagamento);
     }
 
-    public void gravarPrazoFornecedor(int id, int prazoEntrega, int prazoVisita, int prazoSeguranca) throws Exception {
-        fornecedorPrazoDAO.salvar(getLojaVR(), id, 0, prazoEntrega, prazoVisita, prazoSeguranca);
+    public void gravarPrazoFornecedor(int id, int divisao, int prazoEntrega, int prazoVisita, int prazoSeguranca) throws Exception {
+        fornecedorPrazoDAO.salvar(getLojaVR(), id, divisao, prazoEntrega, prazoVisita, prazoSeguranca);
     }
 
     public void gravarPrazoPedidoFornecedor(int idFornecedor, int prazoPedidoEntrega) throws Exception {
