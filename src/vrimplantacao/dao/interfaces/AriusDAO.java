@@ -1530,7 +1530,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	cst_pis as piscofinscst,\n"
                     + "	cod_nat as tiponaturezareceita\n"
                     + "from arius.fis_vs_notas_itens i\n"
-                    + "	inner join rec_t_entrada_nota c\n"
+                    + "	inner join arius.rec_t_entrada_nota c\n"
                     + "		on i.numero_nf = c.numero_nota_fiscal\n"
                     + "where c.data_hora_emissao between " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
                     + "and " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"

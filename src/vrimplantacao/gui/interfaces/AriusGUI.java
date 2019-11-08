@@ -401,12 +401,6 @@ public class AriusGUI extends VRInternalFrame {
                             }
                         }
                                 
-                        if (chkNotasFiscais.isSelected()) {
-                            ariusDAO.setNotasDataInicio(edtDtNotaIni.getDate());
-                            ariusDAO.setNotasDataTermino(edtDtNotaFim.getDate());
-                            importador.importarNotas(OpcaoNotaFiscal.IMP_REIMPORTAR_ITENS_DE_NOTAS_IMPORTADAS);
-                        }
-                        
                     } else if (tab.getSelectedIndex() == 1) {
                         if (chkFornecedor.isSelected()) {
                             ariusDAO.setImportarDeTransportadoras(chkIncluirTransportadores.isSelected());
@@ -522,7 +516,14 @@ public class AriusGUI extends VRInternalFrame {
                         if(chkConvConveniado.isSelected()) {
                             importador.importarConvenioConveniado();
                         }
-                    }                 
+                    } else if (tab.getSelectedIndex() == 6) {
+                        if (chkNotasFiscais.isSelected()) {
+                            ariusDAO.setNotasDataInicio(edtDtNotaIni.getDate());
+                            ariusDAO.setNotasDataTermino(edtDtNotaFim.getDate());
+                            importador.importarNotas(OpcaoNotaFiscal.IMP_REIMPORTAR_ITENS_DE_NOTAS_IMPORTADAS);
+                        }
+                        
+                    }
                     
                     gravarParametros();
                     
