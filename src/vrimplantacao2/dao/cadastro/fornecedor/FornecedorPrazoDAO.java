@@ -1,7 +1,9 @@
 package vrimplantacao2.dao.cadastro.fornecedor;
 
+import java.sql.ResultSet;
 import java.sql.Statement;
 import vrframework.classe.Conexao;
+import vrimplantacao2.utils.multimap.MultiMap;
 
 /**
  *
@@ -51,6 +53,32 @@ class FornecedorPrazoDAO {
                     "$$;"
             );
         }
+    }
+
+    public MultiMap<String, Void> getDivisoes(int idLojaVR) throws Exception {
+        MultiMap<String, Void> result = new MultiMap<>();
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select distinct\n"
+                    + "	id_fornecedor,\n"
+                    + "	id_divisaofornecedor "
+                    + "from \n"
+                    + "	fornecedorprazo\n"
+                    + "where \n"
+                    + "id_loja = " + idLojaVR
+                    + " order by\n"
+                    + "	id_fornecedor"
+            )) {
+                while (rst.next()) {
+                    result.put(
+                            null, 
+                            rst.getString("id_fornecedor"),
+                            rst.getString("id_divisaofornecedor")
+                    );
+                }
+            }
+        }
+        return result;
     }
     
 }

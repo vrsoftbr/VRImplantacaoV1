@@ -1393,7 +1393,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                                 case "T05":
                                     next.setIcmsAliq(30);
                                     next.setIcmsCst(0);
-                                    next.setIcmsReduzido(0);
+                                    next.setIcmsReduzido(0) ;
                                     break;
 
                                 default:

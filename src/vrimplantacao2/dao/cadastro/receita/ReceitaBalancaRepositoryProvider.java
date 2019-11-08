@@ -68,11 +68,11 @@ public class ReceitaBalancaRepositoryProvider {
     }
 
     public IDStack getIdsVagosFilizola() throws Exception {
-        return receitaBalancaFilizolaDAO.getIdsVagos(99999);
+        return receitaBalancaFilizolaDAO.getIdsVagos(999999);
     }
 
     public IDStack getIdsVagosToledo() throws Exception {
-        return receitaBalancaToledoDAO.getIdsVagos(99999);
+        return receitaBalancaToledoDAO.getIdsVagos(999999);
     }
 
     public void begin() throws Exception {

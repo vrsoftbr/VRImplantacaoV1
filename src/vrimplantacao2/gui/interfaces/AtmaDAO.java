@@ -57,6 +57,7 @@ public class AtmaDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.EAN_EM_BRANCO,
             OpcaoProduto.TIPO_EMBALAGEM_EAN,
             OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.QTD_EMBALAGEM_COTACAO,
             OpcaoProduto.CUSTO,
             OpcaoProduto.MARGEM,
             OpcaoProduto.PRECO,
@@ -277,6 +278,64 @@ public class AtmaDAO extends InterfaceDAO implements MapaTributoProvider {
             }
         }
         return result;
+    }
+
+    @Override
+    public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
+        List<ProdutoIMP> result = new ArrayList<>();
+
+        if (opt == OpcaoProduto.TIPO_EMBALAGEM_PRODUTO) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + " a.ID_PROD as id_produto,\n"
+                        + " b.FATOR as qtd,\n"
+                        + " 'CX' as tipoembalagem\n"
+                        + "from dbo.EQ_PROD_FATORCX a \n"
+                        + "inner join dbo.TB_FATORCX b on b.ID_FATORCX = a.ID_FATORCX\n"
+                        + "where b.FATOR > 1\n"
+                        + "and a.OPERACAO = 'E'"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id_produto"));
+                        imp.setQtdEmbalagemCotacao(rst.getInt("qtd"));
+                        imp.setTipoEmbalagemCotacao(rst.getString("tipoembalagem"));
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;
+        }
+        
+        if (opt == OpcaoProduto.QTD_EMBALAGEM_COTACAO) {
+            try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+                try (ResultSet rst = stm.executeQuery(
+                        "select \n"
+                        + " a.ID_PROD as id_produto,\n"
+                        + " b.FATOR as qtd,\n"
+                        + " 'CX' as tipoembalagem\n"
+                        + "from dbo.EQ_PROD_FATORCX a \n"
+                        + "inner join dbo.TB_FATORCX b on b.ID_FATORCX = a.ID_FATORCX\n"
+                        + "where b.FATOR > 1\n"
+                        + "and a.OPERACAO = 'E'"
+                )) {
+                    while (rst.next()) {
+                        ProdutoIMP imp = new ProdutoIMP();
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportSistema(getSistema());
+                        imp.setImportId(rst.getString("id_produto"));
+                        imp.setQtdEmbalagemCotacao(rst.getInt("qtd"));
+                        imp.setTipoEmbalagemCotacao(rst.getString("tipoembalagem"));
+                        result.add(imp);
+                    }
+                }
+            }
+            return result;            
+        }
+        return null;
     }
 
     @Override

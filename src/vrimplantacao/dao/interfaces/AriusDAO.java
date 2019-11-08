@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrframework.remote.ItemComboVO;
+import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
@@ -24,11 +25,14 @@ import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
+import static vrimplantacao2.dao.interfaces.SolidusDAO.DATE_FORMAT;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
+import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -42,6 +46,7 @@ import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.ConveniadoIMP;
 import vrimplantacao2.vo.importacao.ConvenioEmpresaIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.DivisaoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
@@ -53,6 +58,8 @@ import vrimplantacao2.vo.importacao.NutricionalIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
+import vrimplantacao2.vo.importacao.ReceitaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
@@ -71,7 +78,17 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
     private Date vendaDataTermino;
     private int tipoVenda = 1;
     private int idEstoque = 1;
+    private Date notasDataInicio = null;
+    private Date notasDataTermino = null;
 
+    public void setNotasDataInicio(Date notasDataInicio) {
+        this.notasDataInicio = notasDataInicio;
+    }
+
+    public void setNotasDataTermino(Date notasDataTermino) {
+        this.notasDataTermino = notasDataTermino;
+    }
+    
     public List<PlanoConta> getPlanosSelecionados() {
         return planosSelecionados;
     }
@@ -518,9 +535,15 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    f.email,\n"
                     + "    f.condpagto,\n"
                     + "    f.produtor,\n"
-                    + "    f.simples_nacional\n"
+                    + "    f.simples_nacional,\n"
+                    + "    fl.id as iddivisao,\n"
+                    + "    fl.descritivo as descdivisao,\n"
+                    + "    fl.condpagto as condpgtodivisao,\n"
+                    + "    fl.dias_vencto as diasvencdivisao,\n"
+                    + "    fl.prazo_entrega as prazoentregadivisao\n"
                     + "from\n"
                     + "    fornecedores f\n"
+                    + "left join fornecedores_linhas fl on fl.fornecedor = f.id    \n"
                     + "order by\n"
                     + "    f.id"
             )) {
@@ -554,6 +577,9 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCondicaoPagamento(Utils.stringToInt(rst.getString("condpagto")));
                     imp.setPrazoVisita(rst.getInt("prazovisita"));
                     imp.setPrazoEntrega(rst.getInt("prazoentrega"));
+                    //imp.setIdDivisao(rst.getString("iddivisao") + "-" + rst.getString("id"));
+
+                    
                     if ("T".equals(rst.getString("produtor"))) {
                         if (Utils.stringToLong(imp.getCnpj_cpf()) <= 99999999999L) {
                             imp.setTipoEmpresa(TipoEmpresa.PRODUTOR_RURAL_FISICA);
@@ -633,7 +659,34 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                             }
                         }
                     }
-
+                    
+                    try (Statement stm3 = ConexaoOracle.getConexao().createStatement()) {
+                        try (ResultSet rst3 = stm3.executeQuery(
+                                "select "
+                                + " f.id,\n"
+                                + " f.frequencia prazovisita,\n"
+                                + " f.entrega prazoentrega,\n"
+                                + " fl.id as iddivisao,\n"
+                                + " fl.descritivo as descdivisao,\n"
+                                + " fl.condpagto as condpgtodivisao,\n"
+                                + " fl.dias_vencto as diasvencdivisao,\n"
+                                + " fl.prazo_entrega as prazoentregadivisao\n"
+                                + "from\n"
+                                + "    fornecedores f\n"
+                                + "left join fornecedores_linhas fl on fl.fornecedor = f.id\n "
+                                + "where f.id = " + imp.getImportId()
+                        )) {
+                            while (rst3.next()) {
+                                imp.addDivisao(
+                                        rst3.getString("iddivisao") + "-" + rst.getString("id"),
+                                        rst3.getInt("prazovisita"),
+                                        rst3.getInt("prazoentrega"),
+                                        0
+                                );                                
+                            }
+                        }
+                    }
+                    
                     result.add(imp);
                 }
             }
@@ -1413,7 +1466,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from arius.rec_t_entrada_nota nfe\n"
                     + "	inner join arius.rec_t_entrada_recebimento er\n"
                     + "		on nfe.id_entrada_recebimento = er.id_entrada_recebimento\n"
-                    + "where nfe.data_hora_emissao between '10-05-2018' and '01-11-2019'\n"
+                    + "where nfe.data_hora_emissao between " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
+                    + "and " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
                     + "order by id"
             )) {
                 while (rs.next()) {
@@ -1437,14 +1491,17 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValorDesconto(rs.getDouble("valordesconto"));
                     imp.setChaveNfe(rs.getString("chavenfe"));
                     imp.setXml(rs.getString("xml"));
+                    
+                    getNotasItem(imp);
+                    
+                    result.add(imp);
                 }
             }
         }
         return result;
     }
 
-    private void getNotaItem(NotaFiscalIMP imp) throws Exception {
-        List<NotaFiscalItemIMP> result = new ArrayList<>();
+    private void getNotasItem(NotaFiscalIMP imp) throws Exception {
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
@@ -1473,9 +1530,10 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	cst_pis as piscofinscst,\n"
                     + "	cod_nat as tiponaturezareceita\n"
                     + "from arius.fis_vs_notas_itens i\n"
-                    + "	inner join rec_t_entrada_nota c\n"
+                    + "	inner join arius.rec_t_entrada_nota c\n"
                     + "		on i.numero_nf = c.numero_nota_fiscal\n"
-                    + "where c.data_hora_emissao between '2018-05-10' and '2019-11-01'\n"
+                    + "where c.data_hora_emissao between " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
+                    + "and " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
                     + "	order by numero_nf"
             )) {
                 while (rs.next()) {
@@ -1483,7 +1541,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     
                     item.setId(rs.getString("id"));
                     item.setNotaFiscal(imp);
-                    item.setNumeroItem(idEstoque);
+                    item.setNumeroItem(rs.getInt("numeroitem"));
                     item.setIdProduto(rs.getString("idproduto"));
                     item.setNcm(rs.getString("ncm"));
                     item.setCest(rs.getString("cest"));
@@ -2529,24 +2587,119 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select \n"
-                    + "  produto_base as produtopai,\n"
-                    + "  produto as produtofilho,\n"
-                    + "  qtde,\n"
-                    + "  qtdeemb\n"
-                    + "from produtos_composicao \n"
-                    + "order by produto_base"
+                    + " pc.produto_base as produto_pai,\n"
+                    + " c.rendimento as qtdproduto_pai,\n"
+                    + " pc.produto as produto_filho,\n"
+                    + " pc.qtde,\n"
+                    + " pc.qtdeemb\n"
+                    + "from produtos_composicao pc\n"
+                    + "inner join composicao c on c.produto_base = pc.produto_base\n"
+                    + "where pc.produto_base in (select id from produtos where composto = 3)\n"
+                    + "order by pc.produto_base"
             )) {
                 while (rst.next()) {
                     AssociadoIMP imp = new AssociadoIMP();
-
-                    imp.setId(rst.getString("produtopai"));
-                    imp.setQtdEmbalagem(rst.getInt("qtde"));
-                    imp.setProdutoAssociadoId(rst.getString("produtofilho"));
-
+                    imp.setId(rst.getString("produto_pai"));
+                    imp.setQtdEmbalagem(rst.getInt("qtdproduto_pai"));
+                    imp.setProdutoAssociadoId(rst.getString("produto_filho"));
+                    imp.setQtdEmbalagemItem(rst.getInt("qtdeemb"));
                     result.add(imp);
                 }
             }
         }
+        return result;
+    }
+
+    @Override
+    public List<ReceitaBalancaIMP> getReceitaBalanca(Set<OpcaoReceitaBalanca> opt) throws Exception {
+        List<ReceitaBalancaIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + " p.id, \n"
+                    + " p.descritivo,\n"
+                    + " p.receita\n"
+                    + "from produtos p\n"
+                    + "where p.composto = 2\n"
+                    + "order by p.id"
+            )) {
+                while (rst.next()) {
+                    ReceitaBalancaIMP imp = new ReceitaBalancaIMP();
+                    imp.setId(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descritivo"));
+                    imp.setReceita(rst.getString("receita"));
+                    imp.getProdutos().add(rst.getString("id"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<ReceitaIMP> getReceitas() throws Exception {
+        List<ReceitaIMP> result = new ArrayList<>();
+        
+        try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "p.id, \n"
+                    + "p.descritivo,\n"
+                    + "p.receita,\n"
+                    + "c.rendimento,\n"
+                    + "pc.produto,\n"
+                    + "pc.qtde,\n"
+                    + "pc.qtdeemb\n"
+                    + "from produtos p\n"
+                    + "inner join composicao c on c.produto_base = p.id\n"
+                    + "inner join produtos_composicao pc on pc.produto_base = p.id\n"
+                    + "where p.composto = 2\n"
+                    + "order by p.id"
+            )) {
+                while (rst.next()) {
+                    ReceitaIMP imp = new ReceitaIMP();
+                    
+                    double qtdEmbUtilizado = 0;
+                    qtdEmbUtilizado = rst.getDouble("qtde");
+                    
+                    imp.setImportsistema(getSistema());                    
+                    imp.setImportloja(getLojaOrigem());
+                    imp.setImportid(rst.getString("id"));
+                    imp.setIdproduto(rst.getString("id"));
+                    imp.setDescricao(rst.getString("descritivo"));
+                    imp.setRendimento(rst.getDouble("rendimento"));
+                    imp.setQtdembalagemreceita((int) qtdEmbUtilizado);
+                    imp.setQtdembalagemproduto(rst.getInt("qtdeemb"));
+                    imp.setFator(1);
+                    imp.getProdutos().add(rst.getString("produto"));
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    @Override
+    public List<DivisaoIMP> getDivisoes() throws Exception {
+        List<DivisaoIMP> result = new ArrayList<>();
+        try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "  ID, FORNECEDOR, DESCRITIVO \n"
+                    + "from fornecedores_linhas order by  fornecedor "
+            )) {
+                while (rst.next()) {
+                    DivisaoIMP imp = new DivisaoIMP();
+                    imp.setId(rst.getString("ID") + "-" + rst.getString("FORNECEDOR"));
+                    imp.setDescricao(rst.getString("DESCRITIVO"));
+                    result.add(imp);
+                }
+            }
+        }
+
         return result;
     }
 }
