@@ -73,6 +73,11 @@ public enum OpcaoProduto {
         public String toString() {
             return "Icms Saída Fora Estado";
         }
+    }, ICMS_SAIDA_NF {
+        @Override
+        public String toString() {
+            return "Icms Saída NF";
+        }
     }, ICMS_CONSUMIDOR {
         @Override
         public String toString() {

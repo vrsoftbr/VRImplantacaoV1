@@ -12,13 +12,17 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
+import vrframework.bean.table.VRTable;
 import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao.dao.cadastro.BancoDAO;
@@ -29,7 +33,6 @@ import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
-import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -51,9 +54,51 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
     public String i_arquivo;
     public String v_pahtFileXls;
 
+    private String complemento = "";
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento == null ? "" : complemento.trim();
+    }
+    
     @Override
     public String getSistema() {
-        return "SiaCriareDbf";
+        if ("".equals(complemento)) {
+            return "SiaCriareMySQL";
+        } else {
+            return "SiaCriareMySQL - " + complemento;
+        }
+    }
+
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet<>(Arrays.asList(
+                OpcaoProduto.MERCADOLOGICO,
+                OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+                OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
+                OpcaoProduto.MERCADOLOGICO_PRODUTO,
+                OpcaoProduto.FAMILIA,
+                OpcaoProduto.FAMILIA_PRODUTO,
+                OpcaoProduto.PRODUTOS,
+                OpcaoProduto.EAN,
+                OpcaoProduto.EAN_EM_BRANCO,
+                OpcaoProduto.DESC_COMPLETA,
+                OpcaoProduto.DESC_GONDOLA,
+                OpcaoProduto.DESC_REDUZIDA,
+                OpcaoProduto.PRECO,
+                OpcaoProduto.CUSTO,
+                OpcaoProduto.MARGEM,
+                OpcaoProduto.PESO_BRUTO,
+                OpcaoProduto.PESO_LIQUIDO,
+                OpcaoProduto.PESAVEL,
+                OpcaoProduto.TIPO_EMBALAGEM_EAN,
+                OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+                OpcaoProduto.VALIDADE,
+                OpcaoProduto.ATIVO,
+                OpcaoProduto.DATA_CADASTRO,
+                OpcaoProduto.ESTOQUE,
+                OpcaoProduto.NCM,
+                OpcaoProduto.CEST
+        ));
     }
 
     @Override
@@ -169,84 +214,81 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
 
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select "
-                    + "p.CODITEM, "
-                    + "p.GRUPO, "
-                    + "p.DESCRICAO, "
-                    + "p.ABREVIA, "
-                    + "p.CUSTO, "
-                    + "p.UNITARIO, "
-                    + "p.BALANCA, "
-                    + "p.ALIQUOTASA as ICMS, "
-                    + "p.UNIDADE, "
-                    + "p.FAMILIA, "
-                    + "p.CODBARRA, "
-                    + "p.NCM, "
-                    + "p.CATEGORIA, "
-                    + "p.ATIVO, "
-                    + "p.PESO_LIQUI, "
-                    + "p.PESO_BRUTO, "
-                    + "(p.QTDEMBALAG / 1000) as QTDEMB, "
-                    + "p.PIS, "
-                    + "p.COFINS, "
-                    + "p.MARKDOWN, "
-                    + "p.CEST, "
-                    + "p.ID_SIMILAR "
-                    + "from produtos p"
+                    "select \n" +
+                    "	p.CODITEM, \n" +
+                    "	p.GRUPO, \n" +
+                    "	p.DESCRICAO, \n" +
+                    "	p.ABREVIA, \n" +
+                    "	p.CUSTO, \n" +
+                    "	p.UNITARIO, \n" +
+                    "	p.BALANCA, \n" +
+                    "	p.ALIQUOTASAIDA as ICMS, \n" +
+                    "	p.UNIDADE, \n" +
+                    "	p.FAMILIA, \n" +
+                    "	p.CODBARRA, \n" +
+                    "	p.NCM, \n" +
+                    "	p.CATEGORIA, \n" +
+                    "	p.ATIVO, \n" +
+                    "	p.PESO_LIQUIDO, \n" +
+                    "	p.PESO_BRUTO, \n" +
+                    "	(p.QTDEMBALAGEM / 1000) as QTDEMB, \n" +
+                    "	p.PIS, \n" +
+                    "	p.COFINS, \n" +
+                    "	p.MARKDOWN, \n" +
+                    "	p.CEST, \n" +
+                    "	p.ID_SIMILARIDADE \n" +
+                    "from\n" +
+                    "	produto p\n" +
+                    "WHERE\n" +
+                    "	p.CODITEM"
             )) {
                 int cont = 0;
                 Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
                 while (rst.next()) {
-                    if (rst.getString("CODITEM") != null) {
-
-                        ProdutoIMP imp = new ProdutoIMP();
-                        ProdutoBalancaVO produtoBalanca;
-                        imp.setImportId(rst.getString("CODITEM"));
-
-                        long codigoProduto;
-                        codigoProduto = Long.parseLong(imp.getImportId());
-                        if (codigoProduto <= Integer.MAX_VALUE) {
-                            produtoBalanca = produtosBalanca.get((int) codigoProduto);
-                        } else {
-                            produtoBalanca = null;
-                        }
-
-                        if (produtoBalanca != null) {
-                            imp.seteBalanca(true);
-                            imp.setValidade(produtoBalanca.getValidade() > 1 ? produtoBalanca.getValidade() : 0);
-                        } else {
-                            imp.setValidade(0);
-                            imp.seteBalanca(false);
-                        }
-
-                        imp.setImportLoja(getLojaOrigem());
-                        imp.setImportSistema(getSistema());
+                    ProdutoIMP imp = new ProdutoIMP();
+                    
+                    imp.setImportId(rst.getString("CODITEM"));
+                    
+                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("CODBARRA")));
+                    if (bal != null) {
+                        imp.setEan(bal.getCodigo() + "");
+                        imp.setQtdEmbalagem(1);
+                        imp.setValidade(bal.getValidade());
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
+                    } else {
                         imp.setEan(rst.getString("CODBARRA"));
-                        imp.setDescricaoCompleta(rst.getString("DESCRICAO"));
-                        imp.setDescricaoReduzida(rst.getString("ABREVIA"));
-                        imp.setDescricaoGondola(imp.getDescricaoCompleta());
-                        imp.setTipoEmbalagem(rst.getString("UNIDADE"));
                         imp.setQtdEmbalagem(rst.getInt("QTDEMB"));
-                        imp.setIdFamiliaProduto(rst.getString("ID_SIMILAR"));
-                        imp.setCodMercadologico1(rst.getString("GRUPO"));
-                        imp.setCodMercadologico2("1");
-                        imp.setCodMercadologico3("1");
-                        imp.setMargem(rst.getDouble("MARKDOWN"));
-                        imp.setPrecovenda(rst.getDouble("UNITARIO") / 1000);
-                        imp.setCustoComImposto(rst.getDouble("CUSTO") / 1000);
-                        imp.setCustoSemImposto(imp.getCustoComImposto());
-                        imp.setNcm(rst.getString("NCM"));
-                        imp.setCest(rst.getString("CEST"));
-                        imp.setPiscofinsCstDebito(rst.getString("PIS"));
-                        imp.setPiscofinsCstCredito(rst.getString("COFINS"));
-                        imp.setIcmsDebitoId(rst.getString("ICMS"));
-                        imp.setIcmsCreditoId(rst.getString("ICMS"));
-                        result.add(imp);
-
-                        cont++;
-
-                        ProgressBar.setStatus(String.valueOf(cont));
+                        imp.setValidade(0);
+                        imp.seteBalanca(rst.getInt("BALANCA") == 1);
+                        imp.setTipoEmbalagem(rst.getString("UNIDADE"));
                     }
+
+                    imp.setImportLoja(getLojaOrigem());
+                    imp.setImportSistema(getSistema());
+                    imp.setEan(rst.getString("CODBARRA"));
+                    imp.setDescricaoCompleta(rst.getString("DESCRICAO"));
+                    imp.setDescricaoReduzida(rst.getString("ABREVIA"));
+                    imp.setDescricaoGondola(imp.getDescricaoCompleta());
+                    imp.setIdFamiliaProduto(rst.getString("ID_SIMILAR"));
+                    imp.setCodMercadologico1(rst.getString("GRUPO"));
+                    imp.setCodMercadologico2("1");
+                    imp.setCodMercadologico3("1");
+                    imp.setMargem(rst.getDouble("MARKDOWN"));
+                    imp.setPrecovenda(rst.getDouble("UNITARIO") / 1000);
+                    imp.setCustoComImposto(rst.getDouble("CUSTO") / 1000);
+                    imp.setCustoSemImposto(imp.getCustoComImposto());
+                    imp.setNcm(rst.getString("NCM"));
+                    imp.setCest(rst.getString("CEST"));
+                    imp.setPiscofinsCstDebito(rst.getString("PIS"));
+                    imp.setPiscofinsCstCredito(rst.getString("COFINS"));
+                    imp.setIcmsDebitoId(rst.getString("ICMS"));
+                    imp.setIcmsCreditoId(rst.getString("ICMS"));
+                    result.add(imp);
+
+                    cont++;
+
+                    ProgressBar.setStatus(String.valueOf(cont));
                 }
             }
         }
@@ -392,31 +434,6 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
     }
 
     @Override
-    public List<ProdutoIMP> getEANs() throws Exception {
-        List<ProdutoIMP> result = new ArrayList<>();
-        ConexaoDBF.abrirConexao(i_arquivo);
-
-        try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select "
-                    + "CODEAN, "
-                    + "CODPROD "
-                    + "from codigos_ean"
-            )) {
-                while (rst.next()) {
-                    ProdutoIMP imp = new ProdutoIMP();
-                    imp.setImportLoja(getLojaOrigem());
-                    imp.setImportSistema(getSistema());
-                    imp.setImportId(rst.getString("CODPROD"));
-                    imp.setEan(rst.getString("CODEAN"));
-                    result.add(imp);
-                }
-            }
-        }
-        return result;
-    }
-
-    @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
         List<FornecedorIMP> result = new ArrayList<>();
         ConexaoDBF.abrirConexao(i_arquivo);
@@ -526,34 +543,38 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
 
         try (Statement stm = ConexaoDBF.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select "
-                    + "CODIGOCLI, "
-                    + "NOMECLI, "
-                    + "BAIRROCLI, "
-                    + "CIDADECLI, "
-                    + "ESTADOCLI, "
-                    + "CEPCLI, "
-                    + "FONECLI, "
-                    + "FAXCLI, "
-                    + "CPFCGC, "
-                    + "IDENINSC, "
-                    + "EMAIL, "
-                    + "ENDERCLI, "
-                    + "BANCO, "
-                    + "CONTA, "
-                    + "AGENCIA, "
-                    + "ATIVO, "
-                    + "RAZAO, "
-                    + "ID_CIDADE, "
-                    + "NUMERO,"
-                    + "NOMEPAI, "
-                    + "NOMEMAE,"
-                    + "OBSERVACAO, "
-                    + "CARGO, "
-                    + "RENDA_TITU, "
-                    + "LIMITE_CRE "
-                    + "from clientes "
-                    + "where TIPO = 'C'"
+                    "select \n" +
+                    "	CODIGOCLI, \n" +
+                    "	NOMECLI, \n" +
+                    "	BAIRROCLI, \n" +
+                    "	CIDADECLI, \n" +
+                    "	ESTADOCLI, \n" +
+                    "	CEPCLI, \n" +
+                    "	FONECLI, \n" +
+                    "	FAXCLI, \n" +
+                    "	CPFCGC, \n" +
+                    "	IDENINSC, \n" +
+                    "	EMAIL, \n" +
+                    "	ENDERCLI, \n" +
+                    "	BANCO, \n" +
+                    "	CONTA, \n" +
+                    "	AGENCIA, \n" +
+                    "	ATIVO, \n" +
+                    "	RAZAO, \n" +
+                    "	ID_CIDADE, \n" +
+                    "	NUMERO,\n" +
+                    "	NOMEPAI, \n" +
+                    "	NOMEMAE,\n" +
+                    "	OBSERVACAO, \n" +
+                    "	CARGO, \n" +
+                    "	RENDA_TITULAR, \n" +
+                    "	LIMITE_CREDITO \n" +
+                    "from\n" +
+                    "	clientes \n" +
+                    "where\n" +
+                    "	TIPO = 'C'\n" +
+                    "order by\n" +
+                    "	codigocli"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -576,8 +597,8 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setNomePai(rst.getString("NOMEPAI"));
                     imp.setNomeMae(rst.getString("NOMEMAE"));
                     imp.setCargo(rst.getString("CARGO"));
-                    imp.setSalario(rst.getDouble("RENDA_TITU"));
-                    imp.setValorLimite(rst.getDouble("LIMITE_CRE"));
+                    imp.setSalario(rst.getDouble("RENDA_TITULAR"));
+                    imp.setValorLimite(rst.getDouble("LIMITE_CREDITO"));
                     imp.setPermiteCheque(true);
                     imp.setPermiteCreditoRotativo(true);
                     result.add(imp);

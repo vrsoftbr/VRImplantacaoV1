@@ -930,7 +930,6 @@ public class ProdutoRepository {
                 icmsAliqSaidaForaEstadoNF = imp.getIcmsAliqSaidaForaEstadoNF();
                 icmsReducaoSaidaForaEstadoNF = imp.getIcmsReducaoSaidaForaEstadoNF();
             }
-
             
             aliqDebito = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, icmsReducaoSaida);
             debitoForaEstado = provider.tributo().getIcms(icmsCstSaidaForaEstado, icmsAliqSaidaForaEstado, icmsReducaoSaidaForaEstado);
