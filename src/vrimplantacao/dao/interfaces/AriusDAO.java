@@ -18,7 +18,10 @@ import vrframework.classe.ProgressBar;
 import vrframework.remote.ItemComboVO;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.classe.ConexaoOracle;
+import vrimplantacao.classe.ConexaoSqlServer;
+import vrimplantacao.dao.cadastro.FornecedorDAO;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.devolucao.receber.ReceberDevolucaoDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.FornecedorAnteriorDAO;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoProdutoFornecedor;
 import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
@@ -30,6 +33,7 @@ import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.utils.sql.SQLUtils;
+import vrimplantacao2.vo.cadastro.financeiro.ReceberDevolucaoVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
@@ -305,6 +309,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "    a.qtde_embalageme qtdembalagem_compra,\n"
                 + "    a.unidade_compra,\n"
                 + "    a.ipv,\n"
+                + "    a.UNIDADE_VENDA,\n"
                 + "    case when not bal.id is null then 'S' else 'N' end balanca,\n"
                 + "    a.descritivo descricaocompleta,\n"
                 + "    a.descritivo_pdv descricaoreduzida,\n"
@@ -326,7 +331,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "    loja.custo custocomimposto, \n"
                 + "    loja.custo_liquido custosemimposto,\n"
                 + "    preco.venda precovenda,\n"
-                + "    case a.status when 0 then 'S' else 'N' end as ativo,\n"
+                //+ "    case a.status when 0 then 'S' else 'N' end as ativo,\n"
+                + "    a.status,\n"
                 + "    a.classificacao_fiscal ncm,\n"
                 + "    case when a.cest > 0 then a.cest else null end as cest,\n"
                 + "    case a.monofasico\n"
@@ -398,26 +404,48 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     //}
                     imp.setQtdEmbalagem(rst.getInt("qtdembalagem"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdembalagem_compra"));
+                    
+                    
+                    String tipoembalagem =  rst.getString("UNIDADE_VENDA");
+                    
+                    
+                    if (tipoembalagem.contains("KG")) {
 
-                    switch (rst.getInt("ipv")) {
-                        case 0: {
+                        if (rst.getInt("ipv") == 1) {
+
+                            imp.setTipoEmbalagem("UN");
+                            imp.setTipoEmbalagemCotacao("UN");
+                        } else {
+                            
                             imp.setTipoEmbalagem("KG");
-                            imp.seteBalanca(true);
+                            imp.setTipoEmbalagemCotacao("KG");
                         }
-                        ;
-                        break;
-                        case 2: {
-                            imp.setTipoEmbalagem("UN");
-                            imp.seteBalanca(true);
+
+                    } else {
+
+                        switch (rst.getInt("ipv")) {
+                            case 0: {
+                                imp.setTipoEmbalagem("KG");
+                                imp.setTipoEmbalagemCotacao("KG");
+                                imp.seteBalanca(true);
+                            }
+                            ;
+                            break;
+                            case 2: {
+                                imp.setTipoEmbalagem("UN");
+                                imp.setTipoEmbalagemCotacao("UN");
+                                imp.seteBalanca(true);
+                            }
+                            ;
+                            break;
+                            default: {
+                                imp.setTipoEmbalagem("UN");
+                                imp.setTipoEmbalagemCotacao("UN");
+                                imp.seteBalanca(false);
+                            }
+                            ;
+                            break;
                         }
-                        ;
-                        break;
-                        default: {
-                            imp.setTipoEmbalagem("UN");
-                            imp.seteBalanca(false);
-                        }
-                        ;
-                        break;
                     }
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
@@ -438,11 +466,16 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));
-                    if ("N".equals(rst.getString("ativo"))) {
+                    
+                    /*if ("N".equals(rst.getString("ativo"))) {
                         imp.setSituacaoCadastro(SituacaoCadastro.EXCLUIDO);
                     } else {
                         imp.setSituacaoCadastro(SituacaoCadastro.ATIVO);
-                    }
+                    }*/
+                    
+                    imp.setDescontinuado((rst.getInt("status") == 1));
+                    imp.setSituacaoCadastro(rst.getInt("status") == 3 ? SituacaoCadastro.EXCLUIDO : SituacaoCadastro.ATIVO);
+                    imp.setVendaPdv((rst.getInt("status") != 2));
                     imp.setNcm(rst.getString("ncm"));
                     imp.setCest(rst.getString("cest"));
                     imp.setPiscofinsCstDebito(rst.getInt("piscofins_cst_debito"));
@@ -1480,6 +1513,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSerie(rs.getString("serie"));
                     imp.setNumeroNota(rs.getInt("numeronota"));
                     imp.setDataEmissao(rs.getDate("dataemissao"));
+                    imp.setDataEntradaSaida(rs.getDate("dataemissao"));
                     imp.setValorIpi(rs.getDouble("valoripi"));
                     imp.setValorFrete(rs.getDouble("valorfrete"));
                     imp.setValorOutrasDespesas(rs.getDouble("valoroutrasdespesas"));
@@ -1491,6 +1525,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValorDesconto(rs.getDouble("valordesconto"));
                     imp.setChaveNfe(rs.getString("chavenfe"));
                     imp.setXml(rs.getString("xml"));
+                    imp.setDataHoraAlteracao(rs.getDate("dataemissao"));
                     
                     getNotasItem(imp);
                     
@@ -2421,11 +2456,13 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "  n.ferro,\n"
                     + "  n.sodio,\n"
                     + "  n.quantidade porcao,\n"
-                    + "  n.obs mensagemalergico\n"
+                    + "  n.obs mensagemalergico\n,"
+                    + "  p.receita as mensagemalergico2\n"
                     + "from\n"
                     + "  nutricional n\n"
+                    + "left join produtos p on p.id = n.id\n"
                     + "order by\n"
-                    + "  id"
+                    + "  n.id"
             )) {
                 while (rst.next()) {
                     NutricionalIMP imp = new NutricionalIMP();
@@ -2446,7 +2483,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setFerro(rst.getDouble("ferro"));
                     imp.setSodio(rst.getDouble("sodio"));
                     imp.setPorcao(rst.getString("porcao"));
-                    imp.getMensagemAlergico().add(rst.getString("mensagemalergico"));
+                    imp.getMensagemAlergico().add(rst.getString("mensagemalergico2"));
 
                     imp.addProduto(rst.getString("id"));
 
@@ -2702,4 +2739,80 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
 
         return result;
     }
+    
+    public void importarReceberDevolucao(int idLojaVR) throws Exception {
+        List<ReceberDevolucaoVO> vResult;
+        try {
+            ProgressBar.setStatus("Carregando dados ReceberDevolucao...");
+            vResult = getReceberDevolucao();
+            if (!vResult.isEmpty()) {
+                new ReceberDevolucaoDAO().salvar(vResult, idLojaVR);
+            }
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+
+    public List<ReceberDevolucaoVO> getReceberDevolucao() throws Exception {
+        List<ReceberDevolucaoVO> vResult = new ArrayList<>();
+        int idFornecedor;
+        try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "ID_TITULO AS ID,\n"
+                    + "CPF_CNPJ AS CNPJ,\n"
+                    + "NF,\n"
+                    + "NOTA,\n"
+                    + "EMISSAO,\n"
+                    + "VENCIMENTO,\n"
+                    + "VALOR,\n"
+                    + "PARCELA,\n"
+                    + "OBSERVACAO\n"
+                    + "from arius.FIN_VI_TITULOS \n"
+                    + "where plano_conta = 70110\n"
+                    + "and tipo_conta = 1\n"
+                    + "and tipo_participante = 'F'\n"
+                    + "and id_empresa = " + getLojaOrigem() + "\n"
+                    + "and pagamento is null\n"
+                    + "order by EMISSAO"
+            )) {
+                while (rst.next()) {
+                    String obs = "";
+                    if ((rst.getString("CNPJ") != null)
+                            && (!rst.getString("CNPJ").trim().isEmpty())) {
+
+                        idFornecedor = new FornecedorDAO().getIdByCnpj(Long.parseLong(Utils.formataNumero(rst.getString("CNPJ"))));
+                        if (idFornecedor != -1) {
+                            ReceberDevolucaoVO imp = new ReceberDevolucaoVO();
+                            imp.setIdFornecedor(idFornecedor);
+                            if ((rst.getString("NOTA") != null)
+                                    && (!rst.getString("NOTA").trim().isEmpty())) {
+                                if (rst.getString("NOTA").trim().length() > 9) {
+                                    obs = "NOTA " + rst.getString("NOTA");
+                                } else {
+                                    imp.setNumeroNota(Integer.parseInt(Utils.formataNumero(rst.getString("NOTA"))));
+                                }
+                            } else {
+                                imp.setNumeroNota(0);
+                            }
+                            
+                            if ((rst.getString("NF") != null) &&
+                                    (!rst.getString("NF").trim().isEmpty())) {                                
+                                obs = obs + " NF " + rst.getString("NF");
+                            }
+                            
+                            imp.setDataemissao(rst.getDate("EMISSAO"));
+                            imp.setDatavencimento(rst.getDate("VENCIMENTO"));
+                            imp.setValor(rst.getDouble("VALOR"));
+                            imp.setNumeroParcela(rst.getInt("PARCELA"));
+                            imp.setObservacao("IMPORTADO VR " + (rst.getString("OBSERVACAO") + obs));
+                            vResult.add(imp);
+                        }
+                    }
+                }
+            }
+        }
+        return vResult;
+    }
+    
 }
