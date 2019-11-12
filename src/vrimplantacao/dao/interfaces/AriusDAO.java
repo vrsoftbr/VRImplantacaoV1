@@ -296,88 +296,86 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         String sql
-                = "SELECT\n"
-                + "    a.id,\n"
-                + "    a.nutricional,\n"
-                + "    coalesce(ean.ean, cast(a.id as varchar(13))) codigobarras,\n"
-                + "    coalesce(ean.qtdee, 1) qtdembalagem,\n"
-                + "    a.unidade_venda unidade,\n"
-                + "    a.qtde_embalageme qtdembalagem_compra,\n"
-                + "    a.unidade_compra,\n"
-                + "    a.ipv,\n"
-                + "    case when not bal.id is null then 'S' else 'N' end balanca,\n"
-                + "    a.descritivo descricaocompleta,\n"
-                + "    a.descritivo_pdv descricaoreduzida,\n"
-                + "    a.descritivo descricaogondola, \n"
-                + "    a.depto cod_mercadologico1,\n"
-                + "    nullif(a.secao,0) cod_mercadologico2,\n"
-                + "    nullif(a.grupo,0) cod_mercadologico3,\n"
-                + "    nullif(a.subgrupo,0) cod_mercadologico4,\n"
-                + "    a.familia id_familiaproduto,\n"
-                + "    fam.descritivo familiaproduto,\n"
-                + "    a.pesob pesobruto,\n"
-                + "    a.pesol pesoliquido,\n"
-                + "    a.datahora_cadastro datacadastro,\n"
-                + "    a.validade,\n"
-                + "    loja.margem_lucro margem, \n"
-                + "    0 as estoquemaximo,\n"
-                + "    estoq.estoque_minimo estoqueminimo,\n"
-                + "    estoq.estoque_atual estoque,\n"
-                + "    loja.custo custocomimposto, \n"
-                + "    loja.custo_liquido custosemimposto,\n"
-                + "    preco.venda precovenda,\n"
-                + "    case a.status when 0 then 'S' else 'N' end as ativo,\n"
-                + "    a.classificacao_fiscal ncm,\n"
-                + "    case when a.cest > 0 then a.cest else null end as cest,\n"
-                + "    case a.monofasico\n"
-                + "        when 'T' then 1\n"
-                + "        when 'I' then 7\n"
-                + "        when 'N' then 8\n"
-                + "        when 'S' then 9\n"
-                + "        when 'M' then 4\n"
-                + "        when 'B' then 5\n"
-                + "        when 'O' then 6\n"
-                + "    else 9 end as piscofins_cst_debito,\n"
-                + "    case a.monofasico\n"
-                + "        when 'T' then 50\n"
-                + "        when 'I' then 71\n"
-                + "        when 'N' then 74\n"
-                + "        when 'S' then 72\n"
-                + "        when 'M' then 70\n"
-                + "        when 'B' then 75\n"
-                + "        when 'O' then 73\n"
-                + "    else 21 end as piscofins_cst_credito,\n"
-                + "    0 as piscofins_natureza_receita,\n"
-                + "    case pe.tributacao_venda\n"
-                + "        when 'T' then 0\n"
-                + "        when 'R' then 20\n"
-                + "        when 'D' then 51\n"
-                + "        when 'S' then 50\n"
-                + "        when 'F' then 60\n"
-                + "        when 'I' then 40\n"
-                + "        when 'N' then 41\n"
-                + "    else 90 end as icms_cst,\n"
-                + "    pe.icms_venda icms_aliquota,\n"
-                + "    pe.reducao_venda icms_reduzido,\n"
-                + "    pe.iva,\n"
-                + "    pe.estado,\n"
-                + "    pe.tipo_iva,\n"
-                + "    pe.st_venda,\n"
-                + "    01 as p_iva\n"
-                + "FROM\n"
-                + "    produtos a\n"
-                + "    join empresas emp on emp.id = " + getLojaOrigem() + "\n"
-                + "    join produtos_estado pe on a.id = pe.id and pe.estado = emp.estado\n"
-                + "    join politicas_empresa poli on poli.empresa = emp.id\n"
-                + "    join produtos_precos preco on a.id = preco.produto and poli.politica = preco.politica and preco.id = " + tipoVenda + "\n"
-                + "    join produtos_loja loja on a.id = loja.id and poli.politica = loja.politica\n"
-                + "    join estoques e on e.empresa = emp.id and e.troca != 'T'\n"
-                + "    join produtos_estoques estoq on estoq.produto = a.id and estoq.estoque = e.id and e.id = " + idEstoque + "\n"
-                + "    left join produtos_ean ean on ean.produto = a.id\n"
-                + "    left join (select distinct id from vw_produtos_balancas order by id) bal on bal.id = a.id\n"
-                + "    left join familias fam on a.familia = fam.id\n"
-                + "order by\n"
-                + "    a.id";
+                = "SELECT\n" +
+                    "   a.id,\n" +
+                    "	a.nutricional,\n" +
+                    "	coalesce(ean.ean, cast(a.id as varchar(13))) codigobarras,\n" +
+                    "	coalesce(ean.qtdee, 1) qtdembalagem,\n" +
+                    "	a.unidade_venda unidade,\n" +
+                    "	a.qtde_embalageme qtdembalagem_compra,\n" +
+                    "	a.unidade_compra,\n" +
+                    "	a.ipv,\n" +
+                    "	case when not bal.id is null then 'S' else 'N' end balanca,\n" +
+                    "	a.descritivo descricaocompleta,\n" +
+                    "	a.descritivo_pdv descricaoreduzida,\n" +
+                    "	a.descritivo descricaogondola, \n" +
+                    "	a.depto cod_mercadologico1,\n" +
+                    "	nullif(a.secao,0) cod_mercadologico2,\n" +
+                    "	nullif(a.grupo,0) cod_mercadologico3,\n" +
+                    "	nullif(a.subgrupo,0) cod_mercadologico4,\n" +
+                    "	a.familia id_familiaproduto,\n" +
+                    "	fam.descritivo familiaproduto,\n" +
+                    "	a.pesob pesobruto,\n" +
+                    "	a.pesol pesoliquido,\n" +
+                    "	a.datahora_cadastro datacadastro,\n" +
+                    "	a.validade,\n" +
+                    "	loja.margem_lucro margem, \n" +
+                    "	0 as estoquemaximo,\n" +
+                    "	estoq.estoque_minimo estoqueminimo,\n" +
+                    "	estoq.estoque_atual estoque,\n" +
+                    "	loja.custo custocomimposto, \n" +
+                    "	loja.custo_liquido custosemimposto,\n" +
+                    "	preco.venda precovenda,\n" +
+                    "	case a.status when 0 then 'S' else 'N' end as ativo,\n" +
+                    "	a.classificacao_fiscal ncm,\n" +
+                    "	case when a.cest > 0 then a.cest else null end as cest,\n" +
+                    "	case a.monofasico\n" +
+                    "		when 'T' then 1\n" +
+                    "		when 'I' then 7\n" +
+                    "		when 'N' then 8\n" +
+                    "		when 'S' then 9\n" +
+                    "		when 'M' then 4\n" +
+                    "		when 'B' then 5\n" +
+                    "		when 'O' then 6\n" +
+                    "	else 9 end as piscofins_cst_debito,\n" +
+                    "	case a.monofasico\n" +
+                    "		when 'T' then 50\n" +
+                    "		when 'I' then 71\n" +
+                    "		when 'N' then 74\n" +
+                    "		when 'S' then 72\n" +
+                    "		when 'M' then 70\n" +
+                    "		when 'B' then 75\n" +
+                    "		when 'O' then 73\n" +
+                    "	else 21 end as piscofins_cst_credito,\n" +
+                    "	0 as piscofins_natureza_receita,\n" +
+                    "	case pe.tributacao_venda\n" +
+                    "		when 'T' then 0\n" +
+                    "		when 'R' then 20\n" +
+                    "		when 'D' then 51\n" +
+                    "		when 'S' then 50\n" +
+                    "		when 'F' then 60\n" +
+                    "		when 'I' then 40\n" +
+                    "		when 'N' then 41\n" +
+                    "	else 90 end as icms_cst,\n" +
+                    "	pe.icms_venda icms_aliquota,\n" +
+                    "	pe.reducao_venda icms_reduzido,\n" +
+                    "	pe.iva,\n" +
+                    "	pe.estado,\n" +
+                    "	pe.tipo_iva,\n" +
+                    "	pe.st_venda,\n" +
+                    "	01 as p_iva\n" +
+                    "	FROM produtos a\n" +
+                    "	join empresas emp on emp.id = " + getLojaOrigem() + "\n" +
+                    "	join produtos_estado pe on a.id = pe.id and pe.estado = emp.estado\n" +
+                    "	join politicas_empresa poli on poli.empresa = emp.id\n" +
+                    "	join produtos_precos preco on a.id = preco.produto and poli.politica = preco.politica and preco.id = 1\n" +
+                    "	join produtos_loja loja on a.id = loja.id and poli.politica = loja.politica\n" +
+                    "	join estoques e on e.empresa = emp.id and e.troca != 'T'\n" +
+                    "	join produtos_estoques estoq on estoq.produto = a.id and estoq.estoque = e.id\n" +
+                    "	left join produtos_ean ean on ean.produto = a.id\n" +
+                    "	left join (select distinct id from vw_produtos_balancas order by id) bal on bal.id = a.id\n" +
+                    "	left join familias fam on a.familia = fam.id\n" +
+                    "	order by a.id";
 
         ProgressBar.setStatus("Executando a query....");
         try (Statement stm = ConexaoOracle.getConexao().createStatement()) {
