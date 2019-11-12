@@ -335,8 +335,8 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setCodMercadologico2(rst.getString("CATEGORIA"));
                     imp.setCodMercadologico3(rst.getString("FAMILIA"));
                     imp.setMargem(rst.getDouble("MARKDOWN"));
-                    imp.setPrecovenda(rst.getDouble("preco") / 1000);
-                    imp.setCustoComImposto(rst.getDouble("CUSTO") / 1000);
+                    imp.setPrecovenda(rst.getDouble("preco"));
+                    imp.setCustoComImposto(rst.getDouble("CUSTO"));
                     imp.setCustoSemImposto(imp.getCustoComImposto());
                     imp.setNcm(rst.getString("NCM"));
                     imp.setCest(rst.getString("CEST"));
