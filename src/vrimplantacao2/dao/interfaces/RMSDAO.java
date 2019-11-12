@@ -81,6 +81,12 @@ public class RMSDAO extends InterfaceDAO {
     private boolean incluirNivel4 = true;
     
     private boolean importarVendasAntigas = false;
+    
+    private boolean somenteAtivos = false;
+
+    public void setSomenteAtivos(boolean somenteAtivos) {
+        this.somenteAtivos = somenteAtivos;
+    }
 
     public void setUtilizarViewMixFiscal(boolean utilizarViewMixFiscal) {
         this.utilizarViewMixFiscal = utilizarViewMixFiscal;
@@ -513,6 +519,7 @@ public class RMSDAO extends InterfaceDAO {
                     "	    atac.ean = ean.EAN_COD_EAN\n" +
                     (utilizarViewMixFiscal ? "left join\n" +
                     "       vw_fis_mxf_produtos vwfis on vwfis.codigo_produto = p.git_cod_item || p.git_digito\n" : "") +
+                    (somenteAtivos ? "where preco.id_situacaocadastral = 1\n" : "") +
                     "order by \n" +
                     "	  p.git_cod_item"
             )) {

@@ -49,6 +49,7 @@ public class RMSGUI_2 extends VRInternalFrame {
         txtStrConexao.setText(params.get(SISTEMA, "STR_CONN"));
         chkUtilizarViewMixFiscal.setSelected(params.getBool(true, SISTEMA, "UTILIZAR_VIEW_FISCAL"));
         chkIncluirNivel4.setSelected(params.getBool(true, SISTEMA, "INCLUIR_NIVEL_4"));
+        chkPSomenteAtivos.setSelected(params.getBool(false, SISTEMA, "SOMENTE_P_ATIVOS"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
         edtVendaDtIni.setDate(params.getDate(SISTEMA, "VENDA_DT_INI"));
@@ -73,6 +74,7 @@ public class RMSGUI_2 extends VRInternalFrame {
         params.put(tabsConn.getSelectedIndex() == 1, SISTEMA, "USAR_STRING_CONN");
         params.put(chkUtilizarViewMixFiscal.isSelected(), SISTEMA, "UTILIZAR_VIEW_FISCAL");
         params.put(chkIncluirNivel4.isSelected(), SISTEMA, "INCLUIR_NIVEL_4");
+        params.put(chkPSomenteAtivos.isSelected(), SISTEMA, "SOMENTE_P_ATIVOS");
         params.put(edtVendaDtIni.getDate(), SISTEMA, "VENDA_DT_INI");
         params.put(edtVendaDtFim.getDate(), SISTEMA, "VENDA_DT_FIM");
         params.put(edtDtNotaIni.getDate(), SISTEMA, "VENDA_DT_INI_NF");
@@ -110,6 +112,8 @@ public class RMSGUI_2 extends VRInternalFrame {
         edtVendaDtIni.setFormats(DATE_FORMAT);
         edtVendaDtFim.setFormats(DATE_FORMAT);
         edtDtNotaIni.setFormats(DATE_FORMAT);
+        
+        tabProdutos.tabParametros.add(pnlCustom);
     }
 
     public void validarDadosAcessoOracle() throws Exception {
@@ -209,6 +213,7 @@ public class RMSGUI_2 extends VRInternalFrame {
                     importador.setLojaVR(idLojaVR);
                     dao.setUtilizarViewMixFiscal(chkUtilizarViewMixFiscal.isSelected());
                     dao.setIncluirNivel4(chkIncluirNivel4.isSelected());
+                    dao.setSomenteAtivos(chkPSomenteAtivos.isSelected());
 
                     if (tabs.getSelectedIndex() == 0) {
                                             
@@ -340,6 +345,8 @@ public class RMSGUI_2 extends VRInternalFrame {
     private void initComponents() {
 
         groupVendasPdv = new javax.swing.ButtonGroup();
+        pnlCustom = new vrframework.bean.panel.VRPanel();
+        chkPSomenteAtivos = new vrframework.bean.checkBox.VRCheckBox();
         vRToolBarPadrao3 = new vrframework.bean.toolBarPadrao.VRToolBarPadrao(this);
         vRPanel3 = new vrframework.bean.panel.VRPanel();
         btnMigrar = new vrframework.bean.button.VRButton();
@@ -409,23 +416,42 @@ public class RMSGUI_2 extends VRInternalFrame {
         chkUtilizarViewMixFiscal = new vrframework.bean.checkBox.VRCheckBox();
         chkIncluirNivel4 = new vrframework.bean.checkBox.VRCheckBox();
 
+        chkPSomenteAtivos.setText("Somente produtos ativos");
+
+        javax.swing.GroupLayout pnlCustomLayout = new javax.swing.GroupLayout(pnlCustom);
+        pnlCustom.setLayout(pnlCustomLayout);
+        pnlCustomLayout.setHorizontalGroup(
+            pnlCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCustomLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkPSomenteAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        pnlCustomLayout.setVerticalGroup(
+            pnlCustomLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCustomLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkPSomenteAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         setTitle("Importação RMS");
         setToolTipText("");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+                formInternalFrameOpened(evt);
             }
             public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
-                formInternalFrameOpened(evt);
+            public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
@@ -951,7 +977,7 @@ public class RMSGUI_2 extends VRInternalFrame {
                 .addComponent(vRLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtDatabase, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(74, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1007,7 +1033,7 @@ public class RMSGUI_2 extends VRInternalFrame {
             .addGroup(vRPanel6Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tabsConn)
+                    .addComponent(tabsConn, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(vRPanel6Layout.createSequentialGroup()
                         .addGroup(vRPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(vRLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1229,6 +1255,7 @@ public class RMSGUI_2 extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkHistoricoVendas;
     private vrframework.bean.checkBox.VRCheckBox chkIncluirNivel4;
     private vrframework.bean.checkBox.VRCheckBox chkNotasFiscais;
+    private vrframework.bean.checkBox.VRCheckBox chkPSomenteAtivos;
     private vrframework.bean.checkBox.VRCheckBox chkPagamentoRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkProdutoFornecedor;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
@@ -1253,6 +1280,7 @@ public class RMSGUI_2 extends VRInternalFrame {
     private vrframework.bean.label.VRLabel lblMesVenda;
     private vrframework.bean.label.VRLabel lblMesVenda1;
     private vrframework.bean.label.VRLabel lblMesVenda2;
+    private vrframework.bean.panel.VRPanel pnlCustom;
     private vrframework.bean.radioButton.VRRadioButton rdbVendasAntigas;
     private vrframework.bean.radioButton.VRRadioButton rdbVendasAtualizadas;
     private javax.swing.JPanel tabConvenio;
