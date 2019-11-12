@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
+import vrframework.classe.Util;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaEntrada;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaEntradaItem;
