@@ -452,16 +452,16 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
-                    "	 pf.id_produto,\n" +
-                    "    pf.id_fornecedor,\n" +
-                    "    coalesce(n.CODIGO, pf.id_produto) codigoexterno,\n" +
-                    "    pf.ULTIMACOMPRA dataalteracao\n" +
+                    "	pf.id_produto,\n" +
+                    "	pf.id_fornecedor,\n" +
+                    "	n.codigo codigoexterno,\n" +
+                    "	pf.ULTIMACOMPRA dataalteracao,\n" +
+                    "	coalesce(n.fator, 1) fator\n" +
                     "from\n" +
                     "	produtos_fornecedores pf\n" +
-                    "   left join produtos_notaentrada n on\n" +
-                    "		pf.NOTA = n.NOTA and\n" +
-                    "        pf.ID_PRODUTO = n.ID_PRODUTO and\n" +
-                    "        pf.id_fornecedor = n.FORNECEDOR"
+                    "	join codigos_fornecedores n on\n" +
+                    "		pf.id_fornecedor = n.id_fornecedor and\n" +
+                    "		pf.ID_PRODUTO = n.ID_PRODUTO"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -472,6 +472,7 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
                     imp.setIdFornecedor(rst.getString("id_fornecedor"));
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
+                    imp.setQtdEmbalagem(rst.getInt("fator"));
                     
                     result.add(imp);
                 }
@@ -573,8 +574,9 @@ public class SiaCriareMySqlDAO extends InterfaceDAO implements MapaTributoProvid
                     "FROM\n" +
                     "	creceber c\n" +
                     "WHERE\n" +
-                    "	baixado != 'S' and\n" +
-                    "	c.EMPRESA = " + getLojaOrigem() + "\n" +
+                    "   c.EMPRESA = " + getLojaOrigem() + " and\n" +
+                    "	c.VLPAGTO < c.VALOR_PARCELA and\n" +
+                    "	c.BAIXADO != 'S' AND dc = 'D'\n" +
                     "ORDER BY\n" +
                     "	id"
             )) {
