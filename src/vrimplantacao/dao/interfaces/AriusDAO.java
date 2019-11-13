@@ -16,9 +16,7 @@ import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrframework.remote.ItemComboVO;
-import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.classe.ConexaoOracle;
-import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.FornecedorDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.devolucao.receber.ReceberDevolucaoDAO;
@@ -28,7 +26,6 @@ import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
-import static vrimplantacao2.dao.interfaces.SolidusDAO.DATE_FORMAT;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
@@ -1499,15 +1496,19 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from arius.rec_t_entrada_nota nfe\n"
                     + "	inner join arius.rec_t_entrada_recebimento er\n"
                     + "		on nfe.id_entrada_recebimento = er.id_entrada_recebimento\n"
-                    + "where nfe.data_hora_emissao between " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
-                    + "and " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
+                    + "where nfe.data_hora_emissao between "
+                    + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
+                    + "and "
+                    + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
+                    + "and er.ID_EMPRESA = " + getLojaOrigem() + "\n"
                     + "order by id"
             )) {
                 while (rs.next()) {
 
                     NotaFiscalIMP imp = new NotaFiscalIMP();
                     imp.setId(rs.getString("id"));
-                    imp.setOperacao(rs.getInt("notaoperacao") == 0 ? NotaOperacao.ENTRADA : NotaOperacao.SAIDA);
+                    //imp.setOperacao(rs.getInt("notaoperacao") == 0 ? NotaOperacao.ENTRADA : NotaOperacao.SAIDA);
+                    imp.setOperacao(NotaOperacao.ENTRADA);
                     imp.setIdDestinatario(rs.getString("iddestinatario"));
                     imp.setModelo(rs.getString("modelo"));
                     imp.setSerie(rs.getString("serie"));
@@ -1567,8 +1568,10 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from arius.fis_vs_notas_itens i\n"
                     + "	inner join arius.rec_t_entrada_nota c\n"
                     + "		on i.numero_nf = c.numero_nota_fiscal\n"
-                    + "where c.data_hora_emissao between " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
-                    + "and " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
+                    + "where c.data_hora_emissao between "
+                    + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
+                    + "and "
+                    + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
                     + "	order by numero_nf"
             )) {
                 while (rs.next()) {

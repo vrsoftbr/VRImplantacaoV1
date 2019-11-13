@@ -615,4 +615,93 @@ public class ArtSystemDAO extends InterfaceDAO {
         }
         return result;
     }
+    
+/*
+    
+    select distinct 
+	cast(ven.CUPDDATCUP as date) as datavenda,
+	convert(varchar(8), cast(ven.CUPDDATCUP as time), 108) as horavenda,
+	ven.CUPNNUMPDV as ecf,
+	ven.CUPNNUMCUP as numerocupom,
+	ven.CUPNVLRCUP as valortotal,
+	ven.CUPNVLRCAN as valorcancelado,
+	ven.CUPNVLRACR as valoracrescimo,
+	ven.CUPNVLRDES as valordesconto,
+	ven.CUPNVLROUT as valoroutro,
+	ven.CUPNCUPCAN as cancelado,
+	ven.CUPCCONCUP
+from ASCUPCUP ven
+where CUPNID_LOJ = 856
+and ven.CUPCCONCUP not like '%DATAFISCAL%'
+and ven.CUPNVLRCUP > 0
+order by 1
+
+select CUPNNUMCUP from ASCUPCUP
+group by CUPNNUMCUP
+having COUNT(CUPNNUMCUP) > 1
+
+select distinct 
+	pro.MVPNID_MVP as id,
+	cast(pro.MVPDDATCAD as date) as data,
+	pro.MVPNID_PRO as id_produto,
+	(pro.MVPNQTDMOV * -1) as qtd,
+	(pro.MVPNVLRVDA * -1) as valor,
+	pro.MVPN_NFNUM as numerocupom,
+	pre.PRENCUSREP as custo,
+	pre.PRENVDAATU as precovenda,
+	inc.MVICID_INT as trib,
+	inc.MVINPERINC as aliquota
+from ASPROMVP pro 
+inner join ASPROMVP_INC inc on inc.MVINID_MVP = pro.MVPNID_MVP and inc.MVICID_INT not in ('121', '122')
+inner join [As_Cad].dbo.ASPROPRE pre on pre.PRENID_PRO = pro.MVPNID_PRO and pre.PRENID_LOJ = 856
+where pro.MVPCTIPMVP = 'VDACX' -- possível tabelas itens da venda
+and pro.MVPNID_LOJ = 856
+order by pro.MVPNID_MVP --2019-10-01 07:34:58.507
+
+select * from [As_Cad].dbo.ASPROFIG
+
+select * from ASCUPCUP_OPE
+select * from ASCUPXML
+select * from ASCUPCUP order by CUPNNUMCUP -- 183301 6.99 2019-10-01 07:34:31.000
+
+
+select * from dbo.ASNFEDFE -- não tem registros nessa table
+select * from ASPROVDA_DIA
+select * from ASPROVDA_DIA_ASS -- não tem registos nessa table
+select * from ASPROVDA_MES
+select * from ASPROVDA_OFE_DIA
+select * from ASPROVDA_OFE_MES_ASS
+select * from ASCUPCUP
+select * from ASPROMVP
+select * from ASPROMVP_INC where MVINID_MVI = 124
+select * from ASCUPCUP_FIN
+select * from ASNFEITE -- não tem nada nessa table
+select * from ASCUPCUP
+select * from ASPROMVP
+select * from ASCUPCUP_L_Z_TRI
+
+select * from ASCUPCUP_CON
+
+select * from ASPROMVP_INC
+select * from ASPROVDA_MES
+select * from ASCUPCUP_OPE
+
+select * from ASCUPCUP_L_Z_TRI where CZTNID_CUZ = 4 order by CZTNTRIALI -- tributação dos cupons
+select * from ASCUPCUP_L_Z
+select * from ASCUPXML
+select * from ASPROEST_MES
+select * from ASPROVDA_MES
+
+
+select * from ASCUPCUP_CON
+select * from ASCUPCUP_FIN
+select * from ASCUPCUP_OPE -- vendas gerais dos pdvs
+select * from ASPROMVP_INC
+select * from ASPROVDA_DIA
+
+select * from ASDEVCUP
+select * from ASLOJECF
+select * from ASPEDCOMAN
+
+select */    
 }

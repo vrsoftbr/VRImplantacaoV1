@@ -463,6 +463,9 @@ public class AriusGUI extends VRInternalFrame {
                             ariusDAO.setDataVencimentoContaPagar(txtDtVencContasPagar.getDate());
                             importador.importarContasPagar(OpcaoContaPagar.NOVOS);
                         }
+                        if (chkReceberDevForn.isSelected()) {
+                            ariusDAO.importarReceberDevolucao(idLojaVR);
+                        }
                     } else if (tab.getSelectedIndex() == 2) {
                         if (chkClientePreferencial.isSelected()) {                            
                             importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.CONTATOS);
@@ -627,6 +630,7 @@ public class AriusGUI extends VRInternalFrame {
         chkNumero = new vrframework.bean.checkBox.VRCheckBox();
         chkFornecedorDivisao = new vrframework.bean.checkBox.VRCheckBox();
         chkPrazoFornecedor = new vrframework.bean.checkBox.VRCheckBox();
+        chkReceberDevForn = new vrframework.bean.checkBox.VRCheckBox();
         tabCliente = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabClienteDados = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
@@ -1120,6 +1124,8 @@ public class AriusGUI extends VRInternalFrame {
 
         chkPrazoFornecedor.setText("Prazo Fornecedor");
 
+        chkReceberDevForn.setText("Receber Devolução");
+
         javax.swing.GroupLayout tabFornecedorLayout = new javax.swing.GroupLayout(tabFornecedor);
         tabFornecedor.setLayout(tabFornecedorLayout);
         tabFornecedorLayout.setHorizontalGroup(
@@ -1137,6 +1143,7 @@ public class AriusGUI extends VRInternalFrame {
                         .addComponent(chkIncluirTransportadores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(tabFornecedorLayout.createSequentialGroup()
                         .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkReceberDevForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(tabFornecedorLayout.createSequentialGroup()
                                 .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1187,7 +1194,9 @@ public class AriusGUI extends VRInternalFrame {
                 .addGroup(tabFornecedorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkContasAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtDtVencContasPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(132, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkReceberDevForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(114, Short.MAX_VALUE))
         );
 
         tab.addTab("Fornecedores", tabFornecedor);
@@ -1794,6 +1803,7 @@ public class AriusGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbCotacao;
     private vrframework.bean.checkBox.VRCheckBox chkQtdEmbalagemEAN;
     private vrframework.bean.checkBox.VRCheckBox chkQtdeEmb;
+    private vrframework.bean.checkBox.VRCheckBox chkReceberDevForn;
     private vrframework.bean.checkBox.VRCheckBox chkReceitaFilizola;
     private vrframework.bean.checkBox.VRCheckBox chkReceitaProduto;
     private vrframework.bean.checkBox.VRCheckBox chkReceitaToledo;
