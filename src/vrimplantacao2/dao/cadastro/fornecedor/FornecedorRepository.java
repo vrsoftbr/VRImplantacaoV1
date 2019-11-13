@@ -111,7 +111,7 @@ public class FornecedorRepository {
                         
                         Map.Entry<String, Integer> divisao = divisoes.get(imp.getIdDivisao());
                         int idDivisao = 0;
-                        if (divisoes != null) {
+                        if (divisao != null) {
                             idDivisao = divisao.getValue();
                         } else {
                             idDivisao = 0;
