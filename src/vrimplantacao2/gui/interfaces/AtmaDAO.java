@@ -71,7 +71,8 @@ public class AtmaDAO extends InterfaceDAO implements MapaTributoProvider {
             OpcaoProduto.VALIDADE,
             OpcaoProduto.MERCADOLOGICO_POR_NIVEL,
             OpcaoProduto.MERCADOLOGICO_PRODUTO,
-            OpcaoProduto.MAPA_TRIBUTACAO
+            OpcaoProduto.MAPA_TRIBUTACAO,
+            OpcaoProduto.MERCADOLOGICO_POR_NIVEL_REPLICAR,
         }));
     }
 
@@ -590,10 +591,14 @@ public class AtmaDAO extends InterfaceDAO implements MapaTributoProvider {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "	ID_PROD as idproduto,\n"
-                    + "	ID_PES as idfornecedor,\n"
-                    + "	CODIGO as codigoexterno\n"
-                    + "from dbo.EQ_PROD_REF"
+                    + "	pf.ID_PROD as idproduto,\n"
+                    + "	pf.ID_PES as idfornecedor,\n"
+                    + "	pf.CODIGO as codigoexterno,\n"
+                    + " cx2.FATOR as qtd\n"
+                    + "from dbo.EQ_PROD_REF pf\n"
+                    + "left join dbo.EQ_PROD_FATORCX cx on cx.ID_PROD = pf.ID_PROD\n"
+                    + "inner join dbo.TB_FATORCX cx2 on cx2.ID_FATORCX = cx.ID_FATORCX\n"
+                    + "and cx.OPERACAO = 'E'"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -602,6 +607,7 @@ public class AtmaDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIdProduto(rst.getString("idproduto"));
                     imp.setIdFornecedor(rst.getString("idfornecedor"));
                     imp.setCodigoExterno(rst.getString("codigoexterno"));
+                    imp.setQtdEmbalagem(rst.getInt("qtd"));
                     result.add(imp);
                 }
             }

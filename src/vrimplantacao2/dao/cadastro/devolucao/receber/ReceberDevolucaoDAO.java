@@ -21,7 +21,7 @@ public class ReceberDevolucaoDAO {
                 sql = new StringBuilder();
                 sql.append("insert into receberdevolucao ("
                         + "id_loja, id_fornecedor, numeronota, dataemissao, datavencimento, \n"
-                        + "valor, observacao, id_situacaoreceberdevolucao, id_tipolocalcobranca, \n"
+                        + "valor, valorliquido, observacao, id_situacaoreceberdevolucao, id_tipolocalcobranca, \n"
                         + "id_tipodevolucao, lancamentomanual, valorpagarfornecedor, \n"
                         + "justificativa, numeroparcela, exportado) "
                         + "values ("
@@ -30,6 +30,7 @@ public class ReceberDevolucaoDAO {
                         + i_list.getNumeroNota() + ", "
                         + "'" + i_list.getDataemissao() + "', "
                         + "'" + i_list.getDatavencimento() + "', "
+                        + i_list.getValor() + ", "
                         + i_list.getValor() + ", "
                         + "'" + i_list.getObservacao() + "', "
                         + i_list.getIdSituacaoReceberDevolucao() + ", "

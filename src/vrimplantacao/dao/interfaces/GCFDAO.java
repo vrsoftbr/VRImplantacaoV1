@@ -250,6 +250,7 @@ public class GCFDAO extends InterfaceDAO {
                     "	ICMS.TRIBUTACAO,\n" +
                     "	ICMS.ALIQUOTA,\n" +
                     "	ICMS.REDUCAO,\n" +
+                    //"   nr.dba_pcnatrec_codigo as piscofinsNaturezaReceita,\n" +
                     "	CEST.dba_itematrib_cestq_fiscal cest,\n" +
                     "	TO_NUMBER(SUBSTR(P.DBA_GIT_FILLER, 97, 5))/1000 AS MARGEM_NIVEL_1,\n" +
                     "   TO_NUMBER(SUBSTR(P.DBA_GIT_FILLER, 102, 5))/1000 AS MARGEM_NIVEL_2,\n" +
@@ -263,6 +264,7 @@ public class GCFDAO extends InterfaceDAO {
                     "    LEFT JOIN A_AG1PDVST MRG ON MRG.DBA_CAD_PROD_1 = P.DBA_GIT_PRODUTO AND MRG.DBA_CAD_FILIAL = EMP.DBA_LOJ_CODIGO_1\n" +
                     "    LEFT JOIN A_CADCITEMATRIB CEST ON dba_itematrib_git_produto = P.DBA_GIT_PRODUTO\n" +
                     "    left join A_CADCMERC merc on p.dba_git_secao = merc.dba_ncc_secao and p.dba_git_grupo = merc.dba_ncc_grupo and p.dba_git_subgrupo = merc.dba_ncc_subgrupo\n" +
+                    //"    LEFT join A_PCNATREC nr on nr.dba_pcnatrec_prod_ncm = p.DBA_GIT_PRODUTO\n" +
                     "    left JOIN (\n" +
                     "         SELECT\n" +
                     "              DBA_GIT_PRODUTO AS ID, \n" +

@@ -916,7 +916,7 @@
                                   <Component id="chkEstadoCivil" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
-                              <Component id="vRPanel1" pref="270" max="32767" attributes="0"/>
+                              <Component id="vRPanel1" pref="290" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
