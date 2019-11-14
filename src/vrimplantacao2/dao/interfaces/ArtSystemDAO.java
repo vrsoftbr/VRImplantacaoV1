@@ -752,7 +752,13 @@ public class ArtSystemDAO extends InterfaceDAO {
                         next.setHoraTermino(timestamp.parse(horaTermino));
                         next.setSubTotalImpressora(rst.getDouble("valortotal"));
                         next.setValorDesconto(rst.getDouble("valordesconto"));
-                        next.setChaveCfe(rst.getString("chaveCfe").replace(".XML", "").replace("CFE", ""));
+                        
+                        if ((rst.getString("chaveCfe") != null)
+                                && (!rst.getString("chaveCfe").trim().isEmpty())) {
+                            next.setChaveCfe(rst.getString("chaveCfe").replace(".XML", "").replace("CFE", ""));
+                        } else {
+                            next.setChaveCfe("");
+                        }
                     }
                 }
             } catch (SQLException | ParseException ex) {
