@@ -156,6 +156,7 @@ public class AriusGUI extends VRInternalFrame {
         tabCheque.pnlLista.setEnabled(false);
         tabCheque.chkAtivarCheque.setEnabled(false);
 
+        txtDtVencContasPagar.setVisible(false);
         txtDtVencContasPagar.setFormats("dd/MM/yyyy");
         txtDtIInicioVenda.setFormats("dd/MM/yyyy");
         txtDtTerminoVenda.setFormats("dd/MM/yyyy");
