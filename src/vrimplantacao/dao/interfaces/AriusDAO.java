@@ -296,8 +296,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        String sql
-                = "SELECT\n"
+        String sql = 
+                "SELECT\n"
                 + "    a.id,\n"
                 + "    a.nutricional,\n"
                 + "    coalesce(ean.ean, cast(a.id as varchar(13))) codigobarras,\n"
@@ -368,17 +368,17 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "    pe.st_venda,\n"
                 + "    01 as p_iva\n"
                 + "FROM\n"
-                + "    produtos a\n"
-                + "    join empresas emp on emp.id = " + getLojaOrigem() + "\n"
-                + "    join produtos_estado pe on a.id = pe.id and pe.estado = emp.estado\n"
-                + "    join politicas_empresa poli on poli.empresa = emp.id\n"
-                + "    join produtos_precos preco on a.id = preco.produto and poli.politica = preco.politica and preco.id = " + tipoVenda + "\n"
-                + "    join produtos_loja loja on a.id = loja.id and poli.politica = loja.politica\n"
-                + "    join estoques e on e.empresa = emp.id and e.troca != 'T'\n"
-                + "    join produtos_estoques estoq on estoq.produto = a.id and estoq.estoque = e.id and e.id = " + idEstoque + "\n"
-                + "    left join produtos_ean ean on ean.produto = a.id\n"
-                + "    left join (select distinct id from vw_produtos_balancas order by id) bal on bal.id = a.id\n"
-                + "    left join familias fam on a.familia = fam.id\n"
+                + "     produtos a\n"
+                + "     join empresas emp on emp.id = " + getLojaOrigem() + "\n"
+                + "	join produtos_estado pe on a.id = pe.id and pe.estado = emp.estado\n"
+                + "	join politicas_empresa poli on poli.empresa = emp.id\n"
+                + "	join produtos_precos preco on a.id = preco.produto and poli.politica = preco.politica and preco.id = 1\n"
+                + "	join produtos_loja loja on a.id = loja.id and poli.politica = loja.politica\n"
+                + "	join estoques e on e.empresa = emp.id and e.troca != 'T'\n"
+                + "	join produtos_estoques estoq on estoq.produto = a.id and estoq.estoque = e.id\n"
+                + "	left join produtos_ean ean on ean.produto = a.id\n"
+                + "	left join (select distinct id from vw_produtos_balancas order by id) bal on bal.id = a.id\n"
+                + "	left join familias fam on a.familia = fam.id\n"
                 + "order by\n"
                 + "    a.id";
 

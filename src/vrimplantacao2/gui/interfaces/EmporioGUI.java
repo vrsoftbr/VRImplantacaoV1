@@ -30,10 +30,10 @@ public class EmporioGUI extends VRInternalFrame {
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
         txtHost.setText(params.getWithNull("localhost", SISTEMA, "HOST"));
-        txtDatabase.setText(params.getWithNull("emporio", SISTEMA, "DATABASE"));
+        txtDatabase.setText(params.getWithNull("emporium", SISTEMA, "DATABASE"));
         txtPorta.setText(params.getWithNull("3306", SISTEMA, "PORTA"));
-        txtUsuario.setText(params.getWithNull("emporio", SISTEMA, "USUARIO"));
-        txtSenha.setText(params.getWithNull("emporio", SISTEMA, "SENHA"));
+        txtUsuario.setText(params.getWithNull("emporium", SISTEMA, "USUARIO"));
+        txtSenha.setText(params.getWithNull("emporium", SISTEMA, "SENHA"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }

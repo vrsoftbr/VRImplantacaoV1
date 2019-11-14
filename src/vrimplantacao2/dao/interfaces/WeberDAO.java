@@ -275,6 +275,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    tabicm aliquota_debito_id,\n"
                     + "    icm.tabicm_st cst_debito,\n"
                     + "    icm.tabicm_aliq icms_aliquota_debito,\n"
+                    + "    icm.tabicm_pbc icms_aliquota_debito_reducao,\n"
                     + "    icm_aliq aliquota_credito,\n"
                     + "    icm_cst cst_credito,\n"
                     + "    icm_pbc aliquota_reducao_credito,\n"
