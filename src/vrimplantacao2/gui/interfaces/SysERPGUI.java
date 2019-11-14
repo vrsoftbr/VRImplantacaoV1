@@ -263,7 +263,7 @@ public class SysERPGUI extends VRInternalFrame implements ConexaoEvent {
         lblCompLoja = new javax.swing.JLabel();
         txtCompLoja = new javax.swing.JTextField();
 
-        setTitle("Importação ArtSystem");
+        setTitle("Importação SysERP");
         setToolTipText("");
 
         conexao.setSistema("JM2Online");

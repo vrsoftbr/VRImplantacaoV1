@@ -6,7 +6,7 @@
     </Component>
   </NonVisualComponents>
   <Properties>
-    <Property name="title" type="java.lang.String" value="Importa&#xe7;&#xe3;o ArtSystem"/>
+    <Property name="title" type="java.lang.String" value="Importa&#xe7;&#xe3;o SysERP"/>
     <Property name="toolTipText" type="java.lang.String" value=""/>
   </Properties>
   <AccessibilityProperties>

@@ -1587,7 +1587,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    tab_nf nf\n" +
                     "where\n" +
                     "    nf.cod_loja = " + getLojaOrigem() + " and\n" +
-                    "    nf.tipo_operacao in (0,1) and\n" +
+                    "    nf.tipo_operacao in (0, 1) and\n" +
                     "    nf.tipo_nf in (0,1) and\n" +
                     //"    nf.tipo_operacao = 0 and\n" + //TODO: Excluir esta linha quando incluir a nota de saida
                     "    nf.dta_emissao >= " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " and\n" +
@@ -1677,7 +1677,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    nfi.val_desconto valor_desconto,\n" +
                     "    nfi.val_frete valor_frete,\n" +
                     "    nfi.val_isento valor_isento,\n" +
-                    "    nfi.val_outras valor_outras,\n" +
+                    "    --nfi.val_outras valor_outras,\n" +
                     "    nfi.cod_sit_tributaria icms_cst,\n" +
                     "    nfi.per_aliq_icms icms_aliq,\n" +
                     "    nfi.per_red_bc_icms icms_red,\n" +
@@ -1736,7 +1736,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     item.setValorDesconto(rst.getDouble("valor_desconto"));
                     item.setValorFrete(rst.getDouble("valor_frete"));
                     item.setValorIsento(rst.getDouble("valor_isento"));
-                    item.setValorOutras(rst.getDouble("valor_outras"));
+                    //item.setValorOutras(rst.getDouble("valor_outras"));
                     item.setIcmsCst(rst.getInt("icms_cst"));
                     item.setIcmsAliquota(rst.getDouble("icms_aliq"));
                     item.setIcmsReduzido(rst.getDouble("icms_red"));

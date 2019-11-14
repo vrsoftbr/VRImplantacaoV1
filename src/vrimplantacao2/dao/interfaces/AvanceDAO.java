@@ -1247,7 +1247,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
         public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) throws Exception {
             this.sql
                     = "SELECT\n" +
-                    "	concat(v.NOTA, v.CAIXA, coalesce(v.datahora_alteracao, v.DATA), v.ccf) id, \n" +
+                    "	concat(v.NOTA, v.CAIXA, v.DATA) id, \n" +
                     "	v.NOTA cupom,\n" +
                     "	v.CAIXA,\n" +
                     "	v.`DATA`,\n" +
@@ -1255,7 +1255,6 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	max(v.HORA) hora,\n" +
                     "	round(sum(coalesce(v.valor, 0) * quant), 2) valor,\n" +
                     "	v.ecf,\n" +
-                    "	v.`STATUS`,\n" +
                     "	max(v.CANCELADO) cancelado,\n" +
                     "	v.CLIENTE id_cliente,\n" +
                     "	c.nome,\n" +
@@ -1266,9 +1265,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	c.cidade,\n" +
                     "	c.uf,\n" +
                     "	c.cep,\n" +
-                    "	c.telefone,\n" +
-                    "	v.coo,\n" +
-                    "	v.ccf\n" +
+                    "	c.telefone\n" +
                     "FROM\n" +
                     "	vendas v\n" +
                     "LEFT JOIN clientes c ON v.CLIENTE = c.codigo\n" +
@@ -1284,7 +1281,6 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	v.CAIXA,\n" +
                     "	v.`DATA`,\n" +
                     "	v.ecf,\n" +
-                    "	v.`STATUS`,\n" +
                     "	v.CLIENTE,\n" +
                     "	c.nome,\n" +
                     "	c.cpf,\n" +
@@ -1294,9 +1290,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	c.cidade,\n" +
                     "	c.uf,\n" +
                     "	c.cep,\n" +
-                    "	c.telefone,\n" +
-                    "	v.coo,\n" +
-                    "	v.ccf\n" +
+                    "	c.telefone\n" +
                     "ORDER  BY\n" +
                     "	v.CAIXA, v.data, v.datahora";
             LOG.log(Level.FINE, "SQL da venda: " + sql);
@@ -1416,7 +1410,7 @@ public class AvanceDAO extends InterfaceDAO implements MapaTributoProvider {
             this.sql
                     = "SELECT\n" +
                     "	v.id,\n" +
-                    "   CONCAT(v.NOTA, v.CAIXA, coalesce(v.datahora_alteracao, v.DATA), v.ccf) id_venda,\n" +
+                    "   CONCAT(v.NOTA, v.CAIXA, v.DATA) id_venda,\n" +
                     "	v.CAIXA,\n" +
                     "	v.NOTA cupom,\n" +
                     "	v.`DATA`,\n" +
