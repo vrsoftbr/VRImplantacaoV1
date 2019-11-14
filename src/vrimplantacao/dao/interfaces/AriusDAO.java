@@ -16,9 +16,7 @@ import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrframework.classe.ProgressBar;
 import vrframework.remote.ItemComboVO;
-import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.classe.ConexaoOracle;
-import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.FornecedorDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.devolucao.receber.ReceberDevolucaoDAO;
@@ -28,7 +26,6 @@ import vrimplantacao2.dao.cadastro.nutricional.OpcaoNutricional;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto2.associado.OpcaoAssociado;
 import vrimplantacao2.dao.interfaces.InterfaceDAO;
-import static vrimplantacao2.dao.interfaces.SolidusDAO.DATE_FORMAT;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
@@ -299,8 +296,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        String sql
-                = "SELECT\n"
+        String sql = 
+                "SELECT\n"
                 + "    a.id,\n"
                 + "    a.nutricional,\n"
                 + "    coalesce(ean.ean, cast(a.id as varchar(13))) codigobarras,\n"
@@ -371,17 +368,17 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                 + "    pe.st_venda,\n"
                 + "    01 as p_iva\n"
                 + "FROM\n"
-                + "    produtos a\n"
-                + "    join empresas emp on emp.id = " + getLojaOrigem() + "\n"
-                + "    join produtos_estado pe on a.id = pe.id and pe.estado = emp.estado\n"
-                + "    join politicas_empresa poli on poli.empresa = emp.id\n"
-                + "    join produtos_precos preco on a.id = preco.produto and poli.politica = preco.politica and preco.id = " + tipoVenda + "\n"
-                + "    join produtos_loja loja on a.id = loja.id and poli.politica = loja.politica\n"
-                + "    join estoques e on e.empresa = emp.id and e.troca != 'T'\n"
-                + "    join produtos_estoques estoq on estoq.produto = a.id and estoq.estoque = e.id and e.id = " + idEstoque + "\n"
-                + "    left join produtos_ean ean on ean.produto = a.id\n"
-                + "    left join (select distinct id from vw_produtos_balancas order by id) bal on bal.id = a.id\n"
-                + "    left join familias fam on a.familia = fam.id\n"
+                + "     produtos a\n"
+                + "     join empresas emp on emp.id = " + getLojaOrigem() + "\n"
+                + "	join produtos_estado pe on a.id = pe.id and pe.estado = emp.estado\n"
+                + "	join politicas_empresa poli on poli.empresa = emp.id\n"
+                + "	join produtos_precos preco on a.id = preco.produto and poli.politica = preco.politica and preco.id = 1\n"
+                + "	join produtos_loja loja on a.id = loja.id and poli.politica = loja.politica\n"
+                + "	join estoques e on e.empresa = emp.id and e.troca != 'T'\n"
+                + "	join produtos_estoques estoq on estoq.produto = a.id and estoq.estoque = e.id\n"
+                + "	left join produtos_ean ean on ean.produto = a.id\n"
+                + "	left join (select distinct id from vw_produtos_balancas order by id) bal on bal.id = a.id\n"
+                + "	left join familias fam on a.familia = fam.id\n"
                 + "order by\n"
                 + "    a.id";
 
@@ -1499,15 +1496,19 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from arius.rec_t_entrada_nota nfe\n"
                     + "	inner join arius.rec_t_entrada_recebimento er\n"
                     + "		on nfe.id_entrada_recebimento = er.id_entrada_recebimento\n"
-                    + "where nfe.data_hora_emissao between " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
-                    + "and " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
+                    + "where nfe.data_hora_emissao between "
+                    + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
+                    + "and "
+                    + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
+                    + "and er.ID_EMPRESA = " + getLojaOrigem() + "\n"
                     + "order by id"
             )) {
                 while (rs.next()) {
 
                     NotaFiscalIMP imp = new NotaFiscalIMP();
                     imp.setId(rs.getString("id"));
-                    imp.setOperacao(rs.getInt("notaoperacao") == 0 ? NotaOperacao.ENTRADA : NotaOperacao.SAIDA);
+                    //imp.setOperacao(rs.getInt("notaoperacao") == 0 ? NotaOperacao.ENTRADA : NotaOperacao.SAIDA);
+                    imp.setOperacao(NotaOperacao.ENTRADA);
                     imp.setIdDestinatario(rs.getString("iddestinatario"));
                     imp.setModelo(rs.getString("modelo"));
                     imp.setSerie(rs.getString("serie"));
@@ -1567,8 +1568,10 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from arius.fis_vs_notas_itens i\n"
                     + "	inner join arius.rec_t_entrada_nota c\n"
                     + "		on i.numero_nf = c.numero_nota_fiscal\n"
-                    + "where c.data_hora_emissao between " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
-                    + "and " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
+                    + "where c.data_hora_emissao between "
+                    + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
+                    + "and "
+                    + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
                     + "	order by numero_nf"
             )) {
                 while (rs.next()) {
@@ -1993,7 +1996,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    parcela <> 0 and\n"
                     + "    not tipo_cadastro is null and\n"
                     + "    pagamento is null and\n"
-                    + "    trunc(vencimento) >= '" + new SimpleDateFormat("dd/MM/yyyy").format(dataVencimentoContaPagar) + "' and\n"
+                    //+ "    trunc(vencimento) <= '" + new SimpleDateFormat("dd/MM/yyyy").format(dataVencimentoContaPagar) + "' and\n"
                     + "    id_cadastro is not null\n"
                     + "order by\n"
                     + "    vencimento"

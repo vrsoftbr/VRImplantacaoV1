@@ -609,6 +609,7 @@
                           </Group>
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="chkReceberDevForn" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" attributes="0">
                                       <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
@@ -673,7 +674,9 @@
                           <Component id="chkContasAPagar" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="txtDtVencContasPagar" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="132" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="chkReceberDevForn" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="114" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -852,6 +855,11 @@
             <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPrazoFornecedor">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Prazo Fornecedor"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkReceberDevForn">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Receber Devolu&#xe7;&#xe3;o"/>
               </Properties>
             </Component>
           </SubComponents>
