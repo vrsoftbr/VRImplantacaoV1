@@ -35,6 +35,10 @@ public class FornecedorDAO {
     private MultiMap<Long, FornecedorVO> cnpjExistentes;
     private int lojaVR;
 
+    public FornecedorDAO() throws Exception {
+        this.anteriorDAO = new FornecedorAnteriorDAO();
+    }
+
     public MultiMap<Long, FornecedorVO> getCnpjExistente() throws Exception {
         if (cnpjExistentes == null) {
             atualizarCnpjExistentes();
@@ -409,7 +413,7 @@ public class FornecedorDAO {
         }
     }
 
-    private final FornecedorAnteriorDAO anteriorDAO = new FornecedorAnteriorDAO();
+    private final FornecedorAnteriorDAO anteriorDAO;
     private MultiMap<Integer, FornecedorVO> existentes;
 
     private void organizar(MultiMap<String, FornecedorIMP> filtrados) {

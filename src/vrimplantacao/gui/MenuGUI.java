@@ -113,6 +113,7 @@ import vrimplantacao2.gui.interfaces.CgaGUI;
 import vrimplantacao2.gui.interfaces.CissGUI;
 import vrimplantacao2.gui.interfaces.ClickGUI;
 import vrimplantacao2.gui.interfaces.ContechGUI;
+import vrimplantacao2.gui.interfaces.ControlXGUI;
 import vrimplantacao2.gui.interfaces.DLinkGUI;
 import vrimplantacao2.gui.interfaces.DataSyncGUI;
 import vrimplantacao2.gui.interfaces.DestroGUI;
@@ -637,6 +638,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuArtSystem = new javax.swing.JMenuItem();
         mnuiSysERP = new javax.swing.JMenuItem();
         mnuAtma = new javax.swing.JMenuItem();
+        mnuControlX = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1705,6 +1707,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuAtma);
+
+        mnuControlX.setText("ControlX");
+        mnuControlX.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuControlXActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuControlX);
 
         mnuDatabase.add(mnuSqlServer2);
 
@@ -4184,6 +4194,10 @@ public final class MenuGUI extends VRMdiFrame {
         SiaCriareMySqlGUI.exibir(this);
     }//GEN-LAST:event_mnuG4ActionPerformed
 
+    private void mnuControlXActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuControlXActionPerformed
+        ControlXGUI.exibir(this);
+    }//GEN-LAST:event_mnuControlXActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4301,6 +4315,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuCodigoBarrasAtacado;
     private javax.swing.JMenuItem mnuContaPagar;
     private javax.swing.JMenuItem mnuContaPagar1;
+    private javax.swing.JMenuItem mnuControlX;
     private javax.swing.JMenuItem mnuControll;
     private javax.swing.JMenuItem mnuCplus;
     private javax.swing.JMenu mnuDB2;
