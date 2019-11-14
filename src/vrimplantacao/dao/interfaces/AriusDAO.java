@@ -1996,7 +1996,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    parcela <> 0 and\n"
                     + "    not tipo_cadastro is null and\n"
                     + "    pagamento is null and\n"
-                    + "    trunc(vencimento) >= '" + new SimpleDateFormat("dd/MM/yyyy").format(dataVencimentoContaPagar) + "' and\n"
+                    //+ "    trunc(vencimento) <= '" + new SimpleDateFormat("dd/MM/yyyy").format(dataVencimentoContaPagar) + "' and\n"
                     + "    id_cadastro is not null\n"
                     + "order by\n"
                     + "    vencimento"

@@ -1,20 +1,26 @@
 package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
-import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.enums.TipoSexo;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
@@ -22,6 +28,8 @@ import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
@@ -29,6 +37,8 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class ArtSystemDAO extends InterfaceDAO {
 
+    private static final Logger LOG = Logger.getLogger(ArtSystemDAO.class.getName());
+    
     @Override
     public String getSistema() {
         return "ArtSystem";
@@ -616,92 +626,325 @@ public class ArtSystemDAO extends InterfaceDAO {
         return result;
     }
     
-/*
     
-    select distinct 
-	cast(ven.CUPDDATCUP as date) as datavenda,
-	convert(varchar(8), cast(ven.CUPDDATCUP as time), 108) as horavenda,
-	ven.CUPNNUMPDV as ecf,
-	ven.CUPNNUMCUP as numerocupom,
-	ven.CUPNVLRCUP as valortotal,
-	ven.CUPNVLRCAN as valorcancelado,
-	ven.CUPNVLRACR as valoracrescimo,
-	ven.CUPNVLRDES as valordesconto,
-	ven.CUPNVLROUT as valoroutro,
-	ven.CUPNCUPCAN as cancelado,
-	ven.CUPCCONCUP
-from ASCUPCUP ven
-where CUPNID_LOJ = 856
-and ven.CUPCCONCUP not like '%DATAFISCAL%'
-and ven.CUPNVLRCUP > 0
-order by 1
+    private String bancoDadosProd;
+    private String bancoDadosVenda;
+    
+    public void setBancoDadosProd(String bancoDadosProd) {
+        this.bancoDadosProd = bancoDadosProd;
+    }
+    
+    public String getBancoDadosProd() {
+        return this.bancoDadosProd;
+    }
 
-select CUPNNUMCUP from ASCUPCUP
-group by CUPNNUMCUP
-having COUNT(CUPNNUMCUP) > 1
+    public void setBancoDadosVenda(String bancoDadosVenda) {
+        this.bancoDadosVenda = bancoDadosVenda;
+    }
+    
+    public String getBancoDadosVenda() {
+        return this.bancoDadosVenda;
+    }    
+    
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new VendaIterator(getLojaOrigem(), getBancoDadosVenda());
+    }
 
-select distinct 
-	pro.MVPNID_MVP as id,
-	cast(pro.MVPDDATCAD as date) as data,
-	pro.MVPNID_PRO as id_produto,
-	(pro.MVPNQTDMOV * -1) as qtd,
-	(pro.MVPNVLRVDA * -1) as valor,
-	pro.MVPN_NFNUM as numerocupom,
-	pre.PRENCUSREP as custo,
-	pre.PRENVDAATU as precovenda,
-	inc.MVICID_INT as trib,
-	inc.MVINPERINC as aliquota
-from ASPROMVP pro 
-inner join ASPROMVP_INC inc on inc.MVINID_MVP = pro.MVPNID_MVP and inc.MVICID_INT not in ('121', '122')
-inner join [As_Cad].dbo.ASPROPRE pre on pre.PRENID_PRO = pro.MVPNID_PRO and pre.PRENID_LOJ = 856
-where pro.MVPCTIPMVP = 'VDACX' -- possível tabelas itens da venda
-and pro.MVPNID_LOJ = 856
-order by pro.MVPNID_MVP --2019-10-01 07:34:58.507
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new VendaItemIterator(getLojaOrigem(), getBancoDadosVenda(), getBancoDadosProd());
+    }
+    
+    private static class VendaIterator implements Iterator<VendaIMP> {
 
-select * from [As_Cad].dbo.ASPROFIG
+        private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+        private Statement stm = ConexaoSqlServer.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaIMP next;
+        private Set<String> uk = new HashSet<>();
 
-select * from ASCUPCUP_OPE
-select * from ASCUPXML
-select * from ASCUPCUP order by CUPNNUMCUP -- 183301 6.99 2019-10-01 07:34:31.000
+        public VendaIterator(String idLojaCliente, String bancoDadosVenda) throws Exception {
+            this.sql
+                    = "select distinct \n"
+                    + "	cast(ven.CUPDDATCUP as date) as datavenda,\n"
+                    + "	convert(varchar(8), cast(ven.CUPDDATCUP as time), 108) as horavenda,\n"
+                    + "	ven.CUPNNUMPDV as ecf,\n"
+                    + "	ven.CUPNNUMCUP as numerocupom,\n"
+                    + "	ven.CUPNVLRCUP as valortotal,\n"
+                    + "	ven.CUPNVLRCAN as valorcancelado,\n"
+                    + "	ven.CUPNVLRACR as valoracrescimo,\n"
+                    + "	ven.CUPNVLRDES as valordesconto,\n"
+                    + "	ven.CUPNVLROUT as valoroutro,\n"
+                    + "	ven.CUPNCUPCAN as cancelado,\n"
+                    + "	xm.CPXCNOMCUP as chaveCfe\n"
+                    + "from [" + bancoDadosVenda + "].dbo.ASCUPCUP ven\n"
+                    + "left join [" + bancoDadosVenda + "].dbo.ASCUPXML xm on xm.CPXNNUMPDV = ven.CUPNNUMPDV \n"
+                    + "	and xm.CPXNNUMCUP = ven.CUPNNUMCUP\n"
+                    + "	and cast(xm.CPXDDATCUP as date) = cast(ven.CUPDDATCUP as date)\n"
+                    + "	and xm.CPXNID_LOJ = " + idLojaCliente + "\n"
+                    + "where CUPNID_LOJ = " + idLojaCliente + "\n"
+                    + "and ven.CUPCCONCUP not like '%DATAFISCAL%'\n"
+                    + "and ven.CUPNVLRCUP > 0";
 
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
 
-select * from dbo.ASNFEDFE -- não tem registros nessa table
-select * from ASPROVDA_DIA
-select * from ASPROVDA_DIA_ASS -- não tem registos nessa table
-select * from ASPROVDA_MES
-select * from ASPROVDA_OFE_DIA
-select * from ASPROVDA_OFE_MES_ASS
-select * from ASCUPCUP
-select * from ASPROMVP
-select * from ASPROMVP_INC where MVINID_MVI = 124
-select * from ASCUPCUP_FIN
-select * from ASNFEITE -- não tem nada nessa table
-select * from ASCUPCUP
-select * from ASPROMVP
-select * from ASCUPCUP_L_Z_TRI
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
 
-select * from ASCUPCUP_CON
+        @Override
+        public VendaIMP next() {
+            obterNext();
+            VendaIMP result = next;
+            next = null;
+            return result;
+        }
 
-select * from ASPROMVP_INC
-select * from ASPROVDA_MES
-select * from ASCUPCUP_OPE
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
 
-select * from ASCUPCUP_L_Z_TRI where CZTNID_CUZ = 4 order by CZTNTRIALI -- tributação dos cupons
-select * from ASCUPCUP_L_Z
-select * from ASCUPXML
-select * from ASPROEST_MES
-select * from ASPROVDA_MES
+        private void obterNext() {
+            try {
+                SimpleDateFormat timestampDate = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaIMP();
+                        String id = rst.getString("datavenda") + "-" + rst.getString("numerocupom") + "-" + rst.getString("ecf");
+                        if (!uk.add(id)) {
+                            LOG.warning("Venda " + id + " já existe na listagem");
+                        }
+                        next.setId(id);
+                        String numeroCupom = rst.getString("numerocupom");
+                        next.setNumeroCupom(Utils.stringToInt(numeroCupom));
+                        next.setEcf(Utils.stringToInt(rst.getString("ecf")));
+                        next.setData(rst.getDate("datavenda"));
+                        
+                        String horavenda = rst.getString("horavenda");
+                        if ((horavenda).contains("::")) {
+                            horavenda = "00:00:00";
+                        }                        
+                        
+                        String horaInicio = timestampDate.format(rst.getDate("datavenda")) + " " + horavenda;
+                        String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " " + horavenda;
 
+                        if ((rst.getString("cancelado") != null)
+                                && (!rst.getString("cancelado").trim().isEmpty())) {
 
-select * from ASCUPCUP_CON
-select * from ASCUPCUP_FIN
-select * from ASCUPCUP_OPE -- vendas gerais dos pdvs
-select * from ASPROMVP_INC
-select * from ASPROVDA_DIA
+                            if (rst.getInt("cancelado") == 1) {
+                                next.setCancelado(true);
+                            } else {
+                                next.setCancelado(false);
+                            }
+                        } else {
+                            next.setCancelado(false);
+                        }
 
-select * from ASDEVCUP
-select * from ASLOJECF
-select * from ASPEDCOMAN
+                        next.setHoraInicio(timestamp.parse(horaInicio));
+                        next.setHoraTermino(timestamp.parse(horaTermino));
+                        next.setSubTotalImpressora(rst.getDouble("valortotal"));
+                        next.setValorDesconto(rst.getDouble("valordesconto"));
+                        next.setChaveCfe(rst.getString("chaveCfe").replace(".XML", "").replace("CFE", ""));
+                    }
+                }
+            } catch (SQLException | ParseException ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+    
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
-select */    
+        private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
+
+        private Statement stm = ConexaoSqlServer.getConexao().createStatement();
+        private ResultSet rst;
+        private String sql;
+        private VendaItemIMP next;
+
+        /**
+         * Método temporario, desenvolver um mapeamento eficiente da tributação.
+         *
+         * @param item
+         * @throws SQLException
+         */
+        public void obterAliquota(VendaItemIMP item, String icms) throws SQLException {
+            /*
+             0700   7.00    ALIQUOTA 07%
+             1200   12.00   ALIQUOTA 12%
+             1800   18.00   ALIQUOTA 18%
+             2500   25.00   ALIQUOTA 25%
+             1100   11.00   ALIQUOTA 11%
+             I      0.00    ISENTO
+             F      0.00    SUBST TRIBUTARIA
+             N      0.00    NAO INCIDENTE
+             */
+            int cst;
+            double aliq;
+            switch (icms) {
+                case "0700":
+                    cst = 0;
+                    aliq = 7;
+                    break;
+                case "1200":
+                    cst = 0;
+                    aliq = 12;
+                    break;
+                case "1800":
+                    cst = 0;
+                    aliq = 18;
+                    break;
+                case "2500":
+                    cst = 0;
+                    aliq = 25;
+                    break;
+                case "1100":
+                    cst = 0;
+                    aliq = 11;
+                    break;
+                case "F":
+                    cst = 60;
+                    aliq = 0;
+                    break;
+                case "N":
+                    cst = 41;
+                    aliq = 0;
+                    break;
+                default:
+                    cst = 40;
+                    aliq = 0;
+                    break;
+            }
+            item.setIcmsCst(cst);
+            item.setIcmsAliq(aliq);
+        }
+
+        public VendaItemIterator(String idLojaCliente, String bancoDadosVenda, String bancoDadosProd) throws Exception {
+            this.sql
+                    = "select distinct \n"
+                    + "	pro.MVPNID_MVP as id,\n"
+                    + "	cast(pro.MVPDDATCAD as date) as datavenda,\n"
+                    + "	pro.MVPNID_PRO as id_produto,\n"
+                    + " p.PROCCODPRO as codigo_produto,\n"
+                    + "	(pro.MVPNQTDMOV * -1) as qtdproduto,\n"
+                    + "	(pro.MVPNVLRVDA * -1) as valortotal,\n"
+                    + "	pro.MVPN_NFNUM as numerocupom,\n"
+                    + " cup.CUPNNUMPDV as ecf,"
+                    + "	pre.PRENCUSREP as custo,\n"
+                    + "	pre.PRENVDAATU as precovenda,\n"
+                    + "	inc.MVICID_INT as tribproduto,\n"
+                    + "	inc.MVINPERINC as aliquota,\n"
+                    + "	case p.PRONID_EMB when 965 then 'KG' else 'UN' end tipoembalagem\n"
+                    + "from [" + bancoDadosVenda + "].dbo.ASPROMVP pro \n"
+                    + "inner join [" + bancoDadosVenda + "].dbo.ASPROMVP_INC inc on inc.MVINID_MVP = pro.MVPNID_MVP "
+                    + "     and inc.MVICID_INT not in ('121', '122')\n"
+                    + "inner join [" + bancoDadosVenda + "].dbo.ASCUPCUP cup on cup.CUPNNUMCUP = pro.MVPN_NFNUM \n"
+                    + "     and cast(cup.CUPDDATCUP as date) = cast(pro.MVPDDATCAD as date)\n"
+                    + "     and cup.CUPNVLRCUP > 0 \n"
+                    + "left join [" + bancoDadosProd + "].dbo.ASPROPRE pre on pre.PRENID_PRO = pro.MVPNID_PRO and pre.PRENID_LOJ = " + idLojaCliente + "\n"
+                    + "inner join [" + bancoDadosProd + "].dbo.ASPROPRO p on p.PRONID_PRO = pro.MVPNID_PRO\n"
+                    + "where pro.MVPCTIPMVP = 'VDACX' -- possível tabelas itens da venda\n"
+                    + "and pro.MVPNID_LOJ = " + idLojaCliente + "";
+
+            LOG.log(Level.FINE, "SQL da venda: " + sql);
+            rst = stm.executeQuery(sql);
+        }
+
+        @Override
+        public boolean hasNext() {
+            obterNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            obterNext();
+            VendaItemIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+
+        private void obterNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaItemIMP();
+                        String idVenda = rst.getString("datavenda") + "-" + rst.getString("numerocupom") + "-" + rst.getString("ecf");
+                        String id = rst.getString("id");
+
+                        next.setId(id);
+                        next.setVenda(idVenda);
+                        next.setProduto(rst.getString("codigo_produto"));
+                        next.setQuantidade(rst.getDouble("qtdproduto"));
+                        next.setTotalBruto(rst.getDouble("valortotal"));
+                        next.setPrecoVenda(rst.getDouble("precovenda"));
+
+                        boolean cancelado = false;
+
+                        next.setCancelado(cancelado);
+                        next.setCodigoBarras(rst.getString("codigo_produto"));
+                        
+                        String strTrib = "";
+
+                        if ((rst.getString("tribproduto") != null)
+                                && (!rst.getString("tribproduto").trim().isEmpty())) {
+                            if ("F".equals(rst.getString("tribproduto").trim())) {
+                                
+                                strTrib = "F";
+                                
+                            } else if ("I".equals(rst.getString("tribproduto").trim())) {
+                                
+                                strTrib = "I";
+                                
+                            } else if ("N".equals(rst.getString("tribproduto").trim())) {
+                                
+                                strTrib = "N";
+                                
+                            } else if ("T".equals(rst.getString("tribproduto"))) {
+                                
+                                if (rst.getDouble("aliquota") == 7) {
+                                    strTrib = "0700";
+                                } else if (rst.getDouble("aliquota") == 11) {
+                                    strTrib = "1100";
+                                } else if (rst.getDouble("aliquota") == 12) {
+                                    strTrib = "1200";
+                                } else if (rst.getDouble("aliquota") == 18) {
+                                    strTrib = "1800";
+                                } else if (rst.getDouble("aliquota") == 25) {
+                                    strTrib = "2500";
+                                } else {
+                                    strTrib = "I";
+                                }
+                                
+                            }
+                            
+                        } else {
+                            strTrib = "I";
+                        }
+
+                        String trib = strTrib;
+
+                        obterAliquota(next, trib);
+                    }
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro no método obterNext()", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+    }
 }
