@@ -57,11 +57,6 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
                 new OpcaoProduto[]{
-                    OpcaoProduto.MERCADOLOGICO,
-                    OpcaoProduto.MERCADOLOGICO_NAO_EXCLUIR,
-                    OpcaoProduto.MERCADOLOGICO_PRODUTO,
-                    OpcaoProduto.FAMILIA,
-                    OpcaoProduto.FAMILIA_PRODUTO,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                     OpcaoProduto.PRODUTOS,
                     OpcaoProduto.EAN,
