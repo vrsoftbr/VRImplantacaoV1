@@ -134,7 +134,8 @@ import vrimplantacao2.gui.interfaces.GR7_2GUI;
 import vrimplantacao2.gui.interfaces.GTechGUI;
 import vrimplantacao2.gui.interfaces.GetWayGUI;
 import vrimplantacao2.gui.interfaces.GuiaSistemasGUI;
-import vrimplantacao2.gui.interfaces.HRTechGUI;
+import vrimplantacao2.gui.interfaces.HRTechGUI_v1;
+import vrimplantacao2.gui.interfaces.HRTechGUI_v2;
 import vrimplantacao2.gui.interfaces.HerculesIntCashGUI;
 import vrimplantacao2.gui.interfaces.HipcomGUI;
 import vrimplantacao2.gui.interfaces.HiperGUI;
@@ -631,7 +632,8 @@ public final class MenuGUI extends VRMdiFrame {
         mnuLince = new javax.swing.JMenuItem();
         mnuDataSync = new javax.swing.JMenuItem();
         mnuWinNexus = new javax.swing.JMenuItem();
-        mnuHRTech = new javax.swing.JMenuItem();
+        mnuHRTechV1 = new javax.swing.JMenuItem();
+        mnuHRTechV2 = new javax.swing.JMenuItem();
         mnuAcom = new javax.swing.JMenuItem();
         mnuHercules = new javax.swing.JMenuItem();
         mnuSav = new javax.swing.JMenuItem();
@@ -1652,13 +1654,21 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuSqlServer2.add(mnuWinNexus);
 
-        mnuHRTech.setText("HRTech");
-        mnuHRTech.addActionListener(new java.awt.event.ActionListener() {
+        mnuHRTechV1.setText("HRTech(v1)");
+        mnuHRTechV1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuHRTechActionPerformed(evt);
+                mnuHRTechV1ActionPerformed(evt);
             }
         });
-        mnuSqlServer2.add(mnuHRTech);
+        mnuSqlServer2.add(mnuHRTechV1);
+
+        mnuHRTechV2.setText("HRTech(v2)");
+        mnuHRTechV2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuHRTechV2ActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuHRTechV2);
 
         mnuAcom.setText("ACOM");
         mnuAcom.addActionListener(new java.awt.event.ActionListener() {
@@ -4053,9 +4063,9 @@ public final class MenuGUI extends VRMdiFrame {
         SuperLoja10GUI.exibir(this);
     }//GEN-LAST:event_mnuSuperLoja10ActionPerformed
 
-    private void mnuHRTechActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuHRTechActionPerformed
-        HRTechGUI.exibir(this);
-    }//GEN-LAST:event_mnuHRTechActionPerformed
+    private void mnuHRTechV1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuHRTechV1ActionPerformed
+        HRTechGUI_v1.exibir(this);
+    }//GEN-LAST:event_mnuHRTechV1ActionPerformed
 
     private void mnuSolutionSuperaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSolutionSuperaActionPerformed
         // TODO add your handling code here:
@@ -4197,6 +4207,10 @@ public final class MenuGUI extends VRMdiFrame {
     private void mnuControlXActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuControlXActionPerformed
         ControlXGUI.exibir(this);
     }//GEN-LAST:event_mnuControlXActionPerformed
+
+    private void mnuHRTechV2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuHRTechV2ActionPerformed
+        HRTechGUI_v2.exibir(this);
+    }//GEN-LAST:event_mnuHRTechV2ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4345,7 +4359,8 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuG4;
     private javax.swing.JMenuItem mnuGDoor;
     private javax.swing.JMenuItem mnuGTech;
-    private javax.swing.JMenuItem mnuHRTech;
+    private javax.swing.JMenuItem mnuHRTechV1;
+    private javax.swing.JMenuItem mnuHRTechV2;
     private javax.swing.JMenuItem mnuHercules;
     private javax.swing.JMenuItem mnuHipcom;
     private javax.swing.JMenuItem mnuHiper;

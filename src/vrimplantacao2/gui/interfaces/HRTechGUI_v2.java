@@ -22,20 +22,20 @@ import vrimplantacao2.dao.cadastro.financeiro.contaspagar.OpcaoContaPagar;
 import vrimplantacao2.dao.cadastro.financeiro.creditorotativo.OpcaoCreditoRotativo;
 import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
-import vrimplantacao2.dao.interfaces.HRTechDAO;
+import vrimplantacao2.dao.interfaces.HRTechDAO_v2;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
-public class HRTechGUI extends VRInternalFrame {
+public class HRTechGUI_v2 extends VRInternalFrame {
 
     private static final String SISTEMA = "HRTech";
     private static final String SERVIDOR_SQL = "Sql Server";
-    private static HRTechGUI instance;
+    private static HRTechGUI_v2 instance;
     private String vLojaCliente = "-1";
     private int vLojaVR = -1;
-    private HRTechDAO dao = new HRTechDAO();
+    private HRTechDAO_v2 dao = new HRTechDAO_v2();
     private ConexaoSqlServer connSqlServer = new ConexaoSqlServer();
 
     private void carregarParametros() throws Exception {
@@ -74,7 +74,7 @@ public class HRTechGUI extends VRInternalFrame {
         params.salvar();
     }
 
-    private HRTechGUI(VRMdiFrame i_mdiFrame) throws Exception {
+    private HRTechGUI_v2(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();        
         this.title = "Importação " + SISTEMA;
@@ -171,7 +171,7 @@ public class HRTechGUI extends VRInternalFrame {
         try {
             i_mdiFrame.setWaitCursor();
             if (instance == null || instance.isClosed()) {
-                instance = new HRTechGUI(i_mdiFrame);
+                instance = new HRTechGUI_v2(i_mdiFrame);
             }
             instance.setVisible(true);
         } catch (Exception ex) {

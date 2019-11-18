@@ -45,7 +45,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
  *
  * @author Importacao
  */
-public class HRTechDAO extends InterfaceDAO implements MapaTributoProvider {
+public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
 
     private static final Logger LOG = Logger.getLogger(GetWayDAO.class.getName());
     

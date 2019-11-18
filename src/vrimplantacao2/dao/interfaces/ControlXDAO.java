@@ -148,7 +148,7 @@ public class ControlXDAO extends InterfaceDAO {
                     imp.setImportId(rs.getString("id"));
                     imp.setEan(rs.getString("ean"));
                     imp.seteBalanca("T".equals(rs.getString("isBalanca")));
-                    imp.setValidade(rs.getInt("validade"));
+                    imp.setValidade(Utils.stringToInt(rs.getString("validade")));
                     imp.setDescricaoCompleta(Utils.acertarTexto(rs.getString("descricaocompleta")));
                     imp.setDescricaoGondola(Utils.acertarTexto(imp.getDescricaoCompleta()));
                     imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
@@ -259,7 +259,7 @@ public class ControlXDAO extends InterfaceDAO {
                     }
                     
                     imp.setPrazoEntrega(rs.getInt("prazoentrega"));
-                    imp.addCondicaoPagamento(rs.getInt("condicaopagamento"));
+                    imp.addCondicaoPagamento(Utils.stringToInt(rs.getString("condicaopagamento")));
                     
                     result.add(imp);
                 }
