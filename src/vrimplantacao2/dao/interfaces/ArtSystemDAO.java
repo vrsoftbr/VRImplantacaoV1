@@ -38,7 +38,7 @@ import vrimplantacao2.vo.importacao.VendaItemIMP;
 public class ArtSystemDAO extends InterfaceDAO {
 
     private static final Logger LOG = Logger.getLogger(ArtSystemDAO.class.getName());
-    
+
     @Override
     public String getSistema() {
         return "ArtSystem";
@@ -71,8 +71,7 @@ public class ArtSystemDAO extends InterfaceDAO {
             OpcaoProduto.ATACADO,
             OpcaoProduto.VALIDADE,
             OpcaoProduto.MERCADOLOGICO,
-            OpcaoProduto.MERCADOLOGICO_PRODUTO,
-        }));
+            OpcaoProduto.MERCADOLOGICO_PRODUTO,}));
     }
 
     public List<Estabelecimento> getLojasCliente() throws Exception {
@@ -227,7 +226,7 @@ public class ArtSystemDAO extends InterfaceDAO {
                         imp.setIcmsReducaoSaida(rst.getDouble("reducao_saida"));
                         imp.setIcmsCstEntrada(rst.getInt("cst_entrada"));
                         imp.setIcmsAliqEntrada(rst.getDouble("aliquota_entrada"));
-                        imp.setIcmsReducaoEntrada(rst.getDouble("reducao_entrada"));                        
+                        imp.setIcmsReducaoEntrada(rst.getDouble("reducao_entrada"));
                         result.add(imp);
                     }
                 }
@@ -239,7 +238,7 @@ public class ArtSystemDAO extends InterfaceDAO {
     @Override
     public List<ProdutoIMP> getProdutos(OpcaoProduto opt) throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        
+
         if (opt == OpcaoProduto.MERCADOLOGICO) {
             try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
                 try (ResultSet rst = stm.executeQuery(
@@ -261,14 +260,14 @@ public class ArtSystemDAO extends InterfaceDAO {
                     }
                 }
                 return result;
-            }            
+            }
         }
         return null;
     }
-    
+
     @Override
     public List<FornecedorIMP> getFornecedores() throws Exception {
-        List<FornecedorIMP> result = new ArrayList<>();       
+        List<FornecedorIMP> result = new ArrayList<>();
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -320,7 +319,7 @@ public class ArtSystemDAO extends InterfaceDAO {
                     imp.setUf(rst.getString("uf"));
                     imp.setTel_principal(rst.getString("ddd") + rst.getString("telefone"));
                     imp.setObservacao(rst.getString("observacao"));
-                          
+
                     if ((rst.getString("condicao_pagamento") != null)
                             && (!rst.getString("condicao_pagamento").trim().isEmpty())) {
 
@@ -388,8 +387,7 @@ public class ArtSystemDAO extends InterfaceDAO {
                             imp.setCondicaoPagamento(0);
                         }
                     }
-                    
-                    
+
                     try (Statement stm2 = ConexaoSqlServer.getConexao().createStatement()) {
                         try (ResultSet rst2 = stm2.executeQuery(
                                 "select \n"
@@ -411,7 +409,7 @@ public class ArtSystemDAO extends InterfaceDAO {
                             }
                         }
                     }
-                    
+
                     result.add(imp);
                 }
             }
@@ -544,22 +542,24 @@ public class ArtSystemDAO extends InterfaceDAO {
                     imp.setValorLimite(rst.getDouble("saldo"));
                     imp.setPermiteCreditoRotativo(true);
                     imp.setPermiteCheque(true);
-                    
-                    if (null != rst.getString("status")) switch (rst.getString("status")) {
-                        case "232":
-                            imp.setBloqueado(true);
-                            break;
-                        case "233":
-                            imp.setBloqueado(false);
-                            break;
-                        case "263":
-                            imp.setBloqueado(true);
-                            break;
-                        default:
-                            imp.setBloqueado(false);
-                            break;
+
+                    if (null != rst.getString("status")) {
+                        switch (rst.getString("status")) {
+                            case "232":
+                                imp.setBloqueado(true);
+                                break;
+                            case "233":
+                                imp.setBloqueado(false);
+                                break;
+                            case "263":
+                                imp.setBloqueado(true);
+                                break;
+                            default:
+                                imp.setBloqueado(false);
+                                break;
+                        }
                     }
-                    
+
                     try (Statement stm2 = ConexaoSqlServer.getConexao().createStatement()) {
                         try (ResultSet rst2 = stm2.executeQuery(
                                 "select \n"
@@ -625,15 +625,14 @@ public class ArtSystemDAO extends InterfaceDAO {
         }
         return result;
     }
-    
-    
+
     private String bancoDadosProd;
     private String bancoDadosVenda;
-    
+
     public void setBancoDadosProd(String bancoDadosProd) {
         this.bancoDadosProd = bancoDadosProd;
     }
-    
+
     public String getBancoDadosProd() {
         return this.bancoDadosProd;
     }
@@ -641,11 +640,11 @@ public class ArtSystemDAO extends InterfaceDAO {
     public void setBancoDadosVenda(String bancoDadosVenda) {
         this.bancoDadosVenda = bancoDadosVenda;
     }
-    
+
     public String getBancoDadosVenda() {
         return this.bancoDadosVenda;
-    }    
-    
+    }
+
     @Override
     public Iterator<VendaIMP> getVendaIterator() throws Exception {
         return new VendaIterator(getLojaOrigem(), getBancoDadosVenda());
@@ -655,7 +654,7 @@ public class ArtSystemDAO extends InterfaceDAO {
     public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
         return new VendaItemIterator(getLojaOrigem(), getBancoDadosVenda(), getBancoDadosProd());
     }
-    
+
     private static class VendaIterator implements Iterator<VendaIMP> {
 
         private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
@@ -681,9 +680,16 @@ public class ArtSystemDAO extends InterfaceDAO {
                     + "	xm.CPXCNOMCUP as chaveCfe\n"
                     + "from [" + bancoDadosVenda + "].dbo.ASCUPCUP ven\n"
                     + "left join [" + bancoDadosVenda + "].dbo.ASCUPXML xm on xm.CPXNNUMPDV = ven.CUPNNUMPDV \n"
-                    + "	and xm.CPXNNUMCUP = ven.CUPNNUMCUP\n"
-                    + "	and cast(xm.CPXDDATCUP as date) = cast(ven.CUPDDATCUP as date)\n"
-                    + "	and xm.CPXNID_LOJ = " + idLojaCliente + "\n"
+                    + "     and xm.CPXNNUMCUP = ven.CUPNNUMCUP\n"
+                    + "     and cast(xm.CPXDDATCUP as date) = cast(ven.CUPDDATCUP as date)\n"
+                    + "     and xm.CPXNID_LOJ = " + idLojaCliente + "\n"
+                    + "     and xm.CPXNID_CPX = (select MIN(CPXNID_CPX) \n"
+                    + "	                           from [" + bancoDadosVenda + "].dbo.ASCUPXML \n"
+                    + "	                          where CPXNNUMCUP = ven.CUPNNUMCUP\n"
+                    + "	                            and CPXNNUMPDV = ven.CUPNNUMPDV\n"
+                    + "	                            and cast(CPXDDATCUP as date) = cast(ven.CUPDDATCUP as date)\n"
+                    + "	                            and CPXNID_LOJ = " + idLojaCliente + "\n"
+                    + "	                        )\n"
                     + "where CUPNID_LOJ = " + idLojaCliente + "\n"
                     + "and ven.CUPCCONCUP not like '%DATAFISCAL%'\n"
                     + "and ven.CUPNVLRCUP > 0";
@@ -727,12 +733,12 @@ public class ArtSystemDAO extends InterfaceDAO {
                         next.setNumeroCupom(Utils.stringToInt(numeroCupom));
                         next.setEcf(Utils.stringToInt(rst.getString("ecf")));
                         next.setData(rst.getDate("datavenda"));
-                        
+
                         String horavenda = rst.getString("horavenda");
                         if ((horavenda).contains("::")) {
                             horavenda = "00:00:00";
-                        }                        
-                        
+                        }
+
                         String horaInicio = timestampDate.format(rst.getDate("datavenda")) + " " + horavenda;
                         String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " " + horavenda;
 
@@ -752,7 +758,7 @@ public class ArtSystemDAO extends InterfaceDAO {
                         next.setHoraTermino(timestamp.parse(horaTermino));
                         next.setSubTotalImpressora(rst.getDouble("valortotal"));
                         next.setValorDesconto(rst.getDouble("valordesconto"));
-                        
+
                         if ((rst.getString("chaveCfe") != null)
                                 && (!rst.getString("chaveCfe").trim().isEmpty())) {
                             next.setChaveCfe(rst.getString("chaveCfe").replace(".XML", "").replace("CFE", ""));
@@ -767,7 +773,7 @@ public class ArtSystemDAO extends InterfaceDAO {
             }
         }
     }
-    
+
     private static class VendaItemIterator implements Iterator<VendaItemIMP> {
 
         private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
@@ -903,25 +909,25 @@ public class ArtSystemDAO extends InterfaceDAO {
 
                         next.setCancelado(cancelado);
                         next.setCodigoBarras(rst.getString("codigo_produto"));
-                        
+
                         String strTrib = "";
 
                         if ((rst.getString("tribproduto") != null)
                                 && (!rst.getString("tribproduto").trim().isEmpty())) {
                             if ("F".equals(rst.getString("tribproduto").trim())) {
-                                
+
                                 strTrib = "F";
-                                
+
                             } else if ("I".equals(rst.getString("tribproduto").trim())) {
-                                
+
                                 strTrib = "I";
-                                
+
                             } else if ("N".equals(rst.getString("tribproduto").trim())) {
-                                
+
                                 strTrib = "N";
-                                
+
                             } else if ("T".equals(rst.getString("tribproduto"))) {
-                                
+
                                 if (rst.getDouble("aliquota") == 7) {
                                     strTrib = "0700";
                                 } else if (rst.getDouble("aliquota") == 11) {
@@ -935,9 +941,9 @@ public class ArtSystemDAO extends InterfaceDAO {
                                 } else {
                                     strTrib = "I";
                                 }
-                                
+
                             }
-                            
+
                         } else {
                             strTrib = "I";
                         }
