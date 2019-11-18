@@ -6,9 +6,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
+import vrimplantacao.utils.Utils;
+import vrimplantacao.vo.vrimplantacao.ProdutoBalancaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
@@ -172,19 +176,37 @@ public class AlphaSysDAO extends InterfaceDAO {
                     + "order by\n"
                     + "    1"
             )) {
+                int cont = 0;
+                Map<Integer, ProdutoBalancaVO> produtosBalanca = new ProdutoBalancaDAO().carregarProdutosBalanca();
+                                
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
 
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
+                    
+                    ProdutoBalancaVO bal = produtosBalanca.get(Utils.stringToInt(rst.getString("ean")));
+                    if (bal != null) {
+                        imp.setEan(bal.getCodigo() + "");
+                        imp.setQtdEmbalagem(1);
+                        imp.setValidade(bal.getValidade());
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
+                    } else {
+                        imp.setEan(rst.getString("ean"));
+                        imp.setValidade(rst.getInt("validade"));
+                        imp.seteBalanca("S".equals(rst.getString("e_balanca")));
+                        imp.setTipoEmbalagem(rst.getString("UNIDADE"));
+                    }
+                    
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
-                    imp.setEan(rst.getString("ean"));
+                    //imp.setEan(rst.getString("ean"));
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtdemb_cotacao"));
-                    imp.setTipoEmbalagem(rst.getString("unidade"));
-                    imp.setValidade(rst.getInt("validade"));
-                    imp.seteBalanca(rst.getBoolean("e_balanca"));
+                    //imp.setTipoEmbalagem(rst.getString("unidade"));
+                    //imp.setValidade(rst.getInt("validade"));
+                    //imp.seteBalanca(rst.getBoolean("e_balanca"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoGondola(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
