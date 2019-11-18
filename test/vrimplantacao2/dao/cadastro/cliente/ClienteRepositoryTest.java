@@ -305,11 +305,7 @@ public class ClienteRepositoryTest {
                 cont++;
                 contatos.add(contato);
             }
-            
-            @Override
-            public void setNotificacao(String mensagem, int qtd) throws Exception {}
-            @Override
-            public void notificar() throws Exception {}
+
         };
         
         ClienteIMP clienteImp1 = ClientePreferencialTestClasses.clienteImp1();
@@ -371,11 +367,7 @@ public class ClienteRepositoryTest {
                 cont++;
                 contatos.add(contato);
             }
-            
-            @Override
-            public void setNotificacao(String mensagem, int qtd) throws Exception {}
-            @Override
-            public void notificar() throws Exception {}
+
         };
         
         ClienteIMP clienteImp1 = ClientePreferencialTestClasses.clienteImp1();
@@ -428,10 +420,7 @@ public class ClienteRepositoryTest {
             public void gravarClienteEventualAnterior(ClienteEventualAnteriorVO anterior) {
                 ant.add(anterior);
             }
-            @Override
-            public void setNotificacao(String mensagem, int qtd) throws Exception {}
-            @Override
-            public void notificar() throws Exception {}
+
         };
         MultiMap<String, ClienteEventualAnteriorVO> multiMap = new MultiMap<>();
         
@@ -482,11 +471,7 @@ public class ClienteRepositoryTest {
                 cont++;
                 contatos.add(contato);
             }
-            
-            @Override
-            public void setNotificacao(String mensagem, int qtd) throws Exception {}
-            @Override
-            public void notificar() throws Exception {}
+
         };
         ClienteIMP clienteImp1 = ClientePreferencialTestClasses.clienteImp1();
         
@@ -517,11 +502,7 @@ public class ClienteRepositoryTest {
                 cont++;
                 contatos.add(contato);
             }
-            
-            @Override
-            public void setNotificacao(String mensagem, int qtd) throws Exception {}
-            @Override
-            public void notificar() throws Exception {}
+
         };
         ClienteIMP clienteImp1 = ClientePreferencialTestClasses.clienteImp1();
         
@@ -554,10 +535,7 @@ public class ClienteRepositoryTest {
             public void gravarClientePreferencialAnterior(ClientePreferencialAnteriorVO anterior) {
                 ant.add(anterior);
             }
-            @Override
-            public void setNotificacao(String mensagem, int qtd) throws Exception {}
-            @Override
-            public void notificar() throws Exception {}
+
         };
         MultiMap<String, ClientePreferencialAnteriorVO> multiMap = new MultiMap<>();
         
@@ -620,11 +598,7 @@ public class ClienteRepositoryTest {
                 cont++;
                 contatos.add(contato);
             }
-            
-            @Override
-            public void setNotificacao(String mensagem, int qtd) throws Exception {}
-            @Override
-            public void notificar() throws Exception {}
+
         };
         
         ClienteIMP clienteImp1 = ClientePreferencialTestClasses.clienteImp1();
@@ -685,11 +659,7 @@ public class ClienteRepositoryTest {
                 cont++;
                 contatos.add(contato);
             }
-            
-            @Override
-            public void setNotificacao(String mensagem, int qtd) throws Exception {}
-            @Override
-            public void notificar() throws Exception {}
+
         };
         
         ClienteIMP clienteImp1 = ClientePreferencialTestClasses.clienteImp1();

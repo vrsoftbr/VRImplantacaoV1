@@ -161,11 +161,9 @@ public class ClienteRepository {
             MultiMap<String, ClientePreferencialAnteriorVO> anteriores = provider.preferencial().getAnteriores();
             //</editor-fold>
             
-<<<<<<< src/vrimplantacao2/dao/cadastro/cliente/ClienteRepository.java
+
             provider.setNotificacao("Atualizando cliente preferêncial...", clientes.size());
-=======
-            setNotificacao("Atualizando cliente preferencial...", clientes.size());
->>>>>>> src/vrimplantacao2/dao/cadastro/cliente/ClienteRepository.java
+            
             for (ClienteIMP imp: clientes) {                
                 ClientePreferencialAnteriorVO anterior = anteriores.get(
                        provider.getSistema(),
