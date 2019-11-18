@@ -21,6 +21,7 @@ import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao.vo.loja.UsuarioVO;
 import vrimplantacao2.parametro.Parametros;
 import vrimplantacao2.parametro.Versao;
+import vrimplantacao.gui.MenuGUI;
 
 public class LoginGUI extends VRDialog {
 

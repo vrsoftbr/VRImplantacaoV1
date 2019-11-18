@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrframework.classe.Conexao;
+import vrframework.classe.Util;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaEntrada;
 import vrimplantacao2.vo.cadastro.notafiscal.NotaEntradaItem;
@@ -82,30 +83,68 @@ public class NotaEntradaDAO {
     }
 
     public void eliminarNota(int id) throws Exception {
+        eliminarItens(id);
         try (Statement stm = Conexao.createStatement()) {
-            stm.execute("delete from notaentradaitemimportacaoxml where id_notaentradaitem in (select id from notaentradaitem where id_notaentrada = " + id + ")");
-            stm.execute("delete from notaentradaitem where id_notaentrada = " + id);
             stm.execute("delete from notaentrada where id = " + id);
         }
     }
-
-    public Integer getNota(NotaFiscalIMP imp, int idLojaVR) throws Exception {
+    
+    public void eliminarItens(int id) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
-            try (ResultSet rst = stm.executeQuery(
-                    "select id from notaentrada n\n" +
+            stm.execute("delete from notaentradaitemimportacaoxml where id_notaentradaitem in (select id from notaentradaitem where id_notaentrada = " + id + ")");
+            stm.execute("delete from notaentradaitem where id_notaentrada = " + id);
+        }
+    }
+
+    public Integer getNota(NotaFiscalIMP imp, int idFornecedor, int idLojaVR) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            String sql = "select id from notaentrada n\n" +
                     "where\n" +
                     "	n.id_loja = " + idLojaVR + " and\n" +
-                    "	n.modelo = '" + imp.getModelo() + "' and\n" +
-                    "	n.serie = '" + imp.getSerie() + "' and\n" +
+                    "   n.id_fornecedor = " + idFornecedor + " and\n" +
                     "	n.numeronota = " + imp.getNumeroNota() + " and\n" +
-                    "	n.dataentrada = '" + new SimpleDateFormat("yyyy-MM-dd").format(imp.getDataEntradaSaida()) + "'"
-            )) {
+                    "	n.dataentrada = '" + new SimpleDateFormat("yyyy-MM-dd").format(imp.getDataEntradaSaida()) + "'";
+            
+            LOG.fine(sql);
+            
+            try (ResultSet rst = stm.executeQuery(sql)) {
                 if (rst.next()) {
                     return rst.getInt("id") > 0 ? rst.getInt("id") : null;
                 }
             }
         }
         return null;
+    }
+
+    public void atualizar(NotaEntrada ne) throws Exception {
+        
+        SQLBuilder sql = new SQLBuilder();
+        sql.setTableName("notaentrada");
+        sql.put("valoripi", ne.getValorIpi());
+        sql.put("valorfrete", ne.getValorFrete());
+        sql.put("valordesconto", ne.getValorDesconto());
+        sql.put("valoroutradespesa", ne.getValorOutraDespesa());
+        sql.put("valordespesaadicional", ne.getValorDespesaAdicional());
+        sql.put("valormercadoria", ne.getValorMercadoria());
+        sql.put("valortotal", ne.getValorTotal());
+        sql.put("valoricms", ne.getValorIcms());
+        sql.put("valoricmssubstituicao", ne.getValorIcmsSubstituicao());
+        sql.put("valorguiasubstituicao", ne.getValorGuiaSubstituicao());
+        sql.put("valorbasecalculo", ne.getValorBaseCalculo());
+        sql.put("valorbasesubstituicao", ne.getValorBaseSubstituicao());
+        sql.put("valorfunrural", ne.getValorFunrural());
+        sql.put("valordescontoboleto", ne.getValorDescontoBoleto());
+        sql.put("valoricmssn", ne.getValorIcmsSN());
+        sql.put("valordespesafrete", ne.getValorDespesaFrete());
+        sql.put("valorfcp", ne.getValorFcp());
+        sql.put("valorfcpst", ne.getValorFcpST());
+        sql.put("valoricmsdesonerado", ne.getValorIcmsDesonerado());
+        sql.put("valorsuframa", ne.getValorSuframa());        
+        sql.setWhere("id = " + ne.getId());
+                
+        try (Statement stm = Conexao.createStatement()) {
+            stm.execute(sql.getUpdate());
+        }
     }
 
     public void salvar(NotaEntrada ne) throws Exception {

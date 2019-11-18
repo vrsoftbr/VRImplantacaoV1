@@ -78,7 +78,7 @@ public class AssociadoRepository {
                                 vItem = new AssociadoItemVO();
                                 vItem.setIdAssociado(vo.getId());
                                 vItem.setIdProduto(produtoFilho);
-                                vItem.setQtdEmbalagem(1);
+                                vItem.setQtdEmbalagem(imp.getQtdEmbalagemItem());
                                 vItem.setAplicaEstoque(true);
                                 vItem.setAplicaCusto(false);
                                 vItem.setAplicaPreco(false);

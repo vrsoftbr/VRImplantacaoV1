@@ -37,10 +37,12 @@ import vrimplantacao2.utils.sql.SQLUtils;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemVO;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
+import vrimplantacao2.vo.cadastro.notafiscal.TipoNota;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
+import vrimplantacao2.vo.enums.TipoDestinatario;
 import vrimplantacao2.vo.enums.TipoIva;
 import vrimplantacao2.vo.importacao.ChequeIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -52,6 +54,9 @@ import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
+import vrimplantacao2.vo.importacao.NotaFiscalIMP;
+import vrimplantacao2.vo.importacao.NotaFiscalItemIMP;
+import vrimplantacao2.vo.importacao.NotaOperacao;
 import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -59,15 +64,12 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
 import vrimplantacao2.vo.importacao.VendaItemIMP;
 
-/**
- *
- * @author Leandro
- */
-
 /*
-* @Guilherme
-* Para localizar tabelas do RMS, utilizar o sistema próprio deles, RMS Log Viewer, 
-* o mesmo gera os scripts e nomes da tabela.
+ *
+ * @author Leandro, Guilherme
+ * Para localizar tabelas do RMS, utilizar o sistema RMS Log Viewer, 
+ * o mesmo gera os scripts e nomes da tabela, caso necessário.
+ * Site com manual do sistema: https://tdn.totvs.com/display/public/LRMS/Manual+de+Extrato+de+Itens
 */
 public class RMSDAO extends InterfaceDAO {
 
@@ -79,6 +81,12 @@ public class RMSDAO extends InterfaceDAO {
     private boolean incluirNivel4 = true;
     
     private boolean importarVendasAntigas = false;
+    
+    private boolean somenteAtivos = false;
+
+    public void setSomenteAtivos(boolean somenteAtivos) {
+        this.somenteAtivos = somenteAtivos;
+    }
 
     public void setUtilizarViewMixFiscal(boolean utilizarViewMixFiscal) {
         this.utilizarViewMixFiscal = utilizarViewMixFiscal;
@@ -511,6 +519,7 @@ public class RMSDAO extends InterfaceDAO {
                     "	    atac.ean = ean.EAN_COD_EAN\n" +
                     (utilizarViewMixFiscal ? "left join\n" +
                     "       vw_fis_mxf_produtos vwfis on vwfis.codigo_produto = p.git_cod_item || p.git_digito\n" : "") +
+                    (somenteAtivos ? "where p.GIT_DAT_SAI_LIN = 0\n" : "") +
                     "order by \n" +
                     "	  p.git_cod_item"
             )) {
@@ -573,6 +582,26 @@ public class RMSDAO extends InterfaceDAO {
                         imp.setAtacadoPreco(rst.getDouble("precoatac"));
 
                         imp.setPautaFiscalId(rst.getString("idpautafiscal"));
+                    } else {
+                        imp.setPiscofinsCstDebito(rst.getInt("piscofins_debito"));
+                        imp.setPiscofinsNaturezaReceita(rst.getInt("nat_rec"));
+                        
+                        imp.setIcmsCstSaida(rst.getInt("icms_cst"));
+                        imp.setIcmsAliqSaida(rst.getDouble("icms_aliq"));
+                        imp.setIcmsReducaoSaida(rst.getDouble("icms_red"));
+                        imp.setIcmsCstSaidaForaEstado(rst.getInt("icms_cst"));
+                        imp.setIcmsAliqSaidaForaEstado(rst.getDouble("icms_aliq"));
+                        imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("icms_red"));
+                        imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("icms_cst"));
+                        imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("icms_aliq"));
+                        imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("icms_red"));
+                        
+                        imp.setIcmsCstEntrada(rst.getInt("icms_cst"));
+                        imp.setIcmsAliqEntrada(rst.getDouble("icms_aliq"));
+                        imp.setIcmsReducaoEntrada(rst.getDouble("icms_red"));
+                        imp.setIcmsCstEntradaForaEstado(rst.getInt("icms_cst"));
+                        imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms_aliq"));
+                        imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("icms_red"));
                     }
                     
                     result.add(imp);
@@ -614,7 +643,7 @@ public class RMSDAO extends InterfaceDAO {
                     "    left join AA2CFORN f2 on f.TIP_CODIGO = f2.FOR_CODIGO and F.TIP_DIGITO = f2.FOR_DIG_FOR \n" +
                     "    left join AA1FORDT f3 on f.TIP_CODIGO = f3.FOR_CODIGO\n" +
                     "WHERE\n" +
-                    "	F.TIP_LOJ_CLI = 'F'\n" +
+                    "	F.TIP_LOJ_CLI in ('F', 'L')\n" +
                     "order by\n" +
                     "    id"
             )) {
@@ -2256,5 +2285,305 @@ public class RMSDAO extends InterfaceDAO {
         return result;
     }
     
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("1yyMMdd");
+    private Date dataInicioNFEntrada;
+
+    public void setDataInicioNFEntrada(Date dataInicioNota) {
+        this.dataInicioNFEntrada = dataInicioNota;
+    }
     
+    @Override
+    public List<NotaFiscalIMP> getNotasFiscais() throws Exception {
+        List<NotaFiscalIMP> result = new ArrayList<>();
+        try(Statement stm = ConexaoOracle.createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "SELECT\n" +
+                    "    NF.ID_FORNECEDOR,\n" +
+                    "    NF.TIP_RAZAO_SOCIAL,\n" +
+                    "    NF.FIS_OPER,\n" +
+                    "    NF.NOTAFISCAL,\n" +
+                    "    SUM(NF.CUSTOTOTAL) CUSTOTOTALNOTA,\n" +
+                    "    NF.FIS_DTA_AGENDA,\n" +
+                    "    NF.FIS_SITUACAO,\n" +
+                    "    NF.DATA,\n" +
+                    "    NF.ESCHC_AGENDA,\n" +
+                    "    NF.ESCLC_CODIGO,\n" +
+                    "    NF.DIGITO_LOJA,\n" +
+                    "    NF.ESCHC_NRO_NOTA,\n" +
+                    "    NF.ESCHC_SER_NOTA,\n" +
+                    "    NF.FIS_SERIE_MR,\n" +
+                    "    NF.VENCIMENTO\n" +
+                    "FROM\n" +
+                    "    (SELECT\n" +
+                    "        TIP_CODIGO || TIP_DIGITO ID_FORNECEDOR,\n" +
+                    "        RTRIM(DECODE(TIP_LOJ_CLI,\n" +
+                    "                    'L',\n" +
+                    "                    TIP_NOME_FANTASIA,\n" +
+                    "                    DECODE(TIP_LOJ_CLI,\n" +
+                    "                          'D',\n" +
+                    "                          TIP_NOME_FANTASIA,\n" +
+                    "                          TIP_RAZAO_SOCIAL))) AS TIP_RAZAO_SOCIAL,\n" +
+                    "        FIS_OPER,\n" +
+                    "        FIS_NRO_NOTA NOTAFISCAL,\n" +
+                    "        FIS_DTA_AGENDA,\n" +
+                    "        FIS_SITUACAO,\n" +
+                    "        ESCHC_DATA DATA,\n" +
+                    "        ((ENTSAIC_QUANTI_UN / ENTSAIC_BASE_EMB) * ENTSAIC_PRC_EMB) CUSTOTOTAL,\n" +
+                    "        ESCHC_AGENDA,\n" +
+                    "        ESCLC_CODIGO,\n" +
+                    "        ESCLC_DIGITO DIGITO_LOJA,\n" +
+                    "        ESCHC_NRO_NOTA,\n" +
+                    "        ESCHC_SER_NOTA,\n" +
+                    "        FIS_SERIE_MR,\n" +
+                    "        (SELECT\n" +
+                    "            MIN(FIV_DTA_VENCTO)\n" +
+                    "        FROM\n" +
+                    "            AA3LVENC\n" +
+                    "        WHERE\n" +
+                    "            FIV_LOJ_ORG    = FIS_LOJ_ORG AND\n" +
+                    "            FIV_DIG_ORG    = FIS_DIG_ORG AND\n" +
+                    "            FIV_NRO_NOTA   = FIS_NRO_NOTA AND\n" +
+                    "            FIV_SERIE      = FIS_SERIE AND\n" +
+                    "            FIV_DTA_AGENDA = FIS_DTA_AGENDA AND\n" +
+                    "            FIV_OPER = FIS_OPER) AS VENCIMENTO\n" +
+                    "    FROM\n" +
+                    "        AG1IENSA I,\n" +
+                    "        AA1CFISC FIS,\n" +
+                    "        AA2CTIPO,\n" +
+                    "        AA1CTCON\n" +
+                    "    WHERE\n" +
+                    "        ROWNUM >= 0 AND\n" +
+                    "        I.ESCHC_DATA >= 1190101 AND\n" +
+                    "        I.ESITC_DIGITO = 0 AND\n" +
+                    "        NVL(I.ENTSAIC_SITUACAO, ' ') <> 'E' AND\n" +
+                    "        NVL(I.ENTSAIC_SITUACAO, ' ') <> '9' AND\n" +
+                    "        I.ESCHC_AGENDA\n" +
+                    "            IN (SELECT\n" +
+                    "                    FIG_AGD AGD\n" +
+                    "                FROM\n" +
+                    "                    AA2CFIGS\n" +
+                    "                WHERE\n" +
+                    "                    FIG_DTA = I.ESCHC_DATA\n" +
+                    "                    AND FIG_SER = I.ESCHC_SER_NOTA\n" +
+                    "                    AND FIG_NTA = I.ESCHC_NRO_NOTA\n" +
+                    "                    AND FIG_ORG = I.ESCHLJC_CODIGO\n" +
+                    "                    AND FIG_AGE = I.ESCHC_AGENDA\n" +
+                    "                UNION\n" +
+                    "                SELECT\n" +
+                    "                    REF_DEP_OPER AGD\n" +
+                    "                FROM\n" +
+                    "                    AA1CRFIS\n" +
+                    "                WHERE\n" +
+                    "                    REF_DEP_DTA_AGENDA = I.ESCHC_DATA\n" +
+                    "                  AND REF_DEP_SERIE = I.ESCHC_SER_NOTA\n" +
+                    "                  AND REF_DEP_NRO_NOTA = I.ESCHC_NRO_NOTA\n" +
+                    "                  AND REF_DEP_LOJ_ORG = I.ESCHLJC_CODIGO\n" +
+                    "                  AND REF_DEP_OPER = I.ESCHC_AGENDA\n" +
+                    "                UNION\n" +
+                    "                  SELECT\n" +
+                    "                    I.ESCHC_AGENDA AGD\n" +
+                    "                  FROM\n" +
+                    "                    DUAL) AND\n" +
+                    "        FIS.FIS_LOJ_ORG = I.ESCHLJC_CODIGO AND\n" +
+                    "        FIS.FIS_DIG_ORG = I.ESCHLJC_DIGITO AND\n" +
+                    "        FIS.FIS_NRO_NOTA = I.ESCHC_NRO_NOTA AND\n" +
+                    "        FIS.FIS_DTA_AGENDA = I.ESCHC_DATA AND\n" +
+                    "        DECODE(FIS.FIS_ENT_SAI,'E',FIS_LOJ_DST,FIS_LOJ_ORG) || ESCLC_DIGITO = " + getLojaOrigem() + " AND\n" +
+                    "        FIS.FIS_SITUACAO <> '9' AND\n" +
+                    "        TIP_CODIGO = DECODE(TBC_INTG_3,'E',I.ESCHLJC_CODIGO,I.ESCLC_CODIGO) AND\n" +
+                    "        TIP_DIGITO = DECODE(TBC_INTG_3,'E',I.ESCHLJC_DIGITO,I.ESCLC_DIGITO) AND\n" +
+                    "        TBC_AGENDA = I.ESCHC_AGENDA AND\n" +
+                    "        TBC_CODIGO = 0 AND\n" +
+                    "        TBC_INTG_13 <> '4' AND\n" +
+                    "        TBC_INTG_11 IN ('C','T','D','R','O') AND\n" +
+                    "        TBC_INTG_3 IN ('E')\n" +
+                    "    ORDER BY\n" +
+                    "        ESCHC_DATA DESC,\n" +
+                    "        ESCHC_AGENDA DESC) NF\n" +
+                    "GROUP BY\n" +
+                    "    NF.ID_FORNECEDOR,\n" +
+                    "    NF.TIP_RAZAO_SOCIAL,\n" +
+                    "    NF.FIS_OPER,\n" +
+                    "    NF.NOTAFISCAL,\n" +
+                    "    NF.FIS_DTA_AGENDA,\n" +
+                    "    NF.FIS_SITUACAO,\n" +
+                    "    NF.DATA,\n" +
+                    "    NF.ESCHC_AGENDA,\n" +
+                    "    NF.ESCLC_CODIGO,\n" +
+                    "    NF.DIGITO_LOJA,\n" +
+                    "    NF.ESCHC_NRO_NOTA,\n" +
+                    "    NF.ESCHC_SER_NOTA,\n" +
+                    "    NF.FIS_SERIE_MR,\n" +
+                    "    NF.VENCIMENTO\n" +
+                    "ORDER BY\n" +
+                    "    NF.FIS_DTA_AGENDA"
+            )) {
+                SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
+                while(rs.next()) {
+                    NotaFiscalIMP imp = new NotaFiscalIMP();
+                    imp.setIdDestinatario(rs.getString("id_fornecedor"));
+                    imp.setTipoDestinatario(TipoDestinatario.FORNECEDOR);
+                    imp.setNumeroNota(rs.getInt("notafiscal"));
+                    imp.setValorTotal(rs.getDouble("custototalnota"));
+                    imp.setDataEmissao(format.parse(rs.getString("data")));
+                    imp.setDataEntradaSaida(format.parse(rs.getString("data")));
+                    imp.setDataHoraAlteracao(format.parse(rs.getString("data")));
+                    imp.setSerie(Utils.formataNumero(rs.getString("eschc_ser_nota")));
+                    imp.setOperacao(NotaOperacao.ENTRADA);
+                    imp.setTipoNota(TipoNota.NORMAL);
+                    formataIDNotaFiscal(imp);
+                    
+                    getNotasItem(String.valueOf(imp.getNumeroNota()), imp.getIdDestinatario(), imp);
+                    
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+    
+    private void getNotasItem(String numeroNota, String idFornecedor, NotaFiscalIMP imp) throws Exception {
+        SimpleDateFormat format = new SimpleDateFormat("1yyMMdd");
+        try (Statement stm = ConexaoOracle.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT \n" +
+                    "    * \n" +
+                    "FROM \n" +
+                    "    (SELECT \n" +
+                    "	     TIP_CODIGO || TIP_DIGITO ID_FORNECEDOR,\n" +
+                    "        RTRIM(DECODE(TIP_LOJ_CLI, \n" +
+                    "                    'L', \n" +
+                    "                    TIP_NOME_FANTASIA,\n" +
+                    "                    DECODE(TIP_LOJ_CLI,\n" +
+                    "                          'D',\n" +
+                    "                          TIP_NOME_FANTASIA,\n" +
+                    "                          TIP_RAZAO_SOCIAL))) AS TIP_RAZAO_SOCIAL, \n" +
+                    "        FIS_OPER, \n" +
+                    "        FIS_NRO_NOTA NOTAFISCAL,\n" +
+                    "        ESITC_CODIGO ID_PRODUTO,\n" +
+                    "        P.GIT_DESCRICAO DESCRICAO,\n" +        
+                    "        ENTSAIC_PRC_UN CUSTOUNITARIO,\n" +
+                    "        ROUND(ENTSAIC_QUANTI_UN / ENTSAIC_BASE_EMB, 2) QUANTIDADE,\n" +
+                    "        (ENTSAIC_PRC_EMB * ROUND(ENTSAIC_QUANTI_UN / ENTSAIC_BASE_EMB, 2)) CUSTOTOTAL,\n" +        
+                    "        ENTSAIC_BASE_EMB QTDEMBALAGEM,\n" +        
+                    "        ENTSAIC_PRC_EMB CUSTOEMBALAGEM,\n" +
+                    "        ENTSAIC_TPO_EMB EMBALAGEM,\n" +
+                    "        FIS_DTA_AGENDA, \n" +
+                    "        FIS_SITUACAO,  \n" +
+                    "        ESCHC_DATA DATA,\n" +
+                    "        ENTSAIC_VLR_ICM,\n" +
+                    "        I.ENTSAIC_PERC_ICMS ICMS,\n" +
+                    "        I.ENTSAIC_PERC_IPI,\n" +
+                    "        ESCHC_AGENDA, \n" +
+                    "        ESCLC_CODIGO, \n" +
+                    "        ESCLC_DIGITO DIGITO_LOJA, \n" +
+                    "        ESCHC_NRO_NOTA, \n" +
+                    "        ESCHC_SER_NOTA, \n" +
+                    "        FIS_SERIE_MR, \n" +
+                    "        (SELECT \n" +
+                    "            MIN(FIV_DTA_VENCTO) \n" +
+                    "        FROM \n" +
+                    "            AA3LVENC \n" +
+                    "        WHERE \n" +
+                    "            FIV_LOJ_ORG    = FIS_LOJ_ORG AND  \n" +
+                    "            FIV_DIG_ORG    = FIS_DIG_ORG AND  \n" +
+                    "            FIV_NRO_NOTA   = FIS_NRO_NOTA AND   \n" +
+                    "            FIV_SERIE      = FIS_SERIE AND   \n" +
+                    "            FIV_DTA_AGENDA = FIS_DTA_AGENDA AND   \n" +
+                    "            FIV_OPER       = FIS_OPER) AS VENCIMENTO \n" +
+                    "    FROM  \n" +
+                    "        AG1IENSA I,\n" +
+                    "        AA1CFISC FIS, \n" +
+                    "        AA2CTIPO, \n" +
+                    "        AA1CTCON, \n" +
+                    "        AA3CITEM P \n" +        
+                    "    WHERE \n" +
+                    "        ROWNUM >= 0 AND \n" +
+                    "        I.ESCHC_DATA >= 1190101 AND\n" +
+                    "        FIS_NRO_NOTA = " + numeroNota + " AND\n" +
+                    "        TIP_CODIGO || TIP_DIGITO = " + idFornecedor + " AND\n" +        
+                    "        I.ESITC_DIGITO = 0 AND \n" +
+                    "        NVL(I.ENTSAIC_SITUACAO, ' ') <> 'E' AND \n" +
+                    "        NVL(I.ENTSAIC_SITUACAO, ' ') <> '9' AND \n" +
+                    "        I.ESCHC_AGENDA \n" +
+                    "            IN (SELECT \n" +
+                    "                    FIG_AGD AGD \n" +
+                    "                FROM \n" +
+                    "                    AA2CFIGS \n" +
+                    "                WHERE \n" +
+                    "                    FIG_DTA = I.ESCHC_DATA \n" +
+                    "                    AND FIG_SER = I.ESCHC_SER_NOTA \n" +
+                    "                    AND FIG_NTA = I.ESCHC_NRO_NOTA \n" +
+                    "                    AND FIG_ORG = I.ESCHLJC_CODIGO \n" +
+                    "                    AND FIG_AGE = I.ESCHC_AGENDA \n" +
+                    "                UNION \n" +
+                    "                SELECT \n" +
+                    "                    REF_DEP_OPER AGD \n" +
+                    "                FROM \n" +
+                    "                    AA1CRFIS \n" +
+                    "                WHERE \n" +
+                    "                    REF_DEP_DTA_AGENDA = I.ESCHC_DATA \n" +
+                    "                  AND REF_DEP_SERIE = I.ESCHC_SER_NOTA \n" +
+                    "                  AND REF_DEP_NRO_NOTA = I.ESCHC_NRO_NOTA \n" +
+                    "                  AND REF_DEP_LOJ_ORG = I.ESCHLJC_CODIGO \n" +
+                    "                  AND REF_DEP_OPER = I.ESCHC_AGENDA \n" +
+                    "                UNION \n" +
+                    "                  SELECT \n" +
+                    "                    I.ESCHC_AGENDA AGD \n" +
+                    "                  FROM \n" +
+                    "                    DUAL) AND   \n" +
+                    "        FIS.FIS_LOJ_ORG = I.ESCHLJC_CODIGO AND \n" +
+                    "        FIS.FIS_DIG_ORG = I.ESCHLJC_DIGITO AND \n" +
+                    "        FIS.FIS_NRO_NOTA = I.ESCHC_NRO_NOTA AND \n" +
+                    "        FIS.FIS_DTA_AGENDA = I.ESCHC_DATA AND \n" +
+                    "        DECODE(FIS.FIS_ENT_SAI,'E',FIS_LOJ_DST,FIS_LOJ_ORG) || ESCLC_DIGITO = " + getLojaOrigem() + " AND \n" +
+                    "        FIS.FIS_SITUACAO <> '9' AND \n" +
+                    "        TIP_CODIGO = DECODE(TBC_INTG_3,'E',I.ESCHLJC_CODIGO,I.ESCLC_CODIGO) AND \n" +
+                    "        TIP_DIGITO = DECODE(TBC_INTG_3,'E',I.ESCHLJC_DIGITO,I.ESCLC_DIGITO) AND \n" +
+                    "        TBC_AGENDA = I.ESCHC_AGENDA AND \n" +
+                    "        I.ESITC_CODIGO = P.GIT_COD_ITEM AND\n" +        
+                    "        TBC_CODIGO = 0 AND\n" +
+                    "        TBC_INTG_13 <> '4' AND \n" +
+                    "        TBC_INTG_11 IN ('C','T','D','R','O') AND \n" +
+                    "        TBC_INTG_3 IN ('E') \n" +
+                    "    ORDER BY \n" +
+                    "        ESCHC_DATA DESC, \n" +
+                    "        ESCHC_AGENDA DESC)"
+            )) {
+                while (rst.next()) {
+                    NotaFiscalItemIMP item = imp.addItem();
+                    item.setId(
+                            rst.getString("ID_FORNECEDOR"), "-",
+                            rst.getString("NOTAFISCAL"), "-",
+                            rst.getString("ID_PRODUTO"), "-",
+                            rst.getString("CUSTOUNITARIO"), "-",
+                            rst.getString("QUANTIDADE"), "-",
+                            rst.getString("CUSTOEMBALAGEM")
+                    );
+                    item.setIdProduto(rst.getString("ID_PRODUTO"));
+                    item.setDescricao(rst.getString("DESCRICAO"));
+                    item.setUnidade(rst.getString("EMBALAGEM"));
+                    item.setQuantidadeEmbalagem(rst.getInt("QTDEMBALAGEM"));
+                    item.setQuantidade(rst.getDouble("QUANTIDADE"));
+                    item.setValorTotalProduto(rst.getDouble("CUSTOTOTAL"));
+                    item.setIcmsAliquota(rst.getDouble("ICMS"));
+                    item.setCfop("1.102");
+                    if(item.getIcmsAliquota() > 0) {
+                        item.setIcmsCst(0);
+                    }
+                    item.setIcmsValor(rst.getDouble("ENTSAIC_VLR_ICM"));
+                }
+            }
+        }
+    }
+    
+    private void formataIDNotaFiscal(NotaFiscalIMP imp) {
+        String formatada = "";
+        formatada = String.format("%s-%s-%s-%s", 
+                imp.getIdDestinatario(), 
+                imp.getNumeroNota(),
+                imp.getDataEmissao(),
+                imp.getValorTotal());
+        imp.setId(formatada);
+    }
 }

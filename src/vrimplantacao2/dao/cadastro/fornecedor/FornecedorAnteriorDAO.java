@@ -24,7 +24,6 @@ public class FornecedorAnteriorDAO {
     }
     
     public void atualizarAnteriores() throws Exception {
-        createTable();
         anteriores = new MultiMap<>(3);
         try (Statement stm = Conexao.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
@@ -85,7 +84,7 @@ public class FornecedorAnteriorDAO {
         }
     }
     
-    private void createTable() throws Exception {
+    public FornecedorAnteriorDAO() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             stm.execute(
                 "do $$\n" +

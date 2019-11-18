@@ -23,6 +23,7 @@ public enum OpcaoFornecedor {
     CONDICAO_PAGAMENTO,
     CONDICAO_PAGAMENTO2,
     PRAZO_FORNECEDOR,
+    PRAZO_PEDIDO_FORNECEDOR,
     TELEFONE,
     TIPO_INSCRICAO,
     SITUACAO_CADASTRO,
@@ -39,7 +40,13 @@ public enum OpcaoFornecedor {
     BANCO_PADRAO,
     COMPLEMENTO,
     CEP, 
-    EMAIL, CONTATO_NOME, TIPO_CONTATO, CELULAR, BLOQUEADO;
+    EMAIL, 
+    CONTATO_NOME, 
+    TIPO_CONTATO, 
+    CELULAR, 
+    BLOQUEADO, 
+    EMITE_NFE, 
+    PERMITE_NF_SEM_PEDIDO;
     
     private List<FornecedorIMP> listaEspecial;
 

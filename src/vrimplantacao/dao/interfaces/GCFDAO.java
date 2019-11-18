@@ -2,6 +2,7 @@ package vrimplantacao.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,6 +32,7 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
 public class GCFDAO extends InterfaceDAO {
     
     private int nivel = 1;
+    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("d/MM/yyyy");
 
     public int getNivel() {
         return nivel;
@@ -210,7 +212,10 @@ public class GCFDAO extends InterfaceDAO {
                     "order by produto, ano, mes, dia"
             )) {
                 while (rst.next()) {
-                    pisCofinsList.put(rst.getString("produto"), new int[] { rst.getInt("piscofinscredito"), rst.getInt("piscofinsdebito"), });
+                    pisCofinsList.put(rst.getString("produto"), new int[] { 
+                        Utils.stringToInt(rst.getString("piscofinscredito")),
+                        Utils.stringToInt(rst.getString("piscofinsdebito"))
+                    });
                 }
             }
             
@@ -234,7 +239,7 @@ public class GCFDAO extends InterfaceDAO {
                     "    NULLIF(P.DBA_GIT_CODIGO_PAI,0) ID_FAMILIA,\n" +
                     "    P.DBA_GIT_PESO_VND PESO,\n" +
                     "    EST.DBA_CADCESTQ_ESTOQUE ESTOQUE,\n" +
-                    "    coalesce(MRG.DBA_CAD_MRG_LUCRO, merc.dba_ncc_margem1, merc.dba_ncc_margem2, merc.dba_ncc_margem3) MARGEM,\n" +
+                    "    coalesce(merc.dba_ncc_margem1, merc.dba_ncc_margem2, merc.dba_ncc_margem3, MRG.DBA_CAD_MRG_LUCRO) MARGEM,\n" +
                     "    P.DBA_GIT_CUS_REP CUSTOCOMIMPOSTO,\n" +
                     "    P.DBA_GIT_CUS_ULT_ENT_BRU CUSTOMSEMIMPOSTO,\n" +
                     "    p.DBA_GIT_PRC_VEN" + getNivel() + " PRECO,\n" +
@@ -245,7 +250,13 @@ public class GCFDAO extends InterfaceDAO {
                     "	ICMS.TRIBUTACAO,\n" +
                     "	ICMS.ALIQUOTA,\n" +
                     "	ICMS.REDUCAO,\n" +
-                    "	CEST.dba_itematrib_cestq_fiscal cest\n" +
+                    //"   nr.dba_pcnatrec_codigo as piscofinsNaturezaReceita,\n" +
+                    "	CEST.dba_itematrib_cestq_fiscal cest,\n" +
+                    "	TO_NUMBER(SUBSTR(P.DBA_GIT_FILLER, 97, 5))/1000 AS MARGEM_NIVEL_1,\n" +
+                    "   TO_NUMBER(SUBSTR(P.DBA_GIT_FILLER, 102, 5))/1000 AS MARGEM_NIVEL_2,\n" +
+                    "   TO_NUMBER(SUBSTR(P.DBA_GIT_FILLER, 107, 5))/1000 AS MARGEM_NIVEL_3,\n" +
+                    "   TO_NUMBER(SUBSTR(P.DBA_GIT_FILLER, 112, 5))/1000 AS MARGEM_NIVEL_4,\n" +
+                    "   TO_NUMBER(SUBSTR(P.DBA_GIT_FILLER, 117, 5))/1000 AS MARGEM_NIVEL_5\n" +
                     "from\n" +
                     "    A_CADCITEM p\n" +
                     "    LEFT JOIN A_CADCLOJA EMP ON EMP.DBA_LOJ_CODIGO_1 = " + getLojaOrigem() + "\n" +
@@ -253,6 +264,7 @@ public class GCFDAO extends InterfaceDAO {
                     "    LEFT JOIN A_AG1PDVST MRG ON MRG.DBA_CAD_PROD_1 = P.DBA_GIT_PRODUTO AND MRG.DBA_CAD_FILIAL = EMP.DBA_LOJ_CODIGO_1\n" +
                     "    LEFT JOIN A_CADCITEMATRIB CEST ON dba_itematrib_git_produto = P.DBA_GIT_PRODUTO\n" +
                     "    left join A_CADCMERC merc on p.dba_git_secao = merc.dba_ncc_secao and p.dba_git_grupo = merc.dba_ncc_grupo and p.dba_git_subgrupo = merc.dba_ncc_subgrupo\n" +
+                    //"    LEFT join A_PCNATREC nr on nr.dba_pcnatrec_prod_ncm = p.DBA_GIT_PRODUTO\n" +
                     "    left JOIN (\n" +
                     "         SELECT\n" +
                     "              DBA_GIT_PRODUTO AS ID, \n" +
@@ -303,7 +315,7 @@ public class GCFDAO extends InterfaceDAO {
                     "			and b.dba_tfis_codigo = 512 \n" +
                     "    ) ICMS ON ICMS.PRODUTO = P.DBA_GIT_PRODUTO"
             )) {
-                SimpleDateFormat format = new SimpleDateFormat("d/MM/yyyy");
+                
                 Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
@@ -312,19 +324,7 @@ public class GCFDAO extends InterfaceDAO {
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportId(rst.getString("id"));
                     String data = rst.getString("DATACADASTRO");
-                    if (data.length() == 8) {
-                        String dia = data.substring(0, 2);
-                        String mes = data.substring(2, 4);
-                        String ano = data.substring(4, 8);
-                        imp.setDataCadastro(format.parse(dia + "/" + mes + "/" + ano));
-                    } else if (data.length() == 7) {
-                        String dia = data.substring(0, 1);
-                        String mes = data.substring(1, 3);
-                        String ano = data.substring(3, 7);
-                        imp.setDataCadastro(format.parse(dia + "/" + mes + "/" + ano));
-                    } else {
-                        imp.setDataCadastro(new Date());
-                    }
+                    imp.setDataCadastro(getData(data));
                     imp.setEan(rst.getString("EAN"));
                     ProdutoBalancaVO bal = balanca.get(Utils.stringToInt(rst.getString("EAN")));
                     if (bal != null) {
@@ -355,7 +355,7 @@ public class GCFDAO extends InterfaceDAO {
                     imp.setPesoBruto(rst.getDouble("PESO"));
                     imp.setPesoLiquido(rst.getDouble("PESO"));
                     imp.setEstoque(rst.getDouble("ESTOQUE"));
-                    imp.setMargem(rst.getDouble("MARGEM"));
+                    imp.setMargem(rst.getDouble("MARGEM_NIVEL_1"));
                     imp.setCustoComImposto(rst.getDouble("CUSTOCOMIMPOSTO"));
                     imp.setCustoSemImposto(rst.getDouble("CUSTOMSEMIMPOSTO"));
                     imp.setPrecovenda(rst.getDouble("PRECO"));
@@ -459,31 +459,24 @@ public class GCFDAO extends InterfaceDAO {
         return result;
     }
 
-    /*@Override
+    @Override
     public List<ProdutoFornecedorIMP> getProdutosFornecedores() throws Exception {
         List<ProdutoFornecedorIMP> result = new ArrayList<>();
         
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
-                    "	CAST(pf.dba_cod_forn AS VARCHAR(50)) ID_FORNECEDOR,\n" +
-                    "	pf.dba_cod_prod_gcf ID_PRODUTO,\n" +
+                    "	CAST(pf.dba_assoc_cod_forn AS VARCHAR(50)) ID_FORNECEDOR,\n" +
+                    "	pf.dba_assoc_cod_prod_gcf ID_PRODUTO,\n" +
                     "	p.DBA_GIT_CUS_REP CUSTOTABELA,\n" +
-                    "	pf.dba_cod_prod_forn CODIGOEXTERNO\n" +
+                    "	pf.dba_assoc_cod_prod_forn CODIGOEXTERNO,\n" +
+                    "  pf.dba_assoc_base_emb qtdembalagem,\n" +
+                    "  pf.dba_assoc_dt dataalteracao\n" +
                     "from\n" +
-                    "	A_RECNFEASSOCPROD pf\n" +
-                    "	join a_cadcitem p on pf.dba_cod_prod_gcf = p.dba_git_produto\n" +
-                    "union\n" +
-                    "select\n" +
-                    "	F.DBA_FOR_CODIGO || F.DBA_FOR_DIG_FOR ID_FORNECEDOR,\n" +
-                    "	A.DBA_GIT_PRODUTO ID_PRODUTO,\n" +
-                    "	A.DBA_GIT_CUS_REP CUSTOTABELA,\n" +
-                    "	A.DBA_GIT_REFERENCIA CODIGOEXTERNO\n" +
-                    "FROM\n" +
-                    "	A_CADCITEM A\n" +
-                    "  JOIN A_CADCFORN F ON A.DBA_GIT_COD_FOR = F.DBA_FOR_CODIGO\n" +
+                    "	a_recnfeassocembforn pf\n" +
+                    "	join a_cadcitem p on pf.dba_assoc_cod_prod_gcf = p.dba_git_produto\n" +
                     "order by\n" +
-                    "	1,2"
+                    "      1, 2"
             )) {
                 while (rst.next()) {
                     ProdutoFornecedorIMP imp = new ProdutoFornecedorIMP();
@@ -494,6 +487,8 @@ public class GCFDAO extends InterfaceDAO {
                     imp.setIdProduto(rst.getString("ID_PRODUTO"));
                     imp.setCustoTabela(rst.getDouble("CUSTOTABELA"));
                     imp.setCodigoExterno(rst.getString("CODIGOEXTERNO"));
+                    imp.setQtdEmbalagem(rst.getDouble("qtdembalagem"));
+                    imp.setDataAlteracao(getData(rst.getString("dataalteracao")));
                     
                     result.add(imp);
                 }
@@ -501,7 +496,7 @@ public class GCFDAO extends InterfaceDAO {
         }
         
         return result;
-    }*/
+    }
 
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
@@ -608,6 +603,22 @@ public class GCFDAO extends InterfaceDAO {
         }
         
         return result;
+    }
+
+    private Date getData(String data) throws ParseException {
+        if (data.length() == 8) {
+            String dia = data.substring(0, 2);
+            String mes = data.substring(2, 4);
+            String ano = data.substring(4, 8);
+            return (FORMAT.parse(dia + "/" + mes + "/" + ano));
+        } else if (data.length() == 7) {
+            String dia = data.substring(0, 1);
+            String mes = data.substring(1, 3);
+            String ano = data.substring(3, 7);
+            return (FORMAT.parse(dia + "/" + mes + "/" + ano));
+        } else {
+            return new Date();
+        }
     }
     
     

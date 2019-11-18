@@ -367,7 +367,7 @@ public class VCashGUI extends VRInternalFrame {
         jLabel2 = new javax.swing.JLabel();
         cmbLojaOrigem = new javax.swing.JComboBox();
 
-        setTitle("Importação DtCom");
+        setTitle("Importação VCash");
         setToolTipText("");
 
         vRToolBarPadrao3.setRollover(true);

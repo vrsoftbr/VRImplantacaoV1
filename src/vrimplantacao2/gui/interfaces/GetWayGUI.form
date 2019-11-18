@@ -172,6 +172,7 @@
                                           <Component id="chkManterBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
                                           <Component id="chkUsarMargemBruta" alignment="0" min="-2" max="-2" attributes="0"/>
                                           <Component id="chkUsarQtdCotacaoProdFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkCopiarIcmsDebitoNaEntrada" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <EmptySpace min="-2" pref="83" max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
@@ -179,21 +180,19 @@
                                           <Component id="chkUtilizarIdIcmsNaEntrada" min="-2" max="-2" attributes="0"/>
                                           <Component id="chkPesquisarKG" min="-2" max="-2" attributes="0"/>
                                           <Component id="chkUtilizarEmbalagemCompra" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chkMetodoAliquota" alignment="0" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                               </Group>
-                              <EmptySpace min="0" pref="30" max="32767" attributes="0"/>
+                              <EmptySpace min="0" pref="20" max="32767" attributes="0"/>
                           </Group>
-                          <Group type="102" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="txtDataFimOferta" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Component id="btnMapaTrib" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" alignment="0" groupAlignment="0" attributes="0">
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="txtDataFimOferta" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="btnMapaTrib" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -227,15 +226,27 @@
                           <Component id="chkForcarUnidade" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="chkUtilizarEmbalagemCompra" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="13" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="txtDataFimOferta" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkUtilizarEmbalagemCompra" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkCopiarIcmsDebitoNaEntrada" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="btnMapaTrib" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="13" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" attributes="0">
+                              <EmptySpace pref="17" max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtDataFimOferta" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="btnMapaTrib" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="13" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
+                              <Component id="chkMetodoAliquota" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
+                          </Group>
+                      </Group>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -327,6 +338,20 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Utilizar embalagem de compra"/>
                 <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;&lt;p&gt;Selecione essa op&#xe7;&#xe3;o caso o cliente n&#xe3;o utilize setor de balan&#xe7;a para determinar quais s&#xe3;o os produtos pes&#xe1;veis.&lt;/p&gt;&#xa;&lt;p&gt;Caso o cliente n&#xe3;o envie carga para a balan&#xe7;a, pode ser que o campo setor de balan&#xe7;a n&#xe3;o esteja preenchido&lt;br&gt; &#xa;e nem o campo tipo de embalagem est&#xe1; correto, neste caso a rotina ir&#xe1; verificar se a palavra KG pode ser encontrado nos produtos&lt;br&gt;&#xa;&lt;b&gt;OBS: Nesta op&#xe7;&#xe3;o, n&#xe3;o ser&#xe1; poss&#xed;vel importar os pes&#xe1;veis unit&#xe1;rios.&lt;/b&gt; &#xa;&lt;/html&gt;"/>
+              </Properties>
+            </Component>
+            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCopiarIcmsDebitoNaEntrada">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Copiar ICMS d&#xe9;bito na entrada"/>
+                <Property name="toolTipText" type="java.lang.String" value="Marque est&#xe1; op&#xe7;&#xe3;o quando o cliente utilizar a margem bruta do GetWay para calcular seus pre&#xe7;os"/>
+                <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="true" type="code"/>
+                </Property>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="chkMetodoAliquota">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Utiliza M&#xe9;todo Aliquota"/>
               </Properties>
             </Component>
           </SubComponents>
@@ -435,6 +460,11 @@
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIcmsEntrada">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="ICMS (Entrada)"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkIcmsSaidaNF">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="ICMS Sa&#xed;da (NF)"/>
                   </Properties>
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkIcmsSaida">

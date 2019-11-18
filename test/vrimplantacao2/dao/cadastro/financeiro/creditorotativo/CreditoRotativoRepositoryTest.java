@@ -60,12 +60,12 @@ public class CreditoRotativoRepositoryTest {
         }
         when(provider.getTodaBaixaAnterior()).thenReturn(todaBaixaAnterior);
         
-        MultiMap<String, CreditoRotativoAnteriorVO> listaAntRot = new MultiMap<>();
+        Map<String, CreditoRotativoAnteriorVO> listaAntRot = new HashMap<>();
         {
             CreditoRotativoAnteriorVO antRot = getAnterior1(true);
-            listaAntRot.put(antRot, antRot.getSistema(), antRot.getLoja(), antRot.getId());
+            listaAntRot.put(antRot.getId(), antRot);
             antRot = getAnterior2(true);
-            listaAntRot.put(antRot, antRot.getSistema(), antRot.getLoja(), antRot.getId());
+            listaAntRot.put(antRot.getId(), antRot);
         }
         when(provider.getTodoCreditoRotativoAnterior()).thenReturn(listaAntRot);
         

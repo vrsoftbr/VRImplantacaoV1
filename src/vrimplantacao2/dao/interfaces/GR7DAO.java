@@ -9,13 +9,18 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
-import vrimplantacao.classe.ConexaoFirebird;
+import java.util.Map;
+import java.util.Set;
 import vrimplantacao.classe.ConexaoMySQL;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto2.ProdutoBalancaDAO;
 import vrimplantacao2.utils.sql.SQLUtils;
+import vrimplantacao2.vo.cadastro.ProdutoBalancaVO;
 import vrimplantacao2.vo.cadastro.oferta.SituacaoOferta;
 import vrimplantacao2.vo.cadastro.oferta.TipoOfertaVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
@@ -32,7 +37,7 @@ import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
 /**
- *
+ * A senha desse sistema GR7 fica armazenada no executavél.
  * @author lucasrafael
  */
 public class GR7DAO extends InterfaceDAO {
@@ -42,6 +47,37 @@ public class GR7DAO extends InterfaceDAO {
         return "GR7";
     }
 
+    @Override
+    public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
+        return new HashSet(Arrays.asList(new OpcaoProduto[]{
+            OpcaoProduto.IMPORTAR_MANTER_BALANCA,
+            OpcaoProduto.PRODUTOS,
+            OpcaoProduto.ATIVO,
+            OpcaoProduto.DESC_COMPLETA,
+            OpcaoProduto.DESC_GONDOLA,
+            OpcaoProduto.DESC_REDUZIDA,
+            OpcaoProduto.DATA_CADASTRO,
+            OpcaoProduto.EAN,
+            OpcaoProduto.EAN_EM_BRANCO,
+            OpcaoProduto.TIPO_EMBALAGEM_EAN,
+            OpcaoProduto.TIPO_EMBALAGEM_PRODUTO,
+            OpcaoProduto.CUSTO,
+            OpcaoProduto.MARGEM,
+            OpcaoProduto.PRECO,
+            OpcaoProduto.ESTOQUE,
+            OpcaoProduto.PESAVEL,
+            OpcaoProduto.NCM,
+            OpcaoProduto.CEST,
+            OpcaoProduto.ICMS,
+            OpcaoProduto.PIS_COFINS,
+            OpcaoProduto.NATUREZA_RECEITA,
+            OpcaoProduto.ATACADO,
+            OpcaoProduto.VALIDADE,
+            OpcaoProduto.MERCADOLOGICO,
+            OpcaoProduto.MERCADOLOGICO_PRODUTO,
+        }));
+    }
+    
     @Override
     public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> vResult = new ArrayList<>();
@@ -110,97 +146,88 @@ public class GR7DAO extends InterfaceDAO {
         List<ProdutoIMP> vResult = new ArrayList<>();
         try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "p.cod_produto id,\n"
-                    + "p.produto descricaocompleta,\n"
-                    + "p.produto_ecf descricaoreduzida,\n"
-                    + "p.produto descricaogondola,\n"
-                    + "case p.ativo when 'S' then 1 else 0 end as id_situacaocadastro,\n"
-                    + "coalesce(data_cadastro, current_date()) datacadastro,\n"
-                    + "p.cod_departamento merc1,\n"
-                    + "p.cod_gondola merc2,\n"
-                    + "p.nbm ncm,\n"
-                    + "p.cest,\n"
-                    + "p.cod_familia id_familia,\n"
-                    + "p.lucro1 margem,\n"
-                    + "p.cod_barras ean,\n"
-                    + "p.qtd_emb,\n"
-                    + "p.qtd_por_emb,\n"
-                    + "p.cod_barras_cx ean_caixa,\n"
-                    + "p.qtd_por_cx qtd_caixa,\n"
-                    + "p.validade,\n"
-                    + "p.unidade,\n"
-                    + "p.peso_bruto,\n"
-                    + "p.peso_liq,\n"
-                    + "piscofins.pis_cst_sai piscof_cst_sai,\n"
-                    + "piscofins.pis_cst_ent piscof_cst_ent,\n"
-                    + "piscofins.nat_rec piscof_nat_rec,\n"
-                    + "p.valor_venda1 preco,\n"
-                    + "p.valor_compra custo,\n"
-                    + "p.qtd_estoque estoque,\n"
-                    + "p.qtd_minima estoque_minimo,\n"
-                    + "p.cst_rev icms_cst,\n"
-                    + "p.aliq_icms_interna icms_aliq,\n"
-                    + "p.reduc_icms_rev icms_reducao,\n"
-                    + "p.icms as icms_consumidor,\n"
-                    + "case when p.pesavel != 'N' then 1 else 0 end pesavel\n"
-                    + "from\n"
-                    + "automacao.produto p\n"
-                    + "left join\n"
-                    + "automacao.pis_cofins piscofins on piscofins.codigo = p.cod_pis_cofins"                    /*+ "union all\n"
-                    + "select\n"
-                    + "p.cod_produto id,\n"
-                    + "p.produto descricaocompleta,\n"
-                    + "p.produto_ecf descricaoreduzida,\n"
-                    + "p.produto descricaogondola,\n"
-                    + "case p.ativo when 'S' then 1 else 0 end as id_situacaocadastro,\n"
-                    + "coalesce(data_cadastro, current_date()) datacadastro,\n"
-                    + "p.cod_departamento merc1,\n"
-                    + "p.cod_gondola merc2,\n"
-                    + "p.nbm ncm,\n"
-                    + "p.cest,\n"
-                    + "p.cod_familia id_familia,\n"
-                    + "p.lucro1 margem,\n"
-                    + "p.cod_barras_emb ean,\n"
-                    + "p.qtd_por_emb qtd_embalagem,\n"
-                    + "p.cod_barras_cx ean_caixa,\n"
-                    + "p.qtd_por_cx qtd_caixa,\n"
-                    + "p.validade,\n"
-                    + "p.unid_da_emb unidade,\n"
-                    + "p.peso_bruto,\n"
-                    + "p.peso_liq,\n"
-                    + "piscofins.pis_cst_sai piscof_cst_sai,\n"
-                    + "piscofins.pis_cst_ent piscof_cst_ent,\n"
-                    + "piscofins.nat_rec piscof_nat_rec,\n"
-                    + "p.valor_venda1 preco,\n"
-                    + "p.valor_compra custo,\n"
-                    + "p.qtd_estoque estoque,\n"
-                    + "p.qtd_minima estoque_minimo,\n"
-                    + "p.cst_rev icms_cst,\n"
-                    + "p.aliq_icms_interna icms_aliq,\n"
-                    + "p.reduc_icms_rev icms_reducao,\n"
-                    + "case when p.pesavel != 'N' then 1 else 0 end pesavel\n"
-                    + "from\n"
-                    + "automacao.produto p\n"
-                    + "join\n"
-                    + "automacao.pis_cofins piscofins on p.cod_pis_cofins = piscofins.codigo\n"
-                    + "where cod_barras_emb <> ''"*/
+                    "select\n" +
+                    "	p.cod_produto id,\n" +
+                    "	p.produto descricaocompleta,\n" +
+                    "	p.produto_ecf descricaoreduzida,\n" +
+                    "	p.produto descricaogondola,\n" +
+                    "	case p.ativo when 'S' then 1 else 0 end as id_situacaocadastro,\n" +
+                    "	coalesce(data_cadastro, current_date()) datacadastro,\n" +
+                    "	p.cod_departamento merc1,\n" +
+                    "	p.cod_gondola merc2,\n" +
+                    "	p.nbm ncm,\n" +
+                    "	p.cest,\n" +
+                    "	p.cod_familia id_familia,\n" +
+                    "	p.lucro1 margem,\n" +
+                    "	coalesce(p.pesavel, 'N') pesavel,\n" +
+                    "	p.cod_barras ean,\n" +
+                    "	p.qtd_emb,\n" +
+                    "	p.qtd_por_emb,\n" +
+                    "	p.cod_barras_cx ean_caixa,\n" +
+                    "	p.qtd_por_cx qtd_caixa,\n" +
+                    "	p.validade,\n" +
+                    "	p.unidade,\n" +
+                    "	p.peso_bruto,\n" +
+                    "	p.peso_liq,\n" +
+                    "	piscofins.pis_cst_sai piscof_cst_sai,\n" +
+                    "	piscofins.pis_cst_ent piscof_cst_ent,\n" +
+                    "	piscofins.nat_rec piscof_nat_rec,\n" +
+                    "	p.valor_venda1 preco,\n" +
+                    "	p.valor_compra custo,\n" +
+                    "	p.qtd_estoque estoque,\n" +
+                    "	p.qtd_minima estoque_minimo,\n" +
+                    "	p.cst_rev icms_cst,\n" +
+                    "	p.aliq_icms_interna icms_aliq,\n" +
+                    "	p.reduc_icms_rev icms_reducao,\n" +
+                    "	p.icms as icms_consumidor,\n" +
+                    "	case when p.pesavel != 'N' then 1 else 0 end pesavel\n" +
+                    "from\n" +
+                    "	produto p\n" +
+                    "left join\n" +
+                    "	pis_cofins piscofins on\n" +
+                    "		piscofins.codigo = p.cod_pis_cofins"
             )) {
+                Map<Integer, ProdutoBalancaVO> balanca = new ProdutoBalancaDAO().getProdutosBalanca();
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("id"));
                     
-                    if ((rst.getString("ean") != null) &&
-                            (!rst.getString("ean").trim().isEmpty())) {                        
-                        imp.seteBalanca(Long.parseLong(Utils.formataNumero(rst.getString("ean").trim())) <= 999999);
+                    ProdutoBalancaVO bal = balanca.get(Utils.stringToInt(rst.getString("ean")));
+                    if (bal != null) {
+                        imp.setEan(String.valueOf(bal.getCodigo()));
+                        imp.seteBalanca(true);
+                        imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
+                        imp.setValidade(bal.getValidade());
+                        imp.setQtdEmbalagem(1);
                     } else {
-                        imp.seteBalanca(false);
+                        imp.setEan(rst.getString("ean"));
+                        switch (rst.getString("pesavel")) {
+                            case "U": {
+                                imp.seteBalanca(true);
+                                imp.setTipoEmbalagem("UN");
+                                imp.setQtdEmbalagem(1);
+                            }; break;
+                            case "L": {
+                                imp.seteBalanca(true);
+                                imp.setTipoEmbalagem("KG");
+                                imp.setQtdEmbalagem(1);
+                            }; break;
+                            case "C": {
+                                imp.seteBalanca(true);
+                                imp.setTipoEmbalagem(rst.getString("unidade"));
+                                imp.setQtdEmbalagem(1);
+                            }; break;
+                            default: {
+                                imp.seteBalanca(false);
+                                imp.setTipoEmbalagem(rst.getString("unidade"));
+                                imp.setQtdEmbalagem(rst.getInt("qtd_emb"));
+                            }
+                            imp.setValidade(rst.getInt("validade"));
+                        }
                     }
-                    
-                    //imp.seteBalanca((rst.getInt("pesavel") == 1));
-                    imp.setEan(rst.getString("ean"));
+
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setDescricaoGondola(rst.getString("descricaogondola"));
@@ -209,9 +236,7 @@ public class GR7DAO extends InterfaceDAO {
                     imp.setCodMercadologico1(rst.getString("merc1"));
                     imp.setCodMercadologico2(rst.getString("merc2"));
                     imp.setCodMercadologico3("1");
-                    imp.setTipoEmbalagem(rst.getString("unidade").contains("KG") ? "KG" : "UN");
                     imp.setQtdEmbalagemCotacao(rst.getInt("qtd_emb"));
-                    imp.setQtdEmbalagem(rst.getInt("qtd_emb"));
                     imp.setPesoBruto(rst.getDouble("peso_bruto"));
                     imp.setPesoLiquido(rst.getDouble("peso_liq"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
@@ -220,7 +245,6 @@ public class GR7DAO extends InterfaceDAO {
                     imp.setPiscofinsCstCredito(rst.getInt("piscof_cst_ent"));
                     imp.setPiscofinsNaturezaReceita(rst.getInt("piscof_nat_rec"));
                     imp.setCest(rst.getString("cest"));
-                    imp.setValidade(rst.getInt("validade"));
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setPrecovenda(rst.getDouble("preco"));
                     imp.setCustoComImposto(rst.getDouble("custo"));

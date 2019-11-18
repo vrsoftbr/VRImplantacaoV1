@@ -80,6 +80,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
     private Date vendasDataInicio = null;
     private Date vendasDataTermino = null;
     private Date notasDataInicio = null;
+    private Date notasDataTermino = null;
     private List<Entidade> entidadesCheques;
     private List<Entidade> entidadesCreditoRotativo;
     private List<Entidade> entidadesConvenio;
@@ -1257,6 +1258,10 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
         this.notasDataInicio = notasDataInicio;
     }
 
+    public void setNotasDataTermino(Date notasDataTermino) {
+        this.notasDataTermino = notasDataTermino;
+    }
+
     public void setEntidadesConvenio(List<Entidade> entidadesConvenio) {
         this.entidadesConvenio = entidadesConvenio;
     }
@@ -1582,10 +1587,11 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    tab_nf nf\n" +
                     "where\n" +
                     "    nf.cod_loja = " + getLojaOrigem() + " and\n" +
-                    "    nf.tipo_operacao in (0,1) and\n" +
+                    "    nf.tipo_operacao in (0, 1) and\n" +
                     "    nf.tipo_nf in (0,1) and\n" +
                     //"    nf.tipo_operacao = 0 and\n" + //TODO: Excluir esta linha quando incluir a nota de saida
-                    "    nf.dta_emissao >= " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + "\n" +
+                    "    nf.dta_emissao >= " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " and\n" +
+                    "    nf.dta_emissao <= " + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n" +
                     "order by\n" +
                     "    nf.dta_emissao"
             )) {
@@ -1608,7 +1614,8 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setSerie(rst.getString("serie"));
                     imp.setNumeroNota(Utils.stringToInt(rst.getString("numeronota")));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
-                    imp.setDataEntradaSaida(rst.getDate("dataentradasaida"));
+                    imp.setDataEntradaSaida(rst.getDate("dataemissao"));
+                    //imp.setDataEntradaSaida(rst.getDate("dataentradasaida"));
                     imp.setValorTotal(rst.getDouble("total_nota"));
                     imp.setTipoDestinatario(imp.getOperacao() == NotaOperacao.ENTRADA ? TipoDestinatario.FORNECEDOR : TipoDestinatario.CLIENTE_EVENTUAL);
                     imp.setIdDestinatario(rst.getString("cod_parceiro"));
@@ -1670,11 +1677,12 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    nfi.val_desconto valor_desconto,\n" +
                     "    nfi.val_frete valor_frete,\n" +
                     "    nfi.val_isento valor_isento,\n" +
-                    "    nfi.val_outras valor_outras,\n" +
+                    "    --nfi.val_outras valor_outras,\n" +
                     "    nfi.cod_sit_tributaria icms_cst,\n" +
                     "    nfi.per_aliq_icms icms_aliq,\n" +
                     "    nfi.per_red_bc_icms icms_red,\n" +
                     "    nfi.val_icms icms_valor,\n" +
+                    "    nfi.val_bc_icms icms_bc,\n" +
                     "    nfi.val_bc_st icms_bc_st,\n" +
                     "    nfi.val_icms_st icms_st,\n" +
                     "    nfi.val_base_ipi ipi_base,\n" +
@@ -1728,13 +1736,14 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     item.setValorDesconto(rst.getDouble("valor_desconto"));
                     item.setValorFrete(rst.getDouble("valor_frete"));
                     item.setValorIsento(rst.getDouble("valor_isento"));
-                    item.setValorOutras(rst.getDouble("valor_outras"));
+                    //item.setValorOutras(rst.getDouble("valor_outras"));
                     item.setIcmsCst(rst.getInt("icms_cst"));
                     item.setIcmsAliquota(rst.getDouble("icms_aliq"));
                     item.setIcmsReduzido(rst.getDouble("icms_red"));
                     item.setIcmsValor(rst.getDouble("icms_valor"));
                     item.setIcmsBaseCalculoST(rst.getDouble("icms_bc_st"));
                     item.setIcmsValorST(rst.getDouble("icms_st"));
+                    item.setIcmsBaseCalculo(rst.getDouble("icms_bc"));
                     item.setIpiValorBase(rst.getDouble("ipi_base"));
                     item.setIpiValor(rst.getDouble("ipi_valor"));
                     item.setPisCofinsCst(Utils.stringToInt(rst.getString("pis_cst")));

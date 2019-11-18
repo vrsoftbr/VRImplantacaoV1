@@ -5,6 +5,7 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 import vrframework.classe.Conexao;
 import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.multimap.MultiMap;
@@ -17,6 +18,8 @@ import vrimplantacao2.vo.cadastro.cliente.ClienteEventualVO;
  * @author Leandro
  */
 public class ClienteEventualAnteriorDAO {
+    
+    private static final Logger LOG = Logger.getLogger(ClienteEventualAnteriorDAO.class.getName());
     
     public void createTable() throws Exception {
         try (Statement stm = Conexao.createStatement()) {
@@ -201,6 +204,24 @@ public class ClienteEventualAnteriorDAO {
             }
         }
         return null;
+    }
+
+    public Map<String, Integer> getClientesEventuaisImportados(String sistema, String lojaOrigem) throws Exception {
+        Map<String, Integer> result = new HashMap<>();
+        try (Statement stm = Conexao.createStatement()) {
+            String sql = "select id, codigoatual from implantacao.codant_clienteeventual where \n" +
+                    "	sistema = '" + sistema + "' and\n" +
+                    "	loja = '" + lojaOrigem + "' and\n" +
+                    "	not codigoatual is null";
+            LOG.fine(sql);
+            try (ResultSet rst = stm.executeQuery(sql)) {
+                while (rst.next()) {
+                    result.put(rst.getString("id"), rst.getInt("codigoatual"));
+                }
+            }
+        }
+        LOG.fine("Qte cliente eventual:" + result.size());
+        return result;
     }
     
     

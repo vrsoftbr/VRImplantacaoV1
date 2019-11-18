@@ -1,5 +1,6 @@
 package vrimplantacao2.vo.cadastro;
 
+import java.util.Date;
 import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoProduto;
@@ -15,6 +16,8 @@ public class ProdutoComplementoVO {
     private double troca = 0;
     private double custoSemImposto = 0;
     private double custoComImposto = 0;
+    private double custoAnteriorSemImposto = 0;
+    private double custoAnteriorComImposto = 0;
     private double precoVenda = 0;
     private double precoDiaSeguinte = 0;
     private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
@@ -23,6 +26,7 @@ public class ProdutoComplementoVO {
     private boolean emiteEtiqueta = true;
     private TipoProduto tipoProduto = TipoProduto.MERCADORIA_REVENDA;
     private int idAliquotaCredito = 0;
+    private Date dataPrimeiraAlteracao;
 
     public void setId(int id) {
         this.id = id;
@@ -56,6 +60,14 @@ public class ProdutoComplementoVO {
         this.custoComImposto = MathUtils.round(custoComImposto, 4, 9999999D);
     }
 
+    public void setCustoAnteriorSemImposto(double custoAnteriorSemImposto) {
+        this.custoAnteriorSemImposto = MathUtils.round(custoAnteriorSemImposto, 4, 9999999D);
+    }
+    
+    public void setCustoAnteriorComImposto(double custoAnteriorComImposto) {
+        this.custoAnteriorComImposto = MathUtils.round(custoAnteriorComImposto, 4, 9999999D);
+    }
+    
     public void setPrecoVenda(double precoVenda) {
         this.precoVenda = MathUtils.round(precoVenda, 4, 9999999D);
     }
@@ -106,6 +118,14 @@ public class ProdutoComplementoVO {
 
     public double getCustoComImposto() {
         return custoComImposto;
+    }
+    
+    public double getCustoAnteriorSemImposto() {
+        return custoAnteriorSemImposto;
+    }
+    
+    public double getCustoAnteriorComImposto() {
+        return custoAnteriorComImposto;
     }
 
     public double getPrecoVenda() {
@@ -158,6 +178,14 @@ public class ProdutoComplementoVO {
 
     public void setIdAliquotaCredito(int idAliquotaCredito) {
         this.idAliquotaCredito = idAliquotaCredito;
+    }
+
+    public Date getDataPrimeiraAlteracao() {
+        return dataPrimeiraAlteracao;
+    }
+
+    public void setDataPrimeiraAlteracao(Date dataPrimeiraAlteracao) {
+        this.dataPrimeiraAlteracao = dataPrimeiraAlteracao;
     }
 
 }

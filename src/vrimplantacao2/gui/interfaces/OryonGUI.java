@@ -1,5 +1,6 @@
 package vrimplantacao2.gui.interfaces;
 
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +22,8 @@ import vrimplantacao2.dao.cadastro.fornecedor.OpcaoFornecedor;
 import vrimplantacao2.dao.cadastro.venda.OpcaoVenda;
 import vrimplantacao2.dao.interfaces.Importador;
 import vrimplantacao2.dao.interfaces.OryonDAO;
+import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
+import vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButtonProvider;
 import vrimplantacao2.parametro.Parametros;
 
 public class OryonGUI extends VRInternalFrame {
@@ -59,14 +62,14 @@ public class OryonGUI extends VRInternalFrame {
         params.salvar();
     }
     
-    private OryonDAO baseDAO = new OryonDAO();
+    private OryonDAO dao = new OryonDAO();
     private ConexaoAccess connAccess = new ConexaoAccess();
     
     private OryonGUI(VRMdiFrame i_mdiFrame) throws Exception {
         super(i_mdiFrame);
         initComponents();   
         
-        tabProdutos.setOpcoesDisponiveis(baseDAO);
+        tabProdutos.setOpcoesDisponiveis(dao);
         
         this.title = "Importação " + SISTEMA;
                 
@@ -76,6 +79,31 @@ public class OryonGUI extends VRInternalFrame {
         
         centralizarForm();
         this.setMaximum(false);
+        
+        tabProdutos.setProvider(new MapaTributacaoButtonProvider() {
+
+            @Override
+            public MapaTributoProvider getProvider() {
+                return dao;
+            }
+
+            @Override
+            public String getSistema() {
+                return dao.getSistema();
+            }
+
+            @Override
+            public String getLoja() {
+                dao.setLojaOrigem(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+                return dao.getLojaOrigem();
+            }
+
+            @Override
+            public Frame getFrame() {
+                return mdiFrame;
+            }
+            
+        });
     }
 
     public void validarDadosAcesso() throws Exception {
@@ -111,7 +139,7 @@ public class OryonGUI extends VRInternalFrame {
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
         int cont = 0;
         int index = 0;
-        for (Estabelecimento loja: baseDAO.getLojaCliente()) {
+        for (Estabelecimento loja: dao.getLojaCliente()) {
             cmbLojaOrigem.addItem(loja);
             if (vLojaCliente != null && vLojaCliente.equals(loja.cnpj)) {
                 index = cont;
@@ -149,7 +177,7 @@ public class OryonGUI extends VRInternalFrame {
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;                                        
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;                                        
                     
-                    Importador importador = new Importador(baseDAO);
+                    Importador importador = new Importador(dao);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);     
                     
@@ -205,8 +233,8 @@ public class OryonGUI extends VRInternalFrame {
                         }
                         
                         if (chkPdvVendas.isSelected()) {
-                            baseDAO.setDataInicioVenda(edtDtVendaIni.getDate());
-                            baseDAO.setDataTerminoVenda(edtDtVendaFim.getDate());
+                            dao.setDataInicioVenda(edtDtVendaIni.getDate());
+                            dao.setDataTerminoVenda(edtDtVendaFim.getDate());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
                         }
                         

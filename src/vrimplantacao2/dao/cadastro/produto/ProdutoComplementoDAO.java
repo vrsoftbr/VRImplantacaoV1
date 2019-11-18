@@ -65,6 +65,7 @@ public class ProdutoComplementoDAO {
                     sql.put("valoripi", 0);
                     sql.putNull("dataultimopreco");
                     sql.putNull("dataultimaentrada");
+                    sql.put("dataprimeiraalteracao", vo.getDataPrimeiraAlteracao());
                     sql.put("custosemimposto", vo.getCustoSemImposto());
                     sql.put("custocomimposto", vo.getCustoComImposto());
                     sql.put("custosemimpostoanterior", 0);
@@ -133,10 +134,11 @@ public class ProdutoComplementoDAO {
                 sql.putNull("dataultimaentrada");
                 sql.put("custosemimposto", vo.getCustoSemImposto());
                 sql.put("custocomimposto", vo.getCustoComImposto());
-                sql.put("custosemimpostoanterior", 0);
-                sql.put("custocomimpostoanterior", 0);
+                sql.put("custosemimpostoanterior", vo.getCustoAnteriorSemImposto());
+                sql.put("custocomimpostoanterior", vo.getCustoAnteriorSemImposto());
                 sql.put("precovenda", vo.getPrecoVenda());
                 sql.put("precovendaanterior", 0);
+                sql.put("dataprimeiraentrada", vo.getDataPrimeiraAlteracao());
                 sql.put("precodiaseguinte", vo.getPrecoDiaSeguinte());
                 if (unificacao) {
                     sql.put("estoque", 0);
@@ -221,6 +223,12 @@ public class ProdutoComplementoDAO {
                 if (opt.contains(OpcaoProduto.ESTOQUE)) {
                     sql.put("estoque", vo.getEstoque());
                 }
+                if (opt.contains(OpcaoProduto.ESTOQUE_MINIMO)) {
+                    sql.put("estoqueminimo", vo.getEstoqueMinimo());
+                }
+                if (opt.contains(OpcaoProduto.ESTOQUE_MAXIMO)) {
+                    sql.put("estoquemaximo", vo.getEstoqueMaximo());
+                }
                 if (opt.contains(OpcaoProduto.TROCA)) {
                     sql.put("troca", vo.getTroca());
                 }
@@ -275,12 +283,18 @@ public class ProdutoComplementoDAO {
             if (opt.contains(OpcaoProduto.CUSTO)) {
                 sql.put("custocomimposto", complemento.getCustoComImposto());
                 sql.put("custosemimposto", complemento.getCustoSemImposto());
+                sql.put("custosemimpostoanterior", complemento.getCustoAnteriorSemImposto());
+                sql.put("custocomimpostoanterior", complemento.getCustoAnteriorComImposto());
             }
             if (opt.contains(OpcaoProduto.CUSTO_COM_IMPOSTO)) {
                 sql.put("custocomimposto", complemento.getCustoComImposto());
             }
             if (opt.contains(OpcaoProduto.CUSTO_SEM_IMPOSTO)) {
                 sql.put("custosemimposto", complemento.getCustoSemImposto());
+            }
+            if(opt.contains(OpcaoProduto.CUSTO_ANTERIOR)) {
+                sql.put("custosemimpostoanterior", complemento.getCustoAnteriorSemImposto());
+                sql.put("custocomimpostoanterior", complemento.getCustoAnteriorComImposto());
             }
             if (opt.contains(OpcaoProduto.ESTOQUE)) {
                 if (opt.contains(OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE)) {

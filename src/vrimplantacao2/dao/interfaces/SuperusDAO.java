@@ -33,6 +33,12 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  * @author Leandro
  */
 public class SuperusDAO extends InterfaceDAO {
+    
+    public static final String HOST = "localhost";
+    public static final String PORT = "1521";
+    public static final String USER = "xe";
+    public static final String DATABASE = "xe";
+    public static final String PASSWORD = "smart";
 
     public String v_codEmpresaConv;
     
@@ -460,8 +466,8 @@ public class SuperusDAO extends InterfaceDAO {
                     + "  c.ORGAOEMISSOR\n"
                     + "from\n"
                     + "  PESSOAS p\n"
-                    + "  join CLIENTES c on p.codigo = c.codigo\n"
-                    + ("".equals(v_codEmpresaConv) ? "where c.codigoconvenio = 0\n" : "where c.codigoconvenio not in (" + v_codEmpresaConv) + ")\n"
+                    + "  left join CLIENTES c on p.codigo = c.codigo\n"
+                 // + ("".equals(v_codEmpresaConv) ? "where c.codigoconvenio = 0\n" : "where c.codigoconvenio not in (" + v_codEmpresaConv+ ")\n") 
                     + "order by p.codigo"
             )) {
                 while (rst.next()) {
@@ -507,7 +513,22 @@ public class SuperusDAO extends InterfaceDAO {
                     cli.setEmpresaTelefone(rst.getString("telEmpresa"));
                     cli.setCargo(rst.getString("cargo"));
                     cli.setSalario(rst.getDouble("salario"));
-                    cli.setEstadoCivil(TipoEstadoCivil.getById(rst.getInt("estadoCivil")));
+                    if(rst.getString("estadoCivil") != null && !"".equals(rst.getString("estadoCivil"))) {
+                        switch(rst.getInt("estadoCivil")) {
+                            case 1 : cli.setEstadoCivil(TipoEstadoCivil.SOLTEIRO);
+                                break;
+                            case 2 : cli.setEstadoCivil(TipoEstadoCivil.VIUVO);
+                                break;
+                            case 3 : cli.setEstadoCivil(TipoEstadoCivil.AMAZIADO);
+                                break;
+                            case 4 : cli.setEstadoCivil(TipoEstadoCivil.DIVORCIADO);
+                                break;
+                            case 5 : cli.setEstadoCivil(TipoEstadoCivil.CASADO);
+                                break;
+                            default : cli.setEstadoCivil(TipoEstadoCivil.NAO_INFORMADO);
+                        }
+                    }
+                    //cli.setEstadoCivil(TipoEstadoCivil.getById(rst.getInt("estadoCivil")));
                     cli.setNomeConjuge(rst.getString("conjuge"));
                     cli.setOrgaoemissor(rst.getString("ORGAOEMISSOR"));
 

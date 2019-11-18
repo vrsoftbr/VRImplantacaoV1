@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import vrimplantacao.utils.Utils;
+import vrimplantacao2.dao.cadastro.produto2.DivisaoDAO;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.ProdutoVO;
 import vrimplantacao2.vo.cadastro.fornecedor.FornecedorAnteriorVO;
@@ -18,6 +19,7 @@ import vrimplantacao2.vo.cadastro.fornecedor.ProdutoFornecedorVO;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoInscricao;
 import vrimplantacao2.vo.importacao.FornecedorContatoIMP;
+import vrimplantacao2.vo.importacao.FornecedorDivisaoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.FornecedorPagamentoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
@@ -40,6 +42,7 @@ public class FornecedorRepository {
     public void salvar(List<FornecedorIMP> fornecedores) throws Exception {
         MultiMap<String, FornecedorIMP> filtrados = filtrar(fornecedores);
         fornecedores = null;
+        Map<String, Map.Entry<String, Integer>> divisoes = new DivisaoDAO().getAnteriores(provider.getSistema(), provider.getLojaOrigem());
         System.gc();
         organizar(filtrados);
 
@@ -105,7 +108,20 @@ public class FornecedorRepository {
                     }
 
                     if (imp.getPrazoEntrega() > 0 || imp.getPrazoSeguranca() > 0 || imp.getPrazoVisita() > 0) {
-                        provider.gravarPrazoFornecedor(vo.getId(), imp.getPrazoEntrega(), imp.getPrazoVisita(), imp.getPrazoSeguranca());
+                        
+                        Map.Entry<String, Integer> divisao = divisoes.get(imp.getIdDivisao());
+                        int idDivisao = 0;
+                        if (divisao != null) {
+                            idDivisao = divisao.getValue();
+                        } else {
+                            idDivisao = 0;
+                        }
+                        
+                        provider.gravarPrazoFornecedor(vo.getId(), idDivisao, imp.getPrazoEntrega(), imp.getPrazoVisita(), imp.getPrazoSeguranca());
+                    }
+                    
+                    if (imp.getPrazoPedido() > 0) {
+                        provider.gravarPrazoPedidoFornecedor(vo.getId(), imp.getPrazoPedido());
                     }
                 }
 
@@ -132,6 +148,7 @@ public class FornecedorRepository {
             MultiMap<String, FornecedorAnteriorVO> anteriores = provider.getAnteriores();
             this.contatos = provider.getContatos();
             MultiMap<String, Void> pagamentos = provider.getPagamentos();
+            MultiMap<String, Void> divisoes = provider.getDivisoes();
 
             provider.setStatus("Fornecedores - Gravando...");
             provider.setMaximum(filtrados.size());
@@ -179,7 +196,13 @@ public class FornecedorRepository {
 
                     if (opt.contains(OpcaoFornecedor.PRAZO_FORNECEDOR)) {
                         if (imp.getPrazoEntrega() > 0 || imp.getPrazoSeguranca() > 0 || imp.getPrazoVisita() > 0) {
-                            provider.gravarPrazoFornecedor(vo.getId(), imp.getPrazoEntrega(), imp.getPrazoVisita(), imp.getPrazoSeguranca());
+                            processarDivisoes(imp, vo, divisoes);
+                        }
+                    }
+
+                    if (opt.contains(OpcaoFornecedor.PRAZO_PEDIDO_FORNECEDOR)) {
+                        if (imp.getPrazoPedido() > 0) {
+                            provider.gravarPrazoPedidoFornecedor(vo.getId(), imp.getPrazoPedido());
                         }
                     }
                 }
@@ -229,6 +252,7 @@ public class FornecedorRepository {
     public void unificar(List<FornecedorIMP> fornecedores) throws Exception {
         MultiMap<String, FornecedorIMP> filtrados = filtrar(fornecedores);
         fornecedores = null;
+        Map<String, Map.Entry<String, Integer>> divisoes = new DivisaoDAO().getAnteriores(provider.getSistema(), provider.getLojaOrigem());
         System.gc();
         organizar(filtrados);
 
@@ -295,7 +319,11 @@ public class FornecedorRepository {
                     }
 
                     if (imp.getPrazoEntrega() > 0 || imp.getPrazoSeguranca() > 0 || imp.getPrazoVisita() > 0) {
-                        provider.gravarPrazoFornecedor(vo.getId(), imp.getPrazoEntrega(), imp.getPrazoVisita(), imp.getPrazoSeguranca());
+                        
+                    }
+                    
+                    if (imp.getPrazoPedido() > 0) {
+                        provider.gravarPrazoPedidoFornecedor(vo.getId(), imp.getPrazoPedido());
                     }
                 }
 
@@ -371,6 +399,32 @@ public class FornecedorRepository {
                         String.valueOf(pagamento.getVencimento())
                 );
             }
+        }
+    }
+    
+    public void processarDivisoes(FornecedorIMP imp, FornecedorVO vo, MultiMap<String, Void> div) throws Exception {
+        Map<String, Map.Entry<String, Integer>> divisoes = new DivisaoDAO().getAnteriores(provider.getSistema(), provider.getLojaOrigem());
+        
+        for (FornecedorDivisaoIMP impDiv : imp.getDivisoes().values()) {
+
+            Map.Entry<String, Integer> divisao = divisoes.get(impDiv.getImportId());
+            int idDivisao = 0;
+            if (divisoes != null) {
+                idDivisao = divisao.getValue();
+            } else {
+                idDivisao = 0;
+            }
+
+            if (!div.containsKey(
+                    String.valueOf(vo.getId()),
+                    String.valueOf(idDivisao)                    
+            )) {
+                provider.gravarPrazoFornecedor(vo.getId(), idDivisao, impDiv.getPrazoEntrega(), impDiv.getPrazoVisita(), impDiv.getPrazoSeguranca());
+                div.put(null, 
+                    String.valueOf(vo.getId()),
+                    String.valueOf(idDivisao)                    
+                );
+            }            
         }
     }
 
@@ -511,6 +565,8 @@ public class FornecedorRepository {
         vo.setTipoEmpresa(imp.getTipoEmpresa());
         vo.setTipoPagamento(imp.getTipoPagamento());
         vo.setIdBanco(imp.getIdBanco() == 0 ? 804 : imp.getIdBanco());
+        vo.setUtilizaNfe(imp.isEmiteNfe());
+        vo.setPermiteNfSemPedido(imp.isPermiteNfSemPedido());
         
         //<editor-fold defaultstate="collapsed" desc="ENDEREÇO">
         vo.setEndereco(imp.getEndereco());

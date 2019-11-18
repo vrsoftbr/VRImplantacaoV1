@@ -61,11 +61,10 @@ import vrimplantacao.gui.interfaces.JMasterGUI;
 import vrimplantacao.gui.interfaces.LogusGUI;
 import vrimplantacao.gui.interfaces.Maximus_DatasyncGUI;
 import vrimplantacao.gui.interfaces.MilenioGUI;
-import vrimplantacao.gui.interfaces.MobilityGUI;
 import vrimplantacao.gui.interfaces.PCSistemasGUI;
 import vrimplantacao.gui.interfaces.RMSGUI;
 import vrimplantacao.gui.interfaces.RMSGUI_2;
-import vrimplantacao.gui.interfaces.RootacGUI;
+import vrimplantacao2.gui.interfaces.RootacGUI;
 import vrimplantacao.gui.interfaces.SBOMarketGUI;
 import vrimplantacao2.gui.interfaces.SIMSGUI;
 import vrimplantacao.gui.interfaces.SaacGUI;
@@ -92,10 +91,13 @@ import vrimplantacao.vo.Formulario;
 import vrimplantacao2.gui.component.sqleditor.SQLEditor;
 import vrimplantacao2.gui.interfaces.ASoftGUI;
 import vrimplantacao2.gui.interfaces.AcomGUI;
+import vrimplantacao2.gui.interfaces.AdmMacenoGUI;
 import vrimplantacao2.gui.interfaces.AlphaSysGUI;
 import vrimplantacao2.gui.interfaces.ApolloGUI;
+import vrimplantacao2.gui.interfaces.ArtSystemGUI;
 import vrimplantacao2.gui.interfaces.AsefeGUI;
 import vrimplantacao2.gui.interfaces.AtenasGUI;
+import vrimplantacao2.gui.interfaces.AtmaGUI;
 import vrimplantacao2.gui.interfaces.AutoSystemGUI;
 import vrimplantacao2.gui.interfaces.AutomaqGUI;
 import vrimplantacao2.gui.interfaces.AvanceGUI;
@@ -111,12 +113,14 @@ import vrimplantacao2.gui.interfaces.CgaGUI;
 import vrimplantacao2.gui.interfaces.CissGUI;
 import vrimplantacao2.gui.interfaces.ClickGUI;
 import vrimplantacao2.gui.interfaces.ContechGUI;
+import vrimplantacao2.gui.interfaces.ControlXGUI;
 import vrimplantacao2.gui.interfaces.DLinkGUI;
 import vrimplantacao2.gui.interfaces.DataSyncGUI;
 import vrimplantacao2.gui.interfaces.DestroGUI;
 import vrimplantacao2.gui.interfaces.DtComGUI;
 import vrimplantacao2.gui.interfaces.EmporioGUI;
 import vrimplantacao2.gui.interfaces.EsSystemGUI;
+import vrimplantacao2.gui.interfaces.EticaGUI;
 import vrimplantacao2.gui.interfaces.FHOnlineGUI;
 import vrimplantacao2.gui.interfaces.FaciliteGUI;
 import vrimplantacao2.gui.interfaces.Farm2000GUI;
@@ -124,12 +128,14 @@ import vrimplantacao2.gui.interfaces.FenixGUI;
 import vrimplantacao2.gui.interfaces.FlashGUI;
 import vrimplantacao2.gui.interfaces.FortGUI;
 import vrimplantacao2.gui.interfaces.FortiGUI;
+import vrimplantacao2.gui.interfaces.G3GUI;
 import vrimplantacao2.gui.interfaces.GDoorGUI;
-import vrimplantacao2.gui.interfaces.GR7GUI;
+import vrimplantacao2.gui.interfaces.GR7_2GUI;
 import vrimplantacao2.gui.interfaces.GTechGUI;
 import vrimplantacao2.gui.interfaces.GetWayGUI;
 import vrimplantacao2.gui.interfaces.GuiaSistemasGUI;
 import vrimplantacao2.gui.interfaces.HRTechGUI;
+import vrimplantacao2.gui.interfaces.HRTechGUI_v2;
 import vrimplantacao2.gui.interfaces.HerculesIntCashGUI;
 import vrimplantacao2.gui.interfaces.HipcomGUI;
 import vrimplantacao2.gui.interfaces.HiperGUI;
@@ -137,6 +143,7 @@ import vrimplantacao2.gui.interfaces.ICommerceGUI;
 import vrimplantacao2.gui.interfaces.IQSistemasGUI;
 import vrimplantacao2.gui.interfaces.InfoBrasilGUI;
 import vrimplantacao2.gui.interfaces.InfoMacGUI;
+import vrimplantacao2.gui.interfaces.InovaGUI;
 import vrimplantacao2.gui.interfaces.IntelliCashGUI;
 import vrimplantacao2.gui.interfaces.IntelliconGUI;
 import vrimplantacao2.gui.interfaces.InventerGUI;
@@ -151,10 +158,12 @@ import vrimplantacao2.gui.interfaces.LiteciGUI;
 import vrimplantacao2.gui.interfaces.LyncisGUI;
 import vrimplantacao2.gui.interfaces.MSIInforGUI;
 import vrimplantacao2.gui.interfaces.MarketGUI;
+import vrimplantacao2.gui.interfaces.MobilityGUI;
 import vrimplantacao2.gui.interfaces.MrsGUI;
 import vrimplantacao2.gui.interfaces.MultiPdvGUI;
 import vrimplantacao2.gui.interfaces.OpenGUI;
 import vrimplantacao2.gui.interfaces.OrionGUI;
+import vrimplantacao2.gui.interfaces.OrionTechGUI;
 import vrimplantacao2.gui.interfaces.OryonGUI;
 import vrimplantacao2.gui.interfaces.PdvVrGUI;
 import vrimplantacao2.gui.interfaces.PlanilhaVrGUI;
@@ -167,6 +176,7 @@ import vrimplantacao2.gui.interfaces.RPInfoGUI;
 import vrimplantacao2.gui.interfaces.RepleisGUI;
 import vrimplantacao2.gui.interfaces.SDInformaticaGUI;
 import vrimplantacao2.gui.interfaces.STI3GUI;
+import vrimplantacao2.gui.interfaces.SabTechGUI;
 import vrimplantacao2.gui.interfaces.SambaNetGUI;
 import vrimplantacao2.gui.interfaces.SatecfeGUI;
 import vrimplantacao2.gui.interfaces.SavGUI;
@@ -174,26 +184,29 @@ import vrimplantacao2.gui.interfaces.ScefGUI;
 import vrimplantacao2.gui.interfaces.ShiGUI;
 import vrimplantacao2.gui.interfaces.SiaCriareByFileGUI;
 import vrimplantacao2.gui.interfaces.SiaCriareDbfGUI;
+import vrimplantacao2.gui.interfaces.SiaCriareMySqlGUI;
 import vrimplantacao2.gui.interfaces.SiacGUI;
 import vrimplantacao2.gui.interfaces.SifatGUI;
+import vrimplantacao2.gui.interfaces.Sifat_2GUI;
 import vrimplantacao2.gui.interfaces.SigmaGUI;
 import vrimplantacao2.gui.interfaces.SisMouraGUI;
 import vrimplantacao2.gui.interfaces.SoftcomGUI;
 import vrimplantacao2.gui.interfaces.SofttechGUI;
 import vrimplantacao2.gui.interfaces.SolidusGUI;
 import vrimplantacao2.gui.interfaces.SolutionSuperaGUI;
+import vrimplantacao2.gui.interfaces.SophyxGUI;
 import vrimplantacao2.gui.interfaces.SriGUI;
 import vrimplantacao2.gui.interfaces.SuperGUI;
 import vrimplantacao2.gui.interfaces.SuperLoja10GUI;
 import vrimplantacao2.gui.interfaces.SuperServerGUI;
 import vrimplantacao2.gui.interfaces.SyncTecGUI;
+import vrimplantacao2.gui.interfaces.SysERPGUI;
 import vrimplantacao2.gui.interfaces.SysPdvGUI;
 import vrimplantacao2.gui.interfaces.SysmoFirebirdGUI;
 import vrimplantacao2.gui.interfaces.SysmoPostgresGUI;
 import vrimplantacao2.gui.interfaces.TGAGUI;
 import vrimplantacao2.gui.interfaces.TiTecnologiaGUI;
 import vrimplantacao2.gui.interfaces.TopSystemGUI;
-import vrimplantacao2.gui.interfaces.TopSystemGUI2;
 import vrimplantacao2.gui.interfaces.TopSystemGUI3;
 import vrimplantacao2.gui.interfaces.TstiGUI;
 import vrimplantacao2.gui.interfaces.UmPontoDoisGUI;
@@ -204,6 +217,7 @@ import vrimplantacao2.gui.interfaces.ViaSoftGUI;
 import vrimplantacao2.gui.interfaces.VisualComercioGUI;
 import vrimplantacao2.gui.interfaces.WShopGUI;
 import vrimplantacao2.gui.interfaces.WebSaqGUI;
+import vrimplantacao2.gui.interfaces.WeberGUI;
 import vrimplantacao2.gui.interfaces.WinNexusGUI;
 import vrimplantacao2.gui.interfaces.WinthorGUI;
 import vrimplantacao2.gui.interfaces.Wm_byFileGUI;
@@ -225,7 +239,6 @@ public final class MenuGUI extends VRMdiFrame {
     public IdealGUI formImportarIdeal = null;
     public ImportacaoLogVendaGUI formImportacaoLogVendaGUI = null;
     public RMSGUI formImportarRM = null;
-    public MobilityGUI formImportarMobility = null;
     public GdoorGUI formImportarGdoor = null;
     public WisaSoftGUI_2 formImportarWisaSoft = null;
     public SoftaExGUI formImportarSoftaEx = null;
@@ -259,7 +272,6 @@ public final class MenuGUI extends VRMdiFrame {
     public SimSoftGUI formImportarSimSoft = null;
     public FaucomGUI formImportarFaucom = null;
     public SIMSGUI formImportarSIMS = null;
-    public GR7GUI formImportarGR7 = null;
     public SuperusGUI formImportarSuperus = null;
     public SofgceGUI formImportarSofgce = null;
     public ImportacoesDiversasGUI formImportacoesDiversas = null;
@@ -578,6 +590,10 @@ public final class MenuGUI extends VRMdiFrame {
         mnuAutomaq = new javax.swing.JMenuItem();
         mnuPwGestor = new javax.swing.JMenuItem();
         mnuAtenas = new javax.swing.JMenuItem();
+        mnuEtica = new javax.swing.JMenuItem();
+        mnuThotau = new javax.swing.JMenuItem();
+        mnuiWeber = new javax.swing.JMenuItem();
+        mnuiSophyx = new javax.swing.JMenuItem();
         jMenu6 = new javax.swing.JMenu();
         jMenuItemJMaster = new javax.swing.JMenuItem();
         jMenuItemMilenio = new javax.swing.JMenuItem();
@@ -616,10 +632,15 @@ public final class MenuGUI extends VRMdiFrame {
         mnuLince = new javax.swing.JMenuItem();
         mnuDataSync = new javax.swing.JMenuItem();
         mnuWinNexus = new javax.swing.JMenuItem();
-        mnuHRTech = new javax.swing.JMenuItem();
+        mnuHRTechV1 = new javax.swing.JMenuItem();
+        mnuHRTechV2 = new javax.swing.JMenuItem();
         mnuAcom = new javax.swing.JMenuItem();
         mnuHercules = new javax.swing.JMenuItem();
         mnuSav = new javax.swing.JMenuItem();
+        mnuArtSystem = new javax.swing.JMenuItem();
+        mnuiSysERP = new javax.swing.JMenuItem();
+        mnuAtma = new javax.swing.JMenuItem();
+        mnuControlX = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -653,6 +674,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuRPInfo = new javax.swing.JMenuItem();
         mnuMrs = new javax.swing.JMenuItem();
         mnuMrs1 = new javax.swing.JMenuItem();
+        mnuMrs2 = new javax.swing.JMenuItem();
         jMenu9 = new javax.swing.JMenu();
         jMenuItemFMSistemas = new javax.swing.JMenuItem();
         jMenuItemEverast = new javax.swing.JMenuItem();
@@ -679,6 +701,8 @@ public final class MenuGUI extends VRMdiFrame {
         jMenu10 = new javax.swing.JMenu();
         mnuDLink = new javax.swing.JMenuItem();
         mnuSTI3 = new javax.swing.JMenuItem();
+        mnuG3 = new javax.swing.JMenuItem();
+        mnuG4 = new javax.swing.JMenuItem();
         mnuOrion = new javax.swing.JMenu();
         jMenuItemOrion = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -691,6 +715,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuDtCom = new javax.swing.JMenuItem();
         mnuSiaCriareDbf = new javax.swing.JMenuItem();
         mnuVCash = new javax.swing.JMenuItem();
+        mnuAdmRioPreto = new javax.swing.JMenuItem();
         mnuDB2 = new javax.swing.JMenu();
         jMenuItemCISS = new javax.swing.JMenuItem();
         mnuCache = new javax.swing.JMenu();
@@ -736,7 +761,6 @@ public final class MenuGUI extends VRMdiFrame {
         mnuScripts = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         mnuAvancadas = new javax.swing.JMenu();
-        mnuMapeamentoMercadologico = new javax.swing.JMenuItem();
         mnuImportarNCM = new javax.swing.JMenuItem();
         mnuParametros = new javax.swing.JMenuItem();
         mnuParametros1 = new javax.swing.JMenuItem();
@@ -1302,6 +1326,38 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuFirebird2.add(mnuAtenas);
 
+        mnuEtica.setText("Etica");
+        mnuEtica.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuEticaActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuEtica);
+
+        mnuThotau.setText("OrionTech (Thotau)");
+        mnuThotau.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuThotauActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuThotau);
+
+        mnuiWeber.setText("Weber");
+        mnuiWeber.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuiWeberActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuiWeber);
+
+        mnuiSophyx.setText("Sophyx");
+        mnuiSophyx.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuiSophyxActionPerformed(evt);
+            }
+        });
+        mnuFirebird2.add(mnuiSophyx);
+
         mnuDatabase.add(mnuFirebird2);
 
         jMenu6.setText("SQL Server");
@@ -1474,7 +1530,7 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu6.add(mnuIdealSoft);
 
-        mnuFabTech.setText("FabTech");
+        mnuFabTech.setText("SabTech");
         mnuFabTech.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 mnuFabTechActionPerformed(evt);
@@ -1598,13 +1654,21 @@ public final class MenuGUI extends VRMdiFrame {
         });
         mnuSqlServer2.add(mnuWinNexus);
 
-        mnuHRTech.setText("HRTech");
-        mnuHRTech.addActionListener(new java.awt.event.ActionListener() {
+        mnuHRTechV1.setText("HRTech(v1)");
+        mnuHRTechV1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuHRTechActionPerformed(evt);
+                mnuHRTechV1ActionPerformed(evt);
             }
         });
-        mnuSqlServer2.add(mnuHRTech);
+        mnuSqlServer2.add(mnuHRTechV1);
+
+        mnuHRTechV2.setText("HRTech(v2)");
+        mnuHRTechV2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuHRTechV2ActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuHRTechV2);
 
         mnuAcom.setText("ACOM");
         mnuAcom.addActionListener(new java.awt.event.ActionListener() {
@@ -1629,6 +1693,38 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuSav);
+
+        mnuArtSystem.setText("ArtSystem");
+        mnuArtSystem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuArtSystemActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuArtSystem);
+
+        mnuiSysERP.setText("SysERP");
+        mnuiSysERP.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuiSysERPActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuiSysERP);
+
+        mnuAtma.setText("Atma");
+        mnuAtma.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAtmaActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuAtma);
+
+        mnuControlX.setText("ControlX");
+        mnuControlX.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuControlXActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuControlX);
 
         mnuDatabase.add(mnuSqlServer2);
 
@@ -1887,6 +1983,14 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu8.add(mnuMrs1);
 
+        mnuMrs2.setText("Inove");
+        mnuMrs2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMrs2ActionPerformed(evt);
+            }
+        });
+        jMenu8.add(mnuMrs2);
+
         mnuDatabase.add(jMenu8);
 
         jMenu9.setText("MySQL");
@@ -2087,6 +2191,22 @@ public final class MenuGUI extends VRMdiFrame {
         });
         jMenu10.add(mnuSTI3);
 
+        mnuG3.setText("G3");
+        mnuG3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuG3ActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuG3);
+
+        mnuG4.setText("Sia Criare (MySQL)");
+        mnuG4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuG4ActionPerformed(evt);
+            }
+        });
+        jMenu10.add(mnuG4);
+
         mnuDatabase.add(jMenu10);
 
         mnuOrion.setText("DBF");
@@ -2178,6 +2298,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuOrion.add(mnuVCash);
+
+        mnuAdmRioPreto.setText("ADM (Rio Preto)");
+        mnuAdmRioPreto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuAdmRioPretoActionPerformed(evt);
+            }
+        });
+        mnuOrion.add(mnuAdmRioPreto);
 
         mnuDatabase.add(mnuOrion);
 
@@ -2492,14 +2620,6 @@ public final class MenuGUI extends VRMdiFrame {
 
         mnuAvancadas.setText("Avançadas");
 
-        mnuMapeamentoMercadologico.setText("Mapeamento de Mercadológico");
-        mnuMapeamentoMercadologico.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                mnuMapeamentoMercadologicoActionPerformed(evt);
-            }
-        });
-        mnuAvancadas.add(mnuMapeamentoMercadologico);
-
         mnuImportarNCM.setText("Importar NCM da Legislação");
         mnuImportarNCM.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2734,20 +2854,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItem15ActionPerformed
 
     private void jMenuItemMobilityActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemMobilityActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarMobility == null || formImportarMobility.isClosed()) {
-                formImportarMobility = new MobilityGUI(this);
-            }
-
-            formImportarMobility.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
-
+        MobilityGUI.exibir(this);
     }//GEN-LAST:event_jMenuItemMobilityActionPerformed
 
     private void jMenuItemSysPDVSQLServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSysPDVSQLServerActionPerformed
@@ -2989,18 +3096,7 @@ public final class MenuGUI extends VRMdiFrame {
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
 
-        try {
-            this.setWaitCursor();
-            if (formImportarRootac == null || formImportarRootac.isClosed()) {
-                formImportarRootac = new RootacGUI(this);
-            }
-            formImportarRootac.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-
-        } finally {
-            this.setDefaultCursor();
-        }
+        RootacGUI.exibir(this);
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void jMenuItemDirectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemDirectorActionPerformed
@@ -3195,18 +3291,8 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_jMenuItemSIMSActionPerformed
 
     private void jMenuItemGR7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGR7ActionPerformed
-        try {
-            this.setWaitCursor();
-            if (formImportarGR7 == null || formImportarGR7.isClosed()) {
-                formImportarGR7 = new GR7GUI(this);
-            }
-
-            formImportarGR7.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
+       
+        GR7_2GUI.exibir(this);
     }//GEN-LAST:event_jMenuItemGR7ActionPerformed
 
     private void mnuImportarNCMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuImportarNCMActionPerformed
@@ -3547,17 +3633,7 @@ public final class MenuGUI extends VRMdiFrame {
 
     private void mnuFabTechActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuFabTechActionPerformed
         // TODO add your handling code here:
-        try {
-            this.setWaitCursor();
-            if (formImportarFabTech == null || formImportarFabTech.isClosed()) {
-                formImportarFabTech = new FabTechGUI(this);
-            }
-            formImportarFabTech.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
+        SabTechGUI.exibir(this);
     }//GEN-LAST:event_mnuFabTechActionPerformed
 
     private void jMenuItemTiTecnologiaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemTiTecnologiaActionPerformed
@@ -3613,19 +3689,8 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuEsSystemActionPerformed
 
     private void mnuSifatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSifatActionPerformed
-        // TODO add your handling code here:
-        try {
-            this.setWaitCursor();
-            if (formImportarSifat == null || formImportarSifat.isClosed()) {
-                formImportarSifat = new SifatGUI(this);
-            }
-
-            formImportarSifat.setVisible(true);
-        } catch (Exception ex) {
-            Util.exibirMensagemErro(ex, getTitle());
-        } finally {
-            this.setDefaultCursor();
-        }
+        // TODO add your handling code here:        
+        Sifat_2GUI.exibir(this);
     }//GEN-LAST:event_mnuSifatActionPerformed
 
     private void mnuApolloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuApolloActionPerformed
@@ -3998,9 +4063,9 @@ public final class MenuGUI extends VRMdiFrame {
         SuperLoja10GUI.exibir(this);
     }//GEN-LAST:event_mnuSuperLoja10ActionPerformed
 
-    private void mnuHRTechActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuHRTechActionPerformed
+    private void mnuHRTechV1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuHRTechV1ActionPerformed
         HRTechGUI.exibir(this);
-    }//GEN-LAST:event_mnuHRTechActionPerformed
+    }//GEN-LAST:event_mnuHRTechV1ActionPerformed
 
     private void mnuSolutionSuperaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSolutionSuperaActionPerformed
         // TODO add your handling code here:
@@ -4089,9 +4154,63 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuAtenasActionPerformed
 
     private void mnuSavActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSavActionPerformed
-        // TODO add your handling code here:
         SavGUI.exibir(this);
     }//GEN-LAST:event_mnuSavActionPerformed
+
+    private void mnuEticaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuEticaActionPerformed
+        EticaGUI.exibir(this);
+    }//GEN-LAST:event_mnuEticaActionPerformed
+
+    private void mnuArtSystemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuArtSystemActionPerformed
+        // TODO add your handling code here:
+        ArtSystemGUI.exibir(this);
+    }//GEN-LAST:event_mnuArtSystemActionPerformed
+
+    private void mnuThotauActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuThotauActionPerformed
+        OrionTechGUI.exibir(this);
+    }//GEN-LAST:event_mnuThotauActionPerformed
+
+    private void mnuiWeberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuiWeberActionPerformed
+        WeberGUI.exibir(this);
+    }//GEN-LAST:event_mnuiWeberActionPerformed
+
+    private void mnuG3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuG3ActionPerformed
+        // TODO add your handling code here:
+        G3GUI.exibir(this);
+    }//GEN-LAST:event_mnuG3ActionPerformed
+
+    private void mnuAdmRioPretoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAdmRioPretoActionPerformed
+        AdmMacenoGUI.exibir(this);
+    }//GEN-LAST:event_mnuAdmRioPretoActionPerformed
+
+    private void mnuiSophyxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuiSophyxActionPerformed
+        SophyxGUI.exibir(this);
+    }//GEN-LAST:event_mnuiSophyxActionPerformed
+
+    private void mnuiSysERPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuiSysERPActionPerformed
+        SysERPGUI.exibir(this);
+    }//GEN-LAST:event_mnuiSysERPActionPerformed
+
+    private void mnuMrs2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMrs2ActionPerformed
+        InovaGUI.exibir(this);
+    }//GEN-LAST:event_mnuMrs2ActionPerformed
+
+    private void mnuAtmaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAtmaActionPerformed
+        // TODO add your handling code here:
+        AtmaGUI.exibir(this);
+    }//GEN-LAST:event_mnuAtmaActionPerformed
+
+    private void mnuG4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuG4ActionPerformed
+        SiaCriareMySqlGUI.exibir(this);
+    }//GEN-LAST:event_mnuG4ActionPerformed
+
+    private void mnuControlXActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuControlXActionPerformed
+        ControlXGUI.exibir(this);
+    }//GEN-LAST:event_mnuControlXActionPerformed
+
+    private void mnuHRTechV2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuHRTechV2ActionPerformed
+        HRTechGUI_v2.exibir(this);
+    }//GEN-LAST:event_mnuHRTechV2ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
@@ -4182,13 +4301,16 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuASoft;
     private javax.swing.JMenuItem mnuAcertarIdsProdutos;
     private javax.swing.JMenuItem mnuAcom;
+    private javax.swing.JMenuItem mnuAdmRioPreto;
     private javax.swing.JMenu mnuAjuda;
     private javax.swing.JMenuItem mnuAjudaSobre;
     private javax.swing.JMenuItem mnuAlphaSys;
     private javax.swing.JMenuItem mnuAlterDataWShop;
     private javax.swing.JMenuItem mnuApollo;
+    private javax.swing.JMenuItem mnuArtSystem;
     private javax.swing.JMenuItem mnuAsefe;
     private javax.swing.JMenuItem mnuAtenas;
+    private javax.swing.JMenuItem mnuAtma;
     private javax.swing.JMenuItem mnuAutoSystem;
     private javax.swing.JMenuItem mnuAutoSystem1;
     private javax.swing.JMenuItem mnuAutomaq;
@@ -4207,6 +4329,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuCodigoBarrasAtacado;
     private javax.swing.JMenuItem mnuContaPagar;
     private javax.swing.JMenuItem mnuContaPagar1;
+    private javax.swing.JMenuItem mnuControlX;
     private javax.swing.JMenuItem mnuControll;
     private javax.swing.JMenuItem mnuCplus;
     private javax.swing.JMenu mnuDB2;
@@ -4217,6 +4340,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuDtCom;
     private javax.swing.JMenuItem mnuEmporio;
     private javax.swing.JMenuItem mnuEsSystem;
+    private javax.swing.JMenuItem mnuEtica;
     private javax.swing.JMenuItem mnuFG;
     private javax.swing.JMenuItem mnuFHOnline;
     private javax.swing.JMenuItem mnuFabTech;
@@ -4231,9 +4355,12 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuFlatan;
     private javax.swing.JMenuItem mnuFort;
     private javax.swing.JMenuItem mnuForti;
+    private javax.swing.JMenuItem mnuG3;
+    private javax.swing.JMenuItem mnuG4;
     private javax.swing.JMenuItem mnuGDoor;
     private javax.swing.JMenuItem mnuGTech;
-    private javax.swing.JMenuItem mnuHRTech;
+    private javax.swing.JMenuItem mnuHRTechV1;
+    private javax.swing.JMenuItem mnuHRTechV2;
     private javax.swing.JMenuItem mnuHercules;
     private javax.swing.JMenuItem mnuHipcom;
     private javax.swing.JMenuItem mnuHiper;
@@ -4261,11 +4388,11 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuLogus;
     private javax.swing.JMenuItem mnuLyncis;
     private javax.swing.JMenuItem mnuMSIInfor;
-    private javax.swing.JMenuItem mnuMapeamentoMercadologico;
     private javax.swing.JMenuItem mnuMarket;
     private javax.swing.JMenuBar mnuMenu;
     private javax.swing.JMenuItem mnuMrs;
     private javax.swing.JMenuItem mnuMrs1;
+    private javax.swing.JMenuItem mnuMrs2;
     private javax.swing.JMenuItem mnuOpen;
     private javax.swing.JMenu mnuOrion;
     private javax.swing.JMenuItem mnuOryon;
@@ -4308,6 +4435,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuSysmoFirebird;
     private javax.swing.JMenuItem mnuSysmoPostgres;
     private javax.swing.JMenuItem mnuTga;
+    private javax.swing.JMenuItem mnuThotau;
     private javax.swing.JMenuItem mnuTsti;
     private javax.swing.JMenuItem mnuUmPontoDois;
     private javax.swing.JMenuItem mnuUniplus;
@@ -4321,6 +4449,9 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuWmsi;
     private javax.swing.JMenuItem mnuWmsi1;
     private javax.swing.JMenuItem mnuZpf;
+    private javax.swing.JMenuItem mnuiSophyx;
+    private javax.swing.JMenuItem mnuiSysERP;
+    private javax.swing.JMenuItem mnuiWeber;
     private javax.swing.JMenuItem mnupdvvendaitem;
     private vrframework.bean.toolBar.VRToolBar tlbAtalho;
     private vrframework.bean.toolBar.VRToolBar tlbFixo;
@@ -4349,6 +4480,9 @@ public final class MenuGUI extends VRMdiFrame {
             
             if ("lince".equals(param)) {
                 LinceGUI.exibir(this, true);
+            }
+            if ("g3".equals(param)) {
+                G3GUI.exibir(this, true);
             }
         }
     }

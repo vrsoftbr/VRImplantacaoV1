@@ -80,6 +80,7 @@ public class DefaultLinha implements LinhaArquivo {
         String valor = getString(campo);
         if (valor != null && !"".equals(valor.trim())) {
             valor = valor.replace(",", ".");
+            valor = valor.replace("%", "");
             String[] val = valor.split("\\.");
             if (val.length == 2) {
                 return Double.parseDouble(val[0] + "." + val[1]);

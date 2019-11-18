@@ -161,7 +161,11 @@ public class ClienteRepository {
             MultiMap<String, ClientePreferencialAnteriorVO> anteriores = provider.preferencial().getAnteriores();
             //</editor-fold>
             
+<<<<<<< src/vrimplantacao2/dao/cadastro/cliente/ClienteRepository.java
             provider.setNotificacao("Atualizando cliente preferêncial...", clientes.size());
+=======
+            setNotificacao("Atualizando cliente preferencial...", clientes.size());
+>>>>>>> src/vrimplantacao2/dao/cadastro/cliente/ClienteRepository.java
             for (ClienteIMP imp: clientes) {                
                 ClientePreferencialAnteriorVO anterior = anteriores.get(
                        provider.getSistema(),
@@ -217,6 +221,24 @@ public class ClienteRepository {
                         atualizarClientePreferencial(vo, opt);
                     }
                     if (opt.contains(OpcaoCliente.CELULAR)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.VENCIMENTO_ROTATIVO)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.SEXO)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.DATA_CADASTRO)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.OBSERVACOES)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.RAZAO)) {
+                        atualizarClientePreferencial(vo, opt);
+                    }
+                    if (opt.contains(OpcaoCliente.BAIRRO)) {
                         atualizarClientePreferencial(vo, opt);
                     }
                 }
@@ -896,9 +918,24 @@ public class ClienteRepository {
     
     public ClienteEventualContatoVO converterContatoEventual(ClienteContatoIMP impCont) {
         ClienteEventualContatoVO cont = new ClienteEventualContatoVO();
+        
+        String celular = "", telefone = "";
+        
+        if(impCont.getTelefone() != null && !"".equals(impCont.getTelefone())) {
+            if(impCont.getTelefone().length() > 14) {
+                telefone = impCont.getTelefone().substring(0, 14);
+            }
+        }
+        
+        if(impCont.getCelular() != null && !"".equals(impCont.getCelular())) {
+            if(impCont.getCelular().length() > 14) {
+                celular = impCont.getCelular().substring(0, 14);
+            }
+        }
+        
         cont.setNome(impCont.getNome());
-        cont.setTelefone(impCont.getTelefone());
-        cont.setCelular(impCont.getCelular());
+        cont.setTelefone(telefone);
+        cont.setCelular(celular);
         cont.setEmail(impCont.getEmail());
         return cont;
     }

@@ -1,8 +1,11 @@
 package vrimplantacao;
 
+import java.awt.Font;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 import vrframework.classe.Conexao;
 import vrframework.classe.Properties;
 import vrframework.classe.SplashScreen;
@@ -28,8 +31,31 @@ public class Main {
             }
         }
 
+        
         try {
-            Util.setLookAndFeel();
+            String OSName = System.getProperty("os.name");
+
+            System.out.println("os.name " + OSName);
+
+            if (OSName.toUpperCase().contains("LINUX")) {
+                for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                    if ("Metal".equals(info.getName())) {
+                        UIManager.getDefaults().put("TitledBorder.font", new Font("Tahoma", Font.PLAIN, 10));
+                        UIManager.setLookAndFeel(info.getClassName());
+                        break;
+                    }
+                }
+            } else {
+                Util.setLookAndFeel();
+            }
+
+            
+        } catch (Exception e) {
+            // If Nimbus is not available, you can set the GUI to another look and feel.
+        }
+        
+        try {
+            //Util.setLookAndFeel();
             new PropertiesDAO().verficarConfiguracao();
 
             SplashScreen.show();

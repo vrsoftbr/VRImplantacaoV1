@@ -41,8 +41,11 @@ public class ProdutoIMP {
     private double troca = 0;
     
     private double margem = 0;
+    private double margemMinima = 0;
     private double custoSemImposto = 0;
     private double custoComImposto = 0;    
+    private double custoAnteriorSemImposto = 0;
+    private double custoAnteriorComImposto = 0;
     private double precovenda = 0;    
     
     private SituacaoCadastro situacaoCadastro = SituacaoCadastro.ATIVO;
@@ -106,6 +109,9 @@ public class ProdutoIMP {
     private boolean aceitaMultiplicacaoPDV = true;
     
     private String divisao;
+    
+    private String tipoEmbalagemVolume;
+    private double volume = 1;
     
     public String getImportSistema() {
         return importSistema;
@@ -217,6 +223,14 @@ public class ProdutoIMP {
 
     public double getCustoComImposto() {
         return custoComImposto;
+    }
+    
+    public double getCustoAnteriorSemImposto() {
+        return custoAnteriorSemImposto;
+    }
+    
+    public double getCustoAnteriorComImposto() {
+        return custoAnteriorComImposto;
     }
 
     public double getPrecovenda() {
@@ -417,6 +431,14 @@ public class ProdutoIMP {
 
     public void setCustoComImposto(double custoComImposto) {
         this.custoComImposto = custoComImposto;
+    }
+    
+    public void setCustoAnteriorSemImposto(double custoAnteriorSemImposto) {
+        this.custoAnteriorSemImposto = custoAnteriorSemImposto;
+    }
+    
+    public void setCustoAnteriorComImposto(double custoAnteriorComImposto) {
+        this.custoAnteriorComImposto = custoAnteriorComImposto;
     }
 
     public void setPrecovenda(double precovenda) {
@@ -847,6 +869,36 @@ public class ProdutoIMP {
 
     public void setDivisao(String divisao) {
         this.divisao = divisao;
+    }
+
+    public String getTipoEmbalagemVolume() {
+        return tipoEmbalagemVolume;
+    }
+
+    public void setTipoEmbalagemVolume(String tipoEmbalagemVolume) {
+        this.tipoEmbalagemVolume = tipoEmbalagemVolume;
+    }
+
+    public double getVolume() {
+        return volume;
+    }
+
+    public void setVolume(double volume) {
+        this.volume = volume;
+    }
+
+    /**
+     * @return the margemMinima
+     */
+    public double getMargemMinima() {
+        return margemMinima;
+    }
+
+    /**
+     * @param margemMinima the margemMinima to set
+     */
+    public void setMargemMinima(double margemMinima) {
+        this.margemMinima = margemMinima;
     }
     
 }

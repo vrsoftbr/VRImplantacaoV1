@@ -89,6 +89,11 @@ public class ContasPagarRepository {
                     fornecedor = new FornecedorVO();
                     fornecedor.setId(fornecedorLoja);
                 }
+                
+                if (fornecedor == null) {                    
+                    provider.notificar();
+                    continue;
+                }
 
                 //Se for uma conta nova
                 if (anterior == null || anterior.getCodigoAtual() == null) {
@@ -249,12 +254,17 @@ public class ContasPagarRepository {
         vo.setDataentrada(imp.getDataEntrada() == null ? imp.getDataEmissao() : imp.getDataEntrada());
         vo.setNumerodocumento(Utils.stringToInt(imp.getNumeroDocumento()));
         
-        double total = 0;
-        for (ContaPagarVencimentoIMP vc: imp.getVencimentos()) {
-            total += vc.getValor();
+        if (imp.getValor() == 0) {
+
+            double total = 0;
+            for (ContaPagarVencimentoIMP vc : imp.getVencimentos()) {
+                total += vc.getValor();
+            }
+
+            vo.setValor(total);
+        } else {
+            vo.setValor(imp.getValor());
         }
-        
-        vo.setValor(total);
         
         return vo;        
     }

@@ -63,6 +63,7 @@ public class SolidusGUI extends VRInternalFrame {
         txtReiniciarID.setText(params.getWithNull("1", SISTEMA, "N_REINICIO"));
         cbxUfPautaFiscal.setSelectedIndex(params.getInt(0, SISTEMA, "UF_PAUTA_FISCAL"));
         edtDtNotaIni.setDate(params.getDate(SISTEMA, "DATA_NOTAS"));
+        edtDtNotaFim.setDate(params.getDate(SISTEMA, "DATA_NOTAS_FIM"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }
@@ -78,6 +79,7 @@ public class SolidusGUI extends VRInternalFrame {
         params.put(txtSenha.getText(), SISTEMA, "SENHA");
         params.put(txtSistema.getText(), SISTEMA, "SISTEMA");
         params.put(edtDtNotaIni.getDate(), SISTEMA, "DATA_NOTAS");
+        params.put(edtDtNotaFim.getDate(), SISTEMA, "DATA_NOTAS_FIM");
         params.put(cbxUfPautaFiscal.getSelectedIndex(), SISTEMA, "UF_PAUTA_FISCAL");
         params.put(Utils.stringToInt(txtReiniciarID.getText()), SISTEMA, "N_REINICIO");
         Estabelecimento cliente = (Estabelecimento) cmbLojaOrigem.getSelectedItem();
@@ -394,7 +396,8 @@ public class SolidusGUI extends VRInternalFrame {
                         }
                         if (chkNotasFiscais.isSelected()) {
                             dao.setNotasDataInicio(edtDtNotaIni.getDate());
-                            importador.importarNotas(OpcaoNotaFiscal.IMP_EXCLUIR_NOTAS_EXISTENTES_IMPORTADAS);
+                            dao.setNotasDataTermino(edtDtNotaFim.getDate());
+                            importador.importarNotas(OpcaoNotaFiscal.IMP_REIMPORTAR_ITENS_DE_NOTAS_IMPORTADAS);
                         }
                         if (chkCvEmpresa.isSelected()) {
                             importador.importarConvenioEmpresa();
@@ -522,6 +525,7 @@ public class SolidusGUI extends VRInternalFrame {
         vRPanel7 = new vrframework.bean.panel.VRPanel();
         chkNotasFiscais = new vrframework.bean.checkBox.VRCheckBox();
         edtDtNotaIni = new org.jdesktop.swingx.JXDatePicker();
+        edtDtNotaFim = new org.jdesktop.swingx.JXDatePicker();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -1031,9 +1035,9 @@ public class SolidusGUI extends VRInternalFrame {
             .addGroup(vRPanel4Layout.createSequentialGroup()
                 .addComponent(chkPdvVendas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(edtDtVendaIni, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
+                .addComponent(edtDtVendaIni, javax.swing.GroupLayout.PREFERRED_SIZE, 127, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(edtDtVendaFim, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+                .addComponent(edtDtVendaFim, javax.swing.GroupLayout.PREFERRED_SIZE, 140, Short.MAX_VALUE)
                 .addContainerGap())
         );
         vRPanel4Layout.setVerticalGroup(
@@ -1090,13 +1094,17 @@ public class SolidusGUI extends VRInternalFrame {
             .addGroup(vRPanel7Layout.createSequentialGroup()
                 .addComponent(chkNotasFiscais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(edtDtNotaIni, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(edtDtNotaIni, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(edtDtNotaFim, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(177, Short.MAX_VALUE))
         );
         vRPanel7Layout.setVerticalGroup(
             vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vRPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                 .addComponent(chkNotasFiscais, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(edtDtNotaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(edtDtNotaIni, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(edtDtNotaFim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout tabOutrosLayout = new javax.swing.GroupLayout(tabOutros);
@@ -1105,11 +1113,14 @@ public class SolidusGUI extends VRInternalFrame {
             tabOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(tabOutrosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(tabOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(vRPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(vRPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(vRPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(tabOutrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(tabOutrosLayout.createSequentialGroup()
+                        .addComponent(vRPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(tabOutrosLayout.createSequentialGroup()
+                        .addComponent(vRPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(vRPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         tabOutrosLayout.setVerticalGroup(
@@ -1121,7 +1132,7 @@ public class SolidusGUI extends VRInternalFrame {
                     .addComponent(vRPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(59, Short.MAX_VALUE))
+                .addContainerGap(63, Short.MAX_VALUE))
         );
 
         vRTabbedPane1.addTab("Outros", tabOutros);
@@ -1570,6 +1581,7 @@ public class SolidusGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkUnifProdutos;
     private javax.swing.JComboBox cmbLojaOrigem;
     private vrframework.bean.comboBox.VRComboBox cmbLojaVR;
+    private org.jdesktop.swingx.JXDatePicker edtDtNotaFim;
     private org.jdesktop.swingx.JXDatePicker edtDtNotaIni;
     private org.jdesktop.swingx.JXDatePicker edtDtOferta;
     private org.jdesktop.swingx.JXDatePicker edtDtVendaFim;

@@ -91,6 +91,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
         result.add(OpcaoProduto.PAUTA_FISCAL_PRODUTO);
         result.add(INVENTARIO);
         result.add(OpcaoProduto.OFERTA);
+        result.add(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
 
         return result;
     }
@@ -275,6 +276,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 produto.setPesoBruto(linha.getDouble("pesobruto"));
                 produto.setPesoLiquido(linha.getDouble("pesoliquido"));
                 produto.setDataCadastro(getData(linha.getString("datacadastro")));
+                produto.setDataAlteracao(getData(linha.getString("dataalteracao")));
                 produto.setValidade(linha.getInt("validade"));
                 produto.setMargem(linha.getDouble("margem"));
                 produto.setEstoqueMaximo(linha.getDouble("estoquemaximo"));
@@ -666,13 +668,13 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setParcela(linha.getInt("parcela"));
                 imp.setValor(linha.getDouble("valor"));
                 if(linha.existsColumn("datapagamento")) {
-                    if (linha.getData("datapagamento") != null) {
+                    if (linha.getData(linha.getString("datapagamento")) != null) {
                         imp.addPagamento(
                                 imp.getId(),
                                 linha.getDouble("valorrecebido"),
                                 0,
                                 0,
-                                linha.getData("datapagamento"),
+                                linha.getData(linha.getString("datapagamento")),
                                 ""
                         );
                     }
@@ -935,6 +937,7 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
             imp.setDescricaoReduzida(ln.getString("descricaoreduzida"));
             imp.setQuantidade(ln.getDouble("quantidade"));
             imp.setPrecoVenda(ln.getDouble("precovenda"));
+            imp.setTotalBruto(ln.getDouble("totalbruto"));
             imp.setCancelado("S".equals(Utils.acertarTexto(ln.getString("cancelado"))));
             if (!"".equals(ln.getString("tipocancelamento"))) {
                 imp.setTipoCancelamento(TipoCancelamento.getById(ln.getInt("tipocancelamento")));
@@ -947,9 +950,9 @@ public class PlanilhaDAO extends InterfaceDAO implements MapaTributoProvider {
                 imp.setTipoDesconto(TipoDesconto.getById(ln.getInt("tipodesconto")));
             }
             imp.setIdAliquota(ln.getInt("id_aliquota"));
-            /*imp.setIcmsCst(ln.getInt("icms_cst"));
-             imp.setIcmsAliq(ln.getDouble("icms_aliq"));
-             imp.setIcmsReduzido(ln.getDouble("icms_red"));*/
+            imp.setIcmsCst(ln.getInt("icms_cst"));
+            imp.setIcmsAliq(ln.getDouble("icms_aliq"));
+            imp.setIcmsReduzido(ln.getDouble("icms_red"));
             imp.setContadorDoc(ln.getInt("contadordoc"));
 
             /*if (!hasNext()) {

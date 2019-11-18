@@ -519,13 +519,18 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="chkClientePreferencial" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Component id="chkRotativo" min="-2" max="-2" attributes="0"/>
                               <Component id="chkCheque" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="chkEstadoCivil" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
                           </Group>
                           <EmptySpace pref="316" max="32767" attributes="0"/>
                       </Group>
@@ -539,7 +544,10 @@
                               <Group type="102" attributes="0">
                                   <Component id="chkClientePreferencial" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="chkRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="chkRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="chkEstadoCivil" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
                               <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -588,6 +596,14 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Cheque"/>
                   </Properties>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkEstadoCivil">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Estado Civil"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkEstadoCivilActionPerformed"/>
+                  </Events>
                 </Component>
               </SubComponents>
             </Container>

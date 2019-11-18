@@ -5,6 +5,7 @@ import vrimplantacao.utils.Utils;
 import vrimplantacao.vo.vrimplantacao.CestVO;
 import vrimplantacao2.dao.cadastro.produto.PisCofinsDAO;
 import vrimplantacao2.utils.Factory;
+import vrimplantacao2.utils.MathUtils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.enums.NaturezaReceitaVO;
 import vrimplantacao2.vo.enums.NcmVO;
@@ -29,6 +30,7 @@ public class ProdutoVO {
     private int validade = 0;
     private double pesoBruto = 0;
     private double pesoLiquido = 0;
+    private double margemMinima = 0;
     private double margem = 0;
     private NcmVO ncm = new NcmVO();
     private PisCofinsVO pisCofinsDebito = PisCofinsDAO.PISCOFINS_DEBITO_PADRAO;
@@ -46,6 +48,8 @@ public class ProdutoVO {
     private int idComprador = 1;
     private boolean aceitaMultiplicacaoPDV = true;
     private int idDivisaoFornecedor = 0;
+    private TipoEmbalagem tipoEmbalagemVolume = TipoEmbalagem.UN;
+    private double volume = 1.0;
     
     private final MultiMap<Long, ProdutoAutomacaoVO> eans = new MultiMap<>(
         new Factory<ProdutoAutomacaoVO>() {
@@ -163,7 +167,7 @@ public class ProdutoVO {
     }
 
     public void setMargem(double margem) {
-        this.margem = margem;
+        this.margem = MathUtils.trunc(margem, 2, 999999.99D);
     }
 
     public void setNcm(NcmVO ncm) {
@@ -377,6 +381,36 @@ public class ProdutoVO {
 
     public void setIdDivisaoFornecedor(int idDivisaoFornecedor) {
         this.idDivisaoFornecedor = idDivisaoFornecedor;
+    }
+
+    public TipoEmbalagem getTipoEmbalagemVolume() {
+        return tipoEmbalagemVolume;
+    }
+
+    public void setTipoEmbalagemVolume(TipoEmbalagem tipoEmbalagemVolume) {
+        this.tipoEmbalagemVolume = tipoEmbalagemVolume == null ? TipoEmbalagem.UN : tipoEmbalagemVolume;
+    }
+
+    public double getVolume() {
+        return volume;
+    }
+
+    public void setVolume(double volume) {
+        this.volume = volume;
+    }
+
+    /**
+     * @return the margemMinima
+     */
+    public double getMargemMinima() {
+        return margemMinima;
+    }
+
+    /**
+     * @param margemMinima the margemMinima to set
+     */
+    public void setMargemMinima(double margemMinima) {
+        this.margemMinima = margemMinima;
     }
     
 }

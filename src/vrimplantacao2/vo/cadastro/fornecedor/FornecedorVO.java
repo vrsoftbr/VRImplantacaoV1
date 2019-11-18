@@ -52,6 +52,8 @@ public class FornecedorVO {
     private TipoEmpresa tipoEmpresa = TipoEmpresa.LUCRO_REAL;
     private TipoPagamento tipoPagamento = testing ? new TipoPagamento(0, "TESTE") : Parametros.get().getTipoPagamento();
     private int idBanco;
+    private boolean utilizaNfe = false;
+    private boolean permiteNfSemPedido = false;
     
     public static boolean testing = false;
     
@@ -76,7 +78,7 @@ public class FornecedorVO {
             }
         }
     );
-
+    
     public int getId() {
         return id;
     }
@@ -354,4 +356,21 @@ public class FornecedorVO {
     public void setIdBanco(int idBanco) {
         this.idBanco = idBanco;
     }
+
+    public boolean isUtilizaNfe() {
+        return utilizaNfe;
+    }
+
+    public void setUtilizaNfe(boolean utilizaNfe) {
+        this.utilizaNfe = utilizaNfe;
+    }
+
+    public boolean isPermiteNfSemPedido() {
+        return permiteNfSemPedido;
+    }
+
+    public void setPermiteNfSemPedido(boolean permiteNfSemPedido) {
+        this.permiteNfSemPedido = permiteNfSemPedido;
+    }
+    
 }

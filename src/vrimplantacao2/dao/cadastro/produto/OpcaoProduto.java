@@ -28,6 +28,11 @@ public enum OpcaoProduto {
         public String toString() {
             return "Custo Sem Imposto";
         }
+    }, CUSTO_ANTERIOR {
+        @Override
+        public String toString() {
+            return "Custo Anterior";
+        }
     }, ESTOQUE {
         @Override
         public String toString() {
@@ -67,6 +72,11 @@ public enum OpcaoProduto {
         @Override
         public String toString() {
             return "Icms Saída Fora Estado";
+        }
+    }, ICMS_SAIDA_NF {
+        @Override
+        public String toString() {
+            return "Icms Saída NF";
         }
     }, ICMS_CONSUMIDOR {
         @Override
@@ -143,6 +153,11 @@ public enum OpcaoProduto {
         public String toString() {
             return "Pesavel";
         }
+    }, MARGEM_MINIMA {
+       @Override
+       public String toString() {
+           return "Margem Mínima";
+       }
     }, MARGEM {
         @Override
         public String toString() {
@@ -325,7 +340,15 @@ public enum OpcaoProduto {
      * Faz com que o sistema grave os EANs que são menores que 7 dígitos nos
      * produtos unitários.
      */
-    IMPORTAR_EAN_MENORES_QUE_7_DIGITOS;
+    IMPORTAR_EAN_MENORES_QUE_7_DIGITOS, 
+    VOLUME_TIPO_EMBALAGEM, 
+    VOLUME_QTD, 
+    IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO {
+        @Override
+        public String toString() {
+            return "Importar - Copiar ICMS débito no crédito";
+        }        
+    };
 
     public static Set<OpcaoProduto> getAll() {
         return new HashSet<>(Arrays.asList(OpcaoProduto.values()));

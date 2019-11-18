@@ -72,6 +72,9 @@ public class UniplusGUI extends VRInternalFrame {
         super(i_mdiFrame);
         initComponents();
         
+        tabBalanca.setSistema(NOME_SISTEMA);
+        tabBalanca.setLoja("");
+        
         this.title = "Importação " + NOME_SISTEMA;
                 
         cmbLojaOrigem.setModel(new DefaultComboBoxModel());
@@ -256,6 +259,7 @@ public class UniplusGUI extends VRInternalFrame {
         cmbLojaVR = new vrframework.bean.comboBox.VRComboBox();
         tab = new vrframework.bean.tabbedPane.VRTabbedPane();
         tabImportacao = new vrframework.bean.tabbedPane.VRTabbedPane();
+        tabBalanca = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         tabProdutos = new vrimplantacao2.gui.component.checks.ChecksProdutoPanelGUI();
         tabFornecedor = new vrframework.bean.panel.VRPanel();
         chkFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -357,20 +361,20 @@ public class UniplusGUI extends VRInternalFrame {
 
         setTitle("Uniplus");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
-            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
                 onClose(evt);
             }
-            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
-            }
-            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
             }
-            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
         });
 
@@ -410,6 +414,8 @@ public class UniplusGUI extends VRInternalFrame {
                 .addComponent(cmbLojaVR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
+        tabBalanca.setSistema("");
+        tabImportacao.addTab("Balança", tabBalanca);
         tabImportacao.addTab("Produtos", tabProdutos);
 
         tabFornecedor.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
@@ -633,6 +639,12 @@ public class UniplusGUI extends VRInternalFrame {
 
         txtBancoDadosPostgres.setCaixaAlta(false);
 
+        cmbLojaOrigem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbLojaOrigemActionPerformed(evt);
+            }
+        });
+
         vRLabel8.setText("Loja ID");
 
         txtLojaID.setCaixaAlta(false);
@@ -820,6 +832,10 @@ public class UniplusGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkVendasActionPerformed
 
+    private void cmbLojaOrigemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbLojaOrigemActionPerformed
+        tabBalanca.setLoja(((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj);
+    }//GEN-LAST:event_cmbLojaOrigemActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectarPostgres;
     private vrframework.bean.button.VRButton btnMigrar;
@@ -848,6 +864,7 @@ public class UniplusGUI extends VRInternalFrame {
     private vrframework.bean.panel.VRPanel pnlCustom;
     private vrframework.bean.panel.VRPanel pnlOutras;
     private vrframework.bean.tabbedPane.VRTabbedPane tab;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel tabBalanca;
     private vrframework.bean.tabbedPane.VRTabbedPane tabCliente;
     private vrframework.bean.panel.VRPanel tabClienteDados;
     private vrframework.bean.panel.VRPanel tabFornecedor;

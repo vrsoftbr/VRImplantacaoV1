@@ -276,7 +276,7 @@ public class CreditoRotativoRepository {
         pags.clear();
         System.gc();
         
-        MultiMap<String, CreditoRotativoAnteriorVO> rotativosAnteriores = provider.getTodoCreditoRotativoAnterior();
+        Map<String, CreditoRotativoAnteriorVO> rotativosAnteriores = provider.getTodoCreditoRotativoAnterior();
         MultiMap<String, CreditoRotativoItemAnteriorVO> baixasAnteriores = provider.getTodaBaixaAnterior();
         Map<Integer, Double> baixas = provider.getBaixas();
         
@@ -285,7 +285,12 @@ public class CreditoRotativoRepository {
         try {
             provider.begin();
             
-            provider.setStatus("Importando pagamentos (agrupados)...Gravando", somado.size());            
+            
+            int total = rotativosAnteriores.size();
+            int contadorAtual = 0;
+            int contadorAuxiliar = 0;
+            
+            provider.setStatus("Importando pagamentos (agrupados)...Gravando " + contadorAtual + "/" + total);
             
             //Retorno TODOS os crédito importados de todas as lojas deste cliente.
             for (CreditoRotativoAnteriorVO rotativoAnterior: rotativosAnteriores.values()) {
@@ -365,13 +370,23 @@ public class CreditoRotativoRepository {
                                 );
 
                             }
-
+                        } else {
+                            LOG.warning("Exite baixa anterior para o rotativo '" + rotativoAnterior.getId() + "'");
                         }
+                    } else {
+                        LOG.warning("Não há valor de pagamento '" + rotativoAnterior.getId() + "'");
                     }
+                } else {
+                    LOG.warning("Crédito Rotativo '" + rotativoAnterior.getId() + "' não importado no VR");
                 }
                 
-                provider.setStatus();
-
+                contadorAuxiliar++;
+                contadorAtual++;
+                
+                if (contadorAuxiliar >= 1000) {
+                    contadorAuxiliar = 0;
+                    provider.setStatus("Importando pagamentos (agrupados)...Gravando " + contadorAtual + "/" + total);
+                }
             }         
             
             provider.commit();

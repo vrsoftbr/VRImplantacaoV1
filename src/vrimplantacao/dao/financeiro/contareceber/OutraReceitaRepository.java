@@ -83,6 +83,7 @@ public class OutraReceitaRepository {
                         
                         //Localiza o fornecedor no VR.
                         if (imp.getIdFornecedor()!= null) {
+                            System.out.println("Fornecedor: " + imp.getIdFornecedor());
                             vo.setIdFornecedor(fornecedores.get(imp.getIdFornecedor()));
                             if (vo.getIdFornecedor() == 0) {
                                 LOG.severe("Fornecedor " + imp.getIdFornecedor()+ " não localizado!");

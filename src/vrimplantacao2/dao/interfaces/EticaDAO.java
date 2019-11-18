@@ -10,6 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.enums.SituacaoCadastro;
 import vrimplantacao2.vo.enums.TipoContato;
@@ -144,7 +145,7 @@ public class EticaDAO extends InterfaceDAO {
                     imp.setPiscofinsCstDebito(rst.getString("cst_pis"));
                     imp.setPiscofinsCstCredito(rst.getString("cst_pis_entrada"));
                     imp.setPiscofinsNaturezaReceita(rst.getString("cod_nat_pc"));
-                    imp.setIcmsCst(rst.getInt("cst"));
+                    imp.setIcmsCst(Integer.parseInt(Utils.formataNumero(rst.getString("cst"))));
                     imp.setIcmsAliq(rst.getDouble("aliquota_icms"));
                     imp.setIcmsReducao(rst.getDouble("reducao_base"));
                     result.add(imp);
@@ -288,12 +289,12 @@ public class EticaDAO extends InterfaceDAO {
                     + "    c.dia_venc_finan\n"
                     + "from contato c\n"
                     + "where c.tipo_contato = 'C'\n"
-                    + "order bu c.id"
+                    + "order by c.id"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rst.getString("id"));
-                    imp.setRazao(rst.getString("razao"));
+                    imp.setRazao(rst.getString("fantasia"));
                     imp.setFantasia(rst.getString("fantasia"));
                     imp.setCnpj(rst.getString("cnpj_cpf"));
                     imp.setInscricaoestadual(rst.getString("insc_rg"));
@@ -301,7 +302,7 @@ public class EticaDAO extends InterfaceDAO {
                     imp.setNumero(rst.getString("num_end"));
                     imp.setComplemento(rst.getString("complemento"));
                     imp.setCep(rst.getString("cep_end"));
-                    imp.setBairro(rst.getString("bairro"));
+                    imp.setBairro(rst.getString("bairro_end"));
                     imp.setMunicipio(rst.getString("cidade_end"));
                     imp.setMunicipioIBGE(rst.getInt("codcidade"));
                     imp.setUf(rst.getString("uf_end"));

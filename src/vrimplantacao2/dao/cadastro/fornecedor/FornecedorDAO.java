@@ -35,6 +35,10 @@ public class FornecedorDAO {
     private MultiMap<Long, FornecedorVO> cnpjExistentes;
     private int lojaVR;
 
+    public FornecedorDAO() throws Exception {
+        this.anteriorDAO = new FornecedorAnteriorDAO();
+    }
+
     public MultiMap<Long, FornecedorVO> getCnpjExistente() throws Exception {
         if (cnpjExistentes == null) {
             atualizarCnpjExistentes();
@@ -409,7 +413,7 @@ public class FornecedorDAO {
         }
     }
 
-    private final FornecedorAnteriorDAO anteriorDAO = new FornecedorAnteriorDAO();
+    private final FornecedorAnteriorDAO anteriorDAO;
     private MultiMap<Integer, FornecedorVO> existentes;
 
     private void organizar(MultiMap<String, FornecedorIMP> filtrados) {
@@ -597,11 +601,11 @@ public class FornecedorDAO {
             sql.putNull("id_tipotroca");// integer,
             sql.put("id_tipofornecedor", vo.getTipoFornecedor().getId());// integer NOT NULL,
             sql.put("id_contacontabilfinanceiro", ContaContabilFinanceiro.PAGAMENTO_FORNECEDOR.getID());// integer,
-            sql.put("utilizanfe", false);// boolean NOT NULL,
+            sql.put("utilizanfe", vo.isUtilizaNfe());// boolean NOT NULL,
             sql.put("datacadastro", vo.getDataCadastro());// date NOT NULL,
             sql.put("utilizaconferencia", false);// boolean NOT NULL,
             sql.put("numero", vo.getNumero());// character varying(6) NOT NULL DEFAULT ''::character varying,
-            sql.put("permitenfsempedido", false);// boolean NOT NULL DEFAULT false,
+            sql.put("permitenfsempedido", vo.isPermiteNfSemPedido());// boolean NOT NULL DEFAULT false,
             sql.put("modelonf", "55");// character varying(2) NOT NULL DEFAULT ''::character varying,
             sql.put("emitenf", false);// boolean NOT NULL DEFAULT true,
             sql.put("tiponegociacao", 0);// integer NOT NULL DEFAULT 0,
@@ -696,6 +700,12 @@ public class FornecedorDAO {
                 }
                 if(opt.contains(OpcaoFornecedor.CEP)) {
                     sql.put("cep", vo.getCep());
+                }
+                if (opt.contains(OpcaoFornecedor.EMITE_NFE)) {
+                    sql.put("utilizanfe", vo.isUtilizaNfe());
+                }
+                if (opt.contains(OpcaoFornecedor.PERMITE_NF_SEM_PEDIDO)) {
+                    sql.put("permitenfsempedido", vo.isPermiteNfSemPedido());
                 }
                 sql.setWhere("id = " + vo.getId());
                 if (!sql.isEmpty()) {

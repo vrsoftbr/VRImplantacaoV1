@@ -44,6 +44,7 @@ public enum OpcaoCliente {
     TELEFONE,
     CELULAR,
     ENDERECO_COMPLETO,
+    BAIRRO,
     TIPO_INSCRICAO,
     PERMITE_CHEQUE,
     PERMITE_CREDITOROTATIVO, 
@@ -55,7 +56,10 @@ public enum OpcaoCliente {
     BLOQUEADO,
     CEP,
     COMPLEMENTO,
-    ESTADO_CIVIL;    
+    ESTADO_CIVIL,
+    VENCIMENTO_ROTATIVO,
+    SEXO,
+    DATA_CADASTRO;    
     
     private static final Logger LOG = Logger.getLogger(OpcaoCliente.class.getName());
     private List<ClienteIMP> listaEspecial;

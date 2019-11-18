@@ -124,6 +124,7 @@ public class ProdutoDAO {
             sql.put("larguraembalagem", 0);
             sql.put("alturaembalagem", 0);
             sql.put("perda", 0.0);
+            sql.put("margemminima", vo.getMargemMinima());
             sql.put("margem", vo.getMargem());
             sql.put("verificacustotabela", false);
             sql.put("percentualipi", 0.0);
@@ -180,8 +181,8 @@ public class ProdutoDAO {
             sql.put("impostomedioestadual", 0);
             sql.put("id_tipocompra", 0);
             sql.put("numeroparcela", 0);
-            sql.put("id_tipoembalagemvolume", vo.getTipoEmbalagem().getId());
-            sql.put("volume", 1.0);
+            sql.put("id_tipoembalagemvolume", vo.getTipoEmbalagemVolume().getId());
+            sql.put("volume", vo.getVolume());
             sql.put("id_normacompra", vo.getNormaCompra().getId());
             sql.putNull("lastro");
             sql.putNull("camadas");
@@ -260,6 +261,9 @@ public class ProdutoDAO {
             NaturezaReceitaVO nat = vo.getPisCofinsNaturezaReceita();
             sql.put("tiponaturezareceita", nat != null ? nat.getCodigo() : null);
         }
+        if (opt.contains(OpcaoProduto.MARGEM_MINIMA)) {
+            sql.put("margemminima", vo.getMargemMinima());
+        }
         if (opt.contains(OpcaoProduto.MARGEM)) {
             sql.put("margem", vo.getMargem());
         }
@@ -324,13 +328,20 @@ public class ProdutoDAO {
         if (opt.contains(OpcaoProduto.DIVISAO_PRODUTO)) {
             sql.put("id_divisaofornecedor", vo.getIdDivisaoFornecedor());
         }
+        if (opt.contains(OpcaoProduto.VOLUME_TIPO_EMBALAGEM)) {
+            sql.put("id_tipoembalagemvolume", vo.getTipoEmbalagemVolume().getId());
+        }
+        if (opt.contains(OpcaoProduto.VOLUME_QTD)) {
+            sql.put("volume", vo.getVolume());
+        }
 
         sql.setWhere("id = " + vo.getId());
-
+        String strSql = sql.getUpdate();
+        LOG.fine(strSql);
         try {
             if (!sql.isEmpty()) {
                 try (Statement stm = Conexao.createStatement()) {
-                    stm.execute(sql.getUpdate());
+                    stm.execute(strSql);
                 }
             }
         } catch (Exception e) {

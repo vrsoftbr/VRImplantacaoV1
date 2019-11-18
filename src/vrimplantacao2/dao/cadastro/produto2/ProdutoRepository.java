@@ -50,6 +50,7 @@ public class ProdutoRepository {
     private boolean naoTransformarEANemUN = false;
     private boolean usarConversaoDeAliquotaSimples = true;
     private boolean importarMenoresQue7Digitos = false;
+    private boolean copiarIcmsDebitoParaCredito = false;
     public boolean importarSomenteLoja = false;
     
     private Map<String, Entry<String, Integer>> divisoes;
@@ -77,7 +78,8 @@ public class ProdutoRepository {
 
     public void salvar(List<ProdutoIMP> produtos) throws Exception {
         usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
-        importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);        
+        importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
+        copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
         
         LOG.finest("Abrindo a transação");
         provider.begin();        
@@ -128,6 +130,7 @@ public class ProdutoRepository {
                     //</editor-fold>
                     
                     ProdutoAnteriorVO anterior = provider.anterior().get(keys.get(0), keys.get(1), keys.get(2));
+                    
                     if (anterior == null) {
                         rep.append("01|Produto não importado anteriormente");
                         
@@ -240,11 +243,12 @@ public class ProdutoRepository {
     }
     
     public void atualizar(List<ProdutoIMP> produtos, OpcaoProduto... opcoes) throws Exception {
-        usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
+        Set<OpcaoProduto> op = new HashSet<>(Arrays.asList(opcoes));
+        usarConversaoDeAliquotaSimples = !op.contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
         importarSomenteLoja = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_INDIVIDUAL_LOJA);
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
-        
-        
+        copiarIcmsDebitoParaCredito = op.contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
+                
         LOG.finer("Entrando no método atualizar; produtos(" + produtos.size() + ") opcoes(" + opcoes.length + ")");
         //<editor-fold defaultstate="collapsed" desc="Separa as opções entre 'com lista especial' e 'sem lista especial'">
         Set<OpcaoProduto> optComLista = new LinkedHashSet<>();
@@ -274,6 +278,8 @@ public class ProdutoRepository {
 
             try {
                 provider.begin();
+                
+                LOG.info("importarSomenteLoja: " + importarSomenteLoja);
                 
                 LOG.info("Produtos a serem atualizados: " + organizados.size());
 
@@ -321,9 +327,13 @@ public class ProdutoRepository {
                         anterior = provider.anterior().get(chaveProd);
                     } else {
                         anterior = provider.anterior().getLojaImp(chaveProd);
-                    }                    
+                    }
+                    
+                    LOG.finer("Chave Prod: " + Arrays.deepToString(chaveProd));
 
                     if (anterior != null && anterior.getCodigoAtual() != null) {
+                        
+                        LOG.finer("Anterior encontrado: " + anterior.getImportId() + " - " + anterior.getDescricao());
 
                         //<editor-fold defaultstate="collapsed" desc="Preparando variáveis">
                         int id = anterior.getCodigoAtual().getId();
@@ -425,6 +435,7 @@ public class ProdutoRepository {
     public void unificar(List<ProdutoIMP> produtos) throws Exception {
         usarConversaoDeAliquotaSimples = !provider.getOpcoes().contains(OpcaoProduto.USAR_CONVERSAO_ALIQUOTA_COMPLETA);
         importarMenoresQue7Digitos = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_EAN_MENORES_QUE_7_DIGITOS);
+        copiarIcmsDebitoParaCredito = provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_COPIAR_ICMS_DEBITO_NO_CREDITO);
         
         provider.begin();
         try {
@@ -523,6 +534,10 @@ public class ProdutoRepository {
                             automacao.setProduto(codigoAtual);
                             provider.automacao().salvar(automacao);
                         }
+                    } else {
+                            id = idProdutoExistente;
+                            codigoAtual = new ProdutoVO();
+                            codigoAtual.setId(id);
                     }
                 }
 
@@ -805,22 +820,26 @@ public class ProdutoRepository {
             }
         }
         
-        
-        if (idIcmsCredito != null) {
-            aliqCredito = provider.tributo().getAliquotaByMapaId(idIcmsCredito);
-            creditoForaEstado = provider.tributo().getAliquotaByMapaId(idIcmsCredito);            
+        if (copiarIcmsDebitoParaCredito) {
+            aliqCredito = aliqDebito;
+            creditoForaEstado = debitoForaEstado;
         } else {
-            int icmsCstEntrada = imp.getIcmsCstEntrada();
-            double icmsAliqEntrada = 0;
-            double icmsReducaoEntrada = 0;
+            if (idIcmsCredito != null) {
+                aliqCredito = provider.tributo().getAliquotaByMapaId(idIcmsCredito);
+                creditoForaEstado = provider.tributo().getAliquotaByMapaId(idIcmsCredito);            
+            } else {
+                int icmsCstEntrada = imp.getIcmsCstEntrada();
+                double icmsAliqEntrada = 0;
+                double icmsReducaoEntrada = 0;
 
-            if (icmsCstEntrada == 20 || icmsCstEntrada == 0) {
-                icmsAliqEntrada = imp.getIcmsAliqEntrada();
-                icmsReducaoEntrada = imp.getIcmsReducaoEntrada();
+                if (icmsCstEntrada == 20 || icmsCstEntrada == 0) {
+                    icmsAliqEntrada = imp.getIcmsAliqEntrada();
+                    icmsReducaoEntrada = imp.getIcmsReducaoEntrada();
+                }
+
+                aliqCredito = provider.tributo().getIcms(icmsCstEntrada, icmsAliqEntrada, icmsReducaoEntrada);
+                creditoForaEstado = provider.tributo().getIcms(icmsCstEntrada, icmsAliqEntrada, icmsReducaoEntrada);
             }
-            
-            aliqCredito = provider.tributo().getIcms(icmsCstEntrada, icmsAliqEntrada, icmsReducaoEntrada);
-            creditoForaEstado = provider.tributo().getIcms(icmsCstEntrada, icmsAliqEntrada, icmsReducaoEntrada);
         }
 
         aliquota.setAliquotaCredito(aliqCredito);
@@ -910,7 +929,6 @@ public class ProdutoRepository {
                 icmsAliqSaidaForaEstadoNF = imp.getIcmsAliqSaidaForaEstadoNF();
                 icmsReducaoSaidaForaEstadoNF = imp.getIcmsReducaoSaidaForaEstadoNF();
             }
-
             
             aliqDebito = provider.tributo().getIcms(icmsCstSaida, icmsAliqSaida, icmsReducaoSaida);
             debitoForaEstado = provider.tributo().getIcms(icmsCstSaidaForaEstado, icmsAliqSaidaForaEstado, icmsReducaoSaidaForaEstado);
@@ -936,37 +954,41 @@ public class ProdutoRepository {
             }
         }
         
-        
-        if (idIcmsCredito != null) {
-            aliqCredito = provider.tributo().getAliquotaByMapaId(idIcmsCredito);
-            creditoForaEstado = provider.tributo().getAliquotaByMapaId(idIcmsCreditoForaEstado);
-            if (creditoForaEstado == null) {
-                creditoForaEstado = aliqCredito;
-            }
+        if (copiarIcmsDebitoParaCredito) {
+            aliqCredito = aliqDebito;
+            creditoForaEstado = debitoForaEstado;
         } else {
-            
-            int icmsCstEntrada = imp.getIcmsCstEntrada();
-            double icmsAliqEntrada = 0;
-            double icmsReducaoEntrada = 0;
+            if (idIcmsCredito != null) {
+                aliqCredito = provider.tributo().getAliquotaByMapaId(idIcmsCredito);
+                creditoForaEstado = provider.tributo().getAliquotaByMapaId(idIcmsCreditoForaEstado);
+                if (creditoForaEstado == null) {
+                    creditoForaEstado = aliqCredito;
+                }
+            } else {
 
-            int icmsCstEntradaForaEstado = imp.getIcmsCstEntradaForaEstado();
-            double icmsAliqEntradaForaEstado = 0;
-            double icmsReducaoEntradaForaEstado = 0;
-            
-            if (icmsCstEntrada == 20 || icmsCstEntrada == 0) {
-                icmsAliqEntrada = imp.getIcmsAliqEntrada();
-                icmsReducaoEntrada = imp.getIcmsReducaoEntrada();
-            }
-            if (icmsCstEntradaForaEstado == 20 || icmsCstEntradaForaEstado == 0) {
-                icmsAliqEntradaForaEstado = imp.getIcmsAliqEntradaForaEstado();
-                icmsReducaoEntradaForaEstado = imp.getIcmsReducaoEntradaForaEstado();
-            }
-            
-            aliqCredito = provider.tributo().getIcms(icmsCstEntrada, icmsAliqEntrada, icmsReducaoEntrada);
-            creditoForaEstado = provider.tributo().getIcms(icmsCstEntradaForaEstado, icmsAliqEntradaForaEstado, icmsReducaoEntradaForaEstado);
-            
-            if (creditoForaEstado == null) {
-                creditoForaEstado = aliqCredito;
+                int icmsCstEntrada = imp.getIcmsCstEntrada();
+                double icmsAliqEntrada = 0;
+                double icmsReducaoEntrada = 0;
+
+                int icmsCstEntradaForaEstado = imp.getIcmsCstEntradaForaEstado();
+                double icmsAliqEntradaForaEstado = 0;
+                double icmsReducaoEntradaForaEstado = 0;
+
+                if (icmsCstEntrada == 20 || icmsCstEntrada == 0) {
+                    icmsAliqEntrada = imp.getIcmsAliqEntrada();
+                    icmsReducaoEntrada = imp.getIcmsReducaoEntrada();
+                }
+                if (icmsCstEntradaForaEstado == 20 || icmsCstEntradaForaEstado == 0) {
+                    icmsAliqEntradaForaEstado = imp.getIcmsAliqEntradaForaEstado();
+                    icmsReducaoEntradaForaEstado = imp.getIcmsReducaoEntradaForaEstado();
+                }
+
+                aliqCredito = provider.tributo().getIcms(icmsCstEntrada, icmsAliqEntrada, icmsReducaoEntrada);
+                creditoForaEstado = provider.tributo().getIcms(icmsCstEntradaForaEstado, icmsAliqEntradaForaEstado, icmsReducaoEntradaForaEstado);
+
+                if (creditoForaEstado == null) {
+                    creditoForaEstado = aliqCredito;
+                }
             }
         }
 
@@ -1004,11 +1026,14 @@ public class ProdutoRepository {
         complemento.setPrecoVenda(imp.getPrecovenda());
         complemento.setCustoSemImposto(imp.getCustoSemImposto());
         complemento.setCustoComImposto(imp.getCustoComImposto());
+        complemento.setCustoAnteriorSemImposto(imp.getCustoAnteriorSemImposto());
+        complemento.setCustoAnteriorComImposto(imp.getCustoAnteriorComImposto());
         complemento.setDescontinuado(imp.isDescontinuado());
         complemento.setSituacaoCadastro(imp.getSituacaoCadastro());
         complemento.setTipoProduto(imp.getTipoProduto());
         complemento.setFabricacaoPropria(imp.isFabricacaoPropria());
         complemento.setEmiteEtiqueta(imp.isEmiteEtiqueta());
+        complemento.setDataPrimeiraAlteracao(imp.getDataCadastro());
 
         return complemento;
     }
@@ -1096,6 +1121,7 @@ public class ProdutoRepository {
 
         vo.setFamiliaProduto(provider.getFamiliaProduto(imp.getIdFamiliaProduto()));
         vo.setMargem(imp.getMargem());
+        vo.setMargemMinima(imp.getMargemMinima());
         MercadologicoVO merc = provider.getMercadologico(
                 fillNull(imp.getCodMercadologico1()),
                 fillNull(imp.getCodMercadologico2()),
@@ -1173,9 +1199,7 @@ public class ProdutoRepository {
         vo.setPesoBruto(imp.getPesoBruto());
         vo.setPesoLiquido(imp.getPesoLiquido());
 
-        //<editor-fold defaultstate="collapsed" desc="Conversão do PIS/COFINS">
         convertPisCofins(imp, vo);
-        //</editor-fold>
 
         vo.setValidade(imp.getValidade());
         vo.setExcecao(obterPautaFiscal(imp.getPautaFiscalId()));
@@ -1195,6 +1219,13 @@ public class ProdutoRepository {
         if (comprador != null) {
             vo.setIdComprador(comprador);
         }
+        
+        if (imp.getTipoEmbalagemVolume() == null || imp.getTipoEmbalagemVolume().trim().equals("")) {
+            vo.setTipoEmbalagemVolume(vo.getTipoEmbalagem());
+        } else {
+            vo.setTipoEmbalagemVolume(TipoEmbalagem.getTipoEmbalagem(imp.getTipoEmbalagemVolume()));
+        }
+        vo.setVolume(imp.getVolume());
 
         return vo;
     }
@@ -1383,7 +1414,12 @@ public class ProdutoRepository {
         vo.setCodigoBarras(Utils.stringToLong(imp.getEan()));
         double desconto = imp.getAtacadoPorcentagem();
         if (desconto == 0 && imp.getAtacadoPreco() > 0 && imp.getAtacadoPreco() != imp.getPrecovenda()) {
-            desconto = MathUtils.round(100 - ((imp.getAtacadoPreco() / (imp.getPrecovenda() == 0 ? 1 : imp.getPrecovenda())) * 100), 2);
+            //desconto = MathUtils.round(100 - ((imp.getAtacadoPreco() / (imp.getPrecovenda() == 0 ? 1 : imp.getPrecovenda())) * 100), 2);
+            desconto = (100 - ((imp.getAtacadoPreco() / (imp.getPrecovenda() == 0 ? 1 : imp.getPrecovenda())) * 100));
+            
+            if ("9999994530".equals(imp.getEan())) {
+                System.out.println(desconto + " - " + imp.getAtacadoPreco() + " - " + imp.getPrecovenda());
+            }
         }
         vo.setDesconto(desconto);
         return vo;

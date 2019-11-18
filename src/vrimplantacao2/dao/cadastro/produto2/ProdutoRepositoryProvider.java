@@ -68,10 +68,12 @@ public class ProdutoRepositoryProvider {
     private Set<OpcaoProduto> opcoes = new HashSet<>();    
     private PautaFiscalDAO pautaDao = new PautaFiscalDAO();
     private DivisaoDAO divisaoDAO;
+    private FornecedorAnteriorDAO fornecedorAntDAO;
 
     public ProdutoRepositoryProvider() {
         try {
             this.divisaoDAO = new DivisaoDAO();
+            this.fornecedorAntDAO = new FornecedorAnteriorDAO();
         } catch (Exception ex) {
             throw new RuntimeException(ex.getLocalizedMessage(), ex);
         }
@@ -186,6 +188,10 @@ public class ProdutoRepositoryProvider {
      */
     public Map<String, Integer> getFornecedoresImportados() throws Exception {
         return new FornecedorAnteriorDAO().getFornecedoresImportados(sistema, loja);
+    }
+    
+    public FornecedorAnteriorDAO getFornecedorAnterior() throws Exception {
+        return fornecedorAntDAO;
     }
 
     public Map<String, Integer> getPautaExcecao() throws Exception {

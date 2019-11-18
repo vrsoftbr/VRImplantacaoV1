@@ -143,7 +143,7 @@ public class VendaRepository {
                     cont++;
                     venda.getItens().add(item);
 
-                    Integer produto = provider.getProdutoPorMapeamento(impItem.getCodigoBarras());
+                    Integer produto = provider.getProdutoPorMapeamento(impItem.getProduto());
 
                     if ( produto == null && opt.contains(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR) ) {    
                         produto = provider.getProdutoPorCodigoAnterior(impItem.getProduto());
@@ -260,7 +260,7 @@ public class VendaRepository {
                 ",cupom:" + venda.getNumeroCupom() + 
                 ",data:" + DATE_FORMAT.format(venda.getData()) +
                 ",hora:" + TIME_FORMAT.format(venda.getHoraInicio()) +
-                ",idclientepreferencial:" + venda.getClienteEventual() +
+                ",idclientepreferencial:" + venda.getIdClientePreferencial() +
                 ",subtotalimpressora:" + String.format("%.2f", venda.getSubTotalImpressora()) + "}";
     }
 

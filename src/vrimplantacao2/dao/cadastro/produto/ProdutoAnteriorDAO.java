@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import vrframework.classe.Conexao;
 import vrframework.classe.Util;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.utils.sql.SQLBuilder;
 import vrimplantacao2.utils.sql.SQLUtils;
@@ -260,7 +261,7 @@ public class ProdutoAnteriorDAO {
                     + "and ean.importsistema = " + SQLUtils.stringSQL(sistema) + "\n"
                     + "and ant.imploja = " + SQLUtils.stringSQL(loja) + "\n"
                     + "and ean.importloja = " + SQLUtils.stringSQL(loja) + "\n"
-                    + "and ean.ean = " + SQLUtils.stringSQL(ean)
+                    + "and ean.ean = '" + Utils.stringLong(ean) + "'"//SQLUtils.stringSQL(ean)
             )) {
 
                 if (rst.next()) {

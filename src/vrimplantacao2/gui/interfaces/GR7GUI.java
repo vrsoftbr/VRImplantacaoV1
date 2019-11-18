@@ -36,11 +36,11 @@ public class GR7GUI extends VRInternalFrame {
 
     private void carregarParametros() throws Exception {
         Parametros params = Parametros.get();
-        txtHost.setText(params.get(SISTEMA, "HOST"));
-        txtDatabase.setText(params.get(SISTEMA, "DATABASE"));
-        txtPorta.setText(params.get(SISTEMA, "PORTA"));
-        txtUsuario.setText(params.get(SISTEMA, "USUARIO"));
-        txtSenha.setText(params.get(SISTEMA, "SENHA"));
+        txtHost.setText(params.getWithNull("localhost", SISTEMA, "HOST"));
+        txtDatabase.setText(params.getWithNull("automacao", SISTEMA, "DATABASE"));
+        txtPorta.setText(params.getWithNull("3306", SISTEMA, "PORTA"));
+        txtUsuario.setText(params.getWithNull("automacao", SISTEMA, "USUARIO"));
+        txtSenha.setText(params.getWithNull("rm123", SISTEMA, "SENHA"));
         vLojaCliente = params.get(SISTEMA, "LOJA_CLIENTE");
         vLojaVR = params.getInt(SISTEMA, "LOJA_VR");
     }

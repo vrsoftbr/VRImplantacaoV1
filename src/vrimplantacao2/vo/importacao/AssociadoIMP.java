@@ -9,6 +9,7 @@ public class AssociadoIMP {
     private String id;
     private String descricao;
     private int qtdEmbalagem;
+    private int qtdEmbalagemItem = 1;
     private String produtoAssociadoId;
     private String descricaoProdutoAssociado;
     private double percentualPreco = 0;
@@ -68,6 +69,20 @@ public class AssociadoIMP {
 
     public void setPercentualCusto(double percentualCusto) {
         this.percentualCusto = percentualCusto;
+    }
+
+    /**
+     * @return the qtdEmbalagemItem
+     */
+    public int getQtdEmbalagemItem() {
+        return qtdEmbalagemItem;
+    }
+
+    /**
+     * @param qtdEmbalagemItem the qtdEmbalagemItem to set
+     */
+    public void setQtdEmbalagemItem(int qtdEmbalagemItem) {
+        this.qtdEmbalagemItem = qtdEmbalagemItem;
     }
     
 }

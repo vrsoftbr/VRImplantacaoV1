@@ -417,6 +417,38 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuAtenasActionPerformed"/>
                           </Events>
                         </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuEtica">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Etica"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuEticaActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuThotau">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="OrionTech (Thotau)"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuThotauActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuiWeber">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Weber"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuiWeberActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuiSophyx">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Sophyx"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuiSophyxActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                       </SubComponents>
                     </Menu>
                     <Menu class="javax.swing.JMenu" name="jMenu6">
@@ -594,7 +626,7 @@
                         </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuFabTech">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="FabTech"/>
+                            <Property name="text" type="java.lang.String" value="SabTech"/>
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuFabTechActionPerformed"/>
@@ -719,12 +751,20 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuWinNexusActionPerformed"/>
                           </Events>
                         </MenuItem>
-                        <MenuItem class="javax.swing.JMenuItem" name="mnuHRTech">
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuHRTechV1">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="HRTech"/>
+                            <Property name="text" type="java.lang.String" value="HRTech(v1)"/>
                           </Properties>
                           <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuHRTechActionPerformed"/>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuHRTechV1ActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuHRTechV2">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="HRTech(v2)"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuHRTechV2ActionPerformed"/>
                           </Events>
                         </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuAcom">
@@ -749,6 +789,38 @@
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuSavActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuArtSystem">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="ArtSystem"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuArtSystemActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuiSysERP">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="SysERP"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuiSysERPActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuAtma">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Atma"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuAtmaActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuControlX">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="ControlX"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuControlXActionPerformed"/>
                           </Events>
                         </MenuItem>
                       </SubComponents>
@@ -1014,6 +1086,14 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuMrs1ActionPerformed"/>
                           </Events>
                         </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuMrs2">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Inove"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuMrs2ActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                       </SubComponents>
                     </Menu>
                     <Menu class="javax.swing.JMenu" name="jMenu9">
@@ -1220,6 +1300,22 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuSTI3ActionPerformed"/>
                           </Events>
                         </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuG3">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="G3"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuG3ActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuG4">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Sia Criare (MySQL)"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuG4ActionPerformed"/>
+                          </Events>
+                        </MenuItem>
                       </SubComponents>
                     </Menu>
                     <Menu class="javax.swing.JMenu" name="mnuOrion">
@@ -1313,6 +1409,14 @@
                           </Properties>
                           <Events>
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuVCashActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuAdmRioPreto">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="ADM (Rio Preto)"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuAdmRioPretoActionPerformed"/>
                           </Events>
                         </MenuItem>
                       </SubComponents>
@@ -1669,14 +1773,6 @@
                 <Property name="text" type="java.lang.String" value="Avan&#xe7;adas"/>
               </Properties>
               <SubComponents>
-                <MenuItem class="javax.swing.JMenuItem" name="mnuMapeamentoMercadologico">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Mapeamento de Mercadol&#xf3;gico"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuMapeamentoMercadologicoActionPerformed"/>
-                  </Events>
-                </MenuItem>
                 <MenuItem class="javax.swing.JMenuItem" name="mnuImportarNCM">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Importar NCM da Legisla&#xe7;&#xe3;o"/>
