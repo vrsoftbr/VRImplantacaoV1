@@ -134,7 +134,7 @@ import vrimplantacao2.gui.interfaces.GR7_2GUI;
 import vrimplantacao2.gui.interfaces.GTechGUI;
 import vrimplantacao2.gui.interfaces.GetWayGUI;
 import vrimplantacao2.gui.interfaces.GuiaSistemasGUI;
-import vrimplantacao2.gui.interfaces.HRTechGUI_v1;
+import vrimplantacao2.gui.interfaces.HRTechGUI;
 import vrimplantacao2.gui.interfaces.HRTechGUI_v2;
 import vrimplantacao2.gui.interfaces.HerculesIntCashGUI;
 import vrimplantacao2.gui.interfaces.HipcomGUI;
@@ -4064,7 +4064,7 @@ public final class MenuGUI extends VRMdiFrame {
     }//GEN-LAST:event_mnuSuperLoja10ActionPerformed
 
     private void mnuHRTechV1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuHRTechV1ActionPerformed
-        HRTechGUI_v1.exibir(this);
+        HRTechGUI.exibir(this);
     }//GEN-LAST:event_mnuHRTechV1ActionPerformed
 
     private void mnuSolutionSuperaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSolutionSuperaActionPerformed
