@@ -68,6 +68,7 @@ public class CfopDAO {
             oTipoSaida.idContaContabilFiscalDebito = rst.getObject("id_contacontabilfiscaldebito") == null ? -1 : rst.getInt("id_contacontabilfiscaldebito");
             oTipoSaida.foraEstado = rst.getBoolean("foraestado");
             oTipoSaida.substituicao = rst.getBoolean("substituicao");
+            oTipoSaida.destinatarioCliente = rst.getBoolean("destinatarioCliente");
 
             vTipoSaida.add(oTipoSaida);
         }
