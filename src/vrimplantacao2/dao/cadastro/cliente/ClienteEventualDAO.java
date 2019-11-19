@@ -13,12 +13,24 @@ import vrimplantacao2.vo.cadastro.cliente.ClienteEventualVO;
  * @author Leandro
  */
 public class ClienteEventualDAO {
+    
+    private boolean gerarId = false;
+    
+    public ClienteEventualDAO setGerarId(boolean gerarId) {
+        this.gerarId = gerarId;
+        return this;
+    }
 
     public void salvar(ClienteEventualVO cliente) throws Exception {
         try (Statement stm = Conexao.createStatement()) {
             SQLBuilder sql = new SQLBuilder();
             sql.setTableName("clienteeventual");
-            sql.put("id", cliente.getId());
+            if (gerarId) {
+                sql.putSql("id", "(select coalesce(max(id) + 1, 1) from clienteeventual)");
+                sql.getReturning().add("id");
+            } else {
+                sql.put("id", cliente.getId());
+            }
             sql.put("nome", cliente.getNome());
             sql.put("endereco", cliente.getEndereco());
             sql.put("bairro", cliente.getBairro());
@@ -60,7 +72,14 @@ public class ClienteEventualDAO {
             sql.put("id_tipoIndicadorIe", cliente.getTipoIndicadorIe().getId());
             sql.put("id_classeRisco", cliente.getId_classeRisco());
             
-            stm.execute(sql.getInsert());
+            if (gerarId) {
+                try (ResultSet rst = stm.executeQuery(sql.getInsert())) {
+                    rst.next();
+                    cliente.setId(rst.getInt("id"));
+                }
+            } else {            
+                stm.execute(sql.getInsert());
+            }
         }
     }
 

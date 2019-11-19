@@ -4,6 +4,8 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import vrimplantacao.classe.Global;
 import vrimplantacao.dao.CodigoInternoDAO;
@@ -72,8 +74,20 @@ import vrframework.classe.Conexao;
 import vrframework.classe.Database;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
+import vrimplantacao.dao.cadastro.ClienteEventuallDAO;
+import vrimplantacao.dao.cadastro.FornecedorDAO;
+import vrimplantacao.vo.cadastro.TipoFornecedorVO;
+import vrimplantacao.vo.notafiscal.DestinatarioNfe;
+import vrimplantacao2.dao.cadastro.cliente.ClienteRepository;
+import vrimplantacao2.dao.cadastro.cliente.ClienteRepositoryProvider;
+import vrimplantacao2.dao.cadastro.cliente.OpcaoCliente;
+import vrimplantacao2.parametro.Parametros;
+import vrimplantacao2.vo.enums.TipoIndicadorIE;
+import vrimplantacao2.vo.importacao.ClienteIMP;
 
 public class NotaSaidaDAO {
+    
+    private boolean criarEventualCasoCnpjNaoExista = false;
 
     public NotaSaidaVO carregar(long i_id) throws Exception {
         ResultSet rst = null;
@@ -760,40 +774,44 @@ public class NotaSaidaDAO {
             finalizarCfop(i_notaSaida);
 
             if (oTipoSaida.atualizaEscrita) {
-                new EscritaFechamentoDAO().verificar(i_notaSaida.dataSaida);
+                if (Parametros.get().getBool(true, "IMPORT_NFE", "VERIFICAR_FECHAMENTO_ESCRITA")) {
+                    new EscritaFechamentoDAO().verificar(i_notaSaida.dataSaida);
+                }
 
                 finalizarEscrita(i_notaSaida);
             }
 
-            if (oTipoSaida.baixaEstoque || oTipoSaida.entraEstoque) {
-                finalizarEstoque(i_notaSaida);
-            }
-
-            if (i_notaSaida.valorTotal > 0) {
-                if (oTipoSaida.geraDevolucao) {
-                    finalizarDevolucao(i_notaSaida);
+            if (Parametros.get().getBool(true, "IMPORT_NFE", "PROCESSAR_FINALIZACOES")) {
+                if (oTipoSaida.baixaEstoque || oTipoSaida.entraEstoque) {
+                    finalizarEstoque(i_notaSaida);
                 }
 
-                if (oTipoSaida.geraReceber) {
-                    finalizarVendaPrazo(i_notaSaida);
+                if (i_notaSaida.valorTotal > 0) {
+                    if (oTipoSaida.geraDevolucao) {
+                        finalizarDevolucao(i_notaSaida);
+                    }
+
+                    if (oTipoSaida.geraReceber) {
+                        finalizarVendaPrazo(i_notaSaida);
+                    }
+
+                    if (oTipoSaida.geraContrato) {
+                        finalizarContrato(i_notaSaida);
+                    }
                 }
 
-                if (oTipoSaida.geraContrato) {
-                    finalizarContrato(i_notaSaida);
+                if (oTipoSaida.consultaPedido) {
+                    finalizarPedido(i_notaSaida);
                 }
-            }
 
-            if (oTipoSaida.consultaPedido) {
-                finalizarPedido(i_notaSaida);
-            }
+                finalizarTrocaCupom(i_notaSaida);
 
-            finalizarTrocaCupom(i_notaSaida);
+                finalizarDevolucaoCupom(i_notaSaida);
 
-            finalizarDevolucaoCupom(i_notaSaida);
-
-            if (oTipoSaida.transferencia && new LojaDAO().isFornecedor(i_notaSaida.idFornecedorDestinatario)) {
-                finalizarSenha(i_notaSaida);
-                finalizarTransferencia(i_notaSaida);
+                if (oTipoSaida.transferencia && new LojaDAO().isFornecedor(i_notaSaida.idFornecedorDestinatario)) {
+                    finalizarSenha(i_notaSaida);
+                    finalizarTransferencia(i_notaSaida);
+                }
             }
 
             //atualiza status
@@ -1503,7 +1521,7 @@ public class NotaSaidaDAO {
         }
     }
 
-    public void salvar(NotaSaidaVO i_notaSaida) throws Exception {
+    public void salvar(NotaSaidaVO i_notaSaida, boolean importarDestinatarioComoEventual) throws Exception {
         Statement stm = null;
         ResultSet rst = null;
         StringBuilder sql = null;
@@ -1511,14 +1529,10 @@ public class NotaSaidaDAO {
         try {
             Conexao.begin();
             stm = Conexao.createStatement();
-
-            rst = stm.executeQuery("SELECT id FROM notasaida WHERE chavenfe = '" + i_notaSaida.chaveNfe + "'");
-
-            if (rst.next()) {
-                Util.exibirMensagemConfirmar("Esta nota já existe, deseja exluir e importar novamente ?", "Atenção");
-
-                NotaSaidaVO oNotaSaida = carregar(rst.getLong("id"));
-
+            
+            Integer idNotaSaida = getIdNotaSaida(i_notaSaida.chaveNfe);
+            if (idNotaSaida != null) {
+                NotaSaidaVO oNotaSaida = carregar(idNotaSaida);
                 excluir(oNotaSaida);
             }
 
@@ -1965,5 +1979,62 @@ public class NotaSaidaDAO {
         String senha = Util.formatNumber(Long.toHexString((long) i_numero * data * i_idLoja), 8).substring(0, 8);
 
         return senha.toUpperCase();
+    }
+
+    public Integer getIdNotaSaida(String chaveNfe) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "SELECT id FROM notasaida WHERE chavenfe = '" + chaveNfe + "'"
+            )) {
+                if (rst.next()) {
+                    return rst.getInt("id");
+                }
+                return null;
+            }
+        }
+    }
+    
+    public boolean isNotaExistente(String chaveNfe) throws Exception {
+        return getIdNotaSaida(chaveNfe) != null;
+    }
+
+    public void setCriarEventualCasoCnpjNaoExista(boolean criarEventualCasoCnpjNaoExista) {
+        this.criarEventualCasoCnpjNaoExista = criarEventualCasoCnpjNaoExista;
+    }
+
+    private ClienteIMP converterClienteEventual(NotaSaidaVO nfe) {
+        ClienteIMP imp = new ClienteIMP();
+        
+        DestinatarioNfe dest = nfe.destinatarioNfe;
+        
+        imp.setId(String.valueOf(dest.getCnpj()));
+        imp.setCnpj(String.valueOf(dest.getCnpj()));
+        imp.setRazao(dest.getNome());
+        imp.setFantasia(dest.getNome());
+        imp.setEndereco(dest.getLogradouro());
+        imp.setNumero(dest.getNumero());
+        imp.setComplemento(dest.getComplemento());
+        imp.setBairro(dest.getBairro());
+        imp.setMunicipio(dest.getMunicipio());
+        imp.setMunicipioIBGE(dest.getCodigoIbgeMunicipio());
+        imp.setUf(dest.getUf());
+        imp.setCep(dest.getCep());
+        imp.setTipoIndicadorIe(TipoIndicadorIE.getById(dest.getIndicadorId().getId()));
+        imp.setInscricaoestadual(String.valueOf(dest.getInscricaoEstadual()));
+        imp.setInscricaoMunicipal(String.valueOf(dest.getInscricaoMunicipal()));
+        imp.setTelefone(dest.getTelefone());
+        imp.setEmail(dest.getEmail());
+        
+        return imp;
+    }
+
+    private boolean isClienteEventualExistente(long cnpj) throws Exception {
+        try (Statement stm = Conexao.createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select id from clienteeventual where cnpj = " + cnpj
+            )) {
+                return (rst.next());
+            }
+        }
     }
 }

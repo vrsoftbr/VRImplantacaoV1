@@ -13,4 +13,14 @@ public enum TipoDivergencia {
     public int getId() {
         return id;
     }
+    
+    public static TipoDivergencia getById(int id) {
+        for (TipoDivergencia div: values()) {
+            if (id == div.id) {
+                return div;
+            }
+        }
+        return null;
+    }
+    
 }

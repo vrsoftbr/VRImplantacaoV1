@@ -751,12 +751,20 @@
                             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuWinNexusActionPerformed"/>
                           </Events>
                         </MenuItem>
-                        <MenuItem class="javax.swing.JMenuItem" name="mnuHRTech">
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuHRTechV1">
                           <Properties>
-                            <Property name="text" type="java.lang.String" value="HRTech"/>
+                            <Property name="text" type="java.lang.String" value="HRTech(v1)"/>
                           </Properties>
                           <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuHRTechActionPerformed"/>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuHRTechV1ActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuHRTechV2">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="HRTech(v2)"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuHRTechV2ActionPerformed"/>
                           </Events>
                         </MenuItem>
                         <MenuItem class="javax.swing.JMenuItem" name="mnuAcom">

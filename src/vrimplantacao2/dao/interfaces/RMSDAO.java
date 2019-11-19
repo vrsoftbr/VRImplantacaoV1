@@ -519,7 +519,7 @@ public class RMSDAO extends InterfaceDAO {
                     "	    atac.ean = ean.EAN_COD_EAN\n" +
                     (utilizarViewMixFiscal ? "left join\n" +
                     "       vw_fis_mxf_produtos vwfis on vwfis.codigo_produto = p.git_cod_item || p.git_digito\n" : "") +
-                    (somenteAtivos ? "where preco.id_situacaocadastral = 1\n" : "") +
+                    (somenteAtivos ? "where p.GIT_DAT_SAI_LIN = 0\n" : "") +
                     "order by \n" +
                     "	  p.git_cod_item"
             )) {
@@ -582,6 +582,26 @@ public class RMSDAO extends InterfaceDAO {
                         imp.setAtacadoPreco(rst.getDouble("precoatac"));
 
                         imp.setPautaFiscalId(rst.getString("idpautafiscal"));
+                    } else {
+                        imp.setPiscofinsCstDebito(rst.getInt("piscofins_debito"));
+                        imp.setPiscofinsNaturezaReceita(rst.getInt("nat_rec"));
+                        
+                        imp.setIcmsCstSaida(rst.getInt("icms_cst"));
+                        imp.setIcmsAliqSaida(rst.getDouble("icms_aliq"));
+                        imp.setIcmsReducaoSaida(rst.getDouble("icms_red"));
+                        imp.setIcmsCstSaidaForaEstado(rst.getInt("icms_cst"));
+                        imp.setIcmsAliqSaidaForaEstado(rst.getDouble("icms_aliq"));
+                        imp.setIcmsReducaoSaidaForaEstado(rst.getDouble("icms_red"));
+                        imp.setIcmsCstSaidaForaEstadoNF(rst.getInt("icms_cst"));
+                        imp.setIcmsAliqSaidaForaEstadoNF(rst.getDouble("icms_aliq"));
+                        imp.setIcmsReducaoSaidaForaEstadoNF(rst.getDouble("icms_red"));
+                        
+                        imp.setIcmsCstEntrada(rst.getInt("icms_cst"));
+                        imp.setIcmsAliqEntrada(rst.getDouble("icms_aliq"));
+                        imp.setIcmsReducaoEntrada(rst.getDouble("icms_red"));
+                        imp.setIcmsCstEntradaForaEstado(rst.getInt("icms_cst"));
+                        imp.setIcmsAliqEntradaForaEstado(rst.getDouble("icms_aliq"));
+                        imp.setIcmsReducaoEntradaForaEstado(rst.getDouble("icms_red"));
                     }
                     
                     result.add(imp);
