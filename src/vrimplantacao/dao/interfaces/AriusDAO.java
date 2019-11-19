@@ -1480,6 +1480,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	nfe.serie,\n"
                     + "	nfe.numero_nota_fiscal as numeronota,\n"
                     + "	nfe.data_hora_emissao as dataemissao,\n"
+                    + " to_date(er.data_hora_entrada) as dataentrada,"
                     + "	nfe.valor_total_ipi as valoripi,\n"
                     + "	nfe.valor_frete as valorfrete,\n"
                     + "	nfe.valor_outras_despesas as valoroutrasdespesas,\n"
@@ -1496,7 +1497,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from arius.rec_t_entrada_nota nfe\n"
                     + "	inner join arius.rec_t_entrada_recebimento er\n"
                     + "		on nfe.id_entrada_recebimento = er.id_entrada_recebimento\n"
-                    + "where nfe.data_hora_emissao between "
+                    + "where to_date(er.data_hora_entrada) between "
                     + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
                     + "and "
                     + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
@@ -1513,8 +1514,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setModelo(rs.getString("modelo"));
                     imp.setSerie(rs.getString("serie"));
                     imp.setNumeroNota(rs.getInt("numeronota"));
-                    imp.setDataEmissao(rs.getDate("dataemissao"));
-                    imp.setDataEntradaSaida(rs.getDate("dataemissao"));
+                    imp.setDataEmissao(rs.getDate("dataentrada"));
+                    imp.setDataEntradaSaida(rs.getDate("dataentrada"));
                     imp.setValorIpi(rs.getDouble("valoripi"));
                     imp.setValorFrete(rs.getDouble("valorfrete"));
                     imp.setValorOutrasDespesas(rs.getDouble("valoroutrasdespesas"));
@@ -1526,9 +1527,13 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setValorDesconto(rs.getDouble("valordesconto"));
                     imp.setChaveNfe(rs.getString("chavenfe"));
                     imp.setXml(rs.getString("xml"));
-                    imp.setDataHoraAlteracao(rs.getDate("dataemissao"));
+                    imp.setDataHoraAlteracao(rs.getDate("dataentrada"));
                     
-                    getNotasItem(imp);
+                    getNotasItem(
+                            imp,
+                            imp.getId(),
+                            imp.getIdDestinatario()
+                    );
                     
                     result.add(imp);
                 }
@@ -1537,48 +1542,52 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    private void getNotasItem(NotaFiscalIMP imp) throws Exception {
+    private void getNotasItem(NotaFiscalIMP imp, String idNota, String partic) throws Exception {
         try (Statement stm = ConexaoOracle.createStatement()) {
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
-                    + "	id_c170 as id,\n"
-                    + "	numero_nf as notafiscal,\n"
-                    + "	num_item as numeroitem,\n"
-                    + "	cod_item as idproduto,\n"
-                    + "	ncm,\n"
-                    + "	cest_a as cest,\n"
-                    + "	cfop,\n"
-                    + "	descr_compl as descricao,\n"
-                    + "	unid as unidade,\n"
-                    + "	ean,\n"
-                    + "	embalagem_a as quantidadeembalagem,\n"
-                    + "	qtd as quantidade,\n"
-                    + "	vl_item as valortotalproduto,\n"
-                    + "	cst_icms as icmscst,\n"
-                    + "	aliq_icms as icmsaliquota,\n"
-                    + "	valor_reducao_base_a as icmsreduzido,\n"
-                    + "	vl_bc_icms as icmsbasecalculo,\n"
-                    + "	vl_icms as icmsvalor,\n"
-                    + "	vl_bc_icms_st as icmsbasecalculost,\n"
-                    + "	vl_icms_st as icmsvalorst,\n"
-                    + "	vl_bc_ipi as ipivalorbase,\n"
-                    + "	vl_ipi as ipivalor,\n"
-                    + "	cst_pis as piscofinscst,\n"
-                    + "	cod_nat as tiponaturezareceita\n"
+                    + "i.id_c170 as id,\n"
+                    + "i.numero_nf as notafiscal,\n"
+                    + "i.num_item as numeroitem,\n"
+                    + "i.cod_item as idproduto,\n"
+                    + "i.ncm,\n"
+                    + "i.cest_a as cest,\n"
+                    + "i.cfop,\n"
+                    + "i.descr_compl as descricao,\n"
+                    + "i.unid as unidade,\n"
+                    + "i.ean,\n"
+                    + "i.embalagem_a as quantidadeembalagem,\n"
+                    + "i.qtd as quantidade,\n"
+                    + "i.vl_item as valortotalproduto,\n"
+                    + "i.cst_icms as icmscst,\n"
+                    + "i.aliq_icms as icmsaliquota,\n"
+                    + "i.valor_reducao_base_a as icmsreduzido,\n"
+                    + "i.vl_bc_icms as icmsbasecalculo,\n"
+                    + "i.vl_icms as icmsvalor,\n"
+                    + "i.vl_bc_icms_st as icmsbasecalculost,\n"
+                    + "i.vl_icms_st as icmsvalorst,\n"
+                    + "i.vl_bc_ipi as ipivalorbase,\n"
+                    + "i.vl_ipi as ipivalor,\n"
+                    + "i.cst_pis as piscofinscst,\n"
+                    + "i.cod_nat as tiponaturezareceita\n"
                     + "from arius.fis_vs_notas_itens i\n"
-                    + "	inner join arius.rec_t_entrada_nota c\n"
-                    + "		on i.numero_nf = c.numero_nota_fiscal\n"
-                    + "where c.data_hora_emissao between "
+                    + "inner join arius.rec_t_entrada_nota c\n"
+                    + "	on i.numero_nf = c.numero_nota_fiscal	\n"
+                    + "inner join arius.rec_t_entrada_recebimento er\n"
+                    + "	on c.id_entrada_recebimento = er.id_entrada_recebimento\n"
+                    + "where to_date(er.data_hora_entrada) between "
                     + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
                     + "and "
                     + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
-                    + "	order by numero_nf"
+                    + "and c.id_entrada_recebimento = '" + idNota + "'\n"
+                    + "and er.id_participante = " + partic + "\n"
+                    + "and er.ID_EMPRESA = " + getLojaOrigem() + "\n"
+                    + "order by numero_nf"
             )) {
                 while (rs.next()) {
                     NotaFiscalItemIMP item = imp.addItem();
                     
                     item.setId(rs.getString("id"));
-                    item.setNotaFiscal(imp);
                     item.setNumeroItem(rs.getInt("numeroitem"));
                     item.setIdProduto(rs.getString("idproduto"));
                     item.setNcm(rs.getString("ncm"));
