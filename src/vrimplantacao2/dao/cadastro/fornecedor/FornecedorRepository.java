@@ -42,7 +42,7 @@ public class FornecedorRepository {
     public void salvar(List<FornecedorIMP> fornecedores) throws Exception {
         MultiMap<String, FornecedorIMP> filtrados = filtrar(fornecedores);
         fornecedores = null;
-        Map<String, Map.Entry<String, Integer>> divisoes = new DivisaoDAO().getAnteriores(provider.getSistema(), provider.getLojaOrigem());
+        //Map<String, Map.Entry<String, Integer>> divisoes = new DivisaoDAO().getAnteriores(provider.getSistema(), provider.getLojaOrigem());
         System.gc();
         organizar(filtrados);
 
@@ -54,6 +54,7 @@ public class FornecedorRepository {
             FornecedorIDStack ids = provider.getIdsExistentes();
             this.contatos = provider.getContatos();
             MultiMap<String, Void> pagamentos = provider.getPagamentos();
+            MultiMap<String, Void> divisoes = provider.getDivisoes();
             HashSet opt = new HashSet(Arrays.asList(new OpcaoFornecedor[]{ OpcaoFornecedor.CONTATOS }));
 
             provider.setStatus("Fornecedores - Gravando...");
@@ -109,15 +110,7 @@ public class FornecedorRepository {
 
                     if (imp.getPrazoEntrega() > 0 || imp.getPrazoSeguranca() > 0 || imp.getPrazoVisita() > 0) {
                         
-                        Map.Entry<String, Integer> divisao = divisoes.get(imp.getIdDivisao());
-                        int idDivisao = 0;
-                        if (divisao != null) {
-                            idDivisao = divisao.getValue();
-                        } else {
-                            idDivisao = 0;
-                        }
-                        
-                        provider.gravarPrazoFornecedor(vo.getId(), idDivisao, imp.getPrazoEntrega(), imp.getPrazoVisita(), imp.getPrazoSeguranca());
+                        processarDivisoes(imp, vo, divisoes);                    
                     }
                     
                     if (imp.getPrazoPedido() > 0) {

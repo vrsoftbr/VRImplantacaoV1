@@ -866,7 +866,9 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ven.NOME_CONSUMIDOR as nomecliente\n"
                     + "from CF01 ven \n"
                     + "where ven.LOJA = " + idLojaCliente
-                    + " and ven.EMISSAO >= '" + dataInicio + "' and ven.EMISSAO <= '" + dataTermino + "'";
+                    + " and ven.EMISSAO >= '" + dataInicio + "' and ven.EMISSAO <= '" + dataTermino + "'\n"
+                    + " AND coalesce(ven.VRTOTAL,0 ) > 0\n"
+                    + " AND COALESCE(ven.ECF, 0) > 0";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -904,29 +906,6 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                         }
                         next.setId(id);
 
-                        String numeroCupom = "";
-                        if ((rst.getString("cupomfiscal") != null)
-                                && (!rst.getString("cupomfiscal").trim().isEmpty())
-                                && (!"0".equals(rst.getString("cupomfiscal").trim()))) {
-
-                            numeroCupom = rst.getString("cupomfiscal");
-                        } else {
-                            numeroCupom = rst.getString("numero");
-                        }
-
-                        next.setNumeroCupom(Utils.stringToInt(numeroCupom));
-                        next.setEcf(Utils.stringToInt(rst.getString("caixa")));
-                        next.setData(rst.getDate("datavenda"));
-                        next.setIdClientePreferencial(rst.getString("idcliente"));
-
-                        String horavenda = rst.getString("horavenda");
-                        if ((horavenda).contains("::")) {
-                            horavenda = "00:00:00";
-                        }
-
-                        String horaInicio = timestampDate.format(rst.getDate("datavenda")) + " " + horavenda;
-                        String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " " + horavenda;
-
                         if ((rst.getString("cancelado") != null)
                                 && (!rst.getString("cancelado").trim().isEmpty())) {
 
@@ -938,6 +917,47 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                         } else {
                             next.setCancelado(false);
                         }
+                        
+                        String numeroCupom = "";
+                        if ((rst.getString("cupomfiscal") != null)
+                                && (!rst.getString("cupomfiscal").trim().isEmpty())
+                                && (!"0".equals(rst.getString("cupomfiscal").trim()))) {
+
+                            
+                            if (next.isCancelado()) {
+                                numeroCupom = rst.getString("numero");
+                            } else {
+                                numeroCupom = rst.getString("cupomfiscal");
+                            }
+                            
+                            
+                        } else {
+                            numeroCupom = rst.getString("numero");
+                        }
+                        
+                        String ecfCaixa = "0";
+                        if ((rst.getString("ecf") != null) &&
+                                (!rst.getString("ecf").trim().isEmpty()) &&
+                                (!"0".equals(rst.getString("ecf").trim()))) {
+                            
+                            ecfCaixa = rst.getString("ecf");
+                        } else {
+                            ecfCaixa = rst.getString("caixa");
+                        }
+
+                        
+                        next.setNumeroCupom(Utils.stringToInt(numeroCupom));
+                        next.setEcf(Utils.stringToInt(ecfCaixa));
+                        next.setData(rst.getDate("datavenda"));
+                        next.setIdClientePreferencial(rst.getString("idcliente"));
+
+                        String horavenda = rst.getString("horavenda");
+                        if ((horavenda).contains("::")) {
+                            horavenda = "00:00:00";
+                        }
+
+                        String horaInicio = timestampDate.format(rst.getDate("datavenda")) + " " + horavenda;
+                        String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " " + horavenda;
 
                         next.setHoraInicio(timestamp.parse(horaInicio));
                         next.setHoraTermino(timestamp.parse(horaTermino));
@@ -1039,7 +1059,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	pro.UNIDADE as tipoembalagem,\n"
                     + "	ite.CANCELADO as cancelado,\n"
                     + "	ven.EMISSAO datavenda\n"
-                    + "from cf02 ite\n"
+                    + "from CF02 ite\n"
                     + "inner join CE01 pro on pro.ID_PRODUTO = ite.ID_PRODUTO\n"
                     + "inner join CF01 ven on ven.NUMERO = ite.NUMERO \n"
                     + "	and ven.CAIXA = ite.CAIXA \n"
