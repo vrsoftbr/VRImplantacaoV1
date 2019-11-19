@@ -241,43 +241,58 @@ public class AlphaSysDAO extends InterfaceDAO {
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
+            double juros, multa;
+            int diasInicial, diasFinal;
+            try (ResultSet rst = stm.executeQuery(
+                    "select multa, juros, dias_inicial, dias_final from CONTAS_RECEBER_MULTA_JUROS where cod_empresa = " + getLojaOrigem()
+            )) {
+                rst.next();
+                juros = rst.getDouble("juros");
+                multa = rst.getDouble("multa");
+                diasInicial = rst.getInt("dias_inicial");
+                diasFinal = rst.getInt("dias_final");
+            }
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
-                    "    cr.cod_contas_receber as id,\n" +
+                    "    vc.COD_EMPRESA,\n" +
+                    "    vc.cod_contas_receber,\n" +
+                    "    vc.PARCELA,    \n" +
                     "    cr.dt_emissao as dataemissao,\n" +
                     "    cr.documento as numerocupom,\n" +
-                    "    s.numero_serie as ecf,\n" +
-                    "    cr.vl_total as valor,\n" +
+                    "    cx.COD_SAT as ecf,\n" +
+                    "    vc.VALOR,\n" +
+                    "    vc.VALOR_PAGO,\n" +
                     "    cr.observacao,\n" +
                     "    cr.cod_colaborador as idcliente,\n" +
-                    "    cr.dt_vencimento as datavencimento,\n" +
-                    "    cr.parcelas as parcela,\n" +
-                    "    cr.mora_diaria as juros\n" +
+                    "    vc.dt_vencimento as datavencimento,\n" +
+                    "    current_timestamp - vc.DT_VENCIMENTO dias_atraso\n" +
                     "from\n" +
-                    "    contas_receber cr\n" +
+                    "    CONTAS_RECEBER_VENCIMENTO vc\n" +
+                    "    join CONTAS_RECEBER cr on\n" +
+                    "        cr.COD_EMPRESA = vc.COD_EMPRESA and\n" +
+                    "        cr.COD_CONTAS_RECEBER = vc.COD_CONTAS_RECEBER\n" +
                     "    left join CONTAS_RECEBER_PAGAMENTO cp on\n" +
-                    "        cr.COD_EMPRESA = cp.COD_EMPRESA and\n" +
-                    "        cr.COD_CONTAS_RECEBER = cp.COD_CONTAS_RECEBER\n" +
+                    "        cp.COD_EMPRESA = vc.COD_EMPRESA and\n" +
+                    "        cp.COD_CONTAS_RECEBER = vc.COD_CONTAS_RECEBER and\n" +
+                    "        cp.PARCELA = vc.PARCELA\n" +
                     "    left join caixa cx\n" +
                     "		on cr.cod_caixa = cx.cod_caixa\n" +
-                    "    left join sat s\n" +
-                    "		on cx.cod_sat = s.cod_sat\n" +
                     "where\n" +
-                    "    cr.cod_empresa = " + getLojaOrigem() + " and\n" +
-                    "    cr.cod_documento in ('CDN') and\n" + //Tab. TIPO_DOCUMENTO
-                    "    cp.VALOR is null\n" +
+                    "    cr.COD_EMPRESA = " + getLojaOrigem() + " and\n" +
+                    "    cr.COD_DOCUMENTO = 'CDN' and\n" +
+                    "    coalesce(round(vc.VALOR_PAGO, 2), 0) < round(vc.VALOR, 2) and\n" +
+                    "    cr.COD_RELACIONAMENTO is null\n" +
                     "order by\n" +
-                    "    cr.cod_contas_receber"
+                    "    cr.COD_CONTAS_RECEBER"
             )) {
-                rst.last();
-                ProgressBar.show();
-                ProgressBar.setStatus("Carregando créditos rotativos");
-                ProgressBar.setMaximum(rst.getRow());
-                rst.first();
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     
-                    imp.setId(rst.getString("id"));
+                    imp.setId(
+                            rst.getString("COD_EMPRESA") + "-" +
+                            rst.getString("cod_contas_receber") + "-" +
+                            rst.getString("PARCELA")
+                    );
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setNumeroCupom(rst.getString("numerocupom"));
                     imp.setEcf(rst.getString("ecf"));
@@ -286,13 +301,24 @@ public class AlphaSysDAO extends InterfaceDAO {
                     imp.setIdCliente(rst.getString("idcliente"));
                     imp.setDataVencimento(rst.getDate("datavencimento"));
                     imp.setParcela(rst.getInt("parcela"));
-                    imp.setJuros(rst.getDouble("juros"));
+                    int diasAtraso = rst.getInt("dias_atraso");
+                    
+                    if (diasAtraso >= diasInicial && diasAtraso <= diasFinal) {
+                        double valorRestante = rst.getDouble("valor") - rst.getDouble("valor_pago");                    
+                        imp.setJuros(valorRestante * ((juros / 100) * diasAtraso));
+                        imp.setMulta(valorRestante * (multa / 100));
+                    }
+                    
+                    if (rst.getDouble("valor_pago") > 0) {
+                        imp.addPagamento(imp.getId(), rst.getDouble("valor_pago"), 0, 0, imp.getDataVencimento(), "");
+                    }
                     
                     result.add(imp);
                     ProgressBar.next();
                 }
             }
         }
+        
         return result;
     }
 
@@ -318,7 +344,13 @@ public class AlphaSysDAO extends InterfaceDAO {
                     "	c.fone as telefone,\n" +
                     "	c.celular,\n" +
                     "	c.email,\n" +
-                    "	c.fax\n" +
+                    "	c.fax,\n" +
+                    "	cc.limite_credito,\n" +
+                    "	cc.dia_pagto_1,\n" +
+                    "	cc.dt_nascimento,\n" +
+                    "	cc.sexo,\n" +
+                    "	cc.numero_cartao,\n" +
+                    "	cc.salario\n" +
                     "from colaborador C\n" +
                     "	join logradouro l\n" +
                     "		on c.cod_logradouro = l.cod_logradouro\n" +
@@ -328,8 +360,11 @@ public class AlphaSysDAO extends InterfaceDAO {
                     "		on c.cod_bairro = b.cod_bairro\n" +
                     "	join municipio m\n" +
                     "		on c.cod_municipio = m.cod_municipio\n" +
-                    "where tipo = 1\n" +
-                    "	order by cod_colaborador, tipo"
+                    "	left join CLIENTE_COMPLEMENTO cc on\n" +
+                    "       cc.cod_empresa = c.cod_empresa and\n" +
+                    "       cc.cod_colaborador = c.cod_colaborador\n" +
+                    "where c.tipo = 1\n" +
+                    "	order by c.cod_colaborador, c.tipo"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
@@ -350,6 +385,13 @@ public class AlphaSysDAO extends InterfaceDAO {
                     imp.setCelular(rst.getString("celular"));
                     imp.setEmail(rst.getString("email"));
                     imp.setFax(rst.getString("fax"));
+                    imp.setValorLimite(rst.getDouble("limite_credito"));
+                    imp.setDiaVencimento(rst.getInt("dia_pagto_1"));
+                    imp.setDataNascimento(rst.getDate("dt_nascimento"));
+                    imp.setSexo(rst.getString("sexo"));
+                    imp.setObservacao("NUMERO CARTAO " + rst.getString("numero_cartao"));
+                    imp.setSalario(rst.getDouble("salario"));
+                    imp.setPermiteCreditoRotativo(true);
 
                     result.add(imp);
 
