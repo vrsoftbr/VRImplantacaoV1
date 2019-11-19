@@ -25,6 +25,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
@@ -107,6 +108,21 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        return null;
+        /*select 
+            id_produto, 
+            nome_produto
+        from est_produtos 
+        where 
+            id_produto is (
+        select distinct cod_preco from est_produtos where cod_preco != id_produto
+        )*/
+    }
+    
+    
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
@@ -123,7 +139,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.unm_emb_qtd as qtdembalagem,\n"
                     + "    p.unm as tipoembalagem,\n"
                     + "    p.dias_validade as validade,\n"
-                    + "    nome_produto as descricaocompleta,\n"
+                    + "    coalesce(nome_produto, nome_reduzido) as descricaocompleta,\n"
                     + "    nome_reduzido as descricaoreduzida,\n"
                     + "    nome_reduzido as descricaogondola,\n"
                     + "    peso_bruto as pesobruto,\n"
