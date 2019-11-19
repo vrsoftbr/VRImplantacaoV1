@@ -241,47 +241,6 @@ public class AlphaSysDAO extends InterfaceDAO {
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
-            Map<String, List<CreditoRotativoItemIMP>> pgs = new HashMap<>();
-            try (ResultSet rst = stm.executeQuery(
-                    "select\n" +
-                    "    cod_empresa,\n" +
-                    "    cod_contas_receber_pagamento,\n" +
-                    "    cod_contas_receber,\n" +
-                    "    valor,\n" +
-                    "    vl_desconto,\n" +
-                    "    vl_acrescimo,\n" +
-                    "    dt_pagamento,\n" +
-                    "    observacao\n" +
-                    "from\n" +
-                    "    CONTAS_RECEBER_PAGAMENTO\n" +
-                    "where\n" +
-                    "    cod_empresa = " + getLojaOrigem() + "\n" +
-                    "order by\n" +
-                    "    dt_pagamento"
-            )) {                
-                rst.last();
-                ProgressBar.setStatus("Carregando pagamentos...");
-                ProgressBar.setMaximum(rst.getRow());
-                rst.first();
-                while (rst.next()) {
-                    CreditoRotativoItemIMP imp = new CreditoRotativoItemIMP();
-                    
-                    imp.setId(rst.getString("cod_empresa") + "-" + rst.getString("cod_contas_receber_pagamento"));                    
-                    imp.setValor(rst.getDouble("valor"));
-                    imp.setDesconto(rst.getDouble("vl_desconto"));
-                    imp.setMulta(rst.getDouble("vl_acrescimo"));
-                    imp.setDataPagamento(rst.getDate("dt_pagamento"));
-                    imp.setObservacao(rst.getString("observacao"));
-                    
-                    List<CreditoRotativoItemIMP> list = pgs.get(rst.getString("cod_contas_receber"));
-                    if (list == null) {
-                        list = new ArrayList<>();
-                    }
-                    list.add(imp);
-                    pgs.put(rst.getString("cod_contas_receber"), list);
-                    ProgressBar.next();
-                }
-            }
             try (ResultSet rst = stm.executeQuery(
                     "select\n" +
                     "    cr.cod_contas_receber as id,\n" +
@@ -296,17 +255,19 @@ public class AlphaSysDAO extends InterfaceDAO {
                     "    cr.mora_diaria as juros\n" +
                     "from\n" +
                     "    contas_receber cr\n" +
-                    "    left join colaborador cli\n" +
-                    "		on cr.cod_colaborador = cli.cod_colaborador\n" +
+                    "    left join CONTAS_RECEBER_PAGAMENTO cp on\n" +
+                    "        cr.COD_EMPRESA = cp.COD_EMPRESA and\n" +
+                    "        cr.COD_CONTAS_RECEBER = cp.COD_CONTAS_RECEBER\n" +
                     "    left join caixa cx\n" +
                     "		on cr.cod_caixa = cx.cod_caixa\n" +
                     "    left join sat s\n" +
                     "		on cx.cod_sat = s.cod_sat\n" +
                     "where\n" +
                     "    cr.cod_empresa = " + getLojaOrigem() + " and\n" +
-                    "    cr.cod_documento in ('CDN')\n" + //tabela tipo_documento
+                    "    cr.cod_documento in ('CDN') and\n" + //Tab. TIPO_DOCUMENTO
+                    "    cp.VALOR is null\n" +
                     "order by\n" +
-                    "    id"
+                    "    cr.cod_contas_receber"
             )) {
                 rst.last();
                 ProgressBar.show();
@@ -315,6 +276,7 @@ public class AlphaSysDAO extends InterfaceDAO {
                 rst.first();
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
+                    
                     imp.setId(rst.getString("id"));
                     imp.setDataEmissao(rst.getDate("dataemissao"));
                     imp.setNumeroCupom(rst.getString("numerocupom"));
@@ -326,20 +288,12 @@ public class AlphaSysDAO extends InterfaceDAO {
                     imp.setParcela(rst.getInt("parcela"));
                     imp.setJuros(rst.getDouble("juros"));
                     
-                    List<CreditoRotativoItemIMP> parc = pgs.get(imp.getId());
-                    if (parc != null) {
-                        for (CreditoRotativoItemIMP pg: parc) {
-                            pg.setCreditoRotativo(imp);
-                            imp.getPagamentos().add(pg);
-                        }
-                    }
-                    
                     result.add(imp);
                     ProgressBar.next();
                 }
             }
         }
-        return result; //To change body of generated methods, choose Tools | Templates.
+        return result;
     }
 
     @Override
