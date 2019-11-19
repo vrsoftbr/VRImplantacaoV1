@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import vrframework.classe.Conexao;
+import vrframework.classe.ProgressBar;
 import vrimplantacao2.dao.cadastro.LocalDAO;
 import vrimplantacao2.dao.cadastro.cliente.food.ClienteFoodAnteriorDAO;
 import vrimplantacao2.dao.cadastro.cliente.food.ClienteFoodDAO;
@@ -36,12 +37,30 @@ public class ClienteRepositoryProvider {
     private ClientePreferencialDAO clientePreferencialDAO;
     private Map<Integer, MunicipioVO> municipioByID;
     private MultiMap<String, MunicipioVO> municipioByDesc;
+    private boolean desativarNotificacao = false;
+
+    public void setDesativarNotificacao(boolean desativarNotificacao) {
+        this.desativarNotificacao = desativarNotificacao;
+    }
 
     public ClienteRepositoryProvider() throws Exception {
         this.evt = new OrgEventual(this);
         this.pref = new OrgPreferencial(this);
         this.food = new OrgClienteFood();
         this.clientePreferencialDAO = new ClientePreferencialDAO();
+    }
+    
+    public void setNotificacao(String mensagem, int qtd) throws Exception {
+        if (!desativarNotificacao) {
+            ProgressBar.setStatus(mensagem);
+            ProgressBar.setMaximum(qtd);
+        }
+    }
+
+    public void notificar() throws Exception {
+        if (!desativarNotificacao) {
+            ProgressBar.next();
+        }
     }
     
     public void carregarMunicipios() throws Exception {        

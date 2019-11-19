@@ -1,5 +1,6 @@
 package vrimplantacao.gui.assistente.parametro;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -24,6 +25,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -33,6 +35,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
+import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.VerticalLayout;
 import org.openide.util.Exceptions;
 import vrframework.bean.button.VRButton;
@@ -112,6 +115,14 @@ public class ParametroGUI extends VRInternalFrame {
         rdgTipoConexaoODBC = new ButtonGroup();
         tabs = new VRTabbedPane();
         tabValorPadrão = new VRPanel();
+        scroll = new JScrollPane();
+        vRPanel2 = new VRPanel();
+        pnlDiversos = new VRPanel();
+        vRLabel4 = new VRLabel();
+        cmbTipoPagamento = new JComboBox();
+        txtVendaProdutoPadrao = new VRTextField();
+        vRLabel5 = new VRLabel();
+        chkIgnorarClienteImpVenda = new VRCheckBox();
         pnlLocalizacao = new VRPanel();
         vRLabel1 = new VRLabel();
         vRLabel2 = new VRLabel();
@@ -119,22 +130,19 @@ public class ParametroGUI extends VRInternalFrame {
         cmbUfPadrao = new VRComboBox();
         cmbMunicipioPadrao = new VRComboBox();
         txtCepPadrao = new VRTextField();
-        vRPanel1 = new VRPanel();
-        chkGerarBancoImplantacao = new VRCheckBox();
-        chkImportarBancoImplantacao = new VRCheckBox();
-        txtBancoImplantacao = new VRFileChooser();
-        pnlDiversos = new VRPanel();
-        vRLabel4 = new VRLabel();
-        cmbTipoPagamento = new JComboBox();
-        txtVendaProdutoPadrao = new VRTextField();
-        vRLabel5 = new VRLabel();
-        chkIgnorarClienteImpVenda = new VRCheckBox();
         pnlDriverODBC = new VRPanel();
         vRLabel6 = new VRLabel();
         txtNomeDriverODBC = new VRTextField();
         vRLabel7 = new VRLabel();
         optFonteDados = new JRadioButton();
         optDriver = new JRadioButton();
+        vRPanel1 = new VRPanel();
+        chkGerarBancoImplantacao = new VRCheckBox();
+        chkImportarBancoImplantacao = new VRCheckBox();
+        txtBancoImplantacao = new VRFileChooser();
+        vRPanel5 = new VRPanel();
+        chkNfeSaidaVerificarFechamentoPeriodo = new VRCheckBox();
+        chkNfeSaidaProcessarFinalizacoes = new VRCheckBox();
         tabLogging = new VRPanel();
         btnLogGravar = new VRButton();
         btnLogCancelar = new VRButton();
@@ -145,11 +153,13 @@ public class ParametroGUI extends VRInternalFrame {
         rdTipoConsole = new JRadioButton();
         rdTipoArquivo = new JRadioButton();
         pnlNivelLog = new VRPanel();
+        vRPanel3 = new VRPanel();
         rdOff = new JRadioButton();
         rdSevere = new JRadioButton();
         rdWarning = new JRadioButton();
         rdInfo = new JRadioButton();
         rdConfig = new JRadioButton();
+        vRPanel4 = new VRPanel();
         rdFine = new JRadioButton();
         rdFiner = new JRadioButton();
         rdFinest = new JRadioButton();
@@ -186,6 +196,59 @@ public class ParametroGUI extends VRInternalFrame {
         });
 
         tabValorPadrão.setBorder(BorderFactory.createEtchedBorder());
+        tabValorPadrão.setLayout(new BorderLayout());
+
+        scroll.setBorder(null);
+        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        scroll.setAutoscrolls(true);
+
+        pnlDiversos.setBorder(BorderFactory.createTitledBorder("Diversos"));
+
+        vRLabel4.setText("Tipo de Pagamento");
+
+        txtVendaProdutoPadrao.setMascara("Numero");
+
+        vRLabel5.setText("ID Prod. Padrão (Para Vendas)");
+
+        chkIgnorarClienteImpVenda.setText("Ignorar cliente não importado na importação de venda");
+
+        GroupLayout pnlDiversosLayout = new GroupLayout(pnlDiversos);
+        pnlDiversos.setLayout(pnlDiversosLayout);
+        pnlDiversosLayout.setHorizontalGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDiversosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlDiversosLayout.createSequentialGroup()
+                        .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addGroup(pnlDiversosLayout.createSequentialGroup()
+                                .addComponent(vRLabel4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(cmbTipoPagamento, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(txtVendaProdutoPadrao, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(vRLabel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(pnlDiversosLayout.createSequentialGroup()
+                        .addComponent(chkIgnorarClienteImpVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        pnlDiversosLayout.setVerticalGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDiversosLayout.createSequentialGroup()
+                .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                    .addGroup(pnlDiversosLayout.createSequentialGroup()
+                        .addComponent(vRLabel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addGap(26, 26, 26))
+                    .addGroup(pnlDiversosLayout.createSequentialGroup()
+                        .addComponent(vRLabel4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                            .addComponent(cmbTipoPagamento, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtVendaProdutoPadrao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+                .addComponent(chkIgnorarClienteImpVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         pnlLocalizacao.setBorder(BorderFactory.createTitledBorder("Localização"));
 
@@ -244,80 +307,6 @@ public class ParametroGUI extends VRInternalFrame {
                 .addGap(0, 8, Short.MAX_VALUE))
         );
 
-        vRPanel1.setBorder(BorderFactory.createTitledBorder("Nome do banco implantação"));
-
-        chkGerarBancoImplantacao.setText("Gerar banco");
-
-        chkImportarBancoImplantacao.setText("Importar do banco");
-
-        GroupLayout vRPanel1Layout = new GroupLayout(vRPanel1);
-        vRPanel1.setLayout(vRPanel1Layout);
-        vRPanel1Layout.setHorizontalGroup(vRPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(chkGerarBancoImplantacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkImportarBancoImplantacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtBancoImplantacao, GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        vRPanel1Layout.setVerticalGroup(vRPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(vRPanel1Layout.createSequentialGroup()
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(vRPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                    .addComponent(chkGerarBancoImplantacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtBancoImplantacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chkImportarBancoImplantacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-        );
-
-        pnlDiversos.setBorder(BorderFactory.createTitledBorder("Diversos"));
-
-        vRLabel4.setText("Tipo de Pagamento");
-
-        txtVendaProdutoPadrao.setMascara("Numero");
-
-        vRLabel5.setText("ID Prod. Padrão (Para Vendas)");
-
-        chkIgnorarClienteImpVenda.setText("Ignorar cliente não importado na importação de venda");
-
-        GroupLayout pnlDiversosLayout = new GroupLayout(pnlDiversos);
-        pnlDiversos.setLayout(pnlDiversosLayout);
-        pnlDiversosLayout.setHorizontalGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(pnlDiversosLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlDiversosLayout.createSequentialGroup()
-                        .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                            .addGroup(pnlDiversosLayout.createSequentialGroup()
-                                .addComponent(vRLabel4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 234, Short.MAX_VALUE))
-                            .addComponent(cmbTipoPagamento, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(txtVendaProdutoPadrao, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(vRLabel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(pnlDiversosLayout.createSequentialGroup()
-                        .addComponent(chkIgnorarClienteImpVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-        pnlDiversosLayout.setVerticalGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(pnlDiversosLayout.createSequentialGroup()
-                .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                    .addGroup(pnlDiversosLayout.createSequentialGroup()
-                        .addComponent(vRLabel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addGap(26, 26, 26))
-                    .addGroup(pnlDiversosLayout.createSequentialGroup()
-                        .addComponent(vRLabel4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(pnlDiversosLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(cmbTipoPagamento, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtVendaProdutoPadrao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
-                .addComponent(chkIgnorarClienteImpVenda, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
         pnlDriverODBC.setBorder(BorderFactory.createTitledBorder("Opções do driver ODBC"));
 
         vRLabel6.setText("Tipo de Conexão");
@@ -356,9 +345,11 @@ public class ParametroGUI extends VRInternalFrame {
                     .addComponent(vRLabel6, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnlDriverODBCLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(vRLabel7, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtNomeDriverODBC, GroupLayout.PREFERRED_SIZE, 198, GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(130, Short.MAX_VALUE))
+                    .addGroup(pnlDriverODBCLayout.createSequentialGroup()
+                        .addComponent(vRLabel7, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 201, Short.MAX_VALUE))
+                    .addComponent(txtNomeDriverODBC, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         pnlDriverODBCLayout.setVerticalGroup(pnlDriverODBCLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(pnlDriverODBCLayout.createSequentialGroup()
@@ -373,20 +364,72 @@ public class ParametroGUI extends VRInternalFrame {
                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        GroupLayout tabValorPadrãoLayout = new GroupLayout(tabValorPadrão);
-        tabValorPadrão.setLayout(tabValorPadrãoLayout);
-        tabValorPadrãoLayout.setHorizontalGroup(tabValorPadrãoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(tabValorPadrãoLayout.createSequentialGroup()
+        vRPanel1.setBorder(BorderFactory.createTitledBorder("Nome do banco implantação"));
+
+        chkGerarBancoImplantacao.setText("Gerar banco");
+
+        chkImportarBancoImplantacao.setText("Importar do banco");
+
+        GroupLayout vRPanel1Layout = new GroupLayout(vRPanel1);
+        vRPanel1.setLayout(vRPanel1Layout);
+        vRPanel1Layout.setHorizontalGroup(vRPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(tabValorPadrãoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(vRPanel1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(pnlLocalizacao, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(pnlDiversos, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(pnlDriverODBC, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(chkGerarBancoImplantacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkImportarBancoImplantacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtBancoImplantacao, GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addContainerGap())
         );
-        tabValorPadrãoLayout.setVerticalGroup(tabValorPadrãoLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(tabValorPadrãoLayout.createSequentialGroup()
+        vRPanel1Layout.setVerticalGroup(vRPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel1Layout.createSequentialGroup()
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(vRPanel1Layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                    .addComponent(chkGerarBancoImplantacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtBancoImplantacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkImportarBancoImplantacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+        );
+
+        vRPanel5.setBorder(BorderFactory.createTitledBorder("Nf-e (Saída)"));
+
+        chkNfeSaidaVerificarFechamentoPeriodo.setText("Verificar fechamento de período fiscal");
+
+        chkNfeSaidaProcessarFinalizacoes.setText("Processar finalizações das notas");
+
+        GroupLayout vRPanel5Layout = new GroupLayout(vRPanel5);
+        vRPanel5.setLayout(vRPanel5Layout);
+        vRPanel5Layout.setHorizontalGroup(vRPanel5Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(chkNfeSaidaVerificarFechamentoPeriodo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chkNfeSaidaProcessarFinalizacoes, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(65, Short.MAX_VALUE))
+        );
+        vRPanel5Layout.setVerticalGroup(vRPanel5Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel5Layout.createSequentialGroup()
+                .addGroup(vRPanel5Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(chkNfeSaidaVerificarFechamentoPeriodo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(chkNfeSaidaProcessarFinalizacoes, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        GroupLayout vRPanel2Layout = new GroupLayout(vRPanel2);
+        vRPanel2.setLayout(vRPanel2Layout);
+        vRPanel2Layout.setHorizontalGroup(vRPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(pnlLocalizacao, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnlDiversos, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(vRPanel1, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnlDriverODBC, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(vRPanel5, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        vRPanel2Layout.setVerticalGroup(vRPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(GroupLayout.Alignment.TRAILING, vRPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(pnlLocalizacao, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
@@ -395,8 +438,14 @@ public class ParametroGUI extends VRInternalFrame {
                 .addComponent(pnlDiversos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlDriverODBC, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(109, Short.MAX_VALUE))
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(vRPanel5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        scroll.setViewportView(vRPanel2);
+
+        tabValorPadrão.add(scroll, BorderLayout.CENTER);
 
         tabs.addTab("Valores padrão", tabValorPadrão);
 
@@ -433,54 +482,108 @@ public class ParametroGUI extends VRInternalFrame {
         pnlTipoLog.add(rdTipoArquivo);
 
         pnlNivelLog.setBorder(BorderFactory.createTitledBorder("Nível do LOG"));
-        VerticalLayout verticalLayout1 = new VerticalLayout();
-        verticalLayout1.setGap(3);
-        pnlNivelLog.setLayout(verticalLayout1);
+        pnlNivelLog.setLayout(new HorizontalLayout());
+
+        vRPanel3.setBorder(null);
 
         rdgLogLevel.add(rdOff);
         rdOff.setText("Não logar nada");
-        pnlNivelLog.add(rdOff);
 
         rdgLogLevel.add(rdSevere);
         rdSevere.setText("Erros");
-        pnlNivelLog.add(rdSevere);
 
         rdgLogLevel.add(rdWarning);
         rdWarning.setText("Alertas");
-        pnlNivelLog.add(rdWarning);
 
         rdgLogLevel.add(rdInfo);
         rdInfo.setSelected(true);
         rdInfo.setText("Informações importantes");
-        pnlNivelLog.add(rdInfo);
 
         rdgLogLevel.add(rdConfig);
         rdConfig.setText("Avisos sobre configurações");
-        pnlNivelLog.add(rdConfig);
+
+        GroupLayout vRPanel3Layout = new GroupLayout(vRPanel3);
+        vRPanel3.setLayout(vRPanel3Layout);
+        vRPanel3Layout.setHorizontalGroup(vRPanel3Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel3Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(rdOff, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(rdSevere, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(rdWarning, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(rdInfo, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(rdConfig, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        vRPanel3Layout.setVerticalGroup(vRPanel3Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(rdOff)
+                .addGap(3, 3, 3)
+                .addComponent(rdSevere)
+                .addGap(3, 3, 3)
+                .addComponent(rdWarning)
+                .addGap(3, 3, 3)
+                .addComponent(rdInfo)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(rdConfig)
+                .addGap(10, 10, 10))
+        );
+
+        pnlNivelLog.add(vRPanel3);
+
+        vRPanel4.setBorder(null);
 
         rdgLogLevel.add(rdFine);
         rdFine.setText("Informações do processo");
-        pnlNivelLog.add(rdFine);
 
         rdgLogLevel.add(rdFiner);
         rdFiner.setText("Informações detalhadas do processo");
-        pnlNivelLog.add(rdFiner);
 
         rdgLogLevel.add(rdFinest);
         rdFinest.setText("Informações altamente detalhadas");
-        pnlNivelLog.add(rdFinest);
 
         rdgLogLevel.add(rdAll);
         rdAll.setText("Logar tudo");
-        pnlNivelLog.add(rdAll);
+
+        GroupLayout vRPanel4Layout = new GroupLayout(vRPanel4);
+        vRPanel4.setLayout(vRPanel4Layout);
+        vRPanel4Layout.setHorizontalGroup(vRPanel4Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(vRPanel4Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(rdFine, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(rdFiner, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(rdFinest, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(rdAll, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        vRPanel4Layout.setVerticalGroup(vRPanel4Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(vRPanel4Layout.createSequentialGroup()
+                .addGap(33, 33, 33)
+                .addComponent(rdFine)
+                .addGap(3, 3, 3)
+                .addComponent(rdFiner)
+                .addGap(3, 3, 3)
+                .addComponent(rdFinest)
+                .addGap(3, 3, 3)
+                .addComponent(rdAll)
+                .addGap(10, 10, 10))
+        );
+
+        pnlNivelLog.add(vRPanel4);
 
         GroupLayout pnlLogDadosLayout = new GroupLayout(pnlLogDados);
         pnlLogDados.setLayout(pnlLogDadosLayout);
         pnlLogDadosLayout.setHorizontalGroup(pnlLogDadosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addComponent(txtLogNome)
-            .addComponent(jLabel1)
-            .addComponent(pnlNivelLog, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(pnlTipoLog, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(GroupLayout.Alignment.TRAILING, pnlLogDadosLayout.createSequentialGroup()
+                .addGap(0, 10, Short.MAX_VALUE)
+                .addGroup(pnlLogDadosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1)
+                    .addGroup(pnlLogDadosLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                        .addComponent(pnlNivelLog, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 411, Short.MAX_VALUE)
+                        .addComponent(pnlTipoLog, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(txtLogNome, GroupLayout.Alignment.TRAILING))))
         );
         pnlLogDadosLayout.setVerticalGroup(pnlLogDadosLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(pnlLogDadosLayout.createSequentialGroup()
@@ -490,7 +593,8 @@ public class ParametroGUI extends VRInternalFrame {
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlTipoLog, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlNivelLog, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(pnlNivelLog, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(22, Short.MAX_VALUE))
         );
 
         btnLogExcluir.setText("Excluir");
@@ -516,8 +620,8 @@ public class ParametroGUI extends VRInternalFrame {
         tabLoggingLayout.setHorizontalGroup(tabLoggingLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(GroupLayout.Alignment.TRAILING, tabLoggingLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(tabLoggingLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addGroup(GroupLayout.Alignment.TRAILING, tabLoggingLayout.createSequentialGroup()
                         .addComponent(btnLogGravar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -534,12 +638,12 @@ public class ParametroGUI extends VRInternalFrame {
                 .addGroup(tabLoggingLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addGroup(tabLoggingLayout.createSequentialGroup()
                         .addComponent(pnlLogDados, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(0, 0, 0)
                         .addGroup(tabLoggingLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                             .addComponent(btnLogGravar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(btnLogCancelar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(btnLogExcluir, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jScrollPane1))
+                    .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -661,6 +765,8 @@ public class ParametroGUI extends VRInternalFrame {
     private VRCheckBox chkGerarBancoImplantacao;
     private VRCheckBox chkIgnorarClienteImpVenda;
     private VRCheckBox chkImportarBancoImplantacao;
+    private VRCheckBox chkNfeSaidaProcessarFinalizacoes;
+    private VRCheckBox chkNfeSaidaVerificarFechamentoPeriodo;
     private VRComboBox cmbMunicipioPadrao;
     private JComboBox cmbTipoPagamento;
     private VRComboBox cmbUfPadrao;
@@ -688,6 +794,7 @@ public class ParametroGUI extends VRInternalFrame {
     private ButtonGroup rdgLogLevel;
     private ButtonGroup rdgLogType;
     private ButtonGroup rdgTipoConexaoODBC;
+    private JScrollPane scroll;
     private VRPanel tabLogging;
     private VRPanel tabValorPadrão;
     private VRTable tableLogging;
@@ -705,6 +812,10 @@ public class ParametroGUI extends VRInternalFrame {
     private VRLabel vRLabel6;
     private VRLabel vRLabel7;
     private VRPanel vRPanel1;
+    private VRPanel vRPanel2;
+    private VRPanel vRPanel3;
+    private VRPanel vRPanel4;
+    private VRPanel vRPanel5;
     // End of variables declaration//GEN-END:variables
 
     private void carregarMunicipiosEstados() throws Exception {
@@ -763,6 +874,8 @@ public class ParametroGUI extends VRInternalFrame {
                 txtNomeDriverODBC.setEnabled(false);
         }
         txtNomeDriverODBC.setText(parametros.getWithNull("Microsoft Access Driver (*.mdb)", "ODBC", "DRIVER_ODBC"));
+        chkNfeSaidaProcessarFinalizacoes.setSelected(parametros.getBool(true, "IMPORT_NFE", "PROCESSAR_FINALIZACOES"));
+        chkNfeSaidaVerificarFechamentoPeriodo.setSelected(parametros.getBool(true, "IMPORT_NFE", "VERIFICAR_FECHAMENTO_ESCRITA"));
         
         LOG.fine("Parametros carregados na tela");
     }
@@ -780,6 +893,8 @@ public class ParametroGUI extends VRInternalFrame {
             parametros.setItemVendaPadrao(txtVendaProdutoPadrao.getInt());
             parametros.setIgnorarClienteImpVenda(chkIgnorarClienteImpVenda.isSelected());
             parametros.put(txtNomeDriverODBC.getText(), "ODBC", "DRIVER_ODBC");
+            parametros.put(chkNfeSaidaProcessarFinalizacoes.isSelected(), "IMPORT_NFE", "PROCESSAR_FINALIZACOES");
+            parametros.put(chkNfeSaidaVerificarFechamentoPeriodo.isSelected(), "IMPORT_NFE", "VERIFICAR_FECHAMENTO_ESCRITA");
             if (optDriver.isSelected()) {
                 parametros.put(0, "ODBC", "TIPO_CONEXAO");
             } else if (optFonteDados.isSelected()) {

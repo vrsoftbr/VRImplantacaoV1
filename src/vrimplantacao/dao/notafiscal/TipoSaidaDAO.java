@@ -117,6 +117,7 @@ public class TipoSaidaDAO {
         oTipoSaida.idContaContabilFiscalDebito = rst.getObject("id_contacontabilfiscaldebito") == null ? -1 : rst.getInt("id_contacontabilfiscaldebito");
         oTipoSaida.foraEstado = rst.getBoolean("foraestado");
         oTipoSaida.substituicao = rst.getBoolean("substituicao");
+        oTipoSaida.destinatarioCliente = rst.getBoolean("destinatarioCliente");
 
         sql = new StringBuilder();
         sql.append("SELECT * FROM cfop c WHERE c.cfop = '" + i_cfop + "'");

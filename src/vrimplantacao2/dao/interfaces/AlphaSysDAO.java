@@ -4,11 +4,13 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import vrframework.classe.ProgressBar;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.dao.cadastro.ProdutoBalancaDAO;
 import vrimplantacao.utils.Utils;
@@ -18,8 +20,8 @@ import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.vo.cadastro.mercadologico.MercadologicoNivelIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoItemIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
-import vrimplantacao2.vo.importacao.OfertaIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 
@@ -195,6 +197,7 @@ public class AlphaSysDAO extends InterfaceDAO {
                         imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
                     } else {
                         imp.setEan(rst.getString("ean"));
+                        imp.setQtdEmbalagem(1);
                         imp.setValidade(rst.getInt("validade"));
                         imp.seteBalanca("S".equals(rst.getString("e_balanca")));
                         imp.setTipoEmbalagem(rst.getString("UNIDADE"));
@@ -237,27 +240,79 @@ public class AlphaSysDAO extends InterfaceDAO {
     @Override
     public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
         List<CreditoRotativoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        try (Statement stm = ConexaoFirebird.getConexao().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
+            Map<String, List<CreditoRotativoItemIMP>> pgs = new HashMap<>();
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "    distinct (cr.cod_contas_receber) as id,\n"
-                    + "    cr.dt_emissao as dataemissao,\n"
-                    + "    cr.documento as numerocupom,\n"
-                    + "    s.numero_serie as ecf,\n"
-                    + "    cr.vl_total as valor,\n"
-                    + "    cr.observacao,\n"
-                    + "    cr.cod_colaborador as idcliente,\n"
-                    + "    cr.dt_vencimento as datavencimento,\n"
-                    + "    cr.parcelas as parcela,\n"
-                    + "    cr.mora_diaria as juros\n"
-                    + "from contas_receber cr\n"
-                    + "    left join colaborador cli\n"
-                    + "		on cr.cod_colaborador = cli.cod_colaborador\n"
-                    + "    left join caixa cx\n"
-                    + "		on cr.cod_caixa = cx.cod_caixa\n"
-                    + "    left join sat s\n"
-                    + "		on cx.cod_sat = s.cod_sat\n"
-                    + "where cr.dt_emissao >= '2019-01-01'")) {
+                    "select\n" +
+                    "    cod_empresa,\n" +
+                    "    cod_contas_receber_pagamento,\n" +
+                    "    cod_contas_receber,\n" +
+                    "    valor,\n" +
+                    "    vl_desconto,\n" +
+                    "    vl_acrescimo,\n" +
+                    "    dt_pagamento,\n" +
+                    "    observacao\n" +
+                    "from\n" +
+                    "    CONTAS_RECEBER_PAGAMENTO\n" +
+                    "where\n" +
+                    "    cod_empresa = " + getLojaOrigem() + "\n" +
+                    "order by\n" +
+                    "    dt_pagamento"
+            )) {                
+                rst.last();
+                ProgressBar.setStatus("Carregando pagamentos...");
+                ProgressBar.setMaximum(rst.getRow());
+                rst.first();
+                while (rst.next()) {
+                    CreditoRotativoItemIMP imp = new CreditoRotativoItemIMP();
+                    
+                    imp.setId(rst.getString("cod_empresa") + "-" + rst.getString("cod_contas_receber_pagamento"));                    
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setDesconto(rst.getDouble("vl_desconto"));
+                    imp.setMulta(rst.getDouble("vl_acrescimo"));
+                    imp.setDataPagamento(rst.getDate("dt_pagamento"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    
+                    List<CreditoRotativoItemIMP> list = pgs.get(rst.getString("cod_contas_receber"));
+                    if (list == null) {
+                        list = new ArrayList<>();
+                    }
+                    list.add(imp);
+                    pgs.put(rst.getString("cod_contas_receber"), list);
+                    ProgressBar.next();
+                }
+            }
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n" +
+                    "    cr.cod_contas_receber as id,\n" +
+                    "    cr.dt_emissao as dataemissao,\n" +
+                    "    cr.documento as numerocupom,\n" +
+                    "    s.numero_serie as ecf,\n" +
+                    "    cr.vl_total as valor,\n" +
+                    "    cr.observacao,\n" +
+                    "    cr.cod_colaborador as idcliente,\n" +
+                    "    cr.dt_vencimento as datavencimento,\n" +
+                    "    cr.parcelas as parcela,\n" +
+                    "    cr.mora_diaria as juros\n" +
+                    "from\n" +
+                    "    contas_receber cr\n" +
+                    "    left join colaborador cli\n" +
+                    "		on cr.cod_colaborador = cli.cod_colaborador\n" +
+                    "    left join caixa cx\n" +
+                    "		on cr.cod_caixa = cx.cod_caixa\n" +
+                    "    left join sat s\n" +
+                    "		on cx.cod_sat = s.cod_sat\n" +
+                    "where\n" +
+                    "    cr.cod_empresa = " + getLojaOrigem() + " and\n" +
+                    "    cr.cod_documento in ('CDN')\n" + //tabela tipo_documento
+                    "order by\n" +
+                    "    id"
+            )) {
+                rst.last();
+                ProgressBar.show();
+                ProgressBar.setStatus("Carregando créditos rotativos");
+                ProgressBar.setMaximum(rst.getRow());
+                rst.first();
                 while (rst.next()) {
                     CreditoRotativoIMP imp = new CreditoRotativoIMP();
                     imp.setId(rst.getString("id"));
@@ -270,8 +325,17 @@ public class AlphaSysDAO extends InterfaceDAO {
                     imp.setDataVencimento(rst.getDate("datavencimento"));
                     imp.setParcela(rst.getInt("parcela"));
                     imp.setJuros(rst.getDouble("juros"));
-
+                    
+                    List<CreditoRotativoItemIMP> parc = pgs.get(imp.getId());
+                    if (parc != null) {
+                        for (CreditoRotativoItemIMP pg: parc) {
+                            pg.setCreditoRotativo(imp);
+                            imp.getPagamentos().add(pg);
+                        }
+                    }
+                    
                     result.add(imp);
+                    ProgressBar.next();
                 }
             }
         }
@@ -283,35 +347,36 @@ public class AlphaSysDAO extends InterfaceDAO {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select\n"
-                    + "	cod_colaborador as id,\n"
-                    + "	cgc as cnpj,\n"
-                    + "	ies as inscricaoestadual,\n"
-                    + "	razao,\n"
-                    + "	fantasia,\n"
-                    + "	tl.nome||' '||l.nome as endereco,\n"
-                    + "	numero,\n"
-                    + "	complemento,\n"
-                    + "	b.nome as bairro,\n"
-                    + "	m.nome as municipio,\n"
-                    + "	c.cod_estado as uf,\n"
-                    + "	cep,\n"
-                    + "	dt_cadastro as dataCadastro,\n"
-                    + "	fone as telefone,\n"
-                    + "	celular,\n"
-                    + "	email,\n"
-                    + "	fax\n"
-                    + "from colaborador C\n"
-                    + "	join logradouro l\n"
-                    + "		on c.cod_logradouro = l.cod_logradouro\n"
-                    + "	join logradouro_tipo tl\n"
-                    + "		on c.cod_logradouro_tipo = tl.cod_logradouro_tipo\n"
-                    + "	join bairro b\n"
-                    + "		on c.cod_bairro = b.cod_bairro\n"
-                    + "	join municipio m\n"
-                    + "		on c.cod_municipio = m.cod_municipio\n"
-                    + "where tipo = 1\n"
-                    + "	order by cod_colaborador, tipo")) {
+                    "select\n" +
+                    "	c.cod_colaborador as id,\n" +
+                    "	c.cgc as cnpj,\n" +
+                    "	c.ies as inscricaoestadual,\n" +
+                    "	c.razao,\n" +
+                    "	c.fantasia,\n" +
+                    "	tl.nome||' '||l.nome as endereco,\n" +
+                    "	c.numero,\n" +
+                    "	c.complemento,\n" +
+                    "	b.nome as bairro,\n" +
+                    "	m.nome as municipio,\n" +
+                    "	c.cod_estado as uf,\n" +
+                    "	c.cep,\n" +
+                    "	c.dt_cadastro as dataCadastro,\n" +
+                    "	c.fone as telefone,\n" +
+                    "	c.celular,\n" +
+                    "	c.email,\n" +
+                    "	c.fax\n" +
+                    "from colaborador C\n" +
+                    "	join logradouro l\n" +
+                    "		on c.cod_logradouro = l.cod_logradouro\n" +
+                    "	join logradouro_tipo tl\n" +
+                    "		on c.cod_logradouro_tipo = tl.cod_logradouro_tipo\n" +
+                    "	join bairro b\n" +
+                    "		on c.cod_bairro = b.cod_bairro\n" +
+                    "	join municipio m\n" +
+                    "		on c.cod_municipio = m.cod_municipio\n" +
+                    "where tipo = 1\n" +
+                    "	order by cod_colaborador, tipo"
+            )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
                     imp.setId(rst.getString("id"));
@@ -428,5 +493,6 @@ public class AlphaSysDAO extends InterfaceDAO {
         }
         return result;
     }
+
 }
         
