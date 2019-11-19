@@ -195,6 +195,7 @@ public class AlphaSysDAO extends InterfaceDAO {
                         imp.setTipoEmbalagem("U".equals(bal.getPesavel()) ? "UN" : "KG");
                     } else {
                         imp.setEan(rst.getString("ean"));
+                        imp.setQtdEmbalagem(1);
                         imp.setValidade(rst.getInt("validade"));
                         imp.seteBalanca("S".equals(rst.getString("e_balanca")));
                         imp.setTipoEmbalagem(rst.getString("UNIDADE"));
