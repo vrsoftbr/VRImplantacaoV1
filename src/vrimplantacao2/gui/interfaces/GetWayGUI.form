@@ -183,16 +183,14 @@
                                           <Component id="chkMetodoAliquota" alignment="0" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="txtDataFimOferta" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Component id="btnMapaTrib" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace min="0" pref="20" max="32767" attributes="0"/>
-                          </Group>
-                          <Group type="103" alignment="0" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="txtDataFimOferta" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Component id="btnMapaTrib" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -427,6 +425,11 @@
                     <Property name="text" type="java.lang.String" value="Pre&#xe7;o"/>
                   </Properties>
                 </Component>
+                <Component class="javax.swing.JCheckBox" name="chkTrocaEstoque">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Estoque de Troca"/>
+                  </Properties>
+                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkT1Estoque">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Estoque"/>
@@ -585,14 +588,20 @@
                     <Property name="text" type="java.lang.String" value="Data Altera&#xe7;&#xe3;o"/>
                   </Properties>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAssociado">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Associado"/>
+                  </Properties>
+                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkMargem">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Margem"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAssociado">
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoAtivo">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Associado"/>
+                    <Property name="text" type="java.lang.String" value="Apenas Produtos Ativos"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Marcando esta op&#xe7;&#xe3;o ser&#xe1; importado apenas produtos que est&#xe3;o ativo"/>
                   </Properties>
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUsaMargemLiquida">
@@ -600,10 +609,9 @@
                     <Property name="text" type="java.lang.String" value="Usa Margem Liquida Praticada"/>
                   </Properties>
                 </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutoAtivo">
+                <Component class="javax.swing.JCheckBox" name="chkMargemSobreVenda">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Apenas Produtos Ativos"/>
-                    <Property name="toolTipText" type="java.lang.String" value="Marcando esta op&#xe7;&#xe3;o ser&#xe1; importado apenas produtos que est&#xe3;o ativo"/>
+                    <Property name="text" type="java.lang.String" value="Margem Sobre Venda"/>
                   </Properties>
                 </Component>
               </SubComponents>

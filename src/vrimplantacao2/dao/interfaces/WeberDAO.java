@@ -25,6 +25,7 @@ import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
 import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
+import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.OfertaIMP;
@@ -57,6 +58,8 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
     public Set<OpcaoProduto> getOpcoesDisponiveisProdutos() {
         return new HashSet<>(Arrays.asList(
                 new OpcaoProduto[]{
+                    OpcaoProduto.FAMILIA,
+                    OpcaoProduto.FAMILIA_PRODUTO,
                     OpcaoProduto.IMPORTAR_MANTER_BALANCA,
                     OpcaoProduto.PRODUTOS,
                     OpcaoProduto.EAN,
@@ -107,14 +110,62 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
     }
 
     @Override
+    public List<FamiliaProdutoIMP> getFamiliaProduto() throws Exception {
+        List<FamiliaProdutoIMP> result = new ArrayList<>();
+        
+        try (Statement st = ConexaoFirebird.getConexao().createStatement()) {
+            Set<String> idsFamilia = new HashSet<>();
+            try (ResultSet rs = st.executeQuery(
+                    "select distinct cod_preco from est_produtos where cod_preco != id_produto"
+            )) {
+                while (rs.next()) {
+                    idsFamilia.add(rs.getString("cod_preco"));
+                }
+            }
+            try (ResultSet rs = st.executeQuery(
+                    "select \n" +
+                    "   id_produto, \n" +
+                    "   nome_produto,\n" +
+                    "   cod_preco\n" +
+                    "from\n" +
+                    "   est_produtos \n"
+            )) {
+                while (rs.next()) {
+                    if (idsFamilia.contains(rs.getString("id_produto"))) {
+                        FamiliaProdutoIMP imp = new FamiliaProdutoIMP();
+
+                        imp.setImportSistema(getSistema());
+                        imp.setImportLoja(getLojaOrigem());
+                        imp.setImportId(rs.getString("id_produto"));
+                        imp.setDescricao(rs.getString("nome_produto"));
+
+                        result.add(imp);
+                    }
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            Set<String> idsFamilia = new HashSet<>();
+            try (ResultSet rs = stm.executeQuery(
+                    "select distinct cod_preco from est_produtos where cod_preco != id_produto"
+            )) {
+                while (rs.next()) {
+                    idsFamilia.add(rs.getString("cod_preco"));
+                }
+            }
             try (ResultSet rs = stm.executeQuery(
                     "select\n"
                     + "    p.id_produto as importid,\n"
                     + "    p.data_cadastro as datacadastro,\n"
                     + "    p.data_alteracao as dataalteracao,\n"
+                    + "    p.cod_preco,\n"
                     + "    e.est_max estmaximo,\n"
                     + "    e.est_min estminimo,\n"
                     + "    e.est_atual estoque,\n"
@@ -123,7 +174,7 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    p.unm_emb_qtd as qtdembalagem,\n"
                     + "    p.unm as tipoembalagem,\n"
                     + "    p.dias_validade as validade,\n"
-                    + "    nome_produto as descricaocompleta,\n"
+                    + "    coalesce(nome_produto, nome_reduzido) as descricaocompleta,\n"
                     + "    nome_reduzido as descricaoreduzida,\n"
                     + "    nome_reduzido as descricaogondola,\n"
                     + "    peso_bruto as pesobruto,\n"
@@ -165,6 +216,12 @@ public class WeberDAO extends InterfaceDAO implements MapaTributoProvider {
                         imp.setDescricaoReduzida(rs.getString("descricaoreduzida"));
                     }
                     imp.setDescricaoGondola(rs.getString("descricaocompleta"));
+                    
+                    imp.setIdFamiliaProduto(rs.getString("cod_preco"));
+                    if (idsFamilia.contains(imp.getImportId())) {
+                        imp.setIdFamiliaProduto(imp.getImportId());
+                    }
+                    
                     imp.setEstoque(rs.getDouble("estoque"));
                     imp.setEstoqueMaximo(rs.getDouble("estmaximo"));
                     imp.setEstoqueMinimo(rs.getDouble("estminimo"));

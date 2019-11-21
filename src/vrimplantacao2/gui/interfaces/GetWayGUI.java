@@ -250,6 +250,7 @@ public class GetWayGUI extends VRInternalFrame {
                     getWayDAO.v_usar_arquivoBalanca = chkTemArquivoBalanca.isSelected();
                     getWayDAO.v_usar_arquivoBalancaUnificacao = chkTemArquivoBalancaUnificacao.isSelected();
                     getWayDAO.usarMargemBruta = chkUsarMargemBruta.isSelected();
+                    getWayDAO.usaMargemSobreVenda = chkMargemSobreVenda.isSelected();
                     getWayDAO.setUsarQtdEmbDoProduto(chkUsarQtdCotacaoProdFornecedor.isSelected());
                     getWayDAO.usaMargemLiquidaPraticada = chkUsaMargemLiquida.isSelected();
                     getWayDAO.setUtilizarIdIcmsNaEntrada(chkUtilizarIdIcmsNaEntrada.isSelected());
@@ -300,6 +301,9 @@ public class GetWayGUI extends VRInternalFrame {
                             }
                             if (chkT1Estoque.isSelected()) {
                                 opcoes.add(OpcaoProduto.ESTOQUE);
+                            }
+                            if (chkTrocaEstoque.isSelected()) {
+                                opcoes.add(OpcaoProduto.TROCA);
                             }
                             if (chkT1PisCofins.isSelected()) {
                                 opcoes.add(OpcaoProduto.PIS_COFINS);
@@ -569,6 +573,7 @@ public class GetWayGUI extends VRInternalFrame {
         chkProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Custo = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Preco = new vrframework.bean.checkBox.VRCheckBox();
+        chkTrocaEstoque = new javax.swing.JCheckBox();
         chkT1Estoque = new vrframework.bean.checkBox.VRCheckBox();
         chkT1EAN = new vrframework.bean.checkBox.VRCheckBox();
         chkT1EANemBranco = new vrframework.bean.checkBox.VRCheckBox();
@@ -600,10 +605,11 @@ public class GetWayGUI extends VRInternalFrame {
         chkT1CEST = new vrframework.bean.checkBox.VRCheckBox();
         chkTemArquivoBalanca = new vrframework.bean.checkBox.VRCheckBox();
         chkDtAlteracao = new vrframework.bean.checkBox.VRCheckBox();
-        chkMargem = new vrframework.bean.checkBox.VRCheckBox();
         chkAssociado = new vrframework.bean.checkBox.VRCheckBox();
-        chkUsaMargemLiquida = new vrframework.bean.checkBox.VRCheckBox();
+        chkMargem = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutoAtivo = new vrframework.bean.checkBox.VRCheckBox();
+        chkUsaMargemLiquida = new vrframework.bean.checkBox.VRCheckBox();
+        chkMargemSobreVenda = new javax.swing.JCheckBox();
         vRPanel9 = new vrframework.bean.panel.VRPanel();
         chkClientePreferencial = new vrframework.bean.checkBox.VRCheckBox();
         chkClienteEventual = new vrframework.bean.checkBox.VRCheckBox();
@@ -790,14 +796,13 @@ public class GetWayGUI extends VRInternalFrame {
                                     .addComponent(chkUtilizarIdIcmsNaEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(chkPesquisarKG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(chkUtilizarEmbalagemCompra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkMetodoAliquota))))
-                        .addGap(0, 20, Short.MAX_VALUE))
-                    .addGroup(tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(tabParametrosLayout.createSequentialGroup()
-                            .addComponent(jLabel3)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtDataFimOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(chkMetodoAliquota)))
+                            .addGroup(tabParametrosLayout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtDataFimOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 20, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         tabParametrosLayout.setVerticalGroup(
@@ -873,6 +878,9 @@ public class GetWayGUI extends VRInternalFrame {
 
         chkT1Preco.setText("Preço");
         vRPanel7.add(chkT1Preco);
+
+        chkTrocaEstoque.setText("Estoque de Troca");
+        vRPanel7.add(chkTrocaEstoque);
 
         chkT1Estoque.setText("Estoque");
         vRPanel7.add(chkT1Estoque);
@@ -972,18 +980,21 @@ public class GetWayGUI extends VRInternalFrame {
         chkDtAlteracao.setText("Data Alteração");
         vRPanel7.add(chkDtAlteracao);
 
-        chkMargem.setText("Margem");
-        vRPanel7.add(chkMargem);
-
         chkAssociado.setText("Associado");
         vRPanel7.add(chkAssociado);
 
-        chkUsaMargemLiquida.setText("Usa Margem Liquida Praticada");
-        vRPanel7.add(chkUsaMargemLiquida);
+        chkMargem.setText("Margem");
+        vRPanel7.add(chkMargem);
 
         chkProdutoAtivo.setText("Apenas Produtos Ativos");
         chkProdutoAtivo.setToolTipText("Marcando esta opção será importado apenas produtos que estão ativo");
         vRPanel7.add(chkProdutoAtivo);
+
+        chkUsaMargemLiquida.setText("Usa Margem Liquida Praticada");
+        vRPanel7.add(chkUsaMargemLiquida);
+
+        chkMargemSobreVenda.setText("Margem Sobre Venda");
+        vRPanel7.add(chkMargemSobreVenda);
 
         vRTabbedPane2.addTab("Produtos", vRPanel7);
 
@@ -1724,6 +1735,7 @@ public class GetWayGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkInverterAssociado;
     private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
+    private javax.swing.JCheckBox chkMargemSobreVenda;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
     private javax.swing.JCheckBox chkMetodoAliquota;
     private vrframework.bean.checkBox.VRCheckBox chkNutricionalFilizola;
@@ -1761,6 +1773,7 @@ public class GetWayGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkTemFicha;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemProduto;
+    private javax.swing.JCheckBox chkTrocaEstoque;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;

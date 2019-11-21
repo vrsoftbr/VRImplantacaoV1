@@ -385,17 +385,12 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "    case when p.proenvbal = 'S' then 1 else 0 end e_balanca,\n"
                     + "    coalesce(p.provld, 0) validade,\n"
                     + "    p.trbid,\n"
-                    + "    i.trbtabb icms_cst, \n"
-                    + "    i.trbalq icms_aliquota, \n"
-                    + "    i.trbred icms_reducao, \n"
                     + "    p.procest cest,\n"
                     + "    p.natcodigo piscofins_natrec\n"
                     + "FROM \n"
                     + "    produto p\n"
                     + "    LEFT JOIN item_similares items ON \n"
                     + "        items.procod = p.procod\n"
-                    + "    left join tributacao i on \n"
-                    + "        i.trbid = p.trbid\n"
                     + "    left join estoque est on\n"
                     + "        est.PROCOD = p.PROCOD\n"
                     + (soAtivos ? "where p.proforlin = 'N'\n" : "")
@@ -482,14 +477,7 @@ public class SysPdvDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setPesoLiquido(rst.getDouble("pesoliquido"));
                             imp.setIcmsCreditoId(rst.getString("trbid"));
                             imp.setIcmsDebitoId(rst.getString("trbid"));
-                            /*
-                            imp.setIcmsCstSaida(Utils.stringToInt(rst.getString("icms_cst")));
-                            imp.setIcmsAliqSaida(rst.getDouble("icms_aliquota"));
-                            imp.setIcmsReducaoSaida(rst.getDouble("icms_reducao"));
-                            imp.setIcmsCstEntrada(Utils.stringToInt(rst.getString("icms_cst")));
-                            imp.setIcmsAliqEntrada(rst.getDouble("icms_aliquota"));
-                            imp.setIcmsReducaoEntrada(rst.getDouble("icms_reducao"));
-                            */
+
                             imp.setCest(rst.getString("cest"));
 
                             int[] pis = piscofins.get(rst.getString("id"));

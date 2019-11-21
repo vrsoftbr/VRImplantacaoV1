@@ -2,14 +2,21 @@ package vrimplantacao2.dao.interfaces;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoFirebird;
+import vrimplantacao.classe.ConexaoSQLite;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
+import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
 import vrimplantacao2.gui.component.mapatributacao.MapaTributoProvider;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -19,6 +26,8 @@ import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 import vrimplantacao2.vo.importacao.ProdutoFornecedorIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
+import vrimplantacao2.vo.importacao.VendaIMP;
+import vrimplantacao2.vo.importacao.VendaItemIMP;
 
 /**
  *
@@ -26,6 +35,10 @@ import vrimplantacao2.vo.importacao.ProdutoIMP;
  */
 public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
 
+    private Date vendasDataInicio = null;
+    private Date vendasDataTermino = null;
+    private static final Logger LOG = Logger.getLogger(SophyxDAO.class.getName());
+    
     @Override
     public String getSistema() {
         return "SOPHYX";
@@ -102,6 +115,22 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
                     "    s_razao_social razaosocial\n" +
                     "from\n" +
                     "    lojas"
+            )) {
+                while(rs.next()) {
+                    result.add(new Estabelecimento(rs.getString("id"), rs.getString("razaosocial")));
+                }
+            }
+        }
+        return result;
+    }
+    
+    public List<Estabelecimento> getLojaClienteSQLite() throws Exception {
+        List<Estabelecimento> result = new ArrayList<>();
+        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+            try(ResultSet rs = stm.executeQuery(
+                    "select\n" +
+                    "    1 id,\n" +
+                    "    'LOJA - SQL LITE' razaosocial"
             )) {
                 while(rs.next()) {
                     result.add(new Estabelecimento(rs.getString("id"), rs.getString("razaosocial")));
@@ -574,4 +603,214 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
     
+    public Date getVendasDataInicio() {
+        return vendasDataInicio;
+    }
+
+    public void setVendasDataInicio(Date vendasDataInicio) {
+        this.vendasDataInicio = vendasDataInicio;
+    }
+
+    public void setVendasDataTermino(Date vendasDataTermino) {
+        this.vendasDataTermino = vendasDataTermino;
+    }
+
+    public Date getVendasDataTermino() {
+        return vendasDataTermino;
+    }
+    
+    @Override
+    public Iterator<VendaIMP> getVendaIterator() throws Exception {
+        return new VendaIterator(getLojaOrigem(), getVendasDataInicio(), getVendasDataTermino());
+    }
+
+    @Override
+    public Iterator<VendaItemIMP> getVendaItemIterator() throws Exception {
+        return new VendaItemIterator(getLojaOrigem(), getVendasDataInicio(), getVendasDataTermino());
+    }
+    
+    private static class VendaIterator implements Iterator<VendaIMP> {
+
+        private Statement stm;
+        private ResultSet rst;
+        private VendaIMP next;
+
+        public VendaIterator(String idLojaCliente, Date dataInicio, Date dataTermino) {
+            try {
+                ConexaoSQLite sqLite = new ConexaoSQLite();
+                this.stm = sqLite.get().createStatement();
+                this.rst = stm.executeQuery(
+                        "select	\n" +
+                        "	v.id,\n" +
+                        "	v.sCCF_CVC_CBP ccf,\n" +
+                        "	ecf.sECF ecf,\n" +
+                        "	v.sCOO coo,\n" +
+                        "	v.sCPF_CNPJ_ADQUIRENTE cnpj,\n" +
+                        "	v.sNOME_ADQUIRENTE razao,\n" +
+                        "	v.sDataINICIO_EMISSAO data,\n" +
+                        "	v.sHORA horaemissao,\n" +
+                        "	v.rSUB_TOTAL_DOCUMENTO subtotalimpressora\n" +
+                        "from	\n" +
+                        "	r04 v\n" +
+                        "join r01 ecf on v.id_r01 = ecf.id\n" +
+                        "where	\n" +
+                        "	substr(sDataINICIO_EMISSAO,7)||substr(sDataINICIO_EMISSAO,4,2)||substr(sDataINICIO_EMISSAO,1,2) between '" + 
+                                DATE_FORMAT.format(dataInicio) + "' and '" + DATE_FORMAT.format(dataTermino) + "'"
+                );
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro ao obter a venda", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            processarNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaIMP next() {
+            processarNext();
+            VendaIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+
+        private void processarNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+                        next = new VendaIMP();
+
+                        next.setId(rst.getString("id"));
+                        next.setNumeroCupom(rst.getInt("coo"));
+                        next.setEcf(rst.getInt("ecf"));
+                        next.setData(rst.getDate("data"));
+                        next.setIdClientePreferencial(rst.getString("id_cliente"));
+                        next.setHoraInicio(rst.getTimestamp("horaemissao"));
+                        next.setHoraTermino(rst.getTimestamp("horaemissao"));
+                        next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
+                    }
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro ao obter a venda", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+    }
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyMMdd");
+
+    private static class VendaItemIterator implements Iterator<VendaItemIMP> {
+
+        private Statement stm;
+        private ResultSet rst;
+        private VendaItemIMP next;
+        private String loja = "";
+
+        public VendaItemIterator(String idLojaCliente, Date dataInicio, Date dataTermino) {
+            try {
+                loja = idLojaCliente;
+                ConexaoSQLite sqLite = new ConexaoSQLite();
+                stm = sqLite.get().createStatement();
+                rst = stm.executeQuery(
+                        "select	\n" +
+                        "	i.id,\n" +
+                        "       v.id id_venda,\n" +
+                        "	i.scoo coo,\n" +
+                        "	i.sccf_cvc_cbp ccf,\n" +
+                        "	i.snum_item sequencia,\n" +
+                        "	i.scodigo_produto id_produto,\n" +
+                        "	i.sdescricao descricao,\n" +
+                        "	i.sunidade unidade,\n" +
+                        "	i.rquantidade qtd,\n" +
+                        "	i.rvalor_unitario valorvenda,\n" +
+                        "	i.rvalor_total_liquido subtotalimpressora,\n" +
+                        "	i.sst cst,\n" +
+                        "	i.rtaxa_aliquota icms,\n" +
+                        "	i.sindicador_cancelamento cancelado\n" +
+                        "from	\n" +
+                        "	r05 i\n" +
+                        "join r04 v on i.scoo = v.scoo\n" +
+                        "where	\n" +
+                        "	substr(sDataINICIO_EMISSAO,7)||substr(sDataINICIO_EMISSAO,4,2)||substr(sDataINICIO_EMISSAO,1,2) between '" + 
+                                DATE_FORMAT.format(dataInicio) + "' and '" + DATE_FORMAT.format(dataTermino) + "'"
+                );
+
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro ao obter a venda", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            processarNext();
+            return next != null;
+        }
+
+        @Override
+        public VendaItemIMP next() {
+            processarNext();
+            VendaItemIMP result = next;
+            next = null;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported.");
+        }
+
+        private void processarNext() {
+            try {
+                if (next == null) {
+                    if (rst.next()) {
+                        ProdutoAnteriorDAO antDAO = new ProdutoAnteriorDAO();
+                        next = new VendaItemIMP();
+
+                        next.setId(rst.getString("id"));
+                        next.setVenda(rst.getString("idvenda"));
+                        
+                        int idProduto = antDAO.getCodigoAtualEANant("SOPHYX", loja, rst.getString("idproduto"));
+                        
+                        next.setProduto(String.valueOf(idProduto));
+                        next.setDescricaoReduzida(rst.getString("descricao"));
+                        next.setQuantidade(rst.getDouble("qtd"));
+                        next.setTotalBruto(rst.getDouble("subtotalimpressora"));
+                        next.setCancelado("S".equals(rst.getString("cancelado").trim()));
+                        next.setCodigoBarras(rst.getString("idproduto"));
+                        next.setUnidadeMedida(rst.getString("unidade"));
+                        
+                        if(rst.getString("cst") != null && !"".equals(rst.getString("cst"))) {
+                            switch(rst.getString("cst").trim()) {
+                            case "T": next.setIcmsAliq(rst.getDouble("icms"));
+                                next.setIcmsCst(0);
+                                next.setIcmsReduzido(0);
+                                break;
+                            case "F": next.setIcmsAliq(rst.getDouble("icms"));
+                                next.setIcmsCst(60);
+                                next.setIcmsReduzido(0);
+                                break;
+                            default: 
+                                next.setIcmsAliq(rst.getDouble("icms"));
+                                next.setIcmsCst(40);
+                                next.setIcmsReduzido(0);
+                                break;
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Erro ao obter a venda", ex);
+                throw new RuntimeException(ex);
+            }
+        }
+    }
 }
