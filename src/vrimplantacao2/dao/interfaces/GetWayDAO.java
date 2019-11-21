@@ -275,6 +275,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     "	prod.estoque_max estoquemaximo,\n" +
                     "	prod.estoque_min estoqueminimo,\n" +
                     "	prod.estoque,\n" +
+                    "	trc.QTD estoquetroca,\n" +
                     "	prod.preco_cust custocomimposto,\n" +
                     "	prod.preco_cust custosemimposto,\n" +
                     "	prod.preco_unit precovenda,\n" +
@@ -284,7 +285,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     "   cast(round(((prod.PRECO_CUST / \n" +
                     "		case when prod.PRECO_UNIT = 0 then 1 else \n" +
                     "			prod.PRECO_UNIT end * 100) - 100) * -1, 2) \n" +
-                    "			as numeric(12,2)) margemsobrevenda,\n" +        
+                    "			as numeric(12,2)) margemsobrevenda,        \n" +
                     "	prod.ativo,\n" +
                     "	case when prod.descricao like '*%' then 1 else 0 end descontinuado,\n" +
                     "	prod.codncm ncm,\n" +
@@ -307,6 +308,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     "		prod.codprod > 0\n" +
                     "join aliquota_icms al on\n" +
                     "		al.CODALIQ = prod.codaliq_nf\n" +
+                    "left join TROCACOMPRA trc on prod.CODPROD = trc.CODPROD\n" +
                     (apenasProdutoAtivo == true ? " where upper(ltrim(rtrim(prod.ativo))) = 'S' " : "") +
                     "order by\n" +
                     "	id"
@@ -336,6 +338,7 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setEstoqueMaximo(rst.getDouble("estoquemaximo"));
                     imp.setEstoqueMinimo(rst.getDouble("estoqueminimo"));
                     imp.setEstoque(rst.getDouble("estoque"));
+                    imp.setTroca(rst.getDouble("estoquetroca"));
                     imp.setCustoComImposto(rst.getDouble("custocomimposto"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
                     imp.setPrecovenda(rst.getDouble("precovenda"));

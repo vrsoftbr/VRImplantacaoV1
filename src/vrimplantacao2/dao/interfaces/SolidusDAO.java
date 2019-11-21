@@ -1670,7 +1670,6 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     //imp.setDataEntradaSaida(rst.getDate("dataentradasaida"));
                     imp.setValorTotal(rst.getDouble("total_nota"));
                     imp.setIdDestinatario(rst.getString("cod_parceiro"));
-
                     imp.setTipoDestinatario(imp.getOperacao() == NotaOperacao.ENTRADA ? TipoDestinatario.FORNECEDOR : TipoDestinatario.CLIENTE_EVENTUAL);
                     /*int tipoNF = rst.getInt("tipo_nf");
                     if (tipoNF > 1) {
@@ -1679,7 +1678,6 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                             imp.setIdDestinatario("2347");
                         }
                     }*/
-
                     imp.setTipoFreteNotaFiscal(TipoFreteNotaFiscal.get(rst.getInt("tipo_frete")));
                     imp.setInformacaoComplementar(rst.getString("obs_fiscal") + " " + rst.getString("obs_livre"));
                     imp.setPesoBruto(rst.getDouble("val_peso_cte"));
@@ -1695,7 +1693,7 @@ public class SolidusDAO extends InterfaceDAO implements MapaTributoProvider {
                     }
                     imp.setChaveNfe(rst.getString("num_chave_acesso"));
                     imp.setDataHoraAlteracao(rst.getDate("dta_alteracao"));
-
+                    
                     getNotasItem(
                             rst.getString("cod_parceiro"),
                             //"2347".equals(imp.getIdDestinatario()) ? "1" : imp.getIdDestinatario(),

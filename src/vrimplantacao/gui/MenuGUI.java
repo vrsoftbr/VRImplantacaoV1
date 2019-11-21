@@ -733,6 +733,8 @@ public final class MenuGUI extends VRMdiFrame {
         mnuInfoMacStore = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
         mnuContaPagar1 = new javax.swing.JMenuItem();
+        mnuSQLite = new javax.swing.JMenu();
+        mnuSQLiteSophyx = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem8 = new javax.swing.JMenuItem();
         jMenuItem24 = new javax.swing.JMenuItem();
@@ -2420,6 +2422,13 @@ public final class MenuGUI extends VRMdiFrame {
         jMenu3.add(mnuContaPagar1);
 
         mnuDatabase.add(jMenu3);
+
+        mnuSQLite.setText("SQLite");
+
+        mnuSQLiteSophyx.setText("Sophyx");
+        mnuSQLite.add(mnuSQLiteSophyx);
+
+        mnuDatabase.add(mnuSQLite);
 
         mnuImpSistema.add(mnuDatabase);
 
@@ -4410,6 +4419,8 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuRPInfo;
     private javax.swing.JMenuItem mnuRepleis;
     private javax.swing.JMenuItem mnuSDInformatica;
+    private javax.swing.JMenu mnuSQLite;
+    private javax.swing.JMenuItem mnuSQLiteSophyx;
     private javax.swing.JMenuItem mnuSTI3;
     private javax.swing.JMenuItem mnuSaac;
     private javax.swing.JMenuItem mnuSatecfe;

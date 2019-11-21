@@ -302,6 +302,9 @@ public class GetWayGUI extends VRInternalFrame {
                             if (chkT1Estoque.isSelected()) {
                                 opcoes.add(OpcaoProduto.ESTOQUE);
                             }
+                            if (chkTrocaEstoque.isSelected()) {
+                                opcoes.add(OpcaoProduto.TROCA);
+                            }
                             if (chkT1PisCofins.isSelected()) {
                                 opcoes.add(OpcaoProduto.PIS_COFINS);
                             }
@@ -570,6 +573,7 @@ public class GetWayGUI extends VRInternalFrame {
         chkProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Custo = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Preco = new vrframework.bean.checkBox.VRCheckBox();
+        chkTrocaEstoque = new javax.swing.JCheckBox();
         chkT1Estoque = new vrframework.bean.checkBox.VRCheckBox();
         chkT1EAN = new vrframework.bean.checkBox.VRCheckBox();
         chkT1EANemBranco = new vrframework.bean.checkBox.VRCheckBox();
@@ -874,6 +878,9 @@ public class GetWayGUI extends VRInternalFrame {
 
         chkT1Preco.setText("Preço");
         vRPanel7.add(chkT1Preco);
+
+        chkTrocaEstoque.setText("Estoque de Troca");
+        vRPanel7.add(chkTrocaEstoque);
 
         chkT1Estoque.setText("Estoque");
         vRPanel7.add(chkT1Estoque);
@@ -1766,6 +1773,7 @@ public class GetWayGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkTemFicha;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemProduto;
+    private javax.swing.JCheckBox chkTrocaEstoque;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClienteEventual;
     private vrframework.bean.checkBox.VRCheckBox chkUnifClientePreferencial;
     private vrframework.bean.checkBox.VRCheckBox chkUnifFornecedor;
