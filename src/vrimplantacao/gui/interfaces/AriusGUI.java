@@ -521,7 +521,9 @@ public class AriusGUI extends VRInternalFrame {
                             importador.importarConvenioConveniado();
                         }
                     } else if (tab.getSelectedIndex() == 6) {
-                        if (chkNotasFiscais.isSelected()) {
+                        if (chkNotasFiscais.isSelected()) {                            
+                            ariusDAO.i_notaEntrada = chkNotaEntrada.isSelected();
+                            ariusDAO.i_notaSaida = chkNotaSaida.isSelected();                            
                             ariusDAO.setNotasDataInicio(edtDtNotaIni.getDate());
                             ariusDAO.setNotasDataTermino(edtDtNotaFim.getDate());
                             importador.importarNotas(OpcaoNotaFiscal.IMP_REIMPORTAR_ITENS_DE_NOTAS_IMPORTADAS);

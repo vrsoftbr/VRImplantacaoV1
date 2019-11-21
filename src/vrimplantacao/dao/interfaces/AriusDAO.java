@@ -1576,34 +1576,49 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "left join arius.fis_t_notas_nfe nfe on nfe.id_nota = sai.id_c100 \n"
                         + "where sai.id_empresa_a = " + getLojaOrigem() + "\n"
                         + "and sai.IND_OPER = 1\n"
-                        + "and sai.dt_doc between "
+                        + "and sai.dt_e_s between "
                         + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
                         + "and "
                         + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
                 )) {
                     while (rs.next()) {
-                        NotaFiscalIMP imp = new NotaFiscalIMP();
-                        imp.setId(rs.getString("id"));
-                        imp.setOperacao(NotaOperacao.SAIDA);
-                        imp.setIdDestinatario(rs.getString("iddestinatario"));
-                        imp.setTipoDestinatario(rs.getString("iddestinatario").startsWith("C") ? TipoDestinatario.CLIENTE_EVENTUAL : TipoDestinatario.FORNECEDOR);
-                        imp.setModelo(rs.getString("modelo"));
-                        imp.setSerie(rs.getString("serie"));
-                        imp.setNumeroNota(rs.getInt("numeronota"));
-                        imp.setDataEmissao(rs.getDate("data_documento"));
-                        imp.setDataEntradaSaida(rs.getDate("data_saida"));
-                        imp.setValorProduto(rs.getDouble("valor_mercadoria"));
-                        imp.setValorTotal(rs.getDouble("valor_documento"));
-                        imp.setValorIcms(rs.getDouble("valor_icms"));
-                        imp.setValorIcmsSubstituicao(rs.getDouble("valoricmssubstituicao"));
-                        imp.setValorSeguro(rs.getDouble("valor_seguro"));
-                        imp.setValorIpi(rs.getDouble("valor_ipi"));
-                        imp.setValorOutrasDespesas(rs.getDouble("valor_outras_despesas"));
-                        imp.setValorDesconto(rs.getDouble("valor_desconto"));
-                        imp.setValorFrete(rs.getDouble("valor_frete"));
-                        imp.setChaveNfe(rs.getString("chave_nfe"));
-                        imp.setDataHoraAlteracao(rs.getDate("data_saida"));                        
-                        result.add(imp);
+                        
+                        if ((rs.getString("iddestinatario") != null)
+                                && (!rs.getString("iddestinatario").trim().isEmpty())) {
+                            if ((rs.getString("iddestinatario").startsWith("C"))
+                                    || (rs.getString("iddestinatario").startsWith("F"))) {
+
+                                NotaFiscalIMP imp = new NotaFiscalIMP();
+                                imp.setId(rs.getString("id"));
+                                imp.setOperacao(NotaOperacao.SAIDA);
+                                imp.setIdDestinatario(Utils.formataNumero(rs.getString("iddestinatario")));
+                                imp.setTipoDestinatario(rs.getString("iddestinatario").startsWith("C") ? TipoDestinatario.CLIENTE_EVENTUAL : TipoDestinatario.FORNECEDOR);
+                                imp.setModelo(rs.getString("modelo"));
+                                imp.setSerie(rs.getString("serie"));
+                                imp.setNumeroNota(rs.getInt("numero_documento"));
+                                imp.setDataEmissao(rs.getDate("data_documento"));
+                                imp.setDataEntradaSaida(rs.getDate("data_saida"));
+                                imp.setValorProduto(rs.getDouble("valor_mercadoria"));
+                                imp.setValorTotal(rs.getDouble("valor_documento"));
+                                imp.setValorIcms(rs.getDouble("valor_icms"));
+                                //imp.setValorIcmsSubstituicao(rs.getDouble("valoricmssubstituicao"));
+                                imp.setValorSeguro(rs.getDouble("valor_seguro"));
+                                imp.setValorIpi(rs.getDouble("valor_ipi"));
+                                imp.setValorOutrasDespesas(rs.getDouble("valor_outras_despesas"));
+                                imp.setValorDesconto(rs.getDouble("valor_desconto"));
+                                imp.setValorFrete(rs.getDouble("valor_frete"));
+                                imp.setChaveNfe(rs.getString("chave_nfe"));
+                                imp.setDataHoraAlteracao(rs.getDate("data_saida"));
+
+                                getNotasItem(
+                                        imp,
+                                        imp.getId(),
+                                        rs.getString("iddestinatario")
+                                );
+
+                                result.add(imp);
+                            }
+                        }
                     }
                 }
             }
@@ -1658,6 +1673,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     while (rs.next()) {
                         NotaFiscalItemIMP item = imp.addItem();
 
+                        
                         item.setId(rs.getString("id"));
                         item.setNumeroItem(rs.getInt("numeroitem"));
                         item.setIdProduto(rs.getString("idproduto"));
@@ -1688,8 +1704,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                         "select \n"
                         + "ite.id_c170 as id,\n"
                         + "ite.id_c100 as id_nota_saida,\n"
-                        + "ite.num_item as item,\n"
-                        + "ite.cod_item as id_produto,\n"
+                        + "ite.num_item as numeroitem,\n"
+                        + "ite.cod_item as idproduto,\n"
                         + "ite.descr_compl as descricao_produto,\n"
                         + "ite.qtd as qtd_produto,\n"
                         + "ite.unid as unidade,\n"
@@ -1724,18 +1740,41 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "ite.vl_outras_a,\n"
                         + "ite.vl_contabil_a,\n"
                         + "ite.aliq_icms_a,\n"
-                        + "ite.vl_icms_a\n"
+                        + "ite.vl_icms_a,\n"
+                        + "ite.vl_ipi as valor_ipi,\n"
+                        + "ite.vl_bc_ipi as ipivalorbase\n"
                         + "from arius.fis_t_c170 ite\n"
                         + "inner join arius.fis_t_c100 nfe on nfe.id_c100 = ite.id_c100\n"
-                        + "    and nfe.id_empresa_a = 1\n"
+                        + "    and nfe.id_empresa_a = "+getLojaOrigem()+"\n"
                         + "    and nfe.IND_OPER = 1\n"
-                        + "and to_date(er.data_hora_entrada) between "
+                        + "and nfe.dt_e_s between "
                         + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
                         + "and "
                         + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
+
+                        + "and ite.id_c100 = " + idNota + "\n"
+                        + "and nfe.cod_part = '" + partic + "'"
                 )) {
                     while (rs.next()) {
+                        NotaFiscalItemIMP item = imp.addItem();
                         
+                        item.setId(rs.getString("id"));
+                        item.setNumeroItem(rs.getInt("numeroitem"));
+                        item.setIdProduto(rs.getString("idproduto"));
+                        item.setCfop(rs.getString("cfop"));
+                        item.setDescricao(rs.getString("descricao_produto"));
+                        item.setUnidade(rs.getString("unidade"));
+                        item.setQuantidade(rs.getDouble("qtd_produto"));
+                        item.setValorTotalProduto(rs.getDouble("valor_produto"));
+                        item.setIcmsCst(rs.getInt("cst_icms"));
+                        item.setIcmsAliquota(rs.getDouble("aliq_icms"));
+                        item.setIcmsValor(rs.getDouble("vl_icms"));
+                        item.setIcmsBaseCalculoST(rs.getDouble("vl_bc_icms_st"));
+                        item.setIcmsValorST(rs.getDouble("aliq_st"));
+                        item.setIpiValorBase(rs.getDouble("ipivalorbase"));
+                        item.setIpiValor(rs.getDouble("valor_ipi"));
+                        item.setPisCofinsCst(rs.getInt("cst_pis"));
+                        item.setTipoNaturezaReceita(rs.getInt("cod_nat"));
                     }
                 }
             }
