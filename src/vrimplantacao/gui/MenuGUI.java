@@ -195,6 +195,7 @@ import vrimplantacao2.gui.interfaces.SofttechGUI;
 import vrimplantacao2.gui.interfaces.SolidusGUI;
 import vrimplantacao2.gui.interfaces.SolutionSuperaGUI;
 import vrimplantacao2.gui.interfaces.SophyxGUI;
+import vrimplantacao2.gui.interfaces.SophyxVendaGUI;
 import vrimplantacao2.gui.interfaces.SriGUI;
 import vrimplantacao2.gui.interfaces.SuperGUI;
 import vrimplantacao2.gui.interfaces.SuperLoja10GUI;
@@ -2426,6 +2427,11 @@ public final class MenuGUI extends VRMdiFrame {
         mnuSQLite.setText("SQLite");
 
         mnuSQLiteSophyx.setText("Sophyx");
+        mnuSQLiteSophyx.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSQLiteSophyxActionPerformed(evt);
+            }
+        });
         mnuSQLite.add(mnuSQLiteSophyx);
 
         mnuDatabase.add(mnuSQLite);
@@ -4220,6 +4226,10 @@ public final class MenuGUI extends VRMdiFrame {
     private void mnuHRTechV2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuHRTechV2ActionPerformed
         HRTechGUI_v2.exibir(this);
     }//GEN-LAST:event_mnuHRTechV2ActionPerformed
+
+    private void mnuSQLiteSophyxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSQLiteSophyxActionPerformed
+        SophyxVendaGUI.exibir(this);
+    }//GEN-LAST:event_mnuSQLiteSophyxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
