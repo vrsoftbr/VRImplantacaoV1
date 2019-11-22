@@ -17,6 +17,8 @@ public class ConexaoSQLite {
         this.database = database;
     }
     
+    public ConexaoSQLite(){}
+    
     public ConexaoSQLite conectar() throws SQLException, ClassNotFoundException {        
         Class.forName(org.sqlite.JDBC.class.getName());
         con = DriverManager.getConnection("jdbc:sqlite:" + database);

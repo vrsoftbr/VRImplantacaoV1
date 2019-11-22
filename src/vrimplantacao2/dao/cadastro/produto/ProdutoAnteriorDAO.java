@@ -261,7 +261,7 @@ public class ProdutoAnteriorDAO {
                     + "and ean.importsistema = " + SQLUtils.stringSQL(sistema) + "\n"
                     + "and ant.imploja = " + SQLUtils.stringSQL(loja) + "\n"
                     + "and ean.importloja = " + SQLUtils.stringSQL(loja) + "\n"
-                    + "and ean.ean = '" + Utils.stringLong(ean) + "'"//SQLUtils.stringSQL(ean)
+                    + "and ean.ean = '" + Utils.stringLong(ean) + "'" //SQLUtils.stringSQL(ean)
             )) {
 
                 if (rst.next()) {

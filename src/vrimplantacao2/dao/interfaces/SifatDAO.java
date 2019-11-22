@@ -868,7 +868,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where ven.LOJA = " + idLojaCliente
                     + " and ven.EMISSAO >= '" + dataInicio + "' and ven.EMISSAO <= '" + dataTermino + "'\n"
                     + " AND coalesce(ven.VRTOTAL,0 ) > 0\n"
-                    + " AND COALESCE(ven.ECF, 0) > 0";
+                    + " AND coalesce(ven.SERIE, '') <> 'RC'";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -1064,7 +1064,8 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "inner join CF01 ven on ven.NUMERO = ite.NUMERO \n"
                     + "	and ven.CAIXA = ite.CAIXA \n"
                     + "	and ven.LOJA = ite.LOJA\n"
-                    + " and ven.LOJA = " + idLojaCliente
+                    + " and ven.LOJA = " + idLojaCliente + "\n"
+                    + " and ite.LOJA = " + idLojaCliente + "\n"
                     + " and ven.EMISSAO >= '" + dataInicio + "' and ven.EMISSAO <= '" + dataTermino + "'";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
@@ -1122,7 +1123,12 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setCodigoBarras(rst.getString("codigobarras"));
                         next.setUnidadeMedida(rst.getString("tipoembalagem"));
 
-                        String strTrib = rst.getString("tribproduto").trim();
+                        String strTrib = "";
+                        if ((rst.getString("tribproduto") != null) &&
+                                (!rst.getString("tribproduto").trim().isEmpty())) {
+                            strTrib = rst.getString("tribproduto").trim();
+                        }
+                        
                         String trib = strTrib;
                         obterAliquota(next, trib);
                     }

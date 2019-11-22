@@ -1551,6 +1551,21 @@
                         </MenuItem>
                       </SubComponents>
                     </Menu>
+                    <Menu class="javax.swing.JMenu" name="mnuSQLite">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="SQLite"/>
+                      </Properties>
+                      <SubComponents>
+                        <MenuItem class="javax.swing.JMenuItem" name="mnuSQLiteSophyx">
+                          <Properties>
+                            <Property name="text" type="java.lang.String" value="Sophyx"/>
+                          </Properties>
+                          <Events>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="mnuSQLiteSophyxActionPerformed"/>
+                          </Events>
+                        </MenuItem>
+                      </SubComponents>
+                    </Menu>
                   </SubComponents>
                 </Menu>
                 <Menu class="javax.swing.JMenu" name="jMenu4">
