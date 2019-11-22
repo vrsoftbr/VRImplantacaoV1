@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.classe.ConexaoSQLite;
+import vrimplantacao.utils.Utils;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.dao.cadastro.produto.OpcaoProduto;
 import vrimplantacao2.dao.cadastro.produto.ProdutoAnteriorDAO;
@@ -126,7 +127,8 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
     
     public List<Estabelecimento> getLojaClienteSQLite() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
-        try(Statement stm = ConexaoFirebird.getConexao().createStatement()) {
+        ConexaoSQLite conSQLite = new ConexaoSQLite();
+        try(Statement stm = conSQLite.get().createStatement()) {
             try(ResultSet rs = stm.executeQuery(
                     "select\n" +
                     "    1 id,\n" +
@@ -690,11 +692,11 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
 
                         next.setId(rst.getString("id"));
                         next.setNumeroCupom(rst.getInt("coo"));
-                        next.setEcf(rst.getInt("ecf"));
-                        next.setData(rst.getDate("data"));
-                        next.setIdClientePreferencial(rst.getString("id_cliente"));
-                        next.setHoraInicio(rst.getTimestamp("horaemissao"));
-                        next.setHoraTermino(rst.getTimestamp("horaemissao"));
+                        next.setEcf(Integer.valueOf(Utils.formataNumero(rst.getString("ecf"))));
+                        next.setData(new SimpleDateFormat("dd/MM/yy").parse(rst.getString("data")));
+                        //next.setIdClientePreferencial(rst.getString("id_cliente"));
+                        next.setHoraInicio(new SimpleDateFormat("hh:mm:ss").parse(rst.getString("horaemissao")));
+                        next.setHoraTermino(new SimpleDateFormat("hh:mm:ss").parse(rst.getString("horaemissao")));
                         next.setSubTotalImpressora(rst.getDouble("subtotalimpressora"));
                     }
                 }
@@ -776,16 +778,16 @@ public class SophyxDAO extends InterfaceDAO implements MapaTributoProvider {
                         next = new VendaItemIMP();
 
                         next.setId(rst.getString("id"));
-                        next.setVenda(rst.getString("idvenda"));
+                        next.setVenda(rst.getString("id_venda"));
                         
-                        int idProduto = antDAO.getCodigoAtualEANant("SOPHYX", loja, rst.getString("idproduto"));
+                        int idProduto = antDAO.getCodigoAtualEANant("SOPHYX", loja, rst.getString("id_produto"));
                         
                         next.setProduto(String.valueOf(idProduto));
                         next.setDescricaoReduzida(rst.getString("descricao"));
                         next.setQuantidade(rst.getDouble("qtd"));
                         next.setTotalBruto(rst.getDouble("subtotalimpressora"));
                         next.setCancelado("S".equals(rst.getString("cancelado").trim()));
-                        next.setCodigoBarras(rst.getString("idproduto"));
+                        next.setCodigoBarras(rst.getString("id_produto"));
                         next.setUnidadeMedida(rst.getString("unidade"));
                         
                         if(rst.getString("cst") != null && !"".equals(rst.getString("cst"))) {
