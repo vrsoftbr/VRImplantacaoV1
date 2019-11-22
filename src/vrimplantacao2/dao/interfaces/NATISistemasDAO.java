@@ -15,6 +15,7 @@ import vrimplantacao2.vo.importacao.MercadologicoIMP;
  * @author Alan
  */
 public class NATISistemasDAO extends InterfaceDAO {
+    public String v_lojaMesmoId;
 
     @Override
     public String getSistema() {
