@@ -2017,7 +2017,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	and pagamento is null\n"
                     + "	and not tipo_cadastro is null\n"
                     + " and cl.id is not null\n"
-                    //+ "	and plano_conta in (" + getPlanosContaStr() + ")\n"
+                    + "	and plano_conta in (" + getPlanosContaStr() + ")\n"
                     + "order by id";
             LOG.fine("SQL a ser executado:\n" + sql);
             try (ResultSet rst = stm.executeQuery(sql)) {

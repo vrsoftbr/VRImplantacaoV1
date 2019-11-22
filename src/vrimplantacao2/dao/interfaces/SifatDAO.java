@@ -868,7 +868,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "where ven.LOJA = " + idLojaCliente
                     + " and ven.EMISSAO >= '" + dataInicio + "' and ven.EMISSAO <= '" + dataTermino + "'\n"
                     + " AND coalesce(ven.VRTOTAL,0 ) > 0\n"
-                    + " AND COALESCE(ven.ECF, 0) > 0";
+                    + " AND coalesce(ven.SERIE, '') <> 'RC'";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
