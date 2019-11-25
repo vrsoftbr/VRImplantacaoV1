@@ -192,7 +192,7 @@ public class NATISistemasGUI extends VRInternalFrame {
                     importador.setLojaVR(idLojaVR);
                     
                    
-                    if (tabs.getSelectedIndex() == 1) {
+                    if (tabs.getSelectedIndex() == 0) {
                         if (chkFamiliaProduto.isSelected()) {
                             importador.importarFamiliaProduto();
                         }
@@ -386,7 +386,7 @@ public class NATISistemasGUI extends VRInternalFrame {
                             importador.importarConvenioTransacao();
                         }
                         
-                    } else if (tabs.getSelectedIndex() == 2) {
+                    } else if (tabs.getSelectedIndex() == 1) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
                         }
@@ -591,6 +591,11 @@ public class NATISistemasGUI extends VRInternalFrame {
 
         chkMercadologico.setText("Mercadologico");
         chkMercadologico.setEnabled(true);
+        chkMercadologico.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkMercadologicoActionPerformed(evt);
+            }
+        });
         vRPanel7.add(chkMercadologico);
 
         chkProdutos.setText("Produtos");
@@ -1313,6 +1318,10 @@ public class NATISistemasGUI extends VRInternalFrame {
     private void chkTemArquivoBalancaUnificacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkTemArquivoBalancaUnificacaoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkTemArquivoBalancaUnificacaoActionPerformed
+
+    private void chkMercadologicoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkMercadologicoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkMercadologicoActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;

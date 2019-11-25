@@ -191,6 +191,9 @@
                       <Connection code="true" type="code"/>
                     </Property>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkMercadologicoActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutos">
                   <Properties>

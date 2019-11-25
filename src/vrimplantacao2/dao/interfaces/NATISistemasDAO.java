@@ -82,7 +82,8 @@ public class NATISistemasDAO extends InterfaceDAO {
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-
+                    
+                    imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("importid"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
@@ -95,7 +96,7 @@ public class NATISistemasDAO extends InterfaceDAO {
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setCodMercadologico1(rst.getString("codMercadologico1"));
                     imp.setCodMercadologico2(rst.getString("codMercadologico2"));
-                    imp.setCodMercadologico3(rst.getString("codMercadologico3"));
+                    imp.setCodMercadologico3("1");
                     imp.setEstoque(rst.getDouble("estoque"));
                     imp.setMargem(rst.getDouble("margem"));
                     imp.setCustoSemImposto(rst.getDouble("custosemimposto"));
@@ -197,18 +198,19 @@ public class NATISistemasDAO extends InterfaceDAO {
                     + "		on c.idCategoria = s.idCategoria\n"
                     + "order by 1,3"
             )) {
-                while (rst.next());{
-                MercadologicoIMP imp = new MercadologicoIMP();
-            
-                imp.setImportSistema(getSistema());
-                imp.setImportLoja(getLojaOrigem());
-                
-                imp.setMerc1ID(rst.getString("Merc1ID"));
-                imp.setMerc1Descricao(rst.getString("Merc1Descricao"));
-                imp.setMerc2ID(rst.getString("Merc2ID"));
-                imp.setMerc2Descricao(rst.getString("Merc2Descricao"));
-                
-                result.add(imp);
+                while (rst.next()) {
+                    MercadologicoIMP imp = new MercadologicoIMP();
+                    
+                    imp.setImportSistema(getSistema());
+                    imp.setImportLoja(getLojaOrigem());
+                    
+                    imp.setMerc1ID(rst.getString("Merc1ID"));
+                    imp.setMerc1Descricao(rst.getString("Merc1Descricao"));
+                    imp.setMerc2ID(rst.getString("Merc2ID"));
+                    imp.setMerc2Descricao(rst.getString("Merc2Descricao"));
+                    imp.setMerc3ID("1");
+                    imp.setMerc3Descricao(rst.getString("Merc2Descricao"));
+                    result.add(imp);
                 }
             }
         }
