@@ -146,8 +146,8 @@ public class GetWayGUI extends VRInternalFrame {
 
         edtDtVendaIni.setFormats(new SimpleDateFormat("dd/MM/yyyy"));
         edtDtVendaFim.setFormats(new SimpleDateFormat("dd/MM/yyyy"));
-        txtDataFimOferta.setFormats(new SimpleDateFormat("dd/MM/yyyy"));        
-        
+        txtDataFimOferta.setFormats(new SimpleDateFormat("dd/MM/yyyy"));
+
         centralizarForm();
         this.setMaximum(false);
     }
@@ -244,7 +244,7 @@ public class GetWayGUI extends VRInternalFrame {
 
                     idLojaVR = ((ItemComboVO) cmbLojaVR.getSelectedItem()).id;
                     idLojaCliente = ((Estabelecimento) cmbLojaOrigem.getSelectedItem()).cnpj;
-                    
+
                     getWayDAO.v_tipoDocumento = ((ItemComboVO) cmbTipoDocRotativo.getSelectedItem()).id;
                     getWayDAO.v_tipoDocumentoCheque = ((ItemComboVO) cmbTipoDocCheque.getSelectedItem()).id;
                     getWayDAO.v_usar_arquivoBalanca = chkTemArquivoBalanca.isSelected();
@@ -256,19 +256,19 @@ public class GetWayGUI extends VRInternalFrame {
                     getWayDAO.setUtilizarIdIcmsNaEntrada(chkUtilizarIdIcmsNaEntrada.isSelected());
                     getWayDAO.apenasProdutoAtivo = chkProdutoAtivo.isSelected();
                     getWayDAO.utilizaMetodoAjustaAliquota = chkMetodoAliquota.isSelected();
-                    
-                     if (!"".equals(txtLojaMesmoID.getText()) && !txtLojaMesmoID.getText().isEmpty()) {
+
+                    if (!"".equals(txtLojaMesmoID.getText()) && !txtLojaMesmoID.getText().isEmpty()) {
                         lojaMesmoId = " - " + txtLojaMesmoID.getText();
                     } else {
                         lojaMesmoId = "";
                     }
-                     
+
                     getWayDAO.v_lojaMesmoId = lojaMesmoId;
 
                     Importador importador = new Importador(getWayDAO);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
-                    
+
                     getWayDAO.setUtilizarEmbalagemDeCompra(chkUtilizarEmbalagemCompra.isSelected());
                     getWayDAO.setCopiarIcmsDebitoNaEntrada(chkCopiarIcmsDebitoNaEntrada.isSelected());
 
@@ -301,6 +301,9 @@ public class GetWayGUI extends VRInternalFrame {
                             }
                             if (chkT1Estoque.isSelected()) {
                                 opcoes.add(OpcaoProduto.ESTOQUE);
+                                if (chkSomarEstoque.isSelected()) {
+                                    opcoes.add(OpcaoProduto.ATUALIZAR_SOMAR_ESTOQUE);
+                                }
                             }
                             if (chkTrocaEstoque.isSelected()) {
                                 opcoes.add(OpcaoProduto.TROCA);
@@ -374,7 +377,7 @@ public class GetWayGUI extends VRInternalFrame {
                             if (chkMargem.isSelected()) {
                                 opcoes.add(OpcaoProduto.MARGEM);
                             }
-                            
+
                             if (chkUsaMargemLiquida.isSelected()) {
                                 opcoes.add(OpcaoProduto.MARGEM);
                             }
@@ -398,7 +401,7 @@ public class GetWayGUI extends VRInternalFrame {
                             importador.importarEANemBranco();
                         }
                         if (chkAssociado.isSelected()) {
-                            List<OpcaoAssociado> opcoes = new ArrayList<>();                            
+                            List<OpcaoAssociado> opcoes = new ArrayList<>();
                             if (chkInverterAssociado.isSelected()) {
                                 opcoes.add(OpcaoAssociado.IMP_INVERTER);
                             }
@@ -440,24 +443,24 @@ public class GetWayGUI extends VRInternalFrame {
                             importador.importarClientePreferencial(OpcaoCliente.DADOS, OpcaoCliente.VALOR_LIMITE,
                                     OpcaoCliente.SITUACAO_CADASTRO);
                         }
-                        
+
                         {
                             List<OpcaoCliente> opt = new ArrayList<>();
-                            
+
                             if (chkValorLimite.isSelected()) {
                                 opt.add(OpcaoCliente.VALOR_LIMITE);
                             }
-                            
+
                             if (!opt.isEmpty()) {
-                                importador.atualizarClientePreferencial(opt.toArray(new OpcaoCliente[] {}));
+                                importador.atualizarClientePreferencial(opt.toArray(new OpcaoCliente[]{}));
                             }
-                            
+
                         }
-                        
+
                         if (chkClienteEventual.isSelected()) {
                             importador.importarClienteEventual();
                         }
-                        
+
                         if (chkRotativo.isSelected()) {
                             importador.importarCreditoRotativo();
                         }
@@ -488,14 +491,13 @@ public class GetWayGUI extends VRInternalFrame {
                         }
                         if (chkPdvVendas.isSelected()) {
                             /*strVendaDataInicio = txtVendaDataInicio.getText();
-                            strVendaDataFim = txtVendaDataFim.getText();
+                             strVendaDataFim = txtVendaDataFim.getText();
                             
-                            vendaDataInicio = new java.sql.Date(fmt.parse(strVendaDataInicio).getTime());
-                            vendaDataFim = new java.sql.Date(fmt.parse(strVendaDataFim).getTime());*/
+                             vendaDataInicio = new java.sql.Date(fmt.parse(strVendaDataInicio).getTime());
+                             vendaDataFim = new java.sql.Date(fmt.parse(strVendaDataFim).getTime());*/
 
                             //getWayDAO.setDataInicioVenda(vendaDataInicio);
                             //getWayDAO.setDataTerminoVenda(vendaDataFim);
-                            
                             getWayDAO.setDataInicioVenda(edtDtVendaIni.getDate());
                             getWayDAO.setDataTerminoVenda(edtDtVendaFim.getDate());
                             importador.importarVendas(OpcaoVenda.IMPORTAR_POR_CODIGO_ANTERIOR);
@@ -517,9 +519,9 @@ public class GetWayGUI extends VRInternalFrame {
                             importador.unificarClienteEventual();
                         }
                     }
-                    
+
                     gravarParametros();
-                    
+
                     ProgressBar.dispose();
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
@@ -566,6 +568,7 @@ public class GetWayGUI extends VRInternalFrame {
         chkUtilizarEmbalagemCompra = new vrframework.bean.checkBox.VRCheckBox();
         chkCopiarIcmsDebitoNaEntrada = new vrframework.bean.checkBox.VRCheckBox();
         chkMetodoAliquota = new javax.swing.JCheckBox();
+        chkSomarEstoque = new javax.swing.JCheckBox();
         vRTabbedPane2 = new vrframework.bean.tabbedPane.VRTabbedPane();
         vRPanel7 = new vrframework.bean.panel.VRPanel();
         chkFamiliaProduto = new vrframework.bean.checkBox.VRCheckBox();
@@ -768,6 +771,8 @@ public class GetWayGUI extends VRInternalFrame {
 
         chkMetodoAliquota.setText("Utiliza Método Aliquota");
 
+        chkSomarEstoque.setText("Somar Estoque na Atualização");
+
         javax.swing.GroupLayout tabParametrosLayout = new javax.swing.GroupLayout(tabParametros);
         tabParametros.setLayout(tabParametrosLayout);
         tabParametrosLayout.setHorizontalGroup(
@@ -784,24 +789,25 @@ public class GetWayGUI extends VRInternalFrame {
                                 .addComponent(chkAssociadoSomenteAtivos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(chkDesconsiderarSetorBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(tabParametrosLayout.createSequentialGroup()
                                 .addGroup(tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(chkManterBalanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(chkUsarMargemBruta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(chkUsarQtdCotacaoProdFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkCopiarIcmsDebitoNaEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(chkCopiarIcmsDebitoNaEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(tabParametrosLayout.createSequentialGroup()
+                                        .addComponent(jLabel3)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(txtDataFimOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                 .addGap(83, 83, 83)
                                 .addGroup(tabParametrosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(chkSomarEstoque)
                                     .addComponent(chkForcarUnidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(chkUtilizarIdIcmsNaEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(chkPesquisarKG, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(chkUtilizarEmbalagemCompra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(chkMetodoAliquota)))
-                            .addGroup(tabParametrosLayout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtDataFimOferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(chkMetodoAliquota))))
                         .addGap(0, 20, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -841,7 +847,9 @@ public class GetWayGUI extends VRInternalFrame {
                         .addComponent(btnMapaTrib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(13, 13, 13))
                     .addGroup(tabParametrosLayout.createSequentialGroup()
-                        .addGap(29, 29, 29)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(chkSomarEstoque)
+                        .addGap(3, 3, 3)
                         .addComponent(chkMetodoAliquota)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
@@ -1753,6 +1761,7 @@ public class GetWayGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkReceberVerba;
     private vrframework.bean.checkBox.VRCheckBox chkRotativo;
     private vrframework.bean.checkBox.VRCheckBox chkSituacaoCadastroForn;
+    private javax.swing.JCheckBox chkSomarEstoque;
     private vrframework.bean.checkBox.VRCheckBox chkT1AtivoInativo;
     private vrframework.bean.checkBox.VRCheckBox chkT1CEST;
     private vrframework.bean.checkBox.VRCheckBox chkT1Custo;
