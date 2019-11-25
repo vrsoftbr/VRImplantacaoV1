@@ -161,6 +161,7 @@ import vrimplantacao2.gui.interfaces.MarketGUI;
 import vrimplantacao2.gui.interfaces.MobilityGUI;
 import vrimplantacao2.gui.interfaces.MrsGUI;
 import vrimplantacao2.gui.interfaces.MultiPdvGUI;
+import vrimplantacao2.gui.interfaces.NATISistemasGUI;
 import vrimplantacao2.gui.interfaces.OpenGUI;
 import vrimplantacao2.gui.interfaces.OrionGUI;
 import vrimplantacao2.gui.interfaces.OrionTechGUI;
@@ -642,6 +643,7 @@ public final class MenuGUI extends VRMdiFrame {
         mnuiSysERP = new javax.swing.JMenuItem();
         mnuAtma = new javax.swing.JMenuItem();
         mnuControlX = new javax.swing.JMenuItem();
+        mnuNATISistemas = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuItemRMS = new javax.swing.JMenuItem();
         jMenuItemGCF = new javax.swing.JMenuItem();
@@ -1728,6 +1730,14 @@ public final class MenuGUI extends VRMdiFrame {
             }
         });
         mnuSqlServer2.add(mnuControlX);
+
+        mnuNATISistemas.setText("NATISistemas");
+        mnuNATISistemas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuNATISistemasActionPerformed(evt);
+            }
+        });
+        mnuSqlServer2.add(mnuNATISistemas);
 
         mnuDatabase.add(mnuSqlServer2);
 
@@ -4231,6 +4241,10 @@ public final class MenuGUI extends VRMdiFrame {
         SophyxVendaGUI.exibir(this);
     }//GEN-LAST:event_mnuSQLiteSophyxActionPerformed
 
+    private void mnuNATISistemasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuNATISistemasActionPerformed
+        NATISistemasGUI.exibir(this);
+    }//GEN-LAST:event_mnuNATISistemasActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSair;
     private javax.swing.JMenu jMenu10;
@@ -4412,6 +4426,7 @@ public final class MenuGUI extends VRMdiFrame {
     private javax.swing.JMenuItem mnuMrs;
     private javax.swing.JMenuItem mnuMrs1;
     private javax.swing.JMenuItem mnuMrs2;
+    private javax.swing.JMenuItem mnuNATISistemas;
     private javax.swing.JMenuItem mnuOpen;
     private javax.swing.JMenu mnuOrion;
     private javax.swing.JMenuItem mnuOryon;
