@@ -1,10 +1,11 @@
 package vrimplantacao2.dao.interfaces;
 
+import com.microsoft.sqlserver.jdbc.SQLServerDriver;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import vrimplantacao.classe.ConexaoMySQL;
+import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
@@ -25,7 +26,7 @@ public class NATISistemasDAO extends InterfaceDAO {
     public List<Estabelecimento> getLojas() throws Exception {
         List<Estabelecimento> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select idCliente cod_empresa, concat(idCliente,' - ',stcliente) descricao from Master"
             )) {
@@ -40,7 +41,7 @@ public class NATISistemasDAO extends InterfaceDAO {
     @Override
     public List<ProdutoIMP> getProdutos() throws Exception {
         List<ProdutoIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "	p.idProduto as importId,\n"
@@ -119,7 +120,7 @@ public class NATISistemasDAO extends InterfaceDAO {
     @Override
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery("select\n"
                     + "	c.idcliente as id,\n"
                     + "	c.stcpf_cnpj as cnpj,\n"
@@ -149,6 +150,7 @@ public class NATISistemasDAO extends InterfaceDAO {
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
+                    
                     imp.setId(rst.getString("id"));
                     imp.setCnpj(rst.getString("cnpj"));
                     imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
@@ -179,10 +181,11 @@ public class NATISistemasDAO extends InterfaceDAO {
         return result;
     }
 
-    public List<MercadologicoIMP> getMercadologico() throws Exception {
+    @Override
+    public List<MercadologicoIMP> getMercadologicos() throws Exception {
         List<MercadologicoIMP> result = new ArrayList<>();
 
-        try (Statement stm = ConexaoMySQL.getConexao().createStatement()) {
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
                     + "	c.idCategoria as Merc1ID,\n"
@@ -194,11 +197,11 @@ public class NATISistemasDAO extends InterfaceDAO {
                     + "		on c.idCategoria = s.idCategoria\n"
                     + "order by 1,3"
             )) {
-                while (rst.next());
+                while (rst.next());{
                 MercadologicoIMP imp = new MercadologicoIMP();
             
-                //imp.setImportSistema(getSistema());
-                //imp.setImportLoja(getLojaOrigem());
+                imp.setImportSistema(getSistema());
+                imp.setImportLoja(getLojaOrigem());
                 
                 imp.setMerc1ID(rst.getString("Merc1ID"));
                 imp.setMerc1Descricao(rst.getString("Merc1Descricao"));
@@ -206,9 +209,9 @@ public class NATISistemasDAO extends InterfaceDAO {
                 imp.setMerc2Descricao(rst.getString("Merc2Descricao"));
                 
                 result.add(imp);
+                }
             }
-
         }
-        return result;    
+        return result;
     }
 }
