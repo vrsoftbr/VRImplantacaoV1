@@ -142,226 +142,6 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
-        <Container class="javax.swing.JPanel" name="tabParametros">
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Par&#xe2;metros">
-                <Property name="tabTitle" type="java.lang.String" value="Par&#xe2;metros"/>
-              </JTabbedPaneConstraints>
-            </Constraint>
-          </Constraints>
-
-          <Layout>
-            <DimensionLayout dim="0">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="vRImportaArquivBalancaPanel1" alignment="0" max="32767" attributes="0"/>
-                          <Group type="102" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Component id="chkInverterAssociado" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="chkAssociadoSomenteAtivos" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="chkDesconsiderarSetorBalanca" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Component id="btnMapaTrib" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="chkManterBalanca" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkUsarMargemBruta" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkUsarQtdCotacaoProdFornecedor" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkCopiarIcmsDebitoNaEntrada" min="-2" max="-2" attributes="0"/>
-                                          <Group type="102" alignment="0" attributes="0">
-                                              <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
-                                              <EmptySpace max="-2" attributes="0"/>
-                                              <Component id="txtDataFimOferta" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                      </Group>
-                                      <EmptySpace min="-2" pref="83" max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="chkSomarEstoque" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkForcarUnidade" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkUtilizarIdIcmsNaEntrada" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkPesquisarKG" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkUtilizarEmbalagemCompra" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="chkMetodoAliquota" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                  </Group>
-                              </Group>
-                              <EmptySpace min="0" pref="20" max="32767" attributes="0"/>
-                          </Group>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                  </Group>
-              </Group>
-            </DimensionLayout>
-            <DimensionLayout dim="1">
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="vRImportaArquivBalancaPanel1" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="chkInverterAssociado" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkAssociadoSomenteAtivos" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkDesconsiderarSetorBalanca" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="chkManterBalanca" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkPesquisarKG" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="chkUsarMargemBruta" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkUtilizarIdIcmsNaEntrada" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="chkUsarQtdCotacaoProdFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkForcarUnidade" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="chkUtilizarEmbalagemCompra" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="chkCopiarIcmsDebitoNaEntrada" alignment="3" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" attributes="0">
-                              <EmptySpace pref="17" max="32767" attributes="0"/>
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="txtDataFimOferta" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="btnMapaTrib" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="13" max="-2" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="chkSomarEstoque" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
-                              <Component id="chkMetodoAliquota" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="32767" attributes="0"/>
-                          </Group>
-                      </Group>
-                  </Group>
-              </Group>
-            </DimensionLayout>
-          </Layout>
-          <SubComponents>
-            <Component class="vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel" name="vRImportaArquivBalancaPanel1">
-              <Properties>
-                <Property name="sistema" type="java.lang.String" value="GetWay"/>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkInverterAssociado">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Inverter Associado"/>
-                <Property name="toolTipText" type="java.lang.String" value="Selecione essa op&#xe7;&#xe3;o para que ao importar o associado, seja gerado tamb&#xe9;m o associado para pre&#xe7;o e custo."/>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkAssociadoSomenteAtivos">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Somente produtos ativos (Associado)"/>
-                <Property name="toolTipText" type="java.lang.String" value="Selecione essa op&#xe7;&#xe3;o para que ao importar o associado, seja gerado tamb&#xe9;m o associado para pre&#xe7;o e custo."/>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkManterBalanca">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Manter c&#xf3;digo PLU dos produtos de balan&#xe7;a"/>
-                <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="true" type="code"/>
-                </Property>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUsarMargemBruta">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Usar Margem Bruta"/>
-                <Property name="toolTipText" type="java.lang.String" value="Marque est&#xe1; op&#xe7;&#xe3;o quando o cliente utilizar a margem bruta do GetWay para calcular seus pre&#xe7;os"/>
-                <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="true" type="code"/>
-                </Property>
-              </Properties>
-            </Component>
-            <Component class="org.jdesktop.swingx.JXDatePicker" name="txtDataFimOferta">
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUsarQtdCotacaoProdFornecedor">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Usar qtd. de cota&#xe7;&#xe3;o no produto fornecedor"/>
-                <Property name="toolTipText" type="java.lang.String" value="Marque est&#xe1; op&#xe7;&#xe3;o quando o cliente utilizar a margem bruta do GetWay para calcular seus pre&#xe7;os"/>
-                <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="true" type="code"/>
-                </Property>
-              </Properties>
-            </Component>
-            <Component class="vrimplantacao2.gui.component.mapatributacao.mapatributacaobutton.MapaTributacaoButton" name="btnMapaTrib">
-              <Properties>
-                <Property name="enabled" type="boolean" value="false"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMapaTribActionPerformed"/>
-              </Events>
-            </Component>
-            <Component class="javax.swing.JLabel" name="jLabel3">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Importar ofertas apartir da data"/>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkDesconsiderarSetorBalanca">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Desconsiderar setor de balan&#xe7;a"/>
-                <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;&lt;p&gt;Selecione essa op&#xe7;&#xe3;o caso o cliente n&#xe3;o utilize setor de balan&#xe7;a para determinar quais s&#xe3;o os produtos pes&#xe1;veis.&lt;/p&gt;&#xa;&lt;p&gt;Caso o cliente n&#xe3;o envie carga para a balan&#xe7;a, pode ser que o campo setor de balan&#xe7;a n&#xe3;o esteja preenchido,&lt;br&gt;neste caso &#xe9; necess&#xe1;rio utilizar o tipo de embalagem para determinar o que &#xe9; de KG ou UN.&lt;br&gt;&#xa;&lt;b&gt;OBS: Nesta op&#xe7;&#xe3;o, n&#xe3;o ser&#xe1; poss&#xed;vel importar os pes&#xe1;veis unit&#xe1;rios.&lt;/b&gt; &#xa;&lt;/html&gt;"/>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPesquisarKG">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Pesquisar flag KG na descri&#xe7;&#xe3;o"/>
-                <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;&lt;p&gt;Selecione essa op&#xe7;&#xe3;o caso o cliente n&#xe3;o utilize setor de balan&#xe7;a para determinar quais s&#xe3;o os produtos pes&#xe1;veis.&lt;/p&gt;&#xa;&lt;p&gt;Caso o cliente n&#xe3;o envie carga para a balan&#xe7;a, pode ser que o campo setor de balan&#xe7;a n&#xe3;o esteja preenchido&lt;br&gt; &#xa;e nem o campo tipo de embalagem est&#xe1; correto, neste caso a rotina ir&#xe1; verificar se a palavra KG pode ser encontrado nos produtos&lt;br&gt;&#xa;&lt;b&gt;OBS: Nesta op&#xe7;&#xe3;o, n&#xe3;o ser&#xe1; poss&#xed;vel importar os pes&#xe1;veis unit&#xe1;rios.&lt;/b&gt; &#xa;&lt;/html&gt;"/>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUtilizarIdIcmsNaEntrada">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Utilizar ID Icms para ICMS Entrada"/>
-                <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;&lt;p&gt;Selecione essa op&#xe7;&#xe3;o caso o cliente n&#xe3;o utilize setor de balan&#xe7;a para determinar quais s&#xe3;o os produtos pes&#xe1;veis.&lt;/p&gt;&#xa;&lt;p&gt;Caso o cliente n&#xe3;o envie carga para a balan&#xe7;a, pode ser que o campo setor de balan&#xe7;a n&#xe3;o esteja preenchido&lt;br&gt; &#xa;e nem o campo tipo de embalagem est&#xe1; correto, neste caso a rotina ir&#xe1; verificar se a palavra KG pode ser encontrado nos produtos&lt;br&gt;&#xa;&lt;b&gt;OBS: Nesta op&#xe7;&#xe3;o, n&#xe3;o ser&#xe1; poss&#xed;vel importar os pes&#xe1;veis unit&#xe1;rios.&lt;/b&gt; &#xa;&lt;/html&gt;"/>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkForcarUnidade">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="For&#xe7;ar Unidade"/>
-                <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;&lt;p&gt;Selecione essa op&#xe7;&#xe3;o caso o cliente n&#xe3;o utilize setor de balan&#xe7;a para determinar quais s&#xe3;o os produtos pes&#xe1;veis.&lt;/p&gt;&#xa;&lt;p&gt;Caso o cliente n&#xe3;o envie carga para a balan&#xe7;a, pode ser que o campo setor de balan&#xe7;a n&#xe3;o esteja preenchido&lt;br&gt; &#xa;e nem o campo tipo de embalagem est&#xe1; correto, neste caso a rotina ir&#xe1; verificar se a palavra KG pode ser encontrado nos produtos&lt;br&gt;&#xa;&lt;b&gt;OBS: Nesta op&#xe7;&#xe3;o, n&#xe3;o ser&#xe1; poss&#xed;vel importar os pes&#xe1;veis unit&#xe1;rios.&lt;/b&gt; &#xa;&lt;/html&gt;"/>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkUtilizarEmbalagemCompra">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Utilizar embalagem de compra"/>
-                <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;&lt;p&gt;Selecione essa op&#xe7;&#xe3;o caso o cliente n&#xe3;o utilize setor de balan&#xe7;a para determinar quais s&#xe3;o os produtos pes&#xe1;veis.&lt;/p&gt;&#xa;&lt;p&gt;Caso o cliente n&#xe3;o envie carga para a balan&#xe7;a, pode ser que o campo setor de balan&#xe7;a n&#xe3;o esteja preenchido&lt;br&gt; &#xa;e nem o campo tipo de embalagem est&#xe1; correto, neste caso a rotina ir&#xe1; verificar se a palavra KG pode ser encontrado nos produtos&lt;br&gt;&#xa;&lt;b&gt;OBS: Nesta op&#xe7;&#xe3;o, n&#xe3;o ser&#xe1; poss&#xed;vel importar os pes&#xe1;veis unit&#xe1;rios.&lt;/b&gt; &#xa;&lt;/html&gt;"/>
-              </Properties>
-            </Component>
-            <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkCopiarIcmsDebitoNaEntrada">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Copiar ICMS d&#xe9;bito na entrada"/>
-                <Property name="toolTipText" type="java.lang.String" value="Marque est&#xe1; op&#xe7;&#xe3;o quando o cliente utilizar a margem bruta do GetWay para calcular seus pre&#xe7;os"/>
-                <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="true" type="code"/>
-                </Property>
-              </Properties>
-            </Component>
-            <Component class="javax.swing.JCheckBox" name="chkMetodoAliquota">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Utiliza M&#xe9;todo Aliquota"/>
-              </Properties>
-            </Component>
-            <Component class="javax.swing.JCheckBox" name="chkSomarEstoque">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Somar Estoque na Atualiza&#xe7;&#xe3;o"/>
-              </Properties>
-            </Component>
-          </SubComponents>
-        </Container>
         <Container class="vrframework.bean.tabbedPane.VRTabbedPane" name="vRTabbedPane2">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
@@ -646,17 +426,6 @@
                       <Group type="102" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="cmbTipoDocRotativo" alignment="0" min="-2" pref="159" max="-2" attributes="0"/>
-                                      <Component id="vRLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="vRLabel2" min="-2" max="-2" attributes="0"/>
-                                      <Component id="cmbTipoDocCheque" min="-2" pref="159" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
                               <Component id="chkClienteEventual" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="chkPagamentoRotativo" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
@@ -679,7 +448,7 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace pref="106" max="32767" attributes="0"/>
+                          <EmptySpace pref="110" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -707,17 +476,7 @@
                           <Component id="chkClienteEventual" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkPagamentoRotativo" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="vRLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="vRLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="cmbTipoDocRotativo" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="cmbTipoDocCheque" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace pref="69" max="32767" attributes="0"/>
+                          <EmptySpace pref="152" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -782,20 +541,6 @@
                     <Property name="text" type="java.lang.String" value="Valor Limite"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JComboBox" name="cmbTipoDocRotativo">
-                </Component>
-                <Component class="javax.swing.JComboBox" name="cmbTipoDocCheque">
-                </Component>
-                <Component class="vrframework.bean.label.VRLabel" name="vRLabel1">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Tipo Documento Rotativo"/>
-                  </Properties>
-                </Component>
-                <Component class="vrframework.bean.label.VRLabel" name="vRLabel2">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Tipo Documento Cheque"/>
-                  </Properties>
-                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPermiteRotativoCheque">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Permite Rotativo/Cheque"/>
@@ -845,7 +590,6 @@
                                   </Group>
                                   <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="chkContasPagar" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkProdutoFornecedor" min="-2" max="-2" attributes="0"/>
                                       <Component id="chkComplemento" min="-2" max="-2" attributes="0"/>
                                   </Group>
@@ -864,10 +608,7 @@
                               <Component id="chkProdutoFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="chkFContatos" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="chkContasPagar" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
+                          <Component id="chkFContatos" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="chkFPrazoFornecedor" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -877,7 +618,7 @@
                           <Component id="chkFCondicaoPagamento" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="chkSituacaoCadastroForn" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="128" max="32767" attributes="0"/>
+                          <EmptySpace pref="152" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -937,11 +678,6 @@
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkFCondicaoPagamentoActionPerformed"/>
                   </Events>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkContasPagar">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Contas a Pagar"/>
-                  </Properties>
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkSituacaoCadastroForn">
                   <Properties>
@@ -1028,123 +764,6 @@
                 </Component>
               </SubComponents>
             </Container>
-            <Container class="vrframework.bean.panel.VRPanel" name="tabVendas">
-              <Properties>
-                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                  <Border info="null"/>
-                </Property>
-              </Properties>
-              <Constraints>
-                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-                  <JTabbedPaneConstraints tabName="Vendas">
-                    <Property name="tabTitle" type="java.lang.String" value="Vendas"/>
-                  </JTabbedPaneConstraints>
-                </Constraint>
-              </Constraints>
-
-              <Layout>
-                <DimensionLayout dim="0">
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="vRPanel1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="241" max="32767" attributes="0"/>
-                      </Group>
-                  </Group>
-                </DimensionLayout>
-                <DimensionLayout dim="1">
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="vRPanel1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="168" max="32767" attributes="0"/>
-                      </Group>
-                  </Group>
-                </DimensionLayout>
-              </Layout>
-              <SubComponents>
-                <Container class="vrframework.bean.panel.VRPanel" name="vRPanel1">
-                  <Properties>
-                    <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                      <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                        <TitledBorder title="Importar Vendas (PDV)"/>
-                      </Border>
-                    </Property>
-                  </Properties>
-
-                  <Layout>
-                    <DimensionLayout dim="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="1" attributes="0">
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="chkPdvVendas" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="pnlPdvVendaDatas" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                      </Group>
-                    </DimensionLayout>
-                    <DimensionLayout dim="1">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="chkPdvVendas" min="-2" max="-2" attributes="0"/>
-                                  <Component id="pnlPdvVendaDatas" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="32767" attributes="0"/>
-                          </Group>
-                      </Group>
-                    </DimensionLayout>
-                  </Layout>
-                  <SubComponents>
-                    <Container class="vrframework.bean.panel.VRPanel" name="pnlPdvVendaDatas">
-
-                      <Layout>
-                        <DimensionLayout dim="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="edtDtVendaIni" min="-2" pref="123" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="edtDtVendaFim" min="-2" pref="123" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
-                        </DimensionLayout>
-                        <DimensionLayout dim="1">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="edtDtVendaIni" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="edtDtVendaFim" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
-                        </DimensionLayout>
-                      </Layout>
-                      <SubComponents>
-                        <Component class="org.jdesktop.swingx.JXDatePicker" name="edtDtVendaIni">
-                          <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="edtDtVendaIniActionPerformed"/>
-                          </Events>
-                        </Component>
-                        <Component class="org.jdesktop.swingx.JXDatePicker" name="edtDtVendaFim">
-                          <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="edtDtVendaFimActionPerformed"/>
-                          </Events>
-                        </Component>
-                      </SubComponents>
-                    </Container>
-                    <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkPdvVendas">
-                      <Properties>
-                        <Property name="enabled" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                          <Connection code="true" type="code"/>
-                        </Property>
-                      </Properties>
-                      <Events>
-                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkPdvVendasActionPerformed"/>
-                      </Events>
-                    </Component>
-                  </SubComponents>
-                </Container>
-              </SubComponents>
-            </Container>
           </SubComponents>
         </Container>
         <Container class="vrframework.bean.panel.VRPanel" name="vRPanel2">
@@ -1227,6 +846,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Tem Arquivo Balan&#xe7;a"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkTemArquivoBalancaUnificacaoActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

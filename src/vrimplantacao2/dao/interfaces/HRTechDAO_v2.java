@@ -148,7 +148,7 @@ public class HRTechDAO_v2 extends InterfaceDAO implements MapaTributoProvider {
                     + "			gruc03seto != '' and gruc03grup != '' and gruc03subg != '' and gruc03fami != '' and gruc03subf = ''\n"
                     + "	) m4 on\n"
                     + "		m3.codmerc1 = m4.codmerc1 and m3.codmerc2 = m4.codmerc2 and m3.codmerc3 = m4.codmerc3\n"
-                    + "where m1.codmerc1 >= 200 \n"
+                    //+ "where m1.codmerc1 >= 200 \n"
                     + "	order by 1,3,5,7")) {
                 while (rs.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
