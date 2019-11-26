@@ -983,7 +983,7 @@ public class AtmaDAO extends InterfaceDAO implements MapaTributoProvider {
     private static class VendaIterator implements Iterator<VendaIMP> {
 
         private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
-        private Statement stm = ConexaoMySQL.getConexao().createStatement();
+        private Statement stm = ConexaoSqlServer.getConexao().createStatement();
         private ResultSet rst;
         private String sql;
         private VendaIMP next;
@@ -1081,7 +1081,7 @@ public class AtmaDAO extends InterfaceDAO implements MapaTributoProvider {
 
         private final static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
-        private Statement stm = ConexaoMySQL.getConexao().createStatement();
+        private Statement stm = ConexaoSqlServer.getConexao().createStatement();
         private ResultSet rst;
         private String sql;
         private VendaItemIMP next;
