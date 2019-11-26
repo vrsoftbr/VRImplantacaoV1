@@ -30,7 +30,6 @@ import vrimplantacao2.utils.multimap.MultiMap;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemAnteriorVO;
 import vrimplantacao2.vo.cadastro.cliente.rotativo.CreditoRotativoItemVO;
 import vrimplantacao2.vo.cadastro.receita.OpcaoReceitaBalanca;
-import vrimplantacao2.vo.enums.OpcaoFiscal;
 import vrimplantacao2.vo.enums.TipoContato;
 import vrimplantacao2.vo.importacao.ClienteIMP;
 import vrimplantacao2.vo.importacao.ContaPagarIMP;
@@ -40,7 +39,6 @@ import vrimplantacao2.vo.importacao.FamiliaProdutoIMP;
 import vrimplantacao2.vo.importacao.FornecedorIMP;
 import vrimplantacao2.vo.importacao.MapaTributoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
-import vrimplantacao2.vo.importacao.PautaFiscalIMP;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.ReceitaBalancaIMP;
 import vrimplantacao2.vo.importacao.VendaIMP;
@@ -1058,7 +1056,8 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "	ite.ECF_ST as tribproduto,\n"
                     + "	pro.UNIDADE as tipoembalagem,\n"
                     + "	ite.CANCELADO as cancelado,\n"
-                    + "	ven.EMISSAO datavenda\n"
+                    + "	ven.EMISSAO datavenda,\n"
+                    + " ite.VR_DESCONTO as valordesconto\n"
                     + "from CF02 ite\n"
                     + "inner join CE01 pro on pro.ID_PRODUTO = ite.ID_PRODUTO\n"
                     + "inner join CF01 ven on ven.NUMERO = ite.NUMERO \n"
@@ -1109,6 +1108,7 @@ public class SifatDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setProduto(rst.getString("idproduto"));
                         next.setQuantidade(rst.getDouble("qtdproduto"));
                         next.setTotalBruto(rst.getDouble("valortotal"));
+                        next.setValorDesconto(rst.getDouble("valordesconto"));
 
                         boolean cancelado = false;
 
