@@ -9,7 +9,7 @@ import vrframework.bean.mdiFrame.VRMdiFrame;
 import vrframework.classe.ProgressBar;
 import vrframework.classe.Util;
 import vrframework.remote.ItemComboVO;
-import vrimplantacao.classe.ConexaoMySQL;
+import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao.dao.cadastro.LojaDAO;
 import vrimplantacao.vo.loja.LojaVO;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
@@ -214,7 +214,7 @@ public class ControlXGUI extends VRInternalFrame implements ConexaoEvent {
                     Util.exibirMensagem("Importação " + SISTEMA + " realizada com sucesso!", getTitle());
                 } catch (Exception ex) {
                     try {
-                        ConexaoMySQL.getConexao().close();
+                        ConexaoSqlServer.getConexao().close();
                     } catch (Exception ex1) {
                         Exceptions.printStackTrace(ex1);
                     }
