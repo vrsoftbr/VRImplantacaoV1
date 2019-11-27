@@ -1485,7 +1485,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "	nfe.serie,\n"
                         + "	nfe.numero_nota_fiscal as numeronota,\n"
                         + "	nfe.data_hora_emissao as dataemissao,\n"
-                        + " to_date(er.data_hora_entrada) as dataentrada,"
+                        + "     to_date(er.data_hora_entrada) as dataentrada,"
                         + "	nfe.valor_total_ipi as valoripi,\n"
                         + "	nfe.valor_frete as valorfrete,\n"
                         + "	nfe.valor_outras_despesas as valoroutrasdespesas,\n"
@@ -1512,14 +1512,32 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                     while (rs.next()) {
 
                         NotaFiscalIMP imp = new NotaFiscalIMP();
-                        imp.setId(rs.getString("id"));
+                        imp.setId(
+                                rs.getString("id")
+                                + rs.getString("iddestinatario")
+                                + rs.getString("numeronota")
+                                + rs.getString("dataentrada")
+                        );
                         imp.setOperacao(NotaOperacao.ENTRADA);
                         imp.setIdDestinatario(rs.getString("iddestinatario"));
                         imp.setModelo(rs.getString("modelo"));
                         imp.setSerie(rs.getString("serie"));
                         imp.setNumeroNota(rs.getInt("numeronota"));
-                        imp.setDataEmissao(rs.getDate("dataentrada"));
-                        imp.setDataEntradaSaida(rs.getDate("dataentrada"));
+                        
+                        if ((rs.getString("dataemissao") != null)
+                                && (!rs.getString("dataemissao").trim().isEmpty())) {
+                            imp.setDataEmissao(rs.getDate("dataemissao"));
+                        } else {
+                            imp.setDataEmissao(rs.getDate("dataentrada"));
+                        }
+
+                        if ((rs.getString("dataentrada") != null)
+                                && (!rs.getString("dataentrada").trim().isEmpty())) {
+                            imp.setDataEntradaSaida(rs.getDate("dataentrada"));
+                        } else {
+                            imp.setDataEntradaSaida(rs.getDate("dataemissao"));
+                        }
+                                                
                         imp.setValorIpi(rs.getDouble("valoripi"));
                         imp.setValorFrete(rs.getDouble("valorfrete"));
                         imp.setValorOutrasDespesas(rs.getDouble("valoroutrasdespesas"));
@@ -1535,7 +1553,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
 
                         getNotasItem(
                                 imp,
-                                imp.getId(),
+                                rs.getString("id"),
+                                String.valueOf(imp.getNumeroNota()),
                                 imp.getIdDestinatario()
                         );
 
@@ -1589,7 +1608,14 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                                     || (rs.getString("iddestinatario").startsWith("F"))) {
 
                                 NotaFiscalIMP imp = new NotaFiscalIMP();
-                                imp.setId(rs.getString("id"));
+                                
+                                imp.setId(
+                                        rs.getString("id")
+                                        + rs.getString("iddestinatario")
+                                        + rs.getString("numero_documento")
+                                        + rs.getString("data_saida")
+                                );
+
                                 imp.setOperacao(NotaOperacao.SAIDA);
                                 imp.setIdDestinatario(Utils.formataNumero(rs.getString("iddestinatario")));
                                 imp.setTipoDestinatario(rs.getString("iddestinatario").startsWith("C") ? TipoDestinatario.CLIENTE_EVENTUAL : TipoDestinatario.FORNECEDOR);
@@ -1612,7 +1638,8 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
 
                                 getNotasItem(
                                         imp,
-                                        imp.getId(),
+                                        rs.getString("id"),
+                                        rs.getString("numero_documento"),
                                         rs.getString("iddestinatario")
                                 );
 
@@ -1626,7 +1653,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
         return result;
     }
 
-    private void getNotasItem(NotaFiscalIMP imp, String idNota, String partic) throws Exception {
+    private void getNotasItem(NotaFiscalIMP imp, String idNota, String numeroNota, String partic) throws Exception {
         
         if (i_notaEntrada) {
             try (Statement stm = ConexaoOracle.createStatement()) {
@@ -1666,6 +1693,7 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                         + "and "
                         + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
                         + "and c.id_entrada_recebimento = '" + idNota + "'\n"
+                        + "and c.numero_nota_fiscal = '" + numeroNota + "'\n"
                         + "and er.id_participante = " + partic + "\n"
                         + "and er.ID_EMPRESA = " + getLojaOrigem() + "\n"
                         + "order by numero_nf"
@@ -1751,9 +1779,9 @@ public class AriusDAO extends InterfaceDAO implements MapaTributoProvider {
                         + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataInicio)) + " "
                         + "and "
                         + SQLUtils.stringSQL(DATE_FORMAT.format(notasDataTermino)) + "\n"
-
                         + "and ite.id_c100 = " + idNota + "\n"
-                        + "and nfe.cod_part = '" + partic + "'"
+                        + "and nfe.cod_part = '" + partic + "'\n"
+                        + "and nfe.num_doc = '" + numeroNota + "'"
                 )) {
                     while (rs.next()) {
                         NotaFiscalItemIMP item = imp.addItem();

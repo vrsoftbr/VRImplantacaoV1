@@ -308,7 +308,7 @@ public class NotaFiscalRepository {
             throw new Exception("Fornecedor não encontrado " + imp.getIdDestinatario());
         }
         n.setIdFornecedor(fornecedor);
-        n.setDataEntrada(imp.getDataEmissao());
+        n.setDataEntrada(imp.getDataEntradaSaida());
         n.setIdTipoEntrada(this.tipoNotaEntrada);
         n.setDataEmissao(imp.getDataEmissao());
         n.setDataHoraLancamento(getTimestamp(imp.getDataHoraAlteracao()));
