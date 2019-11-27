@@ -28,7 +28,7 @@ public class NATISistemasDAO extends InterfaceDAO {
 
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
-                    "select idCliente cod_empresa, concat(idCliente,' - ',stcliente) descricao from Master"
+                    "select idCliente cod_empresa, stcliente descricao from Master"
             )) {
                 while (rst.next()) {
                     result.add(new Estabelecimento(rst.getString("cod_empresa"), rst.getString("descricao")));
@@ -69,14 +69,14 @@ public class NATISistemasDAO extends InterfaceDAO {
                     + "	ali.aliquotaicms as icmsAliqEntrada,\n"
                     + "	ali.csticms as icmsCstSaida,\n"
                     + "	ali.aliquotaicms as icmsAliqSaida\n"
-                    + "from nati2.dbo.prd_produtos p\n"
-                    + "	left join nati2.dbo.prd_Codigos ean\n"
+                    + "from dbo.prd_produtos p\n"
+                    + "	left join dbo.prd_Codigos ean\n"
                     + "		on ean.idproduto = p.idproduto\n"
-                    + "	left join nati2.dbo.prd_Medidas med\n"
+                    + "	left join dbo.prd_Medidas med\n"
                     + "		on p.idmedida = med.idmedida\n"
-                    + "	left join nati2.dbo.est_Saldos est\n"
+                    + "	left join dbo.est_Saldos est\n"
                     + "		on est.idproduto = p.idproduto\n"
-                    + "	left join  nati2.dbo.prd_aliquotas ali\n"
+                    + "	left join  dbo.prd_aliquotas ali\n"
                     + "		on p.idaliquota = ali.idaliquota\n"
                     + "order by 1"
             )) {
@@ -145,8 +145,8 @@ public class NATISistemasDAO extends InterfaceDAO {
                     + "	c.stobs as observacao,\n"
                     + "	c.stemail as email,\n"
                     + "	c.vrlimite as limiteCompra\n"
-                    + "from nati2.dbo.dlv_Clientes c\n"
-                    + "	left join nati2.dbo.dlv_CEPs e\n"
+                    + "from dbo.dlv_Clientes c\n"
+                    + "	left join dbo.dlv_CEPs e\n"
                     + "     on e.idcep = c.idcep"
             )) {
                 while (rst.next()) {
@@ -193,8 +193,8 @@ public class NATISistemasDAO extends InterfaceDAO {
                     + "	c.stCategoria as Merc1Descricao,\n"
                     + "	s.idSubCategoria as Merc2ID,\n"
                     + "	s.stSubCategoria as Merc2Descricao\n"
-                    + "from nati2.dbo.prd_Categorias c\n"
-                    + "	left join nati2.dbo.prd_SubCategorias s\n"
+                    + "from dbo.prd_Categorias c\n"
+                    + "	left join dbo.prd_SubCategorias s\n"
                     + "		on c.idCategoria = s.idCategoria\n"
                     + "order by 1,3"
             )) {

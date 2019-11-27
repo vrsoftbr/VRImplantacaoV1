@@ -386,7 +386,7 @@ public class NATISistemasGUI extends VRInternalFrame {
                             importador.importarConvenioTransacao();
                         }
                         
-                    } else if (tabs.getSelectedIndex() == 1) {
+                    } else if (tabs.getSelectedIndex() == 2) {
                         if (chkUnifProdutos.isSelected()) {
                             importador.unificarProdutos();
                         }
@@ -502,6 +502,7 @@ public class NATISistemasGUI extends VRInternalFrame {
         chkConvEmpresa = new vrframework.bean.checkBox.VRCheckBox();
         chkConvConveniado = new vrframework.bean.checkBox.VRCheckBox();
         chkConvRecebimento = new vrframework.bean.checkBox.VRCheckBox();
+        vRImportaArquivBalancaPanel1 = new vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel();
         vRPanel2 = new vrframework.bean.panel.VRPanel();
         chkUnifProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkUnifFornecedor = new vrframework.bean.checkBox.VRCheckBox();
@@ -773,6 +774,11 @@ public class NATISistemasGUI extends VRInternalFrame {
         chkValorLimite.setText("Valor Limite");
 
         chkPermiteRotativoCheque.setText("Permite Rotativo/Cheque");
+        chkPermiteRotativoCheque.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkPermiteRotativoChequeActionPerformed(evt);
+            }
+        });
 
         chkreceberDevolucao.setText("Devolução");
 
@@ -802,7 +808,7 @@ public class NATISistemasGUI extends VRInternalFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(chkPermiteRotativoCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(chkreceberDevolucao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(110, Short.MAX_VALUE))
+                .addContainerGap(337, Short.MAX_VALUE))
         );
         vRPanel9Layout.setVerticalGroup(
             vRPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -825,7 +831,7 @@ public class NATISistemasGUI extends VRInternalFrame {
                 .addComponent(chkClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkPagamentoRotativo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(152, Short.MAX_VALUE))
+                .addContainerGap(229, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Clientes", vRPanel9);
@@ -894,7 +900,7 @@ public class NATISistemasGUI extends VRInternalFrame {
                         .addGroup(vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chkProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(chkComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(279, Short.MAX_VALUE))
+                .addContainerGap(506, Short.MAX_VALUE))
         );
         vRPanel8Layout.setVerticalGroup(
             vRPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -913,10 +919,12 @@ public class NATISistemasGUI extends VRInternalFrame {
                 .addComponent(chkFCondicaoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkSituacaoCadastroForn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(152, Short.MAX_VALUE))
+                .addContainerGap(229, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Fornecedores", vRPanel8);
+
+        tabConvenio.setEnabled(false);
 
         chkConvEmpresa.setText("Empresas");
         chkConvEmpresa.setEnabled(true);
@@ -952,7 +960,7 @@ public class NATISistemasGUI extends VRInternalFrame {
                     .addComponent(chkConvEmpresa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkConvConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkConvRecebimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(397, Short.MAX_VALUE))
+                .addContainerGap(624, Short.MAX_VALUE))
         );
         tabConvenioLayout.setVerticalGroup(
             tabConvenioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -963,12 +971,15 @@ public class NATISistemasGUI extends VRInternalFrame {
                 .addComponent(chkConvConveniado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkConvRecebimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(167, Short.MAX_VALUE))
+                .addContainerGap(280, Short.MAX_VALUE))
         );
 
         vRTabbedPane2.addTab("Convênio", tabConvenio);
 
         tabs.addTab("Importação", vRTabbedPane2);
+
+        vRImportaArquivBalancaPanel1.setSistema("GetWay");
+        tabs.addTab("Balança", vRImportaArquivBalancaPanel1);
 
         chkUnifProdutos.setText("Produtos (Somente com EAN válido)");
 
@@ -1002,7 +1013,7 @@ public class NATISistemasGUI extends VRInternalFrame {
                     .addComponent(chkUnifProdutoFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(211, Short.MAX_VALUE))
+                .addContainerGap(438, Short.MAX_VALUE))
         );
         vRPanel2Layout.setVerticalGroup(
             vRPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1019,7 +1030,7 @@ public class NATISistemasGUI extends VRInternalFrame {
                 .addComponent(chkUnifClientePreferencial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chkUnifClienteEventual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(144, Short.MAX_VALUE))
+                .addContainerGap(257, Short.MAX_VALUE))
         );
 
         tabs.addTab("Unificação", vRPanel2);
@@ -1091,7 +1102,7 @@ public class NATISistemasGUI extends VRInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(vRLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtDatabase, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
+                .addComponent(txtDatabase, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(vRTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(2, 2, 2))
@@ -1183,7 +1194,7 @@ public class NATISistemasGUI extends VRInternalFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(vRPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(vRPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 558, Short.MAX_VALUE)
+                    .addComponent(vRPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, 785, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(vRToolBarPadrao3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
@@ -1323,6 +1334,10 @@ public class NATISistemasGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkMercadologicoActionPerformed
 
+    private void chkPermiteRotativoChequeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkPermiteRotativoChequeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkPermiteRotativoChequeActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
     private vrframework.bean.button.VRButton btnMigrar;
@@ -1410,6 +1425,7 @@ public class NATISistemasGUI extends VRInternalFrame {
     private vrframework.bean.textField.VRTextField txtPorta;
     private vrframework.bean.passwordField.VRPasswordField txtSenha;
     private vrframework.bean.textField.VRTextField txtUsuario;
+    private vrimplantacao.gui.componentes.importabalanca.VRImportaArquivBalancaPanel vRImportaArquivBalancaPanel1;
     private vrframework.bean.label.VRLabel vRLabel20;
     private vrframework.bean.label.VRLabel vRLabel21;
     private vrframework.bean.label.VRLabel vRLabel23;
