@@ -1009,7 +1009,8 @@ public class AtmaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " ven.CNC as cancelado\n"
                     + "from dbo.VND_CUPOM ven\n"
                     + "where ven.ID_EMP = " + idLojaCliente + "\n"
-                    + "and ven.DT_VENDA between '" + dataInicio + "' and '" + dataTermino + "'";
+                    + "and ven.DT_VENDA between '" + dataInicio + "' and '" + dataTermino + "'\n"
+                    + "and ven.CNC = 'NAO'";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -1052,11 +1053,6 @@ public class AtmaDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setData(rst.getDate("datavenda"));
                         next.setIdClientePreferencial(rst.getString("idcliente"));
                         next.setNomeCliente(rst.getString("nomecliente"));
-
-                        String horavenda = rst.getString("horavenda");
-                        if ((horavenda).contains("::")) {
-                            horavenda = "00:00:00";
-                        }
 
                         String horaInicio = timestampDate.format(rst.getDate("datavenda")) + " " + rst.getString("horainicio");
                         String horaTermino = timestampDate.format(rst.getDate("datavenda")) + " " + rst.getString("horafinal");
@@ -1170,7 +1166,13 @@ public class AtmaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + " pro.CNC as cancelado\n"
                     + "from dbo.VND_CUPOM_PROD pro\n"
                     + "where pro.ID_EMP = " + idLojaCliente + "\n"
-                    + "and pro.DT_VENDA between '" + dataInicio + "' and '" + dataTermino + "'";
+                    + "and pro.DT_VENDA between '" + dataInicio + "' and '" + dataTermino + "'\n"
+                    + "and pro.ID_CUPOM "
+                    + "in (select ID_CUPOM "
+                    + "      from VND_CUPOM "
+                    + "     where ID_EMP = " + idLojaCliente + "\n"
+                    + "       and DT_VENDA between '" + dataInicio + "' and '" + dataTermino + "'"
+                    + "       and CNC = 'NAO')";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -1200,8 +1202,8 @@ public class AtmaDAO extends InterfaceDAO implements MapaTributoProvider {
                 if (next == null) {
                     if (rst.next()) {
                         next = new VendaItemIMP();
-                        String idVenda = rst.getString("id");
-                        String id = rst.getString("idvenda");
+                        String id = rst.getString("id");
+                        String idVenda = rst.getString("idvenda");
 
                         next.setId(id);
                         next.setVenda(idVenda);
@@ -1212,6 +1214,7 @@ public class AtmaDAO extends InterfaceDAO implements MapaTributoProvider {
                         next.setValorAcrescimo(rst.getDouble("valoracrescimo"));
                         next.setCancelado("SIM".equals(rst.getString("cancelado").trim()));
                         next.setCodigoBarras(rst.getString("codigobarras"));
+                        next.setSequencia(rst.getInt("sequencia"));
 
                         String strTrib = "";
                         if ((rst.getString("codtrib") != null) &&
