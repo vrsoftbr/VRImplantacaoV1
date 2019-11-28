@@ -187,7 +187,7 @@ public class NATISistemasGUI extends VRInternalFrame {
                     }
                      
                     natiSistemasDAO.v_lojaMesmoId = lojaMesmoId;
-
+                    
                     Importador importador = new Importador(natiSistemasDAO);
                     importador.setLojaOrigem(idLojaCliente);
                     importador.setLojaVR(idLojaVR);
@@ -201,7 +201,7 @@ public class NATISistemasGUI extends VRInternalFrame {
                             importador.importarMercadologico();
                         }
                         if (chkProdutos.isSelected()) {
-                            importador.importarProduto(chkTemArquivoBalanca.isSelected());
+                            importador.importarProduto(chkManterBalanca.isSelected());
                         }
 
                         {
@@ -440,6 +440,7 @@ public class NATISistemasGUI extends VRInternalFrame {
         vRPanel7 = new vrframework.bean.panel.VRPanel();
         chkFamiliaProduto = new vrframework.bean.checkBox.VRCheckBox();
         chkMercadologico = new vrframework.bean.checkBox.VRCheckBox();
+        chkManterBalanca = new vrframework.bean.checkBox.VRCheckBox();
         chkProdutos = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Custo = new vrframework.bean.checkBox.VRCheckBox();
         chkT1Preco = new vrframework.bean.checkBox.VRCheckBox();
@@ -473,7 +474,6 @@ public class NATISistemasGUI extends VRInternalFrame {
         chkT1NCM = new vrframework.bean.checkBox.VRCheckBox();
         chkOfertas = new vrframework.bean.checkBox.VRCheckBox();
         chkT1CEST = new vrframework.bean.checkBox.VRCheckBox();
-        chkTemArquivoBalanca = new vrframework.bean.checkBox.VRCheckBox();
         chkDtAlteracao = new vrframework.bean.checkBox.VRCheckBox();
         chkAssociado = new vrframework.bean.checkBox.VRCheckBox();
         chkMargem = new vrframework.bean.checkBox.VRCheckBox();
@@ -600,6 +600,9 @@ public class NATISistemasGUI extends VRInternalFrame {
         });
         vRPanel7.add(chkMercadologico);
 
+        chkManterBalanca.setText("Manter Balança");
+        vRPanel7.add(chkManterBalanca);
+
         chkProdutos.setText("Produtos");
         chkProdutos.setEnabled(true);
         chkProdutos.addActionListener(new java.awt.event.ActionListener() {
@@ -709,14 +712,6 @@ public class NATISistemasGUI extends VRInternalFrame {
 
         chkT1CEST.setText("CEST");
         vRPanel7.add(chkT1CEST);
-
-        chkTemArquivoBalanca.setText("Tem Arquivo Balança");
-        chkTemArquivoBalanca.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chkTemArquivoBalancaActionPerformed(evt);
-            }
-        });
-        vRPanel7.add(chkTemArquivoBalanca);
 
         chkDtAlteracao.setText("Data Alteração");
         vRPanel7.add(chkDtAlteracao);
@@ -1344,10 +1339,6 @@ public class NATISistemasGUI extends VRInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_chkPermiteRotativoChequeActionPerformed
 
-    private void chkTemArquivoBalancaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkTemArquivoBalancaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_chkTemArquivoBalancaActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;
     private vrframework.bean.button.VRButton btnMigrar;
@@ -1373,6 +1364,7 @@ public class NATISistemasGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkIcmsEntrada;
     private vrframework.bean.checkBox.VRCheckBox chkIcmsSaida;
     private javax.swing.JCheckBox chkIcmsSaidaNF;
+    private vrframework.bean.checkBox.VRCheckBox chkManterBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkMargem;
     private javax.swing.JCheckBox chkMargemSobreVenda;
     private vrframework.bean.checkBox.VRCheckBox chkMercadologico;
@@ -1404,7 +1396,6 @@ public class NATISistemasGUI extends VRInternalFrame {
     private vrframework.bean.checkBox.VRCheckBox chkT1PisCofins;
     private vrframework.bean.checkBox.VRCheckBox chkT1Preco;
     private vrframework.bean.checkBox.VRCheckBox chkT1ProdMercadologico;
-    private vrframework.bean.checkBox.VRCheckBox chkTemArquivoBalanca;
     private vrframework.bean.checkBox.VRCheckBox chkTemArquivoBalancaUnificacao;
     private vrframework.bean.checkBox.VRCheckBox chkTemFicha;
     private vrframework.bean.checkBox.VRCheckBox chkTipoEmbalagemEAN;

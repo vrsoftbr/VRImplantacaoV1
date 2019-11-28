@@ -1,6 +1,5 @@
 package vrimplantacao2.dao.interfaces;
 
-import com.microsoft.sqlserver.jdbc.SQLServerDriver;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -19,6 +18,7 @@ import vrimplantacao2.vo.importacao.MercadologicoIMP;
 public class NATISistemasDAO extends InterfaceDAO {
 
     public String v_lojaMesmoId;
+    public boolean usaArqBal = false;
 
     @Override
     public String getSistema() {
@@ -91,9 +91,15 @@ public class NATISistemasDAO extends InterfaceDAO {
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
                     imp.setEan(rst.getString("ean"));
-                    //imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                    //imp.seteBalanca(rst.getBoolean("ebalanca"));
+                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
                     imp.setValidade(rst.getInt("validade"));
+                    
+                    if(imp.getEan() != null && !"".equals(imp.getEan())) {
+                        if(imp.getEan().length() < 7 && rst.getInt("ebalanca") == 1) {
+                            imp.seteBalanca(true);
+                        }
+                    }
+                    
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
                     imp.setCodMercadologico1(rst.getString("codMercadologico1"));
@@ -112,40 +118,6 @@ public class NATISistemasDAO extends InterfaceDAO {
                     imp.setIcmsAliqEntrada(rst.getDouble("icmsAliqEntrada"));
                     imp.setIcmsCstSaida(rst.getInt("icmsCstSaida"));
                     imp.setIcmsAliqSaida(rst.getDouble("icmsAliqSaida"));
-
-                    String tipoembalagem = rst.getString("tipoembalagem");
-
-                    if (tipoembalagem.contains("KG")) {
-
-                        if (rst.getInt("ebalanca") == 1) {
-                            imp.setTipoEmbalagem("UN");
-                        } else {
-                            imp.setTipoEmbalagem("KG");
-                        }
-
-                    } else {
-
-                        switch (rst.getInt("ebalanca")) {
-                            case 0: {
-                                imp.setTipoEmbalagem("KG");
-                                imp.seteBalanca(true);
-                            }
-                            ;
-                            break;
-                            case 2: {
-                                imp.setTipoEmbalagem("UN");
-                                imp.seteBalanca(true);
-                            }
-                            ;
-                            break;
-                            default: {
-                                imp.setTipoEmbalagem("UN");
-                                imp.seteBalanca(false);
-                            }
-                            ;
-                            break;
-                        }
-                    }
 
                     result.add(imp);
                 }
@@ -184,7 +156,8 @@ public class NATISistemasDAO extends InterfaceDAO {
                     + "     c.vrlimite as limiteCompra\n"
                     + "from dbo.dlv_Clientes c\n"
                     + "     left join dbo.dlv_CEPs e\n"
-                    + "         on e.idcep = c.idcep"
+                    + "         on e.idcep = c.idcep \n"
+                    + "where c.idcliente > 0"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();

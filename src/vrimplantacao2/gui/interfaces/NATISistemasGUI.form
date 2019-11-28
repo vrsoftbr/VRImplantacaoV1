@@ -195,6 +195,11 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkMercadologicoActionPerformed"/>
                   </Events>
                 </Component>
+                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkManterBalanca">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Manter Balan&#xe7;a"/>
+                  </Properties>
+                </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkProdutos">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Produtos"/>
@@ -368,14 +373,6 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="CEST"/>
                   </Properties>
-                </Component>
-                <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkTemArquivoBalanca">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" value="Tem Arquivo Balan&#xe7;a"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkTemArquivoBalancaActionPerformed"/>
-                  </Events>
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkDtAlteracao">
                   <Properties>
