@@ -9,6 +9,7 @@ import vrimplantacao.classe.ConexaoSqlServer;
 import vrimplantacao2.dao.cadastro.Estabelecimento;
 import vrimplantacao2.vo.importacao.ProdutoIMP;
 import vrimplantacao2.vo.importacao.ClienteIMP;
+import vrimplantacao2.vo.importacao.CreditoRotativoIMP;
 import vrimplantacao2.vo.importacao.MercadologicoIMP;
 
 /**
@@ -16,6 +17,7 @@ import vrimplantacao2.vo.importacao.MercadologicoIMP;
  * @author Alan
  */
 public class NATISistemasDAO extends InterfaceDAO {
+
     public String v_lojaMesmoId;
 
     @Override
@@ -82,15 +84,15 @@ public class NATISistemasDAO extends InterfaceDAO {
             )) {
                 while (rst.next()) {
                     ProdutoIMP imp = new ProdutoIMP();
-                    
+
                     imp.setImportLoja(getLojaOrigem());
                     imp.setImportSistema(getSistema());
                     imp.setImportId(rst.getString("importid"));
                     imp.setDataCadastro(rst.getDate("datacadastro"));
                     imp.setDataAlteracao(rst.getDate("dataalteracao"));
                     imp.setEan(rst.getString("ean"));
-                    imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
-                    imp.seteBalanca(rst.getBoolean("ebalanca"));
+                    //imp.setTipoEmbalagem(rst.getString("tipoembalagem"));
+                    //imp.seteBalanca(rst.getBoolean("ebalanca"));
                     imp.setValidade(rst.getInt("validade"));
                     imp.setDescricaoCompleta(rst.getString("descricaocompleta"));
                     imp.setDescricaoReduzida(rst.getString("descricaoreduzida"));
@@ -110,7 +112,41 @@ public class NATISistemasDAO extends InterfaceDAO {
                     imp.setIcmsAliqEntrada(rst.getDouble("icmsAliqEntrada"));
                     imp.setIcmsCstSaida(rst.getInt("icmsCstSaida"));
                     imp.setIcmsAliqSaida(rst.getDouble("icmsAliqSaida"));
-                    
+
+                    String tipoembalagem = rst.getString("tipoembalagem");
+
+                    if (tipoembalagem.contains("KG")) {
+
+                        if (rst.getInt("ebalanca") == 1) {
+                            imp.setTipoEmbalagem("UN");
+                        } else {
+                            imp.setTipoEmbalagem("KG");
+                        }
+
+                    } else {
+
+                        switch (rst.getInt("ebalanca")) {
+                            case 0: {
+                                imp.setTipoEmbalagem("KG");
+                                imp.seteBalanca(true);
+                            }
+                            ;
+                            break;
+                            case 2: {
+                                imp.setTipoEmbalagem("UN");
+                                imp.seteBalanca(true);
+                            }
+                            ;
+                            break;
+                            default: {
+                                imp.setTipoEmbalagem("UN");
+                                imp.seteBalanca(false);
+                            }
+                            ;
+                            break;
+                        }
+                    }
+
                     result.add(imp);
                 }
             }
@@ -122,36 +158,37 @@ public class NATISistemasDAO extends InterfaceDAO {
     public List<ClienteIMP> getClientes() throws Exception {
         List<ClienteIMP> result = new ArrayList<>();
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
-            try (ResultSet rst = stm.executeQuery("select\n"
-                    + "	c.idcliente as id,\n"
-                    + "	c.stcpf_cnpj as cnpj,\n"
-                    + "	c.strg_ie as inscricaoestadual,\n"
-                    + "	c.stcliente as razao,\n"
-                    + "	c.stnomefantasia as fantasia,\n"
-                    + "	c.flativo as ativo,\n"
-                    + "	c.flbloqueado as bloqueado,\n"
-                    + "	e.stendereco as endereco,\n"
-                    + "	c.nrnumero as numero,\n"
-                    + "	c.stcomplemento as complemento,\n"
-                    + "	e.stbairro as bairro,\n"
-                    + "	e.stcidade as municipio,\n"
-                    + "	e.stestado as uf,\n"
-                    + "	e.stcep as cep,\n"
-                    + "	c.dtnascimento as dataNascimento,\n"
-                    + "	c.dtcadastro as dataCadastro,\n"
-                    + "	c.stsexo as sexo,\n"
-                    + "	c.stempresa as empresa,\n"
-                    + "	c.vrlimite as valorLimite,\n"
-                    + "	c.stobs as observacao,\n"
-                    + "	c.stemail as email,\n"
-                    + "	c.vrlimite as limiteCompra\n"
+            try (ResultSet rst = stm.executeQuery(
+                    "select\n"
+                    + "     c.idcliente as id,\n"
+                    + "     c.stcpf_cnpj as cnpj,\n"
+                    + "     c.strg_ie as inscricaoestadual,\n"
+                    + "     c.stcliente as razao,\n"
+                    + "     c.stnomefantasia as fantasia,\n"
+                    + "     c.flativo as ativo,\n"
+                    + "     c.flbloqueado as bloqueado,\n"
+                    + "     e.stendereco as endereco,\n"
+                    + "     c.nrnumero as numero,\n"
+                    + "     c.stcomplemento as complemento,\n"
+                    + "     e.stbairro as bairro,\n"
+                    + "     e.stcidade as municipio,\n"
+                    + "     e.stestado as uf,\n"
+                    + "     e.stcep as cep,\n"
+                    + "     c.dtnascimento as dataNascimento,\n"
+                    + "     c.dtcadastro as dataCadastro,\n"
+                    + "     c.stsexo as sexo,\n"
+                    + "     c.stempresa as empresa,\n"
+                    + "     c.vrlimite as valorLimite,\n"
+                    + "     c.stobs as observacao,\n"
+                    + "     c.stemail as email,\n"
+                    + "     c.vrlimite as limiteCompra\n"
                     + "from dbo.dlv_Clientes c\n"
-                    + "	left join dbo.dlv_CEPs e\n"
-                    + "     on e.idcep = c.idcep"
+                    + "     left join dbo.dlv_CEPs e\n"
+                    + "         on e.idcep = c.idcep"
             )) {
                 while (rst.next()) {
                     ClienteIMP imp = new ClienteIMP();
-                    
+
                     imp.setId(rst.getString("id"));
                     imp.setCnpj(rst.getString("cnpj"));
                     imp.setInscricaoestadual(rst.getString("inscricaoestadual"));
@@ -174,7 +211,7 @@ public class NATISistemasDAO extends InterfaceDAO {
                     imp.setLimiteCompra(rst.getDouble("limitecompra"));
                     imp.setObservacao(rst.getString("observacao"));
                     imp.setEmail(rst.getString("email"));
-                    
+
                     result.add(imp);
                 }
             }
@@ -189,27 +226,66 @@ public class NATISistemasDAO extends InterfaceDAO {
         try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
             try (ResultSet rst = stm.executeQuery(
                     "select\n"
-                    + "	c.idCategoria as Merc1ID,\n"
-                    + "	c.stCategoria as Merc1Descricao,\n"
-                    + "	s.idSubCategoria as Merc2ID,\n"
-                    + "	s.stSubCategoria as Merc2Descricao\n"
+                    + "     c.idCategoria as Merc1ID,\n"
+                    + "     c.stCategoria as Merc1Descricao,\n"
+                    + "     s.idSubCategoria as Merc2ID,\n"
+                    + "     s.stSubCategoria as Merc2Descricao\n"
                     + "from dbo.prd_Categorias c\n"
-                    + "	left join dbo.prd_SubCategorias s\n"
+                    + "     left join dbo.prd_SubCategorias s\n"
                     + "		on c.idCategoria = s.idCategoria\n"
                     + "order by 1,3"
             )) {
                 while (rst.next()) {
                     MercadologicoIMP imp = new MercadologicoIMP();
-                    
+
                     imp.setImportSistema(getSistema());
                     imp.setImportLoja(getLojaOrigem());
-                    
+
                     imp.setMerc1ID(rst.getString("Merc1ID"));
                     imp.setMerc1Descricao(rst.getString("Merc1Descricao"));
                     imp.setMerc2ID(rst.getString("Merc2ID"));
                     imp.setMerc2Descricao(rst.getString("Merc2Descricao"));
                     imp.setMerc3ID("1");
                     imp.setMerc3Descricao(rst.getString("Merc2Descricao"));
+                    result.add(imp);
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<CreditoRotativoIMP> getCreditoRotativo() throws Exception {
+        List<CreditoRotativoIMP> result = new ArrayList<>();
+
+        try (Statement stm = ConexaoSqlServer.getConexao().createStatement()) {
+            try (ResultSet rst = stm.executeQuery(
+                    "select \n"
+                    + "     idcliente as id,\n"
+                    + "     getdate() as dataEmissao,\n"
+                    + "     idCliente*2 as numeroCupom,\n"
+                    + "     1 as ecf,\n"
+                    + "     case when vrsaldo < 0 then vrsaldo*-1 else vrsaldo end as valor,\n"
+                    + "     stobsdelivery as observacao,\n"
+                    + "     idcliente as idCliente,\n"
+                    + "     getdate()+30 as dataVencimento,\n"
+                    + "     stcpf_cnpj as cnpjCliente\n"
+                    + "from dlv_Clientes\n"
+                    + "     where vrsaldo <> 0"
+            )) {
+                while (rst.next()) {
+                    CreditoRotativoIMP imp = new CreditoRotativoIMP();
+
+                    imp.setId(rst.getString("id"));
+                    imp.setDataEmissao(rst.getDate("dataemissao"));
+                    imp.setNumeroCupom(rst.getString("numerocupom"));
+                    imp.setEcf("1");
+                    imp.setValor(rst.getDouble("valor"));
+                    imp.setObservacao(rst.getString("observacao"));
+                    imp.setIdCliente(rst.getString("idcliente"));
+                    imp.setDataVencimento(rst.getDate("datavencimento"));
+                    imp.setCnpjCliente(rst.getString("cnpjcliente"));
+
                     result.add(imp);
                 }
             }

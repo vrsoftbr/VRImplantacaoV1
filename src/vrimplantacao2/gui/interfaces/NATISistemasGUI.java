@@ -161,7 +161,8 @@ public class NATISistemasGUI extends VRInternalFrame {
     }
 
     public void importarTabelas() throws Exception {
-        Thread thread = new Thread() {
+        Thread thread;
+        thread = new Thread() {
             int idLojaVR;
             String idLojaCliente;
             String lojaMesmoId;
@@ -200,7 +201,7 @@ public class NATISistemasGUI extends VRInternalFrame {
                             importador.importarMercadologico();
                         }
                         if (chkProdutos.isSelected()) {
-                           importador.importarProduto();
+                            importador.importarProduto(chkTemArquivoBalanca.isSelected());
                         }
 
                         {
@@ -303,15 +304,15 @@ public class NATISistemasGUI extends VRInternalFrame {
                                 importador.atualizarProdutos(opcoes);
                             }
                         }
-
-                       
+                        
+                        
                         if (chkT1EAN.isSelected()) {
                             importador.importarEAN();
                         }
                         if (chkT1EANemBranco.isSelected()) {
                             importador.importarEANemBranco();
                         }
-                   
+                        
                         
                         if (chkFornecedor.isSelected()) {
                             importador.importarFornecedor();
@@ -534,7 +535,7 @@ public class NATISistemasGUI extends VRInternalFrame {
         vRTextArea1.setRows(5);
         jScrollPane1.setViewportView(vRTextArea1);
 
-        setTitle("Importação GetWay");
+        setTitle("Importação NATISistemas");
         setToolTipText("");
 
         vRToolBarPadrao3.setRollover(true);
@@ -710,6 +711,11 @@ public class NATISistemasGUI extends VRInternalFrame {
         vRPanel7.add(chkT1CEST);
 
         chkTemArquivoBalanca.setText("Tem Arquivo Balança");
+        chkTemArquivoBalanca.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chkTemArquivoBalancaActionPerformed(evt);
+            }
+        });
         vRPanel7.add(chkTemArquivoBalanca);
 
         chkDtAlteracao.setText("Data Alteração");
@@ -1337,6 +1343,10 @@ public class NATISistemasGUI extends VRInternalFrame {
     private void chkPermiteRotativoChequeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkPermiteRotativoChequeActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_chkPermiteRotativoChequeActionPerformed
+
+    private void chkTemArquivoBalancaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkTemArquivoBalancaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_chkTemArquivoBalancaActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnConectar;

@@ -19,7 +19,7 @@
     </Container>
   </NonVisualComponents>
   <Properties>
-    <Property name="title" type="java.lang.String" value="Importa&#xe7;&#xe3;o GetWay"/>
+    <Property name="title" type="java.lang.String" value="Importa&#xe7;&#xe3;o NATISistemas"/>
     <Property name="toolTipText" type="java.lang.String" value=""/>
   </Properties>
   <SyntheticProperties>
@@ -373,6 +373,9 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Tem Arquivo Balan&#xe7;a"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkTemArquivoBalancaActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="vrframework.bean.checkBox.VRCheckBox" name="chkDtAlteracao">
                   <Properties>
