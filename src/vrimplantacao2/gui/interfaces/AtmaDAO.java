@@ -1010,7 +1010,8 @@ public class AtmaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "from dbo.VND_CUPOM ven\n"
                     + "where ven.ID_EMP = " + idLojaCliente + "\n"
                     + "and ven.DT_VENDA between '" + dataInicio + "' and '" + dataTermino + "'\n"
-                    + "and ven.CNC = 'NAO'";
+                    + "and ven.CNC = 'NAO'\n"
+                    + "and ven.STATUS_NFC = 'ENVIADO'";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
@@ -1172,7 +1173,8 @@ public class AtmaDAO extends InterfaceDAO implements MapaTributoProvider {
                     + "      from VND_CUPOM "
                     + "     where ID_EMP = " + idLojaCliente + "\n"
                     + "       and DT_VENDA between '" + dataInicio + "' and '" + dataTermino + "'"
-                    + "       and CNC = 'NAO')";
+                    + "       and CNC = 'NAO'"
+                    + "       and STATUS_NFC = 'ENVIADO')";
 
             LOG.log(Level.FINE, "SQL da venda: " + sql);
             rst = stm.executeQuery(sql);
