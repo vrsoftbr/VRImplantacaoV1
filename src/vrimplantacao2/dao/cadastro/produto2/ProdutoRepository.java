@@ -445,6 +445,7 @@ public class ProdutoRepository {
             System.gc();
 
             ProdutoIDStack idStack = provider.getIDStack();
+            java.sql.Date dataHoraImportacao = Utils.getDataAtual();
 
             boolean unificarProdutoBalanca = provider.getOpcoes().contains(OpcaoProduto.UNIFICAR_PRODUTO_BALANCA);
             if (provider.getOpcoes().contains(OpcaoProduto.IMPORTAR_NAO_TRANSFORMAR_EAN_EM_UN)) {
@@ -548,6 +549,7 @@ public class ProdutoRepository {
                 if (!provider.anterior().cadastrado(keys.get(2))) {
                     ProdutoAnteriorVO anterior = converterImpEmAnterior(imp);
                     anterior.setCodigoAtual(codigoAtual);
+                    anterior.setDataHora(dataHoraImportacao);
                     provider.anterior().salvar(anterior);
                 }
                 if (!provider.eanAnterior().cadastrado(imp.getImportId(), imp.getEan())) {

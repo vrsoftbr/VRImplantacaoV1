@@ -491,12 +491,6 @@ public class GetWayDAO extends InterfaceDAO implements MapaTributoProvider {
                     imp.setIcmsCstSaida(rs.getInt("cst_debito_nf"));
                     imp.setIcmsReducaoSaida(rs.getDouble("icms_debito_red_nf"));
                     
-                    if("23298".equals(imp.getImportId())) {
-                        System.out.println("Prod: " + imp.getImportId() + ", "
-                        + "Icms deb. nf: " + imp.getIcmsAliqSaida() + ", Icms cst nf: " + imp.getIcmsCstSaida() +
-                        ", Icms red. nf: " + imp.getIcmsReducaoSaida());
-                    }
-                    
                     //Aliquota Crédito
                     imp.setIcmsAliqEntrada(rs.getInt("icms_credito_nf"));
                     imp.setIcmsCstEntrada(0);
