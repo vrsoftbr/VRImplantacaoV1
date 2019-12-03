@@ -116,4 +116,28 @@ public class ConexaoDBF {
     public void forceCommit() throws Exception {
         con.createStatement().execute("commit");
     }
+    
+    public static Connection getNewConnection(String i_database) throws Exception {
+
+        if (!usarOdbc) {
+            Class.forName("com.hxtt.sql.dbf.DBFDriver");
+        } else {
+            Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
+        }
+
+        dataBase = i_database;
+        
+        try {
+            if (!usarOdbc) {
+                con = DriverManager.getConnection("jdbc:DBF:/" + i_database+"?loadIndices=false");
+            } else {
+                con = DriverManager.getConnection("jdbc:odbc:DRIVER={Driver do Microsoft dBase (*.dbf)};DefaultDir=" + i_database);
+            }
+            
+            return con;
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+    
 }

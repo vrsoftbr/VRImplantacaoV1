@@ -15,6 +15,7 @@ import vrframework.bean.table.VRColumnTable;
 import vrframework.classe.Util;
 import vrframework.classe.VRException;
 import vrimplantacao.classe.ConexaoDB2;
+import vrimplantacao.classe.ConexaoDBF;
 import vrimplantacao.classe.ConexaoFirebird;
 import vrimplantacao.classe.ConexaoOracle;
 import vrimplantacao.classe.ConexaoSqlServer;
@@ -232,6 +233,29 @@ public class SQLEditor extends VRInternalFrame {
                         editor.txtSenha.getText()
                 );
             }
+        },
+        DBF {
+            private Connection conn;
+            
+            @Override
+            public String toString() {
+                return "DBF";
+            }
+            
+            @Override 
+            public void conectar(final SQLEditor editor) throws Exception {
+                if (conn != null) {
+                    conn.close();
+                }
+                conn = ConexaoDBF.getNewConnection(
+                        editor.txtDatabase.getArquivo()
+                );
+            }
+            
+            @Override
+            public Connection getConexao() throws Exception {
+                return conn;
+            }
         };
         
         public abstract Connection getConexao() throws Exception;
@@ -271,20 +295,26 @@ public class SQLEditor extends VRInternalFrame {
     
     public void validarDadosAcesso() throws Exception {
         
-        if (txtHost.getText().isEmpty()) {
-            throw new VRException("Favor informar host do banco de dados!");
-        }
-        if (txtPorta.getText().isEmpty()) {
-            throw new VRException("Favor informar a porta do banco de dados!");
-        }
-        if (txtDatabase.getArquivo().isEmpty()) {
-            throw new VRException("Favor informar nome do banco de dados!");
-        }
-        if (txtSenha.getText().isEmpty()) {
-            throw new VRException("Favor informar a senha do banco de dados!");
-        }
-        if (txtUsuario.getText().isEmpty()) {
-            throw new VRException("Favor informar o usuário do banco de dados !");
+        if (cmbConexoes.getSelectedIndex() == 4) {
+            if (txtDatabase.getArquivo().isEmpty()) {
+                throw new VRException("Favor informar nome do banco de dados!");
+            }
+        } else {
+            if (txtHost.getText().isEmpty()) {
+                throw new VRException("Favor informar host do banco de dados!");
+            }
+            if (txtPorta.getText().isEmpty()) {
+                throw new VRException("Favor informar a porta do banco de dados!");
+            }
+            if (txtDatabase.getArquivo().isEmpty()) {
+                throw new VRException("Favor informar nome do banco de dados!");
+            }
+            if (txtSenha.getText().isEmpty()) {
+                throw new VRException("Favor informar a senha do banco de dados!");
+            }
+            if (txtUsuario.getText().isEmpty()) {
+                throw new VRException("Favor informar o usuário do banco de dados !");
+            }
         }
 
         Conexao selected = (Conexao) cmbConexoes.getSelectedItem();
