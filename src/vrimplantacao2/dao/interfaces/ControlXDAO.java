@@ -103,6 +103,7 @@ public class ControlXDAO extends InterfaceDAO {
                     + "	p.cSituacaoTribFora id_aliquota_debito_nf_fe,\n"
                     + "	p.cSituacaoTributaria id_aliquota_debito,\n"
                     + "	p.nIcms_Fora icms_fora_estado,\n"
+                    + " p.nIcms_No_Estado icms_dentro_estado,\n"        
                     + "	p.nCST cst,\n"
                     + "	p.Situacao situacaocadastro,\n"
                     + "	p.preco,\n"
@@ -171,13 +172,23 @@ public class ControlXDAO extends InterfaceDAO {
 
                     //Icms Débito
                     imp.setIcmsCstSaida(rs.getInt("cst"));
-                    imp.setIcmsAliqSaida(rs.getDouble("icms_fora_estado"));
+                    imp.setIcmsAliqSaida(rs.getDouble("icms_dentro_estado"));
                     imp.setIcmsReducaoSaida(0);
+                    
+                    //Icms Débito Fora Estado
+                    imp.setIcmsCstSaidaForaEstado(rs.getInt("cst"));
+                    imp.setIcmsAliqSaidaForaEstado(rs.getDouble("icms_fora_estado"));
+                    imp.setIcmsReducaoSaidaForaEstado(0);
 
                     //Icms Crédito
                     imp.setIcmsCstEntrada(rs.getInt("cst"));
-                    imp.setIcmsAliqEntrada(rs.getDouble("icms_fora_estado"));
+                    imp.setIcmsAliqEntrada(rs.getDouble("icms_dentro_estado"));
                     imp.setIcmsReducaoEntrada(0);
+                    
+                    //Icms Crédito Fora Estado
+                    imp.setIcmsCstEntrada(rs.getInt("cst"));
+                    imp.setIcmsAliqEntradaForaEstado(rs.getDouble("icms_fora_estado"));
+                    imp.setIcmsReducaoEntradaForaEstado(0);
 
                     imp.setNcm(rs.getString("ncm"));
                     imp.setCest(rs.getString("cest"));
